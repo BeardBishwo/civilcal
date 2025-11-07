@@ -61,6 +61,8 @@ $controllerMap = [
     'Calculator' => 'App\\Controllers\\CalculatorController',
     'Auth' => 'App\\Controllers\\AuthController',
     'User' => 'App\\Controllers\\UserController',
+    'Profile' => 'App\\Controllers\\ProfileController',
+    'History' => 'App\\Controllers\\HistoryController',
     'Admin' => 'App\\Controllers\\Admin\\DashboardController',
     'Api' => 'App\\Controllers\\ApiController'
 ];
