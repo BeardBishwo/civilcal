@@ -1,0 +1,421 @@
+<?php
+/**
+ * Bishwo Calculator - Installation Wizard
+ * Main Installation Entry Point
+ * 
+ * @package BishwoCalculator
+ * @version 1.0.0
+ */
+
+// Start session for installation data persistence
+session_start();
+
+// Define installation steps
+define('INSTALL_STEPS', [
+    'welcome' => 'Welcome',
+    'requirements' => 'System Requirements',
+    'database' => 'Database Configuration',
+    'admin' => 'Administrator Account',
+    'email' => 'Email Configuration',
+    'finish' => 'Installation Complete'
+]);
+
+// Get current step from URL parameter
+$currentStep = isset($_GET['step']) ? $_GET['step'] : 'welcome';
+$stepIndex = array_search($currentStep, array_keys(INSTALL_STEPS));
+
+// Redirect to welcome if invalid step
+if ($stepIndex === false) {
+    $currentStep = 'welcome';
+    $stepIndex = 0;
+}
+
+// Check if installation is already completed
+if (file_exists(__DIR__ . '/../storage/install.lock') && $currentStep !== 'finish') {
+    header('Location: ../');
+    exit;
+}
+
+// Handle form submissions
+$errors = [];
+$success = false;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+    
+    switch ($action) {
+        case 'save_requirements':
+            // Requirements step completed
+            $_SESSION['install_requirements_ok'] = true;
+            redirectToNextStep();
+            break;
+            
+        case 'save_database':
+            $errors = handleDatabaseStep();
+            if (empty($errors)) {
+                $_SESSION['install_database_ok'] = true;
+                redirectToNextStep();
+            }
+            break;
+            
+        case 'save_admin':
+            $errors = handleAdminStep();
+            if (empty($errors)) {
+                $_SESSION['install_admin_ok'] = true;
+                redirectToNextStep();
+            }
+            break;
+            
+        case 'save_email':
+            $errors = handleEmailStep();
+            if (empty($errors)) {
+                $_SESSION['install_email_ok'] = true;
+                redirectToNextStep();
+            }
+            break;
+            
+        case 'complete_installation':
+            $errors = handleInstallationCompletion();
+            if (empty($errors)) {
+                $success = true;
+            }
+            break;
+    }
+}
+
+// Helper Functions
+function redirectToNextStep() {
+    $currentStep = $_GET['step'] ?? 'welcome';
+    $steps = array_keys(INSTALL_STEPS);
+    $currentIndex = array_search($currentStep, $steps);
+    
+    if ($currentIndex < count($steps) - 1) {
+        $nextStep = $steps[$currentIndex + 1];
+        header("Location: index.php?step=$nextStep");
+        exit;
+    }
+}
+
+function handleDatabaseStep() {
+    $errors = [];
+    
+    // Validate database configuration
+    $dbHost = trim($_POST['db_host'] ?? '');
+    $dbName = trim($_POST['db_name'] ?? '');
+    $dbUser = trim($_POST['db_user'] ?? '');
+    $dbPass = $_POST['db_pass'] ?? '';
+    
+    if (empty($dbHost)) $errors[] = 'Database host is required';
+    if (empty($dbName)) $errors[] = 'Database name is required';
+    if (empty($dbUser)) $errors[] = 'Database username is required';
+    
+    if (empty($errors)) {
+        // Test database connection
+        try {
+            $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPass);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            
+            // Save database configuration to session
+            $_SESSION['db_config'] = [
+                'host' => $dbHost,
+                'name' => $dbName,
+                'user' => $dbUser,
+                'pass' => $dbPass
+            ];
+        } catch (PDOException $e) {
+            $errors[] = 'Database connection failed: ' . $e->getMessage();
+        }
+    }
+    
+    return $errors;
+}
+
+function handleAdminStep() {
+    $errors = [];
+    
+    $adminName = trim($_POST['admin_name'] ?? '');
+    $adminEmail = trim($_POST['admin_email'] ?? '');
+    $adminPass = $_POST['admin_pass'] ?? '';
+    $adminPassConfirm = $_POST['admin_pass_confirm'] ?? '';
+    
+    if (empty($adminName)) $errors[] = 'Administrator name is required';
+    if (empty($adminEmail)) $errors[] = 'Administrator email is required';
+    if (empty($adminPass)) $errors[] = 'Administrator password is required';
+    if ($adminPass !== $adminPassConfirm) $errors[] = 'Passwords do not match';
+    if (strlen($adminPass) < 6) $errors[] = 'Password must be at least 6 characters long';
+    
+    if (empty($errors)) {
+        // Save admin configuration
+        $_SESSION['admin_config'] = [
+            'name' => $adminName,
+            'email' => $adminEmail,
+            'password' => password_hash($adminPass, PASSWORD_DEFAULT)
+        ];
+    }
+    
+    return $errors;
+}
+
+function handleEmailStep() {
+    $errors = [];
+    
+    $smtpEnabled = isset($_POST['smtp_enabled']);
+    $_SESSION['email_config'] = [
+        'smtp_enabled' => $smtpEnabled
+    ];
+    
+    if ($smtpEnabled) {
+        $smtpHost = trim($_POST['smtp_host'] ?? '');
+        $smtpPort = trim($_POST['smtp_port'] ?? '');
+        $smtpUser = trim($_POST['smtp_user'] ?? '');
+        $smtpPass = $_POST['smtp_pass'] ?? '';
+        
+        if (empty($smtpHost)) $errors[] = 'SMTP host is required';
+        if (empty($smtpPort)) $errors[] = 'SMTP port is required';
+        if (empty($smtpUser)) $errors[] = 'SMTP username is required';
+        
+        if (empty($errors)) {
+            $_SESSION['email_config'] = array_merge($_SESSION['email_config'], [
+                'host' => $smtpHost,
+                'port' => $smtpPort,
+                'user' => $smtpUser,
+                'pass' => $smtpPass
+            ]);
+        }
+    }
+    
+    return $errors;
+}
+
+function handleInstallationCompletion() {
+    $errors = [];
+    
+    try {
+        // Create .env file
+        $envContent = generateEnvFile();
+        $envPath = __DIR__ . '/../.env';
+        
+        if (file_put_contents($envPath, $envContent) === false) {
+            $errors[] = 'Failed to create .env file';
+        }
+        
+        // Create installation lock file
+        $lockPath = __DIR__ . '/../storage/install.lock';
+        if (file_put_contents($lockPath, date('Y-m-d H:i:s')) === false) {
+            $errors[] = 'Failed to create installation lock file';
+        }
+        
+        // Create storage directories if they don't exist
+        $storageDirs = [
+            __DIR__ . '/../storage/logs',
+            __DIR__ . '/../storage/cache',
+            __DIR__ . '/../storage/sessions'
+        ];
+        
+        foreach ($storageDirs as $dir) {
+            if (!file_exists($dir)) {
+                mkdir($dir, 0755, true);
+            }
+        }
+        
+        // Run database migrations
+        if (!empty($_SESSION['db_config'])) {
+            runDatabaseMigrations();
+        }
+        
+    } catch (Exception $e) {
+        $errors[] = 'Installation completion failed: ' . $e->getMessage();
+    }
+    
+    return $errors;
+}
+
+function generateEnvFile() {
+    $envVars = [
+        'APP_NAME' => 'Bishwo Calculator',
+        'APP_ENV' => 'production',
+        'APP_DEBUG' => 'false',
+        'APP_URL' => getBaseUrl(),
+        'DB_CONNECTION' => 'mysql',
+        'DB_HOST' => $_SESSION['db_config']['host'] ?? 'localhost',
+        'DB_PORT' => '3306',
+        'DB_DATABASE' => $_SESSION['db_config']['name'] ?? '',
+        'DB_USERNAME' => $_SESSION['db_config']['user'] ?? '',
+        'DB_PASSWORD' => $_SESSION['db_config']['pass'] ?? '',
+        'MAIL_MAILER' => isset($_SESSION['email_config']['smtp_enabled']) && $_SESSION['email_config']['smtp_enabled'] ? 'smtp' : 'log',
+        'MAIL_HOST' => $_SESSION['email_config']['host'] ?? '',
+        'MAIL_PORT' => $_SESSION['email_config']['port'] ?? '587',
+        'MAIL_USERNAME' => $_SESSION['email_config']['user'] ?? '',
+        'MAIL_PASSWORD' => $_SESSION['email_config']['pass'] ?? '',
+        'MAIL_ENCRYPTION' => 'tls',
+        'MAIL_FROM_ADDRESS' => $_SESSION['admin_config']['email'] ?? '',
+        'MAIL_FROM_NAME' => $_SESSION['admin_config']['name'] ?? 'Bishwo Calculator',
+    ];
+    
+    $content = "# Bishwo Calculator Environment Configuration\n";
+    $content .= "# Generated on " . date('Y-m-d H:i:s') . "\n\n";
+    
+    foreach ($envVars as $key => $value) {
+        $content .= "$key=$value\n";
+    }
+    
+    return $content;
+}
+
+function runDatabaseMigrations() {
+    $migrationsDir = __DIR__ . '/../database/migrations';
+    if (!is_dir($migrationsDir)) {
+        return;
+    }
+    
+    // Get all migration files
+    $migrationFiles = glob($migrationsDir . '/*.php');
+    sort($migrationFiles);
+    
+    $pdo = new PDO(
+        "mysql:host={$_SESSION['db_config']['host']};dbname={$_SESSION['db_config']['name']}", 
+        $_SESSION['db_config']['user'], 
+        $_SESSION['db_config']['pass']
+    );
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+    // Create migrations table if it doesn't exist
+    $pdo->exec("CREATE TABLE IF NOT EXISTS migrations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        migration VARCHAR(255) NOT NULL,
+        batch INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+    
+    // Get executed migrations
+    $executed = $pdo->query("SELECT migration FROM migrations")->fetchAll(PDO::FETCH_COLUMN);
+    
+    // Run new migrations
+    foreach ($migrationFiles as $file) {
+        $migrationName = basename($file);
+        if (!in_array($migrationName, $executed)) {
+            include $file;
+            
+            // Get class name from file
+            $className = pathinfo($file, PATHINFO_FILENAME);
+            if (class_exists($className)) {
+                $migration = new $className();
+                if (method_exists($migration, 'up')) {
+                    $migration->up($pdo);
+                }
+                
+                // Record migration as executed
+                $pdo->prepare("INSERT INTO migrations (migration, batch) VALUES (?, 1)")
+                    ->execute([$migrationName]);
+            }
+        }
+    }
+    
+    // Create admin user
+    if (!empty($_SESSION['admin_config'])) {
+        $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role, status, created_at, updated_at) 
+                              VALUES (?, ?, ?, 'admin', 'active', NOW(), NOW()) 
+                              ON DUPLICATE KEY UPDATE 
+                              name = VALUES(name), password = VALUES(password), updated_at = NOW()");
+        $stmt->execute([
+            $_SESSION['admin_config']['name'],
+            $_SESSION['admin_config']['email'],
+            $_SESSION['admin_config']['password']
+        ]);
+    }
+}
+
+function getBaseUrl() {
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $basePath = dirname($scriptName);
+    if ($basePath === '/') $basePath = '';
+    
+    return $protocol . '://' . $host . $basePath;
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bishwo Calculator - Installation Wizard</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Installation CSS -->
+    <link href="assets/css/install.css" rel="stylesheet">
+</head>
+<body class="install-body">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+                <!-- Header -->
+                <div class="install-header text-center mb-4">
+                    <div class="install-logo">
+                        <i class="fas fa-calculator text-primary fa-3x"></i>
+                    </div>
+                    <h1 class="install-title">Bishwo Calculator</h1>
+                    <p class="install-subtitle">Installation Wizard</p>
+                </div>
+                
+                <!-- Progress Steps -->
+                <div class="install-progress mb-4">
+                    <?php foreach (INSTALL_STEPS as $step => $label): ?>
+                        <?php $isActive = ($step === $currentStep); ?>
+                        <?php $isCompleted = (array_search($step, array_keys(INSTALL_STEPS)) < $stepIndex); ?>
+                        <div class="step-item <?php echo $isActive ? 'active' : ''; ?> <?php echo $isCompleted ? 'completed' : ''; ?>">
+                            <div class="step-number">
+                                <?php if ($isCompleted): ?>
+                                    <i class="fas fa-check"></i>
+                                <?php else: ?>
+                                    <?php echo array_search($step, array_keys(INSTALL_STEPS)) + 1; ?>
+                                <?php endif; ?>
+                            </div>
+                            <div class="step-label"><?php echo $label; ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                
+                <!-- Main Content -->
+                <div class="install-content">
+                    <?php if (!empty($errors)): ?>
+                        <div class="alert alert-danger">
+                            <h5><i class="fas fa-exclamation-triangle"></i> Installation Errors</h5>
+                            <ul class="mb-0">
+                                <?php foreach ($errors as $error): ?>
+                                    <li><?php echo htmlspecialchars($error); ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if ($success): ?>
+                        <div class="alert alert-success">
+                            <h5><i class="fas fa-check-circle"></i> Installation Complete!</h5>
+                            <p>Bishwo Calculator has been successfully installed and is ready to use.</p>
+                            <a href="../" class="btn btn-success">
+                                <i class="fas fa-home"></i> Go to Application
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <?php include "includes/Installer.php"; ?>
+                        <?php
+                        $installer = new Installer();
+                        echo $installer->renderStep($currentStep);
+                        ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom Installation JS -->
+    <script src="assets/js/install.js"></script>
+</body>
+</html>

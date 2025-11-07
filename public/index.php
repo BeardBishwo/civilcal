@@ -9,6 +9,20 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Check if installation is completed
+function isInstalled() {
+    $configFile = BASE_PATH . '/config/installed.lock';
+    $envFile = BASE_PATH . '/.env';
+    
+    return file_exists($configFile) && file_exists($envFile);
+}
+
+// Redirect to installer if not installed
+if (!isInstalled() && !isset($_GET['install'])) {
+    header('Location: /install/');
+    exit;
+}
+
 // Define base path
 define('BASE_PATH', __DIR__ . '/..');
 

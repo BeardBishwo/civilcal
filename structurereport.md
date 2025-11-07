@@ -1,6 +1,6 @@
 # Bishwo Calculator - Project Structure Report
 
-**Generated:** 2025-11-07 16:09:45
+**Generated:** 2025-11-07 19:53:42
 
 ## Project Structure
 
@@ -21,6 +21,7 @@ bishwo_calculator/
 │   ├── Controllers
 │   │   ├── Admin
 │   │   │   ├── DashboardController.php
+│   │   │   ├── EmailManagerController.php
 │   │   │   ├── ModuleController.php
 │   │   │   ├── PluginController.php
 │   │   │   ├── SettingsController.php
@@ -29,6 +30,11 @@ bishwo_calculator/
 │   │   ├── ApiController.php
 │   │   ├── AuthController.php
 │   │   ├── CalculatorController.php
+│   │   ├── CommentController.php
+│   │   ├── ExportController.php
+│   │   ├── HistoryController.php
+│   │   ├── ProfileController.php
+│   │   ├── ShareController.php
 │   │   └── UserController.php
 │   ├── Core
 │   │   ├── Auth.php
@@ -45,14 +51,23 @@ bishwo_calculator/
 │   │   └── CorsMiddleware.php
 │   ├── Models
 │   │   ├── Calculation.php
+│   │   ├── CalculationHistory.php
+│   │   ├── Comment.php
+│   │   ├── EmailResponse.php
+│   │   ├── EmailTemplate.php
+│   │   ├── EmailThread.php
+│   │   ├── ExportTemplate.php
 │   │   ├── Payment.php
 │   │   ├── Project.php
 │   │   ├── Settings.php
+│   │   ├── Share.php
 │   │   ├── Subscription.php
-│   │   └── User.php
+│   │   ├── User.php
+│   │   └── Vote.php
 │   ├── Services
 │   │   ├── CalculatorService.php
 │   │   ├── EmailService.php
+│   │   ├── ExportService.php
 │   │   ├── FileService.php
 │   │   ├── PaymentService.php
 │   │   ├── PluginManager.php
@@ -61,6 +76,8 @@ bishwo_calculator/
 │   ├── Views
 │   │   ├── admin
 │   │   │   ├── dashboard.php
+│   │   │   ├── email-manager
+│   │   │   │   └── dashboard.php
 │   │   │   ├── plugins
 │   │   │   │   └── index.php
 │   │   │   ├── settings
@@ -86,10 +103,18 @@ bishwo_calculator/
 │   │   │   ├── admin.php
 │   │   │   ├── auth.php
 │   │   │   └── main.php
-│   │   └── partials
-│   │       ├── footer.php
-│   │       ├── header.php
-│   │       └── navigation.php
+│   │   ├── partials
+│   │   │   ├── footer.php
+│   │   │   ├── header.php
+│   │   │   └── navigation.php
+│   │   ├── share
+│   │   │   └── public-view.php
+│   │   └── user
+│   │       ├── exports.php
+│   │       ├── history.php
+│   │       ├── modals
+│   │       │   └── profile-modals.php
+│   │       └── profile.php
 │   ├── bootstrap.php
 │   └── routes.php
 ├── composer.json
@@ -100,12 +125,22 @@ bishwo_calculator/
 │   ├── mail.php
 │   └── services.php
 ├── database
-│   └── migrations
-│       ├── 001_create_users_table.php
-│       ├── 001_plugin_theme_system.php
-│       ├── 002_create_subscriptions_table.php
-│       ├── 002_theme_editor_tables.php
-│       └── 003_create
+│   ├── migrations
+│   │   ├── 001_create_users_table.php
+│   │   ├── 001_plugin_theme_system.php
+│   │   ├── 002_create_subscriptions_table.php
+│   │   ├── 002_theme_editor_tables.php
+│   │   ├── 003_create
+│   │   ├── 004_create_calculation_history.php
+│   │   ├── 009_create_export_templates.php
+│   │   ├── 010_add_profile_fields_to_users.php
+│   │   ├── 011_create_shares_table.php
+│   │   ├── 012_create_comments_table.php
+│   │   ├── 013_create_votes_table.php
+│   │   ├── 014_create_email_threads_table.php
+│   │   ├── 015_create_email_responses_table.php
+│   │   └── 016_create_email_templates_table.php
+│   └── run_migration.php
 ├── debug
 │   ├── debug-config.php
 │   ├── error-handler.php
@@ -139,6 +174,20 @@ bishwo_calculator/
 │   ├── mailer.php
 │   └── test-footer.php
 ├── index.php
+├── install
+│   ├── assets
+│   │   ├── css
+│   │   │   └── install.css
+│   │   ├── images
+│   │   │   └── README.md
+│   │   └── js
+│   │       └── install.js
+│   ├── cleanup.php
+│   ├── includes
+│   │   ├── Installer.php
+│   │   └── Requirements.php
+│   └── index.php
+├── install_todo.md
 ├── modules
 │   ├── civil
 │   │   ├── brickwork
@@ -561,6 +610,7 @@ bishwo_calculator/
 │           ├── steel-base-plate.php
 │           ├── steel-beam-design.php
 │           └── steel-truss-analysis.php
+├── mvc_structure.md
 ├── plugins
 │   ├── calculator-plugins
 │   │   ├── advanced-steel
@@ -571,8 +621,17 @@ bishwo_calculator/
 │   ├── .htaccess
 │   ├── assets
 │   │   ├── css
+│   │   │   ├── admin
+│   │   │   │   └── email-manager.css
+│   │   │   ├── history.css
+│   │   │   ├── main.css
+│   │   │   └── share.css
 │   │   ├── images
 │   │   ├── js
+│   │   │   ├── exports.js
+│   │   │   ├── history.js
+│   │   │   ├── profile.js
+│   │   │   └── share.js
 │   │   └── uploads
 │   └── index.php
 ├── saas_idea.md
@@ -680,7 +739,6 @@ bishwo_calculator/
 │       └── views
 │           └── layouts
 │               └── main.php
-├── todo_mvc_structure.md
 ├── vendor
 └── version.json
 ```
@@ -725,9 +783,9 @@ vendor{
 
 ## Statistics
 
-- **Total Files:** 517
-- **Total Directories:** 160
-- **Total Items:** 677
+- **Total Files:** 564
+- **Total Directories:** 171
+- **Total Items:** 735
 - **Excludes:** vendor/ folder
 
 ---
