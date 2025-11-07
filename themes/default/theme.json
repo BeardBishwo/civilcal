@@ -1,0 +1,62 @@
+{
+    "name": "Default Theme",
+    "version": "1.0.0",
+    "description": "Default theme for Bishwo Calculator - Modern gradient design with professional engineering tools styling",
+    "author": "Bishwo Calculator Team",
+    "type": "default",
+    "category": "professional",
+    "compatibility": {
+        "php_version": ">=7.4",
+        "calculator_modules": "all"
+    },
+    "styles": [
+        "css/theme.css",
+        "css/header.css",
+        "css/footer.css",
+        "css/home.css",
+        "css/back-to-top.css"
+    ],
+    "scripts": [
+        "js/main.js",
+        "js/header.js",
+        "js/home.js",
+        "js/back-to-top.js"
+    ],
+    "category_styles": {
+        "civil": "css/civil.css",
+        "electrical": "css/electrical.css",
+        "plumbing": "css/plumbing.css",
+        "hvac": "css/hvac.css",
+        "fire": "css/fire.css",
+        "structural": "css/structural.css",
+        "site": "css/site.css",
+        "estimation": "css/estimation.css",
+        "management": "css/management.css",
+        "mep": "css/mep.css"
+    },
+    "features": {
+        "dark_mode": true,
+        "responsive": true,
+        "search": true,
+        "navigation": true,
+        "user_dropdown": true
+    },
+    "colors": {
+        "primary": "#667eea",
+        "secondary": "#764ba2",
+        "accent": "#f093fb",
+        "background": "#ffffff",
+        "surface": "#f8fafc",
+        "text": "#2d3748",
+        "text_secondary": "#718096",
+        "border": "#e2e8f0"
+    },
+    "layout": {
+        "container_max_width": "1200px",
+        "sidebar_width": "250px",
+        "header_height": "80px",
+        "footer_height": "auto"
+    },
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-01T00:00:00Z"
+}

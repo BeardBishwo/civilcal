@@ -1,0 +1,42 @@
+{
+    "name": "Professional Theme",
+    "slug": "professional",
+    "version": "1.0.0",
+    "author": "Bishwo Calculator Team",
+    "description": "A sophisticated professional theme with a dark color scheme, perfect for engineering professionals and technical applications.",
+    "type": "core",
+    "screenshot": "screenshot.png",
+    "colors": {
+        "primary": "#2c3e50",
+        "secondary": "#34495e",
+        "success": "#27ae60",
+        "info": "#3498db",
+        "warning": "#f39c12",
+        "danger": "#e74c3c",
+        "light": "#ecf0f1",
+        "dark": "#2c3e50"
+    },
+    "fonts": {
+        "primary": "Roboto, sans-serif",
+        "secondary": "Open Sans, sans-serif"
+    },
+    "settings": {
+        "show_breadcrumbs": true,
+        "show_sidebar": true,
+        "sidebar_position": "left",
+        "header_style": "dark",
+        "footer_style": "dark"
+    },
+    "features": [
+        "responsive-design",
+        "dark-mode-support",
+        "professional-layout",
+        "advanced-calculator-interface"
+    ],
+    "compatibility": {
+        "php_version": ">=7.4",
+        "calculator_modules": "all"
+    },
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-01T00:00:00Z"
+}

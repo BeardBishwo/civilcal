@@ -1,0 +1,24 @@
+RewriteEngine On
+
+# Allow public folder to be accessed directly
+# This prevents the redirect loop
+
+# Security - prevent directory listing
+Options -Indexes
+
+# Prevent access to sensitive files
+<FilesMatch "\.(env|json|config.js|md|gitignore|gitattributes|lock)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block access to composer files and vendor directory
+RewriteRule ^(vendor|composer\.(json|lock)|node_modules)/ - [F,L]
+
+# Block access to application files
+RewriteRule ^(app|config|database|storage|tests)/ - [F,L]
+
+# Enable URL rewriting for pretty URLs
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ public/index.php?url=$1 [QSA,L]

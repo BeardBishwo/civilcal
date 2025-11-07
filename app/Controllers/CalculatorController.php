@@ -1,0 +1,250 @@
+<?php
+namespace App\Controllers;
+
+use App\Core\Controller;
+
+class CalculatorController extends Controller {
+    
+    public function __construct() {
+        parent::__construct();
+    }
+    
+    /**
+     * Home page - Main dashboard
+     */
+    public function index() {
+        $this->setCategory('home');
+        $this->setTitle('Bishwo Calculator - Professional Engineering Calculations');
+        $this->setDescription('Professional engineering calculation tools for civil, electrical, structural, and MEP design');
+        $this->setKeywords('engineering calculator, civil engineering, electrical design, structural analysis, MEP calculations');
+        
+        $data = [
+            'title' => 'Welcome to Bishwo Calculator',
+            'subtitle' => 'Professional Engineering Calculation Tools',
+            'description' => 'Comprehensive suite of engineering calculation tools for design professionals'
+        ];
+        
+        $this->view('index', $data);
+    }
+    
+    /**
+     * Civil Engineering calculations
+     */
+    public function civil() {
+        $this->setCategory('civil');
+        $this->setTitle('Civil Engineering Calculator');
+        $this->setDescription('Civil engineering calculation tools including concrete, structural, and earthwork calculations');
+        
+        $data = [
+            'title' => 'Civil Engineering Tools',
+            'calculators' => [
+                'concrete' => 'Concrete Mix Design & Volume',
+                'structural' => 'Structural Analysis & Design',
+                'earthwork' => 'Earthwork & Excavation',
+                'brickwork' => 'Masonry & Brickwork',
+                'plastering' => 'Plastering & Finishing'
+            ]
+        ];
+        
+        $this->view('civil/index', $data);
+    }
+    
+    /**
+     * Electrical Engineering calculations
+     */
+    public function electrical() {
+        $this->setCategory('electrical');
+        $this->setTitle('Electrical Engineering Calculator');
+        $this->setDescription('Electrical engineering calculation tools including load calculations, wire sizing, and electrical design');
+        
+        $data = [
+            'title' => 'Electrical Engineering Tools',
+            'calculators' => [
+                'load-calculation' => 'Load Calculations',
+                'wire-sizing' => 'Wire & Cable Sizing',
+                'voltage-drop' => 'Voltage Drop Analysis',
+                'conduit-sizing' => 'Conduit Sizing',
+                'short-circuit' => 'Short Circuit Analysis'
+            ]
+        ];
+        
+        $this->view('electrical/index', $data);
+    }
+    
+    /**
+     * Structural Engineering calculations
+     */
+    public function structural() {
+        $this->setCategory('structural');
+        $this->setTitle('Structural Engineering Calculator');
+        $this->setDescription('Structural engineering analysis and design tools for beams, columns, slabs, and foundations');
+        
+        $data = [
+            'title' => 'Structural Engineering Tools',
+            'calculators' => [
+                'beam-analysis' => 'Beam Analysis & Design',
+                'column-design' => 'Column Design',
+                'slab-design' => 'Slab Design',
+                'foundation-design' => 'Foundation Design',
+                'load-analysis' => 'Load Analysis'
+            ]
+        ];
+        
+        $this->view('structural/index', $data);
+    }
+    
+    /**
+     * Plumbing Engineering calculations
+     */
+    public function plumbing() {
+        $this->setCategory('plumbing');
+        $this->setTitle('Plumbing Engineering Calculator');
+        $this->setDescription('Plumbing system design and calculation tools for water supply, drainage, and fixtures');
+        
+        $data = [
+            'title' => 'Plumbing Engineering Tools',
+            'calculators' => [
+                'water-supply' => 'Water Supply Design',
+                'drainage' => 'Drainage System Design',
+                'stormwater' => 'Stormwater Management',
+                'fixtures' => 'Fixture Count & Sizing',
+                'pipe-sizing' => 'Pipe Sizing'
+            ]
+        ];
+        
+        $this->view('plumbing/index', $data);
+    }
+    
+    /**
+     * HVAC Engineering calculations
+     */
+    public function hvac() {
+        $this->setCategory('hvac');
+        $this->setTitle('HVAC Engineering Calculator');
+        $this->setDescription('HVAC system design and analysis tools for load calculations and equipment sizing');
+        
+        $data = [
+            'title' => 'HVAC Engineering Tools',
+            'calculators' => [
+                'load-calculation' => 'HVAC Load Calculations',
+                'equipment-sizing' => 'Equipment Sizing',
+                'duct-sizing' => 'Duct Sizing',
+                'psychrometrics' => 'Psychrometric Analysis',
+                'energy-analysis' => 'Energy Analysis'
+            ]
+        ];
+        
+        $this->view('hvac/index', $data);
+    }
+    
+    /**
+     * Fire Protection Engineering calculations
+     */
+    public function fire() {
+        $this->setCategory('fire');
+        $this->setTitle('Fire Protection Engineering Calculator');
+        $this->setDescription('Fire protection system design and hydraulic calculations for sprinkler systems');
+        
+        $data = [
+            'title' => 'Fire Protection Engineering Tools',
+            'calculators' => [
+                'sprinklers' => 'Sprinkler System Design',
+                'hydraulics' => 'Hydraulic Calculations',
+                'standpipes' => 'Standpipe Systems',
+                'fire-pumps' => 'Fire Pump Sizing',
+                'hazard-classification' => 'Hazard Classification'
+            ]
+        ];
+        
+        $this->view('fire/index', $data);
+    }
+    
+    /**
+     * MEP (Mechanical, Electrical, Plumbing) Integration
+     */
+    public function mep() {
+        $this->setCategory('mep');
+        $this->setTitle('MEP Integration Calculator');
+        $this->setDescription('MEP system integration and coordination tools for building design');
+        
+        $data = [
+            'title' => 'MEP Integration Tools',
+            'calculators' => [
+                'coordination' => 'System Coordination',
+                'cost-management' => 'Cost Management',
+                'energy-efficiency' => 'Energy Efficiency',
+                'integration' => 'System Integration',
+                'reports-documentation' => 'Reports & Documentation'
+            ]
+        ];
+        
+        $this->view('mep/index', $data);
+    }
+    
+    /**
+     * Estimation and Costing
+     */
+    public function estimation() {
+        $this->setCategory('estimation');
+        $this->setTitle('Project Estimation Calculator');
+        $this->setDescription('Project cost estimation, quantity takeoff, and financial analysis tools');
+        
+        $data = [
+            'title' => 'Project Estimation Tools',
+            'calculators' => [
+                'cost-estimation' => 'Cost Estimation',
+                'quantity-takeoff' => 'Quantity Takeoff',
+                'labor-estimation' => 'Labor Estimation',
+                'equipment-estimation' => 'Equipment Estimation',
+                'project-financials' => 'Project Financials'
+            ]
+        ];
+        
+        $this->view('estimation/index', $data);
+    }
+    
+    /**
+     * Project Management
+     */
+    public function management() {
+        $this->setCategory('management');
+        $this->setTitle('Project Management Tools');
+        $this->setDescription('Project management tools for scheduling, resource allocation, and quality control');
+        
+        $data = [
+            'title' => 'Project Management Tools',
+            'calculators' => [
+                'scheduling' => 'Project Scheduling',
+                'resource-allocation' => 'Resource Allocation',
+                'quality-control' => 'Quality Control',
+                'procurement' => 'Procurement Management',
+                'analytics' => 'Project Analytics'
+            ]
+        ];
+        
+        $this->view('management/index', $data);
+    }
+    
+    /**
+     * Site Engineering
+     */
+    public function site() {
+        $this->setCategory('site');
+        $this->setTitle('Site Engineering Tools');
+        $this->setDescription('Site engineering tools for surveying, earthwork, and construction site management');
+        
+        $data = [
+            'title' => 'Site Engineering Tools',
+            'calculators' => [
+                'surveying' => 'Surveying Calculations',
+                'earthwork' => 'Earthwork Operations',
+                'safety' => 'Construction Safety',
+                'productivity' => 'Productivity Analysis',
+                'concrete-tools' => 'Concrete Field Tools'
+            ]
+        ];
+        
+        $this->view('site/index', $data);
+    }
+}
+?>
