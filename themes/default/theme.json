@@ -32,7 +32,8 @@
         "site": "css/site.css",
         "estimation": "css/estimation.css",
         "management": "css/management.css",
-        "mep": "css/mep.css"
+        "mep": "css/mep.css",
+        "project-management": "css/management.css"
     },
     "features": {
         "dark_mode": true,

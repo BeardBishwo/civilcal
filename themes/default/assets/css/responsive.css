@@ -1,0 +1,306 @@
+/* Bishwo Calculator - Responsive Design Styles */
+/* Mobile-first responsive design for all device sizes */
+
+/* Base Responsive Variables */
+:root {
+    --mobile-breakpoint: 768px;
+    --tablet-breakpoint: 1024px;
+    --desktop-breakpoint: 1200px;
+    --container-padding: 1rem;
+    --container-padding-tablet: 1.5rem;
+    --container-padding-desktop: 2rem;
+}
+
+/* Mobile First Base Styles (up to 767px) */
+@media (max-width: 767px) {
+    .container {
+        padding: 0 var(--container-padding);
+    }
+    
+    .header {
+        height: 60px;
+        padding: 0 1rem;
+    }
+    
+    .header .logo {
+        font-size: 1.2rem;
+    }
+    
+    .nav-menu {
+        display: none;
+    }
+    
+    .mobile-menu-btn {
+        display: block;
+    }
+    
+    .category-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .category-card {
+        padding: 1rem;
+    }
+    
+    .footer {
+        padding: 2rem 1rem;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .calculator-container {
+        padding: 1rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .result-display {
+        font-size: 1.2rem;
+    }
+}
+
+/* Tablet Styles (768px to 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .container {
+        padding: 0 var(--container-padding-tablet);
+    }
+    
+    .header {
+        height: 70px;
+        padding: 0 1.5rem;
+    }
+    
+    .nav-menu {
+        display: flex;
+    }
+    
+    .mobile-menu-btn {
+        display: none;
+    }
+    
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+    
+    h1 {
+        font-size: 2.2rem;
+    }
+    
+    h2 {
+        font-size: 1.8rem;
+    }
+    
+    .btn {
+        min-width: 120px;
+        margin-right: 1rem;
+        margin-bottom: 0;
+    }
+    
+    .calculator-container {
+        padding: 2rem;
+    }
+    
+    .form-row {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .form-group {
+        flex: 1;
+    }
+}
+
+/* Desktop Styles (1024px and up) */
+@media (min-width: 1024px) {
+    .container {
+        padding: 0 var(--container-padding-desktop);
+    }
+    
+    .header {
+        height: 80px;
+        padding: 0 2rem;
+    }
+    
+    .nav-menu {
+        display: flex;
+    }
+    
+    .mobile-menu-btn {
+        display: none;
+    }
+    
+    .category-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+    
+    .footer-content {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 3rem;
+    }
+    
+    h1 {
+        font-size: 2.8rem;
+    }
+    
+    h2 {
+        font-size: 2rem;
+    }
+    
+    .btn {
+        min-width: 150px;
+    }
+    
+    .calculator-container {
+        padding: 3rem;
+    }
+    
+    .result-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+/* Large Desktop (1200px and up) */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .category-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .result-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Print Styles */
+@media print {
+    .header,
+    .nav-menu,
+    .mobile-menu-btn,
+    .footer,
+    .btn,
+    .back-to-top {
+        display: none !important;
+    }
+    
+    .container {
+        padding: 0;
+        max-width: none;
+    }
+    
+    .category-card,
+    .calculator-container {
+        break-inside: avoid;
+        margin-bottom: 1rem;
+    }
+    
+    body {
+        font-size: 12pt;
+        line-height: 1.4;
+    }
+    
+    h1, h2, h3 {
+        color: #000 !important;
+    }
+}
+
+/* Accessibility and High Contrast */
+@media (prefers-contrast: high) {
+    :root {
+        --primary: #000;
+        --secondary: #333;
+        --text: #000;
+        --background: #fff;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .btn,
+    .category-card,
+    .nav-menu a {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+
+/* Landscape Mobile Optimization */
+@media (max-width: 767px) and (orientation: landscape) {
+    .header {
+        height: 50px;
+    }
+    
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .footer {
+        padding: 1rem;
+    }
+}
+
+/* Dark Mode Responsive */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #1a1a1a;
+        --surface: #2d2d2d;
+        --text: #ffffff;
+        --text_secondary: #cccccc;
+        --border: #404040;
+    }
+}
+
+/* Focus and Active States for Mobile */
+@media (max-width: 767px) {
+    .btn:active,
+    .category-card:active {
+        transform: scale(0.98);
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
