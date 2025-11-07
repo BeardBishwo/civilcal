@@ -1,0 +1,256 @@
+<?php
+/**
+ * Fan Coil Unit Selection Calculator
+ * FCU selection and system balancing
+ * 
+ * @package MEP
+ * @subpackage Mechanical
+ */
+
+require_once '../../includes/config.php';
+require_once '../../includes/db.php';
+
+// Initialize variables
+$cooling_load = $heating_load = $airflow = $external_static = $fan_speed = '';
+$results = [];
+
+// Handle form submission
+if ($_POST) {
+    $cooling_load = floatval($_POST['cooling_load'] ?? 0);
+    $heating_load = floatval($_POST['heating_load'] ?? 0);
+    $airflow = floatval($_POST['airflow'] ?? 0);
+    $external_static = floatval($_POST['external_static'] ?? 0);
+    $fan_speed = $_POST['fan_speed'] ?? 'variable';
+    
+    if ($cooling_load > 0) {
+        // FCU sizing calculations
+        $cooling_capacity = $cooling_load / 12000; // Convert to tons
+        $heating_capacity = $heating_load / 12000; // Convert to tons
+        
+        // Airflow calculations (400 CFM per ton standard)
+        $required_airflow = $cooling_capacity * 400;
+        
+        // Fan power calculation
+        $fan_efficiency = 0.65; // 65% fan efficiency
+        $motor_efficiency = 0.85; // 85% motor efficiency
+        $combined_efficiency = $fan_efficiency * $motor_efficiency;
+        
+        // Fan power = (Airflow * ESP) / (6356 * Efficiency)
+        $fan_power_hp = ($required_airflow * $external_static) / (6356 * $combined_efficiency);
+        $fan_power_kw = $fan_power_hp * 0.746;
+        
+        // Coil selection criteria
+        if ($cooling_capacity <= 2) {
+            $coil_type = "2-Row Cooling Coil";
+            $coil_capacity_factor = 0.9;
+        } elseif ($cooling_capacity <= 5) {
+            $coil_type = "4-Row Cooling Coil";
+            $coil_capacity_factor = 0.95;
+        } else {
+            $coil_type = "6-Row Cooling Coil";
+            $coil_capacity_factor = 1.0;
+        }
+        
+        // Heating coil sizing
+        if ($heating_capacity >= $cooling_capacity * 0.7) {
+            $heating_coil_type = "Hot Water Coil (1-row)";
+        } else {
+            $heating_coil_type = "Electric Strip Heater";
+        }
+        
+        // Filter selection
+        $filter_type = ($external_static > 0.5) ? "High MERV Filter (MERV 13)" : "Standard Filter (MERV 8)";
+        $filter_pressure_drop = ($external_static > 0.5) ? 0.25 : 0.1;
+        
+        // Noise level estimation
+        $noise_level = 45 + (10 * log10($fan_power_hp + 0.1)) + ($fan_speed == 'high' ? 5 : 0);
+        
+        // Control system selection
+        if ($fan_speed == 'variable') {
+            $control_system = "Variable Speed Control (VFD)";
+            $control_cost_factor = 1.3;
+        } elseif ($fan_speed == 'multi') {
+            $control_system = "Multi-Speed Control";
+            $control_cost_factor = 1.15;
+        } else {
+            $control_system = "On/Off Control";
+            $control_cost_factor = 1.0;
+        }
+        
+        // Energy efficiency calculations
+        $annual_energy_kwh = ($fan_power_kw * 8760 * 0.7) + ($cooling_capacity * 0.8 * 8760 * 0.3);
+        $annual_cost = $annual_energy_kwh * 0.12; // $0.12 per kWh
+        
+        $results = [
+            'cooling_capacity' => round($cooling_capacity, 1),
+            'heating_capacity' => round($heating_capacity, 1),
+            'required_airflow' => round($required_airflow, 0),
+            'actual_airflow' => round($airflow, 0),
+            'fan_power_hp' => round($fan_power_hp, 2),
+            'fan_power_kw' => round($fan_power_kw, 2),
+            'coil_type' => $coil_type,
+            'heating_coil_type' => $heating_coil_type,
+            'filter_type' => $filter_type,
+            'filter_pressure_drop' => $filter_pressure_drop,
+            'control_system' => $control_system,
+            'noise_level' => round($noise_level, 1),
+            'annual_energy_kwh' => round($annual_energy_kwh, 0),
+            'annual_cost' => round($annual_cost, 2),
+            'efficiency_rating' => round((($cooling_capacity * 12000) / ($fan_power_kw * 3412)) * 100, 0) . '%',
+            'recommendations' => []
+        ];
+        
+        // Add recommendations
+        if ($external_static > 0.5) {
+            $results['recommendations'][] = "High ESP detected - check duct design";
+        }
+        
+        if ($noise_level > 65) {
+            $results['recommendations'][] = "High noise levels - consider acoustic treatment";
+        }
+        
+        if ($cooling_capacity > 10) {
+            $results['recommendations'][] = "Large capacity - consider multiple smaller units";
+        }
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fan Coil Unit Selection - MEP Suite</title>
+    <link rel="stylesheet" href="../../assets/css/header.css">
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .form-section { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        .input-group input, .input-group select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; }
+        .results { background: #f8f9fa; padding: 25px; border-radius: 8px; border-left: 5px solid #6f42c1; }
+        .results h3 { color: #6f42c1; margin-top: 0; }
+        .result-item { margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px; }
+        .result-label { font-weight: bold; color: #555; }
+        .recommendations { background: #f8d7da; padding: 15px; border-radius: 6px; border-left: 5px solid #dc3545; }
+        .recommendations h4 { color: #721c24; margin-top: 0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .btn { background: #6f42c1; color: white; padding: 12px 30px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        .equipment-summary { background: #e2e3e5; padding: 15px; border-radius: 6px; border-left: 4px solid #495057; }
+    </style>
+</head>
+<body>
+    <?php include '../../includes/header.php'; ?>
+    
+    <div class="container">
+        <h1>Fan Coil Unit Selection Calculator</h1>
+        
+        <form method="POST" class="form-section">
+            <div class="grid">
+                <div class="input-group">
+                    <label>Cooling Load:</label>
+                    <input type="number" step="1" name="cooling_load" value="<?= htmlspecialchars($cooling_load) ?>" placeholder="e.g., 36000" required>
+                    <small>BTU per hour</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>Heating Load:</label>
+                    <input type="number" step="1" name="heating_load" value="<?= htmlspecialchars($heating_load) ?>" placeholder="e.g., 24000">
+                    <small>BTU per hour</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>Airflow:</label>
+                    <input type="number" step="1" name="airflow" value="<?= htmlspecialchars($airflow) ?>" placeholder="e.g., 1200">
+                    <small>CFM (optional - will calculate if blank)</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>External Static Pressure:</label>
+                    <input type="number" step="0.01" name="external_static" value="<?= htmlspecialchars($external_static) ?>" placeholder="e.g., 0.25">
+                    <small>Inches of Water Column</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>Fan Speed Control:</label>
+                    <select name="fan_speed">
+                        <option value="variable" <?= $fan_speed == 'variable' ? 'selected' : '' ?>>Variable Speed (VFD)</option>
+                        <option value="multi" <?= $fan_speed == 'multi' ? 'selected' : '' ?>>Multi-Speed</option>
+                        <option value="single" <?= $fan_speed == 'single' ? 'selected' : '' ?>>Single Speed</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">Select FCU</button>
+        </form>
+        
+        <?php if (!empty($results)): ?>
+            <div class="results">
+                <h3>FCU Selection Results</h3>
+                
+                <div class="equipment-summary">
+                    <h4>Recommended FCU Configuration</h4>
+                    <strong>Cooling: <?= $results['cooling_capacity'] ?> Tons</strong><br>
+                    <strong>Heating: <?= $results['heating_capacity'] ?> Tons</strong><br>
+                    <strong>Airflow: <?= $results['required_airflow'] ?> CFM</strong><br>
+                    <strong>Control: <?= $results['control_system'] ?></strong>
+                </div>
+                
+                <div class="grid">
+                    <div class="result-item">
+                        <span class="result-label">Cooling Coil:</span> 
+                        <?= $results['coil_type'] ?>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Heating Coil:</span> 
+                        <?= $results['heating_coil_type'] ?>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Filter Type:</span> 
+                        <?= $results['filter_type'] ?>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Fan Power:</span> 
+                        <?= $results['fan_power_hp'] ?> HP (<?= $results['fan_power_kw'] ?> kW)
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Noise Level:</span> 
+                        <?= $results['noise_level'] ?> dB(A)
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Efficiency Rating:</span> 
+                        <?= $results['efficiency_rating'] ?>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Annual Energy:</span> 
+                        <?= $results['annual_energy_kwh'] ?> kWh/year
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Annual Operating Cost:</span> 
+                        $<?= $results['annual_cost'] ?>
+                    </div>
+                </div>
+                
+                <?php if (!empty($results['recommendations'])): ?>
+                    <div class="recommendations">
+                        <h4>Design Recommendations</h4>
+                        <ul>
+                            <?php foreach ($results['recommendations'] as $recommendation): ?>
+                                <li><?= htmlspecialchars($recommendation) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</body>
+</html>

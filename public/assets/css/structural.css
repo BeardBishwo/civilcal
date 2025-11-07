@@ -1,0 +1,198 @@
+/* assets/css/structural.css */
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.hero {
+    text-align: center;
+    padding: 4rem 0;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(45deg, #3498db, #2ecc71, #9b59b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+
+.sub-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.sub-nav-btn {
+    padding: 0.4rem 0.8rem;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    color: #f7fafc;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.sub-nav-btn:hover,
+.sub-nav-btn.active {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+body.sticky-nav .sub-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    padding: 0.4rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Add responsive styles for the sub-nav */
+
+@media (max-width: 768px) {
+    .sub-nav {
+        justify-content: flex-start;
+        padding: 0.4rem;
+        border-radius: 15px;
+    }
+    .sub-nav-btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.85rem;
+    }
+    body.sticky-nav .sub-nav {
+        padding: 0.3rem 0.5rem;
+    }
+}
+
+body.sticky-nav .container {
+    padding-top: 80px;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.category-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+}
+
+.category-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.category-icon {
+    font-size: 2rem;
+    margin-right: 1rem;
+    color: #3498db;
+}
+
+.category-title h3 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.category-title p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin: 0;
+}
+
+.tool-list {
+    list-style: none;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out;
+}
+
+.category-card.active .tool-list {
+    max-height: 500px;
+    padding-top: 1rem;
+}
+
+.tool-item {
+    margin-bottom: 0.5rem;
+}
+
+.tool-item a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    color: #f7fafc;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.tool-item a:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(10px);
+    border-left: 4px solid #3498db;
+}
+
+.category-card.highlight {
+    animation: blink-effect 1.5s ease-in-out;
+}
+
+@keyframes blink-effect {
+    0% {
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.2), 0 0 10px rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(52, 152, 219, 0.8), 0 0 30px rgba(46, 204, 113, 0.8);
+        border: 2px solid rgba(52, 152, 219, 0.7);
+    }
+    100% {
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.2), 0 0 10px rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}

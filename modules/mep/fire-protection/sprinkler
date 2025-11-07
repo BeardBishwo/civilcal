@@ -1,0 +1,710 @@
+<?php
+require_once '../../includes/config.php';
+require_once '../../includes/db.php';
+require_once '../../includes/functions.php';
+
+// Get calculation results from database if available
+$calculationId = $_GET['id'] ?? null;
+$existingCalculation = null;
+
+if ($calculationId) {
+    $stmt = $pdo->prepare("SELECT * FROM mep_calculations WHERE id = ? AND module = 'sprinkler_layout'");
+    $stmt->execute([$calculationId]);
+    $existingCalculation = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+$pageTitle = "Sprinkler System Layout Calculator";
+include '../../includes/header.php';
+?>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="page-title">Sprinkler System Layout Calculator</h1>
+                <p class="page-description">Design automatic sprinkler systems with NFPA 13 compliance, coverage analysis, and hydraulic calculations.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Project Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="sprinklerForm">
+                            <div class="form-group">
+                                <label for="projectName">Project Name</label>
+                                <input type="text" class="form-control" id="projectName" name="projectName" required>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="buildingType">Building Occupancy</label>
+                                        <select class="form-control" id="buildingType" name="buildingType" required onchange="updateSprinklerRequirements()">
+                                        <option value="">Select Occupancy</option>
+                                        <option value="office">Office</option>
+                                        <option value="retail">Retail/Assembly</option>
+                                        <option value="warehouse">Warehouse</option>
+                                        <option value="industrial">Industrial</option>
+                                        <option value="residential">Residential</option>
+                                        <option value="healthcare">Healthcare</option>
+                                        <option value="educational">Educational</option>
+                                        <option value="storage">Storage</option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="sprinklerType">Sprinkler Type</label>
+                                        <select class="form-control" id="sprinklerType" name="sprinklerType" required onchange="updateSprinklerRequirements()">
+                                        <option value="">Select Type</option>
+                                        <option value="standard_response">Standard Response</option>
+                                        <option value="quick_response">Quick Response</option>
+                                        <option value="extended_coverage">Extended Coverage</option>
+                                        <option value="dry_sprinkler">Dry Sprinkler</option>
+                                        <option value="pre_action">Pre-Action</option>
+                                        <option value="deluge">Deluge</option>
+                                    </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="ceilingHeight">Ceiling Height (ft)</label>
+                                        <input type="number" class="form-control" id="ceilingHeight" name="ceilingHeight" min="8" max="40" step="0.5" required onchange="updateSprinklerRequirements()">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="hazardClassification">Hazard Classification</label>
+                                        <select class="form-control" id="hazardClassification" name="hazardClassification" required onchange="updateSprinklerRequirements()">
+                                        <option value="">Select Hazard</option>
+                                        <option value="light">Light Hazard (Group 1)</option>
+                                        <option value="ordinary_1">Ordinary Hazard Group 1</option>
+                                        <option value="ordinary_2">Ordinary Hazard Group 2</option>
+                                        <option value="extra_hazard_1">Extra Hazard Group 1</option>
+                                        <option value="extra_hazard_2">Extra Hazard Group 2</option>
+                                        <option value="storage_group_a">Storage Group A</option>
+                                        <option value="storage_group_b">Storage Group B</option>
+                                        <option value="storage_group_c">Storage Group C</option>
+                                    </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="roomArea">Room/Floor Area (sq ft)</label>
+                                        <input type="number" class="form-control" id="roomArea" name="roomArea" min="100" required onchange="updateSprinklerRequirements()">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="density">Design Density (gpm/sq ft)</label>
+                                        <input type="number" class="form-control" id="density" name="density" step="0.01" min="0.05" max="1.0" onchange="updateSprinklerRequirements()">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="maxSpacing">Max Sprinkler Spacing (ft)</label>
+                                        <input type="number" class="form-control" id="maxSpacing" name="maxSpacing" step="1" min="12" max="25" onchange="updateSprinklerRequirements()">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="kFactor">K-Factor</label>
+                                        <select class="form-control" id="kFactor" name="kFactor" onchange="updateSprinklerRequirements()">
+                                        <option value="">Auto Select</option>
+                                        <option value="2.8">2.8</option>
+                                        <option value="5.6">5.6</option>
+                                        <option value="8.0">8.0</option>
+                                        <option value="11.2">11.2</option>
+                                        <option value="14.0">14.0</option>
+                                    </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>System Design Parameters</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="sprinklerResults">
+                            <div class="alert alert-info">
+                                <h6>Coverage Analysis</h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <strong>Max Coverage Area:</strong> <span id="maxCoverage">-</span> sq ft
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Max Spacing:</strong> <span id="maxSpacingReq">-</span> ft
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <strong>Min Flow Rate:</strong> <span id="minFlowRate">-</span> gpm
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Required Pressure:</strong> <span id="requiredPressure">-</span> psi
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-warning">
+                                <h6>System Layout</h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <strong>Estimated Sprinklers:</strong> <span id="estimatedSprinklers">-</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>System Flow:</strong> <span id="systemFlow">-</span> gpm
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <strong>Demand Area:</strong> <span id="demandArea">-</span> sq ft
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Hose Stream Allowance:</strong> <span id="hoseStream">-</span> gpm
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-success">
+                                <h6>Hydraulic Summary</h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <strong>Total System Demand:</strong> <span id="totalDemand">-</span> gpm
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Remote Area Factor:</strong> <span id="remoteAreaFactor">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Layout Design</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="sprinkler-layout-canvas">
+                                    <canvas id="layoutCanvas" width="600" height="400" style="border: 1px solid #ccc;"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <h6>Sprinkler Placement Guide</h6>
+                                <div id="placementGuide">
+                                    <p class="text-muted">Enter building dimensions to view layout recommendations.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Cost Estimation</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="cost-item">
+                                    <strong>Sprinkler Heads</strong>
+                                    <span id="sprinklerCost">$0</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="cost-item">
+                                    <strong>Pipe & Fittings</strong>
+                                    <span id="pipeCost">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="cost-item">
+                                    <strong>Control Valve</strong>
+                                    <span id="valveCost">$0</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="cost-item">
+                                    <strong>Installation Labor</strong>
+                                    <span id="laborCost">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Total Material Cost:</strong>
+                            </div>
+                            <div class="col-6">
+                                <span id="materialCost" class="text-primary">$0</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Total Project Cost:</strong>
+                            </div>
+                            <div class="col-6">
+                                <span id="projectCost" class="text-success">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Code Compliance & Safety</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="complianceNotes">
+                            <p class="text-muted">Select occupancy type and hazard classification to view code requirements.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 text-center">
+                <button type="button" class="btn btn-primary" onclick="calculateSprinklerLayout()">Calculate Layout</button>
+                <button type="button" class="btn btn-success" onclick="saveCalculation()">Save Calculation</button>
+                <button type="button" class="btn btn-secondary" onclick="exportResults()">Export Results</button>
+                <button type="button" class="btn btn-info" onclick="printReport()">Print Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // NFPA 13 sprinkler requirements database
+        const sprinklerRequirements = {
+            office: {
+                light: {
+                    density: 0.10,
+                    maxSpacing: 15,
+                    maxCoverage: 225,
+                    kFactor: 5.6,
+                    minPressure: 7
+                },
+                ordinary_1: {
+                    density: 0.15,
+                    maxSpacing: 15,
+                    maxCoverage: 200,
+                    kFactor: 5.6,
+                    minPressure: 7
+                }
+            },
+            retail: {
+                light: {
+                    density: 0.10,
+                    maxSpacing: 15,
+                    maxCoverage: 225,
+                    kFactor: 5.6,
+                    minPressure: 7
+                },
+                ordinary_1: {
+                    density: 0.15,
+                    maxSpacing: 15,
+                    maxCoverage: 200,
+                    kFactor: 5.6,
+                    minPressure: 7
+                }
+            },
+            warehouse: {
+                ordinary_1: {
+                    density: 0.20,
+                    maxSpacing: 12,
+                    maxCoverage: 144,
+                    kFactor: 8.0,
+                    minPressure: 10
+                },
+                storage_group_a: {
+                    density: 0.30,
+                    maxSpacing: 12,
+                    maxCoverage: 100,
+                    kFactor: 11.2,
+                    minPressure: 15
+                }
+            },
+            industrial: {
+                ordinary_2: {
+                    density: 0.25,
+                    maxSpacing: 12,
+                    maxCoverage: 130,
+                    kFactor: 8.0,
+                    minPressure: 10
+                },
+                extra_hazard_1: {
+                    density: 0.40,
+                    maxSpacing: 12,
+                    maxCoverage: 100,
+                    kFactor: 11.2,
+                    minPressure: 20
+                }
+            }
+        };
+
+        // Cost estimation data
+        const costData = {
+            sprinkler_per_head: 45,
+            pipe_per_linear_ft: 15,
+            valve_cost: 850,
+            labor_multiplier: 2.5,
+            fitting_multiplier: 0.3,
+            markup_multiplier: 1.15
+        };
+
+        function updateSprinklerRequirements() {
+            const buildingType = document.getElementById('buildingType').value;
+            const hazardClassification = document.getElementById('hazardClassification').value;
+            const roomArea = parseFloat(document.getElementById('roomArea').value) || 0;
+            const ceilingHeight = parseFloat(document.getElementById('ceilingHeight').value) || 0;
+
+            if (!buildingType || !hazardClassification || roomArea === 0) return;
+
+            // Get requirements from database
+            let requirements = null;
+
+            // Map hazard classifications to keys
+            const hazardKey = hazardClassification.replace('_', '_'); // Keep as is for lookup
+
+            if (sprinklerRequirements[buildingType] && sprinklerRequirements[buildingType][hazardKey]) {
+                requirements = sprinklerRequirements[buildingType][hazardKey];
+            } else {
+                // Use light hazard as default
+                requirements = {
+                    density: 0.10,
+                    maxSpacing: 15,
+                    maxCoverage: 225,
+                    kFactor: 5.6,
+                    minPressure: 7
+                };
+            }
+
+            // Auto-adjust based on ceiling height
+            let adjustedMaxSpacing = requirements.maxSpacing;
+            let adjustedMaxCoverage = requirements.maxCoverage;
+            let adjustedKFactor = requirements.kFactor;
+            let adjustedMinPressure = requirements.minPressure;
+
+            if (ceilingHeight > 20) {
+                adjustedMaxSpacing = Math.max(12, requirements.maxSpacing - 2);
+                adjustedMaxCoverage = Math.max(100, requirements.maxCoverage - 50);
+                adjustedKFactor = Math.max(5.6, requirements.kFactor * 1.25);
+                adjustedMinPressure = requirements.minPressure * 1.3;
+            }
+
+            // Manual overrides if specified
+            const manualDensity = parseFloat(document.getElementById('density').value);
+            const manualSpacing = parseFloat(document.getElementById('maxSpacing').value);
+            const manualKFactor = parseFloat(document.getElementById('kFactor').value);
+
+            const density = manualDensity || requirements.density;
+            const maxSpacing = manualSpacing || adjustedMaxSpacing;
+            const kFactor = manualKFactor || adjustedKFactor;
+            const minPressure = adjustedMinPressure;
+            const maxCoverage = adjustedMaxCoverage;
+
+            // Calculate sprinkler layout
+            const estimatedSprinklers = Math.ceil(roomArea / maxCoverage);
+            const minFlowRate = Math.sqrt(density * maxCoverage) * kFactor;
+            const systemFlow = estimatedSprinklers * minFlowRate;
+
+            // Calculate hydraulic parameters
+            const demandArea = buildingType === 'warehouse' ? 2500 : 1500;
+            const remoteAreaFactor = buildingType === 'warehouse' ? 1.2 : 1.0;
+            const hoseStream = estimatedSprinklers > 20 ? 250 : 100;
+            const totalDemand = systemFlow + hoseStream;
+
+            // Update display
+            document.getElementById('maxCoverage').textContent = maxCoverage;
+            document.getElementById('maxSpacingReq').textContent = maxSpacing;
+            document.getElementById('minFlowRate').textContent = minFlowRate.toFixed(1);
+            document.getElementById('requiredPressure').textContent = minPressure.toFixed(1);
+            document.getElementById('estimatedSprinklers').textContent = estimatedSprinklers;
+            document.getElementById('systemFlow').textContent = systemFlow.toFixed(0);
+            document.getElementById('demandArea').textContent = demandArea;
+            document.getElementById('hoseStream').textContent = hoseStream;
+            document.getElementById('totalDemand').textContent = totalDemand.toFixed(0);
+            document.getElementById('remoteAreaFactor').textContent = remoteAreaFactor;
+
+            // Calculate costs
+            const sprinklerCost = estimatedSprinklers * costData.sprinkler_per_head;
+            const pipeCost = Math.sqrt(roomArea) * 4 * costData.pipe_per_linear_ft; // Rough estimate
+            const valveCost = costData.valve_cost;
+            const laborCost = (sprinklerCost + pipeCost + valveCost) * costData.labor_multiplier;
+            const materialCost = sprinklerCost + pipeCost + valveCost;
+            const projectCost = (materialCost + laborCost) * costData.markup_multiplier;
+
+            document.getElementById('sprinklerCost').textContent = `$${sprinklerCost.toLocaleString()}`;
+            document.getElementById('pipeCost').textContent = `$${pipeCost.toLocaleString()}`;
+            document.getElementById('valveCost').textContent = `$${valveCost.toLocaleString()}`;
+            document.getElementById('laborCost').textContent = `$${laborCost.toLocaleString()}`;
+            document.getElementById('materialCost').textContent = `$${materialCost.toLocaleString()}`;
+            document.getElementById('projectCost').textContent = `$${projectCost.toLocaleString()}`;
+
+            // Update layout canvas
+            drawLayoutCanvas(roomArea, maxSpacing, estimatedSprinklers);
+
+            // Update placement guide
+            updatePlacementGuide(maxSpacing, estimatedSprinklers);
+
+            // Update compliance notes
+            updateComplianceNotes(buildingType, hazardClassification, ceilingHeight);
+        }
+
+        function drawLayoutCanvas(roomArea, maxSpacing, sprinklerCount) {
+            const canvas = document.getElementById('layoutCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Calculate room dimensions (assume square room)
+            const roomWidth = Math.sqrt(roomArea);
+            const roomHeight = roomWidth;
+
+            // Scale to fit canvas
+            const scaleX = (canvas.width - 40) / roomWidth;
+            const scaleY = (canvas.height - 40) / roomHeight;
+            const scale = Math.min(scaleX, scaleY);
+
+            const scaledWidth = roomWidth * scale;
+            const scaledHeight = roomHeight * scale;
+            const offsetX = (canvas.width - scaledWidth) / 2;
+            const offsetY = (canvas.height - scaledHeight) / 2;
+
+            // Draw room outline
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(offsetX, offsetY, scaledWidth, scaledHeight);
+
+            // Calculate sprinkler positions in grid
+            const spacing = maxSpacing;
+            const cols = Math.floor(roomWidth / spacing);
+            const rows = Math.floor(roomHeight / spacing);
+            const actualSprinklers = cols * rows;
+
+            // Draw sprinklers
+            ctx.fillStyle = '#dc3545';
+            const sprinklerRadius = 8;
+
+            for (let i = 1; i <= cols; i++) {
+                for (let j = 1; j <= rows; j++) {
+                    const x = offsetX + (i * spacing * scale) - (spacing * scale / 2);
+                    const y = offsetY + (j * spacing * scale) - (spacing * scale / 2);
+
+                    if (x < offsetX + scaledWidth && y < offsetY + scaledHeight) {
+                        ctx.beginPath();
+                        ctx.arc(x, y, sprinklerRadius, 0, 2 * Math.PI);
+                        ctx.fill();
+                    }
+                }
+            }
+
+            // Add legend
+            ctx.fillStyle = '#000';
+            ctx.font = '12px Arial';
+            ctx.fillText(`Estimated Sprinklers: ${actualSprinklers}`, 10, 20);
+            ctx.fillText(`Spacing: ${spacing} ft`, 10, 35);
+            ctx.fillText(`Room: ${roomWidth.toFixed(0)}' x ${roomHeight.toFixed(0)}'`, 10, 50);
+        }
+
+        function updatePlacementGuide(maxSpacing, sprinklerCount) {
+            const guideDiv = document.getElementById('placementGuide');
+            let guide = '<h6>Placement Guidelines</h6><ul>';
+
+            guide += `<li>Maintain ${maxSpacing} ft maximum spacing</li>`;
+            guide += `<li>Keep 12" minimum from walls</li>`;
+            guide += `<li>Avoid obstructions above sprinklers</li>`;
+            guide += `<li>Provide access for maintenance</li>`;
+            guide += `<li>Coordinate with ceiling features</li>`;
+
+            guide += '</ul>';
+            guide += `<p><strong>Total Sprinklers Required:</strong> ${sprinklerCount}</p>`;
+
+            guideDiv.innerHTML = guide;
+        }
+
+        function updateComplianceNotes(buildingType, hazardClassification, ceilingHeight) {
+            const notesDiv = document.getElementById('complianceNotes');
+            let notes = '<h6>NFPA 13 Requirements</h6><ul>';
+
+            if (buildingType === 'office') {
+                notes += '<li>Light hazard classification typically applies</li>';
+                notes += '<li>Minimum density: 0.10 gpm/sq ft</li>';
+                notes += '<li>Maximum coverage: 225 sq ft per sprinkler</li>';
+            } else if (buildingType === 'warehouse') {
+                notes += '<li>Higher hazard classification based on storage type</li>';
+                notes += '<li>Extended coverage sprinklers may be required</li>';
+                notes += '<li>In-rack sprinklers for high piled storage</li>';
+            } else if (buildingType === 'industrial') {
+                notes += '<li>Occupancy hazard determines design density</li>';
+                notes += '<li>Quick response sprinklers preferred</li>';
+                notes += '<li>Special protection for high-hazard areas</li>';
+            }
+
+            if (ceilingHeight > 20) {
+                notes += '<li>Increased spacing restrictions for high ceilings</li>';
+                notes += '<li>Higher K-factor sprinklers may be required</li>';
+                notes += '<li>Additional density for ceiling level</li>';
+            }
+
+            notes += '<li>Submit plans for authority review</li>';
+            notes += '<li>Conduct hydrostatic test at 200 psi</li>';
+            notes += '<li>Provide adequate water supply</li>';
+            notes += '</ul>';
+
+            notesDiv.innerHTML = notes;
+        }
+
+        function calculateSprinklerLayout() {
+            updateSprinklerRequirements();
+
+            // Show success message
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success alert-dismissible fade show';
+            alert.innerHTML = `
+        Sprinkler layout calculation completed successfully.
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+    `;
+            document.querySelector('.container-fluid').insertBefore(alert, document.querySelector('.container-fluid').firstChild);
+        }
+
+        function saveCalculation() {
+            const formData = new FormData(document.getElementById('sprinklerForm'));
+            formData.append('module', 'sprinkler_layout');
+            formData.append('results', document.getElementById('sprinklerResults').innerHTML);
+
+            fetch('../../api/save_calculation.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Calculation saved successfully!');
+                    } else {
+                        alert('Error saving calculation: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error saving calculation');
+                });
+        }
+
+        function exportResults() {
+            const results = {
+                project: {
+                    name: document.getElementById('projectName').value,
+                    buildingType: document.getElementById('buildingType').value,
+                    sprinklerType: document.getElementById('sprinklerType').value
+                },
+                parameters: {
+                    ceilingHeight: document.getElementById('ceilingHeight').value,
+                    roomArea: document.getElementById('roomArea').value,
+                    hazardClassification: document.getElementById('hazardClassification').value,
+                    density: document.getElementById('density').value,
+                    maxSpacing: document.getElementById('maxSpacing').value,
+                    kFactor: document.getElementById('kFactor').value
+                },
+                design: {
+                    estimatedSprinklers: document.getElementById('estimatedSprinklers').textContent,
+                    systemFlow: document.getElementById('systemFlow').textContent,
+                    totalDemand: document.getElementById('totalDemand').textContent,
+                    requiredPressure: document.getElementById('requiredPressure').textContent
+                },
+                costs: {
+                    material: document.getElementById('materialCost').textContent,
+                    project: document.getElementById('projectCost').textContent
+                }
+            };
+
+            const dataStr = JSON.stringify(results, null, 2);
+            const dataBlob = new Blob([dataStr], {
+                type: 'application/json'
+            });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'sprinkler_layout_results.json';
+            link.click();
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-update when inputs change
+            const inputs = ['buildingType', 'sprinklerType', 'ceilingHeight', 'hazardClassification', 'roomArea', 'density', 'maxSpacing', 'kFactor'];
+            inputs.forEach(id => {
+                document.getElementById(id).addEventListener('change', updateSprinklerRequirements);
+                if (id === 'roomArea' || id === 'ceilingHeight') {
+                    document.getElementById(id).addEventListener('input', updateSprinklerRequirements);
+                }
+            });
+        });
+    </script>
+
+    <style>
+        .sprinkler-layout-canvas {
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        #layoutCanvas {
+            background: white;
+            border-radius: 3px;
+        }
+        
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cost-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+
+    <?php include '../../includes/footer.php'; ?>

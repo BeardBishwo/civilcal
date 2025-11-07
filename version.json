@@ -1,0 +1,14 @@
+{
+    "version": "1.0.0",
+    "releaseDate": "2025-10-26",
+    "description": "Initial release of AEC Calculator",
+    "downloadUrl": "https://github.com/yourusername/aec-calculator/releases/tag/v1.0.0",
+    "changes": [
+        "First stable release",
+        "Light/Dark mode support",
+        "Responsive dashboard",
+        "SEO optimizations",
+        "Error pages",
+        "Version checker"
+    ]
+}

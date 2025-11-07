@@ -1,0 +1,183 @@
+/* assets/css/plumbing.css */
+
+
+/* Inherit theme colors instead of overriding */
+
+body {
+    /* Remove fixed background - use theme.css instead */
+    color: var(--light);
+}
+
+
+/* Only apply plumbing-specific styles without overriding body background */
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.hero {
+    text-align: center;
+    padding: 4rem 0;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(45deg, #20c997, #0dcaf0, #198754);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+
+.sub-nav {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 2rem 0;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
+}
+
+.sub-nav-btn {
+    padding: 0.75rem 1.5rem;
+    border: 1px solid transparent;
+    border-radius: 50px;
+    color: #f7fafc;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.sub-nav-btn:hover,
+.sub-nav-btn.active {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+body.sticky-nav .sub-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+}
+
+body.sticky-nav .container {
+    padding-top: 80px;
+    /* Adjust this value to match the height of the sub-nav */
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.category-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+}
+
+.category-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.category-icon {
+    font-size: 2rem;
+    margin-right: 1rem;
+    color: #20c997;
+}
+
+.category-title h3 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.category-title p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin: 0;
+}
+
+.tool-list {
+    list-style: none;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out;
+}
+
+.category-card.active .tool-list {
+    max-height: 500px;
+    /* Adjust as needed */
+    padding-top: 1rem;
+}
+
+.tool-item {
+    margin-bottom: 0.5rem;
+}
+
+.tool-item a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    color: #f7fafc;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.tool-item a:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(10px);
+    border-left: 4px solid #0dcaf0;
+}
+
+.category-card.highlight {
+    animation: blink-effect 1.5s ease-in-out;
+}
+
+@keyframes blink-effect {
+    0% {
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.2), 0 0 10px rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(32, 201, 151, 0.8), 0 0 30px rgba(13, 202, 240, 0.8);
+        border: 2px solid rgba(32, 201, 151, 0.7);
+    }
+    100% {
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.2), 0 0 10px rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}

@@ -1,0 +1,260 @@
+<?php
+/**
+ * HVAC Load Estimation Calculator
+ * Calculates cooling and heating load requirements (BTU/TR)
+ * 
+ * @package MEP
+ * @subpackage Mechanical
+ */
+
+require_once '../../includes/config.php';
+require_once '../../includes/db.php';
+
+// Initialize variables
+$area = $occupancy = $lighting = $equipment = $windows = $walls = '';
+$results = [];
+
+// Handle form submission
+if ($_POST) {
+    $area = floatval($_POST['area'] ?? 0);
+    $occupancy = intval($_POST['occupancy'] ?? 0);
+    $lighting = floatval($_POST['lighting'] ?? 0);
+    $equipment = floatval($_POST['equipment'] ?? 0);
+    $windows = floatval($_POST['windows'] ?? 0);
+    $walls = intval($_POST['walls'] ?? 0);
+    
+    if ($area > 0) {
+        // Basic load calculations (simplified ASHRAE method)
+        
+        // 1. Area-based load (20 BTU/sq ft typical)
+        $area_cooling_load = $area * 20;
+        $area_heating_load = $area * 12;
+        
+        // 2. Occupancy load (250 BTU/person sensible + 200 BTU/person latent)
+        $occupancy_cooling_load = $occupancy * 450;
+        $occupancy_heating_load = $occupancy * 200;
+        
+        // 3. Lighting load (3.41 BTU per watt)
+        $lighting_cooling_load = $lighting * 3.41;
+        $lighting_heating_load = $lighting * 3.41;
+        
+        // 4. Equipment load (3.41 BTU per watt)
+        $equipment_cooling_load = $equipment * 3.41;
+        $equipment_heating_load = $equipment * 2.5; // Less heat in heating mode
+        
+        // 5. Window heat gain (50 BTU/sq ft for south-facing windows)
+        $window_cooling_load = $windows * 50;
+        $window_heating_load = $windows * 20; // Solar gain in winter
+        
+        // 6. Infiltration load (infiltration rate * volume * 1.08)
+        $air_changes = 0.5; // Air changes per hour
+        $volume = $area * 10; // Assume 10 ft ceiling height
+        $infiltration_rate = $volume * $air_changes / 60; // CFM
+        $indoor_temp = 75; // °F
+        $outdoor_temp = 90; // °F (summer design temp)
+        $infiltration_cooling_load = $infiltration_rate * ($outdoor_temp - $indoor_temp) * 1.08;
+        
+        // Total loads
+        $total_cooling_load = $area_cooling_load + $occupancy_cooling_load + 
+                             $lighting_cooling_load + $equipment_cooling_load + 
+                             $window_cooling_load + $infiltration_cooling_load;
+                             
+        $total_heating_load = $area_heating_load + $occupancy_heating_load + 
+                             $lighting_heating_load + $equipment_heating_load + $window_heating_load;
+        
+        // Add safety factors
+        $cooling_load_with_safety = $total_cooling_load * 1.25; // 25% safety factor
+        $heating_load_with_safety = $total_heating_load * 1.15; // 15% safety factor
+        
+        // Convert to tons of refrigeration (12,000 BTU/hr = 1 ton)
+        $cooling_tons = $cooling_load_with_safety / 12000;
+        
+        // Calculate equipment capacities
+        $cooler_capacity = $cooling_load_with_safety / 12000; // tons
+        $heater_capacity = $heating_load_with_safety / 3412; // kW (converted from BTU/hr)
+        
+        // Energy efficiency calculations
+        $seasonal_cooling_load = $cooling_load_with_safety * 0.6; // Seasonal variation
+        $annual_cooling_energy = $seasonal_cooling_load * 8760 / (3.5 * 12000); // kWh/year (COP = 3.5)
+        $annual_heating_energy = $heating_load_with_safety * 4000 / 3.5; // kWh/year (simplified)
+        
+        $results = [
+            'cooling_load' => round($total_cooling_load, 0),
+            'heating_load' => round($total_heating_load, 0),
+            'cooling_load_safety' => round($cooling_load_with_safety, 0),
+            'heating_load_safety' => round($heating_load_with_safety, 0),
+            'cooling_tons' => round($cooling_tons, 1),
+            'cooler_capacity' => round($cooler_capacity, 1),
+            'heater_capacity' => round($heater_capacity, 1),
+            'breakdown' => [
+                'area_cooling' => round($area_cooling_load, 0),
+                'occupancy_cooling' => round($occupancy_cooling_load, 0),
+                'lighting_cooling' => round($lighting_cooling_load, 0),
+                'equipment_cooling' => round($equipment_cooling_load, 0),
+                'window_cooling' => round($window_cooling_load, 0),
+                'infiltration_cooling' => round($infiltration_cooling_load, 0)
+            ],
+            'energy_annual' => [
+                'cooling' => round($annual_cooling_energy, 0),
+                'heating' => round($annual_heating_energy, 0)
+            ],
+            'recommendations' => []
+        ];
+        
+        // Add recommendations
+        if ($cooling_tons < 1) {
+            $results['recommendations'][] = "Consider packaged unit for small load";
+        } elseif ($cooling_tons > 50) {
+            $results['recommendations'][] = "Consider chilled water system for large load";
+        }
+        
+        if ($lighting > 20 * $area) {
+            $results['recommendations'][] = "High lighting load - consider LED upgrade";
+        }
+        
+        if ($windows > $area * 0.3) {
+            $results['recommendations'][] = "High window area - consider solar control film";
+        }
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HVAC Load Estimation Calculator - MEP Suite</title>
+    <link rel="stylesheet" href="../../assets/css/header.css">
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .form-section { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        .input-group input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; }
+        .results { background: #f8f9fa; padding: 25px; border-radius: 8px; border-left: 5px solid #fd7e14; }
+        .results h3 { color: #fd7e14; margin-top: 0; }
+        .result-item { margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px; }
+        .result-label { font-weight: bold; color: #555; }
+        .breakdown { background: #e9ecef; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .recommendations { background: #fff3cd; padding: 15px; border-radius: 6px; border-left: 5px solid #ffc107; }
+        .recommendations h4 { color: #856404; margin-top: 0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .btn { background: #fd7e14; color: white; padding: 12px 30px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        .equipment-capacity { background: #d1ecf1; padding: 15px; border-radius: 6px; border-left: 4px solid #17a2b8; }
+    </style>
+</head>
+<body>
+    <?php include '../../includes/header.php'; ?>
+    
+    <div class="container">
+        <h1>HVAC Load Estimation Calculator</h1>
+        
+        <form method="POST" class="form-section">
+            <div class="grid">
+                <div class="input-group">
+                    <label>Floor Area:</label>
+                    <input type="number" step="0.1" name="area" value="<?= htmlspecialchars($area) ?>" placeholder="e.g., 2000" required>
+                    <small>Square Feet</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>Expected Occupancy:</label>
+                    <input type="number" step="1" name="occupancy" value="<?= htmlspecialchars($occupancy) ?>" placeholder="e.g., 25">
+                    <small>Number of People</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>Lighting Load:</label>
+                    <input type="number" step="0.1" name="lighting" value="<?= htmlspecialchars($lighting) ?>" placeholder="e.g., 1500">
+                    <small>Total Watts</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>Equipment Load:</label>
+                    <input type="number" step="0.1" name="equipment" value="<?= htmlspecialchars($equipment) ?>" placeholder="e.g., 2000">
+                    <small>Total Watts (computers, printers, etc.)</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>Window Area:</label>
+                    <input type="number" step="0.1" name="windows" value="<?= htmlspecialchars($windows) ?>" placeholder="e.g., 300">
+                    <small>Square Feet of Windows</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>External Walls:</label>
+                    <input type="number" step="1" name="walls" value="<?= htmlspecialchars($walls) ?>" placeholder="e.g., 200">
+                    <small>Linear Feet</small>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">Calculate HVAC Load</button>
+        </form>
+        
+        <?php if (!empty($results)): ?>
+            <div class="results">
+                <h3>HVAC Load Analysis</h3>
+                
+                <div class="equipment-capacity">
+                    <h4>Recommended Equipment Capacity</h4>
+                    <strong>Cooling: <?= $results['cooler_capacity'] ?> Tons (<?= $results['cooling_tons'] ?> TR)</strong><br>
+                    <strong>Heating: <?= $results['heater_capacity'] ?> kW</strong>
+                </div>
+                
+                <div class="grid">
+                    <div class="result-item">
+                        <span class="result-label">Total Cooling Load:</span> 
+                        <?= $results['cooling_load'] ?> BTU/hr
+                        <br><small>(<?= $results['cooling_load_safety'] ?> BTU/hr with safety factor)</small>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Total Heating Load:</span> 
+                        <?= $results['heating_load'] ?> BTU/hr
+                        <br><small>(<?= $results['heating_load_safety'] ?> BTU/hr with safety factor)</small>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Cooling Capacity:</span> 
+                        <?= $results['cooling_tons'] ?> Tons of Refrigeration
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Annual Cooling Energy:</span> 
+                        <?= $results['energy_annual']['cooling'] ?> kWh/year
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Annual Heating Energy:</span> 
+                        <?= $results['energy_annual']['heating'] ?> kWh/year
+                    </div>
+                </div>
+                
+                <div class="breakdown">
+                    <h4>Cooling Load Breakdown</h4>
+                    <div class="grid">
+                        <div>Area Load: <?= $results['breakdown']['area_cooling'] ?> BTU/hr</div>
+                        <div>Occupancy: <?= $results['breakdown']['occupancy_cooling'] ?> BTU/hr</div>
+                        <div>Lighting: <?= $results['breakdown']['lighting_cooling'] ?> BTU/hr</div>
+                        <div>Equipment: <?= $results['breakdown']['equipment_cooling'] ?> BTU/hr</div>
+                        <div>Windows: <?= $results['breakdown']['window_cooling'] ?> BTU/hr</div>
+                        <div>Infiltration: <?= $results['breakdown']['infiltration_cooling'] ?> BTU/hr</div>
+                    </div>
+                </div>
+                
+                <?php if (!empty($results['recommendations'])): ?>
+                    <div class="recommendations">
+                        <h4>Design Recommendations</h4>
+                        <ul>
+                            <?php foreach ($results['recommendations'] as $recommendation): ?>
+                                <li><?= htmlspecialchars($recommendation) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</body>
+</html>

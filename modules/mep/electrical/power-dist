@@ -1,0 +1,329 @@
+<?php
+/**
+ * Power Distribution Calculator
+ * Single-line diagram generator for electrical distribution
+ * 
+ * @package MEP
+ * @subpackage Electrical
+ */
+
+require_once '../../includes/config.php';
+require_once '../../includes/db.php';
+
+// Initialize variables
+$total_load = $voltage = $power_factor = $efficiency = $phase = '';
+$results = [];
+
+// Handle form submission
+if ($_POST) {
+    $total_load = floatval($_POST['total_load'] ?? 0);
+    $voltage = floatval($_POST['voltage'] ?? 0);
+    $power_factor = floatval($_POST['power_factor'] ?? 0.8);
+    $efficiency = floatval($_POST['efficiency'] ?? 0.9);
+    $phase = $_POST['phase'] ?? 'three';
+    
+    if ($total_load > 0 && $voltage > 0) {
+        // Power calculations
+        if ($phase == 'single') {
+            // Single phase calculations
+            $current = ($total_load * 1000) / ($voltage * $power_factor);
+            $line_current = $current;
+        } else {
+            // Three phase calculations
+            $current = ($total_load * 1000) / (sqrt(3) * $voltage * $power_factor);
+            $line_current = $current;
+        }
+        
+        // Calculate input power (considering efficiency)
+        $input_power = $total_load / $efficiency;
+        $input_current = ($input_power * 1000) / ($voltage * sqrt(3) * $power_factor * ($phase == 'single' ? 1 : sqrt(3)));
+        
+        // Conduit sizing based on current (NEC ampacity tables simplified)
+        if ($current <= 20) {
+            $conduit_size = "3/4 inch";
+            $wire_size = "12 AWG";
+            $ampacity = 20;
+        } elseif ($current <= 30) {
+            $conduit_size = "1 inch";
+            $wire_size = "10 AWG";
+            $ampacity = 30;
+        } elseif ($current <= 40) {
+            $conduit_size = "1-1/4 inch";
+            $wire_size = "8 AWG";
+            $ampacity = 40;
+        } elseif ($current <= 55) {
+            $conduit_size = "1-1/2 inch";
+            $wire_size = "6 AWG";
+            $ampacity = 55;
+        } elseif ($current <= 65) {
+            $conduit_size = "2 inch";
+            $wire_size = "4 AWG";
+            $ampacity = 65;
+        } elseif ($current <= 85) {
+            $conduit_size = "2 inch";
+            $wire_size = "3 AWG";
+            $ampacity = 85;
+        } elseif ($current <= 115) {
+            $conduit_size = "2-1/2 inch";
+            $wire_size = "2 AWG";
+            $ampacity = 115;
+        } elseif ($current <= 130) {
+            $conduit_size = "3 inch";
+            $wire_size = "1 AWG";
+            $ampacity = 130;
+        } else {
+            $conduit_size = "4 inch";
+            $wire_size = "2/0 AWG";
+            $ampacity = 150;
+        }
+        
+        // Protection device sizing (125% of continuous load)
+        $protection_current = $current * 1.25;
+        
+        if ($protection_current <= 15) {
+            $breaker_size = "15A";
+        } elseif ($protection_current <= 20) {
+            $breaker_size = "20A";
+        } elseif ($protection_current <= 30) {
+            $breaker_size = "30A";
+        } elseif ($protection_current <= 40) {
+            $breaker_size = "40A";
+        } elseif ($protection_current <= 50) {
+            $breaker_size = "50A";
+        } elseif ($protection_current <= 60) {
+            $breaker_size = "60A";
+        } elseif ($protection_current <= 70) {
+            $breaker_size = "70A";
+        } elseif ($protection_current <= 80) {
+            $breaker_size = "80A";
+        } elseif ($protection_current <= 90) {
+            $breaker_size = "90A";
+        } elseif ($protection_current <= 100) {
+            $breaker_size = "100A";
+        } elseif ($protection_current <= 125) {
+            $breaker_size = "125A";
+        } elseif ($protection_current <= 150) {
+            $breaker_size = "150A";
+        } elseif ($protection_current <= 200) {
+            $breaker_size = "200A";
+        } else {
+            $breaker_size = "250A";
+        }
+        
+        // Voltage drop calculation (simplified)
+        $distance = floatval($_POST['distance'] ?? 100); // feet
+        $voltage_drop_percent = ($current * $distance * 2) / (1000 * $voltage) * 100;
+        
+        // Transformer sizing
+        if ($total_load <= 15) {
+            $transformer_size = "15 kVA";
+        } elseif ($total_load <= 25) {
+            $transformer_size = "25 kVA";
+        } elseif ($total_load <= 37.5) {
+            $transformer_size = "37.5 kVA";
+        } elseif ($total_load <= 50) {
+            $transformer_size = "50 kVA";
+        } elseif ($total_load <= 75) {
+            $transformer_size = "75 kVA";
+        } elseif ($total_load <= 100) {
+            $transformer_size = "100 kVA";
+        } elseif ($total_load <= 150) {
+            $transformer_size = "150 kVA";
+        } elseif ($total_load <= 225) {
+            $transformer_size = "225 kVA";
+        } else {
+            $transformer_size = "300 kVA";
+        }
+        
+        $results = [
+            'load_current' => round($current, 1),
+            'input_current' => round($input_current, 1),
+            'conduit_size' => $conduit_size,
+            'wire_size' => $wire_size,
+            'wire_ampacity' => $ampacity,
+            'breaker_size' => $breaker_size,
+            'protection_current' => round($protection_current, 1),
+            'voltage_drop_percent' => round($voltage_drop_percent, 2),
+            'transformer_size' => $transformer_size,
+            'power_factor' => $power_factor,
+            'efficiency' => $efficiency,
+            'phase_type' => $phase,
+            'recommendations' => []
+        ];
+        
+        // Add recommendations
+        if ($voltage_drop_percent > 3) {
+            $results['recommendations'][] = "Voltage drop is high - consider larger conductors";
+        }
+        
+        if ($power_factor < 0.9) {
+            $results['recommendations'][] = "Low power factor - consider power factor correction";
+        }
+        
+        if ($efficiency < 0.85) {
+            $results['recommendations'][] = "Low efficiency - consider premium efficiency motors";
+        }
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Distribution Calculator - MEP Suite</title>
+    <link rel="stylesheet" href="../../assets/css/header.css">
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .form-section { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        .input-group input, .input-group select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; }
+        .results { background: #f8f9fa; padding: 25px; border-radius: 8px; border-left: 5px solid #007bff; }
+        .results h3 { color: #007bff; margin-top: 0; }
+        .result-item { margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px; }
+        .result-label { font-weight: bold; color: #555; }
+        .recommendations { background: #fff3cd; padding: 15px; border-radius: 6px; border-left: 5px solid #ffc107; }
+        .recommendations h4 { color: #856404; margin-top: 0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .btn { background: #007bff; color: white; padding: 12px 30px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        .single-line-diagram { background: #e9ecef; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: center; }
+        .diagram-symbol { display: inline-block; margin: 10px; padding: 10px; background: white; border: 2px solid #007bff; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <?php include '../../includes/header.php'; ?>
+    
+    <div class="container">
+        <h1>Power Distribution Calculator</h1>
+        
+        <form method="POST" class="form-section">
+            <div class="grid">
+                <div class="input-group">
+                    <label>Total Load:</label>
+                    <input type="number" step="0.1" name="total_load" value="<?= htmlspecialchars($total_load) ?>" placeholder="e.g., 50" required>
+                    <small>kW</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>System Voltage:</label>
+                    <select name="voltage">
+                        <option value="208" <?= $voltage == 208 ? 'selected' : '' ?>>208V (3-Phase)</option>
+                        <option value="480" <?= $voltage == 480 ? 'selected' : '' ?>>480V (3-Phase)</option>
+                        <option value="240" <?= $voltage == 240 ? 'selected' : '' ?>>240V (3-Phase)</option>
+                        <option value="120" <?= $voltage == 120 ? 'selected' : '' ?>>120V (Single-Phase)</option>
+                        <option value="240V" <?= $voltage == 240 ? 'selected' : '' ?>>240V (Single-Phase)</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label>Power Factor:</label>
+                    <input type="number" step="0.01" name="power_factor" value="<?= htmlspecialchars($power_factor) ?>" min="0.7" max="1.0" placeholder="0.8">
+                </div>
+                
+                <div class="input-group">
+                    <label>System Efficiency:</label>
+                    <input type="number" step="0.01" name="efficiency" value="<?= htmlspecialchars($efficiency) ?>" min="0.7" max="1.0" placeholder="0.9">
+                </div>
+                
+                <div class="input-group">
+                    <label>Phase Configuration:</label>
+                    <select name="phase">
+                        <option value="three" <?= $phase == 'three' ? 'selected' : '' ?>>Three Phase</option>
+                        <option value="single" <?= $phase == 'single' ? 'selected' : '' ?>>Single Phase</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label>Distance (optional):</label>
+                    <input type="number" step="1" name="distance" value="<?= $_POST['distance'] ?? '100' ?>" placeholder="e.g., 100">
+                    <small>Feet for voltage drop calculation</small>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">Calculate Distribution</button>
+        </form>
+        
+        <?php if (!empty($results)): ?>
+            <div class="results">
+                <h3>Power Distribution Analysis</h3>
+                
+                <div class="grid">
+                    <div class="result-item">
+                        <span class="result-label">Load Current:</span> 
+                        <?= $results['load_current'] ?> A
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Input Current:</span> 
+                        <?= $results['input_current'] ?> A
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Conduit Size:</span> 
+                        <?= $results['conduit_size'] ?>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Wire Size:</span> 
+                        <?= $results['wire_size'] ?>
+                        <br><small>(<?= $results['wire_ampacity'] ?>A ampacity)</small>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Circuit Breaker:</span> 
+                        <?= $results['breaker_size'] ?>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Voltage Drop:</span> 
+                        <?= $results['voltage_drop_percent'] ?>%
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Transformer Size:</span> 
+                        <?= $results['transformer_size'] ?>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">System Type:</span> 
+                        <?= $results['phase_type'] == 'three' ? 'Three Phase' : 'Single Phase' ?>, 
+                        <?= $results['power_factor'] ?> PF, <?= $results['efficiency'] ?> Efficiency
+                    </div>
+                </div>
+                
+                <div class="single-line-diagram">
+                    <h4>Single Line Diagram</h4>
+                    <div class="diagram-symbol">UTILITY METER</div>
+                    <div>↓</div>
+                    <div class="diagram-symbol">MAIN DISCONNECT</div>
+                    <div>↓</div>
+                    <div class="diagram-symbol">MAIN PANEL</div>
+                    <div>↓</div>
+                    <div class="diagram-symbol"><?= $results['transformer_size'] ?> TRANSFORMER</div>
+                    <div>↓</div>
+                    <div class="diagram-symbol"><?= $results['breaker_size'] ?> BREAKER</div>
+                    <div>↓</div>
+                    <div class="diagram-symbol"><?= $results['wire_size'] ?> CONDUCTORS</div>
+                    <div>↓</div>
+                    <div class="diagram-symbol">LOAD CENTER</div>
+                    <div>↓</div>
+                    <div class="diagram-symbol"><?= $total_load ?> kW LOAD</div>
+                </div>
+                
+                <?php if (!empty($results['recommendations'])): ?>
+                    <div class="recommendations">
+                        <h4>Design Recommendations</h4>
+                        <ul>
+                            <?php foreach ($results['recommendations'] as $recommendation): ?>
+                                <li><?= htmlspecialchars($recommendation) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</body>
+</html>

@@ -1,0 +1,442 @@
+<?php
+// modules/electrical/wiring/derating-calculator.php
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wire Derating Calculator - AEC Toolkit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --dark: #1a202c;
+            --light: #f7fafc;
+            --glass: rgba(255, 255, 255, 0.05);
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            --yellow: #feca57;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: var(--light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .calculator-wrapper {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            margin-top: 3rem;
+        }
+
+        .calculator-wrapper h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--yellow);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--light);
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #f093fb;
+            box-shadow: 0 0 15px rgba(240, 147, 251, 0.3);
+        }
+
+        .btn-calculate {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            border: none;
+            border-radius: 50px;
+            color: var(--light);
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .result-area {
+            margin-top: 2rem;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            padding: 2rem;
+            border-radius: 10px;
+            display: none;
+            text-align: left;
+        }
+
+        .result-area h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 0.5rem;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .result-item strong {
+            color: var(--yellow);
+        }
+
+        .result-item.warning {
+            background: rgba(255, 193, 7, 0.3);
+        }
+
+        .result-item.danger {
+            background: rgba(244, 67, 54, 0.3);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            color: #f093fb;
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .derating-note {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="calculator-wrapper">
+            <h1><i class="fas fa-thermometer-half me-2"></i>Wire Derating Calculator</h1>
+            <form id="derating-form">
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="wire-size"><i class="fas fa-wire me-2"></i>Wire Size (AWG)</label>
+                            <select id="wire-size" class="form-control" required>
+                                <option value="14">14 AWG</option>
+                                <option value="12">12 AWG</option>
+                                <option value="10">10 AWG</option>
+                                <option value="8">8 AWG</option>
+                                <option value="6">6 AWG</option>
+                                <option value="4">4 AWG</option>
+                                <option value="2">2 AWG</option>
+                                <option value="1">1 AWG</option>
+                                <option value="1/0">1/0 AWG</option>
+                                <option value="2/0">2/0 AWG</option>
+                                <option value="3/0">3/0 AWG</option>
+                                <option value="4/0">4/0 AWG</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="insulation-rating"><i class="fas fa-layer-group me-2"></i>Insulation Rating (°C)</label>
+                            <select id="insulation-rating" class="form-control" required>
+                                <option value="60">60°C (TW)</option>
+                                <option value="75">75°C (THW, THWN)</option>
+                                <option value="90">90°C (THHN, XHHW)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="ambient-temp"><i class="fas fa-thermometer-half me-2"></i>Ambient Temperature (°F)</label>
+                            <input type="number" id="ambient-temp" class="form-control" step="1" min="30" max="200" value="86" required>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="conductor-count"><i class="fas fa-list me-2"></i>Current Carrying Conductors</label>
+                            <input type="number" id="conductor-count" class="form-control" step="1" min="2" max="20" value="3" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="neutral-load"><i class="fas fa-balance-scale me-2"></i>Neutral Carries Load</label>
+                            <select id="neutral-load" class="form-control" required>
+                                <option value="no">No</option>
+                                <option value="yes">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="raceway-type"><i class="fas fa-square me-2"></i>Raceway Type</label>
+                            <select id="raceway-type" class="form-control" required>
+                                <option value="none">Free Air</option>
+                                <option value="conduit">Conduit</option>
+                                <option value="cable">Cable Tray</option>
+                                <option value="underground">Underground</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-calculate">Calculate Derating</button>
+            </form>
+            
+            <div class="derating-note">
+                <i class="fas fa-info-circle me-2"></i>
+                Wire derating per NEC 310.15 includes temperature correction and conductor count adjustment factors.
+            </div>
+            
+            <div class="result-area" id="result-area">
+                <h3><i class="fas fa-calculator me-2"></i>Derating Results</h3>
+                <div class="result-grid" id="result-grid"></div>
+            </div>
+        </div>
+        <a href="../../../electrical.php" class="back-link">Back to Electrical Module</a>
+    </div>
+
+    <script>
+        function calculateWireDerating(wireSize, insulationRating, ambientTemp, conductorCount, neutralLoad, racewayType) {
+            // Base ampacity from NEC Table 310.16 (Copper conductors)
+            const copperAmpacity = {
+                '14': { '60': 15, '75': 20, '90': 25 },
+                '12': { '60': 20, '75': 25, '90': 30 },
+                '10': { '60': 30, '75': 35, '90': 40 },
+                '8': { '60': 40, '50': 50, '90': 55 },
+                '6': { '60': 55, '75': 65, '90': 75 },
+                '4': { '60': 70, '75': 85, '90': 95 },
+                '2': { '60': 95, '75': 115, '90': 130 },
+                '1': { '60': 110, '75': 130, '90': 150 },
+                '1/0': { '60': 125, '75': 150, '90': 170 },
+                '2/0': { '60': 145, '75': 175, '90': 195 },
+                '3/0': { '60': 165, '75': 200, '90': 225 },
+                '4/0': { '60': 195, '75': 230, '90': 260 }
+            };
+            
+            let baseAmpacity = copperAmpacity[wireSize] ? copperAmpacity[wireSize][insulationRating] : 0;
+            
+            // Temperature correction factor (NEC Table 310.16)
+            const tempFactors = {
+                '60': [1.0, 0.94, 0.88, 0.82, 0.75, 0.67, 0.58, 0.47, 0.35, 0.22],
+                '75': [1.0, 0.96, 0.91, 0.87, 0.82, 0.76, 0.69, 0.61, 0.50, 0.40],
+                '90': [1.0, 0.97, 0.94, 0.90, 0.87, 0.83, 0.78, 0.72, 0.65, 0.58]
+            };
+            
+            // Convert ambient temp to adjustment factor
+            const tempIndex = Math.floor((ambientTemp - 86) / 5);
+            let tempFactor = 1.0;
+            if (tempIndex >= 0 && tempIndex < tempFactors[insulationRating].length) {
+                tempFactor = tempFactors[insulationRating][tempIndex];
+            }
+            
+            // Determine effective conductor count for adjustment
+            let effectiveCount = conductorCount;
+            if (neutralLoad === 'yes' && conductorCount >= 4) {
+                // For 4+ conductors, neutral may not carry unbalanced load
+                effectiveCount = Math.max(3, conductorCount - 1);
+            }
+            
+            // Conductor adjustment factor (NEC 310.15)
+            let adjustmentFactor = 1.0;
+            let adjustmentClass = '';
+            if (effectiveCount > 3) {
+                if (effectiveCount <= 6) {
+                    adjustmentFactor = 0.8;
+                    adjustmentClass = 'warning';
+                } else if (effectiveCount <= 9) {
+                    adjustmentFactor = 0.7;
+                    adjustmentClass = 'warning';
+                } else if (effectiveCount <= 20) {
+                    adjustmentFactor = 0.5;
+                    adjustmentClass = 'danger';
+                } else {
+                    adjustmentFactor = 0.4;
+                    adjustmentClass = 'danger';
+                }
+            }
+            
+            // Apply raceway factor (additional derating for raceway fill)
+            let racewayFactor = 1.0;
+            if (racewayType === 'conduit' && effectiveCount > 6) {
+                racewayFactor = 0.9; // Additional 10% for conduit
+            }
+            
+            // Calculate final ampacity
+            const tempCorrectedAmpacity = baseAmpacity * tempFactor;
+            const adjustedAmpacity = tempCorrectedAmpacity * adjustmentFactor * racewayFactor;
+            
+            return {
+                baseAmpacity: baseAmpacity,
+                tempFactor: tempFactor,
+                tempCorrectedAmpacity: tempCorrectedAmpacity,
+                adjustmentFactor: adjustmentFactor,
+                racewayFactor: racewayFactor,
+                adjustedAmpacity: adjustedAmpacity,
+                effectiveCount: effectiveCount,
+                adjustmentClass: adjustmentClass,
+                wireSize: wireSize,
+                insulationRating: insulationRating,
+                ambientTemp: ambientTemp,
+                conductorCount: conductorCount,
+                neutralLoad: neutralLoad,
+                racewayType: racewayType
+            };
+        }
+
+        document.getElementById('derating-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const wireSize = document.getElementById('wire-size').value;
+            const insulationRating = document.getElementById('insulation-rating').value;
+            const ambientTemp = parseFloat(document.getElementById('ambient-temp').value);
+            const conductorCount = parseInt(document.getElementById('conductor-count').value);
+            const neutralLoad = document.getElementById('neutral-load').value;
+            const racewayType = document.getElementById('raceway-type').value;
+
+            if (isNaN(ambientTemp) || isNaN(conductorCount)) {
+                alert('Please enter valid numbers.');
+                return;
+            }
+            
+            const result = calculateWireDerating(wireSize, insulationRating, ambientTemp, conductorCount, neutralLoad, racewayType);
+            
+            const insulationText = {
+                '60': '60°C (TW)',
+                '75': '75°C (THW, THWN)',
+                '90': '90°C (THHN, XHHW)'
+            };
+            
+            const racewayText = {
+                'none': 'Free Air',
+                'conduit': 'Conduit',
+                'cable': 'Cable Tray',
+                'underground': 'Underground'
+            };
+            
+            const resultHtml = `
+                <div class="result-item">
+                    <strong>Wire Size:</strong><br>${result.wireSize} AWG
+                </div>
+                <div class="result-item">
+                    <strong>Insulation Rating:</strong><br>${insulationText[result.insulationRating]}
+                </div>
+                <div class="result-item">
+                    <strong>Ambient Temperature:</strong><br>${result.ambientTemp}°F
+                </div>
+                <div class="result-item">
+                    <strong>Current Conductors:</strong><br>${result.conductorCount}
+                </div>
+                <div class="result-item">
+                    <strong>Effective Conductors:</strong><br>${result.effectiveCount}
+                </div>
+                <div class="result-item">
+                    <strong>Base Ampacity:</strong><br>${result.baseAmpacity} A
+                </div>
+                <div class="result-item">
+                    <strong>Temperature Factor:</strong><br>${result.tempFactor.toFixed(3)}
+                </div>
+                <div class="result-item">
+                    <strong>Temp Corrected:</strong><br>${result.tempCorrectedAmpacity.toFixed(1)} A
+                </div>
+                <div class="result-item">
+                    <strong>Adjustment Factor:</strong><br>${result.adjustmentFactor.toFixed(3)}
+                </div>
+                <div class="result-item">
+                    <strong>Raceway Factor:</strong><br>${result.racewayFactor.toFixed(3)}
+                </div>
+                <div class="result-item ${result.adjustmentClass}">
+                    <strong>Final Ampacity:</strong><br>${result.adjustedAmpacity.toFixed(1)} A
+                </div>
+                <div class="result-item">
+                    <strong>Raceway Type:</strong><br>${racewayText[racewayType]}
+                </div>
+            `;
+            
+            document.getElementById('result-grid').innerHTML = resultHtml;
+            document.getElementById('result-area').style.display = 'block';
+            
+            // Save calculation
+            saveCalculation('Wire Derating', `${result.wireSize}AWG ${result.insulationRating}°C → ${result.adjustedAmpacity.toFixed(1)}A`);
+        });
+
+        function saveCalculation(type, calculation) {
+            let recent = JSON.parse(localStorage.getItem('recentWireDeratingCalculations') || '[]');
+            recent.unshift({
+                type: type,
+                calculation: calculation,
+                timestamp: new Date().toLocaleString()
+            });
+            
+            recent = recent.slice(0, 5);
+            localStorage.setItem('recentWireDeratingCalculations', JSON.stringify(recent));
+        }
+    </script>
+</body>
+</html>

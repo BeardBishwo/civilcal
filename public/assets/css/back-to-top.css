@@ -1,0 +1,246 @@
+/* assets/css/back-to-top.css - Back to Top Button Styling */
+
+.back-to-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9999;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.back-to-top-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.back-to-top-btn:hover::before {
+    left: 100%;
+}
+
+.back-to-top-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 1), rgba(118, 75, 162, 1));
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.back-to-top-btn:hover i {
+    animation: float 1s ease-in-out infinite;
+}
+
+.back-to-top-btn:active {
+    transform: translateY(-2px);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.back-to-top-btn.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0);
+    pointer-events: auto;
+    display: flex !important;
+}
+
+.back-to-top-btn i {
+    font-size: 1rem;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-block;
+}
+
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+.back-to-top-btn:hover i {
+    animation: bounce 0.6s ease infinite alternate;
+}
+
+@keyframes bounce {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-3px);
+    }
+}
+
+.back-to-top-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.back-to-top-btn:hover .back-to-top-text {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+
+/* Pulse animation on scroll */
+
+.back-to-top-btn.pulse {
+    animation: pulse 2s ease infinite;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+        box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
+    }
+}
+
+
+/* Dark theme support */
+
+body[data-theme="dark"] .back-to-top-btn {
+    background: var(--glass, rgba(0, 0, 0, 0.2));
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e6eefc;
+}
+
+body[data-theme="dark"] .back-to-top-btn:hover {
+    background: var(--glass, rgba(0, 0, 0, 0.3));
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #f093fb;
+}
+
+body.dark-theme .back-to-top-btn {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(240, 147, 251, 0.15));
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e6eefc;
+}
+
+body.dark-theme .back-to-top-btn:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.25), rgba(240, 147, 251, 0.25));
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #f093fb;
+    box-shadow: 0 8px 25px rgba(240, 147, 251, 0.2);
+}
+
+
+/* Mobile responsive */
+
+@media (max-width: 768px) {
+    .back-to-top-btn {
+        width: 50px;
+        height: 50px;
+        bottom: 20px;
+        right: 20px;
+        font-size: 1rem;
+    }
+    .back-to-top-btn i {
+        font-size: 1.1rem;
+    }
+    .back-to-top-text {
+        display: none;
+    }
+    .back-to-top-btn:hover .back-to-top-text {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .back-to-top-btn {
+        width: 45px;
+        height: 45px;
+        bottom: 15px;
+        right: 15px;
+        font-size: 0.9rem;
+    }
+    .back-to-top-btn i {
+        font-size: 1rem;
+    }
+}
+
+
+/* High contrast mode support */
+
+@media (prefers-contrast: high) {
+    .back-to-top-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border-color: #000;
+        color: #000;
+    }
+    .back-to-top-btn:hover {
+        background: #fff;
+        border-color: #000;
+        color: #000;
+    }
+}
+
+
+/* Reduced motion support */
+
+@media (prefers-reduced-motion: reduce) {
+    .back-to-top-btn,
+    .back-to-top-btn *,
+    .back-to-top-btn::before {
+        animation: none !important;
+        transition: none !important;
+    }
+    .back-to-top-btn:hover i {
+        animation: none !important;
+    }
+}
+
+
+/* Loading state */
+
+.back-to-top-btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.back-to-top-btn.loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
