@@ -74,3 +74,42 @@ $router->add('GET', '/user/exports/download/{filename}', 'ExportController@downl
 $router->add('GET', '/user/exports/search', 'ExportController@searchTemplates', ['auth']);
 $router->add('GET', '/user/exports/stats', 'ExportController@getStats', ['auth']);
 $router->add('POST', '/user/exports/cleanup', 'ExportController@cleanup', ['auth']);
+
+// Share & Comment System Routes
+$router->add('GET', '/share/create', 'ShareController@create', ['auth']);
+$router->add('POST', '/share/store', 'ShareController@store', ['auth']);
+$router->add('GET', '/share/my-shares', 'ShareController@myShares', ['auth']);
+$router->add('GET', '/share/public/{token}', 'ShareController@publicView');
+$router->add('POST', '/share/{id}/embed', 'ShareController@generateEmbed', ['auth']);
+$router->add('DELETE', '/share/{id}', 'ShareController@destroy', ['auth']);
+
+// Comment System Routes
+$router->add('POST', '/comments', 'CommentController@store', ['auth']);
+$router->add('POST', '/comments/{id}/reply', 'CommentController@reply', ['auth']);
+$router->add('POST', '/comments/{id}/vote', 'CommentController@vote', ['auth']);
+$router->add('PUT', '/comments/{id}', 'CommentController@update', ['auth']);
+$router->add('DELETE', '/comments/{id}', 'CommentController@destroy', ['auth']);
+$router->add('GET', '/comments/share/{shareId}', 'CommentController@getByShare');
+
+// Email Manager Admin Routes
+$router->add('GET', '/admin/email-manager', 'Admin\EmailManagerController@dashboard', ['auth', 'admin']);
+$router->add('GET', '/admin/email-manager/threads', 'Admin\EmailManagerController@threads', ['auth', 'admin']);
+$router->add('GET', '/admin/email-manager/thread/{id}', 'Admin\EmailManagerController@viewThread', ['auth', 'admin']);
+$router->add('POST', '/admin/email-manager/thread/{id}/reply', 'Admin\EmailManagerController@reply', ['auth', 'admin']);
+$router->add('POST', '/admin/email-manager/thread/{id}/status', 'Admin\EmailManagerController@updateStatus', ['auth', 'admin']);
+$router->add('POST', '/admin/email-manager/thread/{id}/assign', 'Admin\EmailManagerController@assign', ['auth', 'admin']);
+$router->add('POST', '/admin/email-manager/thread/{id}/priority', 'Admin\EmailManagerController@updatePriority', ['auth', 'admin']);
+
+// Email Templates Admin Routes
+$router->add('GET', '/admin/email-manager/templates', 'Admin\EmailManagerController@templates', ['auth', 'admin']);
+$router->add('POST', '/admin/email-manager/templates', 'Admin\EmailManagerController@createTemplate', ['auth', 'admin']);
+$router->add('GET', '/admin/email-manager/template/{id}', 'Admin\EmailManagerController@editTemplate', ['auth', 'admin']);
+$router->add('PUT', '/admin/email-manager/template/{id}', 'Admin\EmailManagerController@updateTemplate', ['auth', 'admin']);
+$router->add('DELETE', '/admin/email-manager/template/{id}', 'Admin\EmailManagerController@deleteTemplate', ['auth', 'admin']);
+$router->add('POST', '/admin/email-manager/templates/{id}/use', 'Admin\EmailManagerController@useTemplate', ['auth', 'admin']);
+
+// API Routes for Share & Comment System
+$router->add('GET', '/api/comments/{shareId}', 'CommentController@getByShare');
+$router->add('POST', '/api/comments/{id}/vote', 'CommentController@vote', ['auth']);
+$router->add('POST', '/api/share/{id}/embed', 'ShareController@generateEmbed', ['auth']);
+$router->add('POST', '/api/share', 'ShareController@store', ['auth']);
