@@ -1,49 +1,52 @@
 <?php
+
 namespace App\Core;
 
+use PDO;
+use PDOException;
+
 class Database {
-    private $connection;
-    private $host;
-    private $dbname;
-    private $username;
-    private $password;
+    private static $instance = null;
+    private $pdo;
     
-    public function __construct() {
-        $config = require_once CONFIG_PATH . '/database.php';
+    private function __construct() {
+        $config = require_once __DIR__ . '/../../config/database.php';
         
-        $this->host = $config['host'];
-        $this->dbname = $config['database'];
-        $this->username = $config['username'];
-        $this->password = $config['password'];
-        
-        $this->connect();
-    }
-    
-    private function connect() {
         try {
-            $dsn = "mysql:host={$this->host};dbname={$this->dbname};charset=utf8mb4";
-            $this->connection = new \PDO($dsn, $this->username, $this->password, [
-                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-                \PDO::ATTR_EMULATE_PREPARES => false,
-            ]);
-        } catch (\PDOException $e) {
+            $dsn = "mysql:host={$config['host']};dbname={$config['database']}";
+            if (isset($config['charset'])) {
+                $dsn .= ";charset={$config['charset']}";
+            }
+            
+            $this->pdo = new PDO(
+                $dsn,
+                $config['username'],
+                $config['password'],
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ]
+            );
+        } catch (PDOException $e) {
             throw new \Exception("Database connection failed: " . $e->getMessage());
         }
     }
     
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+    
+    public function getPdo() {
+        return $this->pdo;
+    }
+    
     public function query($sql, $params = []) {
-        $stmt = $this->connection->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt;
     }
-    
-    public function prepare($sql) {
-        return $this->connection->prepare($sql);
-    }
-    
-    public function lastInsertId() {
-        return $this->connection->lastInsertId();
-    }
 }
-?>

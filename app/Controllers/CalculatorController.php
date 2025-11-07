@@ -2,11 +2,146 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Models\CalculationHistory;
 
 class CalculatorController extends Controller {
     
     public function __construct() {
         parent::__construct();
+    }
+    
+    // Add this method to save calculation history
+    private function saveToHistory($calculatorType, $inputs, $results, $title = null) {
+        // Check if user is logged in
+        $auth = new \App\Core\Auth();
+        if (!$auth->check()) {
+            return; // Don't save if user not logged in
+        }
+
+        $user = $auth->user();
+        $historyModel = new CalculationHistory();
+        
+        // Auto-generate title if not provided
+        if (!$title) {
+            $title = $calculatorType . ' Calculation - ' . date('M j, Y g:i A');
+        }
+
+        $historyModel->saveCalculation(
+            $user->id, 
+            $calculatorType, 
+            $inputs, 
+            $results, 
+            $title
+        );
+    }
+    
+    // Add this method to handle calculation results and save to history
+    public function saveCalculation() {
+        // This method would be called via AJAX when a calculation is completed
+        $auth = new \App\Core\Auth();
+        if (!$auth->check()) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Not logged in']);
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $calculatorType = $input['calculator_type'] ?? 'Unknown';
+        $inputs = $input['inputs'] ?? [];
+        $results = $input['results'] ?? [];
+        $title = $input['title'] ?? null;
+
+        $this->saveToHistory($calculatorType, $inputs, $results, $title);
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'message' => 'Calculation saved to history']);
+    }
+    
+    // Add this method to calculate and save history
+    public function calculate($calculatorType, $inputs) {
+        // Get calculation results based on calculator type
+        $results = $this->processCalculation($calculatorType, $inputs);
+        
+        // Save to history
+        $this->saveToHistory($calculatorType, $inputs, $results);
+        
+        return $results;
+    }
+    
+    // Placeholder method for actual calculation processing
+    private function processCalculation($calculatorType, $inputs) {
+        // This would contain the actual calculation logic for each calculator type
+        // For now, returning a placeholder result
+        return [
+            'input_received' => $inputs,
+            'calculator_type' => $calculatorType,
+            'calculated_at' => date('Y-m-d H:i:s'),
+            'status' => 'processed'
+        ];
+    }
+    
+    // Add dashboard method
+    public function dashboard() {
+        $this->setCategory('dashboard');
+        $this->setTitle('Dashboard - Bishwo Calculator');
+        
+        // Get recent calculations if user is logged in
+        $recentCalculations = [];
+        $auth = new \App\Core\Auth();
+        if ($auth->check()) {
+            $user = $auth->user();
+            $historyModel = new CalculationHistory();
+            $recentCalculations = $historyModel->getRecentCalculations($user->id, 5);
+        }
+        
+        $data = [
+            'title' => 'Dashboard',
+            'recent_calculations' => $recentCalculations,
+            'total_calculators' => 200, // Example number
+            'categories' => [
+                'civil' => 'Civil Engineering',
+                'electrical' => 'Electrical Engineering', 
+                'structural' => 'Structural Engineering',
+                'plumbing' => 'Plumbing Engineering',
+                'hvac' => 'HVAC Engineering',
+                'fire' => 'Fire Protection',
+                'mep' => 'MEP Integration',
+                'estimation' => 'Cost Estimation',
+                'management' => 'Project Management',
+                'site' => 'Site Engineering'
+            ]
+        ];
+        
+        $this->view('dashboard', $data);
+    }
+    
+    // Add category method
+    public function category($category) {
+        $this->setCategory($category);
+        $this->setTitle(ucfirst($category) . ' Engineering Calculator');
+        
+        $data = [
+            'category' => $category,
+            'title' => ucfirst($category) . ' Engineering Tools',
+            'description' => 'Professional ' . $category . ' engineering calculation tools'
+        ];
+        
+        $this->view($category . '/index', $data);
+    }
+    
+    // Add show method
+    public function show($category, $calculator) {
+        $this->setCategory($category);
+        $this->setTitle(ucfirst(str_replace('-', ' ', $calculator)) . ' Calculator');
+        
+        $data = [
+            'category' => $category,
+            'calculator' => $calculator,
+            'title' => ucfirst(str_replace('-', ' ', $calculator)) . ' Calculator',
+            'description' => 'Calculate ' . str_replace('-', ' ', $calculator) . ' with our professional tool'
+        ];
+        
+        $this->view('calculators/' . $category . '/' . $calculator, $data);
     }
     
     /**

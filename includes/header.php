@@ -1626,7 +1626,7 @@ m        color: #93c5fd;
                                 <i class="fas fa-user-circle"></i>
                             </button>
                             <div class="profile-dropdown" id="profileDropdown">
-                                <a href="<?php echo app_base_url('profile.php'); ?>" class="menu-item">
+                                <a href="/user/profile" class="menu-item">
                                     <i class="fas fa-user-edit" style="color: #8b5cf6;"></i>
                                     <span class="text">Profile Settings</span>
                                 </a>

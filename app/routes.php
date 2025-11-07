@@ -19,6 +19,15 @@ $router->add('POST', '/api/calculate/{calculator}', 'ApiController@calculate', [
 $router->add('GET', '/profile', 'UserController@profile', ['auth']);
 $router->add('POST', '/profile', 'UserController@updateProfile', ['auth']);
 
+// Profile Management Routes
+$router->add('GET', '/user/profile', 'ProfileController@index', ['auth']);
+$router->add('POST', '/profile/update', 'ProfileController@updateProfile', ['auth']);
+$router->add('POST', '/profile/notifications', 'ProfileController@updateNotifications', ['auth']);
+$router->add('POST', '/profile/privacy', 'ProfileController@updatePrivacy', ['auth']);
+$router->add('POST', '/profile/password', 'ProfileController@changePassword', ['auth']);
+$router->add('POST', '/profile/delete', 'ProfileController@deleteAccount', ['auth']);
+$router->add('GET', '/profile/avatar/{filename}', 'ProfileController@serveAvatar', ['auth']);
+
 // Admin Routes
 $router->add('GET', '/admin', 'Admin\DashboardController@index', ['auth', 'admin']);
 $router->add('GET', '/admin/users', 'Admin\UserController@index', ['auth', 'admin']);
@@ -38,3 +47,30 @@ $router->add('POST', '/admin/themes/upload', 'Admin\ThemeController@upload', ['a
 $router->add('POST', '/admin/themes/activate/{slug}', 'Admin\ThemeController@activate', ['auth', 'admin']);
 $router->add('POST', '/admin/themes/delete/{slug}', 'Admin\ThemeController@delete', ['auth', 'admin']);
 $router->add('GET', '/admin/themes/details/{slug}', 'Admin\ThemeController@details', ['auth', 'admin']);
+
+// History Management Routes
+$router->add('GET', '/history', 'HistoryController@index', ['auth']);
+$router->add('GET', '/history/search', 'HistoryController@search', ['auth']);
+$router->add('POST', '/history/save', 'HistoryController@saveCalculation', ['auth']);
+$router->add('POST', '/history/favorite/{id}', 'HistoryController@toggleFavorite', ['auth']);
+$router->add('GET', '/history/delete/{id}', 'HistoryController@delete', ['auth']);
+$router->add('GET', '/history/view/{id}', 'HistoryController@view', ['auth']);
+$router->add('GET', '/history/stats', 'HistoryController@stats', ['auth']);
+$router->add('GET', '/history/recent', 'HistoryController@recent', ['auth']);
+$router->add('GET', '/history/by-type/{calculatorType}', 'HistoryController@byType', ['auth']);
+$router->add('GET', '/history/export', 'HistoryController@export', ['auth']);
+$router->add('POST', '/history/bulk-delete', 'HistoryController@bulkDelete', ['auth']);
+$router->add('POST', '/history/bulk-favorite', 'HistoryController@bulkFavorite', ['auth']);
+
+// Export Management Routes
+$router->add('GET', '/user/exports/templates', 'ExportController@templates', ['auth']);
+$router->add('POST', '/user/exports/create-template', 'ExportController@createTemplate', ['auth']);
+$router->add('POST', '/user/exports/update-template/{id}', 'ExportController@updateTemplate', ['auth']);
+$router->add('POST', '/user/exports/delete-template/{id}', 'ExportController@deleteTemplate', ['auth']);
+$router->add('POST', '/user/exports/duplicate-template/{id}', 'ExportController@duplicateTemplate', ['auth']);
+$router->add('GET', '/user/exports/template-config/{id}', 'ExportController@getTemplateConfig', ['auth']);
+$router->add('POST', '/user/exports/export', 'ExportController@export', ['auth']);
+$router->add('GET', '/user/exports/download/{filename}', 'ExportController@download', ['auth']);
+$router->add('GET', '/user/exports/search', 'ExportController@searchTemplates', ['auth']);
+$router->add('GET', '/user/exports/stats', 'ExportController@getStats', ['auth']);
+$router->add('POST', '/user/exports/cleanup', 'ExportController@cleanup', ['auth']);
