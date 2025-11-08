@@ -3,6 +3,51 @@
  * Advanced Logging System for Bishwo Calculator
  */
 
+// Define missing logging constants
+if (!defined('LOG_TO_FILE')) {
+    define('LOG_TO_FILE', true);
+}
+
+if (!defined('LOG_TO_CONSOLE')) {
+    define('LOG_TO_CONSOLE', true);
+}
+
+if (!defined('CURRENT_LOG_LEVEL')) {
+    define('CURRENT_LOG_LEVEL', LOG_LEVEL_INFO);
+}
+
+if (!defined('DEBUG_LOG_PATH')) {
+    define('DEBUG_LOG_PATH', __DIR__ . '/logs/debug.log');
+}
+
+if (!defined('ERROR_LOG_PATH')) {
+    define('ERROR_LOG_PATH', __DIR__ . '/logs/error.log');
+}
+
+if (!defined('ACCESS_LOG_PATH')) {
+    define('ACCESS_LOG_PATH', __DIR__ . '/logs/access.log');
+}
+
+if (!defined('SYSTEM_LOG_PATH')) {
+    define('SYSTEM_LOG_PATH', __DIR__ . '/logs/system.log');
+}
+
+if (!defined('LOG_LEVEL_ERROR')) {
+    define('LOG_LEVEL_ERROR', 1);
+}
+
+if (!defined('LOG_LEVEL_WARNING')) {
+    define('LOG_LEVEL_WARNING', 2);
+}
+
+if (!defined('LOG_LEVEL_INFO')) {
+    define('LOG_LEVEL_INFO', 3);
+}
+
+if (!defined('LOG_LEVEL_DEBUG')) {
+    define('LOG_LEVEL_DEBUG', 4);
+}
+
 function debug_log($message, $level = LOG_LEVEL_INFO) {
     // Check if we should log this level
     if ($level > CURRENT_LOG_LEVEL) {

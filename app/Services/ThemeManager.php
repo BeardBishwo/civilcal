@@ -295,5 +295,44 @@ class ThemeManager
     {
         return $this->currentTheme['category_styles'] ?? [];
     }
+
+    /* Static helpers for backward compatibility when called statically */
+    public static function getAllThemes()
+    {
+        $tm = new self();
+        return $tm->getAvailableThemes();
+    }
+
+    public static function installTheme($themeName)
+    {
+        // Basic placeholder: attempt to create theme directory
+        $tm = new self();
+        $themePath = $tm->themesPath . $themeName;
+        if (!is_dir($themePath)) {
+            return mkdir($themePath, 0755, true);
+        }
+        return false;
+    }
+
+    public static function activateTheme($themeName)
+    {
+        $tm = new self();
+        return $tm->setTheme($themeName);
+    }
+
+    public static function deleteTheme($themeName)
+    {
+        $tm = new self();
+        $themePath = $tm->themesPath . $themeName;
+        if (is_dir($themePath)) {
+            // basic recursive delete
+            $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($themePath, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
+            foreach ($it as $file) {
+                if ($file->isDir()) rmdir($file->getRealPath()); else unlink($file->getRealPath());
+            }
+            return rmdir($themePath);
+        }
+        return false;
+    }
 }
 ?>

@@ -80,14 +80,14 @@ function performClashAnalysis($data) {
     // Perform clash detection
     $hard_clashes = detectHardClashes($mechanical_layout, $electrical_layout, $plumbing_layout, $fire_protection_layout);
     $soft_clashes = detectSoftClashes($mechanical_layout, $electrical_layout, $plumbing_layout, $fire_protection_layout);
-    $4d_clashes = detect4DClashes($mechanical_layout, $electrical_layout, $plumbing_layout, $fire_protection_layout);
+    $clashes4d = detect4DClashes($mechanical_layout, $electrical_layout, $plumbing_layout, $fire_protection_layout);
     
     // Calculate clash statistics
-    $total_clashes = count($hard_clashes) + count($soft_clashes) + count($4d_clashes);
+    $total_clashes = count($hard_clashes) + count($soft_clashes) + count($clashes4d);
     $clash_density = $building_area > 0 ? $total_clashes / $building_area : 0;
     
     // Generate resolution recommendations
-    $resolution_recommendations = generateResolutionRecommendations($hard_clashes, $soft_clashes, $4d_clashes);
+    $resolution_recommendations = generateResolutionRecommendations($hard_clashes, $soft_clashes, $clashes4d);
     
     // Calculate coordination score
     $coordination_score = calculateCoordinationScore($total_clashes, $building_area, $complexity_level);
@@ -122,12 +122,12 @@ function performClashAnalysis($data) {
             'fire_protection' => $fire_protection_layout
         ),
         'clash_results' => array(
-            'hard_clashes' => $hard_clashes,
-            'soft_clashes' => $soft_clashes,
-            '4d_clashes' => $4d_clashes,
-            'total_clashes' => $total_clashes,
-            'clash_density' => $clash_density
-        ),
+                'hard_clashes' => $hard_clashes,
+                'soft_clashes' => $soft_clashes,
+                '4d_clashes' => $clashes4d,
+                'total_clashes' => $total_clashes,
+                'clash_density' => $clash_density
+            ),
         'statistics' => array(
             'coordination_score' => $coordination_score,
             'critical_clashes' => $critical_clashes,
@@ -479,7 +479,7 @@ function calculateResolutionEfficiency($recommendations) {
 /**
  * Generate resolution recommendations
  */
-function generateResolutionRecommendations($hard_clashes, $soft_clashes, $4d_clashes) {
+function generateResolutionRecommendations($hard_clashes, $soft_clashes, $clashes4d) {
     $recommendations = array();
     
     // Process hard clashes
@@ -533,7 +533,7 @@ function generateResolutionRecommendations($hard_clashes, $soft_clashes, $4d_cla
     }
     
     // Process 4D clashes
-    foreach ($4d_clashes as $clash) {
+    foreach ($clashes4d as $clash) {
         $recommendations[] = array(
             'clash_id' => $clash['id'],
             'priority' => 'low',

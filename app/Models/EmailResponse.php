@@ -42,5 +42,28 @@ class EmailResponse {
         $stmt->execute([$threadId]);
         return $stmt->fetchAll();
     }
+
+    // Compatibility wrappers expected by controllers
+    public function getResponsesByThread($threadId)
+    {
+        return $this->getByThread($threadId);
+    }
+
+    public function addResponse($data)
+    {
+        $success = $this->create([
+            'thread_id' => $data['thread_id'],
+            'user_id' => $data['user_id'],
+            'message' => $data['content'] ?? ($data['message'] ?? ''),
+            'is_internal_note' => $data['is_internal'] ?? ($data['is_internal_note'] ?? false)
+        ]);
+
+        if ($success) {
+            // return the created response (best effort)
+            $lastId = $this->db->lastInsertId();
+            return $this->find($lastId);
+        }
+        return false;
+    }
 }
 ?>

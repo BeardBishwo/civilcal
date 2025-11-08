@@ -132,17 +132,8 @@ $router->add('PUT', '/admin/email-manager/template/{id}', 'Admin\EmailManagerCon
 $router->add('DELETE', '/admin/email-manager/template/{id}', 'Admin\EmailManagerController@deleteTemplate', ['auth', 'admin']);
 $router->add('POST', '/admin/email-manager/templates/{id}/use', 'Admin\EmailManagerController@useTemplate', ['auth', 'admin']);
 
-// Error Monitoring & Logging Routes
-$router->add('GET', '/admin/error-logs', 'Admin\ErrorLogController@index', ['auth', 'admin']);
-$router->add('GET', '/admin/error-logs/get-error-stats', 'Admin\ErrorLogController@getErrorStats', ['auth', 'admin']);
-$router->add('GET', '/admin/error-logs/get-method-calls', 'Admin\ErrorLogController@getMethodCalls', ['auth', 'admin']);
-$router->add('GET', '/admin/error-logs/get-failed-calls', 'Admin\ErrorLogController@getFailedCalls', ['auth', 'admin']);
-$router->add('POST', '/admin/error-logs/clear-logs', 'Admin\ErrorLogController@clearLogs', ['auth', 'admin']);
-$router->add('GET', '/admin/error-logs/export-logs', 'Admin\ErrorLogController@exportLogs', ['auth', 'admin']);
-
 // API Routes for Share & Comment System
 $router->add('GET', '/api/comments/{shareId}', 'CommentController@getByShare');
 $router->add('POST', '/api/comments/{id}/vote', 'CommentController@vote', ['auth']);
 $router->add('POST', '/api/share/{id}/embed', 'ShareController@generateEmbed', ['auth']);
 $router->add('POST', '/api/share', 'ShareController@store', ['auth']);
-?>

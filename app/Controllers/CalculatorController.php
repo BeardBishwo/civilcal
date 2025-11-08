@@ -381,5 +381,37 @@ class CalculatorController extends Controller {
         
         $this->view('site/index', $data);
     }
+    
+    /**
+     * Traditional Nepali Units Calculator
+     */
+    public function traditionalUnits() {
+        $this->setCategory('traditional-units');
+        $this->setTitle('Traditional Nepali Units Calculator');
+        $this->setDescription('Convert between traditional Nepali measurement units with geolocation awareness');
+        
+        $data = [
+            'title' => 'Traditional Nepali Units Calculator',
+            'description' => 'Convert between traditional Nepali measurement units (Ropani, Bigha, Kattha, Aana, Paisa, Daam, Dhur) with automatic geolocation detection for Nepali users',
+            'widget_enabled' => true,
+            'geolocation_available' => true,
+            'supported_units' => [
+                'dhur' => 'Dhur (धुर)',
+                'daam' => 'Daam (दाम)',
+                'paisa' => 'Paisa (पैसा)',
+                'aana' => 'Aana (आना)',
+                'kattha' => 'Kattha (कठ्ठा)',
+                'bigha' => 'Bigha (बिघा)',
+                'ropani' => 'Ropani (रोपनी)'
+            ],
+            'metric_units' => [
+                'sq_feet' => 'Square Feet',
+                'sq_meter' => 'Square Meters',
+                'sq_yard' => 'Square Yards'
+            ]
+        ];
+        
+        $this->view('calculators/traditional-units', $data);
+    }
 }
 ?>

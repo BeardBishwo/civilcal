@@ -129,6 +129,59 @@ class EmailTemplate {
             'content' => $content
         ];
     }
+
+    // Compatibility wrappers expected by controllers
+    public function getAllTemplates()
+    {
+        return $this->getAll();
+    }
+
+    public function createTemplate($data)
+    {
+        $success = $this->create($data);
+        if ($success) {
+            $lastId = $this->db->lastInsertId();
+            return $this->find($lastId);
+        }
+        return false;
+    }
+
+    public function updateTemplate($id, $data)
+    {
+        return $this->update($id, $data);
+    }
+
+    public function getTemplateById($id)
+    {
+        return $this->find($id);
+    }
+
+    public function deleteTemplate($id)
+    {
+        return $this->delete($id);
+    }
+
+    /**
+     * Process template content string with variables
+     */
+    public function processTemplateContent($content, $variables = [])
+    {
+        foreach ($variables as $key => $value) {
+            $content = str_replace("{{$key}}", $value, $content);
+        }
+        return $content;
+    }
+
+    // Make processTemplate flexible: accept id or content
+    public function processTemplateFlexible($input, $variables = [])
+    {
+        if (is_numeric($input)) {
+            $result = $this->processTemplate(intval($input), $variables);
+            if ($result === false) return false;
+            return $result['content'];
+        }
+        return $this->processTemplateContent($input, $variables);
+    }
     
     public function toggleActive($id) {
         $stmt = $this->db->getPdo()->prepare("

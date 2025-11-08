@@ -165,19 +165,19 @@ class BIMIntegration {
     
     public function getBIMModelElements($modelId, $category = null) {
         $sql = "SELECT * FROM mep_bim_elements WHERE model_id = ?";
-        $params = [$modelId];
-        $types = "i";
-        
+
         if ($category) {
             $sql .= " AND category = ?";
-            $params[] = $category;
-            $types .= "s";
         }
-        
+
         $sql .= " ORDER BY element_type, element_id";
-        
+
         $stmt = $this->db->prepare($sql);
-        $stmt->bind_param(...$params);
+        if ($category) {
+            $stmt->bind_param("is", $modelId, $category);
+        } else {
+            $stmt->bind_param("i", $modelId);
+        }
         $stmt->execute();
         $result = $stmt->get_result();
         
@@ -315,7 +315,9 @@ class BIMIntegration {
         
         $elementId = 100;
         foreach ($elements as $element) {
-            $ifcContent .= "#{$elementId}=IFCBUILDINGELEMENT('{$element['element_id']}',#{$elementId+1},$,'{$element['element_type']}',$,$,$,$,$);\n";
+            $nextId = $elementId + 1;
+            // use a computed next id instead of inline expression in interpolation
+            $ifcContent .= "#{$elementId}=IFCBUILDINGELEMENT('{$element['element_id']}',#{$nextId},$,'{$element['element_type']}',\$,\$,\$,\$,\$);\n";
             $elementId++;
         }
         

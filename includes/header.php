@@ -1403,7 +1403,7 @@ if (!empty($_COOKIE['site_theme']) && $_COOKIE['site_theme'] === 'dark') {
     body.dark-theme .help-btn {
         background: linear-gradient(135deg, rgba(96,165,250,0.15), rgba(59,130,246,0.1));
         border: 1px solid rgba(96,165,250,0.3);
-m        color: #93c5fd;
+        color: #93c5fd;
     }
 
     body.dark-theme .help-btn:hover {

@@ -132,7 +132,7 @@ class Comment {
             
             $db->commit();
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $db->rollback();
             return false;
         }

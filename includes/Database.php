@@ -10,6 +10,11 @@ class Database {
     private $password;
     private $charset;
     public $conn;
+    /**
+     * Singleton instance
+     * @var Database|null
+     */
+    private static $instance = null;
 
     /**
      * Constructor - initialize database connection parameters
@@ -49,6 +54,27 @@ class Database {
         }
         
         return $this->conn;
+    }
+
+    /**
+     * Return singleton instance of Database
+     * @return Database
+     */
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    /**
+     * Backwards-compatible alias used across the codebase
+     * @return PDO|null
+     */
+    public function getPdo()
+    {
+        return $this->getConnectionObject();
     }
 
     /**
@@ -174,6 +200,44 @@ class Database {
             error_log('Last insert ID error: ' . $e->getMessage());
         }
         return 0;
+    }
+
+    /**
+     * Compatibility: provide a mysqli-like prepare() wrapper that returns
+     * a lightweight statement object with bind_param and get_result methods.
+     * This helps legacy modules that expect mysqli-style API.
+     * @param string $sql
+     * @return PDOPreparedStatementWrapper|false
+     */
+    public function prepare($sql)
+    {
+        $conn = $this->getConnectionObject();
+        if (!$conn) {
+            return false;
+        }
+        // Load compatibility class if available
+        if (!class_exists('PDOPreparedStatementWrapper')) {
+            $compatFile = __DIR__ . '/pdo_mysqli_compat.php';
+            if (file_exists($compatFile)) {
+                require_once $compatFile;
+            }
+        }
+        if (class_exists('PDOPreparedStatementWrapper')) {
+            return new PDOPreparedStatementWrapper($conn, $sql);
+        }
+        // Fallback to native PDO prepare
+        return $conn->prepare($sql);
+    }
+
+    /**
+     * Magic getter to support legacy $db->insert_id usage
+     */
+    public function __get($name)
+    {
+        if ($name === 'insert_id') {
+            return $this->lastInsertId();
+        }
+        return null;
     }
 }
 ?>

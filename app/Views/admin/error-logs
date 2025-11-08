@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Monitoring Dashboard - Bishwo Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .error-card {
+            border-left: 4px solid #dc3545;
+            transition: all 0.3s ease;
+        }
+        .error-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .status-success { color: #28a745; }
+        .status-error { color: #dc3545; }
+        .status-warning { color: #ffc107; }
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .error-timeline {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error-item {
+            border-left: 3px solid #e9ecef;
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+        .error-item.error { border-color: #dc3545; }
+        .error-item.warning { border-color: #ffc107; }
+        .error-item.success { border-color: #28a745; }
+        .performance-alert {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .dark-mode .card {
+            background-color: #2d3748;
+            color: #ffffff;
+        }
+        .dark-mode .metric-card {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1><i class="fas fa-bug"></i> Error Monitoring Dashboard</h1>
+                    <div>
+                        <button class="btn btn-outline-secondary me-2" onclick="toggleDarkMode()">
+                            <i class="fas fa-moon"></i> Dark Mode
+                        </button>
+                        <button class="btn btn-primary" onclick="refreshData()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="metric-card text-center">
+                    <div class="metric-value" id="total-errors"><?= $stats['total_errors'] ?? 0 ?></div>
+                    <div class="metric-label">Total Errors</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="metric-card text-center">
+                    <div class="metric-value" id="success-rate"><?= round($stats['success_rate'] ?? 100, 1) ?>%</div>
+                    <div class="metric-label">Success Rate</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="metric-card text-center">
+                    <div class="metric-value" id="avg-time"><?= round(($stats['average_execution_time'] ?? 0) * 1000, 1) ?>ms</div>
+                    <div class="metric-label">Avg Response Time</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="metric-card text-center">
+                    <div class="metric-value" id="total-calls"><?= $stats['total_calls'] ?? 0 ?></div>
+                    <div class="metric-label">Method Calls</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-line"></i> Error Rate Trend (Last 10 Requests)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="errorRateChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-pie-chart"></i> Error Categories</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="errorCategoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance & Error Details -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-tachometer-alt"></i> Performance Analysis</h5>
+                    </div>
+                    <div class="card-body">
+                        <?php if (!empty($performance_data['slowest_calls'])): ?>
+                            <h6>Slowest Method Calls (>100ms)</h6>
+                            <?php foreach (array_slice($performance_data['slowest_calls'], 0, 5) as $call): ?>
+                                <div class="performance-alert">
+                                    <strong><?= htmlspecialchars($call['class'] . '::' . $call['method']) ?></strong><br>
+                                    Execution Time: <?= round($call['execution_time'] * 1000, 2) ?>ms<br>
+                                    <small class="text-muted"><?= $call['timestamp'] ?></small>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="text-muted">No slow method calls detected in the last 100 requests.</p>
+                        <?php endif; ?>
+                        
+                        <hr>
+                        <p><strong>Average Response Time:</strong> <?= round($performance_data['average_response_time'] * 1000, 1) ?>ms</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Recent Errors</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="error-timeline">
+                            <?php if (!empty($recent_errors)): ?>
+                                <?php foreach (array_slice($recent_errors, 0, 10) as $error): ?>
+                                    <div class="error-item <?= $error['success'] ? 'success' : 'error' ?>">
+                                        <div class="d-flex justify-content-between">
+                                            <strong><?= htmlspecialchars($error['class'] . '::' . $error['method']) ?></strong>
+                                            <small class="text-muted"><?= $error['timestamp'] ?></small>
+                                        </div>
+                                        <?php if (!$error['success']): ?>
+                                            <div class="mt-1">
+                                                <span class="badge bg-danger">Error</span>
+                                                <small class="text-muted"><?= htmlspecialchars($error['error'] ?? 'Unknown error') ?></small>
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="mt-1">
+                                                <span class="badge bg-success">Success</span>
+                                                <small class="text-muted"><?= round($error['execution_time'] * 1000, 2) ?>ms</small>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p class="text-muted">No recent method calls recorded.</p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5>Actions</h5>
+                        <button class="btn btn-info me-2" onclick="exportLogs('json')">
+                            <i class="fas fa-download"></i> Export JSON
+                        </button>
+                        <button class="btn btn-info me-2" onclick="exportLogs('csv')">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
+                        <button class="btn btn-warning me-2" onclick="clearLogs()">
+                            <i class="fas fa-trash"></i> Clear Logs
+                        </button>
+                        <button class="btn btn-primary" onclick="autoRefresh()">
+                            <i class="fas fa-play"></i> Start Auto-Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let errorRateChart, errorCategoryChart;
+        let autoRefreshInterval;
+
+        // Initialize charts
+        function initCharts() {
+            // Error Rate Trend Chart
+            const errorTrendCtx = document.getElementById('errorRateChart').getContext('2d');
+            errorRateChart = new Chart(errorTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: <?= json_encode(array_column($performance_data['error_rate_trend'] ?? [], 'period')) ?>,
+                    datasets: [{
+                        label: 'Error Rate %',
+                        data: <?= json_encode(array_column($performance_data['error_rate_trend'] ?? [], 'error_rate')) ?>,
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        tension: 0.1
+                    }, {
+                        label: 'Total Calls',
+                        data: <?= json_encode(array_column($performance_data['error_rate_trend'] ?? [], 'total')) ?>,
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Error Rate %'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Total Calls'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    }
+                }
+            });
+
+            // Error Categories Chart
+            const categoryCtx = document.getElementById('errorCategoryChart').getContext('2d');
+            errorCategoryChart = new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: <?= json_encode(array_keys($error_categories ?? [])) ?>,
+                    datasets: [{
+                        data: <?= json_encode(array_values($error_categories ?? [])) ?>,
+                        backgroundColor: [
+                            '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#20c997', '#fd7e14'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Refresh data
+        function refreshData() {
+            fetch('/admin/error-logs/get-error-stats')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateMetrics(data.stats);
+                        updateErrorTimeline(data.recent_errors);
+                        if (data.failed_calls) {
+                            updateErrorCategories(data.failed_calls);
+                        }
+                    }
+                })
+                .catch(error => console.error('Error refreshing data:', error));
+        }
+
+        // Update metrics display
+        function updateMetrics(stats) {
+            document.getElementById('total-errors').textContent = stats.total_errors || 0;
+            document.getElementById('success-rate').textContent = (stats.success_rate || 0).toFixed(1) + '%';
+            document.getElementById('avg-time').textContent = ((stats.average_execution_time || 0) * 1000).toFixed(1) + 'ms';
+            document.getElementById('total-calls').textContent = stats.total_calls || 0;
+        }
+
+        // Update error timeline
+        function updateErrorTimeline(errors) {
+            const timeline = document.querySelector('.error-timeline');
+            timeline.innerHTML = '';
+            
+            errors.slice(0, 10).forEach(error => {
+                const div = document.createElement('div');
+                div.className = `error-item ${error.success ? 'success' : 'error'}`;
+                div.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <strong>${error.class}::${error.method}</strong>
+                        <small class="text-muted">${error.timestamp}</small>
+                    </div>
+                    ${!error.success ? `
+                        <div class="mt-1">
+                            <span class="badge bg-danger">Error</span>
+                            <small class="text-muted">${error.error || 'Unknown error'}</small>
+                        </div>
+                    ` : `
+                        <div class="mt-1">
+                            <span class="badge bg-success">Success</span>
+                            <small class="text-muted">${(error.execution_time * 1000).toFixed(2)}ms</small>
+                        </div>
+                    `}
+                `;
+                timeline.appendChild(div);
+            });
+        }
+
+        // Update error categories
+        function updateErrorCategories(failedCalls) {
+            const categories = {};
+            failedCalls.forEach(call => {
+                const category = categorizeError(call.error);
+                categories[category] = (categories[category] || 0) + 1;
+            });
+            
+            errorCategoryChart.data.labels = Object.keys(categories);
+            errorCategoryChart.data.datasets[0].data = Object.values(categories);
+            errorCategoryChart.update();
+        }
+
+        function categorizeError(error) {
+            if (!error) return 'Unknown';
+            
+            error = error.toLowerCase();
+            
+            if (error.includes('undefined method')) return 'Missing Method';
+            if (error.includes('syntax error')) return 'Syntax Error';
+            if (error.includes('undefined')) return 'Undefined Variable';
+            if (error.includes('call to undefined')) return 'Undefined Call';
+            if (error.includes('not found')) return 'Not Found';
+            
+            return 'Other';
+        }
+
+        // Export logs
+        function exportLogs(format) {
+            window.open(`/admin/error-logs/export-logs?format=${format}`, '_blank');
+        }
+
+        // Clear logs
+        function clearLogs() {
+            if (confirm('Are you sure you want to clear all error logs? This action cannot be undone.')) {
+                window.location.href = '/admin/error-logs/clear-logs';
+            }
+        }
+
+        // Auto refresh
+        function autoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+                document.querySelector('button[onclick="autoRefresh()"]').innerHTML = '<i class="fas fa-play"></i> Start Auto-Refresh';
+            } else {
+                autoRefreshInterval = setInterval(refreshData, 30000); // Refresh every 30 seconds
+                document.querySelector('button[onclick="autoRefresh()"]').innerHTML = '<i class="fas fa-pause"></i> Stop Auto-Refresh';
+            }
+        }
+
+        // Toggle dark mode
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+        });
+    </script>
+</body>
+</html>

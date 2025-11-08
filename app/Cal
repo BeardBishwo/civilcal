@@ -1,0 +1,393 @@
+<?php
+
+namespace App\Calculators;
+
+use App\Services\GeolocationService;
+
+/**
+ * TraditionalUnitsCalculator - Nepali Traditional Measurement Units Converter
+ * 
+ * This calculator provides conversion between traditional Nepali measurement units:
+ * - Ropani (रोपनी)
+ * - Bigha (बिघा) 
+ * - Kattha (कट्ठा)
+ * - Aana (आना)
+ * - Paisa (पैसा)
+ * - Daam (दाम)
+ * - Dhur (धुर)
+ * 
+ * These units are commonly used in Nepal for measuring land area.
+ */
+class TraditionalUnitsCalculator
+{
+    private $geolocationService;
+    
+    // Traditional Nepali units with their base values in Dhur (smallest unit)
+    private $unitConversions = [
+        'ropani' => 547.6,      // 1 Ropani = 547.6 Dhur
+        'bigha' => 20.0,        // 1 Bigha = 20 Kattha = 320 Dhur
+        'kattha' => 16.0,       // 1 Kattha = 16 Dhur
+        'aana' => 4.0,          // 1 Aana = 4 Dhur
+        'paisa' => 2.0,         // 1 Paisa = 2 Dhur
+        'daam' => 1.0,          // 1 Daam = 1 Dhur
+        'dhur' => 1.0           // Base unit
+    ];
+
+    // Modern equivalents
+    private $metricConversions = [
+        'sq_feet' => 342.25,    // 1 Dhur = 342.25 square feet
+        'sq_meter' => 31.80,    // 1 Dhur = 31.80 square meters
+        'hectare' => 0.003168,  // 1 Dhur = 0.003168 hectares
+        'acre' => 0.007828      // 1 Dhur = 0.007828 acres
+    ];
+
+    // Unit names in Nepali (Devanagari script)
+    private $nepaliNames = [
+        'ropani' => 'रोपनी',
+        'bigha' => 'बिघा',
+        'kattha' => 'कट्ठा',
+        'aana' => 'आना',
+        'paisa' => 'पैसा',
+        'daam' => 'दाम',
+        'dhur' => 'धुर',
+        'sq_feet' => 'वर्ग फुट',
+        'sq_meter' => 'वर्ग मिटर',
+        'hectare' => 'हेक्टर',
+        'acre' => 'एकड'
+    ];
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->geolocationService = new GeolocationService();
+    }
+
+    /**
+     * Convert between traditional Nepali units
+     * 
+     * @param float $value Value to convert
+     * @param string $fromUnit Source unit
+     * @param string $toUnit Target unit
+     * @return array
+     */
+    public function convertBetweenUnits($value, $fromUnit, $toUnit)
+    {
+        $result = $this->validateConversion($value, $fromUnit, $toUnit);
+        if (!$result['success']) {
+            return $result;
+        }
+
+        try {
+            // Convert to base unit (Dhur) first
+            $baseValue = $value * $this->unitConversions[$fromUnit];
+            
+            // Convert from base unit to target unit
+            $convertedValue = $baseValue / $this->unitConversions[$toUnit];
+            
+            return [
+                'success' => true,
+                'input_value' => $value,
+                'input_unit' => $fromUnit,
+                'input_unit_nepali' => $this->nepaliNames[$fromUnit],
+                'output_value' => round($convertedValue, 4),
+                'output_unit' => $toUnit,
+                'output_unit_nepali' => $this->nepaliNames[$toUnit],
+                'conversion_type' => 'traditional_to_traditional',
+                'calculation_details' => [
+                    'step1' => "{$value} {$fromUnit} = " . round($baseValue, 4) . " Dhur",
+                    'step2' => round($baseValue, 4) . " Dhur = " . round($convertedValue, 4) . " {$toUnit}"
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'Conversion failed: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Convert from traditional unit to metric unit
+     * 
+     * @param float $value Value to convert
+     * @param string $fromUnit Source traditional unit
+     * @param string $toMetricUnit Target metric unit (sq_feet, sq_meter, hectare, acre)
+     * @return array
+     */
+    public function convertToMetric($value, $fromUnit, $toMetricUnit)
+    {
+        $result = $this->validateTraditionalUnit($fromUnit);
+        if (!$result['success']) {
+            return $result;
+        }
+
+        $result = $this->validateMetricUnit($toMetricUnit);
+        if (!$result['success']) {
+            return $result;
+        }
+
+        try {
+            // Convert to Dhur first
+            $dhurValue = $value * $this->unitConversions[$fromUnit];
+            
+            // Convert Dhur to metric unit
+            $metricValue = $dhurValue * $this->metricConversions[$toMetricUnit];
+            
+            return [
+                'success' => true,
+                'input_value' => $value,
+                'input_unit' => $fromUnit,
+                'input_unit_nepali' => $this->nepaliNames[$fromUnit],
+                'output_value' => round($metricValue, 4),
+                'output_unit' => $toMetricUnit,
+                'output_unit_nepali' => $this->nepaliNames[$toMetricUnit],
+                'conversion_type' => 'traditional_to_metric',
+                'calculation_details' => [
+                    'step1' => "{$value} {$fromUnit} = " . round($dhurValue, 4) . " Dhur",
+                    'step2' => round($dhurValue, 4) . " Dhur = " . round($metricValue, 4) . " {$toMetricUnit}"
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'Conversion failed: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Convert from metric unit to traditional unit
+     * 
+     * @param float $value Value to convert
+     * @param string $fromMetricUnit Source metric unit
+     * @param string $toUnit Target traditional unit
+     * @return array
+     */
+    public function convertFromMetric($value, $fromMetricUnit, $toUnit)
+    {
+        $result = $this->validateMetricUnit($fromMetricUnit);
+        if (!$result['success']) {
+            return $result;
+        }
+
+        $result = $this->validateTraditionalUnit($toUnit);
+        if (!$result['success']) {
+            return $result;
+        }
+
+        try {
+            // Convert metric to Dhur first
+            $dhurValue = $value / $this->metricConversions[$fromMetricUnit];
+            
+            // Convert Dhur to target traditional unit
+            $traditionalValue = $dhurValue / $this->unitConversions[$toUnit];
+            
+            return [
+                'success' => true,
+                'input_value' => $value,
+                'input_unit' => $fromMetricUnit,
+                'input_unit_nepali' => $this->nepaliNames[$fromMetricUnit],
+                'output_value' => round($traditionalValue, 4),
+                'output_unit' => $toUnit,
+                'output_unit_nepali' => $this->nepaliNames[$toUnit],
+                'conversion_type' => 'metric_to_traditional',
+                'calculation_details' => [
+                    'step1' => "{$value} {$fromMetricUnit} = " . round($dhurValue, 4) . " Dhur",
+                    'step2' => round($dhurValue, 4) . " Dhur = " . round($traditionalValue, 4) . " {$toUnit}"
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'Conversion failed: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Get all conversion results for a given value and unit
+     * 
+     * @param float $value Value to convert
+     * @param string $fromUnit Source unit
+     * @return array
+     */
+    public function getAllConversions($value, $fromUnit)
+    {
+        $result = $this->validateTraditionalUnit($fromUnit);
+        if (!$result['success']) {
+            return $result;
+        }
+
+        try {
+            $dhurValue = $value * $this->unitConversions[$fromUnit];
+            
+            // Get all traditional unit conversions
+            $traditionalConversions = [];
+            foreach ($this->unitConversions as $unit => $conversionRate) {
+                $traditionalConversions[$unit] = [
+                    'value' => round($dhurValue / $conversionRate, 4),
+                    'nepali_name' => $this->nepaliNames[$unit]
+                ];
+            }
+            
+            // Get all metric conversions
+            $metricConversions = [];
+            foreach ($this->metricConversions as $unit => $conversionRate) {
+                $metricConversions[$unit] = [
+                    'value' => round($dhurValue * $conversionRate, 4),
+                    'nepali_name' => $this->nepaliNames[$unit]
+                ];
+            }
+            
+            return [
+                'success' => true,
+                'input_value' => $value,
+                'input_unit' => $fromUnit,
+                'input_unit_nepali' => $this->nepaliNames[$fromUnit],
+                'in_dhur' => round($dhurValue, 4),
+                'traditional_conversions' => $traditionalConversions,
+                'metric_conversions' => $metricConversions,
+                'geolocation_data' => $this->geolocationService->getUserCountry()
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'Conversion failed: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Get available traditional units
+     * 
+     * @return array
+     */
+    public function getAvailableUnits()
+    {
+        $units = [];
+        foreach ($this->unitConversions as $unit => $rate) {
+            $units[$unit] = [
+                'name' => $unit,
+                'nepali_name' => $this->nepaliNames[$unit],
+                'dhur_equivalent' => $rate,
+                'type' => 'traditional'
+            ];
+        }
+        
+        foreach ($this->metricConversions as $unit => $rate) {
+            $units[$unit] = [
+                'name' => $unit,
+                'nepali_name' => $this->nepaliNames[$unit],
+                'dhur_equivalent' => 1 / $rate, // Inverse for metric units
+                'type' => 'metric'
+            ];
+        }
+        
+        return $units;
+    }
+
+    /**
+     * Check if user is from Nepal (for location-specific features)
+     * 
+     * @return bool
+     */
+    public function isForNepaliUser()
+    {
+        $countryData = $this->geolocationService->getUserCountry();
+        return $countryData['is_nepali_user'] ?? false;
+    }
+
+    /**
+     * Get calculator information and usage statistics
+     * 
+     * @return array
+     */
+    public function getCalculatorInfo()
+    {
+        return [
+            'name' => 'Traditional Nepali Units Calculator',
+            'version' => '1.0.0',
+            'supported_units' => $this->getAvailableUnits(),
+            'base_unit' => 'Dhur',
+            'geolocation_enabled' => true,
+            'nepali_user' => $this->isForNepaliUser(),
+            'country_data' => $this->geolocationService->getUserCountry(),
+            'accuracy' => 'Standard Nepali measurement conversions',
+            'disclaimer' => 'Traditional measurements may vary slightly by region in Nepal'
+        ];
+    }
+
+    /**
+     * Validate traditional unit
+     * 
+     * @param string $unit
+     * @return array
+     */
+    private function validateTraditionalUnit($unit)
+    {
+        if (!isset($this->unitConversions[$unit])) {
+            return [
+                'success' => false,
+                'error' => "Invalid traditional unit: {$unit}. Available units: " . implode(', ', array_keys($this->unitConversions))
+            ];
+        }
+        return ['success' => true];
+    }
+
+    /**
+     * Validate metric unit
+     * 
+     * @param string $unit
+     * @return array
+     */
+    private function validateMetricUnit($unit)
+    {
+        if (!isset($this->metricConversions[$unit])) {
+            return [
+                'success' => false,
+                'error' => "Invalid metric unit: {$unit}. Available units: " . implode(', ', array_keys($this->metricConversions))
+            ];
+        }
+        return ['success' => true];
+    }
+
+    /**
+     * Validate conversion parameters
+     * 
+     * @param float $value
+     * @param string $fromUnit
+     * @param string $toUnit
+     * @return array
+     */
+    private function validateConversion($value, $fromUnit, $toUnit)
+    {
+        if (!is_numeric($value) || $value < 0) {
+            return [
+                'success' => false,
+                'error' => 'Value must be a non-negative number'
+            ];
+        }
+
+        if (empty($fromUnit) || empty($toUnit)) {
+            return [
+                'success' => false,
+                'error' => 'Both fromUnit and toUnit are required'
+            ];
+        }
+
+        $fromValid = $this->validateTraditionalUnit($fromUnit);
+        $toValid = $this->validateTraditionalUnit($toUnit);
+
+        if (!$fromValid['success']) {
+            return $fromValid;
+        }
+
+        if (!$toValid['success']) {
+            return $toValid;
+        }
+
+        return ['success' => true];
+    }
+}

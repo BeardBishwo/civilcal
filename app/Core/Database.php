@@ -49,4 +49,86 @@ class Database {
         $stmt->execute($params);
         return $stmt;
     }
+    
+    public function prepare($sql) {
+        return $this->pdo->prepare($sql);
+    }
+    
+    public function insert($table, $data) {
+        $columns = implode(',', array_keys($data));
+        $placeholders = ':' . implode(', :', array_keys($data));
+        
+        $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
+        $stmt = $this->prepare($sql);
+        
+        return $stmt->execute($data);
+    }
+    
+    public function update($table, $data, $where, $whereParams = []) {
+        $set = [];
+        foreach ($data as $key => $value) {
+            $set[] = "{$key} = :{$key}";
+        }
+        $setClause = implode(', ', $set);
+        
+        $sql = "UPDATE {$table} SET {$setClause} WHERE {$where}";
+        $stmt = $this->prepare($sql);
+        
+        $params = array_merge($data, $whereParams);
+        return $stmt->execute($params);
+    }
+    
+    public function delete($table, $where, $whereParams = []) {
+        $sql = "DELETE FROM {$table} WHERE {$where}";
+        $stmt = $this->prepare($sql);
+        
+        return $stmt->execute($whereParams);
+    }
+    
+    public function find($table, $conditions = [], $columns = '*') {
+        $where = '';
+        $params = [];
+        
+        if (!empty($conditions)) {
+            $whereConditions = [];
+            foreach ($conditions as $key => $value) {
+                $whereConditions[] = "{$key} = :{$key}";
+                $params[$key] = $value;
+            }
+            $where = 'WHERE ' . implode(' AND ', $whereConditions);
+        }
+        
+        $sql = "SELECT {$columns} FROM {$table} {$where}";
+        $stmt = $this->prepare($sql);
+        $stmt->execute($params);
+        
+        return $stmt->fetchAll();
+    }
+    
+    public function findOne($table, $conditions = [], $columns = '*') {
+        $results = $this->find($table, $conditions, $columns);
+        return !empty($results) ? $results[0] : null;
+    }
+    
+    public function count($table, $conditions = []) {
+        $where = '';
+        $params = [];
+        
+        if (!empty($conditions)) {
+            $whereConditions = [];
+            foreach ($conditions as $key => $value) {
+                $whereConditions[] = "{$key} = :{$key}";
+                $params[$key] = $value;
+            }
+            $where = 'WHERE ' . implode(' AND ', $whereConditions);
+        }
+        
+        $sql = "SELECT COUNT(*) as count FROM {$table} {$where}";
+        $stmt = $this->prepare($sql);
+        $stmt->execute($params);
+        
+        $result = $stmt->fetch();
+        return (int) $result['count'];
+    }
 }
+?>

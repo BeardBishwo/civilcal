@@ -258,7 +258,7 @@ class RevitPluginIntegration {
         $sql .= " ORDER BY family_name, type_name";
         
         $stmt = $this->db->prepare($sql);
-        $stmt->bind_param(...$params);
+        call_user_func_array(array($stmt, 'bind_param'), $params);
         $stmt->execute();
         $result = $stmt->get_result();
         

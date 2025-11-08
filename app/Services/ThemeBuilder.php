@@ -11,6 +11,12 @@ use App\Core\Database;
 
 class ThemeBuilder
 {
+    // Define missing theme constants
+    const TYPOGRAPHY_DEFAULT_FAMILY = 'Inter';
+    const TYPOGRAPHY_SECONDARY_FAMILY = 'Roboto';
+    const FONT_FAMILY_PRIMARY = 'Inter';
+    const FONT_FAMILY_SECONDARY = 'Roboto';
+    
     private $db;
     private $themesDir;
     private $storageDir;
