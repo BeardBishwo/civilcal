@@ -1,6 +1,6 @@
 # Bishwo Calculator - Project Structure Report
 
-**Generated:** 2025-11-08 10:22:06
+**Generated:** 2025-11-08 12:44:57
 
 ## Project Structure
 
@@ -11,11 +11,10 @@ bishwo_calculator/
 ├── .git
 ├── .htaccess
 ├── README.md
-├── TH
+├── TH.md
 ├── admin
 ├── admin_panel_todo.md
 ├── app
-│   ├── Cal
 │   ├── Calculators
 │   │   ├── BaseCalculator.php
 │   │   ├── CalculatorFactory.php
@@ -26,10 +25,7 @@ bishwo_calculator/
 │   │   └── TraditionalUnitsCalculator.php
 │   ├── Controllers
 │   │   ├── Admin
-│   │   │   ├── CalculatorController
 │   │   │   ├── CalculatorController.php
-│   │   │   ├── D
-│   │   │   ├── DashboardController
 │   │   │   ├── DashboardController.php
 │   │   │   ├── EmailManagerController.php
 │   │   │   ├── ErrorLogController.php
@@ -47,7 +43,6 @@ bishwo_calculator/
 │   │   ├── ExportController.php
 │   │   ├── HistoryController.php
 │   │   ├── HomeController.php
-│   │   ├── Profile
 │   │   ├── ProfileController.php
 │   │   ├── ShareController.php
 │   │   ├── UserController.php
@@ -69,7 +64,6 @@ bishwo_calculator/
 │   │   ├── AuthMiddleware.php
 │   │   └── CorsMiddleware.php
 │   ├── Models
-│   │   ├── Cal
 │   │   ├── Calculation.php
 │   │   ├── CalculationHistory.php
 │   │   ├── Comment.php
@@ -82,7 +76,6 @@ bishwo_calculator/
 │   │   ├── Settings.php
 │   │   ├── Share.php
 │   │   ├── Subscription.php
-│   │   ├── User
 │   │   ├── User.php
 │   │   └── Vote.php
 │   ├── Services
@@ -95,7 +88,6 @@ bishwo_calculator/
 │   │   ├── GeolocationService.php
 │   │   ├── PaymentService.php
 │   │   ├── PluginManager.php
-│   │   ├── SettingsService
 │   │   ├── SettingsService.php
 │   │   ├── ThemeBuilder.php
 │   │   ├── ThemeManager.php
@@ -162,8 +154,7 @@ bishwo_calculator/
 │   │   ├── BaseWidget.php
 │   │   └── TraditionalUnitsWidget.php
 │   ├── bootstrap.php
-│   ├── routes.php
-│   └── routes_updated.php
+│   └── routes.php
 ├── complete_admin_todo.md
 ├── composer.json
 ├── composer.lock
@@ -179,7 +170,7 @@ bishwo_calculator/
 │   │   ├── 001_plugin_theme_system.php
 │   │   ├── 002_create_subscriptions_table.php
 │   │   ├── 002_theme_editor_tables.php
-│   │   ├── 003_create
+│   │   ├── 003_create_subscriptions_table.php
 │   │   ├── 004_create_calculation_history.php
 │   │   ├── 009_create_export_templates.php
 │   │   ├── 010_add_profile_fields_to_users.php
@@ -672,7 +663,7 @@ bishwo_calculator/
 │   │   └── green-building-tools
 │   │       └── plugin.json
 │   └── theme-plugins
-├── production_im
+├── production_.md
 ├── production_implementation.md
 ├── public
 │   ├── .htaccess
@@ -842,9 +833,9 @@ vendor{
 
 ## Statistics
 
-- **Total Files:** 616
+- **Total Files:** 607
 - **Total Directories:** 178
-- **Total Items:** 794
+- **Total Items:** 785
 - **Excludes:** vendor/ folder
 
 ---

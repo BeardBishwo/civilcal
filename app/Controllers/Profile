@@ -1,4 +1,0 @@
-<?php
-// This file was incorrectly named "Profile" without extension
-// It should be deleted. The correct ProfileController class is in ProfileController.php
-?>
