@@ -16,8 +16,10 @@ class CloudSyncManager {
             // Create connection record
             $sql = "INSERT INTO mep_cloud_connections (provider, config_data, status, created_date) 
                     VALUES (?, ?, 'connecting', NOW())";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bind_param("ss", $this->syncProvider, json_encode($config));
+                $stmt = $this->db->prepare($sql);
+                $provider_var = $this->syncProvider;
+                $config_json = json_encode($config);
+                $stmt->bind_param("ss", $provider_var, $config_json);
             $stmt->execute();
             $connectionId = $this->db->insert_id;
             
@@ -353,8 +355,12 @@ class CloudSyncManager {
     
     private function updateProjectInfo($projectId, $projectInfo) {
         $sql = "UPDATE projects SET project_name = ?, description = ? WHERE id = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("ssi", $projectInfo['name'], $projectInfo['description'], $projectId);
+    $stmt = $this->db->prepare($sql);
+    // ensure bind_param gets variables (passed by reference)
+    $p_name = $projectInfo['name'] ?? null;
+    $p_description = $projectInfo['description'] ?? null;
+    $p_id = $projectId;
+    $stmt->bind_param("ssi", $p_name, $p_description, $p_id);
         $stmt->execute();
     }
     
@@ -363,8 +369,11 @@ class CloudSyncManager {
         foreach ($calculations as $calc) {
             $sql = "INSERT INTO mep_calculations (project_id, calculation_type, input_data, result, created_date) 
                     VALUES (?, ?, ?, ?, NOW())";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bind_param("isss", $projectId, $calc['calculation_type'], json_encode($calc), json_encode($calc['result']));
+                $stmt = $this->db->prepare($sql);
+                $c_type = $calc['calculation_type'];
+                $c_json = json_encode($calc);
+                $c_result_json = json_encode($calc['result']);
+                $stmt->bind_param("isss", $projectId, $c_type, $c_json, $c_result_json);
             if ($stmt->execute()) {
                 $imported++;
             }
@@ -377,8 +386,11 @@ class CloudSyncManager {
         foreach ($models as $model) {
             $sql = "INSERT INTO mep_bim_models (project_id, model_name, model_type, file_path, import_date) 
                     VALUES (?, ?, ?, ?, NOW())";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bind_param("isss", $projectId, $model['model_name'], $model['model_type'], $model['file_path']);
+                $stmt = $this->db->prepare($sql);
+                $m_name = $model['model_name'];
+                $m_type = $model['model_type'];
+                $m_path = $model['file_path'];
+                $stmt->bind_param("isss", $projectId, $m_name, $m_type, $m_path);
             if ($stmt->execute()) {
                 $imported++;
             }
@@ -391,8 +403,9 @@ class CloudSyncManager {
         foreach ($coordination as $coord) {
             $sql = "INSERT INTO mep_coordination_reports (project_id, report_data, created_date) 
                     VALUES (?, ?, NOW())";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bind_param("is", $projectId, json_encode($coord));
+                $stmt = $this->db->prepare($sql);
+                $coord_json = json_encode($coord);
+                $stmt->bind_param("is", $projectId, $coord_json);
             if ($stmt->execute()) {
                 $imported++;
             }
@@ -406,7 +419,8 @@ class CloudSyncManager {
                 WHERE id = ?";
         $stmt = $this->db->prepare($sql);
         $status = $result['success'] ? 'completed' : 'failed';
-        $stmt->bind_param("ssi", $status, json_encode($result), $syncId);
+    $result_json = json_encode($result);
+    $stmt->bind_param("ssi", $status, $result_json, $syncId);
         $stmt->execute();
     }
     
@@ -455,13 +469,18 @@ class CloudSyncManager {
                     VALUES (?, ?, ?, ?, ?, ?, NOW())";
             
             $stmt = $this->db->prepare($sql);
-            $stmt->bind_param("isssis", 
+            $cfg_frequency = $config['frequency'];
+            $cfg_time = $config['time'];
+            $cfg_types_json = json_encode($config['types']);
+            $cfg_active = $config['active'] ?? 1;
+            $cfg_json = json_encode($config);
+            $stmt->bind_param("isssis",
                 $projectId,
-                $config['frequency'],
-                $config['time'],
-                json_encode($config['types']),
-                $config['active'] ?? 1,
-                json_encode($config)
+                $cfg_frequency,
+                $cfg_time,
+                $cfg_types_json,
+                $cfg_active,
+                $cfg_json
             );
             
             $stmt->execute();

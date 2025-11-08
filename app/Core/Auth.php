@@ -8,7 +8,7 @@ class Auth {
     private $userModel;
     
     public function __construct() {
-        $this->userModel = new \App\Models\User();
+        $this->userModel = new User();
     }
     
     public function attempt($email, $password) {

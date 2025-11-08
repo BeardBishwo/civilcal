@@ -331,7 +331,8 @@ class MEPPermissions {
             // Check if permission already exists
             $checkSql = "SELECT id FROM mep_permissions WHERE permission_name = ?";
             $checkStmt = $this->db->prepare($checkSql);
-            $checkStmt->bind_param("s", $perm[0]);
+            $perm_name = $perm[0];
+            $checkStmt->bind_param("s", $perm_name);
             $checkStmt->execute();
             $checkResult = $checkStmt->get_result();
             

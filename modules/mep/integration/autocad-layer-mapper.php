@@ -16,15 +16,25 @@ class AutoCADLayerMapper {
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
             
             $stmt = $this->db->prepare($sql);
-            $stmt->bind_param("ssssssii", 
-                $mappingData['name'],
-                $mappingData['category'],
-                $mappingData['layer'],
-                json_encode($mappingData['properties']),
-                $mappingData['color'],
-                $mappingData['linetype'],
-                $mappingData['lineweight'],
-                $mappingData['active'] ?? 1
+            // ensure bind_param receives variables (passed by reference)
+            $m_name = $mappingData['name'];
+            $m_category = $mappingData['category'];
+            $m_layer = $mappingData['layer'];
+            $m_properties = json_encode($mappingData['properties']);
+            $m_color = $mappingData['color'];
+            $m_linetype = $mappingData['linetype'];
+            $m_lineweight = $mappingData['lineweight'];
+            $m_active = $mappingData['active'] ?? 1;
+
+            $stmt->bind_param("ssssssii",
+                $m_name,
+                $m_category,
+                $m_layer,
+                $m_properties,
+                $m_color,
+                $m_linetype,
+                $m_lineweight,
+                $m_active
             );
             
             $stmt->execute();
@@ -174,9 +184,13 @@ class AutoCADLayerMapper {
                 SET mapped_elements = ?, unmapped_elements = ?, 
                 session_status = 'completed', completion_date = NOW() 
                 WHERE id = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("iii", count($mappedElements), count($unmappedElements), $sessionId);
-        $stmt->execute();
+    $stmt = $this->db->prepare($sql);
+    // bind_param requires variables (passed by reference)
+    $mapped_count = count($mappedElements);
+    $unmapped_count = count($unmappedElements);
+    $s_id = $sessionId;
+    $stmt->bind_param("iii", $mapped_count, $unmapped_count, $s_id);
+    $stmt->execute();
     }
     
     public function exportToAutoCAD($sessionId, $format = 'DWG') {

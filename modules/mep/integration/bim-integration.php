@@ -37,7 +37,14 @@ class BIMIntegration {
             $sql = "INSERT INTO mep_bim_models (project_id, model_name, model_type, file_path, file_size, element_count, imported_by, import_date, status) 
                     VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 'processing')";
             $stmt = $this->db->prepare($sql);
-            $stmt->bind_param("issssii", $projectId, $fileName, $modelType, $filePath, $fileSize, count($elements), $userId);
+            // ensure variables for bind_param (count() is an expression)
+            $b_fileName = $fileName;
+            $b_modelType = $modelType;
+            $b_filePath = $filePath;
+            $b_fileSize = $fileSize;
+            $b_element_count = count($elements);
+            $b_userId = $userId;
+            $stmt->bind_param("issssii", $projectId, $b_fileName, $b_modelType, $b_filePath, $b_fileSize, $b_element_count, $b_userId);
             $stmt->execute();
             $modelId = $this->db->insert_id;
             
@@ -136,7 +143,11 @@ class BIMIntegration {
                     VALUES (?, ?, ?, ?, ?, NOW())";
             $stmt = $this->db->prepare($sql);
             $dataJson = json_encode($element['data'] ?? []);
-            $stmt->bind_param("issss", $modelId, $element['element_id'], $element['element_type'], $element['category'], $dataJson);
+            // temporaries for bind_param (array access must be assigned to variables)
+            $e_element_id = $element['element_id'];
+            $e_element_type = $element['element_type'];
+            $e_category = $element['category'];
+            $stmt->bind_param("issss", $modelId, $e_element_id, $e_element_type, $e_category, $dataJson);
             $stmt->execute();
         }
     }

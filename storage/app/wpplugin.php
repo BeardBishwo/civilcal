@@ -10,7 +10,10 @@ Author URI: __URL__
 */
 
 // This code simply registers the shortcode "shorturl". You can change it if you want something else 
-add_shortcode("shorturl", "pus_shortcode_shorten_url");
+// Only execute in WordPress environment
+if (function_exists('add_shortcode')) {
+    add_shortcode('bishwo_calculator', 'shortcode_render_calculator');
+}
 
 // Function to send the request
 function pus_shortcode_shorten_url($atts, $content){

@@ -45,8 +45,23 @@ class Database {
     }
     
     public function query($sql, $params = []) {
+        /**
+         * Execute a prepared statement and return a PDOCompat wrapper around
+         * the PDOStatement so legacy code can use fetch_assoc() while modern
+         * code can still call fetchAll()/fetch() via delegation.
+         *
+         * @param string $sql
+         * @param array $params
+         * @return \App\Core\PDOCompat|\PDOStatement
+         */
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
+
+        // Return a compatibility wrapper that exposes fetch_assoc()
+        if (class_exists('\App\Core\PDOCompat')) {
+            return new \App\Core\PDOCompat($stmt);
+        }
+
         return $stmt;
     }
     
@@ -85,6 +100,9 @@ class Database {
         return $stmt->execute($whereParams);
     }
     
+    /**
+     * @return array
+     */
     public function find($table, $conditions = [], $columns = '*') {
         $where = '';
         $params = [];
@@ -129,6 +147,14 @@ class Database {
         
         $result = $stmt->fetch();
         return (int) $result['count'];
+    }
+    
+    /**
+     * Get the ID of the last inserted row
+     * @return string The last inserted ID
+     */
+    public function lastInsertId() {
+        return $this->pdo->lastInsertId();
     }
 }
 ?>

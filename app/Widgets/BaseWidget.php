@@ -78,6 +78,22 @@ abstract class BaseWidget
     }
 
     /**
+     * Get widget default title (to be overridden by child classes)
+     */
+    protected function getDefaultTitle(): string
+    {
+        return 'Widget Title';
+    }
+
+    /**
+     * Get widget default description (to be overridden by child classes)
+     */
+    protected function getDefaultDescription(): string
+    {
+        return 'Widget description';
+    }
+
+    /**
      * Check if widget is enabled
      */
     public function isEnabled(): bool
@@ -150,7 +166,7 @@ abstract class BaseWidget
     /**
      * Render widget HTML
      */
-    abstract public function render(): string;
+    abstract public function render(array $data = []): string;
 
     /**
      * Get widget assets (CSS, JS files)
@@ -174,7 +190,7 @@ abstract class BaseWidget
     /**
      * Validate widget configuration
      */
-    public function validateConfig(): bool
+    public function validateConfig($config = null): bool
     {
         // Base validation - child classes can override
         return true;
@@ -418,3 +434,4 @@ abstract class BaseWidget
         return $this->getConfig('position', 0);
     }
 }
+?>

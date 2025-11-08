@@ -16,7 +16,7 @@ if (!defined('BISHWO_CALCULATOR')) {
 /**
  * Get the current theme instance
  * 
- * @return \Bishwo_Calculator\Services\ThemeManager|null
+ * @return \App\Services\ThemeManager|null
  */
 function get_theme() {
     static $theme = null;
@@ -26,7 +26,7 @@ function get_theme() {
         $themeManagerPath = dirname(__DIR__, 2) . '/app/Services/ThemeManager.php';
         if (file_exists($themeManagerPath)) {
             require_once $themeManagerPath;
-            $theme = new \Bishwo_Calculator\Services\ThemeManager();
+            $theme = new \App\Services\ThemeManager();
         }
     }
     
@@ -75,7 +75,7 @@ function load_theme_styles($category = null) {
         $theme->loadThemeStyles();
         
         if ($category) {
-            $theme->loadCategoryStyles($category);
+            $theme->loadCategoryStyle($category);
         }
     }
 }
@@ -106,7 +106,7 @@ function load_theme_scripts($category = null) {
 function theme_asset($path) {
     $theme = get_theme();
     if ($theme) {
-        return $theme->getAssetUrl($path);
+        return $theme->getThemeAsset($path);
     }
     return get_base_url() . 'assets/' . ltrim($path, '/');
 }
@@ -119,7 +119,7 @@ function theme_asset($path) {
 function get_current_theme() {
     $theme = get_theme();
     if ($theme) {
-        return $theme->getCurrentTheme();
+        return $theme->getActiveTheme();
     }
     return 'default';
 }
@@ -133,7 +133,7 @@ function get_current_theme() {
 function set_active_theme($theme_name) {
     $theme = get_theme();
     if ($theme) {
-        return $theme->setActiveTheme($theme_name);
+        return $theme->setTheme($theme_name);
     }
     return false;
 }
@@ -161,7 +161,7 @@ function get_available_themes() {
 function get_theme_config($key = null, $default = null) {
     $theme = get_theme();
     if ($theme) {
-        $config = $theme->getConfig();
+        $config = $theme->getThemeConfig();
         
         if ($key === null) {
             return $config;

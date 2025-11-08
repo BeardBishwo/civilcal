@@ -2,6 +2,11 @@
 require_once '../../../../includes/config.php';
 
 class RevitPluginIntegration {
+    /**
+     * @var \App\Core\Database|\PDO|\mysqli|null
+     * Database connection. Could be the app Database wrapper (PDO), a raw PDO
+     * instance, or a legacy mysqli connection. PHPDoc helps static analysis.
+     */
     private $db;
     
     public function __construct() {
@@ -15,13 +20,21 @@ class RevitPluginIntegration {
                     features, is_active, created_date) VALUES (?, ?, ?, ?, ?, ?, NOW())";
             
             $stmt = $this->db->prepare($sql);
-            $stmt->bind_param("sssssi", 
-                $pluginData['name'],
-                $pluginData['version'],
-                $pluginData['api_key'],
-                $pluginData['path'],
-                json_encode($pluginData['features']),
-                $pluginData['active'] ?? 1
+            // mysqli_stmt::bind_param requires variables (passed by reference).
+            $p_name = $pluginData['name'];
+            $p_version = $pluginData['version'];
+            $p_api_key = $pluginData['api_key'];
+            $p_path = $pluginData['path'];
+            $p_features = json_encode($pluginData['features']);
+            $p_active = $pluginData['active'] ?? 1;
+
+            $stmt->bind_param("sssssi",
+                $p_name,
+                $p_version,
+                $p_api_key,
+                $p_path,
+                $p_features,
+                $p_active
             );
             
             $stmt->execute();
@@ -148,13 +161,20 @@ class RevitPluginIntegration {
                    VALUES (?, ?, ?, ?, ?, ?, NOW())";
             
             $stmt = $this->db->prepare($sql);
-            $stmt->bind_param("isssss", 
+            // bind_param needs variables; extract element fields to temporary variables
+            $e_element_id = $element['element_id'];
+            $e_family_name = $element['family_name'];
+            $e_type_name = $element['type_name'];
+            $e_category = $element['category'];
+            $e_parameters = json_encode($element['parameters']);
+
+            $stmt->bind_param("isssss",
                 $projectId,
-                $element['element_id'],
-                $element['family_name'],
-                $element['type_name'],
-                $element['category'],
-                json_encode($element['parameters'])
+                $e_element_id,
+                $e_family_name,
+                $e_type_name,
+                $e_category,
+                $e_parameters
             );
             
             if ($stmt->execute()) {
@@ -216,8 +236,10 @@ class RevitPluginIntegration {
         $sql = "UPDATE mep_sync_records 
                 SET sync_status = ?, sync_result = ?, completion_date = NOW() 
                 WHERE id = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("ssi", $status, json_encode($result), $syncId);
+    $stmt = $this->db->prepare($sql);
+    // json_encode returns a string; bind_param requires variables (references)
+    $result_json = json_encode($result);
+    $stmt->bind_param("ssi", $status, $result_json, $syncId);
         $stmt->execute();
     }
     
@@ -258,7 +280,14 @@ class RevitPluginIntegration {
         $sql .= " ORDER BY family_name, type_name";
         
         $stmt = $this->db->prepare($sql);
-        call_user_func_array(array($stmt, 'bind_param'), $params);
+        // bind_param requires a type string plus variables. Build types and call bind_param accordingly.
+        if ($category) {
+            // types: projectId (int), category (string)
+            $stmt->bind_param('is', $projectId, $category);
+        } else {
+            // only projectId
+            $stmt->bind_param('i', $projectId);
+        }
         $stmt->execute();
         $result = $stmt->get_result();
         
@@ -306,12 +335,40 @@ class RevitPluginIntegration {
     
     public function getPluginStatus() {
         $sql = "SELECT COUNT(*) as active_plugins FROM mep_revit_plugins WHERE is_active = 1";
-        $result = $this->db->query($sql);
-        $row = $result->fetch_assoc();
-        
+        $active = 0;
+
+        // Support multiple DB wrappers: App\Core\Database (PDO wrapper), raw PDO, and mysqli
+        // 1) If we have our Database wrapper, use its PDO instance
+        if (is_object($this->db) && method_exists($this->db, 'getPdo')) {
+            try {
+                // Annotate $pdo for static analyzers: getPdo() should return a \PDO instance from the app Database wrapper.
+                /** @var \PDO $pdo */
+                $pdo = $this->db->getPdo();
+                $stmt = $pdo->query($sql);
+                $row = $stmt ? $stmt->fetch(\PDO::FETCH_ASSOC) : false;
+                $active = isset($row['active_plugins']) ? (int)$row['active_plugins'] : 0;
+            } catch (Exception $e) {
+                $active = 0;
+            }
+
+        // 2) If $this->db is a raw PDO instance
+        } elseif ($this->db instanceof \PDO) {
+            $stmt = $this->db->query($sql);
+            $row = $stmt ? $stmt->fetch(\PDO::FETCH_ASSOC) : false;
+            $active = isset($row['active_plugins']) ? (int)$row['active_plugins'] : 0;
+
+        // 3) Assume mysqli-style connection for legacy code
+        } else {
+            $result = $this->db->query($sql);
+            if ($result) {
+                $row = method_exists($result, 'fetch_assoc') ? $result->fetch_assoc() : null;
+                $active = isset($row['active_plugins']) ? (int)$row['active_plugins'] : 0;
+            }
+        }
+
         return [
-            'active_plugins' => $row['active_plugins'],
-            'status' => $row['active_plugins'] > 0 ? 'connected' : 'disconnected',
+            'active_plugins' => $active,
+            'status' => $active > 0 ? 'connected' : 'disconnected',
             'last_check' => date('Y-m-d H:i:s')
         ];
     }

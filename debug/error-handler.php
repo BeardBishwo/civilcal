@@ -90,13 +90,13 @@ class AdvancedErrorHandler {
         // Log the enhanced error
         self::logError($errorData);
         
-        // Display error if in debug mode
-        if (DEBUG_MODE && DISPLAY_ERRORS) {
-            self::displayEnhancedError($errorData);
+        // If not in debug mode, just prevent the default handler. Otherwise, display error and exit.
+        if (!DEBUG_MODE || !DISPLAY_ERRORS) {
+            return true;
         }
-
-        // Don't execute PHP internal error handler
-        return true;
+        
+        self::displayEnhancedError($errorData);
+        exit;
     }
     
     private static function categorizeError($errstr, $errno) {
@@ -269,7 +269,6 @@ class AdvancedErrorHandler {
     </div>
 </body>
 </html>";
-        exit;
     }
     
     public static function handleException($exception) {
@@ -293,6 +292,7 @@ class AdvancedErrorHandler {
         if (DEBUG_MODE && DISPLAY_ERRORS) {
             self::displayEnhancedError($errorData);
         }
+        exit;
     }
     
     public static function handleShutdown() {

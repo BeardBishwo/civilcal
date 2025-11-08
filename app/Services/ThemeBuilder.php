@@ -22,6 +22,12 @@ class ThemeBuilder
     private $storageDir;
     private $previewDir;
 
+    /**
+     * @var \App\Core\Database|\PDO|null Database connection wrapper or PDO instance
+     */
+    // The $db property is provided by Database::getInstance() and returns a wrapper
+    // with getPdo()/query() methods. The PHPDoc above helps static analyzers.
+
     public function __construct()
     {
         $this->db = Database::getInstance();
@@ -920,12 +926,12 @@ a:hover {
         
         // Set color variables
         Object.keys(colors).forEach(key => {
-            root.style.setProperty(`--color-${key}`, colors[key]);
+            root.style.setProperty('--color-' + key, colors[key]);
         });
         
         // Set typography variables
         root.style.setProperty('--font-size-base', typography.base_size + 'px');
-        root.style.setProperty('--font-family-primary', `'${typography.font_family}', sans-serif`);
+        root.style.setProperty('--font-family-primary', '\'' + typography.font_family + '\', sans-serif');
         
         // Set layout variables
         root.style.setProperty('--border-radius-md', layout.border_radius_md + 'px');
@@ -1177,8 +1183,9 @@ a:hover {
     private function themeSlugExists($slug)
     {
         $sql = "SELECT id FROM theme_templates WHERE slug = ?";
-        $result = $this->db->query($sql, [$slug]);
-        return !empty($result);
+    $stmt = $this->db->query($sql, [$slug]);
+    $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return (bool) $row;
     }
 
     /**
@@ -1249,7 +1256,8 @@ a:hover {
             $themeData['updated_by']
         ];
         
-        return $this->db->insert($sql, $params);
+        $this->db->query($sql, $params);
+        return $this->db->lastInsertId();
     }
 
     /**
@@ -1285,7 +1293,7 @@ a:hover {
             $themeId
         ];
         
-        return $this->db->update($sql, $params);
+        return $this->db->query($sql, $params);
     }
 
     /**
@@ -1294,8 +1302,9 @@ a:hover {
     private function getThemeById($themeId)
     {
         $sql = "SELECT * FROM theme_templates WHERE id = ?";
-        $result = $this->db->query($sql, [$themeId]);
-        return isset($result[0]) ? $result[0] : null;
+    $stmt = $this->db->query($sql, [$themeId]);
+    $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return is_array($row) ? $row : null;
     }
 
     /**
@@ -1315,7 +1324,7 @@ a:hover {
             $userId
         ];
         
-        return $this->db->insert($sql, $params);
+        return $this->db->query($sql, $params);
     }
 
     /**
@@ -1357,13 +1366,14 @@ a:hover {
     private function getNextVersion($themeId)
     {
         $sql = "SELECT version FROM theme_versions WHERE theme_id = ? ORDER BY created_at DESC LIMIT 1";
-        $result = $this->db->query($sql, [$themeId]);
-        
-        if (empty($result)) {
+    $stmt = $this->db->query($sql, [$themeId]);
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (empty($result) || !is_array($result)) {
             return '1.0.0';
         }
-        
-        $currentVersion = $result[0]['version'];
+
+        $currentVersion = $result['version'];
         $parts = explode('.', $currentVersion);
         
         // Increment patch version
@@ -1396,7 +1406,7 @@ a:hover {
             $userAgent
         ];
         
-        return $this->db->insert($sql, $params);
+        return $this->db->query($sql, $params);
     }
 
     /**

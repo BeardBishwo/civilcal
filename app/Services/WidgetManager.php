@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Widgets\BaseWidget;
 use App\Core\Database;
 use Exception;
+use PDO;
 
 /**
  * WidgetManager - Service for managing widgets in the Bishwo Calculator system
@@ -33,7 +34,7 @@ class WidgetManager
      * 
      * @param Database|null $database
      */
-    public function __construct(Database $database = null)
+    public function __construct(?Database $database = null)
     {
         $this->database = $database;
         $this->initialize();
@@ -127,8 +128,10 @@ class WidgetManager
             $query = "SELECT * FROM {$this->widgetTable} ORDER BY position ASC";
             $results = $this->database->query($query);
             
-            while ($row = $results->fetch_assoc()) {
-                $this->widgetConfigs[$row['id']] = $row;
+            if ($results) {
+                while ($row = $results->fetch(PDO::FETCH_ASSOC)) {
+                    $this->widgetConfigs[$row['id']] = $row;
+                }
             }
         } catch (Exception $e) {
             error_log("Failed to load widget configs: " . $e->getMessage());
@@ -305,4 +308,288 @@ class WidgetManager
             'database_connected' => $this->database !== null
         ];
     }
+    
+    /**
+     * Get information about a specific widget class
+     * 
+     * @param string $className
+     * @return array|null
+     */
+    public function getWidgetClassInfo($className)
+    {
+        if (!isset($this->widgetClasses[$className])) {
+            return null;
+        }
+        
+        try {
+            // Load the class to get reflection information
+            require_once $this->widgetClasses[$className];
+            
+            $reflection = new \ReflectionClass($className);
+            $info = [
+                'name' => $className,
+                'file' => $this->widgetClasses[$className],
+                'description' => $reflection->getDocComment(),
+                'methods' => [],
+                'properties' => [],
+                'is_abstract' => $reflection->isAbstract(),
+                'is_interface' => $reflection->isInterface(),
+                'parent_class' => $reflection->getParentClass() ? $reflection->getParentClass()->getName() : null,
+                'interfaces' => $reflection->getInterfaceNames()
+            ];
+            
+            // Get public methods
+            foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+                $info['methods'][] = [
+                    'name' => $method->getName(),
+                    'return_type' => $method->getReturnType(),
+                    'parameters' => array_map(function($param) {
+                        return [
+                            'name' => $param->getName(),
+                            'type' => $param->getType(),
+                            'optional' => $param->isOptional(),
+                            'default_value' => $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null
+                        ];
+                    }, $method->getParameters())
+                ];
+            }
+            
+            // Get public properties
+            foreach ($reflection->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
+                $info['properties'][] = [
+                    'name' => $property->getName(),
+                    'type' => $property->getType(),
+                    'default_value' => $property->getValue()
+                ];
+            }
+            
+            return $info;
+        } catch (Exception $e) {
+            error_log("Failed to get widget class info for {$className}: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Load a specific widget by ID
+     * 
+     * @param string $widgetId
+     * @return BaseWidget|null
+     */
+    public function loadWidget($widgetId)
+    {
+        if (isset($this->widgetInstances[$widgetId])) {
+            return $this->widgetInstances[$widgetId];
+        }
+        
+        if (!isset($this->widgetConfigs[$widgetId])) {
+            return null;
+        }
+        
+        try {
+            $config = $this->widgetConfigs[$widgetId];
+            $widgetData = array_merge($config, [
+                'config' => json_decode($config['config'], true) ?? []
+            ]);
+            
+            $widget = BaseWidget::fromArray($widgetData);
+            
+            if ($widget) {
+                $this->widgetInstances[$widgetId] = $widget;
+            }
+            
+            return $widget;
+        } catch (Exception $e) {
+            error_log("Failed to load widget {$widgetId}: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Delete a widget
+     * 
+     * @param string $widgetId
+     * @return bool
+     */
+    public function deleteWidget($widgetId)
+    {
+        try {
+            // Remove from local cache
+            unset($this->widgetInstances[$widgetId]);
+            unset($this->widgetConfigs[$widgetId]);
+            
+            // Skip database operations if no database connection
+            if (!$this->database) {
+                return true;
+            }
+            
+            // Database deletion would go here
+            // For now, just return true
+            return true;
+        } catch (Exception $e) {
+            error_log("Failed to delete widget {$widgetId}: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Set widget enabled/disabled status
+     * 
+     * @param string $widgetId
+     * @param bool $enabled
+     * @return bool
+     */
+    public function setWidgetEnabled($widgetId, $enabled = true)
+    {
+        try {
+            if (isset($this->widgetInstances[$widgetId])) {
+                $widget = $this->widgetInstances[$widgetId];
+                if ($enabled) {
+                    $widget->enable();
+                } else {
+                    $widget->disable();
+                }
+            }
+            
+            // Update configuration
+            if (isset($this->widgetConfigs[$widgetId])) {
+                $this->widgetConfigs[$widgetId]['is_enabled'] = $enabled;
+            }
+            
+            // Skip database operations if no database connection
+            if (!$this->database) {
+                return true;
+            }
+            
+            // Database update would go here
+            return true;
+        } catch (Exception $e) {
+            error_log("Failed to set widget enabled status for {$widgetId}: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Set widget visibility
+     * 
+     * @param string $widgetId
+     * @param bool $visible
+     * @return bool
+     */
+    public function setWidgetVisible($widgetId, $visible = true)
+    {
+        try {
+            if (isset($this->widgetInstances[$widgetId])) {
+                $widget = $this->widgetInstances[$widgetId];
+                $widget->setVisible($visible);
+            }
+            
+            // Update configuration
+            if (isset($this->widgetConfigs[$widgetId])) {
+                $this->widgetConfigs[$widgetId]['is_visible'] = $visible;
+            }
+            
+            // Skip database operations if no database connection
+            if (!$this->database) {
+                return true;
+            }
+            
+            // Database update would go here
+            return true;
+        } catch (Exception $e) {
+            error_log("Failed to set widget visibility for {$widgetId}: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Set widget position
+     * 
+     * @param string $widgetId
+     * @param int $position
+     * @return bool
+     */
+    public function setWidgetPosition($widgetId, $position)
+    {
+        try {
+            if (isset($this->widgetInstances[$widgetId])) {
+                $widget = $this->widgetInstances[$widgetId];
+                $widget->setPosition($position);
+            }
+            
+            // Update configuration
+            if (isset($this->widgetConfigs[$widgetId])) {
+                $this->widgetConfigs[$widgetId]['position'] = $position;
+            }
+            
+            // Skip database operations if no database connection
+            if (!$this->database) {
+                return true;
+            }
+            
+            // Database update would go here
+            return true;
+        } catch (Exception $e) {
+            error_log("Failed to set widget position for {$widgetId}: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Create widget database tables
+     * 
+     * @return bool
+     */
+    public function createWidgetTables()
+    {
+        if (!$this->database) {
+            return false;
+        }
+        
+        try {
+            // Create main widgets table
+            $widgetsTable = "
+                CREATE TABLE IF NOT EXISTS {$this->widgetTable} (
+                    id VARCHAR(255) PRIMARY KEY,
+                    class_name VARCHAR(255) NOT NULL,
+                    title VARCHAR(255) NOT NULL,
+                    description TEXT,
+                    config JSON,
+                    is_enabled BOOLEAN DEFAULT 1,
+                    is_visible BOOLEAN DEFAULT 1,
+                    position INT DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    INDEX idx_enabled (is_enabled),
+                    INDEX idx_visible (is_visible),
+                    INDEX idx_position (position)
+                )
+            ";
+            
+            $this->database->query($widgetsTable);
+            
+            // Create widget settings table
+            $settingsTable = "
+                CREATE TABLE IF NOT EXISTS {$this->widgetSettingsTable} (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    widget_id VARCHAR(255) NOT NULL,
+                    setting_key VARCHAR(255) NOT NULL,
+                    setting_value TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    FOREIGN KEY (widget_id) REFERENCES {$this->widgetTable}(id) ON DELETE CASCADE,
+                    UNIQUE KEY unique_widget_setting (widget_id, setting_key),
+                    INDEX idx_widget_id (widget_id)
+                )
+            ";
+            
+            $this->database->query($settingsTable);
+            
+            return true;
+        } catch (Exception $e) {
+            error_log("Failed to create widget tables: " . $e->getMessage());
+            return false;
+        }
+    }
 }
+?>

@@ -53,7 +53,7 @@ class TraditionalUnitsWidget extends BaseWidget
      * 
      * @return string
      */
-    private function getDefaultTitle(): string
+    protected function getDefaultTitle(): string
     {
         return $this->isForNepaliUser ? 
             'परम्परागत एकाइ क्यालकुलेटर' : 
@@ -65,7 +65,7 @@ class TraditionalUnitsWidget extends BaseWidget
      * 
      * @return string
      */
-    private function getDefaultDescription(): string
+    protected function getDefaultDescription(): string
     {
         return $this->isForNepaliUser ?
             'नेपाली परम्परागत मापन एकाइहरूको रूपान्तरण' :
@@ -75,9 +75,10 @@ class TraditionalUnitsWidget extends BaseWidget
     /**
      * Render widget content
      * 
+     * @param array $data
      * @return string
      */
-    public function render(): string
+    public function render(array $data = []): string
     {
         $this->beforeRender();
         
@@ -255,8 +256,11 @@ class TraditionalUnitsWidget extends BaseWidget
     
     /**
      * Validate widget configuration
+     * 
+     * @param mixed $config
+     * @return bool
      */
-    public function validateConfig(): bool
+    public function validateConfig($config = null): bool
     {
         $required = ['default_from_unit', 'default_to_unit'];
         foreach ($required as $key) {
@@ -281,3 +285,4 @@ class TraditionalUnitsWidget extends BaseWidget
         return $data;
     }
 }
+?>

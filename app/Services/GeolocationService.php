@@ -128,17 +128,21 @@ class GeolocationService
      */
     private function getCountryFromMaxMind($ip)
     {
-        if (extension_loaded('geoip')) {
-            // Using PHP geoip extension
-            $countryCode = geoip_country_code_by_name($ip);
-            $countryName = geoip_country_name_by_name($ip);
-            
-            if ($countryCode) {
-                return [
-                    'country_code' => $countryCode,
-                    'country_name' => $countryName ?: $countryCode
-                ];
+        try {
+            // Use MaxMind GeoIP2 library
+            if (class_exists('\MaxMind\Db\Reader')) {
+                $reader = new \MaxMind\Db\Reader($this->dbPath);
+                $record = $reader->get($ip);
+                
+                if ($record && isset($record['country'])) {
+                    return [
+                        'country_code' => $record['country']['iso_code'],
+                        'country_name' => $record['country']['names']['en']
+                    ];
+                }
             }
+        } catch (Exception $e) {
+            error_log("MaxMind GeoIP2 error: " . $e->getMessage());
         }
 
         return null;

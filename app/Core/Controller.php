@@ -6,6 +6,7 @@ class Controller {
     protected $auth;
     protected $theme;
     protected $view;
+    protected $session;
     
     public function __construct() {
         // Initialize session if not already started
@@ -24,8 +25,11 @@ class Controller {
         
         // Initialize view with theme support
         $this->view = new View();
+        
+        // Initialize session
+        $this->session = new Session();
     }
-    
+
     /**
      * Initialize theme system
      */
@@ -180,6 +184,49 @@ class Controller {
         if (!$this->hasRole($role)) {
             $this->redirect('/unauthorized');
         }
+    }
+    
+    /**
+     * Send error response
+     * 
+     * @param string $message Error message
+     * @param int $status HTTP status code
+     * @param array $data Additional error data
+     */
+    protected function error($message, $status = 400, $data = []) {
+        $response = [
+            'success' => false,
+            'error' => [
+                'message' => $message,
+                'code' => $status
+            ]
+        ];
+        
+        if (!empty($data)) {
+            $response['error']['data'] = $data;
+        }
+        
+        $this->json($response, $status);
+    }
+    
+    /**
+     * Send success response
+     * 
+     * @param string $message Success message
+     * @param mixed $data Response data
+     * @param int $status HTTP status code
+     */
+    protected function success($message = 'Success', $data = null, $status = 200) {
+        $response = [
+            'success' => true,
+            'message' => $message
+        ];
+        
+        if ($data !== null) {
+            $response['data'] = $data;
+        }
+        
+        $this->json($response, $status);
     }
 }
 ?>

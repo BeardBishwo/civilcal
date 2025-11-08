@@ -161,6 +161,17 @@ class ThemeManager
     }
 
     /**
+     * Load category-specific scripts
+     */
+    public function loadCategoryScripts($category)
+    {
+        if (isset($this->currentTheme['category_scripts'][$category])) {
+            $script = $this->currentTheme['category_scripts'][$category];
+            echo '<script src="' . htmlspecialchars($this->getThemeAsset($script)) . '"></script>' . PHP_EOL;
+        }
+    }
+
+    /**
      * Set active theme
      */
     public function setTheme($themeName)
@@ -199,11 +210,13 @@ class ThemeManager
         $partialPath = $this->themesPath . $this->activeTheme . '/views/partials/' . $partial . '.php';
         
         if (file_exists($partialPath)) {
+            ob_start();
             extract($data);
             include $partialPath;
-        } else {
-            echo "<!-- Partial not found: {$partial} -->" . PHP_EOL;
+            return ob_get_clean();
         }
+        
+        return "<!-- Partial not found: {$partial} -->" . PHP_EOL;
     }
 
     /**
@@ -214,11 +227,13 @@ class ThemeManager
         $viewPath = $this->themesPath . $this->activeTheme . '/views/' . $view . '.php';
         
         if (file_exists($viewPath)) {
+            ob_start();
             extract($data);
             include $viewPath;
-        } else {
-            echo "<!-- View not found: {$view} -->" . PHP_EOL;
+            return ob_get_clean();
         }
+        
+        return "<!-- View not found: {$view} -->" . PHP_EOL;
     }
 
     /**
@@ -294,6 +309,26 @@ class ThemeManager
     public function getAllCategoryStyles()
     {
         return $this->currentTheme['category_styles'] ?? [];
+    }
+
+    /**
+     * Check if theme supports a feature
+     */
+    public function supportsFeature($feature)
+    {
+        return isset($this->currentTheme['features']) && in_array($feature, $this->currentTheme['features']);
+    }
+
+    /**
+     * Get category-specific classes
+     */
+    public function getCategoryClasses($category)
+    {
+        $classes = 'category-' . htmlspecialchars($category);
+        if (isset($this->currentTheme['category_classes'][$category])) {
+            $classes .= ' ' . htmlspecialchars($this->currentTheme['category_classes'][$category]);
+        }
+        return $classes;
     }
 
     /* Static helpers for backward compatibility when called statically */
