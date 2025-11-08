@@ -2,41 +2,56 @@
 // Routes Definition
 // This file defines all application routes
 
-$router->add('GET', '/', 'CalculatorController@dashboard', ['auth']);
+// Public Routes
+$router->add('GET', '/', 'HomeController@index');
+$router->add('GET', '/features', 'HomeController@features');
+$router->add('GET', '/pricing', 'HomeController@pricing');
+$router->add('GET', '/about', 'HomeController@about');
+$router->add('GET', '/contact', 'HomeController@contact');
+$router->add('POST', '/contact', 'HomeController@contact');
+
+// Authentication Routes
 $router->add('GET', '/login', 'AuthController@showLogin', ['guest']);
 $router->add('POST', '/login', 'AuthController@login', ['guest']);
 $router->add('GET', '/register', 'AuthController@showRegister', ['guest']);
 $router->add('POST', '/register', 'AuthController@register', ['guest']);
 $router->add('POST', '/logout', 'AuthController@logout', ['auth']);
 
-// Calculator Routes
-$router->add('GET', '/calculators', 'CalculatorController@index', ['auth']);
-$router->add('GET', '/calculators/{category}', 'CalculatorController@category', ['auth']);
-$router->add('GET', '/calculators/{category}/{calculator}', 'CalculatorController@show', ['auth']);
-$router->add('POST', '/api/calculate/{calculator}', 'ApiController@calculate', ['auth']);
+// Calculator Routes (Public)
+$router->add('GET', '/calculators', 'CalculatorController@index');
+$router->add('GET', '/calculator/{category}', 'CalculatorController@category');
+$router->add('GET', '/calculator/{category}/{tool}', 'CalculatorController@tool');
+$router->add('POST', '/calculator/{category}/{tool}/calculate', 'CalculatorController@calculate');
 
-// Traditional Units Calculator Routes
-$router->add('GET', '/calculators/traditional-units', 'CalculatorController@traditionalUnits', ['auth']);
-$router->add('POST', '/api/traditional-units/convert', 'ApiController@traditionalUnitsConvert', ['auth']);
-$router->add('POST', '/api/traditional-units/all-conversions', 'ApiController@traditionalUnitsAllConversions', ['auth']);
+// Calculator Routes (Protected)
+$router->add('GET', '/dashboard', 'CalculatorController@dashboard', ['auth']);
 
 // User Routes
-$router->add('GET', '/profile', 'UserController@profile', ['auth']);
-$router->add('POST', '/profile', 'UserController@updateProfile', ['auth']);
+$router->add('GET', '/profile', 'ProfileController@index', ['auth']);
+$router->add('POST', '/profile/update', 'ProfileController@update', ['auth']);
+$router->add('POST', '/profile/change-password', 'ProfileController@changePassword', ['auth']);
+$router->add('GET', '/history', 'ProfileController@history', ['auth']);
+$router->add('POST', '/history/delete/{id}', 'ProfileController@deleteCalculation', ['auth']);
 
-// Profile Management Routes
-$router->add('GET', '/user/profile', 'ProfileController@index', ['auth']);
-$router->add('POST', '/profile/update', 'ProfileController@updateProfile', ['auth']);
-$router->add('POST', '/profile/notifications', 'ProfileController@updateNotifications', ['auth']);
-$router->add('POST', '/profile/privacy', 'ProfileController@updatePrivacy', ['auth']);
-$router->add('POST', '/profile/password', 'ProfileController@changePassword', ['auth']);
-$router->add('POST', '/profile/delete', 'ProfileController@deleteAccount', ['auth']);
-$router->add('GET', '/profile/avatar/{filename}', 'ProfileController@serveAvatar', ['auth']);
+// API Routes
+$router->add('POST', '/api/calculate', 'ApiController@calculate');
+$router->add('GET', '/api/calculators', 'ApiController@getCalculators');
+$router->add('GET', '/api/calculator/{category}/{tool}', 'ApiController@getCalculator');
+$router->add('GET', '/api/calculations', 'ApiController@getUserCalculations', ['auth']);
+$router->add('GET', '/api/calculations/{id}', 'ApiController@getCalculation', ['auth']);
 
 // Admin Routes
 $router->add('GET', '/admin', 'Admin\DashboardController@index', ['auth', 'admin']);
 $router->add('GET', '/admin/users', 'Admin\UserController@index', ['auth', 'admin']);
 $router->add('GET', '/admin/settings', 'Admin\SettingsController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/settings/save', 'Admin\SettingsController@saveSettings', ['auth', 'admin']);
+
+// Calculators Management Routes
+$router->add('GET', '/admin/calculators', 'Admin\CalculatorController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/calculators/add', 'Admin\CalculatorController@addCalculator', ['auth', 'admin']);
+
+// Modules Management Routes
+$router->add('GET', '/admin/modules', 'Admin\ModuleController@index', ['auth', 'admin']);
 
 // Widget Management Routes
 $router->add('GET', '/admin/widgets', 'WidgetController@index', ['auth', 'admin']);
@@ -115,6 +130,20 @@ $router->add('PUT', '/comments/{id}', 'CommentController@update', ['auth']);
 $router->add('DELETE', '/comments/{id}', 'CommentController@destroy', ['auth']);
 $router->add('GET', '/comments/share/{shareId}', 'CommentController@getByShare');
 
+// Email & Notifications Management Routes
+$router->add('GET', '/admin/email', 'Admin\EmailManagerController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/email/send-test', 'Admin\EmailManagerController@sendTestEmail', ['auth', 'admin']);
+$router->add('POST', '/admin/email/save-template', 'Admin\EmailManagerController@saveTemplate', ['auth', 'admin']);
+
+// Billing & Subscriptions Management Routes
+$router->add('GET', '/admin/subscriptions', 'Admin\SubscriptionController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/subscriptions/create-plan', 'Admin\SubscriptionController@createPlan', ['auth', 'admin']);
+
+// Help & Logs Management Routes
+$router->add('GET', '/admin/help', 'Admin\HelpController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/help/clear-logs', 'Admin\HelpController@clearLogs', ['auth', 'admin']);
+$router->add('POST', '/admin/help/backup', 'Admin\HelpController@backupSystem', ['auth', 'admin']);
+
 // Email Manager Admin Routes
 $router->add('GET', '/admin/email-manager', 'Admin\EmailManagerController@dashboard', ['auth', 'admin']);
 $router->add('GET', '/admin/email-manager/threads', 'Admin\EmailManagerController@threads', ['auth', 'admin']);
@@ -132,8 +161,17 @@ $router->add('PUT', '/admin/email-manager/template/{id}', 'Admin\EmailManagerCon
 $router->add('DELETE', '/admin/email-manager/template/{id}', 'Admin\EmailManagerController@deleteTemplate', ['auth', 'admin']);
 $router->add('POST', '/admin/email-manager/templates/{id}/use', 'Admin\EmailManagerController@useTemplate', ['auth', 'admin']);
 
+// Error Monitoring & Logging Routes
+$router->add('GET', '/admin/error-logs', 'Admin\ErrorLogController@index', ['auth', 'admin']);
+$router->add('GET', '/admin/error-logs/get-error-stats', 'Admin\ErrorLogController@getErrorStats', ['auth', 'admin']);
+$router->add('GET', '/admin/error-logs/get-method-calls', 'Admin\ErrorLogController@getMethodCalls', ['auth', 'admin']);
+$router->add('GET', '/admin/error-logs/get-failed-calls', 'Admin\ErrorLogController@getFailedCalls', ['auth', 'admin']);
+$router->add('POST', '/admin/error-logs/clear-logs', 'Admin\ErrorLogController@clearLogs', ['auth', 'admin']);
+$router->add('GET', '/admin/error-logs/export-logs', 'Admin\ErrorLogController@exportLogs', ['auth', 'admin']);
+
 // API Routes for Share & Comment System
 $router->add('GET', '/api/comments/{shareId}', 'CommentController@getByShare');
 $router->add('POST', '/api/comments/{id}/vote', 'CommentController@vote', ['auth']);
 $router->add('POST', '/api/share/{id}/embed', 'ShareController@generateEmbed', ['auth']);
 $router->add('POST', '/api/share', 'ShareController@store', ['auth']);
+?>
