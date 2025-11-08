@@ -4,6 +4,9 @@
  * MVC Router with Theme System Integration
  */
 
+// Define base path FIRST
+define('BASE_PATH', __DIR__ . '/..');
+
 // Start session
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -22,9 +25,6 @@ if (!isInstalled() && !isset($_GET['install'])) {
     header('Location: /install/');
     exit;
 }
-
-// Define base path
-define('BASE_PATH', __DIR__ . '/..');
 
 // Include autoloader
 require_once BASE_PATH . '/vendor/autoload.php';
