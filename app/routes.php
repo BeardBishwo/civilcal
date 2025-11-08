@@ -123,6 +123,20 @@ $router->add('PUT', '/comments/{id}', 'CommentController@update', ['auth']);
 $router->add('DELETE', '/comments/{id}', 'CommentController@destroy', ['auth']);
 $router->add('GET', '/comments/share/{shareId}', 'CommentController@getByShare');
 
+// Email & Notifications Management Routes
+$router->add('GET', '/admin/email', 'Admin\EmailManagerController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/email/send-test', 'Admin\EmailManagerController@sendTestEmail', ['auth', 'admin']);
+$router->add('POST', '/admin/email/save-template', 'Admin\EmailManagerController@saveTemplate', ['auth', 'admin']);
+
+// Billing & Subscriptions Management Routes
+$router->add('GET', '/admin/subscriptions', 'Admin\SubscriptionController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/subscriptions/create-plan', 'Admin\SubscriptionController@createPlan', ['auth', 'admin']);
+
+// Help & Logs Management Routes
+$router->add('GET', '/admin/help', 'Admin\HelpController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/help/clear-logs', 'Admin\HelpController@clearLogs', ['auth', 'admin']);
+$router->add('POST', '/admin/help/backup', 'Admin\HelpController@backupSystem', ['auth', 'admin']);
+
 // Email Manager Admin Routes
 $router->add('GET', '/admin/email-manager', 'Admin\EmailManagerController@dashboard', ['auth', 'admin']);
 $router->add('GET', '/admin/email-manager/threads', 'Admin\EmailManagerController@threads', ['auth', 'admin']);
