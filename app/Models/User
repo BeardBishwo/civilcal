@@ -186,7 +186,7 @@ class User {
     }
     
     public function changePassword($userId, $newPassword) {
-        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $hashedPassword = password_hash($newPassword, PASSWORD_PASSWORD);
         $stmt = $this->db->getPdo()->prepare("UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?");
         return $stmt->execute([$hashedPassword, $userId]);
     }

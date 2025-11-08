@@ -37,6 +37,14 @@ $router->add('GET', '/profile/avatar/{filename}', 'ProfileController@serveAvatar
 $router->add('GET', '/admin', 'Admin\DashboardController@index', ['auth', 'admin']);
 $router->add('GET', '/admin/users', 'Admin\UserController@index', ['auth', 'admin']);
 $router->add('GET', '/admin/settings', 'Admin\SettingsController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/settings/save', 'Admin\SettingsController@saveSettings', ['auth', 'admin']);
+
+// Calculators Management Routes
+$router->add('GET', '/admin/calculators', 'Admin\CalculatorController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/calculators/add', 'Admin\CalculatorController@addCalculator', ['auth', 'admin']);
+
+// Modules Management Routes
+$router->add('GET', '/admin/modules', 'Admin\ModuleController@index', ['auth', 'admin']);
 
 // Widget Management Routes
 $router->add('GET', '/admin/widgets', 'WidgetController@index', ['auth', 'admin']);

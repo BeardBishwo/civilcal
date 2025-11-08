@@ -1,0 +1,101 @@
+<?php
+namespace App\Controllers\Admin;
+
+use App\Core\Controller;
+
+class CalculatorController extends Controller
+{
+    public function index()
+    {
+        $calculators = $this->getAllCalculators();
+        $categories = $this->getCalculatorCategories();
+        
+        // Prepare data for the view
+        $this->data['currentPage'] = 'calculators';
+        $this->data['calculators'] = $calculators;
+        $this->data['categories'] = $categories;
+        $this->data['title'] = 'Calculators Management - Admin Panel';
+        
+        // Load the view
+        $this->loadView('admin/calculators/index', $this->data);
+    }
+
+    public function addCalculator()
+    {
+        if ($_POST) {
+            $data = [
+                'name' => $_POST['name'],
+                'category' => $_POST['category'],
+                'description' => $_POST['description'],
+                'formula' => $_POST['formula'],
+                'inputs' => json_encode($_POST['inputs']),
+                'outputs' => json_encode($_POST['outputs']),
+                'status' => $_POST['status'],
+                'created_at' => date('Y-m-d H:i:s')
+            ];
+
+            try {
+                $db = \App\Core\Database::getInstance();
+                $stmt = $db->getPdo()->prepare("INSERT INTO calculators (name, category, description, formula, inputs, outputs, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                $result = $stmt->execute([
+                    $data['name'], $data['category'], $data['description'], 
+                    $data['formula'], $data['inputs'], $data['outputs'], 
+                    $data['status'], $data['created_at']
+                ]);
+
+                echo json_encode(['success' => $result, 'message' => $result ? 'Calculator added successfully' : 'Failed to add calculator']);
+            } catch (\Exception $e) {
+                echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+            }
+            return;
+        }
+    }
+
+    private function getAllCalculators()
+    {
+        // Mock data for now
+        return [
+            [
+                'id' => 1,
+                'name' => 'Concrete Volume Calculator',
+                'category' => 'civil',
+                'description' => 'Calculate concrete volume for slabs, beams, columns',
+                'status' => 'active',
+                'usage_count' => 1250,
+                'created_at' => '2024-01-15'
+            ],
+            [
+                'id' => 2,
+                'name' => 'Electrical Load Calculator',
+                'category' => 'electrical',
+                'description' => 'Calculate electrical load for residential buildings',
+                'status' => 'active',
+                'usage_count' => 980,
+                'created_at' => '2024-01-10'
+            ],
+            [
+                'id' => 3,
+                'name' => 'Steel Beam Calculator',
+                'category' => 'structural',
+                'description' => 'Calculate steel beam load capacity',
+                'status' => 'inactive',
+                'usage_count' => 650,
+                'created_at' => '2024-01-05'
+            ]
+        ];
+    }
+
+    private function getCalculatorCategories()
+    {
+        return [
+            'civil' => 'Civil Engineering',
+            'electrical' => 'Electrical Engineering',
+            'structural' => 'Structural Engineering',
+            'hvac' => 'HVAC',
+            'plumbing' => 'Plumbing',
+            'estimation' => 'Estimation',
+            'management' => 'Project Management'
+        ];
+    }
+}
+?>
