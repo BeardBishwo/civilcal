@@ -1,30 +1,43 @@
 # Bishwo Calculator - Project Structure Report
 
-**Generated:** 2025-11-07 19:53:42
+**Generated:** 2025-11-08 10:22:06
 
 ## Project Structure
 
 ```
 bishwo_calculator/
 ├── .env.example
+├── .env.production
 ├── .git
 ├── .htaccess
 ├── README.md
 ├── TH
+├── admin
+├── admin_panel_todo.md
 ├── app
+│   ├── Cal
 │   ├── Calculators
 │   │   ├── BaseCalculator.php
+│   │   ├── CalculatorFactory.php
 │   │   ├── CivilCalculator.php
 │   │   ├── ElectricalCalculator.php
 │   │   ├── HvacCalculator.php
-│   │   └── PlumbingCalculator.php
+│   │   ├── PlumbingCalculator.php
+│   │   └── TraditionalUnitsCalculator.php
 │   ├── Controllers
 │   │   ├── Admin
+│   │   │   ├── CalculatorController
+│   │   │   ├── CalculatorController.php
+│   │   │   ├── D
+│   │   │   ├── DashboardController
 │   │   │   ├── DashboardController.php
 │   │   │   ├── EmailManagerController.php
+│   │   │   ├── ErrorLogController.php
+│   │   │   ├── HelpController.php
 │   │   │   ├── ModuleController.php
 │   │   │   ├── PluginController.php
 │   │   │   ├── SettingsController.php
+│   │   │   ├── SubscriptionController.php
 │   │   │   ├── ThemeController.php
 │   │   │   └── UserController.php
 │   │   ├── ApiController.php
@@ -33,15 +46,21 @@ bishwo_calculator/
 │   │   ├── CommentController.php
 │   │   ├── ExportController.php
 │   │   ├── HistoryController.php
+│   │   ├── HomeController.php
+│   │   ├── Profile
 │   │   ├── ProfileController.php
 │   │   ├── ShareController.php
-│   │   └── UserController.php
+│   │   ├── UserController.php
+│   │   └── WidgetController.php
 │   ├── Core
 │   │   ├── Auth.php
 │   │   ├── Controller.php
 │   │   ├── Database.php
 │   │   ├── Model.php
+│   │   ├── ModelLogger.php
+│   │   ├── PDOCompat.php
 │   │   ├── Router.php
+│   │   ├── SafeModel.php
 │   │   ├── Session.php
 │   │   ├── Validator.php
 │   │   └── View.php
@@ -50,6 +69,7 @@ bishwo_calculator/
 │   │   ├── AuthMiddleware.php
 │   │   └── CorsMiddleware.php
 │   ├── Models
+│   │   ├── Cal
 │   │   ├── Calculation.php
 │   │   ├── CalculationHistory.php
 │   │   ├── Comment.php
@@ -62,28 +82,50 @@ bishwo_calculator/
 │   │   ├── Settings.php
 │   │   ├── Share.php
 │   │   ├── Subscription.php
+│   │   ├── User
 │   │   ├── User.php
 │   │   └── Vote.php
 │   ├── Services
+│   │   ├── CalculationService.php
 │   │   ├── CalculatorService.php
 │   │   ├── EmailService.php
 │   │   ├── ExportService.php
 │   │   ├── FileService.php
+│   │   ├── FileUploadService.php
+│   │   ├── GeolocationService.php
 │   │   ├── PaymentService.php
 │   │   ├── PluginManager.php
+│   │   ├── SettingsService
+│   │   ├── SettingsService.php
 │   │   ├── ThemeBuilder.php
-│   │   └── ThemeManager.php
+│   │   ├── ThemeManager.php
+│   │   └── WidgetManager.php
 │   ├── Views
 │   │   ├── admin
+│   │   │   ├── calculators
+│   │   │   │   └── index.php
 │   │   │   ├── dashboard.php
+│   │   │   ├── email
+│   │   │   │   └── index.php
 │   │   │   ├── email-manager
 │   │   │   │   └── dashboard.php
+│   │   │   ├── error-logs
+│   │   │   ├── help
+│   │   │   │   └── index.php
+│   │   │   ├── modules
+│   │   │   │   └── index.php
 │   │   │   ├── plugins
 │   │   │   │   └── index.php
 │   │   │   ├── settings
+│   │   │   │   └── index.php
+│   │   │   ├── subscriptions
+│   │   │   │   └── index.php
 │   │   │   ├── themes
 │   │   │   │   └── index.php
-│   │   │   └── users
+│   │   │   ├── users
+│   │   │   │   └── index.php
+│   │   │   └── widgets
+│   │   │       └── index.php
 │   │   ├── auth
 │   │   │   ├── forgot-password.php
 │   │   │   ├── login.php
@@ -98,7 +140,8 @@ bishwo_calculator/
 │   │   │   ├── plumbing
 │   │   │   ├── project-management
 │   │   │   ├── site
-│   │   │   └── structural
+│   │   │   ├── structural
+│   │   │   └── traditional-units.php
 │   │   ├── layouts
 │   │   │   ├── admin.php
 │   │   │   ├── auth.php
@@ -115,8 +158,13 @@ bishwo_calculator/
 │   │       ├── modals
 │   │       │   └── profile-modals.php
 │   │       └── profile.php
+│   ├── Widgets
+│   │   ├── BaseWidget.php
+│   │   └── TraditionalUnitsWidget.php
 │   ├── bootstrap.php
-│   └── routes.php
+│   ├── routes.php
+│   └── routes_updated.php
+├── complete_admin_todo.md
 ├── composer.json
 ├── composer.lock
 ├── config
@@ -125,6 +173,7 @@ bishwo_calculator/
 │   ├── mail.php
 │   └── services.php
 ├── database
+│   ├── migrate.php
 │   ├── migrations
 │   │   ├── 001_create_users_table.php
 │   │   ├── 001_plugin_theme_system.php
@@ -139,7 +188,8 @@ bishwo_calculator/
 │   │   ├── 013_create_votes_table.php
 │   │   ├── 014_create_email_threads_table.php
 │   │   ├── 015_create_email_responses_table.php
-│   │   └── 016_create_email_templates_table.php
+│   │   ├── 016_create_email_templates_table.php
+│   │   └── 018_create_complete_system_tables.php
 │   └── run_migration.php
 ├── debug
 │   ├── debug-config.php
@@ -152,6 +202,10 @@ bishwo_calculator/
 │   │   ├── error.log
 │   │   └── system.log
 │   └── temp
+├── debug_plan.md
+├── deploy.sh
+├── final_admin_implementation.md
+├── implementation_todo.md
 ├── includes
 │   ├── BackupManager.php
 │   ├── ComplianceConfig.php
@@ -172,6 +226,7 @@ bishwo_calculator/
 │   ├── functions.php
 │   ├── header.php
 │   ├── mailer.php
+│   ├── pdo_mysqli_compat.php
 │   └── test-footer.php
 ├── index.php
 ├── install
@@ -617,6 +672,8 @@ bishwo_calculator/
 │   │   └── green-building-tools
 │   │       └── plugin.json
 │   └── theme-plugins
+├── production_im
+├── production_implementation.md
 ├── public
 │   ├── .htaccess
 │   ├── assets
@@ -625,7 +682,8 @@ bishwo_calculator/
 │   │   │   │   └── email-manager.css
 │   │   │   ├── history.css
 │   │   │   ├── main.css
-│   │   │   └── share.css
+│   │   │   ├── share.css
+│   │   │   └── widgets.css
 │   │   ├── images
 │   │   ├── js
 │   │   │   ├── exports.js
@@ -656,6 +714,7 @@ bishwo_calculator/
 │   ├── basic_test.php
 │   ├── clean_project_structure.php
 │   ├── comprehensive_functional_test.php
+│   ├── geolocation_traditional_units_test.php
 │   ├── run_tests.php
 │   └── saas_system_test.php
 ├── themes
@@ -783,9 +842,9 @@ vendor{
 
 ## Statistics
 
-- **Total Files:** 564
-- **Total Directories:** 171
-- **Total Items:** 735
+- **Total Files:** 616
+- **Total Directories:** 178
+- **Total Items:** 794
 - **Excludes:** vendor/ folder
 
 ---
