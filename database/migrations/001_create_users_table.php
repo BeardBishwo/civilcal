@@ -1,10 +1,11 @@
 <?php
-require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'Core' . DIRECTORY_SEPARATOR . 'Database.php';
-
-use App\Core\Database;
+// Simple migration without dependency on Database class
+// This creates the users table directly using PDO
 
 try {
-    $pdo = Database::getInstance()->getPdo();
+    // Direct PDO connection using hardcoded values (will be overridden by installation config)
+    $pdo = new PDO("mysql:host=localhost;dbname=bishwo_calculator", "root", "");
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
     $sql = "CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,

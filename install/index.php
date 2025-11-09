@@ -117,8 +117,15 @@ function handleDatabaseStep() {
     if (empty($dbUser)) $errors[] = 'Database username is required';
     
     if (empty($errors)) {
-        // Test database connection
         try {
+            // First try to connect to MySQL server without specifying database
+            $pdoServer = new PDO("mysql:host=$dbHost", $dbUser, $dbPass);
+            $pdoServer->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            
+            // Create database if it doesn't exist
+            $pdoServer->exec("CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            
+            // Now connect to the specific database
             $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPass);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
@@ -307,6 +314,10 @@ function runDatabaseMigrations() {
     );
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
+    // Load migration compatibility layer
+    require_once __DIR__ . '/includes/migration_compat.php';
+    MigrationCompat::setPdo($pdo);
+    
     // Create migrations table if it doesn't exist
     $pdo->exec("CREATE TABLE IF NOT EXISTS migrations (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -322,54 +333,78 @@ function runDatabaseMigrations() {
     foreach ($migrationFiles as $file) {
         $migrationName = basename($file);
         if (!in_array($migrationName, $executed)) {
-            include $file;
-            
-            // Get class name from file
-            $className = pathinfo($file, PATHINFO_FILENAME);
-            if (class_exists($className)) {
-                $migration = new $className();
-                if (method_exists($migration, 'up')) {
-                    $migration->up($pdo);
+            try {
+                // Include the file and check for class structure
+                $content = file_get_contents($file);
+                
+                // Check if it's a class-based migration
+                if (preg_match('/class\s+(\w+).*?\{/', $content, $matches)) {
+                    $className = $matches[1];
+                    include $file;
+                    
+                    if (class_exists($className)) {
+                        $migration = new $className();
+                        if (method_exists($migration, 'up')) {
+                            // For modern migrations, pass PDO directly
+                            if ($className === 'CreateCompleteSystemTables') {
+                                $migration->up($pdo);
+                            } else {
+                                // For other migrations, they can use the Database class
+                                $migration->up($pdo);
+                            }
+                        }
+                    }
+                } else {
+                    // Handle legacy migration format (just execute SQL)
+                    eval('?>' . $content);
                 }
                 
                 // Record migration as executed
                 $pdo->prepare("INSERT INTO migrations (migration, batch) VALUES (?, 1)")
                     ->execute([$migrationName]);
+                    
+            } catch (Exception $e) {
+                // Log error but continue with other migrations
+                error_log("Migration error for $migrationName: " . $e->getMessage());
             }
         }
     }
     
     // Create admin user
     if (!empty($_SESSION['admin_config'])) {
-        // Parse the full name into first and last name
-        $fullName = trim($_SESSION['admin_config']['name']);
-        $nameParts = explode(' ', $fullName, 2);
-        $firstName = $nameParts[0];
-        $lastName = isset($nameParts[1]) ? $nameParts[1] : '';
-        
-        // Check if admin user already exists
-        $checkStmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
-        $checkStmt->execute([$_SESSION['admin_config']['email']]);
-        
-        if ($checkStmt->fetch()) {
-            // Update existing user
-            $stmt = $pdo->prepare("UPDATE users SET first_name = ?, last_name = ?, password = ?, role = 'admin', updated_at = NOW() WHERE email = ?");
-            $stmt->execute([
-                $firstName,
-                $lastName,
-                $_SESSION['admin_config']['password'],
-                $_SESSION['admin_config']['email']
-            ]);
-        } else {
-            // Insert new user
-            $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password, role, created_at, updated_at) 
-                                  VALUES (?, ?, ?, ?, 'admin', NOW(), NOW())");
-            $stmt->execute([
-                $firstName,
-                $lastName,
-                $_SESSION['admin_config']['email'],
-                $_SESSION['admin_config']['password']
-            ]);
+        try {
+            // Parse the full name into first and last name
+            $fullName = trim($_SESSION['admin_config']['name']);
+            $nameParts = explode(' ', $fullName, 2);
+            $firstName = $nameParts[0];
+            $lastName = isset($nameParts[1]) ? $nameParts[1] : '';
+            
+            // Check if admin user already exists
+            $checkStmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+            $checkStmt->execute([$_SESSION['admin_config']['email']]);
+            
+            if ($checkStmt->fetch()) {
+                // Update existing user
+                $stmt = $pdo->prepare("UPDATE users SET first_name = ?, last_name = ?, password = ?, role = 'admin', updated_at = NOW() WHERE email = ?");
+                $stmt->execute([
+                    $firstName,
+                    $lastName,
+                    $_SESSION['admin_config']['password'],
+                    $_SESSION['admin_config']['email']
+                ]);
+            } else {
+                // Insert new user
+                $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password, role, created_at, updated_at) 
+                                      VALUES (?, ?, ?, ?, 'admin', NOW(), NOW())");
+                $stmt->execute([
+                    $firstName,
+                    $lastName,
+                    $_SESSION['admin_config']['email'],
+                    $_SESSION['admin_config']['password']
+                ]);
+            }
+        } catch (Exception $e) {
+            error_log("Admin user creation error: " . $e->getMessage());
         }
     }
 }
@@ -451,9 +486,20 @@ function getBaseUrl() {
                         <div class="alert alert-success">
                             <h5><i class="fas fa-check-circle"></i> Installation Complete!</h5>
                             <p>Bishwo Calculator has been successfully installed and is ready to use.</p>
-                            <a href="../" class="btn btn-success">
-                                <i class="fas fa-home"></i> Go to Application
-                            </a>
+                            <div class="d-flex gap-3 mt-3">
+                                <a href="../index.php" class="btn btn-success">
+                                    <i class="fas fa-home"></i> Go to Application
+                                </a>
+                                <a href="../admin" class="btn btn-primary">
+                                    <i class="fas fa-cog"></i> Admin Dashboard
+                                </a>
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle"></i> 
+                                    If you see 404 errors, make sure your web server is configured to serve the parent directory.
+                                </small>
+                            </div>
                         </div>
                     <?php else: ?>
                         <?php include "includes/Installer.php"; ?>

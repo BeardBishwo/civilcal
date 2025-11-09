@@ -20,12 +20,39 @@ class Database {
      * Constructor - initialize database connection parameters
      */
     public function __construct() {
-        // Load configuration from config.php
-        $this->host = DB_HOST ?? '127.0.0.1';
-        $this->db_name = DB_NAME ?? 'aec_calculator';
-        $this->username = DB_USER ?? 'root';
-        $this->password = DB_PASS ?? '';
+        // Load .env file if it exists
+        $this->loadEnv();
+        
+        // Use environment variables with fallbacks to config.php constants
+        $this->host = getenv('DB_HOST') ?: (defined('DB_HOST') ? DB_HOST : '127.0.0.1');
+        $this->db_name = getenv('DB_DATABASE') ?: (defined('DB_NAME') ? DB_NAME : 'aec_calculator');
+        $this->username = getenv('DB_USERNAME') ?: (defined('DB_USER') ? DB_USER : 'root');
+        $this->password = getenv('DB_PASSWORD') ?: (defined('DB_PASS') ? DB_PASS : '');
         $this->charset = 'utf8mb4';
+    }
+    
+    /**
+     * Load environment variables from .env file
+     */
+    private function loadEnv() {
+        $envFile = __DIR__ . '/../.env';
+        if (file_exists($envFile)) {
+            $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach ($lines as $line) {
+                if (strpos(trim($line), '#') === 0) {
+                    continue; // Skip comments
+                }
+                if (strpos($line, '=') === false) {
+                    continue; // Skip invalid lines
+                }
+                list($name, $value) = explode('=', $line, 2);
+                $name = trim($name);
+                $value = trim($value);
+                if (!empty($name)) {
+                    putenv("$name=$value");
+                }
+            }
+        }
     }
 
     /**

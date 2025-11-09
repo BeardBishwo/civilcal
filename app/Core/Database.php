@@ -10,7 +10,26 @@ class Database {
     private $pdo;
     
     private function __construct() {
-        $config = require_once __DIR__ . '/../../config/database.php';
+        $configFile = __DIR__ . '/../../config/database.php';
+        
+        if (!file_exists($configFile)) {
+            throw new \Exception("Database configuration file not found: $configFile");
+        }
+        
+        // Include the file to get the config array
+        $config = include $configFile;
+        
+        if (!is_array($config)) {
+            throw new \Exception("Database configuration is not an array. Got: " . gettype($config));
+        }
+        
+        // Validate required configuration keys
+        $requiredKeys = ['host', 'database', 'username'];
+        foreach ($requiredKeys as $key) {
+            if (!isset($config[$key])) {
+                throw new \Exception("Missing required database configuration key: $key");
+            }
+        }
         
         try {
             $dsn = "mysql:host={$config['host']};dbname={$config['database']}";
@@ -18,10 +37,12 @@ class Database {
                 $dsn .= ";charset={$config['charset']}";
             }
             
+            $password = $config['password'] ?? '';
+            
             $this->pdo = new PDO(
                 $dsn,
                 $config['username'],
-                $config['password'],
+                $password,
                 [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

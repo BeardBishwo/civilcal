@@ -32,16 +32,30 @@ require_once BASE_PATH . '/vendor/autoload.php';
 // Include helper functions
 require_once BASE_PATH . '/themes/default/helpers.php';
 
+// Get base path dynamically
+function getBasePath() {
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $basePath = dirname($scriptName);
+    if ($basePath === '/') $basePath = '';
+    
+    // Remove public directory from base path if present
+    $basePath = str_replace('/public', '', $basePath);
+    
+    return $basePath;
+}
+
 // Parse request - handle both methods
 if (isset($_GET['url'])) {
     // URL parameter from .htaccess
     $path = $_GET['url'];
 } else {
     // Direct REQUEST_URI method
-    $request = $_SERVER['REQUEST_URI'];
+    $request = $_SERVER['REQUEST_URI'] ?? '';
     
-    // Remove base path from request (adjust as needed)
-    $basePath = '/bishwo_calculator';
+    // Get base path
+    $basePath = getBasePath();
+    
+    // Remove base path from request
     $path = str_replace($basePath, '', $request);
     $path = parse_url($path, PHP_URL_PATH);
 }
@@ -131,7 +145,7 @@ if (class_exists($controllerClass)) {
                     <h4>Application Error</h4>
                     <p>Sorry, an error occurred while processing your request.</p>
                     <p><strong>Error:</strong> " . htmlspecialchars($e->getMessage()) . "</p>
-                    <a href='/' class='btn btn-primary'>Go Home</a>
+                    <a href='" . getBaseUrl() . "' class='btn btn-primary'>Go Home</a>
                 </div>
             </div>
         </body>
@@ -157,5 +171,13 @@ if (class_exists($controllerClass)) {
     ];
     
     $themeManager->renderView('404', $data);
+}
+
+function getBaseUrl() {
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $basePath = getBasePath();
+    
+    return $protocol . '://' . $host . $basePath . '/';
 }
 ?>
