@@ -14,6 +14,7 @@ session_start();
 define('INSTALL_STEPS', [
     'welcome' => 'Welcome',
     'requirements' => 'System Requirements',
+    'permissions' => 'File Permissions',
     'database' => 'Database Configuration',
     'admin' => 'Administrator Account',
     'email' => 'Email Configuration',
@@ -47,6 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'save_requirements':
             // Requirements step completed
             $_SESSION['install_requirements_ok'] = true;
+            redirectToNextStep();
+            break;
+            
+        case 'save_permissions':
+            // Permissions step completed
+            $_SESSION['install_permissions_ok'] = true;
             redirectToNextStep();
             break;
             
@@ -159,7 +166,19 @@ function handleAdminStep() {
 function handleEmailStep() {
     $errors = [];
     
-    $smtpEnabled = isset($_POST['smtp_enabled']);
+    // Check if email setup is being skipped
+    if (isset($_POST['skip_email'])) {
+        $_SESSION['email_config'] = [
+            'smtp_enabled' => false,
+            'skipped' => true
+        ];
+        $_SESSION['install_email_ok'] = true;
+        redirectToNextStep();
+        return [];
+    }
+    
+    // Handle SMTP configuration
+    $smtpEnabled = isset($_POST['smtp_enabled']) && $_POST['smtp_enabled'] === '1';
     $_SESSION['email_config'] = [
         'smtp_enabled' => $smtpEnabled
     ];
@@ -170,9 +189,10 @@ function handleEmailStep() {
         $smtpUser = trim($_POST['smtp_user'] ?? '');
         $smtpPass = $_POST['smtp_pass'] ?? '';
         
-        if (empty($smtpHost)) $errors[] = 'SMTP host is required';
-        if (empty($smtpPort)) $errors[] = 'SMTP port is required';
-        if (empty($smtpUser)) $errors[] = 'SMTP username is required';
+        // Only validate if SMTP is enabled
+        if (empty($smtpHost)) $errors[] = 'SMTP host is required when SMTP is enabled';
+        if (empty($smtpPort)) $errors[] = 'SMTP port is required when SMTP is enabled';
+        if (empty($smtpUser)) $errors[] = 'SMTP username is required when SMTP is enabled';
         
         if (empty($errors)) {
             $_SESSION['email_config'] = array_merge($_SESSION['email_config'], [
@@ -182,6 +202,14 @@ function handleEmailStep() {
                 'pass' => $smtpPass
             ]);
         }
+    } else {
+        // Store empty values when SMTP is disabled
+        $_SESSION['email_config'] = array_merge($_SESSION['email_config'], [
+            'host' => '',
+            'port' => '',
+            'user' => '',
+            'pass' => ''
+        ]);
     }
     
     return $errors;
@@ -356,28 +384,33 @@ function getBaseUrl() {
                 <!-- Header -->
                 <div class="install-header text-center mb-4">
                     <div class="install-logo">
-                        <i class="fas fa-calculator text-primary fa-3x"></i>
+                        <img src="assets/images/banner.jpg" alt="Bishwo Calculator Logo" class="logo-image">
                     </div>
-                    <h1 class="install-title">Bishwo Calculator</h1>
-                    <p class="install-subtitle">Installation Wizard</p>
+                    <h1 class="install-title">🚀 Bishwo Calculator</h1>
+                    <p class="install-subtitle">Professional Engineering Calculator Suite - Installation Wizard</p>
                 </div>
                 
-                <!-- Progress Steps -->
-                <div class="install-progress mb-4">
-                    <?php foreach (INSTALL_STEPS as $step => $label): ?>
-                        <?php $isActive = ($step === $currentStep); ?>
-                        <?php $isCompleted = (array_search($step, array_keys(INSTALL_STEPS)) < $stepIndex); ?>
-                        <div class="step-item <?php echo $isActive ? 'active' : ''; ?> <?php echo $isCompleted ? 'completed' : ''; ?>">
-                            <div class="step-number">
-                                <?php if ($isCompleted): ?>
-                                    <i class="fas fa-check"></i>
-                                <?php else: ?>
-                                    <?php echo array_search($step, array_keys(INSTALL_STEPS)) + 1; ?>
+                <!-- Professional Arrow-Style Progress Navigation -->
+                <div class="arrow-progress-container">
+                    <div class="arrow-progress">
+                        <div class="progress-line"></div>
+                        <div class="progress-line-fill" style="width: <?= ($stepIndex / (count(INSTALL_STEPS) - 1)) * 100 ?>%;"></div>
+                        <?php foreach (INSTALL_STEPS as $step => $label): ?>
+                            <?php $stepIndexNum = array_search($step, array_keys(INSTALL_STEPS)); ?>
+                            <?php $isActive = ($step === $currentStep); ?>
+                            <?php $isCompleted = ($stepIndexNum < $stepIndex); ?>
+                            <div class="arrow-step <?php echo $isActive ? 'active' : ''; ?> <?php echo $isCompleted ? 'completed' : ''; ?>">
+                                <div class="arrow-step-content">
+                                    <div class="arrow-step-label"><?php echo $label; ?></div>
+                                </div>
+                                <?php if ($stepIndexNum < count(INSTALL_STEPS) - 1): ?>
+                                    <div class="arrow-connector">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </div>
                                 <?php endif; ?>
                             </div>
-                            <div class="step-label"><?php echo $label; ?></div>
-                        </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
                 
                 <!-- Main Content -->

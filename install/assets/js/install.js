@@ -344,26 +344,43 @@ function navigateToStep(step) {
  */
 function initializeEmailConfig() {
     const smtpToggle = document.getElementById('smtp_enabled');
-    const smtpConfig = document.getElementById('smtp_config');
+    const smtpConfig = document.querySelector('.smtp-fields');
+    const smtpHidden = document.getElementById('smtp_enabled_hidden');
 
     if (!smtpToggle || !smtpConfig) return;
 
     smtpToggle.addEventListener('change', function() {
-        if (this.checked) {
-            smtpConfig.classList.remove('d-none');
+        const isEnabled = this.checked;
+        smtpConfig.style.display = isEnabled ? 'block' : 'none';
+        if (smtpHidden) {
+            smtpHidden.value = isEnabled ? '1' : '0';
+        }
+
+        if (isEnabled) {
             // Focus first SMTP field
-            const firstField = smtpConfig.querySelector('input');
-            if (firstField) {
-                setTimeout(() => firstField.focus(), 100);
-            }
-        } else {
-            smtpConfig.classList.add('d-none');
+            setTimeout(() => {
+                const firstField = smtpConfig.querySelector('input');
+                if (firstField) {
+                    firstField.focus();
+                }
+            }, 100);
         }
     });
 
     // Initialize SMTP config visibility
     if (smtpToggle.checked) {
-        smtpConfig.classList.remove('d-none');
+        smtpConfig.style.display = 'block';
+    }
+
+    // Skip email setup handler
+    const skipButton = document.querySelector('button[name="skip_email"]');
+    if (skipButton) {
+        skipButton.addEventListener('click', function(e) {
+            if (!confirm('Skip email configuration? You can configure it later from admin settings.')) {
+                e.preventDefault();
+                return false;
+            }
+        });
     }
 }
 
