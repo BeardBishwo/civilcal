@@ -1,6 +1,6 @@
 <?php
 /**
- * Bishwo Calculator - MVC Entry Point
+ * Bishwo Calculator - FIXED MVC Entry Point
  * Routes all requests through the MVC system
  */
 
@@ -29,10 +29,10 @@ if (!isInstalled() && !isset($_GET['install'])) {
     exit;
 }
 
-// Initialize router
+// Initialize router FIRST
 $router = new \App\Core\Router();
 
-// Make router available globally for routes file
+// Make router available globally for routes file BEFORE loading routes
 $GLOBALS['router'] = $router;
 
 // Load routes

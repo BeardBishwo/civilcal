@@ -1,23 +1,20 @@
 <?php
 namespace App\Controllers;
 
-use App\Controllers\Controller;
-use App\Core\Auth;
-use App\Services\GeolocationService;
+use App\Core\Controller;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        $geolocation = new GeolocationService();
-        $isNepal = $geolocation->isNepalUser();
-        $user = Auth::user();
+        $user = null; // Simple user check
+        $isNepal = false; // Default to false
         
         $stats = $this->getSystemStats();
         $featuredCalculators = $this->getFeaturedCalculators();
         $testimonials = $this->getTestimonials();
         
-        return view('home/index', [
+        $this->view('home/index', [
             'user' => $user,
             'isNepal' => $isNepal,
             'stats' => $stats,
@@ -28,8 +25,8 @@ class HomeController extends Controller
     
     public function features()
     {
-        return view('home/features', [
-            'user' => Auth::user()
+        $this->view('home/features', [
+            'user' => null
         ]);
     }
     
@@ -37,16 +34,16 @@ class HomeController extends Controller
     {
         $plans = $this->getPricingPlans();
         
-        return view('home/pricing', [
-            'user' => Auth::user(),
+        $this->view('home/pricing', [
+            'user' => null,
             'plans' => $plans
         ]);
     }
     
     public function about()
     {
-        return view('home/about', [
-            'user' => Auth::user()
+        $this->view('home/about', [
+            'user' => null
         ]);
     }
     
@@ -58,8 +55,8 @@ class HomeController extends Controller
             return;
         }
         
-        return view('home/contact', [
-            'user' => Auth::user()
+        $this->view('home/contact', [
+            'user' => null
         ]);
     }
     

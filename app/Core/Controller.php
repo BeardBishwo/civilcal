@@ -14,8 +14,8 @@ class Controller {
             session_start();
         }
         
-        // Initialize database connection
-        $this->db = new Database();
+        // Initialize database connection using singleton
+        $this->db = Database::getInstance();
         
         // Initialize authentication
         $this->auth = new Auth();

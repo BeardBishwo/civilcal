@@ -2,6 +2,7 @@
 /**
  * Premium Home Page Template - Theme Default
  * $10,000 Quality Design Integration
+ * Used by HomeController@index
  */
 ?>
 
@@ -15,7 +16,7 @@
             <h1 class="hero-title-premium">Bishwo Calculator</h1>
             <p class="hero-subtitle-premium">Advanced Engineering Calculations & Design Tools for Modern Professionals</p>
             <div class="premium-buttons-premium">
-                <?php if (!isset($_SESSION['user_id'])): ?>
+                <?php if (!isset($user) || !$user): ?>
                     <a href="/login" class="premium-btn btn-primary">🔐 Login to Dashboard</a>
                     <a href="/register" class="premium-btn btn-outline">🚀 Get Started Free</a>
                 <?php else: ?>
@@ -99,7 +100,7 @@
         <div class="row g-4">
             <div class="col-md-3 col-6">
                 <div class="stat-card-premium">
-                    <div class="stat-number-premium" id="stat-tools">56+</div>
+                    <div class="stat-number-premium" id="stat-tools"><?= $stats['calculators'] ?? '56' ?>+</div>
                     <div class="stat-label-premium">Professional Tools</div>
                 </div>
             </div>

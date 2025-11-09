@@ -1,7 +1,7 @@
 <?php
 namespace App\Controllers;
 
-use App\Controllers\Controller;
+use App\Core\Controller;
 use App\Core\Auth;
 use App\Services\CalculationService;
 use App\Calculators\CalculatorFactory;

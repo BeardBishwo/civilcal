@@ -2,6 +2,9 @@
 // Routes Definition - Complete Updated Version
 // This file defines all application routes with comprehensive features
 
+// Get router from global scope
+$router = $GLOBALS['router'];
+
 // Public Routes
 $router->add('GET', '/', 'HomeController@index');
 $router->add('GET', '/features', 'HomeController@features');
