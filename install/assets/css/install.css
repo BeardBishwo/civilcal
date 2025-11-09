@@ -826,6 +826,171 @@ body {
     font-size: 1.2rem;
 }
 
+
+/* Email Configuration Styling */
+
+.email-config-toggle {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.form-check-input {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s ease;
+}
+
+.form-check-input:checked {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.form-check-input:focus {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 0.2rem rgba(81, 207, 102, 0.25);
+}
+
+.form-check-label {
+    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+    color: var(--text-primary);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.form-check-label strong {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.required-mark {
+    color: var(--accent-color);
+    font-weight: bold;
+    margin-left: 2px;
+}
+
+.smtp-fields {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.email-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
+    margin-top: 20px;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+}
+
+.email-actions .btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: auto;
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* Mobile responsive for email actions */
+
+@media (max-width: 768px) {
+    .email-actions {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .email-actions .btn {
+        padding: 10px 16px;
+        font-size: 0.8rem;
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .email-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .email-actions .btn {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 5px;
+    }
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    border: none;
+    color: white;
+    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+    font-weight: 600;
+}
+
+.btn-info:hover {
+    background: linear-gradient(135deg, #138496, #117a8b);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+}
+
+.email-skip-note .alert {
+    border-left: 4px solid var(--code-blue);
+}
+
+#emailTestResult {
+    border-radius: 8px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.is-valid {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 0.2rem rgba(81, 207, 102, 0.25);
+}
+
+.is-invalid {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25);
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--danger-color);
+    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+}
+
+.valid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--success-color);
+    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+}
+
 .panel-title {
     font-family: 'Fira Code', 'JetBrains Mono', monospace;
     color: var(--text-primary);

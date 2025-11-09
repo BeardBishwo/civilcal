@@ -12,7 +12,12 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeFormValidation();
     initializeAJAXHandlers();
     initializeProgressTracking();
-    initializeEmailConfig();
+
+    // Initialize email config with delay to ensure DOM is ready
+    setTimeout(() => {
+        initializeEmailConfig();
+    }, 100);
+
     initializeTooltips();
     initializeAnimations();
 });
@@ -343,15 +348,82 @@ function navigateToStep(step) {
  * Email Configuration
  */
 function initializeEmailConfig() {
-    const smtpToggle = document.getElementById('smtp_enabled');
+    console.log('Initializing email config...');
+
+    // Use multiple selectors to find elements with better error handling
+    const smtpToggle = document.getElementById('smtp_enabled') ||
+        document.querySelector('input[name="smtp_enabled"]');
     const smtpConfig = document.querySelector('.smtp-fields');
-    const smtpHidden = document.getElementById('smtp_enabled_hidden');
+    const smtpHidden = document.getElementById('smtp_enabled_hidden') ||
+        document.querySelector('input[name="smtp_enabled"]');
+    const testEmailBtn = document.getElementById('testEmailBtn') ||
+        document.querySelector('button[id="testEmailBtn"]');
 
-    if (!smtpToggle || !smtpConfig) return;
+    console.log('Email config elements found:', {
+        smtpToggle: !!smtpToggle,
+        smtpConfig: !!smtpConfig,
+        smtpHidden: !!smtpHidden,
+        testEmailBtn: !!testEmailBtn
+    });
 
+    if (!smtpToggle || !smtpConfig) {
+        console.log('Email config elements not found:', { smtpToggle: !!smtpToggle, smtpConfig: !!smtpConfig });
+        return;
+    }
+
+    // Form validation for email fields
+    const emailFields = smtpConfig.querySelectorAll('input[required]');
+    console.log('Found email fields:', emailFields.length, emailFields);
+
+    // Enhanced function to update test button visibility
+    function updateTestButtonVisibility() {
+        console.log('Updating test button visibility...');
+        if (testEmailBtn) {
+            const allFieldsFilled = Array.from(emailFields).every(field => field.value.trim() !== '');
+            console.log('All fields filled check:', {
+                allFieldsFilled: allFieldsFilled,
+                fieldCount: emailFields.length,
+                filledCount: Array.from(emailFields).filter(f => f.value.trim() !== '').length,
+                fields: Array.from(emailFields).map(f => ({ name: f.name, value: f.value.trim() }))
+            });
+
+            testEmailBtn.style.display = allFieldsFilled ? 'inline-flex' : 'none';
+            console.log('Test button display set to:', testEmailBtn.style.display);
+        } else {
+            console.log('Test email button not found - cannot update visibility');
+        }
+    }
+
+    // Add event listeners to email fields
+    emailFields.forEach((field, index) => {
+        console.log(`Adding event listeners to field ${index}: ${field.name}`);
+        field.addEventListener('input', function() {
+            console.log(`Field ${field.name} value changed to:`, this.value);
+            updateTestButtonVisibility();
+        });
+        field.addEventListener('blur', function() {
+            validateEmailField(this);
+            updateTestButtonVisibility();
+        });
+        // Also add change event for better compatibility
+        field.addEventListener('change', function() {
+            console.log(`Field ${field.name} change event:`, this.value);
+            updateTestButtonVisibility();
+        });
+    });
+
+    // Check initial state
+    updateTestButtonVisibility();
+
+    // Also check after a longer delay to ensure DOM is fully ready
+    setTimeout(updateTestButtonVisibility, 500);
+
+    // Toggle handler
     smtpToggle.addEventListener('change', function() {
+        console.log('SMTP toggle changed:', this.checked);
         const isEnabled = this.checked;
         smtpConfig.style.display = isEnabled ? 'block' : 'none';
+
         if (smtpHidden) {
             smtpHidden.value = isEnabled ? '1' : '0';
         }
@@ -364,23 +436,167 @@ function initializeEmailConfig() {
                     firstField.focus();
                 }
             }, 100);
+
+            // Update button visibility when enabled
+            setTimeout(updateTestButtonVisibility, 150);
+        } else {
+            // Hide test button when disabled
+            if (testEmailBtn) {
+                testEmailBtn.style.display = 'none';
+            }
         }
     });
 
-    // Initialize SMTP config visibility
-    if (smtpToggle.checked) {
-        smtpConfig.style.display = 'block';
+    // Initialize SMTP config visibility (show by default for better UX)
+    smtpConfig.style.display = 'block';
+
+    // Test email functionality with enhanced error handling
+    if (testEmailBtn) {
+        console.log('Adding click handler to test email button');
+        testEmailBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Test email button clicked');
+            sendTestEmail();
+        });
+    } else {
+        console.warn('Test email button not found - no click handler attached');
     }
 
     // Skip email setup handler
     const skipButton = document.querySelector('button[name="skip_email"]');
     if (skipButton) {
         skipButton.addEventListener('click', function(e) {
-            if (!confirm('Skip email configuration? You can configure it later from admin settings.')) {
-                e.preventDefault();
-                return false;
-            }
+            console.log('Skip email setup clicked');
+            // Just proceed with skip, no confirmation
         });
+    }
+
+    console.log('Email config initialization complete');
+}
+
+/**
+ * Validate individual email field
+ */
+function validateEmailField(field) {
+    let isValid = true;
+    let message = '';
+
+    // Required field check
+    if (field.hasAttribute('required') && !field.value.trim()) {
+        isValid = false;
+        message = 'This field is required';
+    }
+
+    // Host validation
+    if (field.name === 'smtp_host' && field.value) {
+        const hostRegex = /^[a-zA-Z0-9.-]+$/;
+        if (!hostRegex.test(field.value)) {
+            isValid = false;
+            message = 'Please enter a valid host name';
+        }
+    }
+
+    // Port validation
+    if (field.name === 'smtp_port' && field.value) {
+        const port = parseInt(field.value);
+        if (isNaN(port) || port < 1 || port > 65535) {
+            isValid = false;
+            message = 'Please enter a valid port number (1-65535)';
+        }
+    }
+
+    // Update field validation state
+    if (isValid) {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+        removeFieldError(field);
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+        showFieldError(field, message);
+    }
+
+    return isValid;
+}
+
+/**
+ * Send test email functionality
+ */
+async function sendTestEmail() {
+    const testEmailBtn = document.getElementById('testEmailBtn');
+    const resultDiv = document.getElementById('emailTestResult');
+    const form = document.getElementById('emailForm');
+    const formData = new FormData(form);
+
+    // Validate all required fields first
+    const smtpHost = (formData.get('smtp_host') || '').trim();
+    const smtpPort = (formData.get('smtp_port') || '').trim();
+    const smtpUser = (formData.get('smtp_user') || '').trim();
+    const smtpPass = formData.get('smtp_pass') || '';
+
+    if (!smtpHost || !smtpPort || !smtpUser || !smtpPass) {
+        showEmailTestResult(false, 'All fields (host, port, username, password) are required.', 'danger');
+        return;
+    }
+
+    // Client-side validation
+    if (!/^[a-zA-Z0-9.-]+$/.test(smtpHost)) {
+        showEmailTestResult(false, 'Invalid SMTP host format. Please enter a valid hostname.', 'danger');
+        return;
+    }
+
+    const portNum = parseInt(smtpPort);
+    if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
+        showEmailTestResult(false, 'Invalid port number. Must be between 1 and 65535.', 'danger');
+        return;
+    }
+
+    setButtonLoading(testEmailBtn, true);
+    resultDiv.style.display = 'none';
+
+    try {
+        // Make real AJAX call to backend
+        const response = await fetch('ajax/test-email.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showEmailTestResult(true, result.message, 'success');
+        } else {
+            showEmailTestResult(false, result.message, 'danger');
+        }
+
+    } catch (error) {
+        console.error('Email test error:', error);
+        showEmailTestResult(false, 'Failed to connect to email test service. Please check your server configuration and try again.', 'danger');
+    } finally {
+        setButtonLoading(testEmailBtn, false);
+    }
+}
+/**
+ * Show email test result
+ */
+function showEmailTestResult(success, message, type) {
+    const resultDiv = document.getElementById('emailTestResult');
+    const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+    const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+
+    resultDiv.innerHTML = `
+        <div class="alert ${alertClass}">
+            <i class="fas ${iconClass}"></i>
+            ${message}
+        </div>
+    `;
+    resultDiv.style.display = 'block';
+
+    // Auto-hide after 10 seconds if successful
+    if (success) {
+        setTimeout(() => {
+            resultDiv.style.display = 'none';
+        }, 10000);
     }
 }
 

@@ -341,15 +341,36 @@ function runDatabaseMigrations() {
     
     // Create admin user
     if (!empty($_SESSION['admin_config'])) {
-        $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role, status, created_at, updated_at) 
-                              VALUES (?, ?, ?, 'admin', 'active', NOW(), NOW()) 
-                              ON DUPLICATE KEY UPDATE 
-                              name = VALUES(name), password = VALUES(password), updated_at = NOW()");
-        $stmt->execute([
-            $_SESSION['admin_config']['name'],
-            $_SESSION['admin_config']['email'],
-            $_SESSION['admin_config']['password']
-        ]);
+        // Parse the full name into first and last name
+        $fullName = trim($_SESSION['admin_config']['name']);
+        $nameParts = explode(' ', $fullName, 2);
+        $firstName = $nameParts[0];
+        $lastName = isset($nameParts[1]) ? $nameParts[1] : '';
+        
+        // Check if admin user already exists
+        $checkStmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $checkStmt->execute([$_SESSION['admin_config']['email']]);
+        
+        if ($checkStmt->fetch()) {
+            // Update existing user
+            $stmt = $pdo->prepare("UPDATE users SET first_name = ?, last_name = ?, password = ?, role = 'admin', updated_at = NOW() WHERE email = ?");
+            $stmt->execute([
+                $firstName,
+                $lastName,
+                $_SESSION['admin_config']['password'],
+                $_SESSION['admin_config']['email']
+            ]);
+        } else {
+            // Insert new user
+            $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password, role, created_at, updated_at) 
+                                  VALUES (?, ?, ?, ?, 'admin', NOW(), NOW())");
+            $stmt->execute([
+                $firstName,
+                $lastName,
+                $_SESSION['admin_config']['email'],
+                $_SESSION['admin_config']['password']
+            ]);
+        }
     }
 }
 

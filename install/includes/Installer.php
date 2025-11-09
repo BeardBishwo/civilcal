@@ -498,7 +498,7 @@ class Installer {
     
     private function renderEmailStep() {
         $emailConfig = $_SESSION['email_config'] ?? [];
-        $smtpEnabled = isset($emailConfig['smtp_enabled']) ? (bool)$emailConfig['smtp_enabled'] : false;
+        $smtpEnabled = isset($emailConfig['smtp_enabled']) ? (bool)$emailConfig['smtp_enabled'] : true; // Default to true
         
         $html = '
         <div class="panel-title"><i class="fas fa-envelope"></i> Email Configuration</div>
@@ -520,31 +520,31 @@ class Installer {
             <input type="hidden" name="action" value="save_email">
             <input type="hidden" name="smtp_enabled" id="smtp_enabled_hidden" value="' . ($smtpEnabled ? '1' : '0') . '">
             
-            <div class="smtp-fields" style="' . ($smtpEnabled ? '' : 'display: none;') . '">
+            <div class="smtp-fields" style="display: block;">
                 <div class="form-group">
-                    <label for="smtp_host" class="form-label">SMTP Host</label>
+                    <label for="smtp_host" class="form-label">SMTP Host <span class="required-mark">*</span></label>
                     <input type="text" class="form-control" id="smtp_host" name="smtp_host" 
-                           value="' . htmlspecialchars($emailConfig['host'] ?? '') . '">
+                           value="' . htmlspecialchars($emailConfig['host'] ?? '') . '" required>
                     <div class="form-text">e.g., smtp.gmail.com, smtp.sendgrid.net</div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="smtp_port" class="form-label">SMTP Port</label>
+                    <label for="smtp_port" class="form-label">SMTP Port <span class="required-mark">*</span></label>
                     <input type="text" class="form-control" id="smtp_port" name="smtp_port" 
-                           value="' . htmlspecialchars($emailConfig['port'] ?? '587') . '">
+                           value="' . htmlspecialchars($emailConfig['port'] ?? '587') . '" required>
                     <div class="form-text">Usually 587 (TLS) or 465 (SSL)</div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="smtp_user" class="form-label">SMTP Username</label>
+                    <label for="smtp_user" class="form-label">SMTP Username <span class="required-mark">*</span></label>
                     <input type="text" class="form-control" id="smtp_user" name="smtp_user" 
-                           value="' . htmlspecialchars($emailConfig['user'] ?? '') . '">
+                           value="' . htmlspecialchars($emailConfig['user'] ?? '') . '" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="smtp_pass" class="form-label">SMTP Password</label>
+                    <label for="smtp_pass" class="form-label">SMTP Password <span class="required-mark">*</span></label>
                     <input type="password" class="form-control" id="smtp_pass" name="smtp_pass" 
-                           value="' . htmlspecialchars($emailConfig['pass'] ?? '') . '">
+                           value="' . htmlspecialchars($emailConfig['pass'] ?? '') . '" required>
                 </div>
                 
                 <div class="alert alert-success">
@@ -553,7 +553,16 @@ class Installer {
                         <li><strong>Gmail:</strong> Use app-specific passwords or allow less secure apps</li>
                         <li><strong>SendGrid:</strong> Use your API key as the password</li>
                         <li><strong>Custom SMTP:</strong> Contact your hosting provider for details</li>
+                        <li><strong>Test Email:</strong> Click "Send Test Email" to verify your configuration before proceeding</li>
                     </ul>
+                </div>
+                
+                <div class="email-test-info mt-3">
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle"></i> Email Testing</h6>
+                        <p class="mb-2">The test email will be sent to the same email address you configure above.</p>
+                        <p class="mb-0"><strong>Note:</strong> Check your spam/junk folder if you do not see the test email.</p>
+                    </div>
                 </div>
             </div>
             
@@ -561,22 +570,28 @@ class Installer {
                 <button type="submit" class="btn btn-primary me-3">
                     <i class="fas fa-save"></i> Save Email Configuration
                 </button>
-                <button type="submit" name="skip_email" value="1" class="btn btn-secondary" 
-                        onclick="return confirm(\'Skip email configuration? You can configure it later from admin settings.\')">
+                <button type="button" id="testEmailBtn" class="btn btn-info me-3" style="display: none;">
+                    <i class="fas fa-paper-plane"></i> Send Test Email
+                </button>
+                <button type="submit" name="skip_email" value="1" class="btn btn-secondary">
                     <i class="fas fa-forward"></i> Skip Email Setup
                 </button>
             </div>
         </form>
         
-        <div class="alert alert-info mt-3">
-            <h6><i class="fas fa-info-circle"></i> Email Configuration Note</h6>
-            <p class="mb-2">Email configuration is optional. If you skip this step:</p>
-            <ul class="mb-0">
-                <li>System notifications will be logged to file instead</li>
-                <li>You can configure email settings later from the admin panel</li>
-                <li>User registration emails will not be sent until configured</li>
-            </ul>
-        </div>';
+        <div class="email-skip-note mt-3">
+            <div class="alert alert-info">
+                <h6><i class="fas fa-info-circle"></i> Email Configuration Note</h6>
+                <p class="mb-2">Email configuration is optional. If you skip this step:</p>
+                <ul class="mb-0">
+                    <li>System notifications will be logged to file instead</li>
+                    <li>You can configure email settings later from the admin panel</li>
+                    <li>User registration emails will not be sent until configured</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="emailTestResult" class="mt-3" style="display: none;"></div>';
         
         return $html;
     }
