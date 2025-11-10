@@ -203,9 +203,6 @@ class ProCalculatorCore {
      * Initialize accessibility features
      */
     initAccessibility() {
-        // Skip to content link
-        this.addSkipToContent();
-
         // Focus management
         this.initFocusManagement();
 
@@ -479,17 +476,6 @@ class ProCalculatorCore {
                 body.classList.remove('pc-menu-open');
             }
         }
-    }
-
-    /**
-     * Add skip to content link
-     */
-    addSkipToContent() {
-        const skipLink = document.createElement('a');
-        skipLink.href = '#main-content';
-        skipLink.className = 'pc-skip-to-content';
-        skipLink.textContent = 'Skip to main content';
-        document.body.insertBefore(skipLink, document.body.firstChild);
     }
 
     /**

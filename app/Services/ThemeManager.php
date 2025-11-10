@@ -34,6 +34,7 @@ class ThemeManager
 
     /**
      * Get base URL
+     * Works in both subdirectory and document root installations
      */
     private function getBaseUrl()
     {
@@ -42,7 +43,13 @@ class ThemeManager
         $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
         $baseDir = dirname($scriptName);
         
-        if ($baseDir === '/') {
+        // Remove /public from path if present (for clean URLs)
+        if (substr($baseDir, -7) === '/public') {
+            $baseDir = substr($baseDir, 0, -7);
+        }
+        
+        // Normalize path
+        if ($baseDir === '/' || $baseDir === '\\') {
             $baseDir = '';
         }
         
@@ -761,7 +768,12 @@ class ThemeManager
 
     public function themeUrl($path = '')
     {
-        return $this->baseUrl . '/assets/themes/' . $this->activeTheme . '/' . ltrim($path, '/');
+        // Remove 'assets/' prefix if present since we're already adding '/assets/themes/'
+        $cleanPath = ltrim($path, '/');
+        if (strpos($cleanPath, 'assets/') === 0) {
+            $cleanPath = substr($cleanPath, 7); // Remove 'assets/' prefix
+        }
+        return $this->baseUrl . '/assets/themes/' . $this->activeTheme . '/' . $cleanPath;
     }
 
     public function assetsUrl($path = '')

@@ -20,10 +20,13 @@ class CalculatorController extends Controller
         $categories = $this->getCalculatorCategories();
         $featuredCalculators = $this->getFeaturedCalculators();
         
-        return view('calculators/index', [
+        $this->view->render('home/index', [
             'categories' => $categories,
             'featuredCalculators' => $featuredCalculators,
-            'user' => Auth::user()
+            'stats' => ['calculators' => 56, 'users' => 1234, 'calculations' => 15420, 'countries' => 25],
+            'testimonials' => [],
+            'user' => null,
+            'viewHelper' => $this->view
         ]);
     }
     
@@ -33,14 +36,13 @@ class CalculatorController extends Controller
         $categoryInfo = $this->getCategoryInfo($category);
         
         if (!$categoryInfo) {
-            return $this->notFound();
+            http_response_code(404);
+            echo '404 - Category Not Found';
+            return;
         }
         
-        return view('calculators/category', [
-            'category' => $categoryInfo,
-            'calculators' => $calculators,
-            'user' => Auth::user()
-        ]);
+        // For now, redirect to home
+        header('Location: ' . $this->view->url(''));
     }
     
     public function tool($category, $tool)
@@ -48,18 +50,13 @@ class CalculatorController extends Controller
         $calculator = CalculatorFactory::create($category, $tool);
         
         if (!$calculator) {
-            return $this->notFound();
+            http_response_code(404);
+            echo '404 - Calculator Not Found';
+            return;
         }
         
-        $calculatorInfo = $this->getCalculatorInfo($category, $tool);
-        
-        return view('calculators/tool', [
-            'calculator' => $calculator,
-            'calculatorInfo' => $calculatorInfo,
-            'category' => $category,
-            'tool' => $tool,
-            'user' => Auth::user()
-        ]);
+        // For now, redirect to home
+        header('Location: ' . $this->view->url(''));
     }
     
     public function calculate($category, $tool)
@@ -259,6 +256,6 @@ class CalculatorController extends Controller
     private function notFound()
     {
         http_response_code(404);
-        return view('errors/404');
+        echo '404 - Page Not Found';
     }
 }

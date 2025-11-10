@@ -30,6 +30,9 @@ spl_autoload_register(function ($class) {
 $appConfig = require_once CONFIG_PATH . '/app.php';
 $dbConfig = require_once CONFIG_PATH . '/database.php';
 
+// Define debug constant
+define('APP_DEBUG', $appConfig['debug'] ?? true);
+
 // Set error reporting
 if ($appConfig['debug'] ?? false) {
     error_reporting(E_ALL);

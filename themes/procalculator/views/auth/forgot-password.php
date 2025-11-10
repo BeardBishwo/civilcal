@@ -23,11 +23,14 @@
     <meta property="twitter:image" content="/themes/procalculator/assets/images/og-image.jpg">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="<?= $viewHelper->themeUrl('assets/favicon.ico') ?>">
     
     <!-- ProCalculator Premium Theme Styles -->
-    <link rel="stylesheet" href="/themes/procalculator/assets/css/procalculator-premium.css">
-    <link rel="stylesheet" href="/themes/procalculator/assets/css/auth.css">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/procalculator-premium.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/auth.css') ?>">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     
     <!-- Additional CSS for forgot password page -->
     <style>
@@ -50,7 +53,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('/themes/procalculator/assets/images/hero-pattern.svg') repeat;
+            background: url('<?= $viewHelper->themeUrl('assets/images/hero-pattern.svg') ?>') repeat;
             opacity: 0.05;
             z-index: 0;
         }
@@ -184,12 +187,284 @@
                 font-size: 2rem;
             }
         }
+        
+        /* Premium Email Input with Animations */
+        .pc-email-input-wrapper {
+            position: relative;
+            margin-bottom: var(--pc-spacing-xl);
+        }
+        
+        .pc-input-container {
+            position: relative;
+            margin-top: var(--pc-spacing-sm);
+        }
+        
+        .pc-input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--pc-premium);
+            font-size: 1.125rem;
+            z-index: 2;
+            transition: all var(--pc-transition-normal);
+        }
+        
+        .pc-premium-input {
+            padding-left: 48px !important;
+            padding-right: 16px !important;
+            border: 2px solid var(--pc-glass-border) !important;
+            background: var(--pc-glass) !important;
+            transition: all var(--pc-transition-normal) !important;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .pc-premium-input:focus {
+            border-color: var(--pc-premium) !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+        
+        .pc-premium-input:focus + .pc-input-underline {
+            transform: scaleX(1);
+        }
+        
+        .pc-premium-input:focus ~ .pc-input-icon {
+            color: var(--pc-gold);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .pc-input-underline {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--pc-premium), var(--pc-gold));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 2px;
+        }
+        
+        /* Email Particles Animation */
+        .pc-email-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: var(--pc-radius-md);
+        }
+        
+        .pc-premium-input:focus ~ .pc-email-particles::before,
+        .pc-premium-input:focus ~ .pc-email-particles::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--pc-premium);
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleFloat 2s ease-out;
+        }
+        
+        .pc-premium-input:focus ~ .pc-email-particles::before {
+            left: 20%;
+            animation-delay: 0.2s;
+        }
+        
+        .pc-premium-input:focus ~ .pc-email-particles::after {
+            left: 70%;
+            animation-delay: 0.5s;
+        }
+        
+        @keyframes particleFloat {
+            0% {
+                bottom: 0;
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                bottom: 100%;
+                opacity: 0;
+                transform: translateY(-20px) scale(0.5);
+            }
+        }
+        
+        /* Premium Forgot Button */
+        .pc-forgot-btn {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: var(--pc-spacing-lg) var(--pc-spacing-xl);
+            min-height: 72px;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+            transition: all var(--pc-transition-normal);
+        }
+        
+        .pc-forgot-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .pc-forgot-btn:hover::before {
+            left: 100%;
+        }
+        
+        .pc-forgot-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+        }
+        
+        .pc-pulse-icon {
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes iconPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+        
+        /* Loading Animations */
+        .pc-spinner-premium {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite, scanPulse 2s ease-in-out infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes scanPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
+            }
+        }
+        
+        .pc-loading-text {
+            margin-left: var(--pc-spacing-sm);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .pc-loading-dots span {
+            animation: dotBlink 1.4s infinite;
+            opacity: 0;
+        }
+        
+        .pc-loading-dots span:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .pc-loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .pc-loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes dotBlink {
+            0%, 20% { opacity: 0; }
+            40% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        .pc-btn-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--pc-spacing-md);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .pc-btn-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+        
+        .pc-btn-text-main {
+            flex: 1;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .pc-btn-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.3px;
+        }
+        
+        .pc-btn-subtitle {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+        }
+        
+        .pc-btn-arrow {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: transform var(--pc-transition-fast);
+        }
+        
+        .pc-forgot-btn:hover .pc-btn-arrow {
+            transform: translateX(4px);
+        }
+        
+        .pc-btn-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--pc-spacing-sm);
+        }
+        
+        .pc-hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
-    <!-- Skip to content for accessibility -->
-    <a href="#main-content" class="pc-skip-to-content">Skip to main content</a>
-    
     <div class="pc-forgot-container" id="main-content">
         <div class="pc-forgot-card pc-card">
             <!-- Header -->
@@ -211,32 +486,47 @@
             <form class="pc-premium-form" id="forgotForm" novalidate>
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                 
-                <div class="pc-form-group">
-                    <label for="email" class="pc-label">
+                <div class="pc-form-group pc-email-input-wrapper">
+                    <label for="email" class="pc-label pc-floating-label">
                         <i class="fas fa-envelope me-2"></i>Email Address
                     </label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        class="pc-input pc-form-control" 
-                        placeholder="Enter your registered email address"
-                        required 
-                        autocomplete="email"
-                        aria-describedby="email-error"
-                    >
+                    <div class="pc-input-container">
+                        <span class="pc-input-icon">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="pc-input pc-form-control pc-premium-input" 
+                            placeholder="Enter your registered email address"
+                            required 
+                            autocomplete="email"
+                            aria-describedby="email-error"
+                        >
+                        <span class="pc-input-underline"></span>
+                        <span class="pc-email-particles"></span>
+                    </div>
                     <div id="email-error" class="pc-error-message" role="alert" aria-live="polite"></div>
                 </div>
 
                 <div class="pc-form-group">
-                    <button type="submit" class="pc-btn pc-btn-primary pc-btn-lg pc-w-full" id="forgotBtn">
-                        <span class="pc-btn-text">
-                            <i class="fas fa-paper-plane me-2"></i>
-                            Send Reset Link
+                    <button type="submit" class="pc-btn pc-btn-premium pc-btn-lg pc-w-full pc-forgot-btn" id="forgotBtn">
+                        <span class="pc-btn-content">
+                            <span class="pc-btn-icon pc-pulse-icon">
+                                <i class="fas fa-paper-plane"></i>
+                            </span>
+                            <span class="pc-btn-text-main">
+                                <span class="pc-btn-title">Send Reset Link</span>
+                                <span class="pc-btn-subtitle">We'll email you a secure reset link</span>
+                            </span>
+                            <span class="pc-btn-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </span>
                         </span>
                         <span class="pc-btn-loading pc-hidden">
-                            <span class="pc-spinner"></span>
-                            Sending reset link...
+                            <span class="pc-spinner-premium"></span>
+                            <span class="pc-loading-text">Sending reset link<span class="pc-loading-dots"><span>.</span><span>.</span><span>.</span></span></span>
                         </span>
                     </button>
                 </div>
@@ -249,7 +539,7 @@
 
             <!-- Back to Login Link -->
             <div class="pc-back-link">
-                <a href="/login" class="pc-back-cta">
+                <a href="<?= $viewHelper->url('login') ?>" class="pc-back-cta">
                     <i class="fas fa-arrow-left"></i>
                     Back to Sign In
                 </a>
@@ -258,14 +548,12 @@
     </div>
 
     <!-- ProCalculator Premium Theme Scripts -->
-    <script src="/themes/procalculator/assets/js/procalculator-core.js"></script>
-    <script src="/themes/procalculator/assets/js/auth-enhanced.js"></script>
-    
-    <!-- Font Awesome for icons -->
-    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    <script src="<?= $viewHelper->themeUrl('assets/js/procalculator-core.js') ?>"></script>
+    <script src="<?= $viewHelper->themeUrl('assets/js/auth-enhanced.js') ?>"></script>
     
     <!-- Forgot Password Page Specific Script -->
     <script>
+        const basePath = "<?= $viewHelper->url('') ?>";
         document.addEventListener('DOMContentLoaded', function() {
             // Form submission handler
             document.getElementById('forgotForm').addEventListener('submit', async function(e) {
@@ -322,7 +610,7 @@
                         <h1 class="pc-forgot-title">Check Your Email</h1>
                         <p class="pc-forgot-subtitle">We've sent a password reset link to your email address. Click the link in the email to reset your password.</p>
                         <div class="pc-form-group" style="margin-top: var(--pc-spacing-xl);">
-                            <a href="/login" class="pc-btn pc-btn-primary pc-btn-lg pc-w-full">
+                            <a href="${basePath}/login" class="pc-btn pc-btn-primary pc-btn-lg pc-w-full">
                                 <i class="fas fa-sign-in-alt me-2"></i>
                                 Back to Sign In
                             </a>

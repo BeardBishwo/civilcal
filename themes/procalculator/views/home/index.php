@@ -21,6 +21,9 @@ $testimonials = $testimonials ?? [];
     
     <!-- ProCalculator Premium CSS -->
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/procalculator-premium.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/components.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/animations.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/responsive.css') ?>">
 
     
     <!-- Premium Fonts -->
@@ -37,7 +40,7 @@ $testimonials = $testimonials ?? [];
 
     
     <!-- Hero Section -->
-    <section class="hero-section">
+    <section class="hero-section" id="main-content">
         <div class="hero-background">
             <div class="floating-shapes">
                 <div class="shape shape-1"></div>
@@ -66,11 +69,11 @@ $testimonials = $testimonials ?? [];
                 </p>
                 
                 <div class="hero-actions">
-                    <a href="/calculators" class="btn btn-primary btn-lg">
+                    <a href="<?= $viewHelper->url('calculators') ?>" class="btn btn-primary btn-lg">
                         <i class="bi bi-calculator"></i>
                         Start Calculating
                     </a>
-                    <a href="/features" class="btn btn-outline btn-lg">
+                    <a href="<?= $viewHelper->url('features') ?>" class="btn btn-outline btn-lg">
                         <i class="bi bi-info-circle"></i>
                         Explore Features
                     </a>
@@ -116,7 +119,7 @@ $testimonials = $testimonials ?? [];
                     <div class="card-content">
                         <h3 class="card-title"><?= htmlspecialchars($calculator['name']) ?></h3>
                         <p class="card-description"><?= htmlspecialchars($calculator['description']) ?></p>
-                        <a href="/calculator/<?= htmlspecialchars($calculator['category']) ?>/<?= htmlspecialchars($calculator['tool']) ?>" 
+                        <a href="<?= $viewHelper->url('calculator/' . htmlspecialchars($calculator['category']) . '/' . htmlspecialchars($calculator['tool'])) ?>" 
                            class="card-link">
                             Use Calculator
                             <i class="bi bi-arrow-right"></i>
@@ -249,16 +252,16 @@ $testimonials = $testimonials ?? [];
                 </p>
                 <div class="cta-actions">
                     <?php if (!$user): ?>
-                    <a href="/register" class="btn btn-primary btn-lg">
+                    <a href="<?= $viewHelper->url('register') ?>" class="btn btn-primary btn-lg">
                         <i class="bi bi-person-plus"></i>
                         Create Account
                     </a>
-                    <a href="/login" class="btn btn-outline btn-lg">
+                    <a href="<?= $viewHelper->url('login') ?>" class="btn btn-outline btn-lg">
                         <i class="bi bi-box-arrow-in-right"></i>
                         Sign In
                     </a>
                     <?php else: ?>
-                    <a href="/dashboard" class="btn btn-primary btn-lg">
+                    <a href="<?= $viewHelper->url('dashboard') ?>" class="btn btn-primary btn-lg">
                         <i class="bi bi-speedometer2"></i>
                         Go to Dashboard
                     </a>

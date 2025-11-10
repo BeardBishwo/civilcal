@@ -1,5 +1,1 @@
-Installation completed successfully
-Date: 2025-11-09 16:02:00
-Version: 1.0.0
-Database: uniquebishwo
-Status: Production Ready
+Installation completed at: <?= date('Y-m-d H:i:s') ?>

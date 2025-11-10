@@ -23,11 +23,14 @@
     <meta property="twitter:image" content="/themes/procalculator/assets/images/og-image.jpg">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="<?= $viewHelper->themeUrl('assets/favicon.ico') ?>">
     
     <!-- ProCalculator Premium Theme Styles -->
-    <link rel="stylesheet" href="/themes/procalculator/assets/css/procalculator-premium.css">
-    <link rel="stylesheet" href="/themes/procalculator/assets/css/auth.css">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/procalculator-premium.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/auth.css') ?>">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     
     <!-- Additional CSS for login page -->
     <style>
@@ -49,7 +52,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('/themes/procalculator/assets/images/hero-pattern.svg') repeat;
+            background: url('<?= $viewHelper->themeUrl('assets/images/hero-pattern.svg') ?>') repeat;
             opacity: 0.05;
             z-index: 0;
         }
@@ -312,18 +315,15 @@
     </style>
 </head>
 <body>
-    <!-- Skip to content for accessibility -->
-    <a href="#main-content" class="pc-skip-to-content">Skip to main content</a>
-    
-    <div class="pc-login-container" id="main-content">
-        <div class="pc-login-card pc-card">
+    <div class="pc-login-container auth-container" id="main-content">
+        <div class="pc-login-card pc-card auth-card">
             <!-- Header -->
-            <div class="pc-login-header">
-                <div class="pc-login-logo">
+            <div class="pc-login-header auth-header">
+                <div class="pc-login-logo auth-logo">
                     <i class="fas fa-calculator"></i>
                 </div>
-                <h1 class="pc-login-title">Welcome Back</h1>
-                <p class="pc-login-subtitle">Sign in to your ProCalculator account</p>
+                <h1 class="pc-login-title auth-title">Welcome Back</h1>
+                <p class="pc-login-subtitle auth-subtitle">Sign in to your ProCalculator account</p>
             </div>
 
             <!-- Social Login Options -->
@@ -356,18 +356,18 @@
             <?php endif; ?>
 
             <!-- Login Form -->
-            <form class="pc-premium-form" id="loginForm" novalidate>
+            <form class="pc-premium-form auth-form" id="loginForm" novalidate>
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                 
-                <div class="pc-form-group">
-                    <label for="email" class="pc-label">
+                <div class="pc-form-group form-group">
+                    <label for="email" class="pc-label form-label">
                         <i class="fas fa-envelope me-2"></i>Email Address
                     </label>
-                    <input 
+                        <input 
                         type="email" 
                         id="email" 
                         name="email" 
-                        class="pc-input pc-form-control" 
+                        class="pc-input pc-form-control form-input" 
                         placeholder="Enter your email address"
                         required 
                         autocomplete="email"
@@ -376,8 +376,8 @@
                     <div id="email-error" class="pc-error-message" role="alert" aria-live="polite"></div>
                 </div>
 
-                <div class="pc-form-group">
-                    <label for="password" class="pc-label">
+                <div class="pc-form-group form-group">
+                    <label for="password" class="pc-label form-label">
                         <i class="fas fa-lock me-2"></i>Password
                     </label>
                     <div class="pc-password-input-container">
@@ -385,7 +385,7 @@
                             type="password" 
                             id="password" 
                             name="password" 
-                            class="pc-input pc-form-control" 
+                            class="pc-input pc-form-control form-input" 
                             placeholder="Enter your password"
                             required 
                             autocomplete="current-password"
@@ -406,19 +406,27 @@
                         Remember me
                     </label>
                     <div class="pc-forgot-password">
-                        <a href="/forgot-password" class="pc-forgot-link">Forgot password?</a>
+                        <a href="<?= $viewHelper->url('forgot-password') ?>" class="pc-forgot-link">Forgot password?</a>
                     </div>
                 </div>
 
-                <div class="pc-form-group">
-                    <button type="submit" class="pc-btn pc-btn-primary pc-btn-lg pc-w-full" id="loginBtn">
-                        <span class="pc-btn-text">
-                            <i class="fas fa-sign-in-alt me-2"></i>
-                            Sign In
+                <div class="pc-form-group form-group">
+                    <button type="submit" class="pc-btn pc-btn-premium pc-btn-lg pc-w-full pc-login-btn" id="loginBtn">
+                        <span class="pc-btn-content">
+                            <span class="pc-btn-icon">
+                                <i class="fas fa-sign-in-alt"></i>
+                            </span>
+                            <span class="pc-btn-text-main">
+                                <span class="pc-btn-title">Sign In</span>
+                                <span class="pc-btn-subtitle">Access your professional dashboard</span>
+                            </span>
+                            <span class="pc-btn-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </span>
                         </span>
                         <span class="pc-btn-loading pc-hidden">
-                            <span class="pc-spinner"></span>
-                            Signing in...
+                            <span class="pc-spinner-premium"></span>
+                            <span class="pc-loading-text">Signing in<span class="pc-loading-dots"><span>.</span><span>.</span><span>.</span></span></span>
                         </span>
                     </button>
                 </div>
@@ -427,44 +435,19 @@
             <!-- Register Link -->
             <div class="pc-register-link">
                 <p>Don't have an account? 
-                    <a href="/register" class="pc-register-cta">Create Professional Account</a>
+                    <a href="<?= $viewHelper->url('register') ?>" class="pc-register-cta">Create Professional Account</a>
                 </p>
             </div>
         </div>
     </div>
 
-    <!-- Security Notice -->
-    <div class="pc-security-notice pc-hidden" id="security-notice">
-        <div class="pc-notification-content">
-            <i class="fas fa-shield-alt pc-notification-icon"></i>
-            <div>
-                <strong>Security Notice</strong>
-                <div class="pc-text-secondary">Your connection is protected with SSL encryption</div>
-            </div>
-        </div>
-    </div>
-
     <!-- ProCalculator Premium Theme Scripts -->
-    <script src="/themes/procalculator/assets/js/procalculator-core.js"></script>
-    <script src="/themes/procalculator/assets/js/auth-enhanced.js"></script>
-    
-    <!-- Font Awesome for icons -->
-    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    <script src="<?= $viewHelper->themeUrl('assets/js/procalculator-core.js') ?>"></script>
+    <script src="<?= $viewHelper->themeUrl('assets/js/auth-enhanced.js') ?>"></script>
     
     <!-- Login Page Specific Script -->
     <script>
-        // Auto-hide security notice
         document.addEventListener('DOMContentLoaded', function() {
-            const securityNotice = document.getElementById('security-notice');
-            if (securityNotice) {
-                setTimeout(() => {
-                    securityNotice.classList.remove('pc-hidden');
-                    setTimeout(() => {
-                        securityNotice.classList.add('pc-hidden');
-                    }, 5000);
-                }, 2000);
-            }
-
             // Setup demo login buttons
             document.querySelectorAll('.pc-demo-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -606,22 +589,159 @@
             height: 18px;
             accent-color: var(--pc-premium);
         }
-
-        .pc-skip-to-content {
-            position: absolute;
-            top: -40px;
-            left: 6px;
-            background: var(--pc-primary);
-            color: white;
-            padding: 8px;
-            text-decoration: none;
-            border-radius: 4px;
-            z-index: 1000;
-            transition: top 0.3s;
+        
+        /* Premium Login Button */
+        .pc-login-btn {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--pc-premium), var(--pc-gold));
+            border: none;
+            padding: var(--pc-spacing-lg) var(--pc-spacing-xl);
+            min-height: 72px;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+            transition: all var(--pc-transition-normal);
         }
-
-        .pc-skip-to-content:focus {
-            top: 6px;
+        
+        .pc-login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .pc-login-btn:hover::before {
+            left: 100%;
+        }
+        
+        .pc-login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(99, 102, 241, 0.4);
+        }
+        
+        .pc-btn-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--pc-spacing-md);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .pc-btn-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+        
+        .pc-btn-text-main {
+            flex: 1;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .pc-btn-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.3px;
+        }
+        
+        .pc-btn-subtitle {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+        }
+        
+        .pc-btn-arrow {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: transform var(--pc-transition-fast);
+        }
+        
+        .pc-login-btn:hover .pc-btn-arrow {
+            transform: translateX(4px);
+        }
+        
+        .pc-spinner-premium {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite, scanPulse 2s ease-in-out infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes scanPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
+            }
+        }
+        
+        .pc-loading-text {
+            margin-left: var(--pc-spacing-sm);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .pc-loading-dots span {
+            animation: dotBlink 1.4s infinite;
+            opacity: 0;
+        }
+        
+        .pc-loading-dots span:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .pc-loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .pc-loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes dotBlink {
+            0%, 20% { opacity: 0; }
+            40% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        .pc-btn-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--pc-spacing-sm);
+        }
+        
+        .pc-hidden {
+            display: none !important;
         }
     </style>
 </body>

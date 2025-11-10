@@ -3,9 +3,38 @@ namespace App\Core;
 
 class View {
     private $themeManager;
+    private $basePath;
     
     public function __construct() {
         $this->themeManager = new \App\Services\ThemeManager();
+        $this->basePath = $this->getBasePath();
+    }
+    
+    /**
+     * Get base path for URLs (handles subdirectory installations)
+     */
+    private function getBasePath() {
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+        $scriptDir = dirname($scriptName);
+        
+        // Remove /public from path
+        if (substr($scriptDir, -7) === '/public') {
+            $scriptDir = substr($scriptDir, 0, -7);
+        }
+        
+        if ($scriptDir === '/' || $scriptDir === '') {
+            return '';
+        }
+        
+        return $scriptDir;
+    }
+    
+    /**
+     * Generate URL with base path
+     */
+    public function url($path = '') {
+        $path = ltrim($path, '/');
+        return $this->basePath . '/' . $path;
     }
     
     public function render($view, $data = []) {

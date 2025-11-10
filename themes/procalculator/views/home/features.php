@@ -16,7 +16,10 @@ $user = $user ?? null;
     <meta name="description" content="Discover premium features of ProCalculator: $100K quality calculations, glassmorphism design, and professional tools.">
     
     <!-- ProCalculator Premium CSS -->
-    <link rel="stylesheet" href="<?= $this->themeUrl('assets/css/procalculator-premium.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('css/procalculator-premium.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('css/components.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('css/animations.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('css/responsive.css') ?>">
     
     <!-- Premium Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,10 +31,10 @@ $user = $user ?? null;
 </head>
 <body class="procalculator-features">
     <!-- Navigation Header -->
-    <?php $this->partial('partials/header', compact('user')); ?>
+    <?php $viewHelper->partial('partials/header', compact('user')); ?>
     
     <!-- Page Hero -->
-    <section class="page-hero">
+    <section class="page-hero" id="main-content">
         <div class="container">
             <div class="hero-content">
                 <nav class="breadcrumb">

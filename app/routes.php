@@ -18,6 +18,8 @@ $router->add('GET', '/login', 'AuthController@showLogin', ['guest']);
 $router->add('POST', '/login', 'AuthController@login', ['guest']);
 $router->add('GET', '/register', 'AuthController@showRegister', ['guest']);
 $router->add('POST', '/register', 'AuthController@register', ['guest']);
+$router->add('GET', '/forgot-password', 'AuthController@showForgotPassword', ['guest']);
+$router->add('POST', '/forgot-password', 'AuthController@forgotPassword', ['guest']);
 $router->add('POST', '/logout', 'AuthController@logout', ['auth']);
 
 // Calculator Routes (Public)
