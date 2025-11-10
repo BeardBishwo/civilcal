@@ -655,7 +655,13 @@ class ThemeManager
     // Legacy methods for backward compatibility
     public function getThemeAsset($assetPath)
     {
-        return $this->baseUrl . '/themes/' . $this->activeTheme . '/assets/' . ltrim($assetPath, '/');
+        // Remove 'assets/' prefix if present since we're serving from /assets/themes/
+        $cleanPath = ltrim($assetPath, '/');
+        if (strpos($cleanPath, 'assets/') === 0) {
+            $cleanPath = substr($cleanPath, 7); // Remove 'assets/' prefix
+        }
+        
+        return $this->baseUrl . '/assets/themes/' . $this->activeTheme . '/' . $cleanPath;
     }
 
     public function loadThemeStyles()
@@ -666,6 +672,7 @@ class ThemeManager
             }
         }
     }
+
 
     public function loadThemeScripts()
     {
@@ -754,13 +761,14 @@ class ThemeManager
 
     public function themeUrl($path = '')
     {
-        return $this->baseUrl . '/themes/' . $this->activeTheme . '/' . ltrim($path, '/');
+        return $this->baseUrl . '/assets/themes/' . $this->activeTheme . '/' . ltrim($path, '/');
     }
 
     public function assetsUrl($path = '')
     {
-        return $this->baseUrl . '/themes/' . $this->activeTheme . '/assets/' . ltrim($path, '/');
+        return $this->baseUrl . '/assets/themes/' . $this->activeTheme . '/' . ltrim($path, '/');
     }
+
 
     /**
      * Render a partial template
