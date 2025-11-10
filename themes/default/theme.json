@@ -1,7 +1,7 @@
 {
     "name": "Default Premium Theme",
-    "version": "2.0.0",
-    "description": "Premium theme for Bishwo Calculator - $10,000 quality design with modern gradients, glassmorphism, and professional engineering tools styling",
+    "version": "2.1.0",
+    "description": "Optimized premium theme for Bishwo Calculator - Consolidated CSS and enhanced JavaScript for $10,000 quality design with modern gradients, glassmorphism, and professional engineering tools styling",
     "author": "Bishwo Calculator Team",
     "type": "default",
     "category": "premium",
@@ -10,19 +10,16 @@
         "calculator_modules": "all"
     },
     "styles": [
-        "css/theme.css",
+        "css/consolidated-premium.css",
         "css/header.css",
         "css/footer.css",
         "css/home.css",
-        "css/back-to-top.css",
-        "css/premium.css"
+        "css/back-to-top.css"
     ],
     "scripts": [
-        "js/main.js",
-        "js/header.js",
-        "js/home.js",
-        "js/back-to-top.js",
-        "js/premium.js"
+        "js/enhanced-main.js",
+        "js/auth.js",
+        "js/home.js"
     ],
     "category_styles": {
         "civil": "css/civil.css",
@@ -37,6 +34,9 @@
         "mep": "css/mep.css",
         "project-management": "css/management.css"
     },
+    "category_scripts": {
+        "civil": "js/civil.js"
+    },
     "features": {
         "dark_mode": true,
         "responsive": true,
@@ -46,7 +46,8 @@
         "premium": true,
         "animations": true,
         "glassmorphism": true,
-        "gradients": true
+        "gradients": true,
+        "optimized": true
     },
     "colors": {
         "primary": "#667eea",
@@ -85,6 +86,12 @@
         "shadow_premium": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
         "shadow_hover": "0 35px 60px -12px rgba(0, 0, 0, 0.3)"
     },
+    "optimization": {
+        "consolidated_css": true,
+        "enhanced_js": true,
+        "reduced_file_count": true,
+        "improved_performance": true
+    },
     "created_at": "2025-01-01T00:00:00Z",
-    "updated_at": "2025-11-09T20:53:00Z"
+    "updated_at": "2025-11-10T11:58:00Z"
 }

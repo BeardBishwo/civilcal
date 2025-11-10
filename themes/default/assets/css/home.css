@@ -233,3 +233,207 @@
         padding: 0.75rem 1rem;
     }
 }
+
+
+/* Additional homepage styles for index.php */
+
+.hero-section {
+    padding: 80px 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-align: center;
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.premium-badge {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    padding: 8px 20px;
+    margin-bottom: 20px;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.hero-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.hero-subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.categories-section {
+    padding: 80px 0;
+    background: #f8fafc;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-title {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: #1a365d;
+    margin-bottom: 15px;
+}
+
+.section-subtitle {
+    font-size: 1.1rem;
+    color: #4a5568;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.category-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.category-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.category-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a365d;
+    margin-bottom: 15px;
+}
+
+.category-description {
+    color: #4a5568;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.category-badge {
+    background: #667eea;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.stats-section {
+    padding: 60px 0;
+    background: white;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #667eea;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+.premium-footer {
+    background: #1a202c;
+    color: white;
+    padding: 60px 0;
+    text-align: center;
+}
+
+.footer-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.footer-description {
+    font-size: 1.1rem;
+    color: #a0aec0;
+    margin-bottom: 30px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.footer-badges {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.footer-badge {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 60px 0;
+    }
+    .categories-section {
+        padding: 60px 0;
+    }
+    .category-card {
+        padding: 25px 20px;
+    }
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    .hero-buttons .btn {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+    .footer-badges {
+        flex-direction: column;
+        align-items: center;
+    }
+}

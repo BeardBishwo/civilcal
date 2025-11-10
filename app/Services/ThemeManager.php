@@ -1,11 +1,19 @@
 <?php
 /**
- * Theme Manager Service
- * Handles theme management, asset loading, and rendering
- * PHP 7.4 Compatible Version
+ * Enhanced Theme Manager Service with Database Integration
+ * 
+ * Complete modular theme management system with CRUD operations
+ * Database-driven theme management with backup and security features
+ * 
+ * @version 2.0.0
+ * @author Bishwo Calculator Team
+ * @package App\Services
  */
 
 namespace App\Services;
+
+use App\Models\Theme;
+use PDOException;
 
 class ThemeManager
 {
@@ -14,13 +22,14 @@ class ThemeManager
     private $activeTheme;
     private $baseUrl;
     private $assetsCache = [];
-
+    private $themeModel;
+    
     public function __construct()
     {
         $this->themesPath = BASE_PATH . '/themes/';
         $this->baseUrl = $this->getBaseUrl();
-        $this->activeTheme = $this->getActiveThemeName();
-        $this->loadThemeConfig();
+        $this->themeModel = new Theme();
+        $this->loadActiveTheme();
     }
 
     /**
@@ -41,29 +50,22 @@ class ThemeManager
     }
 
     /**
-     * Get active theme from session or default
+     * Load active theme from database
      */
-    private function getActiveThemeName()
+    private function loadActiveTheme()
     {
-        return isset($_SESSION['active_theme']) ? $_SESSION['active_theme'] : 'default';
-    }
-
-    /**
-     * Load theme configuration
-     */
-    private function loadThemeConfig()
-    {
-        $configFile = $this->themesPath . $this->activeTheme . '/theme.json';
+        $activeThemeData = $this->themeModel->getActive();
         
-        if (file_exists($configFile)) {
-            $config = json_decode(file_get_contents($configFile), true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $this->currentTheme = $config;
-            }
-        }
-        
-        // Fallback to default configuration
-        if (!$this->currentTheme) {
+        if ($activeThemeData) {
+            $this->activeTheme = $activeThemeData['name'];
+            $this->currentTheme = $activeThemeData['config'] ?? [];
+            
+            // Update session
+            $_SESSION['active_theme'] = $this->activeTheme;
+            $_SESSION['active_theme_id'] = $activeThemeData['id'];
+        } else {
+            // Fallback to default
+            $this->activeTheme = 'default';
             $this->currentTheme = $this->getDefaultThemeConfig();
         }
     }
@@ -107,16 +109,555 @@ class ThemeManager
     }
 
     /**
-     * Get theme asset URL
+     * Get all themes from database
      */
+    public function getAllThemes($status = null, $isPremium = null, $limit = null, $offset = 0)
+    {
+        return $this->themeModel->getAll($status, $isPremium, $limit, $offset);
+    }
+
+    /**
+     * Get theme by ID
+     */
+    public function getThemeById($id)
+    {
+        return $this->themeModel->getById($id);
+    }
+
+    /**
+     * Get theme by name
+     */
+    public function getThemeByName($name)
+    {
+        return $this->themeModel->getByName($name);
+    }
+
+    /**
+     * Search themes
+     */
+    public function searchThemes($query, $limit = 20)
+    {
+        return $this->themeModel->search($query, $limit);
+    }
+
+    /**
+     * Get theme statistics
+     */
+    public function getThemeStats()
+    {
+        return $this->themeModel->getStats();
+    }
+
+    /**
+     * Create new theme
+     */
+    public function createTheme($data)
+    {
+        try {
+            // Validate required fields
+            if (empty($data['name']) || empty($data['display_name'])) {
+                return [
+                    'success' => false,
+                    'message' => 'Theme name and display name are required'
+                ];
+            }
+
+            // Check if theme name already exists
+            if ($this->themeModel->nameExists($data['name'])) {
+                return [
+                    'success' => false,
+                    'message' => 'Theme with this name already exists'
+                ];
+            }
+
+            // Validate theme.json if provided
+            if (isset($data['config_json'])) {
+                $config = json_decode($data['config_json'], true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return [
+                        'success' => false,
+                        'message' => 'Invalid JSON configuration'
+                    ];
+                }
+                $data['config'] = $config;
+            }
+
+            // Calculate file size and checksum if theme directory exists
+            $themePath = $this->themesPath . $data['name'];
+            if (is_dir($themePath)) {
+                $data['file_size'] = $this->calculateDirectorySize($themePath);
+                $data['checksum'] = $this->generateThemeChecksum($themePath);
+            }
+
+            $themeId = $this->themeModel->create($data);
+            
+            if ($themeId) {
+                return [
+                    'success' => true,
+                    'message' => 'Theme created successfully',
+                    'theme_id' => $themeId
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Failed to create theme'
+            ];
+
+        } catch (Exception $e) {
+            error_log("Theme Creation Error: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Error creating theme: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Update theme
+     */
+    public function updateTheme($id, $data)
+    {
+        try {
+            $result = $this->themeModel->update($id, $data);
+            
+            if ($result) {
+                // If updating active theme, reload configuration
+                $activeTheme = $this->themeModel->getActive();
+                if ($activeTheme && $activeTheme['id'] == $id) {
+                    $this->loadActiveTheme();
+                }
+
+                return [
+                    'success' => true,
+                    'message' => 'Theme updated successfully'
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Failed to update theme'
+            ];
+
+        } catch (Exception $e) {
+            error_log("Theme Update Error: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Error updating theme: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Activate theme
+     */
+    public function activateTheme($id)
+    {
+        try {
+            $theme = $this->themeModel->getById($id);
+            
+            if (!$theme) {
+                return [
+                    'success' => false,
+                    'message' => 'Theme not found'
+                ];
+            }
+
+            if ($theme['status'] === 'deleted') {
+                return [
+                    'success' => false,
+                    'message' => 'Cannot activate deleted theme'
+                ];
+            }
+
+            $result = $this->themeModel->activate($id);
+            
+            if ($result) {
+                // Update current theme
+                $this->activeTheme = $theme['name'];
+                $this->currentTheme = $theme['config'] ?? [];
+                
+                return [
+                    'success' => true,
+                    'message' => 'Theme activated successfully',
+                    'theme_name' => $theme['name']
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Failed to activate theme'
+            ];
+
+        } catch (Exception $e) {
+            error_log("Theme Activation Error: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Error activating theme: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Deactivate theme
+     */
+    public function deactivateTheme($id)
+    {
+        try {
+            $result = $this->themeModel->deactivate($id);
+            
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Theme deactivated successfully'
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Failed to deactivate theme'
+            ];
+
+        } catch (Exception $e) {
+            error_log("Theme Deactivation Error: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Error deactivating theme: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Delete theme (soft delete with backup)
+     */
+    public function deleteTheme($id, $createBackup = true)
+    {
+        try {
+            $theme = $this->themeModel->getById($id);
+            
+            if (!$theme) {
+                return [
+                    'success' => false,
+                    'message' => 'Theme not found'
+                ];
+            }
+
+            if ($theme['status'] === 'active') {
+                return [
+                    'success' => false,
+                    'message' => 'Cannot delete active theme. Please activate another theme first.'
+                ];
+            }
+
+            $result = $this->themeModel->delete($id, $createBackup);
+            
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Theme deleted successfully' . ($createBackup ? ' (backup created)' : ''),
+                    'backup_created' => $createBackup
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Failed to delete theme'
+            ];
+
+        } catch (Exception $e) {
+            error_log("Theme Deletion Error: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Error deleting theme: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Restore deleted theme
+     */
+    public function restoreTheme($id)
+    {
+        try {
+            $result = $this->themeModel->restore($id);
+            
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Theme restored successfully'
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Failed to restore theme'
+            ];
+
+        } catch (Exception $e) {
+            error_log("Theme Restoration Error: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Error restoring theme: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Hard delete theme
+     */
+    public function hardDeleteTheme($id)
+    {
+        try {
+            $theme = $this->themeModel->getById($id);
+            
+            if (!$theme) {
+                return [
+                    'success' => false,
+                    'message' => 'Theme not found'
+                ];
+            }
+
+            if ($theme['status'] === 'active') {
+                return [
+                    'success' => false,
+                    'message' => 'Cannot delete active theme'
+                ];
+            }
+
+            $result = $this->themeModel->hardDelete($id);
+            
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Theme permanently deleted'
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Failed to delete theme'
+            ];
+
+        } catch (Exception $e) {
+            error_log("Theme Hard Delete Error: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Error deleting theme: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Install theme from ZIP file
+     */
+    public function installThemeFromZip($zipFile)
+    {
+        try {
+            if (!file_exists($zipFile)) {
+                return [
+                    'success' => false,
+                    'message' => 'Theme ZIP file not found'
+                ];
+            }
+
+            // Validate ZIP file
+            $zip = new \ZipArchive();
+            if ($zip->open($zipFile) !== TRUE) {
+                return [
+                    'success' => false,
+                    'message' => 'Cannot open ZIP file'
+                ];
+            }
+
+            // Check for theme.json
+            if ($zip->locateName('theme.json') === false) {
+                $zip->close();
+                return [
+                    'success' => false,
+                    'message' => 'Invalid theme: theme.json not found'
+                ];
+            }
+
+            // Extract theme.json to read configuration
+            $themeConfigJson = $zip->getFromName('theme.json');
+            $themeConfig = json_decode($themeConfigJson, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $zip->close();
+                return [
+                    'success' => false,
+                    'message' => 'Invalid theme.json configuration'
+                ];
+            }
+
+            $themeName = $themeConfig['slug'] ?? $themeConfig['name'] ?? '';
+            if (empty($themeName)) {
+                $zip->close();
+                return [
+                    'success' => false,
+                    'message' => 'Theme name not found in configuration'
+                ];
+            }
+
+            // Check if theme already exists
+            if ($this->themeModel->nameExists($themeName)) {
+                $zip->close();
+                return [
+                    'success' => false,
+                    'message' => 'Theme with this name already exists'
+                ];
+            }
+
+            // Extract to themes directory
+            $extractPath = $this->themesPath . $themeName;
+            $zip->extractTo($extractPath);
+            $zip->close();
+
+            // Create theme in database
+            $themeData = [
+                'name' => $themeName,
+                'display_name' => $themeConfig['name'] ?? ucfirst($themeName),
+                'version' => $themeConfig['version'] ?? '1.0.0',
+                'author' => $themeConfig['author'] ?? 'Unknown',
+                'description' => $themeConfig['description'] ?? '',
+                'status' => 'inactive',
+                'is_premium' => $themeConfig['premium'] ?? 0,
+                'price' => $themeConfig['price'] ?? 0.00,
+                'config' => $themeConfig,
+                'file_size' => filesize($zipFile),
+                'checksum' => hash_file('sha256', $zipFile)
+            ];
+
+            $themeId = $this->themeModel->create($themeData);
+            
+            if ($themeId) {
+                return [
+                    'success' => true,
+                    'message' => 'Theme installed successfully',
+                    'theme_id' => $themeId,
+                    'theme_name' => $themeName
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Theme installed but database record creation failed'
+            ];
+
+        } catch (Exception $e) {
+            error_log("Theme Installation Error: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Error installing theme: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Get theme backups
+     */
+    public function getThemeBackups($themeId = null)
+    {
+        return $this->themeModel->getBackups($themeId);
+    }
+
+    /**
+     * Validate theme integrity
+     */
+    public function validateTheme($themeName)
+    {
+        try {
+            $themePath = $this->themesPath . $themeName;
+            
+            if (!is_dir($themePath)) {
+                return [
+                    'success' => false,
+                    'message' => 'Theme directory not found'
+                ];
+            }
+
+            $issues = [];
+            
+            // Check for theme.json
+            if (!file_exists($themePath . '/theme.json')) {
+                $issues[] = 'theme.json not found';
+            } else {
+                $config = json_decode(file_get_contents($themePath . '/theme.json'), true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $issues[] = 'Invalid theme.json format';
+                }
+            }
+
+            // Check for required directories
+            $requiredDirs = ['assets', 'views'];
+            foreach ($requiredDirs as $dir) {
+                if (!is_dir($themePath . '/' . $dir)) {
+                    $issues[] = "Required directory '{$dir}' not found";
+                }
+            }
+
+            return [
+                'success' => empty($issues),
+                'message' => empty($issues) ? 'Theme validation passed' : 'Theme validation failed',
+                'issues' => $issues
+            ];
+
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Error validating theme: ' . $e->getMessage(),
+                'issues' => []
+            ];
+        }
+    }
+
+    /**
+     * Calculate directory size
+     */
+    private function calculateDirectorySize($directory)
+    {
+        $size = 0;
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+        
+        foreach ($files as $file) {
+            if ($file->isFile()) {
+                $size += $file->getSize();
+            }
+        }
+        
+        return $size;
+    }
+
+    /**
+     * Generate theme checksum
+     */
+    private function generateThemeChecksum($directory)
+    {
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+        
+        $hashes = [];
+        foreach ($files as $file) {
+            if ($file->isFile()) {
+                $hashes[] = hash_file('sha256', $file->getRealPath());
+            }
+        }
+        
+        sort($hashes);
+        return hash('sha256', implode('', $hashes));
+    }
+
+    // Legacy methods for backward compatibility
     public function getThemeAsset($assetPath)
     {
         return $this->baseUrl . '/themes/' . $this->activeTheme . '/assets/' . ltrim($assetPath, '/');
     }
 
-    /**
-     * Load theme styles
-     */
     public function loadThemeStyles()
     {
         if (isset($this->currentTheme['styles'])) {
@@ -126,9 +667,6 @@ class ThemeManager
         }
     }
 
-    /**
-     * Load theme scripts
-     */
     public function loadThemeScripts()
     {
         if (isset($this->currentTheme['scripts'])) {
@@ -138,236 +676,23 @@ class ThemeManager
         }
     }
 
-    /**
-     * Get category-specific style
-     */
-    public function getCategoryStyle($category)
-    {
-        if (isset($this->currentTheme['category_styles'][$category])) {
-            return $this->currentTheme['category_styles'][$category];
-        }
-        return null;
-    }
-
-    /**
-     * Load category-specific style
-     */
-    public function loadCategoryStyle($category)
-    {
-        $style = $this->getCategoryStyle($category);
-        if ($style) {
-            echo '<link rel="stylesheet" href="' . htmlspecialchars($this->getThemeAsset($style)) . '">' . PHP_EOL;
-        }
-    }
-
-    /**
-     * Load category-specific scripts
-     */
-    public function loadCategoryScripts($category)
-    {
-        if (isset($this->currentTheme['category_scripts'][$category])) {
-            $script = $this->currentTheme['category_scripts'][$category];
-            echo '<script src="' . htmlspecialchars($this->getThemeAsset($script)) . '"></script>' . PHP_EOL;
-        }
-    }
-
-    /**
-     * Set active theme
-     */
-    public function setTheme($themeName)
-    {
-        $themePath = $this->themesPath . $themeName;
-        if (is_dir($themePath)) {
-            $this->activeTheme = $themeName;
-            $_SESSION['active_theme'] = $themeName;
-            $this->loadThemeConfig();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Get active theme name
-     */
     public function getActiveTheme()
     {
         return $this->activeTheme;
     }
 
-    /**
-     * Get current theme configuration
-     */
     public function getThemeConfig()
     {
         return $this->currentTheme;
     }
 
-    /**
-     * Render theme partial
-     */
-    public function renderPartial($partial, $data = [])
-    {
-        $partialPath = $this->themesPath . $this->activeTheme . '/views/partials/' . $partial . '.php';
-        
-        if (file_exists($partialPath)) {
-            ob_start();
-            extract($data);
-            include $partialPath;
-            return ob_get_clean();
-        }
-        
-        return "<!-- Partial not found: {$partial} -->" . PHP_EOL;
-    }
-
-    /**
-     * Render theme view
-     */
-    public function renderView($view, $data = [])
-    {
-        $viewPath = $this->themesPath . $this->activeTheme . '/views/' . $view . '.php';
-        
-        if (file_exists($viewPath)) {
-            ob_start();
-            extract($data);
-            include $viewPath;
-            return ob_get_clean();
-        }
-        
-        return "<!-- View not found: {$view} -->" . PHP_EOL;
-    }
-
-    /**
-     * Get theme URL for navigation
-     */
     public function themeUrl($path = '')
     {
         return $this->baseUrl . '/themes/' . $this->activeTheme . '/' . ltrim($path, '/');
     }
 
-    /**
-     * Get theme assets URL
-     */
     public function assetsUrl($path = '')
     {
         return $this->baseUrl . '/themes/' . $this->activeTheme . '/assets/' . ltrim($path, '/');
     }
-
-    /**
-     * Get available themes
-     */
-    public function getAvailableThemes()
-    {
-        $themes = [];
-        $directories = glob($this->themesPath . '*', GLOB_ONLYDIR);
-        
-        foreach ($directories as $dir) {
-            $themeName = basename($dir);
-            $configFile = $dir . '/theme.json';
-            
-            if (file_exists($configFile)) {
-                $config = json_decode(file_get_contents($configFile), true);
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    $themes[$themeName] = $config;
-                }
-            } else {
-                $themes[$themeName] = [
-                    'name' => ucfirst($themeName) . ' Theme',
-                    'version' => '1.0.0',
-                    'description' => 'Theme: ' . $themeName
-                ];
-            }
-        }
-        
-        return $themes;
-    }
-
-    /**
-     * Get theme metadata
-     */
-    public function getThemeMetadata()
-    {
-        return [
-            'name' => $this->currentTheme['name'] ?? 'Default Theme',
-            'version' => $this->currentTheme['version'] ?? '1.0.0',
-            'author' => $this->currentTheme['author'] ?? 'Bishwo Calculator',
-            'description' => $this->currentTheme['description'] ?? '',
-            'active_theme' => $this->activeTheme
-        ];
-    }
-
-    /**
-     * Check if theme has custom category style
-     */
-    public function hasCategoryStyle($category)
-    {
-        return isset($this->currentTheme['category_styles'][$category]);
-    }
-
-    /**
-     * Get all category styles
-     */
-    public function getAllCategoryStyles()
-    {
-        return $this->currentTheme['category_styles'] ?? [];
-    }
-
-    /**
-     * Check if theme supports a feature
-     */
-    public function supportsFeature($feature)
-    {
-        return isset($this->currentTheme['features']) && in_array($feature, $this->currentTheme['features']);
-    }
-
-    /**
-     * Get category-specific classes
-     */
-    public function getCategoryClasses($category)
-    {
-        $classes = 'category-' . htmlspecialchars($category);
-        if (isset($this->currentTheme['category_classes'][$category])) {
-            $classes .= ' ' . htmlspecialchars($this->currentTheme['category_classes'][$category]);
-        }
-        return $classes;
-    }
-
-    /* Static helpers for backward compatibility when called statically */
-    public static function getAllThemes()
-    {
-        $tm = new self();
-        return $tm->getAvailableThemes();
-    }
-
-    public static function installTheme($themeName)
-    {
-        // Basic placeholder: attempt to create theme directory
-        $tm = new self();
-        $themePath = $tm->themesPath . $themeName;
-        if (!is_dir($themePath)) {
-            return mkdir($themePath, 0755, true);
-        }
-        return false;
-    }
-
-    public static function activateTheme($themeName)
-    {
-        $tm = new self();
-        return $tm->setTheme($themeName);
-    }
-
-    public static function deleteTheme($themeName)
-    {
-        $tm = new self();
-        $themePath = $tm->themesPath . $themeName;
-        if (is_dir($themePath)) {
-            // basic recursive delete
-            $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($themePath, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
-            foreach ($it as $file) {
-                if ($file->isDir()) rmdir($file->getRealPath()); else unlink($file->getRealPath());
-            }
-            return rmdir($themePath);
-        }
-        return false;
-    }
 }
-?>

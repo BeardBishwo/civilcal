@@ -1,54 +1,360 @@
 <?php
 namespace App\Controllers\Admin;
 
-use App\Controllers\Controller;
+use App\Core\Controller;
 use App\Services\ThemeManager;
+use Exception;
 
 class ThemeController extends Controller
 {
+    private $themeManager;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->themeManager = new ThemeManager();
+        
+        // Check admin authentication
+        if (!$this->auth->check() || !$this->auth->isAdmin()) {
+            $this->redirect('/login');
+        }
+    }
+
     public function index()
     {
-        $themes = ThemeManager::getAllThemes();
-        $activeTheme = $this->getActiveTheme();
-        
-        // Prepare data for the view
-        $this->data['currentPage'] = 'themes';
-        $this->data['themes'] = $themes;
-        $this->data['activeTheme'] = $activeTheme;
-        $this->data['title'] = 'Themes Management - Admin Panel';
-        
-        // Load the view
-        $this->loadView('admin/themes/index', $this->data);
-    }
-
-    public function activateTheme()
-    {
-        if ($_POST && isset($_POST['theme_name'])) {
-            $themeName = $_POST['theme_name'];
-            $result = ThemeManager::activateTheme($themeName);
+        try {
+            $themes = $this->themeManager->getAllThemes();
+            $stats = $this->themeManager->getThemeStats();
+            $activeTheme = $this->getActiveThemeData();
             
-            echo json_encode($result);
-            return;
+            // Prepare data for the view
+            $data = [
+                'currentPage' => 'themes',
+                'themes' => $themes,
+                'activeTheme' => $activeTheme,
+                'stats' => $stats,
+                'title' => 'Themes Management - Admin Panel'
+            ];
+            
+            // Load the admin view
+            $this->adminView('admin/themes/index', $data);
+        } catch (Exception $e) {
+            error_log("Theme Index Error: " . $e->getMessage());
+            $this->adminView('admin/themes/index', [
+                'error' => 'Failed to load themes: ' . $e->getMessage(),
+                'title' => 'Themes Management - Admin Panel'
+            ]);
         }
-        
-        echo json_encode(['success' => false, 'message' => 'Invalid request']);
     }
 
-    public function uploadTheme()
+    public function activate()
     {
-        if ($_FILES && isset($_FILES['theme_zip'])) {
-            $result = ThemeManager::installTheme($_FILES['theme_zip']);
-            echo json_encode($result);
+        if (!$this->isAjax()) {
+            $this->redirect('/admin/themes');
             return;
         }
-        
-        echo json_encode(['success' => false, 'message' => 'No file uploaded']);
+
+        try {
+            if (!isset($_POST['theme_id'])) {
+                $this->error('Theme ID required');
+                return;
+            }
+
+            $themeId = intval($_POST['theme_id']);
+            $result = $this->themeManager->activateTheme($themeId);
+            
+            // Log the action
+            error_log("Theme Admin Activity: theme_activated - Theme ID: {$themeId}");
+            
+            if ($result['success']) {
+                $this->success('Theme activated successfully', $result);
+            } else {
+                $this->error($result['message']);
+            }
+        } catch (Exception $e) {
+            error_log("Theme Activation Error: " . $e->getMessage());
+            $this->error('Activation failed: ' . $e->getMessage());
+        }
     }
 
-    private function getActiveTheme()
+    public function deactivate()
     {
-        // Get active theme from database or config
-        return 'default';
+        if (!$this->isAjax()) {
+            $this->redirect('/admin/themes');
+            return;
+        }
+
+        try {
+            if (!isset($_POST['theme_id'])) {
+                $this->error('Theme ID required');
+                return;
+            }
+
+            $themeId = intval($_POST['theme_id']);
+            $result = $this->themeManager->deactivateTheme($themeId);
+            
+            // Log the action
+            error_log("Theme Admin Activity: theme_deactivated - Theme ID: {$themeId}");
+            
+            if ($result['success']) {
+                $this->success('Theme deactivated successfully', $result);
+            } else {
+                $this->error($result['message']);
+            }
+        } catch (Exception $e) {
+            error_log("Theme Deactivation Error: " . $e->getMessage());
+            $this->error('Deactivation failed: ' . $e->getMessage());
+        }
+    }
+
+    public function delete()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('/admin/themes');
+            return;
+        }
+
+        try {
+            if (!isset($_POST['theme_id'])) {
+                $this->error('Theme ID required');
+                return;
+            }
+
+            $themeId = intval($_POST['theme_id']);
+            $createBackup = isset($_POST['create_backup']) ? (bool)$_POST['create_backup'] : true;
+            $result = $this->themeManager->deleteTheme($themeId, $createBackup);
+            
+            // Log the action
+            $action = $createBackup ? 'theme_deleted_with_backup' : 'theme_deleted';
+            error_log("Theme Admin Activity: {$action} - Theme ID: {$themeId}");
+            
+            if ($result['success']) {
+                $this->success('Theme deleted successfully', $result);
+            } else {
+                $this->error($result['message']);
+            }
+        } catch (Exception $e) {
+            error_log("Theme Deletion Error: " . $e->getMessage());
+            $this->error('Deletion failed: ' . $e->getMessage());
+        }
+    }
+
+    public function restore()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('/admin/themes');
+            return;
+        }
+
+        try {
+            if (!isset($_POST['theme_id'])) {
+                $this->error('Theme ID required');
+                return;
+            }
+
+            $themeId = intval($_POST['theme_id']);
+            $result = $this->themeManager->restoreTheme($themeId);
+            
+            // Log the action
+            error_log("Theme Admin Activity: theme_restored - Theme ID: {$themeId}");
+            
+            if ($result['success']) {
+                $this->success('Theme restored successfully', $result);
+            } else {
+                $this->error($result['message']);
+            }
+        } catch (Exception $e) {
+            error_log("Theme Restoration Error: " . $e->getMessage());
+            $this->error('Restoration failed: ' . $e->getMessage());
+        }
+    }
+
+    public function hardDelete()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('/admin/themes');
+            return;
+        }
+
+        try {
+            if (!isset($_POST['theme_id'])) {
+                $this->error('Theme ID required');
+                return;
+            }
+
+            $themeId = intval($_POST['theme_id']);
+            $result = $this->themeManager->hardDeleteTheme($themeId);
+            
+            // Log the action
+            error_log("Theme Admin Activity: theme_hard_deleted - Theme ID: {$themeId}");
+            
+            if ($result['success']) {
+                $this->success('Theme permanently deleted', $result);
+            } else {
+                $this->error($result['message']);
+            }
+        } catch (Exception $e) {
+            error_log("Theme Hard Delete Error: " . $e->getMessage());
+            $this->error('Hard deletion failed: ' . $e->getMessage());
+        }
+    }
+
+    public function upload()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('/admin/themes');
+            return;
+        }
+
+        try {
+            if (!isset($_FILES['theme_zip']) || $_FILES['theme_zip']['error'] !== UPLOAD_ERR_OK) {
+                $this->error('No file uploaded or upload error');
+                return;
+            }
+
+            $uploadedFile = $_FILES['theme_zip']['tmp_name'];
+            $result = $this->themeManager->installThemeFromZip($uploadedFile);
+            
+            // Log the action
+            if ($result['success']) {
+                error_log("Theme Admin Activity: theme_uploaded - Theme: " . ($result['theme_name'] ?? 'Unknown'));
+                $this->success('Theme uploaded successfully', $result);
+            } else {
+                $this->error($result['message']);
+            }
+        } catch (Exception $e) {
+            error_log("Theme Upload Error: " . $e->getMessage());
+            $this->error('Upload failed: ' . $e->getMessage());
+        }
+    }
+
+    public function validate()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('/admin/themes');
+            return;
+        }
+
+        try {
+            if (!isset($_POST['theme_name'])) {
+                $this->error('Theme name required');
+                return;
+            }
+
+            $themeName = $_POST['theme_name'];
+            $result = $this->themeManager->validateTheme($themeName);
+            
+            $this->success('Validation completed', $result);
+        } catch (Exception $e) {
+            error_log("Theme Validation Error: " . $e->getMessage());
+            $this->error('Validation failed: ' . $e->getMessage());
+        }
+    }
+
+    public function search()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('/admin/themes');
+            return;
+        }
+
+        try {
+            $query = $_GET['q'] ?? '';
+            $limit = intval($_GET['limit'] ?? 20);
+            
+            $themes = $this->themeManager->searchThemes($query, $limit);
+            
+            $this->success('Search completed', ['themes' => $themes]);
+        } catch (Exception $e) {
+            error_log("Theme Search Error: " . $e->getMessage());
+            $this->error('Search failed: ' . $e->getMessage());
+        }
+    }
+
+    public function backups()
+    {
+        try {
+            $themeId = $_GET['theme_id'] ?? null;
+            $backups = $this->themeManager->getThemeBackups($themeId);
+            
+            $data = [
+                'currentPage' => 'theme-backups',
+                'backups' => $backups,
+                'title' => 'Theme Backups - Admin Panel'
+            ];
+            
+            $this->adminView('admin/themes/backups', $data);
+        } catch (Exception $e) {
+            error_log("Theme Backups Error: " . $e->getMessage());
+            $this->adminView('admin/themes/backups', [
+                'error' => 'Failed to load backups: ' . $e->getMessage(),
+                'title' => 'Theme Backups - Admin Panel'
+            ]);
+        }
+    }
+
+    public function bulkAction()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('/admin/themes');
+            return;
+        }
+
+        try {
+            if (!isset($_POST['action']) || !isset($_POST['theme_ids'])) {
+                $this->error('Action and theme IDs required');
+                return;
+            }
+
+            $action = $_POST['action'];
+            $themeIds = array_map('intval', $_POST['theme_ids']);
+            $results = [];
+
+            foreach ($themeIds as $themeId) {
+                switch ($action) {
+                    case 'activate':
+                        $result = $this->themeManager->activateTheme($themeId);
+                        break;
+                    case 'deactivate':
+                        $result = $this->themeManager->deactivateTheme($themeId);
+                        break;
+                    case 'delete':
+                        $createBackup = isset($_POST['create_backup']);
+                        $result = $this->themeManager->deleteTheme($themeId, $createBackup);
+                        break;
+                    default:
+                        $result = ['success' => false, 'message' => 'Invalid action'];
+                }
+                $results[] = $result;
+            }
+
+            // Log the bulk action
+            error_log("Theme Admin Activity: bulk_theme_action - Action: {$action}, Count: " . count($themeIds));
+            
+            $this->success("Bulk action '{$action}' completed", [
+                'results' => $results
+            ]);
+        } catch (Exception $e) {
+            error_log("Theme Bulk Action Error: " . $e->getMessage());
+            $this->error('Bulk action failed: ' . $e->getMessage());
+        }
+    }
+
+    private function getActiveThemeData()
+    {
+        try {
+            $themes = $this->themeManager->getAllThemes('active');
+            return $themes[0] ?? null;
+        } catch (Exception $e) {
+            error_log("Get Active Theme Error: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    private function isAjax()
+    {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+               strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 }
 ?>

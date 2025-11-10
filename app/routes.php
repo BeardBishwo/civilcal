@@ -111,6 +111,38 @@ $router->add('POST', '/admin/themes/activate/{slug}', 'Admin\ThemeController@act
 $router->add('POST', '/admin/themes/delete/{slug}', 'Admin\ThemeController@delete', ['auth', 'admin']);
 $router->add('GET', '/admin/themes/details/{slug}', 'Admin\ThemeController@details', ['auth', 'admin']);
 
+// Premium Theme Management Routes
+$router->add('GET', '/admin/premium-themes', 'Admin\PremiumThemeController@index', ['auth', 'admin']);
+$router->add('GET', '/admin/premium-themes/create', 'Admin\PremiumThemeController@create', ['auth', 'admin']);
+$router->add('POST', '/admin/premium-themes', 'Admin\PremiumThemeController@store', ['auth', 'admin']);
+$router->add('GET', '/admin/premium-themes/{id}', 'Admin\PremiumThemeController@show', ['auth', 'admin']);
+$router->add('GET', '/admin/premium-themes/{id}/edit', 'Admin\PremiumThemeController@edit', ['auth', 'admin']);
+$router->add('PUT', '/admin/premium-themes/{id}', 'Admin\PremiumThemeController@update', ['auth', 'admin']);
+$router->add('DELETE', '/admin/premium-themes/{id}', 'Admin\PremiumThemeController@destroy', ['auth', 'admin']);
+$router->add('POST', '/admin/premium-themes/{id}/activate', 'Admin\PremiumThemeController@activate', ['auth', 'admin']);
+$router->add('POST', '/admin/premium-themes/{id}/deactivate', 'Admin\PremiumThemeController@deactivate', ['auth', 'admin']);
+$router->add('POST', '/admin/premium-themes/validate-license', 'Admin\PremiumThemeController@validateLicense', ['auth', 'admin']);
+$router->add('POST', '/admin/premium-themes/install', 'Admin\PremiumThemeController@installTheme', ['auth', 'admin']);
+$router->add('POST', '/admin/premium-themes/{id}/settings', 'Admin\PremiumThemeController@updateSettings', ['auth', 'admin']);
+$router->add('GET', '/admin/premium-themes/{id}/settings', 'Admin\PremiumThemeController@settings', ['auth', 'admin']);
+$router->add('GET', '/admin/premium-themes/{id}/analytics', 'Admin\PremiumThemeController@analytics', ['auth', 'admin']);
+$router->add('GET', '/admin/premium-themes/{id}/customize', 'Admin\PremiumThemeController@customize', ['auth', 'admin']);
+$router->add('POST', '/admin/premium-themes/{id}/customize', 'Admin\PremiumThemeController@updateCustomization', ['auth', 'admin']);
+$router->add('GET', '/admin/premium-themes/{id}/preview', 'Admin\PremiumThemeController@preview', ['auth', 'admin']);
+$router->add('POST', '/admin/premium-themes/upload-zip', 'Admin\PremiumThemeController@uploadZip', ['auth', 'admin']);
+$router->add('GET', '/admin/premium-themes/marketplace', 'Admin\PremiumThemeController@marketplace', ['auth', 'admin']);
+$router->add('GET', '/admin/premium-themes/export/{id}', 'Admin\PremiumThemeController@export', ['auth', 'admin']);
+
+// API Routes for Premium Themes
+$router->add('GET', '/api/premium-themes/active', 'ApiController@getActivePremiumTheme');
+$router->add('GET', '/api/premium-themes/settings', 'ApiController@getPremiumThemeSettings');
+$router->add('POST', '/api/premium-themes/settings', 'ApiController@updatePremiumThemeSettings');
+$router->add('GET', '/api/premium-themes/custom-css', 'ApiController@getCustomCSS');
+$router->add('POST', '/api/premium-themes/custom-css', 'ApiController@updateCustomCSS');
+$router->add('POST', '/api/premium-themes/toggle-dark-mode', 'ApiController@toggleDarkMode');
+$router->add('POST', '/api/premium-themes/change-skin', 'ApiController@changeCalculatorSkin');
+$router->add('GET', '/api/premium-themes/preview/{id}', 'ApiController@previewPremiumTheme');
+
 // History Management Routes
 $router->add('GET', '/history', 'HistoryController@index', ['auth']);
 $router->add('GET', '/history/search', 'HistoryController@search', ['auth']);

@@ -1,19 +1,18 @@
 # Bishwo Calculator - Project Structure Report
 
-**Generated:** 2025-11-08 12:44:57
+**Generated:** 2025-11-10 07:43:02
 
 ## Project Structure
 
 ```
 bishwo_calculator/
+├── .env
 ├── .env.example
 ├── .env.production
 ├── .git
 ├── .htaccess
+├── PROCALCULATOR_COMPLETION_REPORT.md
 ├── README.md
-├── TH.md
-├── admin
-├── admin_panel_todo.md
 ├── app
 │   ├── Calculators
 │   │   ├── BaseCalculator.php
@@ -43,6 +42,7 @@ bishwo_calculator/
 │   │   ├── ExportController.php
 │   │   ├── HistoryController.php
 │   │   ├── HomeController.php
+│   │   ├── PaymentController.php
 │   │   ├── ProfileController.php
 │   │   ├── ShareController.php
 │   │   ├── UserController.php
@@ -59,6 +59,8 @@ bishwo_calculator/
 │   │   ├── Session.php
 │   │   ├── Validator.php
 │   │   └── View.php
+│   ├── Libraries
+│   │   └── PayTMLibrary.php
 │   ├── Middleware
 │   │   ├── AdminMiddleware.php
 │   │   ├── AuthMiddleware.php
@@ -76,6 +78,7 @@ bishwo_calculator/
 │   │   ├── Settings.php
 │   │   ├── Share.php
 │   │   ├── Subscription.php
+│   │   ├── Theme.php
 │   │   ├── User.php
 │   │   └── Vote.php
 │   ├── Services
@@ -123,16 +126,6 @@ bishwo_calculator/
 │   │   │   ├── login.php
 │   │   │   └── register.php
 │   │   ├── calculators
-│   │   │   ├── civil
-│   │   │   ├── electrical
-│   │   │   ├── estimation
-│   │   │   ├── fire
-│   │   │   ├── hvac
-│   │   │   ├── mep
-│   │   │   ├── plumbing
-│   │   │   ├── project-management
-│   │   │   ├── site
-│   │   │   ├── structural
 │   │   │   └── traditional-units.php
 │   │   ├── layouts
 │   │   │   ├── admin.php
@@ -142,6 +135,11 @@ bishwo_calculator/
 │   │   │   ├── footer.php
 │   │   │   ├── header.php
 │   │   │   └── navigation.php
+│   │   ├── payment
+│   │   │   ├── checkout.php
+│   │   │   ├── esewa-form.php
+│   │   │   ├── failed.php
+│   │   │   └── success.php
 │   │   ├── share
 │   │   │   └── public-view.php
 │   │   └── user
@@ -155,12 +153,12 @@ bishwo_calculator/
 │   │   └── TraditionalUnitsWidget.php
 │   ├── bootstrap.php
 │   └── routes.php
-├── complete_admin_todo.md
 ├── composer.json
 ├── composer.lock
 ├── config
 │   ├── app.php
 │   ├── database.php
+│   ├── installed.lock
 │   ├── mail.php
 │   └── services.php
 ├── database
@@ -180,23 +178,23 @@ bishwo_calculator/
 │   │   ├── 014_create_email_threads_table.php
 │   │   ├── 015_create_email_responses_table.php
 │   │   ├── 016_create_email_templates_table.php
-│   │   └── 018_create_complete_system_tables.php
-│   └── run_migration.php
+│   │   ├── 018_create_complete_system_tables.php
+│   │   └── add_themes_table.php
+│   ├── run_migration.php
+│   ├── setup_db.php
+│   ├── test_theme_activation.php
+│   └── verify_themes.php
 ├── debug
 │   ├── debug-config.php
 │   ├── error-handler.php
-│   ├── log-view
+│   ├── log-view.php
 │   ├── logger.php
-│   ├── logs
-│   │   ├── access.log
-│   │   ├── debug.log
-│   │   ├── error.log
-│   │   └── system.log
-│   └── temp
-├── debug_plan.md
+│   └── logs
+│       ├── access.log
+│       ├── debug.log
+│       ├── error.log
+│       └── system.log
 ├── deploy.sh
-├── final_admin_implementation.md
-├── implementation_todo.md
 ├── includes
 │   ├── BackupManager.php
 │   ├── ComplianceConfig.php
@@ -221,19 +219,50 @@ bishwo_calculator/
 │   └── test-footer.php
 ├── index.php
 ├── install
+│   ├── ajax
+│   │   └── test-email.php
 │   ├── assets
 │   │   ├── css
 │   │   │   └── install.css
 │   │   ├── images
-│   │   │   └── README.md
+│   │   │   └── banner.jpg
 │   │   └── js
 │   │       └── install.js
-│   ├── cleanup.php
 │   ├── includes
 │   │   ├── Installer.php
-│   │   └── Requirements.php
+│   │   ├── Requirements.php
+│   │   └── migration_compat.php
 │   └── index.php
-├── install_todo.md
+├── md_files
+│   ├── 404_ERROR_COMPLETE_RESOLUTION.md
+│   ├── 404_SOLUTION_GUIDE.md
+│   ├── COMPREHENSIVE_MVC_DEBUG_REPORT.md
+│   ├── FINAL_404_RESOLUTION.md
+│   ├── FINAL_ACCESS_IN.md
+│   ├── FINAL_COMPREHENSIVE_SOLUTION.md
+│   ├── FINAL_VERIFICATION.md
+│   ├── IMPLEMENTATION_SUMMARY.md
+│   ├── INSTALLATION
+│   ├── TH.md
+│   ├── admin_panel_todo.md
+│   ├── admin_plan.md
+│   ├── complete_admin_todo.md
+│   ├── comprehensive_mvc_testing_todo.md
+│   ├── database_fix_summary.md
+│   ├── database_fix_todo.md
+│   ├── debug_plan.md
+│   ├── final_admin_implementation.md
+│   ├── implementation_todo.md
+│   ├── index_fix_verification.md
+│   ├── install_system_completion_summary.md
+│   ├── install_todo.md
+│   ├── laragon_installation_guide.md
+│   ├── mvc_structure.md
+│   ├── premium_theme_integration_todo.md
+│   ├── production_.md
+│   ├── production_implementation.md
+│   ├── saas_idea.md
+│   └── structurereport.md
 ├── modules
 │   ├── civil
 │   │   ├── brickwork
@@ -249,8 +278,6 @@ bishwo_calculator/
 │   │   │   ├── cut-and-fill-volume.php
 │   │   │   ├── excavation-volume.php
 │   │   │   └── slope-calculation.php
-│   │   ├── resources
-│   │   │   └── css
 │   │   └── structural
 │   │       ├── beam-load-capacity.php
 │   │       ├── column-design.php
@@ -386,7 +413,6 @@ bishwo_calculator/
 │   │       ├── enthalpy.php
 │   │       └── sensible-heat-ratio.php
 │   ├── m
-│   ├── management
 │   ├── mep
 │   │   ├── bootstrap.php
 │   │   ├── coordination
@@ -656,15 +682,11 @@ bishwo_calculator/
 │           ├── steel-base-plate.php
 │           ├── steel-beam-design.php
 │           └── steel-truss-analysis.php
-├── mvc_structure.md
 ├── plugins
-│   ├── calculator-plugins
-│   │   ├── advanced-steel
-│   │   └── green-building-tools
-│   │       └── plugin.json
-│   └── theme-plugins
-├── production_.md
-├── production_implementation.md
+│   └── calculator-plugins
+│       ├── advanced-steel
+│       └── green-building-tools
+│           └── plugin.json
 ├── public
 │   ├── .htaccess
 │   ├── assets
@@ -675,15 +697,12 @@ bishwo_calculator/
 │   │   │   ├── main.css
 │   │   │   ├── share.css
 │   │   │   └── widgets.css
-│   │   ├── images
-│   │   ├── js
-│   │   │   ├── exports.js
-│   │   │   ├── history.js
-│   │   │   ├── profile.js
-│   │   │   └── share.js
-│   │   └── uploads
+│   │   └── js
+│   │       ├── exports.js
+│   │       ├── history.js
+│   │       ├── profile.js
+│   │       └── share.js
 │   └── index.php
-├── saas_idea.md
 ├── storage
 │   ├── app
 │   │   ├── GeoLite2-City.mmdb
@@ -694,101 +713,80 @@ bishwo_calculator/
 │   │   ├── tmp
 │   │   │   └── index.html
 │   │   └── wpplugin.php
-│   ├── backups
-│   ├── cache
-│   ├── logs
-│   └── sessions
-├── structurereport.md
+│   └── install.lock
 ├── tests
-│   ├── Feature
-│   ├── Unit
+│   ├── admin-creation-debug.php
 │   ├── basic_test.php
+│   ├── civil_module_test.html
 │   ├── clean_project_structure.php
+│   ├── cleanup.php
 │   ├── comprehensive_functional_test.php
+│   ├── comprehensive_installation_test.php
+│   ├── correct_access_urls.html
+│   ├── database-save-verification.php
+│   ├── database_operations_test.php
+│   ├── debug_full_index.php
+│   ├── debug_index.php
+│   ├── debug_installation.php
+│   ├── debug_router.php
+│   ├── debug_routing.php
+│   ├── debug_url.php
+│   ├── email-test-verification.php
+│   ├── email_system_test.php
+│   ├── emergency_access.php
+│   ├── file_system_test.php
+│   ├── final_premium_test.html
+│   ├── fix_database_config.php
 │   ├── geolocation_traditional_units_test.php
+│   ├── homepage_test.html
+│   ├── index_final.php
+│   ├── index_fixed.php
+│   ├── index_simple.php
+│   ├── index_working.php
+│   ├── install-test.html
+│   ├── install_test_installation.php
+│   ├── install_test_output.html
+│   ├── installation_system_test.php
+│   ├── laragon_setup.html
+│   ├── laragon_setup_helper.php
+│   ├── mvc_comprehensive_test.php
+│   ├── oindex.php
+│   ├── payment_system_test.php
+│   ├── payment_verification_test.php
+│   ├── premium_theme_integration_test.php
+│   ├── quick_payment_test.php
+│   ├── router_detailed_test.php
+│   ├── run_all_tests.php
 │   ├── run_tests.php
-│   └── saas_system_test.php
+│   ├── saas_system_test.php
+│   ├── simple_db_test.php
+│   ├── simple_test.php
+│   ├── test
+│   ├── test-installation.php
+│   ├── test.php
+│   ├── test_app.php
+│   ├── test_app_functionality.php
+│   ├── test_database.php
+│   ├── test_database_config.php
+│   ├── test_database_connection.php
+│   ├── test_database_isolated.php
+│   ├── test_direct.php
+│   ├── test_homecontroller_execution.php
+│   ├── test_installation.php
+│   ├── test_premium.html
+│   ├── test_premium_theme.php
+│   ├── test_production_router.php
+│   ├── test_route_matching.php
+│   ├── test_router_global.php
+│   ├── test_routes_loading.php
+│   ├── test_simple_homecontroller.php
+│   ├── test_solution.html
+│   ├── test_system.php
+│   ├── test_theme_routing.php
+│   └── verify_database.php
+├── theme.md
 ├── themes
-│   ├── default
-│   │   ├── assets
-│   │   │   ├── css
-│   │   │   │   ├── back-to-top.css
-│   │   │   │   ├── civil.css
-│   │   │   │   ├── electrical.css
-│   │   │   │   ├── estimation.css
-│   │   │   │   ├── fire.css
-│   │   │   │   ├── footer.css
-│   │   │   │   ├── header.css
-│   │   │   │   ├── home.css
-│   │   │   │   ├── hvac.css
-│   │   │   │   ├── management.css
-│   │   │   │   ├── mep.css
-│   │   │   │   ├── plumbing.css
-│   │   │   │   ├── responsive.css
-│   │   │   │   ├── site.css
-│   │   │   │   ├── structural.css
-│   │   │   │   └── theme.css
-│   │   │   ├── images
-│   │   │   │   ├── applogo.png
-│   │   │   │   ├── banner.jpg
-│   │   │   │   ├── favicon.png
-│   │   │   │   └── profile.png
-│   │   │   ├── js
-│   │   │   │   ├── auth.js
-│   │   │   │   ├── back-to-top.js
-│   │   │   │   ├── header.js
-│   │   │   │   ├── home.js
-│   │   │   │   ├── main.js
-│   │   │   │   └── theme.js
-│   │   │   └── uploads
-│   │   ├── helpers.php
-│   │   ├── theme.json
-│   │   └── views
-│   │       ├── 403.php
-│   │       ├── 404.php
-│   │       ├── 500.php
-│   │       ├── civil
-│   │       │   └── index.php
-│   │       ├── electrical
-│   │       │   └── index.php
-│   │       ├── index.php
-│   │       ├── layouts
-│   │       │   ├── admin.php
-│   │       │   ├── auth.php
-│   │       │   ├── login.php
-│   │       │   ├── logout.php
-│   │       │   ├── main.php
-│   │       │   ├── register.php
-│   │       │   ├── reset.php
-│   │       │   └── verify.php
-│   │       ├── pages
-│   │       │   └── auth
-│   │       │       ├── forgot-password.php
-│   │       │       ├── login.php
-│   │       │       └── register.php
-│   │       └── partials
-│   │           ├── civil.php
-│   │           ├── electrical.php
-│   │           ├── estimation.php
-│   │           ├── fire.php
-│   │           ├── footer.php
-│   │           ├── header.php
-│   │           ├── hvac.php
-│   │           ├── index.php
-│   │           ├── management.php
-│   │           ├── mep.php
-│   │           ├── plumbing.php
-│   │           ├── site.php
-│   │           └── structural.php
-│   └── professional
-│       ├── assets
-│       │   ├── css
-│       │   ├── images
-│       │   └── js
-│       ├── theme.json
-│       └── views
-│           └── layouts
-│               └── main.php
+│   ├── premium(no theme)
 ├── vendor
 └── version.json
 ```
@@ -833,9 +831,9 @@ vendor{
 
 ## Statistics
 
-- **Total Files:** 607
-- **Total Directories:** 178
-- **Total Items:** 785
+- **Total Files:** 718
+- **Total Directories:** 162
+- **Total Items:** 880
 - **Excludes:** vendor/ folder
 
 ---
