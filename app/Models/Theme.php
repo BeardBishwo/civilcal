@@ -1,11 +1,11 @@
 <?php
 /**
- * Theme Model
+ * Theme Model - FIXED VERSION
  * 
  * Handles all database operations for theme management
  * 
  * @package App\Models
- * @version 1.0.0
+ * @version 1.0.1
  * @author Bishwo Calculator Team
  */
 
@@ -21,9 +21,17 @@ class Theme
     
     public function __construct()
     {
-        // Use the Database singleton for consistent connection handling
-        $database = \App\Core\Database::getInstance();
-        $this->db = $database->getPdo();
+        // Include the database configuration
+        require_once __DIR__ . '/../../includes/config.php';
+        require_once __DIR__ . '/../../includes/db.php';
+        
+        // Get database connection using the global get_db() function
+        $this->db = get_db();
+        
+        // If database connection failed, log the error
+        if (!$this->db) {
+            error_log("Theme Model Error: Failed to establish database connection");
+        }
     }
     
     /**
@@ -66,10 +74,10 @@ class Theme
             $stmt->execute();
             $themes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
-            // Decode JSON fields
+            // Decode JSON fields with null checks
             foreach ($themes as &$theme) {
-                $theme['config'] = json_decode($theme['config_json'], true);
-                $theme['settings'] = json_decode($theme['settings_json'], true);
+                $theme['config'] = $theme['config_json'] ? json_decode($theme['config_json'], true) : [];
+                $theme['settings'] = $theme['settings_json'] ? json_decode($theme['settings_json'], true) : [];
                 unset($theme['config_json'], $theme['settings_json']);
             }
             
@@ -93,8 +101,8 @@ class Theme
             
             $theme = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($theme) {
-                $theme['config'] = json_decode($theme['config_json'], true);
-                $theme['settings'] = json_decode($theme['settings_json'], true);
+                $theme['config'] = $theme['config_json'] ? json_decode($theme['config_json'], true) : [];
+                $theme['settings'] = $theme['settings_json'] ? json_decode($theme['settings_json'], true) : [];
                 unset($theme['config_json'], $theme['settings_json']);
             }
             
@@ -118,8 +126,8 @@ class Theme
             
             $theme = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($theme) {
-                $theme['config'] = json_decode($theme['config_json'], true);
-                $theme['settings'] = json_decode($theme['settings_json'], true);
+                $theme['config'] = $theme['config_json'] ? json_decode($theme['config_json'], true) : [];
+                $theme['settings'] = $theme['settings_json'] ? json_decode($theme['settings_json'], true) : [];
                 unset($theme['config_json'], $theme['settings_json']);
             }
             
@@ -142,8 +150,8 @@ class Theme
             
             $theme = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($theme) {
-                $theme['config'] = json_decode($theme['config_json'], true);
-                $theme['settings'] = json_decode($theme['settings_json'], true);
+                $theme['config'] = $theme['config_json'] ? json_decode($theme['config_json'], true) : [];
+                $theme['settings'] = $theme['settings_json'] ? json_decode($theme['settings_json'], true) : [];
                 unset($theme['config_json'], $theme['settings_json']);
             }
             
@@ -389,10 +397,10 @@ class Theme
             
             $themes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
-            // Decode JSON fields
+            // Decode JSON fields with null checks
             foreach ($themes as &$theme) {
-                $theme['config'] = json_decode($theme['config_json'], true);
-                $theme['settings'] = json_decode($theme['settings_json'], true);
+                $theme['config'] = $theme['config_json'] ? json_decode($theme['config_json'], true) : [];
+                $theme['settings'] = $theme['settings_json'] ? json_decode($theme['settings_json'], true) : [];
                 unset($theme['config_json'], $theme['settings_json']);
             }
             
@@ -455,7 +463,7 @@ class Theme
             
             return file_put_contents($filepath, json_encode($backupData, JSON_PRETTY_PRINT)) !== false;
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Theme Model Error (createBackup): " . $e->getMessage());
             return false;
         }
@@ -496,7 +504,7 @@ class Theme
             
             return $backups;
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Theme Model Error (getBackups): " . $e->getMessage());
             return [];
         }

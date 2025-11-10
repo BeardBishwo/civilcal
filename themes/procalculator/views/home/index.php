@@ -20,7 +20,8 @@ $testimonials = $testimonials ?? [];
     <meta name="description" content="Professional engineering calculators with $100K premium quality. Advanced glassmorphism design with comprehensive calculation tools.">
     
     <!-- ProCalculator Premium CSS -->
-    <link rel="stylesheet" href="<?= $this->themeUrl('assets/css/procalculator-premium.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/procalculator-premium.css') ?>">
+
     
     <!-- Premium Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,7 +33,8 @@ $testimonials = $testimonials ?? [];
 </head>
 <body class="procalculator-home">
     <!-- Navigation Header -->
-    <?php $this->partial('partials/header', compact('user')); ?>
+    <?php $viewHelper->partial('partials/header', compact('user')); ?>
+
     
     <!-- Hero Section -->
     <section class="hero-section">
@@ -267,10 +269,11 @@ $testimonials = $testimonials ?? [];
     </section>
     
     <!-- Footer -->
-    <?php $this->partial('partials/footer'); ?>
+    <?php $viewHelper->partial('partials/footer'); ?>
     
     <!-- ProCalculator Core JavaScript -->
-    <script src="<?= $this->themeUrl('assets/js/procalculator-core.js') ?>"></script>
+    <script src="<?= $viewHelper->themeUrl('assets/js/procalculator-core.js') ?>"></script>
+
     
     <!-- Initialize Premium Features -->
     <script>

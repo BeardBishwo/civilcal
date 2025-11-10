@@ -14,38 +14,49 @@ class HomeController extends Controller
         $featuredCalculators = $this->getFeaturedCalculators();
         $testimonials = $this->getTestimonials();
         
-        $this->view('home/index', [
+        // Make the View object available in templates
+        $data = [
             'user' => $user,
             'isNepal' => $isNepal,
             'stats' => $stats,
             'featuredCalculators' => $featuredCalculators,
-            'testimonials' => $testimonials
-        ]);
+            'testimonials' => $testimonials,
+            'viewHelper' => $this->view // Pass View object to templates
+        ];
+        
+        $this->view->render('home/index', $data);
     }
+
     
     public function features()
     {
-        $this->view('home/features', [
-            'user' => null
+        $this->view->render('home/features', [
+            'user' => null,
+            'viewHelper' => $this->view
         ]);
     }
+
     
     public function pricing()
     {
         $plans = $this->getPricingPlans();
         
-        $this->view('home/pricing', [
+        $this->view->render('home/pricing', [
             'user' => null,
-            'plans' => $plans
+            'plans' => $plans,
+            'viewHelper' => $this->view
         ]);
     }
+
     
     public function about()
     {
-        $this->view('home/about', [
-            'user' => null
+        $this->view->render('home/about', [
+            'user' => null,
+            'viewHelper' => $this->view
         ]);
     }
+
     
     public function contact()
     {
@@ -55,10 +66,12 @@ class HomeController extends Controller
             return;
         }
         
-        $this->view('home/contact', [
-            'user' => null
+        $this->view->render('home/contact', [
+            'user' => null,
+            'viewHelper' => $this->view
         ]);
     }
+
     
     private function getSystemStats()
     {

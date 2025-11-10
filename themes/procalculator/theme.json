@@ -48,33 +48,32 @@
         "weights": [300, 400, 500, 600, 700, 800, 900]
     },
     "styles": [
-        "css/procalculator-premium.css",
-        "css/glassmorphism.css",
-        "css/animations.css",
-        "css/responsive.css",
-        "css/auth.css",
-        "css/components.css",
-        "css/dashboard.css"
-    ],
-    "scripts": [
-        "js/procalculator-core.js",
-        "js/auth-enhanced.js",
-        "js/animations.js",
-        "js/dashboard.js",
-        "js/glassmorphism.js"
+        "assets/css/procalculator/procalculator",
+        "assets/css/animations.css",
+        "assets/css/responsive.css",
+        "assets/css/auth.css",
+        "assets/css/components.css",
+        "assets/css/dashboard.css"
     ],
     "category_styles": {
-        "civil": "css/civil-premium.css",
-        "electrical": "css/electrical-premium.css",
-        "plumbing": "css/plumbing-premium.css",
-        "hvac": "css/hvac-premium.css",
-        "fire": "css/fire-premium.css",
-        "structural": "css/structural-premium.css",
-        "site": "css/site-premium.css",
-        "estimation": "css/estimation-premium.css",
-        "management": "css/management-premium.css",
-        "mep": "css/mep-premium.css"
+        "civil": "assets/css/procalculator/civil",
+        "electrical": "assets/css/procalculator/electrical",
+        "plumbing": "assets/css/procalculator/plumbing",
+        "hvac": "assets/css/procalculator/hvac",
+        "fire": "assets/css/procalculator/fire",
+        "structural": "assets/css/procalculator/structural",
+        "site": "assets/css/procalculator/site",
+        "estimation": "assets/css/procalculator/estimation",
+        "management": "assets/css/procalculator/management",
+        "mep": "assets/css/procalculator/mep"
     },
+    "scripts": [
+        "assets/js/procalculator-core.js",
+        "assets/js/auth-enhanced.js",
+        "assets/js/animations.js",
+        "assets/js/dashboard.js",
+        "assets/js/glassmorphism.js"
+    ],
     "features": {
         "dark_mode": true,
         "glassmorphism": true,

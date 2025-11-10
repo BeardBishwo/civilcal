@@ -1,640 +1,604 @@
-/* ProCalculator Premium Theme - Main CSS */
+/* ProCalculator Premium Theme - Main Stylesheet */
 
 
-/* Ultra-Premium $100,000 Quality Styling */
-
-
-/* Import Google Fonts */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
-
-/* CSS Variables for ProCalculator Theme */
+/* $100K Quality Glassmorphism Design */
 
 :root {
-    /* Premium Color Palette */
-    --pc-primary: #1a1a2e;
-    --pc-secondary: #16213e;
-    --pc-accent: #0f4c75;
-    --pc-premium: #3f72af;
-    --pc-gold: #f093fb;
-    --pc-platinum: #667eea;
-    --pc-background: #0f0f23;
-    --pc-surface: #1a1a2e;
-    --pc-glass: rgba(255, 255, 255, 0.05);
-    --pc-glass-border: rgba(255, 255, 255, 0.1);
-    --pc-text: #ffffff;
-    --pc-text-secondary: #b8c6db;
-    --pc-success: #10b981;
-    --pc-warning: #f59e0b;
-    --pc-error: #ef4444;
-    --pc-info: #3b82f6;
-    /* Premium Gradients */
-    --pc-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --pc-gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --pc-gradient-hero: linear-gradient(135deg, #0f4c75 0%, #1a1a2e 50%, #16213e 100%);
-    --pc-gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-    --pc-gradient-premium: linear-gradient(135deg, #f093fb 0%, #667eea 50%, #764ba2 100%);
-    --pc-gradient-dark: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-    /* Typography */
-    --pc-font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --pc-font-secondary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --pc-font-mono: 'JetBrains Mono', Consolas, monospace;
-    /* Spacing */
-    --pc-spacing-xs: 0.25rem;
-    --pc-spacing-sm: 0.5rem;
-    --pc-spacing-md: 1rem;
-    --pc-spacing-lg: 1.5rem;
-    --pc-spacing-xl: 2rem;
-    --pc-spacing-2xl: 3rem;
-    --pc-spacing-3xl: 4rem;
-    /* Border Radius */
-    --pc-radius-sm: 8px;
-    --pc-radius-md: 12px;
-    --pc-radius-lg: 16px;
-    --pc-radius-xl: 20px;
-    --pc-radius-2xl: 24px;
-    /* Shadows */
-    --pc-shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-    --pc-shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-    --pc-shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-    --pc-shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-    --pc-shadow-premium: 0 35px 60px -12px rgba(103, 126, 234, 0.3);
-    --pc-shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    /* Animations */
-    --pc-transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --pc-transition-normal: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    --pc-transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Colors */
+    --primary: #1a1a2e;
+    --secondary: #16213e;
+    --accent: #0f4c75;
+    --premium: #3f72af;
+    --gold: #f093fb;
+    --platinum: #667eea;
+    --background: #0f0f23;
+    --surface: #1a1a2e;
+    --glass: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text: #ffffff;
+    --text-secondary: #b8c6db;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: #3b82f6;
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-hero: linear-gradient(135deg, #0f4c75 0%, #1a1a2e 50%, #16213e 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    --gradient-premium: linear-gradient(135deg, #f093fb 0%, #667eea 50%, #764ba2 100%);
+    --gradient-dark: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+    /* Fonts */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-secondary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', Consolas, monospace;
     /* Layout */
-    --pc-container-max-width: 1400px;
-    --pc-sidebar-width: 300px;
-    --pc-header-height: 100px;
-    --pc-footer-height: auto;
-    --pc-grid-columns: 12;
-    --pc-gutter: 1.5rem;
+    --container-max-width: 1400px;
+    --sidebar-width: 300px;
+    --header-height: 100px;
+    --footer-height: auto;
+    --grid-columns: 12;
+    --gutter: 1.5rem;
+    /* Animations */
+    --animation-duration: 0.6s;
+    --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+    --hover-scale: scale(1.02);
+    --hover-y: translateY(-5px);
+    --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    --glass-blur: blur(20px);
+    --backdrop-blur: backdrop-filter: blur(20px);
+    /* Border radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
 }
 
 
-/* Global Reset and Base Styles */
+/* Reset and base styles */
 
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 html {
     font-size: 16px;
-    scroll-behavior: smooth;
+    line-height: 1.6;
 }
 
 body {
-    font-family: var(--pc-font-primary);
-    background: var(--pc-gradient-dark);
-    color: var(--pc-text);
-    line-height: 1.6;
+    font-family: var(--font-primary);
+    background: var(--background);
+    color: var(--text);
+    background-image: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
     min-height: 100vh;
     overflow-x: hidden;
 }
 
 
-/* Premium Container */
+/* Glassmorphism effects */
 
-.pc-container {
-    max-width: var(--pc-container-max-width);
+.glass {
+    background: var(--glass);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow);
+}
+
+.glass-card {
+    background: var(--glass);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin: 1rem 0;
+    transition: all var(--animation-duration) var(--animation-easing);
+}
+
+.glass-card:hover {
+    transform: var(--hover-y);
+    box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.7);
+}
+
+
+/* Container */
+
+.container {
+    max-width: var(--container-max-width);
     margin: 0 auto;
-    padding: 0 var(--pc-gutter);
-    width: 100%;
+    padding: 0 var(--gutter);
 }
 
 
-/* Premium Grid System */
+/* Grid system */
 
-.pc-grid {
+.grid {
     display: grid;
-    grid-template-columns: repeat(var(--pc-grid-columns), 1fr);
-    gap: var(--pc-gutter);
-}
-
-.pc-grid-1 {
-    grid-template-columns: 1fr;
-}
-
-.pc-grid-2 {
-    grid-template-columns: repeat(2, 1fr);
-}
-
-.pc-grid-3 {
-    grid-template-columns: repeat(3, 1fr);
-}
-
-.pc-grid-4 {
-    grid-template-columns: repeat(4, 1fr);
-}
-
-.pc-grid-12 {
     grid-template-columns: repeat(12, 1fr);
+    gap: var(--gutter);
+    grid-auto-rows: minmax(0, auto);
+}
+
+.col-1 {
+    grid-column: span 1;
+}
+
+.col-2 {
+    grid-column: span 2;
+}
+
+.col-3 {
+    grid-column: span 3;
+}
+
+.col-4 {
+    grid-column: span 4;
+}
+
+.col-5 {
+    grid-column: span 5;
+}
+
+.col-6 {
+    grid-column: span 6;
+}
+
+.col-7 {
+    grid-column: span 7;
+}
+
+.col-8 {
+    grid-column: span 8;
+}
+
+.col-9 {
+    grid-column: span 9;
+}
+
+.col-10 {
+    grid-column: span 10;
+}
+
+.col-11 {
+    grid-column: span 11;
+}
+
+.col-12 {
+    grid-column: span 12;
 }
 
 
-/* Premium Cards */
+/* Flexbox utilities */
 
-.pc-card {
-    background: var(--pc-gradient-glass);
-    border: 1px solid var(--pc-glass-border);
-    border-radius: var(--pc-radius-lg);
-    padding: var(--pc-spacing-xl);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: var(--pc-shadow-glass);
-    transition: all var(--pc-transition-normal);
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.flex-row {
+    flex-direction: row;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.justify-around {
+    justify-content: space-around;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.items-start {
+    align-items: flex-start;
+}
+
+.items-end {
+    align-items: flex-end;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+
+/* Text utilities */
+
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-primary {
+    color: var(--primary);
+}
+
+.text-secondary {
+    color: var(--text-secondary);
+}
+
+.text-success {
+    color: var(--success);
+}
+
+.text-warning {
+    color: var(--warning);
+}
+
+.text-error {
+    color: var(--error);
+}
+
+.text-info {
+    color: var(--info);
+}
+
+.text-gold {
+    color: var(--gold);
+}
+
+.text-platinum {
+    color: var(--platinum);
+}
+
+.font-mono {
+    font-family: var(--font-mono);
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.font-medium {
+    font-weight: 500;
+}
+
+
+/* Spacing utilities */
+
+.m-0 {
+    margin: 0;
+}
+
+.mt-1 {
+    margin-top: 0.5rem;
+}
+
+.mt-2 {
+    margin-top: 1rem;
+}
+
+.mt-3 {
+    margin-top: 1.5rem;
+}
+
+.mt-4 {
+    margin-top: 2rem;
+}
+
+.mb-1 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 1rem;
+}
+
+.mb-3 {
+    margin-bottom: 1.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 2rem;
+}
+
+.ml-1 {
+    margin-left: 0.5rem;
+}
+
+.ml-2 {
+    margin-left: 1rem;
+}
+
+.mr-1 {
+    margin-right: 0.5rem;
+}
+
+.mr-2 {
+    margin-right: 1rem;
+}
+
+.p-1 {
+    padding: 0.5rem;
+}
+
+.p-2 {
+    padding: 1rem;
+}
+
+.p-3 {
+    padding: 1.5rem;
+}
+
+.p-4 {
+    padding: 2rem;
+}
+
+.px-2 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.py-2 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+
+/* Home page specific styles */
+
+.procalculator-home .hero-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     overflow: hidden;
+    background: var(--gradient-hero);
 }
 
-.pc-card::before {
-    content: '';
+.procalculator-home .hero-background {
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    height: 1px;
-    background: var(--pc-gradient-primary);
-    opacity: 0.8;
-}
-
-.pc-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: var(--pc-shadow-premium);
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
-.pc-card-premium {
-    background: var(--pc-gradient-premium);
-    border: 2px solid transparent;
-    background-clip: padding-box;
-    position: relative;
-}
-
-.pc-card-premium::before {
-    background: var(--pc-gradient-premium);
-    height: 2px;
-}
-
-
-/* Premium Buttons */
-
-.pc-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--pc-spacing-sm) var(--pc-spacing-lg);
-    border: none;
-    border-radius: var(--pc-radius-md);
-    font-family: var(--pc-font-primary);
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all var(--pc-transition-normal);
-    position: relative;
-    overflow: hidden;
-    white-space: nowrap;
-    user-select: none;
-}
-
-.pc-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left var(--pc-transition-normal);
+    pointer-events: none;
 }
 
-.pc-btn:hover::before {
-    left: 100%;
-}
-
-.pc-btn-primary {
-    background: var(--pc-gradient-primary);
-    color: white;
-    box-shadow: var(--pc-shadow-md);
-}
-
-.pc-btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--pc-shadow-premium);
-}
-
-.pc-btn-secondary {
-    background: var(--pc-gradient-secondary);
-    color: white;
-    box-shadow: var(--pc-shadow-md);
-}
-
-.pc-btn-secondary:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--pc-shadow-premium);
-}
-
-.pc-btn-glass {
-    background: var(--pc-glass);
-    color: var(--pc-text);
-    border: 1px solid var(--pc-glass-border);
-    backdrop-filter: blur(20px);
-}
-
-.pc-btn-glass:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
-.pc-btn-lg {
-    padding: var(--pc-spacing-md) var(--pc-spacing-2xl);
-    font-size: 1rem;
-    border-radius: var(--pc-radius-lg);
-}
-
-.pc-btn-sm {
-    padding: var(--pc-spacing-xs) var(--pc-spacing-md);
-    font-size: 0.75rem;
-    border-radius: var(--pc-radius-sm);
-}
-
-
-/* Premium Typography */
-
-.pc-heading {
-    font-family: var(--pc-font-primary);
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: var(--pc-spacing-lg);
-    background: var(--pc-gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.pc-heading-1 {
-    font-size: 3rem;
-}
-
-.pc-heading-2 {
-    font-size: 2.5rem;
-}
-
-.pc-heading-3 {
-    font-size: 2rem;
-}
-
-.pc-heading-4 {
-    font-size: 1.5rem;
-}
-
-.pc-heading-5 {
-    font-size: 1.25rem;
-}
-
-.pc-heading-6 {
-    font-size: 1rem;
-}
-
-.pc-text {
-    color: var(--pc-text);
-    margin-bottom: var(--pc-spacing-md);
-}
-
-.pc-text-secondary {
-    color: var(--pc-text-secondary);
-}
-
-.pc-text-gradient {
-    background: var(--pc-gradient-premium);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-
-/* Premium Forms */
-
-.pc-form-group {
-    margin-bottom: var(--pc-spacing-lg);
-}
-
-.pc-label {
-    display: block;
-    margin-bottom: var(--pc-spacing-sm);
-    font-weight: 600;
-    color: var(--pc-text);
-}
-
-.pc-input {
+.procalculator-home .floating-shapes {
+    position: absolute;
     width: 100%;
-    padding: var(--pc-spacing-md);
-    background: var(--pc-glass);
-    border: 1px solid var(--pc-glass-border);
-    border-radius: var(--pc-radius-md);
-    color: var(--pc-text);
-    font-family: var(--pc-font-primary);
-    font-size: 0.875rem;
-    transition: all var(--pc-transition-normal);
-    backdrop-filter: blur(10px);
+    height: 100%;
 }
 
-.pc-input:focus {
-    outline: none;
-    border-color: var(--pc-premium);
-    box-shadow: 0 0 0 3px rgba(103, 126, 234, 0.1), 0 0 20px rgba(103, 126, 234, 0.3);
-    background: rgba(255, 255, 255, 0.08);
+.procalculator-home .shape {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--glass);
+    animation: float 6s ease-in-out infinite;
 }
 
-.pc-input::placeholder {
-    color: var(--pc-text-secondary);
+.procalculator-home .shape-1 {
+    width: 200px;
+    height: 200px;
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
 }
 
-.pc-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'><path fill='%23ffffff' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 12px;
-    padding-right: 40px;
+.procalculator-home .shape-2 {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    right: 15%;
+    animation-delay: 2s;
 }
 
-.pc-textarea {
-    resize: vertical;
-    min-height: 120px;
+.procalculator-home .shape-3 {
+    width: 100px;
+    height: 100px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: 4s;
 }
 
+.procalculator-home .shape-4 {
+    width: 180px;
+    height: 180px;
+    top: 40%;
+    right: 30%;
+    animation-delay: 1s;
+}
 
-/* Premium Status Badges */
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    33% {
+        transform: translateY(-30px) rotate(120deg);
+    }
+    66% {
+        transform: translateY(30px) rotate(240deg);
+    }
+}
 
-.pc-badge {
+.procalculator-home .hero-content {
+    text-align: center;
+    z-index: 2;
+    position: relative;
+}
+
+.procalculator-home .hero-badge {
     display: inline-flex;
     align-items: center;
-    padding: var(--pc-spacing-xs) var(--pc-spacing-sm);
-    border-radius: var(--pc-radius-sm);
-    font-size: 0.75rem;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--glass);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: var(--backdrop-blur);
+    margin-bottom: 2rem;
+    font-size: 0.875rem;
     font-weight: 600;
+}
+
+.procalculator-home .hero-title {
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.procalculator-home .title-line {
+    display: block;
+}
+
+.procalculator-home .gradient-text {
+    background: var(--gradient-premium);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.procalculator-home .hero-description {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+}
+
+.procalculator-home .hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 4rem;
+}
+
+.procalculator-home .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all var(--animation-duration) var(--animation-easing);
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.procalculator-home .btn-primary {
+    background: var(--gradient-premium);
+    color: white;
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.procalculator-home .btn-primary:hover {
+    transform: var(--hover-y);
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+}
+
+.procalculator-home .btn-outline {
+    background: var(--glass);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: var(--backdrop-blur);
+}
+
+.procalculator-home .btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: var(--hover-y);
+}
+
+.procalculator-home .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+}
+
+.procalculator-home .stat-item {
+    text-align: center;
+}
+
+.procalculator-home .stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: var(--gradient-premium);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.procalculator-home .stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
-.pc-badge-success {
-    background: var(--pc-success);
-    color: white;
-}
 
-.pc-badge-warning {
-    background: var(--pc-warning);
-    color: white;
-}
-
-.pc-badge-error {
-    background: var(--pc-error);
-    color: white;
-}
-
-.pc-badge-info {
-    background: var(--pc-info);
-    color: white;
-}
-
-.pc-badge-premium {
-    background: var(--pc-gradient-premium);
-    color: white;
-}
-
-
-/* Loading States */
-
-.pc-loading {
-    position: relative;
-    overflow: hidden;
-}
-
-.pc-loading::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    animation: pc-shimmer 1.5s infinite;
-}
-
-@keyframes pc-shimmer {
-    0% {
-        left: -100%;
-    }
-    100% {
-        left: 100%;
-    }
-}
-
-.pc-spinner {
-    width: 24px;
-    height: 24px;
-    border: 2px solid var(--pc-glass-border);
-    border-top: 2px solid var(--pc-premium);
-    border-radius: 50%;
-    animation: pc-spin 1s linear infinite;
-}
-
-@keyframes pc-spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-
-/* Responsive Design */
-
-@media (max-width: 1024px) {
-    .pc-container {
-        padding: 0 var(--pc-spacing-md);
-    }
-    .pc-grid-4 {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .pc-grid-3 {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
+/* Responsive design */
 
 @media (max-width: 768px) {
-    .pc-heading-1 {
-        font-size: 2rem;
+    .procalculator-home .hero-title {
+        font-size: 2.5rem;
     }
-    .pc-heading-2 {
-        font-size: 1.75rem;
+    .procalculator-home .hero-actions {
+        flex-direction: column;
+        align-items: center;
     }
-    .pc-heading-3 {
-        font-size: 1.5rem;
+    .procalculator-home .hero-stats {
+        flex-wrap: wrap;
+        gap: 1.5rem;
     }
-    .pc-grid-4,
-    .pc-grid-3,
-    .pc-grid-2 {
-        grid-template-columns: 1fr;
+    .grid {
+        grid-template-columns: repeat(6, 1fr);
     }
-    .pc-card {
-        padding: var(--pc-spacing-lg);
+    .col-6 {
+        grid-column: span 6;
     }
-    .pc-sidebar {
-        transform: translateX(-100%);
-        transition: transform var(--pc-transition-normal);
+    .col-4 {
+        grid-column: span 4;
     }
-    .pc-sidebar.open {
-        transform: translateX(0);
+    .col-3 {
+        grid-column: span 3;
+    }
+    .col-2 {
+        grid-column: span 2;
+    }
+    .col-1 {
+        grid-column: span 1;
     }
 }
 
 @media (max-width: 480px) {
-    .pc-container {
-        padding: 0 var(--pc-spacing-sm);
+    .procalculator-home .hero-title {
+        font-size: 2rem;
     }
-    .pc-btn {
-        width: 100%;
-        justify-content: center;
+    .procalculator-home .hero-description {
+        font-size: 1rem;
     }
-    .pc-card {
-        padding: var(--pc-spacing-md);
+    .grid {
+        grid-template-columns: repeat(4, 1fr);
     }
-}
-
-
-/* Utility Classes */
-
-.pc-hidden {
-    display: none !important;
-}
-
-.pc-invisible {
-    visibility: hidden !important;
-}
-
-.pc-visible {
-    visibility: visible !important;
-}
-
-.pc-text-center {
-    text-align: center !important;
-}
-
-.pc-text-left {
-    text-align: left !important;
-}
-
-.pc-text-right {
-    text-align: right !important;
-}
-
-.pc-mt-auto {
-    margin-top: auto !important;
-}
-
-.pc-mb-auto {
-    margin-bottom: auto !important;
-}
-
-.pc-ml-auto {
-    margin-left: auto !important;
-}
-
-.pc-mr-auto {
-    margin-right: auto !important;
-}
-
-.pc-flex {
-    display: flex !important;
-}
-
-.pc-flex-col {
-    flex-direction: column !important;
-}
-
-.pc-flex-row {
-    flex-direction: row !important;
-}
-
-.pc-items-center {
-    align-items: center !important;
-}
-
-.pc-justify-center {
-    justify-content: center !important;
-}
-
-.pc-justify-between {
-    justify-content: space-between !important;
-}
-
-.pc-w-full {
-    width: 100% !important;
-}
-
-.pc-h-full {
-    height: 100% !important;
-}
-
-.pc-relative {
-    position: relative !important;
-}
-
-.pc-absolute {
-    position: absolute !important;
-}
-
-.pc-fixed {
-    position: fixed !important;
-}
-
-.pc-overflow-hidden {
-    overflow: hidden !important;
-}
-
-.pc-overflow-auto {
-    overflow: auto !important;
-}
-
-
-/* Premium Scrollbar */
-
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--pc-surface);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--pc-gradient-primary);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--pc-gradient-secondary);
-}
-
-
-/* Selection */
-
-::selection {
-    background: var(--pc-premium);
-    color: white;
-}
-
-::-moz-selection {
-    background: var(--pc-premium);
-    color: white;
 }

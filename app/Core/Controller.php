@@ -9,13 +9,17 @@ class Controller {
     protected $session;
     
     public function __construct() {
+        // Load configuration first
+        require_once __DIR__ . '/../../includes/config.php';
+        require_once __DIR__ . '/../../includes/db.php';
+        
         // Initialize session if not already started
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
         
-        // Initialize database connection using singleton
-        $this->db = Database::getInstance();
+        // Initialize database connection using global function
+        $this->db = get_db();
         
         // Initialize authentication
         $this->auth = new Auth();
@@ -29,6 +33,7 @@ class Controller {
         // Initialize session
         $this->session = new Session();
     }
+
 
     /**
      * Initialize theme system

@@ -1,11 +1,11 @@
 <?php
 /**
- * Enhanced Theme Manager Service with Database Integration
+ * Complete Theme Manager Service with Database Integration
  * 
- * Complete modular theme management system with CRUD operations
- * Database-driven theme management with backup and security features
+ * Enhanced modular theme management system with all required methods
+ * Database-driven theme management with view rendering capabilities
  * 
- * @version 2.0.0
+ * @version 2.0.2
  * @author Bishwo Calculator Team
  * @package App\Services
  */
@@ -204,7 +204,7 @@ class ThemeManager
                 'message' => 'Failed to create theme'
             ];
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Theme Creation Error: " . $e->getMessage());
             return [
                 'success' => false,
@@ -239,7 +239,7 @@ class ThemeManager
                 'message' => 'Failed to update theme'
             ];
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Theme Update Error: " . $e->getMessage());
             return [
                 'success' => false,
@@ -289,7 +289,7 @@ class ThemeManager
                 'message' => 'Failed to activate theme'
             ];
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Theme Activation Error: " . $e->getMessage());
             return [
                 'success' => false,
@@ -318,7 +318,7 @@ class ThemeManager
                 'message' => 'Failed to deactivate theme'
             ];
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Theme Deactivation Error: " . $e->getMessage());
             return [
                 'success' => false,
@@ -364,7 +364,7 @@ class ThemeManager
                 'message' => 'Failed to delete theme'
             ];
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Theme Deletion Error: " . $e->getMessage());
             return [
                 'success' => false,
@@ -393,7 +393,7 @@ class ThemeManager
                 'message' => 'Failed to restore theme'
             ];
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Theme Restoration Error: " . $e->getMessage());
             return [
                 'success' => false,
@@ -438,7 +438,7 @@ class ThemeManager
                 'message' => 'Failed to delete theme'
             ];
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Theme Hard Delete Error: " . $e->getMessage());
             return [
                 'success' => false,
@@ -544,7 +544,7 @@ class ThemeManager
                 'message' => 'Theme installed but database record creation failed'
             ];
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Theme Installation Error: " . $e->getMessage());
             return [
                 'success' => false,
@@ -602,7 +602,7 @@ class ThemeManager
                 'issues' => $issues
             ];
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return [
                 'success' => false,
                 'message' => 'Error validating theme: ' . $e->getMessage(),
@@ -652,6 +652,84 @@ class ThemeManager
         return hash('sha256', implode('', $hashes));
     }
 
+    // === VIEW RENDERING METHODS ===
+
+    /**
+     * Render a partial view
+     */
+    public function renderPartial($partial, $data = [])
+    {
+        $partialPath = $this->themesPath . $this->activeTheme . '/views/partials/' . $partial . '.php';
+        
+        if (file_exists($partialPath)) {
+            extract($data);
+            include $partialPath;
+        } else {
+            // Fallback to default partial
+            $defaultPath = $this->themesPath . 'default/views/partials/' . $partial . '.php';
+            if (file_exists($defaultPath)) {
+                extract($data);
+                include $defaultPath;
+            } else {
+                error_log("Partial view not found: " . $partialPath);
+            }
+        }
+    }
+
+    /**
+     * Render a full view
+     */
+    public function renderView($view, $data = [])
+    {
+        $viewPath = $this->themesPath . $this->activeTheme . '/views/' . $view . '.php';
+        
+        if (file_exists($viewPath)) {
+            extract($data);
+            include $viewPath;
+        } else {
+            // Fallback to default view
+            $defaultPath = $this->themesPath . 'default/views/' . $view . '.php';
+            if (file_exists($defaultPath)) {
+                extract($data);
+                include $defaultPath;
+            } else {
+                error_log("View not found: " . $viewPath);
+                throw new \Exception("View not found: " . $view);
+            }
+        }
+    }
+
+    /**
+     * Load category specific style
+     */
+    public function loadCategoryStyle($category)
+    {
+        if (isset($this->currentTheme['category_styles'][$category])) {
+            $stylePath = $this->currentTheme['category_styles'][$category];
+            echo '<link rel="stylesheet" href="' . htmlspecialchars($this->getThemeAsset($stylePath)) . '">' . PHP_EOL;
+        }
+    }
+
+    /**
+     * Set active theme
+     */
+    public function setTheme($themeName)
+    {
+        try {
+            // Check if theme exists
+            $theme = $this->getThemeByName($themeName);
+            if (!$theme || $theme['status'] === 'deleted') {
+                return false;
+            }
+            
+            // Activate the theme
+            return $this->activateTheme($theme['id']);
+        } catch (\Exception $e) {
+            error_log("Error setting theme: " . $e->getMessage());
+            return false;
+        }
+    }
+
     // Legacy methods for backward compatibility
     public function getThemeAsset($assetPath)
     {
@@ -674,16 +752,6 @@ class ThemeManager
                 echo '<script src="' . htmlspecialchars($this->getThemeAsset($script)) . '"></script>' . PHP_EOL;
             }
         }
-    }
-
-    public function getActiveTheme()
-    {
-        return $this->activeTheme;
-    }
-
-    public function getThemeConfig()
-    {
-        return $this->currentTheme;
     }
 
     /**
@@ -752,6 +820,19 @@ class ThemeManager
         return $availableThemes;
     }
 
+    /**
+     * Get active theme name - SINGLE INSTANCE (no duplicates)
+     */
+    public function getActiveTheme()
+    {
+        return $this->activeTheme;
+    }
+
+    public function getThemeConfig()
+    {
+        return $this->currentTheme;
+    }
+
     public function themeUrl($path = '')
     {
         return $this->baseUrl . '/themes/' . $this->activeTheme . '/' . ltrim($path, '/');
@@ -760,79 +841,6 @@ class ThemeManager
     public function assetsUrl($path = '')
     {
         return $this->baseUrl . '/themes/' . $this->activeTheme . '/assets/' . ltrim($path, '/');
-    }
-
-    /**
-     * Render a partial template
-     */
-    public function renderPartial($template, $data = [])
-    {
-        $templateFile = $this->themesPath . $this->activeTheme . '/views/partials/' . $template . '.php';
-        
-        if (file_exists($templateFile)) {
-            extract($data);
-            include $templateFile;
-        } else {
-            // Fallback to default theme
-            $defaultFile = BASE_PATH . '/themes/default/views/partials/' . $template . '.php';
-            if (file_exists($defaultFile)) {
-                extract($data);
-                include $defaultFile;
-            } else {
-                // Log missing template
-                error_log("Theme template not found: $template in theme: " . $this->activeTheme);
-            }
-        }
-    }
-
-    /**
-     * Render a view template
-     */
-    public function renderView($template, $data = [])
-    {
-        $templateFile = $this->themesPath . $this->activeTheme . '/views/' . $template . '.php';
-        
-        if (file_exists($templateFile)) {
-            extract($data);
-            include $templateFile;
-        } else {
-            // Fallback to default theme
-            $defaultFile = BASE_PATH . '/themes/default/views/' . $template . '.php';
-            if (file_exists($defaultFile)) {
-                extract($data);
-                include $defaultFile;
-            } else {
-                // Log missing template
-                error_log("Theme template not found: $template in theme: " . $this->activeTheme);
-            }
-        }
-    }
-
-    /**
-     * Load category-specific styles
-     */
-    public function loadCategoryStyle($category)
-    {
-        if (isset($this->currentTheme['category_styles'][$category])) {
-            $style = $this->currentTheme['category_styles'][$category];
-            echo '<link rel="stylesheet" href="' . htmlspecialchars($this->getThemeAsset($style)) . '">' . PHP_EOL;
-        }
-    }
-
-    /**
-     * Set theme (for switching themes)
-     */
-    public function setTheme($themeName)
-    {
-        $theme = $this->themeModel->getByName($themeName);
-        
-        if ($theme && $theme['status'] === 'active') {
-            $this->activeTheme = $themeName;
-            $this->currentTheme = $theme['config'] ?? [];
-            return true;
-        }
-        
-        return false;
     }
 }
 ?>
