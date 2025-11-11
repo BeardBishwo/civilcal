@@ -295,7 +295,7 @@ $testimonials = $testimonials ?? [];
     </script>
     
     <!-- ProCalculator Core JavaScript -->
-    <script src="<?= $viewHelper->themeUrl('assets/js/procalculator-core.js') ?>"></script>
+    <script src="/assets/themes/procalculator/js/procalculator-core.js"></script>
 
     
     <!-- Initialize Premium Features -->

@@ -1304,7 +1304,7 @@
     <div id="toast-container" class="pc-toast-container"></div>
 
     <!-- ProCalculator Premium Theme Scripts -->
-    <script src="<?= $viewHelper->themeUrl('assets/js/procalculator-core.js') ?>"></script>
+    <script src="/assets/themes/procalculator/js/procalculator-core.js"></script>
     <script src="<?= $viewHelper->themeUrl('assets/js/auth-enhanced.js') ?>"></script>
     
     <!-- Registration Page Specific Script -->

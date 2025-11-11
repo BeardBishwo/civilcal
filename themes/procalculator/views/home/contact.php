@@ -415,6 +415,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 <?php $viewHelper->partial('partials/footer'); ?>
 
 <!-- ProCalculator Core JavaScript -->
-<script src="<?= $viewHelper->themeUrl('assets/js/procalculator-core.js') ?>"></script>
+<script src="/assets/themes/procalculator/js/procalculator-core.js"></script>
 </body>
 </html>

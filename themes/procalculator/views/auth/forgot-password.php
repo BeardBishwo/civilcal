@@ -548,7 +548,7 @@
     </div>
 
     <!-- ProCalculator Premium Theme Scripts -->
-    <script src="<?= $viewHelper->themeUrl('assets/js/procalculator-core.js') ?>"></script>
+    <script src="/assets/themes/procalculator/js/procalculator-core.js"></script>
     <script src="<?= $viewHelper->themeUrl('assets/js/auth-enhanced.js') ?>"></script>
     
     <!-- Forgot Password Page Specific Script -->
