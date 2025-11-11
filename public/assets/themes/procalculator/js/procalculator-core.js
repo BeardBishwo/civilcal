@@ -39,6 +39,12 @@ class ProCalculatorCore {
 
             // Initialize accessibility
             this.initAccessibility();
+            
+            // Initialize user dropdown
+            this.initUserDropdown();
+            
+            // Initialize dark mode toggle
+            this.initDarkModeToggle();
 
             this.isInitialized = true;
             console.log('✅ ProCalculator Premium Theme Loaded Successfully');
@@ -240,6 +246,12 @@ class ProCalculatorCore {
      */
     async handleFormSubmit(e) {
         const form = e.target;
+        
+        // Skip auth forms - they have their own handlers
+        if (form.id === 'loginForm' || form.id === 'registerForm' || form.id === 'forgotForm') {
+            return;
+        }
+        
         if (form.classList.contains('pc-premium-form')) {
             e.preventDefault();
 
@@ -668,6 +680,73 @@ class ProCalculatorGlassmorphism {
 
     initGlassmorphismEffects() {
         // Glassmorphism effects
+    }
+    
+    /**
+     * Initialize user dropdown
+     */
+    initUserDropdown() {
+        const userToggle = document.querySelector('.user-profile-toggle');
+        const userDropdown = document.querySelector('.user-dropdown-menu');
+        
+        if (userToggle && userDropdown) {
+            // Toggle dropdown on click
+            userToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isExpanded = userToggle.getAttribute('aria-expanded') === 'true';
+                userToggle.setAttribute('aria-expanded', !isExpanded);
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!userToggle.contains(e.target) && !userDropdown.contains(e.target)) {
+                    userToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+            
+            // Prevent dropdown from closing when clicking inside
+            userDropdown.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+    }
+    
+    /**
+     * Initialize dark mode toggle
+     */
+    initDarkModeToggle() {
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const darkModeCheckbox = document.getElementById('darkModeCheckbox');
+        
+        if (darkModeToggle && darkModeCheckbox) {
+            // Load saved preference
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            darkModeCheckbox.checked = isDarkMode;
+            
+            if (isDarkMode) {
+                document.documentElement.classList.add('dark-mode');
+            }
+            
+            // Toggle dark mode
+            darkModeToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                darkModeCheckbox.checked = !darkModeCheckbox.checked;
+                const isDark = darkModeCheckbox.checked;
+                
+                if (isDark) {
+                    document.documentElement.classList.add('dark-mode');
+                    localStorage.setItem('darkMode', 'true');
+                } else {
+                    document.documentElement.classList.remove('dark-mode');
+                    localStorage.setItem('darkMode', 'false');
+                }
+                
+                // Dispatch event for other components
+                this.dispatchEvent('pc:darkmode:changed', { isDark });
+            });
+        }
     }
 }
 

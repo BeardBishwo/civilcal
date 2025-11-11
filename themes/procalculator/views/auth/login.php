@@ -170,34 +170,71 @@
         }
 
         .pc-demo-accounts {
-            background: var(--pc-gradient-secondary);
+            background: linear-gradient(135deg, 
+                rgba(99, 102, 241, 0.15), 
+                rgba(139, 92, 246, 0.15)
+            );
+            border: 1px solid rgba(99, 102, 241, 0.3);
             border-radius: var(--pc-radius-md);
             padding: var(--pc-spacing-lg);
             margin-bottom: var(--pc-spacing-xl);
             text-align: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .pc-demo-accounts h4 {
             color: white;
             margin-bottom: var(--pc-spacing-md);
             font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .pc-demo-accounts h4 i {
+            color: #6366f1;
+            font-size: 1.1rem;
         }
 
         .pc-demo-btn {
-            background: rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, 
+                rgba(99, 102, 241, 0.3), 
+                rgba(139, 92, 246, 0.3)
+            );
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: var(--pc-spacing-sm) var(--pc-spacing-md);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.75rem 1.5rem;
             border-radius: var(--pc-radius-sm);
             margin: var(--pc-spacing-xs);
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 600;
             transition: all var(--pc-transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
         }
 
         .pc-demo-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, 
+                rgba(99, 102, 241, 0.5), 
+                rgba(139, 92, 246, 0.5)
+            );
+            border-color: rgba(99, 102, 241, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .pc-demo-btn:active {
+            transform: translateY(0);
+        }
+
+        .pc-demo-btn i {
+            font-size: 1rem;
         }
 
         .pc-forgot-password {
@@ -342,21 +379,19 @@
                 <span>Or continue with email</span>
             </div>
 
-            <!-- Demo Accounts (for development) -->
-            <?php if (defined('ENVIRONMENT') && ENVIRONMENT === 'development'): ?>
+            <!-- Demo Accounts -->
             <div class="pc-demo-accounts">
-                <h4>Quick Demo Access</h4>
-                <button class="pc-demo-btn" data-email="engineer@procalculator.com" data-password="Engineer123!">
-                    <i class="fas fa-bolt"></i> Demo User
+                <h4><i class="fas fa-rocket"></i> Quick Demo Access</h4>
+                <button type="button" class="pc-demo-btn" data-email="engineer@procalculator.com" data-password="Engineer123!">
+                    <i class="fas fa-user-tie"></i> Demo Engineer
                 </button>
-                <button class="pc-demo-btn" data-email="admin@procalculator.com" data-password="Admin123!">
-                    <i class class="fas fa-crown"></i> Demo Admin
+                <button type="button" class="pc-demo-btn" data-email="admin@procalculator.com" data-password="Admin123!">
+                    <i class="fas fa-crown"></i> Demo Admin
                 </button>
             </div>
-            <?php endif; ?>
 
             <!-- Login Form -->
-            <form class="pc-premium-form auth-form" id="loginForm" novalidate>
+            <form class="auth-form" id="loginForm" novalidate>
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                 
                 <div class="pc-form-group form-group">
@@ -441,26 +476,96 @@
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div class="pc-toast-container" id="toast-container"></div>
+
     <!-- ProCalculator Premium Theme Scripts -->
-    <script src="<?= $viewHelper->themeUrl('assets/js/procalculator-core.js') ?>"></script>
+    <!-- Load auth-enhanced FIRST, then core -->
     <script src="<?= $viewHelper->themeUrl('assets/js/auth-enhanced.js') ?>"></script>
+    <script src="<?= $viewHelper->themeUrl('assets/js/procalculator-core.js') ?>"></script>
+    
+    <!-- Initialize Auth Module -->
+    <script>
+        // Initialize auth independently
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof ProCalculatorAuth !== 'undefined') {
+                console.log('Initializing ProCalculatorAuth...');
+                const auth = new ProCalculatorAuth(null);
+                auth.init().catch(err => console.error('Auth init failed:', err));
+            } else {
+                console.error('ProCalculatorAuth class not found!');
+            }
+        });
+    </script>
     
     <!-- Login Page Specific Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Toast notification system
+            function showToast(type, title, message) {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = `pc-toast toast-${type}`;
+                
+                const iconMap = {
+                    success: 'fa-check-circle',
+                    error: 'fa-times-circle',
+                    warning: 'fa-exclamation-triangle',
+                    info: 'fa-info-circle'
+                };
+                
+                toast.innerHTML = `
+                    <div class="pc-toast-icon">
+                        <i class="fas ${iconMap[type]}"></i>
+                    </div>
+                    <div class="pc-toast-content">
+                        <div class="pc-toast-title">${title}</div>
+                        <div class="pc-toast-message">${message}</div>
+                    </div>
+                    <button class="pc-toast-close" onclick="this.parentElement.classList.add('toast-hide'); setTimeout(() => this.parentElement.remove(), 400);">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                container.appendChild(toast);
+                
+                // Auto-dismiss after 3 seconds
+                setTimeout(() => {
+                    toast.classList.add('toast-hide');
+                    setTimeout(() => toast.remove(), 400);
+                }, 3000);
+            }
+            
+            // Make showToast available globally
+            window.showToast = showToast;
+
             // Setup demo login buttons
             document.querySelectorAll('.pc-demo-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const email = this.dataset.email;
                     const password = this.dataset.password;
                     
+                    // Fill the form fields
                     document.getElementById('email').value = email;
                     document.getElementById('password').value = password;
                     
+                    // Add visual feedback
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 200);
+                    
+                    // Show loading toast
+                    showToast('info', 'Demo Login', 'Filling credentials...');
+                    
                     // Auto-submit form after filling
                     setTimeout(() => {
-                        document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-                    }, 500);
+                        const loginForm = document.getElementById('loginForm');
+                        if (loginForm) {
+                            // Trigger submit event properly
+                            loginForm.requestSubmit();
+                        }
+                    }, 800);
                 });
             });
 
@@ -742,6 +847,205 @@
         
         .pc-hidden {
             display: none !important;
+        }
+        
+        /* Toast Notification */
+        .pc-toast-container {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            z-index: 99999;
+            pointer-events: none;
+        }
+        
+        .pc-toast {
+            background: linear-gradient(135deg, rgba(17, 24, 39, 0.98), rgba(31, 41, 55, 0.98));
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 12px;
+            min-width: 360px;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            pointer-events: all;
+            animation: toastSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pc-toast::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            animation: shimmer 3s infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Success Toast - Green Theme */
+        .pc-toast.toast-success {
+            border-left: 4px solid #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1));
+            box-shadow: 0 20px 60px rgba(16, 185, 129, 0.3), 0 0 40px rgba(16, 185, 129, 0.15);
+        }
+        
+        .pc-toast.toast-success::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #10b981, #059669);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+        }
+        
+        /* Error Toast - Red Theme */
+        .pc-toast.toast-error {
+            border-left: 4px solid #ef4444;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1));
+            box-shadow: 0 20px 60px rgba(239, 68, 68, 0.3), 0 0 40px rgba(239, 68, 68, 0.15);
+        }
+        
+        .pc-toast.toast-error::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #ef4444, #dc2626);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+        }
+        
+        .pc-toast.toast-hide {
+            animation: toastSlideOut 0.4s cubic-bezier(0.4, 0, 1, 1) forwards;
+        }
+        
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(-120%) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes toastSlideOut {
+            from {
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-120%) scale(0.9);
+                opacity: 0;
+            }
+        }
+        
+        .pc-toast-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .toast-success .pc-toast-icon {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            animation: successPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes successPulse {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4), 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            50% {
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4), 0 0 0 12px rgba(16, 185, 129, 0);
+            }
+        }
+        
+        .toast-error .pc-toast-icon {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            animation: errorShake 0.5s ease-in-out;
+        }
+        
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        
+        .pc-toast-content {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .pc-toast-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 4px;
+            letter-spacing: 0.3px;
+        }
+        
+        .toast-success .pc-toast-title {
+            color: #10b981;
+        }
+        
+        .toast-error .pc-toast-title {
+            color: #ef4444;
+        }
+        
+        .pc-toast-message {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        .pc-toast-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.2s;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .pc-toast-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transform: rotate(90deg);
         }
     </style>
 </body>

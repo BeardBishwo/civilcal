@@ -16,10 +16,12 @@ $user = $user ?? null;
     <meta name="description" content="Discover premium features of ProCalculator: $100K quality calculations, glassmorphism design, and professional tools.">
     
     <!-- ProCalculator Premium CSS -->
-    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('css/procalculator-premium.css') ?>">
-    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('css/components.css') ?>">
-    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('css/animations.css') ?>">
-    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('css/responsive.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/procalculator-premium.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/header-footer.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/features.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/components.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/animations.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/responsive.css') ?>">
     
     <!-- Premium Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,6 +30,7 @@ $user = $user ?? null;
     
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="procalculator-features">
     <!-- Navigation Header -->
@@ -38,7 +41,7 @@ $user = $user ?? null;
         <div class="container">
             <div class="hero-content">
                 <nav class="breadcrumb">
-                    <a href="/">Home</a>
+                    <a href="<?= $viewHelper->url('') ?>">Home</a>
                     <i class="bi bi-chevron-right"></i>
                     <span>Features</span>
                 </nav>
@@ -288,16 +291,16 @@ $user = $user ?? null;
                 <p>Start your professional journey with ProCalculator today.</p>
                 <div class="cta-actions">
                     <?php if (!$user): ?>
-                    <a href="/register" class="btn btn-primary btn-lg">
+                    <a href="<?= $viewHelper->url('register') ?>" class="btn btn-primary btn-lg">
                         <i class="bi bi-person-plus"></i>
                         Get Started Free
                     </a>
-                    <a href="/pricing" class="btn btn-outline btn-lg">
+                    <a href="<?= $viewHelper->url('pricing') ?>" class="btn btn-outline btn-lg">
                         <i class="bi bi-currency-dollar"></i>
                         View Pricing
                     </a>
                     <?php else: ?>
-                    <a href="/dashboard" class="btn btn-primary btn-lg">
+                    <a href="<?= $viewHelper->url('dashboard') ?>" class="btn btn-primary btn-lg">
                         <i class="bi bi-speedometer2"></i>
                         Go to Dashboard
                     </a>
@@ -308,9 +311,9 @@ $user = $user ?? null;
     </section>
     
     <!-- Footer -->
-    <?php $this->partial('partials/footer'); ?>
+    <?php $viewHelper->partial('partials/footer'); ?>
     
     <!-- ProCalculator Core JavaScript -->
-    <script src="<?= $this->themeUrl('assets/js/procalculator-core.js') ?>"></script>
+    <script src="<?= $viewHelper->themeUrl('assets/js/procalculator-core.js') ?>"></script>
 </body>
 </html>

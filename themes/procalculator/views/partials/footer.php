@@ -1,6 +1,10 @@
-</main>
-
-    <!-- Premium Footer -->
+<?php
+/**
+ * ProCalculator Footer Partial
+ * Footer component
+ */
+?>
+<!-- Premium Footer -->
     <footer class="procalculator-footer glassmorphism-footer" role="contentinfo">
         <div class="footer-container">
             <!-- Footer Top Section -->
@@ -40,60 +44,60 @@
                     <div class="footer-section">
                         <h4 class="footer-section-title">Products</h4>
                         <ul class="footer-menu">
-                            <li><a href="/calculators/civil" class="footer-link">Civil Engineering</a></li>
-                            <li><a href="/calculators/electrical" class="footer-link">Electrical</a></li>
-                            <li><a href="/calculators/plumbing" class="footer-link">Plumbing</a></li>
-                            <li><a href="/calculators/hvac" class="footer-link">HVAC</a></li>
-                            <li><a href="/calculators/structural" class="footer-link">Structural</a></li>
-                            <li><a href="/calculators" class="footer-link premium-accent">View All Calculators</a></li>
+                            <li><a href="<?= $viewHelper->url('calculator/civil') ?>" class="footer-link">Civil Engineering</a></li>
+                            <li><a href="<?= $viewHelper->url('calculator/electrical') ?>" class="footer-link">Electrical</a></li>
+                            <li><a href="<?= $viewHelper->url('calculator/plumbing') ?>" class="footer-link">Plumbing</a></li>
+                            <li><a href="<?= $viewHelper->url('calculator/hvac') ?>" class="footer-link">HVAC</a></li>
+                            <li><a href="<?= $viewHelper->url('calculator/structural') ?>" class="footer-link">Structural</a></li>
+                            <li><a href="<?= $viewHelper->url('calculators') ?>" class="footer-link premium-accent">View All Calculators</a></li>
                         </ul>
                     </div>
 
                     <div class="footer-section">
                         <h4 class="footer-section-title">Features</h4>
                         <ul class="footer-menu">
-                            <li><a href="/features/dashboard" class="footer-link">Dashboard</a></li>
-                            <li><a href="/features/history" class="footer-link">Calculation History</a></li>
-                            <li><a href="/features/favorites" class="footer-link">Favorites</a></li>
-                            <li><a href="/features/export" class="footer-link">Export Tools</a></li>
-                            <li><a href="/features/collaboration" class="footer-link">Team Collaboration</a></li>
-                            <li><a href="/features/api" class="footer-link">API Access</a></li>
+                            <li><a href="<?= $viewHelper->url('dashboard') ?>" class="footer-link">Dashboard</a></li>
+                            <li><a href="<?= $viewHelper->url('history') ?>" class="footer-link">Calculation History</a></li>
+                            <li><a href="<?= $viewHelper->url('history') ?>" class="footer-link">Favorites</a></li>
+                            <li><a href="<?= $viewHelper->url('user/exports/templates') ?>" class="footer-link">Export Tools</a></li>
+                            <li><a href="<?= $viewHelper->url('features') ?>" class="footer-link">Team Collaboration</a></li>
+                            <li><a href="<?= $viewHelper->url('features') ?>" class="footer-link">API Access</a></li>
                         </ul>
                     </div>
 
                     <div class="footer-section">
                         <h4 class="footer-section-title">Support</h4>
                         <ul class="footer-menu">
-                            <li><a href="/help/documentation" class="footer-link">Documentation</a></li>
-                            <li><a href="/help/tutorials" class="footer-link">Tutorials</a></li>
-                            <li><a href="/help/calculators-guide" class="footer-link">Calculators Guide</a></li>
-                            <li><a href="/help/api-reference" class="footer-link">API Reference</a></li>
-                            <li><a href="/help/contact" class="footer-link">Contact Support</a></li>
-                            <li><a href="/help/status" class="footer-link">System Status</a></li>
+                            <li><a href="<?= $viewHelper->url('features') ?>" class="footer-link">Documentation</a></li>
+                            <li><a href="<?= $viewHelper->url('features') ?>" class="footer-link">Tutorials</a></li>
+                            <li><a href="<?= $viewHelper->url('features') ?>" class="footer-link">Calculators Guide</a></li>
+                            <li><a href="<?= $viewHelper->url('features') ?>" class="footer-link">API Reference</a></li>
+                            <li><a href="<?= $viewHelper->url('contact') ?>" class="footer-link">Contact Support</a></li>
+                            <li><a href="<?= $viewHelper->url('features') ?>" class="footer-link">System Status</a></li>
                         </ul>
                     </div>
 
                     <div class="footer-section">
                         <h4 class="footer-section-title">Company</h4>
                         <ul class="footer-menu">
-                            <li><a href="/about" class="footer-link">About Us</a></li>
-                            <li><a href="/careers" class="footer-link">Careers</a></li>
-                            <li><a href="/blog" class="footer-link">Engineering Blog</a></li>
-                            <li><a href="/case-studies" class="footer-link">Case Studies</a></li>
-                            <li><a href="/partners" class="footer-link">Partners</a></li>
-                            <li><a href="/press" class="footer-link">Press Kit</a></li>
+                            <li><a href="<?= $viewHelper->url('about') ?>" class="footer-link">About Us</a></li>
+                            <li><a href="<?= $viewHelper->url('about') ?>" class="footer-link">Careers</a></li>
+                            <li><a href="<?= $viewHelper->url('about') ?>" class="footer-link">Engineering Blog</a></li>
+                            <li><a href="<?= $viewHelper->url('about') ?>" class="footer-link">Case Studies</a></li>
+                            <li><a href="<?= $viewHelper->url('about') ?>" class="footer-link">Partners</a></li>
+                            <li><a href="<?= $viewHelper->url('about') ?>" class="footer-link">Press Kit</a></li>
                         </ul>
                     </div>
 
                     <div class="footer-section">
                         <h4 class="footer-section-title">Legal</h4>
                         <ul class="footer-menu">
-                            <li><a href="/legal/privacy" class="footer-link">Privacy Policy</a></li>
-                            <li><a href="/legal/terms" class="footer-link">Terms of Service</a></li>
-                            <li><a href="/legal/cookies" class="footer-link">Cookie Policy</a></li>
-                            <li><a href="/legal/license" class="footer-link">License Agreement</a></li>
-                            <li><a href="/legal/compliance" class="footer-link">Compliance</a></li>
-                            <li><a href="/legal/security" class="footer-link">Security</a></li>
+                            <li><a href="<?= $viewHelper->url('about') ?>" class="footer-link">Privacy Policy</a></li>
+                            <li><a href="<?= $viewHelper->url('about') ?>" class="footer-link">Terms of Service</a></li>
+                            <li><a href="<?= $viewHelper->url('about') ?>" class="footer-link">Cookie Policy</a></li>
+                            <li><a href="<?= $viewHelper->url('about') ?>" class="footer-link">License Agreement</a></li>
+                            <li><a href="<?= $viewHelper->url('about') ?>" class="footer-link">Compliance</a></li>
+                            <li><a href="<?= $viewHelper->url('about') ?>" class="footer-link">Security</a></li>
                         </ul>
                     </div>
                 </div>
@@ -157,77 +161,3 @@
             </button>
         </div>
     </footer>
-
-    <!-- Premium JavaScript Files -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-eDcn4Z0s5bGZ0QvZ8lM3cR4QvQ3aK5r7kZ8g2G4z8I7/r5gq5r3bGfF5xN2jQ5M3bO3c7ZqK6r8s6hZ7kQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
-    <!-- Core JavaScript -->
-    <?php foreach (['js/procalculator-core.js', 'js/glassmorphism.js', 'js/animations.js'] as $script): ?>
-        <script src="/themes/procalculator/<?= htmlspecialchars($script) ?>"></script>
-    <?php endforeach; ?>
-    
-    <!-- Page-specific scripts -->
-    <?php if (isset($additional_scripts)): ?>
-        <?php foreach ($additional_scripts as $script): ?>
-            <script src="<?= htmlspecialchars($script) ?>"></script>
-        <?php endforeach; ?>
-    <?php endif; ?>
-    
-    <!-- Premium Features Script -->
-    <script>
-        // Initialize premium features when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize theme
-            if (typeof ProCalculatorCore !== 'undefined') {
-                ProCalculatorCore.init();
-            }
-            
-            // Initialize glassmorphism effects
-            if (typeof GlassmorphismEffects !== 'undefined') {
-                GlassmorphismEffects.init();
-            }
-            
-            // Initialize animations
-            if (typeof PremiumAnimations !== 'undefined') {
-                PremiumAnimations.init();
-            }
-            
-            // Hide loader when page is fully loaded
-            window.addEventListener('load', function() {
-                const loader = document.getElementById('premium-loader');
-                if (loader) {
-                    loader.style.opacity = '0';
-                    setTimeout(() => {
-                        loader.style.display = 'none';
-                    }, 600);
-                }
-            });
-        });
-    </script>
-
-    <!-- Global Error Handler -->
-    <script>
-        window.addEventListener('error', function(e) {
-            console.error('ProCalculator Error:', e.error);
-            // Could send to logging service in production
-        });
-    </script>
-
-    <!-- Performance Monitoring (Development Only) -->
-    <?php if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development'): ?>
-        <script>
-            // Performance monitoring for development
-            window.addEventListener('load', function() {
-                const perfData = performance.getEntriesByType('navigation')[0];
-                console.log('ProCalculator Performance:', {
-                    loadTime: perfData.loadEventEnd - perfData.loadEventStart,
-                    domContentLoaded: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
-                    firstPaint: performance.getEntriesByType('paint').find(entry => entry.name === 'first-paint')?.startTime,
-                    firstContentfulPaint: performance.getEntriesByType('paint').find(entry => entry.name === 'first-contentful-paint')?.startTime
-                });
-            });
-        </script>
-    <?php endif; ?>
-
-</body>
-</html>

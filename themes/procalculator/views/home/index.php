@@ -21,6 +21,7 @@ $testimonials = $testimonials ?? [];
     
     <!-- ProCalculator Premium CSS -->
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/procalculator-premium.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/header-footer.css') ?>">
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/components.css') ?>">
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/animations.css') ?>">
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/responsive.css') ?>">
@@ -33,6 +34,7 @@ $testimonials = $testimonials ?? [];
     
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="procalculator-home">
     <!-- Navigation Header -->

@@ -18,9 +18,21 @@ class ProCalculatorAuth {
      * Get base path from URL
      */
     getBasePath() {
+        // Get the base path from the current URL
+        // For http://localhost/bishwo_calculator/login it should return /bishwo_calculator
         const path = window.location.pathname;
-        const match = path.match(/^(\/[^\/]+)?/);
-        return match ? match[0] : '';
+        
+        // Extract everything before /login, /register, /forgot-password, etc.
+        const authPages = ['/login', '/register', '/forgot-password', '/reset-password', '/verify'];
+        for (const page of authPages) {
+            if (path.endsWith(page)) {
+                return path.substring(0, path.length - page.length);
+            }
+        }
+        
+        // Fallback: get first path segment
+        const segments = path.split('/').filter(s => s);
+        return segments.length > 0 ? '/' + segments[0] : '';
     }
 
     /**
@@ -54,6 +66,7 @@ class ProCalculatorAuth {
         
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            e.stopPropagation();
             
             if (!this.validateLoginForm()) {
                 return;
@@ -65,20 +78,31 @@ class ProCalculatorAuth {
             this.setButtonLoading(submitBtn, true);
             
             try {
+                console.log('Login attempt - basePath:', this.basePath);
+                console.log('Fetching:', `${this.basePath}/login`);
+                
                 const response = await fetch(`${this.basePath}/login`, {
                     method: 'POST',
                     body: formData
                 });
                 
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
+                console.log('Response data:', data);
                 
                 if (data.success) {
-                    this.showNotification('Success! Redirecting...', 'success');
+                    this.showNotification(data.message || 'Login successful!', 'success');
                     setTimeout(() => {
                         window.location.href = data.redirect || `${this.basePath}/dashboard`;
-                    }, 1000);
+                    }, 1500);
                 } else {
-                    this.showNotification(data.message || 'Login failed', 'error');
+                    this.showNotification(data.message || 'Invalid email or password', 'error');
                     this.setButtonLoading(submitBtn, false);
                 }
             } catch (error) {
@@ -86,7 +110,7 @@ class ProCalculatorAuth {
                 this.showNotification('An error occurred. Please try again.', 'error');
                 this.setButtonLoading(submitBtn, false);
             }
-        });
+        }, true);
     }
 
     /**
@@ -344,18 +368,18 @@ class ProCalculatorAuth {
      * Show notification using toast system
      */
     showNotification(message, type = 'info') {
-        // Use global toast function if available, otherwise fallback
+        // Use global toast function if available
         if (typeof window.showToast === 'function') {
             const titles = {
-                success: 'Success',
-                error: 'Error',
-                warning: 'Warning',
-                info: 'Information'
+                success: '✓ Success',
+                error: '✗ Error',
+                warning: '⚠ Warning',
+                info: 'ℹ Information'
             };
             window.showToast(type, titles[type] || 'Notification', message);
         } else {
-            // Fallback to console
-            console.log(`[${type.toUpperCase()}] ${message}`);
+            // Fallback to alert if toast not available
+            alert(`${type.toUpperCase()}: ${message}`);
         }
     }
 

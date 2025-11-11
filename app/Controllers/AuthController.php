@@ -16,6 +16,11 @@ class AuthController extends Controller
      */
     public function showLogin()
     {
+        // Generate CSRF token if not exists
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        
         $this->view->render('auth/login', [
             'viewHelper' => $this->view
         ]);
@@ -260,8 +265,21 @@ class AuthController extends Controller
      */
     public function logout()
     {
+        // Store user name for logout message
+        $userName = $_SESSION['user_name'] ?? 'User';
+        
+        // Destroy session
         session_destroy();
-        header('Location: /');
-        exit;
+        
+        // Start new session for logout page message
+        session_start();
+        $_SESSION['logout_message'] = 'You have been successfully logged out';
+        $_SESSION['logout_user'] = $userName;
+        
+        // Render premium logout page
+        $this->view->render('auth/logout', [
+            'viewHelper' => $this->view,
+            'userName' => $userName
+        ]);
     }
 }

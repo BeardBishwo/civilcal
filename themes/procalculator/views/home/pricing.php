@@ -1,8 +1,31 @@
  
 <?php
-// ProCalculator Pricing Page
-include __DIR__ . '/../partials/header.php';
+/**
+ * ProCalculator Pricing Page
+ */
+$user = $user ?? null;
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - ProCalculator</title>
+    
+    <!-- ProCalculator Premium CSS -->
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/procalculator-premium.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/header-footer.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/components.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/animations.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/responsive.css') ?>">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="procalculator-pricing">
+    <!-- Header -->
+    <?php $viewHelper->partial('partials/header', compact('user')); ?>
 
 <div class="container-fluid px-0">
     <!-- Hero Section -->
@@ -412,3 +435,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+</div>
+
+<!-- Footer -->
+<?php $viewHelper->partial('partials/footer'); ?>
+
+<!-- ProCalculator Core JavaScript -->
+<script src="<?= $viewHelper->themeUrl('assets/js/procalculator-core.js') ?>"></script>
+</body>
+</html>

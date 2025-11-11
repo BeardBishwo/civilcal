@@ -13,7 +13,9 @@
 namespace App\Services;
 
 use App\Models\Theme;
+use App\Core\View;
 use PDOException;
+use Exception;
 
 class ThemeManager
 {
@@ -787,20 +789,26 @@ class ThemeManager
      */
     public function renderPartial($template, $data = [])
     {
-        $templateFile = $this->themesPath . $this->activeTheme . '/views/partials/' . $template . '.php';
+        // Remove .php extension if present
+        $template = str_replace('.php', '', $template);
+        
+        $templateFile = $this->themesPath . $this->activeTheme . '/views/' . $template . '.php';
         
         if (file_exists($templateFile)) {
             extract($data);
+            // Make $viewHelper available in partials
+            $viewHelper = new View();
             include $templateFile;
         } else {
             // Fallback to default theme
-            $defaultFile = BASE_PATH . '/themes/default/views/partials/' . $template . '.php';
+            $defaultFile = BASE_PATH . '/themes/default/views/' . $template . '.php';
             if (file_exists($defaultFile)) {
                 extract($data);
+                $viewHelper = new View();
                 include $defaultFile;
             } else {
                 // Log missing template
-                error_log("Theme template not found: $template in theme: " . $this->activeTheme);
+                error_log("Theme template not found: $template in theme: " . $this->activeTheme . " (looked in: $templateFile)");
             }
         }
     }

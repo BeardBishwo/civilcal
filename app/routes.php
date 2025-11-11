@@ -20,7 +20,8 @@ $router->add('GET', '/register', 'AuthController@showRegister', ['guest']);
 $router->add('POST', '/register', 'AuthController@register', ['guest']);
 $router->add('GET', '/forgot-password', 'AuthController@showForgotPassword', ['guest']);
 $router->add('POST', '/forgot-password', 'AuthController@forgotPassword', ['guest']);
-$router->add('POST', '/logout', 'AuthController@logout', ['auth']);
+$router->add('GET', '/logout', 'AuthController@logout'); // No middleware - can be accessed anytime
+$router->add('POST', '/logout', 'AuthController@logout'); // No middleware - can be accessed anytime
 
 // Calculator Routes (Public)
 $router->add('GET', '/calculators', 'CalculatorController@index');

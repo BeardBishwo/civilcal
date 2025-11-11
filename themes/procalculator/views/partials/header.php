@@ -1,63 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
-    <title><?= htmlspecialchars($title ?? 'ProCalculator - Premium Engineering Platform') ?></title>
-    
-    <!-- Premium Meta Tags -->
-    <meta name="description" content="<?= htmlspecialchars($description ?? 'Ultra-premium engineering calculator platform with $100K quality design and professional features') ?>">
-    <meta name="author" content="Bishwo Calculator Team">
-    <meta name="theme-color" content="#1a1a2e">
-    <meta name="msapplication-TileColor" content="#1a1a2e">
-    
-    <!-- Favicons -->
-    <link rel="icon" type="image/x-icon" href="/themes/procalculator/assets/favicon.ico">
-    <link rel="apple-touch-icon" href="/themes/procalculator/assets/apple-touch-icon.png">
-    
-    <!-- Premium Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Premium Stylesheets -->
-    <?php foreach (['css/procalculator-premium.css', 'css/glassmorphism.css', 'css/animations.css', 'css/responsive.css'] as $style): ?>
-        <link rel="stylesheet" href="/themes/procalculator/<?= htmlspecialchars($style) ?>">
-    <?php endforeach; ?>
-    
-    <!-- Page-specific styles -->
-    <?php if (isset($additional_styles)): ?>
-        <?php foreach ($additional_styles as $style): ?>
-            <link rel="stylesheet" href="<?= htmlspecialchars($style) ?>">
-        <?php endforeach; ?>
-    <?php endif; ?>
-</head>
-<body class="procalculator-theme premium-dark-mode">
-    <!-- Premium Loading Screen -->
-    <div id="premium-loader" class="premium-loader">
-        <div class="loader-content">
-            <div class="loader-logo">
-                <div class="logo-icon premium-gradient">
-                    <i class="fas fa-calculator"></i>
-                </div>
-            </div>
-            <div class="loader-text">
-                <h2>ProCalculator</h2>
-                <p>Loading Premium Experience...</p>
-            </div>
-            <div class="loader-progress">
-                <div class="progress-bar premium-gradient"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Premium Header -->
+<?php
+/**
+ * ProCalculator Header Partial
+ * Navigation and header component
+ */
+?>
+<!-- Premium Header -->
     <header class="procalculator-header glassmorphism-header" role="banner">
         <div class="header-container">
             <!-- Brand Section -->
             <div class="header-brand">
-                <a href="/dashboard" class="brand-link premium-hover" aria-label="ProCalculator Home">
+                <a href="<?= $viewHelper->url('') ?>" class="brand-link premium-hover" aria-label="ProCalculator Home">
                     <div class="brand-logo premium-gradient">
                         <i class="fas fa-calculator"></i>
                     </div>
@@ -72,13 +24,13 @@
             <nav class="header-navigation" role="navigation" aria-label="Main navigation">
                 <ul class="nav-menu">
                     <li class="nav-item">
-                        <a href="/dashboard" class="nav-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>">
+                        <a href="<?= $viewHelper->url('dashboard') ?>" class="nav-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>">
                             <i class="fas fa-tachometer-alt"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a href="/calculators" class="nav-link dropdown-toggle">
+                        <a href="<?= $viewHelper->url('calculators') ?>" class="nav-link dropdown-toggle">
                             <i class="fas fa-calculator"></i>
                             <span>Calculators</span>
                             <i class="fas fa-chevron-down dropdown-icon"></i>
@@ -87,27 +39,27 @@
                             <div class="dropdown-section">
                                 <h4>Engineering Categories</h4>
                                 <div class="dropdown-grid">
-                                    <a href="/calculators/civil" class="dropdown-item">
+                                    <a href="<?= $viewHelper->url('calculator/civil') ?>" class="dropdown-item">
                                         <i class="fas fa-building"></i>
                                         <span>Civil Engineering</span>
                                     </a>
-                                    <a href="/calculators/electrical" class="dropdown-item">
+                                    <a href="<?= $viewHelper->url('calculator/electrical') ?>" class="dropdown-item">
                                         <i class="fas fa-bolt"></i>
                                         <span>Electrical</span>
                                     </a>
-                                    <a href="/calculators/plumbing" class="dropdown-item">
+                                    <a href="<?= $viewHelper->url('calculator/plumbing') ?>" class="dropdown-item">
                                         <i class="fas fa-faucet"></i>
                                         <span>Plumbing</span>
                                     </a>
-                                    <a href="/calculators/hvac" class="dropdown-item">
+                                    <a href="<?= $viewHelper->url('calculator/hvac') ?>" class="dropdown-item">
                                         <i class="fas fa-wind"></i>
                                         <span>HVAC</span>
                                     </a>
-                                    <a href="/calculators/fire" class="dropdown-item">
+                                    <a href="<?= $viewHelper->url('calculator/fire') ?>" class="dropdown-item">
                                         <i class="fas fa-fire-extinguisher"></i>
                                         <span>Fire Safety</span>
                                     </a>
-                                    <a href="/calculators/structural" class="dropdown-item">
+                                    <a href="<?= $viewHelper->url('calculator/structural') ?>" class="dropdown-item">
                                         <i class="fas fa-drafting-compass"></i>
                                         <span>Structural</span>
                                     </a>
@@ -116,19 +68,19 @@
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a href="/history" class="nav-link">
+                        <a href="<?= $viewHelper->url('history') ?>" class="nav-link">
                             <i class="fas fa-history"></i>
                             <span>History</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/favorites" class="nav-link">
+                        <a href="<?= $viewHelper->url('history') ?>" class="nav-link">
                             <i class="fas fa-star"></i>
                             <span>Favorites</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/export" class="nav-link">
+                        <a href="<?= $viewHelper->url('user/exports/templates') ?>" class="nav-link">
                             <i class="fas fa-download"></i>
                             <span>Export</span>
                         </a>
@@ -195,57 +147,92 @@
                 <!-- User Profile -->
                 <div class="header-user">
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <div class="user-profile dropdown">
-                            <button class="user-toggle premium-btn-icon" aria-label="User menu">
-                                <div class="user-avatar">
+                        <div class="user-profile-dropdown">
+                            <button class="user-profile-toggle" aria-label="User menu" aria-expanded="false">
+                                <div class="user-avatar-wrapper">
                                     <img src="<?= htmlspecialchars($_SESSION['user_avatar'] ?? '/themes/procalculator/assets/images/default-avatar.png') ?>" 
-                                         alt="User avatar" class="avatar-image">
+                                         alt="<?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>" 
+                                         class="user-avatar-img">
+                                    <div class="user-status-indicator online"></div>
                                 </div>
-                                <div class="user-info">
-                                    <span class="user-name"><?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?></span>
-                                    <span class="user-role"><?= htmlspecialchars($_SESSION['user_role'] ?? 'Engineer') ?></span>
+                                <div class="user-info-text">
+                                    <span class="user-display-name"><?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?></span>
+                                    <span class="user-display-role"><?= ucfirst(htmlspecialchars($_SESSION['user_role'] ?? 'User')) ?></span>
                                 </div>
-                                <i class="fas fa-chevron-down dropdown-icon"></i>
+                                <i class="fas fa-chevron-down user-dropdown-arrow"></i>
                             </button>
-                            <div class="user-menu glassmorphism-dropdown">
-                                <div class="user-menu-section">
-                                    <div class="user-menu-item">
-                                        <i class="fas fa-user"></i>
-                                        <a href="/profile">My Profile</a>
+                            
+                            <!-- Dropdown Menu -->
+                            <div class="user-dropdown-menu glassmorphism-dropdown">
+                                <div class="user-dropdown-header">
+                                    <div class="user-dropdown-avatar">
+                                        <img src="<?= htmlspecialchars($_SESSION['user_avatar'] ?? '/themes/procalculator/assets/images/default-avatar.png') ?>" 
+                                             alt="<?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>">
                                     </div>
-                                    <div class="user-menu-item">
-                                        <i class="fas fa-cog"></i>
-                                        <a href="/settings">Settings</a>
-                                    </div>
-                                    <div class="user-menu-item">
-                                        <i class="fas fa-shield-alt"></i>
-                                        <a href="/security">Security</a>
-                                    </div>
-                                    <div class="user-menu-item">
-                                        <i class="fas fa-question-circle"></i>
-                                        <a href="/help">Help & Support</a>
+                                    <div class="user-dropdown-info">
+                                        <h4><?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?></h4>
+                                        <p><?= htmlspecialchars($_SESSION['user_email'] ?? '') ?></p>
+                                        <span class="user-badge"><?= ucfirst(htmlspecialchars($_SESSION['user_role'] ?? 'User')) ?></span>
                                     </div>
                                 </div>
-                                <div class="user-menu-divider"></div>
-                                <div class="user-menu-section">
-                                    <div class="user-menu-item">
+                                
+                                <div class="user-dropdown-divider"></div>
+                                
+                                <div class="user-dropdown-section">
+                                    <a href="<?= $viewHelper->url('profile') ?>" class="user-dropdown-item">
+                                        <i class="fas fa-user-circle"></i>
+                                        <span>My Profile</span>
+                                    </a>
+                                    <a href="<?= $viewHelper->url('profile') ?>" class="user-dropdown-item">
+                                        <i class="fas fa-cog"></i>
+                                        <span>Settings</span>
+                                    </a>
+                                    <a href="<?= $viewHelper->url('profile') ?>" class="user-dropdown-item">
+                                        <i class="fas fa-shield-alt"></i>
+                                        <span>Security</span>
+                                    </a>
+                                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                                    <a href="<?= $viewHelper->url('admin') ?>" class="user-dropdown-item">
+                                        <i class="fas fa-crown"></i>
+                                        <span>Admin Panel</span>
+                                    </a>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <div class="user-dropdown-divider"></div>
+                                
+                                <div class="user-dropdown-section">
+                                    <button class="user-dropdown-item theme-toggle-btn" id="darkModeToggle">
                                         <i class="fas fa-moon"></i>
-                                        <button class="theme-toggle">Dark Mode</button>
-                                    </div>
-                                    <div class="user-menu-item">
+                                        <span>Dark Mode</span>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="darkModeCheckbox">
+                                            <span class="toggle-slider"></span>
+                                        </div>
+                                    </button>
+                                    <a href="<?= $viewHelper->url('contact') ?>" class="user-dropdown-item">
+                                        <i class="fas fa-question-circle"></i>
+                                        <span>Help & Support</span>
+                                    </a>
+                                </div>
+                                
+                                <div class="user-dropdown-divider"></div>
+                                
+                                <div class="user-dropdown-section">
+                                    <a href="<?= $viewHelper->url('logout') ?>" class="user-dropdown-item logout-item">
                                         <i class="fas fa-sign-out-alt"></i>
-                                        <a href="/logout">Logout</a>
-                                    </div>
+                                        <span>Logout</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     <?php else: ?>
                         <div class="auth-buttons">
-                            <a href="/auth/login" class="btn btn-outline premium-btn">
+                            <a href="<?= $viewHelper->url('login') ?>" class="btn btn-outline premium-btn">
                                 <i class="fas fa-sign-in-alt"></i>
                                 Login
                             </a>
-                            <a href="/auth/register" class="btn btn-primary premium-btn">
+                            <a href="<?= $viewHelper->url('register') ?>" class="btn btn-primary premium-btn">
                                 <i class="fas fa-user-plus"></i>
                                 Register
                             </a>
@@ -273,31 +260,31 @@
             <nav class="mobile-nav-menu" role="navigation">
                 <ul class="mobile-nav-list">
                     <li class="mobile-nav-item">
-                        <a href="/dashboard" class="mobile-nav-link">
+                        <a href="<?= $viewHelper->url('dashboard') ?>" class="mobile-nav-link">
                             <i class="fas fa-tachometer-alt"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li class="mobile-nav-item">
-                        <a href="/calculators" class="mobile-nav-link">
+                        <a href="<?= $viewHelper->url('calculators') ?>" class="mobile-nav-link">
                             <i class="fas fa-calculator"></i>
                             <span>Calculators</span>
                         </a>
                     </li>
                     <li class="mobile-nav-item">
-                        <a href="/history" class="mobile-nav-link">
+                        <a href="<?= $viewHelper->url('history') ?>" class="mobile-nav-link">
                             <i class="fas fa-history"></i>
                             <span>History</span>
                         </a>
                     </li>
                     <li class="mobile-nav-item">
-                        <a href="/favorites" class="mobile-nav-link">
+                        <a href="<?= $viewHelper->url('history') ?>" class="mobile-nav-link">
                             <i class="fas fa-star"></i>
                             <span>Favorites</span>
                         </a>
                     </li>
                     <li class="mobile-nav-item">
-                        <a href="/export" class="mobile-nav-link">
+                        <a href="<?= $viewHelper->url('user/exports/templates') ?>" class="mobile-nav-link">
                             <i class="fas fa-download"></i>
                             <span>Export</span>
                         </a>
@@ -308,19 +295,19 @@
                     <div class="mobile-nav-divider"></div>
                     <ul class="mobile-nav-list">
                         <li class="mobile-nav-item">
-                            <a href="/profile" class="mobile-nav-link">
+                            <a href="<?= $viewHelper->url('profile') ?>" class="mobile-nav-link">
                                 <i class="fas fa-user"></i>
                                 <span>Profile</span>
                             </a>
                         </li>
                         <li class="mobile-nav-item">
-                            <a href="/settings" class="mobile-nav-link">
+                            <a href="<?= $viewHelper->url('profile') ?>" class="mobile-nav-link">
                                 <i class="fas fa-cog"></i>
                                 <span>Settings</span>
                             </a>
                         </li>
                         <li class="mobile-nav-item">
-                            <a href="/logout" class="mobile-nav-link">
+                            <a href="<?= $viewHelper->url('logout') ?>" class="mobile-nav-link">
                                 <i class="fas fa-sign-out-alt"></i>
                                 <span>Logout</span>
                             </a>
@@ -330,13 +317,13 @@
                     <div class="mobile-nav-divider"></div>
                     <ul class="mobile-nav-list">
                         <li class="mobile-nav-item">
-                            <a href="/auth/login" class="mobile-nav-link">
+                            <a href="<?= $viewHelper->url('login') ?>" class="mobile-nav-link">
                                 <i class="fas fa-sign-in-alt"></i>
                                 <span>Login</span>
                             </a>
                         </li>
                         <li class="mobile-nav-item">
-                            <a href="/auth/register" class="mobile-nav-link">
+                            <a href="<?= $viewHelper->url('register') ?>" class="mobile-nav-link">
                                 <i class="fas fa-user-plus"></i>
                                 <span>Register</span>
                             </a>
@@ -346,7 +333,3 @@
             </nav>
         </div>
     </header>
-
-    <!-- Main Content Wrapper -->
-    <main class="main-content" role="main">
-        <!-- Page-specific content will be rendered here -->
