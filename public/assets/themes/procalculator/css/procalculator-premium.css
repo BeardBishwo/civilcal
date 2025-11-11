@@ -81,6 +81,43 @@
     --radius-2xl: 24px;
 }
 
+/* Light mode variable overrides */
+html:not(.dark-mode) body:not(.dark-mode) {
+    /* Colors */
+    --primary: #111827;
+    --secondary: #1f2937;
+    --accent: #2563eb;
+    --premium: #7c3aed;
+    --gold: #f59e0b;
+    --platinum: #3b82f6;
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --glass: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --text: #0f172a;
+    --text-secondary: #475569;
+    --success: #059669;
+    --warning: #d97706;
+    --error: #dc2626;
+    --info: #2563eb;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%);
+    --gradient-secondary: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+    --gradient-hero: linear-gradient(135deg, #e2e8f0 0%, #f8fafc 50%, #e2e8f0 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.03) 100%);
+    --gradient-premium: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #7c3aed 100%);
+    --gradient-dark: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%);
+
+    /* Effects/Text */
+    --pc-glass: rgba(255, 255, 255, 0.7);
+    --pc-glass-border: rgba(0, 0, 0, 0.08);
+    --pc-gradient-glass: linear-gradient(135deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.03) 100%);
+    --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    --pc-text: #0f172a;
+    --pc-text-secondary: #475569;
+}
+
 
 /* Reset and base styles */
 

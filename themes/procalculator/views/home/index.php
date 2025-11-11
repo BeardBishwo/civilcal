@@ -19,6 +19,18 @@ $testimonials = $testimonials ?? [];
     <title>ProCalculator - Premium Engineering Calculator Platform</title>
     <meta name="description" content="Professional engineering calculators with $100K premium quality. Advanced glassmorphism design with comprehensive calculation tools.">
     
+    <!-- Immediate Dark Mode Script - Prevents Flash of Light Mode -->
+    <script>
+        (function() {
+            const darkMode = localStorage.getItem('darkMode');
+            const isDark = darkMode === null ? true : darkMode === 'true';
+            if (isDark) {
+                document.documentElement.classList.add('dark-mode');
+            }
+            console.log('🌙 Pre-load dark mode:', isDark);
+        })();
+    </script>
+    
     <!-- ProCalculator Premium CSS -->
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/procalculator-premium.css') ?>">
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/header-footer.css') ?>">
@@ -275,6 +287,12 @@ $testimonials = $testimonials ?? [];
     
     <!-- Footer -->
     <?php $viewHelper->partial('partials/footer'); ?>
+    
+    <script>
+        // Debug theme application
+        console.log('🎨 Current theme classes:', document.documentElement.className);
+        console.log('🌙 Dark mode enabled:', document.documentElement.classList.contains('dark-mode'));
+    </script>
     
     <!-- ProCalculator Core JavaScript -->
     <script src="<?= $viewHelper->themeUrl('assets/js/procalculator-core.js') ?>"></script>

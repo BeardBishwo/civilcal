@@ -40,11 +40,16 @@ class ProCalculatorCore {
             // Initialize accessibility
             this.initAccessibility();
             
-            // Initialize user dropdown
-            this.initUserDropdown();
-            
-            // Initialize dark mode toggle
-            this.initDarkModeToggle();
+            // Initialize user dropdown and dark mode toggle via glassmorphism module
+            const glassModule = this.modules.get('glassmorphism');
+            if (glassModule) {
+                if (typeof glassModule.initUserDropdown === 'function') {
+                    glassModule.initUserDropdown();
+                }
+                if (typeof glassModule.initDarkModeToggle === 'function') {
+                    glassModule.initDarkModeToggle();
+                }
+            }
 
             this.isInitialized = true;
             console.log('✅ ProCalculator Premium Theme Loaded Successfully');
@@ -715,37 +720,140 @@ class ProCalculatorGlassmorphism {
      * Initialize dark mode toggle
      */
     initDarkModeToggle() {
+        console.log('🌓 Initializing dark mode toggle...');
+        
         const darkModeToggle = document.getElementById('darkModeToggle');
         const darkModeCheckbox = document.getElementById('darkModeCheckbox');
         
-        if (darkModeToggle && darkModeCheckbox) {
-            // Load saved preference
-            const isDarkMode = localStorage.getItem('darkMode') === 'true';
-            darkModeCheckbox.checked = isDarkMode;
-            
-            if (isDarkMode) {
-                document.documentElement.classList.add('dark-mode');
-            }
-            
-            // Toggle dark mode
-            darkModeToggle.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                darkModeCheckbox.checked = !darkModeCheckbox.checked;
-                const isDark = darkModeCheckbox.checked;
-                
-                if (isDark) {
-                    document.documentElement.classList.add('dark-mode');
-                    localStorage.setItem('darkMode', 'true');
-                } else {
-                    document.documentElement.classList.remove('dark-mode');
-                    localStorage.setItem('darkMode', 'false');
-                }
-                
-                // Dispatch event for other components
-                this.dispatchEvent('pc:darkmode:changed', { isDark });
+        if (!darkModeToggle || !darkModeCheckbox) {
+            console.warn('⚠️ Dark mode elements not found:', {
+                toggle: !!darkModeToggle,
+                checkbox: !!darkModeCheckbox
             });
+            return;
+        }
+        
+        console.log('✅ Dark mode elements found');
+        
+        // Load saved preference (default to dark mode for premium look)
+        const savedMode = localStorage.getItem('darkMode');
+        const isDarkMode = savedMode === null ? true : savedMode === 'true';
+        
+        console.log('💾 Saved mode:', savedMode, 'Using dark mode:', isDarkMode);
+        
+        // Apply initial state immediately
+        darkModeCheckbox.checked = isDarkMode;
+        this.applyDarkMode(isDarkMode, true);
+        this.updateDarkModeUI(isDarkMode, darkModeToggle);
+        
+        // Toggle dark mode on button click
+        const toggleHandler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('🔄 Toggle clicked!');
+            
+            // Toggle checkbox
+            darkModeCheckbox.checked = !darkModeCheckbox.checked;
+            const isDark = darkModeCheckbox.checked;
+            
+            console.log('🌓 Switching to:', isDark ? 'dark' : 'light');
+            
+            // Apply dark mode with animation
+            this.applyDarkMode(isDark, false);
+            this.updateDarkModeUI(isDark, darkModeToggle);
+            
+            // Save preference
+            localStorage.setItem('darkMode', isDark.toString());
+            console.log('💾 Saved to localStorage:', isDark);
+            
+            // Show toast notification
+            this.showModeChangeNotification(isDark);
+            
+            // Dispatch event for other components
+            this.dispatchEvent('pc:darkmode:changed', { isDark });
+        };
+        
+        darkModeToggle.addEventListener('click', toggleHandler);
+        
+        // Also allow clicking the checkbox directly
+        darkModeCheckbox.addEventListener('change', (e) => {
+            e.stopPropagation();
+            const isDark = darkModeCheckbox.checked;
+            
+            console.log('☑️ Checkbox changed:', isDark);
+            
+            this.applyDarkMode(isDark, false);
+            this.updateDarkModeUI(isDark, darkModeToggle);
+            localStorage.setItem('darkMode', isDark.toString());
+            this.showModeChangeNotification(isDark);
+            this.dispatchEvent('pc:darkmode:changed', { isDark });
+        });
+        
+        console.log('✅ Dark mode toggle initialized successfully');
+    }
+    
+    /**
+     * Apply dark mode to the page
+     */
+    applyDarkMode(isDark, isInitial = false) {
+        const html = document.documentElement;
+        const body = document.body;
+        
+        console.log('🎨 Applying mode:', isDark ? 'dark' : 'light', 'Initial:', isInitial);
+        
+        if (isDark) {
+            html.classList.add('dark-mode');
+            body.classList.add('dark-mode');
+            console.log('🌙 Dark mode classes added');
+        } else {
+            html.classList.remove('dark-mode');
+            body.classList.remove('dark-mode');
+            console.log('☀️ Light mode classes removed');
+        }
+        
+        // Log current classes for debugging
+        console.log('📋 HTML classes:', html.className);
+        console.log('📋 Body classes:', body.className);
+        
+        // Force a repaint
+        void html.offsetHeight;
+        
+        // Dispatch custom event
+        window.dispatchEvent(new CustomEvent('themeChanged', { detail: { isDark } }));
+    }
+    
+    /**
+     * Update dark mode UI elements
+     */
+    updateDarkModeUI(isDark, toggleBtn) {
+        if (!toggleBtn) return;
+        
+        const buttonText = toggleBtn.querySelector('span');
+        const buttonIcon = toggleBtn.querySelector('i');
+        
+        if (buttonText) {
+            buttonText.textContent = isDark ? 'Dark Mode' : 'Light Mode';
+            console.log('📝 Updated text:', buttonText.textContent);
+        }
+        
+        if (buttonIcon) {
+            buttonIcon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+            console.log('🎨 Updated icon:', buttonIcon.className);
+        }
+    }
+    
+    /**
+     * Show mode change notification
+     */
+    showModeChangeNotification(isDark) {
+        // Check if showToast is available
+        if (typeof window.showToast === 'function') {
+            const mode = isDark ? 'Dark' : 'Light';
+            const icon = isDark ? '🌙' : '☀️';
+            window.showToast('info', `${icon} ${mode} Mode`, `Switched to ${mode.toLowerCase()} mode`);
+        } else {
+            console.log('ℹ️ Toast function not available');
         }
     }
 }
