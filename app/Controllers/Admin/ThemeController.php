@@ -22,6 +22,51 @@ class ThemeController extends Controller
         }
     }
 
+    public function updateSettings($id)
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('/admin/themes');
+            return;
+        }
+
+        try {
+            $payload = $_POST;
+            if (empty($payload)) {
+                $raw = file_get_contents('php://input');
+                $json = json_decode($raw, true);
+                if (is_array($json)) { $payload = $json; }
+            }
+
+            $allowed = ['primary','secondary','accent','background','text','text_secondary','dark_mode_enabled','typography_style'];
+            $settings = [];
+            foreach ($allowed as $k) {
+                if (array_key_exists($k, $payload)) {
+                    $v = $payload[$k];
+                    if ($k === 'dark_mode_enabled') {
+                        $v = filter_var($v, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                        $v = (bool)$v;
+                    }
+                    $settings[$k] = $v;
+                }
+            }
+            if (empty($settings)) {
+                $this->error('No settings provided');
+                return;
+            }
+
+            $res = $this->themeManager->updateThemeSettings((int)$id, $settings);
+            if ($res['success']) {
+                AuditLogger::info('theme_settings_updated', ['theme_id' => (int)$id, 'keys' => array_keys($settings)]);
+                $this->success($res['message'], ['settings' => $settings]);
+            } else {
+                AuditLogger::warning('theme_settings_update_failed', ['theme_id' => (int)$id, 'message' => $res['message'] ?? null]);
+                $this->error($res['message'] ?? 'Failed');
+            }
+        } catch (Exception $e) {
+            $this->error('Update failed: ' . $e->getMessage());
+        }
+    }
+
     public function index()
     {
         try {

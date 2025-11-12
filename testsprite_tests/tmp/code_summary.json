@@ -1,0 +1,36 @@
+{
+  "project": "Bishwo_Calculator",
+  "stack": {
+    "language": "php",
+    "framework": "custom MVC",
+    "views": "PHP templates under themes/<active>/views",
+    "assets": "public/assets/themes/<active> and themes/<active>/assets",
+    "db": "PDO via includes/db.php",
+    "routing": "app/routes.php with custom Router"
+  },
+  "features": [
+    "Themes: install, activate, validate, preview, backups, settings",
+    "Plugins: upload, toggle, delete, details, refresh, plugin manifest validation",
+    "Modules: service providers (Civil, Electrical, HVAC) + module navigation",
+    "API v1: calculators, health endpoints, history",
+    "Backup/Restore: full system backup with db.sql + themes/plugins",
+    "Audit Log viewer with filters & download",
+    "Rate limiting + CSRF on admin POST routes",
+    "Logger + AuditLogger for structured logs"
+  ],
+  "key_paths": {
+    "routes": "app/routes.php",
+    "theme_manager": "app/Services/ThemeManager.php",
+    "theme_views": "themes/default/views",
+    "admin_theme_ui": "app/Views/admin/themes/index.php",
+    "plugin_manager": "app/Services/PluginManager.php",
+    "controllers": "app/Controllers/*"
+  },
+  "critical_flows": [
+    "User: Home -> Navigate calculators via dynamic dropdown -> Open calculator page",
+    "Admin: /admin/themes -> Upload -> Validate -> Activate -> Customize settings -> Verify dynamic CSS applied",
+    "Admin: /admin/help -> Backup/Export/Restore -> Download artifacts",
+    "Admin: /admin/audit-logs -> Filter & download",
+    "API v1: /api/v1/health -> 200 JSON"
+  ]
+}

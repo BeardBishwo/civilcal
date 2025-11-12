@@ -32,31 +32,49 @@ class CalculatorController extends Controller
     
     public function category($category)
     {
-        $calculators = $this->getCalculatorsByCategory($category);
-        $categoryInfo = $this->getCategoryInfo($category);
-        
-        if (!$categoryInfo) {
+        $all = CalculatorFactory::getAvailableCalculators();
+        $list = array_values(array_filter($all, function($c) use ($category){
+            return isset($c['category']) && strtolower($c['category']) === strtolower($category);
+        }));
+
+        if (empty($list)) {
             http_response_code(404);
             echo '404 - Category Not Found';
             return;
         }
-        
-        // For now, redirect to home
-        header('Location: ' . $this->view->url(''));
+
+        $title = ucwords(str_replace(['-','_'], ' ', $category)) . ' Calculators';
+        $this->view->render('calculators/category', [
+            'title' => $title,
+            'category' => $category,
+            'calculators' => $list,
+        ]);
     }
     
     public function tool($category, $tool)
     {
-        $calculator = CalculatorFactory::create($category, $tool);
-        
-        if (!$calculator) {
+        $all = CalculatorFactory::getAvailableCalculators();
+        $match = null;
+        foreach ($all as $c) {
+            if ((isset($c['category']) && strtolower($c['category']) === strtolower($category))
+                && (isset($c['slug']) && strtolower($c['slug']) === strtolower($tool))) {
+                $match = $c; break;
+            }
+        }
+
+        if (!$match) {
             http_response_code(404);
             echo '404 - Calculator Not Found';
             return;
         }
-        
-        // For now, redirect to home
-        header('Location: ' . $this->view->url(''));
+
+        $title = ($match['name'] ?? ucwords(str_replace(['-','_'], ' ', $tool)));
+        $this->view->render('calculators/tool', [
+            'title' => $title,
+            'category' => $category,
+            'tool' => $tool,
+            'calculator' => $match,
+        ]);
     }
     
     public function calculate($category, $tool)

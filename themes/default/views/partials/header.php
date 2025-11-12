@@ -1,5 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" class="<?php echo isset($theme_data['features']['dark_mode']) && $theme_data['features']['dark_mode'] ? 'dark' : ''; ?>">
+<html lang="en" class="<?php
+    $dark = (isset($theme_data['features']['dark_mode']) && $theme_data['features']['dark_mode']);
+    try {
+        $tm0 = new \App\Services\ThemeManager();
+        $md0 = $tm0->getThemeMetadata();
+        if (isset($md0['settings']['dark_mode_enabled']) && $md0['settings']['dark_mode_enabled']) { $dark = true; }
+    } catch (\Throwable $e) {}
+    echo $dark ? 'dark' : '';
+?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,6 +41,8 @@
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkfQJa+GQZ4zJQFzFZC2Z1C1QvZ1C6Zhz+Kbx5Q5v8Q7Zx1Zq9a2Yx4Yw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <?php
     // Load theme styles
@@ -46,23 +56,41 @@
     }
     ?>
     
+    <?php
+    try {
+        $tm = new \App\Services\ThemeManager();
+        $meta = $tm->getThemeMetadata();
+        $cfg = $meta['config'] ?? [];
+        $settings = $meta['settings'] ?? [];
+        $colors = $cfg['colors'] ?? [];
+        $primary = $settings['primary'] ?? ($colors['primary'] ?? '#2563eb');
+        $secondary = $settings['secondary'] ?? ($colors['secondary'] ?? '#64748b');
+        $accent = $settings['accent'] ?? ($colors['accent'] ?? '#0ea5e9');
+        $bgPrimary = $settings['background'] ?? ($colors['background'] ?? '#ffffff');
+        $textPrimary = $settings['text'] ?? ($colors['text'] ?? '#1e293b');
+        $textSecondary = $settings['text_secondary'] ?? ($colors['text_secondary'] ?? '#64748b');
+    } catch (\Throwable $e) {
+        $primary = '#2563eb'; $secondary = '#64748b'; $accent = '#0ea5e9';
+        $bgPrimary = '#ffffff'; $textPrimary = '#1e293b'; $textSecondary = '#64748b';
+    }
+    ?>
     <style>
         :root {
             /* Primary Colors */
-            --primary-color: #2563eb;
-            --primary-dark: #1d4ed8;
-            --primary-light: #3b82f6;
-            --secondary-color: #64748b;
-            --accent-color: #0ea5e9;
+            --primary-color: <?= htmlspecialchars($primary) ?>;
+            --primary-dark: <?= htmlspecialchars($primary) ?>;
+            --primary-light: <?= htmlspecialchars($primary) ?>;
+            --secondary-color: <?= htmlspecialchars($secondary) ?>;
+            --accent-color: <?= htmlspecialchars($accent) ?>;
             
             /* Text Colors */
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
+            --text-primary: <?= htmlspecialchars($textPrimary) ?>;
+            --text-secondary: <?= htmlspecialchars($textSecondary) ?>;
             --text-light: #94a3b8;
             --text-muted: #cbd5e1;
             
             /* Background Colors */
-            --bg-primary: #ffffff;
+            --bg-primary: <?= htmlspecialchars($bgPrimary) ?>;
             --bg-secondary: #f8fafc;
             --bg-tertiary: #f1f5f9;
             --bg-dark: #0f172a;
@@ -500,6 +528,39 @@
                             Home
                         </a>
                     </li>
+                    <?php
+                    try {
+                        $calcs = \App\Calculators\CalculatorFactory::getAvailableCalculators();
+                        $groups = [];
+                        foreach ($calcs as $c) {
+                            $cat = $c['category'] ?? 'general';
+                            if (!isset($groups[$cat])) $groups[$cat] = [];
+                            $groups[$cat][] = $c;
+                        }
+                        if (!empty($groups)) {
+                            echo '<li class="nav-item dropdown">';
+                            echo '<button class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">';
+                            echo '<i class="fas fa-calculator"></i> Calculators <i class="fas fa-chevron-down"></i>';
+                            echo '</button>';
+                            echo '<div class="dropdown-menu" role="menu">';
+                            foreach ($groups as $cat => $items) {
+                                $catLabel = ucwords(str_replace(['-','_'], ' ', (string)$cat));
+                                echo '<div class="dropdown-item" style="font-weight:600; cursor:default;">' . htmlspecialchars($catLabel) . '</div>';
+                                foreach ($items as $it) {
+                                    $slug = $it['slug'] ?? '';
+                                    $name = $it['name'] ?? $slug;
+                                    if ($slug) {
+                                        $href = '/calculator/' . rawurlencode((string)$cat) . '/' . rawurlencode((string)$slug);
+                                        echo '<a href="' . $href . '" class="dropdown-item">' . htmlspecialchars((string)$name) . '</a>';
+                                    }
+                                }
+                                echo '<hr style="border:none;border-top:1px solid var(--border-color);margin:4px 0;">';
+                            }
+                            echo '</div>';
+                            echo '</li>';
+                        }
+                    } catch (\Throwable $e) { }
+                    ?>
                     
                     <!-- Civil Engineering Dropdown -->
                     <li class="nav-item dropdown">

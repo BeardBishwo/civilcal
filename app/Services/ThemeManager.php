@@ -561,6 +561,25 @@ class ThemeManager
             }
             $zip->close();
 
+            // Post-extract limits
+            list($totalBytes, $fileCount) = $this->dirStats($tempExtract);
+            $maxBytes = 100 * 1024 * 1024; // 100MB
+            $maxFiles = 10000;
+            if ($totalBytes > $maxBytes || $fileCount > $maxFiles) {
+                $this->rrmdir($tempBase);
+                return [
+                    'success' => false,
+                    'message' => 'Theme package too large'
+                ];
+            }
+
+            // Validate manifest and structure
+            $val = $this->validateThemeManifest($tempExtract, $themeConfig);
+            if (!($val['success'] ?? false)) {
+                $this->rrmdir($tempBase);
+                return $val;
+            }
+
             // Move extracted theme into themes directory
             $extractPath = $this->themesPath . $themeName;
             if (is_dir($extractPath)) {
@@ -665,6 +684,18 @@ class ThemeManager
         @rmdir($dir);
     }
 
+    private function dirStats(string $dir): array
+    {
+        $bytes = 0; $count = 0;
+        $it = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+        foreach ($it as $file) {
+            if ($file->isFile()) { $bytes += $file->getSize(); $count++; }
+        }
+        return [$bytes, $count];
+    }
+
     /**
      * Get theme backups
      */
@@ -721,6 +752,46 @@ class ThemeManager
                 'issues' => []
             ];
         }
+    }
+
+    private function validateThemeManifest(string $themeDir, array $config): array
+    {
+        $baseReal = realpath($themeDir) ?: $themeDir;
+        // Required fields
+        $name = $config['slug'] ?? ($config['name'] ?? null);
+        $version = $config['version'] ?? null;
+        if (!$name || !$version) {
+            return ['success' => false, 'message' => 'theme.json missing name/slug or version'];
+        }
+        // Required directories
+        $requiredDirs = ['assets','views'];
+        foreach ($requiredDirs as $d) {
+            if (!is_dir($themeDir . '/' . $d)) {
+                return ['success' => false, 'message' => "Required directory '{$d}' not found"];
+            }
+        }
+        // Validate asset lists if present
+        foreach (['styles','scripts'] as $key) {
+            if (isset($config[$key])) {
+                if (!is_array($config[$key])) {
+                    return ['success' => false, 'message' => "$key must be an array"];
+                }
+                foreach ($config[$key] as $rel) {
+                    if (!is_string($rel) || $rel === '') {
+                        return ['success' => false, 'message' => "$key entries must be non-empty strings"];
+                    }
+                    $full = rtrim($themeDir, '/\\') . '/' . ltrim($rel, '/\\');
+                    $real = realpath($full);
+                    if ($real === false || !is_file($real)) {
+                        return ['success' => false, 'message' => "Referenced asset not found: $rel"];
+                    }
+                    if (strpos($real, $baseReal) !== 0) {
+                        return ['success' => false, 'message' => 'Asset path traversal detected'];
+                    }
+                }
+            }
+        }
+        return ['success' => true, 'message' => 'Manifest validated'];
     }
 
     /**
@@ -822,6 +893,7 @@ class ThemeManager
                 'is_premium' => (bool) $activeThemeData['is_premium'],
                 'price' => (float) $activeThemeData['price'],
                 'config' => $activeThemeData['config'] ?? [],
+                'settings' => $activeThemeData['settings'] ?? [],
                 'status' => $activeThemeData['status'],
                 'activated_at' => $activeThemeData['activated_at'],
                 'usage_count' => (int) $activeThemeData['usage_count']
@@ -869,6 +941,27 @@ class ThemeManager
         }
         
         return $availableThemes;
+    }
+
+    /**
+     * Update theme settings (settings_json) only
+     */
+    public function updateThemeSettings(int $id, array $settings): array
+    {
+        try {
+            $ok = $this->themeModel->updateSettings($id, $settings);
+            if ($ok) {
+                // If the updated theme is active, reload
+                $active = $this->themeModel->getActive();
+                if ($active && (int)$active['id'] === (int)$id) {
+                    $this->loadActiveTheme();
+                }
+                return ['success' => true, 'message' => 'Theme settings updated'];
+            }
+            return ['success' => false, 'message' => 'Failed to update settings'];
+        } catch (Exception $e) {
+            return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
+        }
     }
 
     public function themeUrl($path = '')

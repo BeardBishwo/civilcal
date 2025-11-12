@@ -7,6 +7,7 @@ class ElectricalServiceProvider extends BaseProvider
 {
     public function register($router): void
     {
-        // Register Electrical module specific routes here in future
+        // Register Electrical module health endpoint
+        $router->add('GET', '/api/v1/electrical/health', 'Api\\Electrical\\StatusController@health');
     }
 }

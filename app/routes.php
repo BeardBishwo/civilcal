@@ -73,6 +73,8 @@ $router->add('GET', '/api/v1/calculators', 'ApiController@getCalculators');
 $router->add('GET', '/api/v1/calculator/{category}/{tool}', 'ApiController@getCalculator');
 $router->add('GET', '/api/v1/calculations', 'ApiController@getUserCalculations');
 $router->add('GET', '/api/v1/calculations/{id}', 'ApiController@getCalculation');
+// API v1 Health
+$router->add('GET', '/api/v1/health', 'Api\\V1\\HealthController@health');
 
 // Admin Routes
 $router->add('GET', '/admin', 'Admin\DashboardController@index', ['auth', 'admin']);
@@ -108,19 +110,24 @@ $router->add('POST', '/api/widgets/setting/{id}', 'ApiController@updateWidgetSet
 
 // Plugin Management Routes
 $router->add('GET', '/admin/plugins', 'Admin\PluginController@index', ['auth', 'admin']);
-$router->add('POST', '/admin/plugins/upload', 'Admin\PluginController@upload', ['auth', 'admin']);
-$router->add('POST', '/admin/plugins/toggle', 'Admin\PluginController@toggle', ['auth', 'admin']);
-$router->add('POST', '/admin/plugins/toggle/{slug}/{action}', 'Admin\PluginController@toggle', ['auth', 'admin']);
-$router->add('POST', '/admin/plugins/delete/{slug}', 'Admin\PluginController@delete', ['auth', 'admin']);
-$router->add('GET', '/admin/plugins/details/{slug}', 'Admin\PluginController@details', ['auth', 'admin']);
-$router->add('POST', '/admin/plugins/refresh', 'Admin\PluginController@refresh', ['auth', 'admin']);
+$router->add('POST', '/admin/plugins/upload', 'Admin\PluginController@upload', ['auth', 'admin', 'ratelimit']);
+$router->add('POST', '/admin/plugins/toggle', 'Admin\PluginController@toggle', ['auth', 'admin', 'ratelimit']);
+$router->add('POST', '/admin/plugins/toggle/{slug}/{action}', 'Admin\PluginController@toggle', ['auth', 'admin', 'ratelimit']);
+$router->add('POST', '/admin/plugins/delete/{slug}', 'Admin\PluginController@delete', ['auth', 'admin', 'ratelimit']);
+$router->add('GET', '/admin/plugins/details/{slug}', 'Admin\PluginController@details', ['auth', 'admin', 'ratelimit']);
+$router->add('POST', '/admin/plugins/refresh', 'Admin\PluginController@refresh', ['auth', 'admin', 'ratelimit']);
 
 // Theme Management Routes
 $router->add('GET', '/admin/themes', 'Admin\ThemeController@index', ['auth', 'admin']);
-$router->add('POST', '/admin/themes/upload', 'Admin\ThemeController@upload', ['auth', 'admin']);
-$router->add('POST', '/admin/themes/activate/{slug}', 'Admin\ThemeController@activate', ['auth', 'admin']);
-$router->add('POST', '/admin/themes/delete/{slug}', 'Admin\ThemeController@delete', ['auth', 'admin']);
+$router->add('POST', '/admin/themes/upload', 'Admin\ThemeController@upload', ['auth', 'admin', 'ratelimit']);
+$router->add('POST', '/admin/themes/activate/{slug}', 'Admin\ThemeController@activate', ['auth', 'admin', 'ratelimit']);
+$router->add('POST', '/admin/themes/activate', 'Admin\ThemeController@activate', ['auth', 'admin', 'ratelimit']);
+$router->add('POST', '/admin/themes/delete/{slug}', 'Admin\ThemeController@delete', ['auth', 'admin', 'ratelimit']);
+$router->add('POST', '/admin/themes/delete', 'Admin\ThemeController@delete', ['auth', 'admin', 'ratelimit']);
+$router->add('POST', '/admin/themes/restore', 'Admin\ThemeController@restore', ['auth', 'admin', 'ratelimit']);
+$router->add('POST', '/admin/themes/hardDelete', 'Admin\ThemeController@hardDelete', ['auth', 'admin', 'ratelimit']);
 $router->add('GET', '/admin/themes/details/{slug}', 'Admin\ThemeController@details', ['auth', 'admin']);
+$router->add('POST', '/admin/themes/{id}/settings', 'Admin\ThemeController@updateSettings', ['auth', 'admin', 'ratelimit']);
 
 // Premium Theme Management Routes
 $router->add('GET', '/admin/premium-themes', 'Admin\PremiumThemeController@index', ['auth', 'admin']);
@@ -208,11 +215,17 @@ $router->add('POST', '/admin/subscriptions/create-plan', 'Admin\SubscriptionCont
 
 // Help & Logs Management Routes
 $router->add('GET', '/admin/help', 'Admin\HelpController@index', ['auth', 'admin']);
-$router->add('POST', '/admin/help/clear-logs', 'Admin\HelpController@clearLogs', ['auth', 'admin']);
-$router->add('POST', '/admin/help/backup', 'Admin\HelpController@backupSystem', ['auth', 'admin']);
-$router->add('POST', '/admin/help/export-themes', 'Admin\HelpController@exportThemes', ['auth', 'admin']);
-$router->add('POST', '/admin/help/export-plugins', 'Admin\HelpController@exportPlugins', ['auth', 'admin']);
-$router->add('POST', '/admin/help/restore', 'Admin\HelpController@restore', ['auth', 'admin']);
+$router->add('POST', '/admin/help/clear-logs', 'Admin\HelpController@clearLogs', ['auth', 'admin', 'ratelimit']);
+$router->add('POST', '/admin/help/backup', 'Admin\HelpController@backupSystem', ['auth', 'admin', 'ratelimit']);
+$router->add('POST', '/admin/help/export-themes', 'Admin\HelpController@exportThemes', ['auth', 'admin', 'ratelimit']);
+$router->add('POST', '/admin/help/export-plugins', 'Admin\HelpController@exportPlugins', ['auth', 'admin', 'ratelimit']);
+$router->add('POST', '/admin/help/restore', 'Admin\HelpController@restore', ['auth', 'admin', 'ratelimit']);
+$router->add('GET', '/admin/help/download-backup', 'Admin\HelpController@downloadBackup', ['auth', 'admin']);
+$router->add('POST', '/admin/help/export-logs', 'Admin\HelpController@exportLogs', ['auth', 'admin', 'ratelimit']);
+
+// Audit Logs Viewer
+$router->add('GET', '/admin/audit-logs', 'Admin\AuditLogController@index', ['auth', 'admin']);
+$router->add('GET', '/admin/audit-logs/download', 'Admin\AuditLogController@download', ['auth', 'admin']);
 
 // Email Manager Admin Routes
 $router->add('GET', '/admin/email-manager', 'Admin\EmailManagerController@dashboard', ['auth', 'admin']);

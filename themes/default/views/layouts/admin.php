@@ -30,6 +30,25 @@
         $theme->loadAdminStyles();
     }
     ?>
+    <?php
+    // Read active theme settings for admin CSS variables
+    try {
+        $tm_admin = new \App\Services\ThemeManager();
+        $meta_admin = $tm_admin->getThemeMetadata();
+        $cfg_admin = $meta_admin['config'] ?? [];
+        $settings_admin = $meta_admin['settings'] ?? [];
+        $colors_admin = $cfg_admin['colors'] ?? [];
+        $admin_primary = $settings_admin['primary'] ?? ($colors_admin['primary'] ?? '#4f46e5');
+        $admin_secondary = $settings_admin['secondary'] ?? ($colors_admin['secondary'] ?? '#64748b');
+        $admin_text = $settings_admin['text'] ?? ($colors_admin['text'] ?? '#1e293b');
+        $admin_text_secondary = $settings_admin['text_secondary'] ?? ($colors_admin['text_secondary'] ?? '#64748b');
+    } catch (\Throwable $e) {
+        $admin_primary = '#4f46e5';
+        $admin_secondary = '#64748b';
+        $admin_text = '#1e293b';
+        $admin_text_secondary = '#64748b';
+    }
+    ?>
 </head>
 <body class="admin-body">
     <!-- Admin Sidebar -->
@@ -477,10 +496,10 @@
     <style>
         /* Admin Theme Variables */
         :root {
-            --admin-primary: #4f46e5;
-            --admin-primary-dark: #4338ca;
-            --admin-primary-light: #6366f1;
-            --admin-secondary: #64748b;
+            --admin-primary: <?= htmlspecialchars($admin_primary) ?>;
+            --admin-primary-dark: <?= htmlspecialchars($admin_primary) ?>;
+            --admin-primary-light: <?= htmlspecialchars($admin_primary) ?>;
+            --admin-secondary: <?= htmlspecialchars($admin_secondary) ?>;
             --admin-success: #10b981;
             --admin-warning: #f59e0b;
             --admin-error: #ef4444;
@@ -490,8 +509,8 @@
             --admin-bg-light: #ffffff;
             --admin-bg-dark: #1e293b;
             
-            --admin-text: #1e293b;
-            --admin-text-light: #64748b;
+            --admin-text: <?= htmlspecialchars($admin_text) ?>;
+            --admin-text-light: <?= htmlspecialchars($admin_text_secondary) ?>;
             --admin-text-muted: #94a3b8;
             
             --admin-border: #e2e8f0;

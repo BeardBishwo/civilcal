@@ -12,7 +12,8 @@ class Router {
         'admin' => '\App\Middleware\AdminMiddleware',
         'cors' => '\App\Middleware\CorsMiddleware',
         'csrf' => '\App\Middleware\CsrfMiddleware',
-        'security' => '\App\Middleware\SecurityMiddleware'
+        'security' => '\App\Middleware\SecurityMiddleware',
+        'ratelimit' => '\App\Middleware\RateLimitMiddleware'
     ];
     
     public function add($method, $uri, $controller, $middleware = []) {

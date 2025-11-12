@@ -22,6 +22,9 @@ $content = '
             <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#restoreModal">
                 <i class="bi bi-arrow-counterclockwise me-2"></i>Restore
             </button>
+            <a class="btn btn-outline-dark btn-sm" href="/admin/audit-logs">
+                <i class="bi bi-file-text me-2"></i>Audit Logs
+            </a>
         </div>
     </div>
 
@@ -78,7 +81,7 @@ $content = '
                         <button class="btn btn-sm btn-outline-danger me-2" id="clearLogs">
                             <i class="bi bi-trash me-1"></i>Clear Logs
                         </button>
-                        <button class="btn btn-sm btn-outline-primary">
+                        <button class="btn btn-sm btn-outline-primary" id="exportLogs">
                             <i class="bi bi-download me-1"></i>Export Logs
                         </button>
                     </div>
@@ -318,6 +321,28 @@ document.getElementById("clearLogs").addEventListener("click", function() {
                 alert("Error: " + data.message);
             }
         });
+
+// Export system logs
+document.getElementById("exportLogs").addEventListener("click", function() {
+    const headers = { "X-Requested-With": "XMLHttpRequest" };
+    const csrfMeta = document.querySelector("meta[name=\"csrf-token\"]");
+    const csrf = csrfMeta ? csrfMeta.getAttribute("content") : null;
+    if (csrf) { headers["X-CSRF-Token"] = csrf; }
+    fetch("/admin/help/export-logs", { method: "POST", headers: headers })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                const msg = d.message + (d.filename ? " ("+d.filename+")" : "");
+                if (d.download_url && confirm(msg + "\nDownload now?")) {
+                    window.location = d.download_url;
+                } else {
+                    alert(msg + (d.path ? "\nSaved: " + d.path : ""));
+                }
+            } else {
+                alert("Error: " + d.message);
+            }
+        });
+});
     }
 });
 
@@ -335,7 +360,12 @@ document.getElementById("createBackup").addEventListener("click", function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert("Backup created successfully!");
+                const msg = "Backup created successfully!" + (data.filename ? " ("+data.filename+")" : "");
+                if (data.download_url && confirm(msg + "\nDownload now?")) {
+                    window.location = data.download_url;
+                } else {
+                    alert(msg + (data.path ? "\nSaved: " + data.path : ""));
+                }
             } else {
                 alert("Error: " + data.message);
             }
@@ -351,7 +381,18 @@ document.getElementById("exportThemes").addEventListener("click", function() {
     if (csrf) { headers["X-CSRF-Token"] = csrf; }
     fetch("/admin/help/export-themes", { method: "POST", headers: headers })
         .then(r => r.json())
-        .then(d => { alert(d.success ? (d.message + (d.path ? "\nSaved: " + d.path : "")) : ("Error: " + d.message)); });
+        .then(d => {
+            if (d.success) {
+                const msg = d.message + (d.filename ? " ("+d.filename+")" : "");
+                if (d.download_url && confirm(msg + "\nDownload now?")) {
+                    window.location = d.download_url;
+                } else {
+                    alert(msg + (d.path ? "\nSaved: " + d.path : ""));
+                }
+            } else {
+                alert("Error: " + d.message);
+            }
+        });
 });
 
 // Export plugins
@@ -362,7 +403,18 @@ document.getElementById("exportPlugins").addEventListener("click", function() {
     if (csrf) { headers["X-CSRF-Token"] = csrf; }
     fetch("/admin/help/export-plugins", { method: "POST", headers: headers })
         .then(r => r.json())
-        .then(d => { alert(d.success ? (d.message + (d.path ? "\nSaved: " + d.path : "")) : ("Error: " + d.message)); });
+        .then(d => {
+            if (d.success) {
+                const msg = d.message + (d.filename ? " ("+d.filename+")" : "");
+                if (d.download_url && confirm(msg + "\nDownload now?")) {
+                    window.location = d.download_url;
+                } else {
+                    alert(msg + (d.path ? "\nSaved: " + d.path : ""));
+                }
+            } else {
+                alert("Error: " + d.message);
+            }
+        });
 });
 
 // Restore validate

@@ -1,6 +1,8 @@
 <?php
 namespace App\Calculators;
 
+use App\Services\PluginManager;
+
 class CalculatorFactory
 {
     public static function create($calculatorType, $calculatorSlug = null)
@@ -42,33 +44,51 @@ class CalculatorFactory
     public static function getAvailableCalculators()
     {
         $calculators = [];
-        
-        // Load from database or scan modules directory
+
+        // Load from modules directory (core calculators)
         $modulesPath = __DIR__ . '/../../modules';
-        $categories = scandir($modulesPath);
-        
-        foreach ($categories as $category) {
-            if ($category === '.' || $category === '..') continue;
-            
-            $categoryPath = $modulesPath . '/' . $category;
-            if (is_dir($categoryPath)) {
-                $calculatorFiles = glob($categoryPath . '/*/*.php');
-                
-                foreach ($calculatorFiles as $file) {
-                    $slug = pathinfo($file, PATHINFO_FILENAME);
-                    $subcategory = basename(dirname($file));
-                    
-                    $calculators[] = [
-                        'category' => $category,
-                        'subcategory' => $subcategory,
-                        'slug' => $slug,
-                        'name' => self::slugToName($slug),
-                        'path' => $file
-                    ];
+        if (is_dir($modulesPath)) {
+            $categories = scandir($modulesPath);
+            foreach ($categories as $category) {
+                if ($category === '.' || $category === '..') continue;
+                $categoryPath = $modulesPath . '/' . $category;
+                if (is_dir($categoryPath)) {
+                    $calculatorFiles = glob($categoryPath . '/*/*.php');
+                    foreach ($calculatorFiles as $file) {
+                        $slug = pathinfo($file, PATHINFO_FILENAME);
+                        $subcategory = basename(dirname($file));
+                        $calculators[] = [
+                            'category' => $category,
+                            'subcategory' => $subcategory,
+                            'slug' => $slug,
+                            'name' => self::slugToName($slug),
+                            'path' => $file
+                        ];
+                    }
                 }
             }
         }
-        
+
+        // Include active plugin calculators (if any)
+        try {
+            $pm = new PluginManager();
+            $pluginCalcs = $pm->getActiveCalculators();
+            foreach ($pluginCalcs as $pc) {
+                // Expect keys: category, calculator (slug), file_path, name
+                if (!empty($pc['category']) && !empty($pc['calculator']) && !empty($pc['file_path'])) {
+                    $calculators[] = [
+                        'category' => $pc['category'],
+                        'subcategory' => 'plugin',
+                        'slug' => $pc['calculator'],
+                        'name' => $pc['name'] ?? self::slugToName($pc['calculator']),
+                        'path' => $pc['file_path']
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silent fail to avoid breaking API listing if plugins table not ready
+        }
+
         return $calculators;
     }
     

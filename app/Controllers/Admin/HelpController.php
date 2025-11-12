@@ -3,6 +3,7 @@ namespace App\Controllers\Admin;
 
 use App\Core\Controller;
 use App\Core\Database;
+use App\Services\AuditLogger;
 
 class HelpController extends Controller
 {
@@ -15,6 +16,31 @@ class HelpController extends Controller
         include __DIR__ . '/../../Views/admin/help/index.php';
     }
 
+    public function exportLogs()
+    {
+        header('Content-Type: application/json');
+        try {
+            $logsDir = (defined('STORAGE_PATH') ? STORAGE_PATH : dirname(__DIR__, 3) . '/storage') . '/logs';
+            if (!is_dir($logsDir)) {
+                echo json_encode(['success' => false, 'message' => 'Logs directory not found']);
+                return;
+            }
+            $backupDir = (defined('STORAGE_PATH') ? STORAGE_PATH : dirname(__DIR__, 3) . '/storage') . '/backups';
+            if (!is_dir($backupDir)) { @mkdir($backupDir, 0755, true); }
+            $zipPath = $backupDir . '/logs-export-' . date('Ymd-His') . '.zip';
+            $ok = $this->zipDirectory($logsDir, $zipPath);
+            $file = basename($zipPath);
+            $download = '/admin/help/download-backup?file=' . rawurlencode($file);
+            $resp = $ok ? ['success' => true, 'message' => 'Logs exported', 'path' => $zipPath, 'filename' => $file, 'download_url' => $download]
+                        : ['success' => false, 'message' => 'Failed to create zip'];
+            AuditLogger::info($ok ? 'logs_exported' : 'logs_export_failed', $ok ? ['path' => $zipPath] : ['message' => 'Failed to create zip']);
+            echo json_encode($resp);
+        } catch (\Exception $e) {
+            AuditLogger::error('logs_export_exception', ['error' => $e->getMessage()]);
+            echo json_encode(['success' => false, 'message' => 'Export failed: ' . $e->getMessage()]);
+        }
+    }
+
     public function clearLogs()
     {
         $result = $this->clearSystemLogs();
@@ -25,8 +51,13 @@ class HelpController extends Controller
 
     public function backupSystem()
     {
-        $result = $this->createBackup();
-        
+        // Create a full system backup package: db.sql + themes + plugins + manifest.json
+        $result = $this->createSystemBackupPackage();
+        if ($result['success'] ?? false) {
+            AuditLogger::info('system_backup_created', ['path' => $result['path'] ?? null]);
+        } else {
+            AuditLogger::warning('system_backup_failed', ['message' => $result['message'] ?? null]);
+        }
         echo json_encode($result);
         return;
     }
@@ -44,9 +75,14 @@ class HelpController extends Controller
             if (!is_dir($backupDir)) { @mkdir($backupDir, 0755, true); }
             $zipPath = $backupDir . '/themes-export-' . date('Ymd-His') . '.zip';
             $ok = $this->zipDirectory($themesDir, $zipPath);
-            echo json_encode($ok ? ['success' => true, 'message' => 'Themes exported', 'path' => $zipPath]
-                                  : ['success' => false, 'message' => 'Failed to create zip']);
+            $file = basename($zipPath);
+            $download = '/admin/help/download-backup?file=' . rawurlencode($file);
+            $resp = $ok ? ['success' => true, 'message' => 'Themes exported', 'path' => $zipPath, 'filename' => $file, 'download_url' => $download]
+                        : ['success' => false, 'message' => 'Failed to create zip'];
+            AuditLogger::info($ok ? 'themes_exported' : 'themes_export_failed', $ok ? ['path' => $zipPath] : ['message' => 'Failed to create zip']);
+            echo json_encode($resp);
         } catch (\Exception $e) {
+            AuditLogger::error('themes_export_exception', ['error' => $e->getMessage()]);
             echo json_encode(['success' => false, 'message' => 'Export failed: ' . $e->getMessage()]);
         }
     }
@@ -64,9 +100,14 @@ class HelpController extends Controller
             if (!is_dir($backupDir)) { @mkdir($backupDir, 0755, true); }
             $zipPath = $backupDir . '/plugins-export-' . date('Ymd-His') . '.zip';
             $ok = $this->zipDirectory($pluginsDir, $zipPath);
-            echo json_encode($ok ? ['success' => true, 'message' => 'Plugins exported', 'path' => $zipPath]
-                                  : ['success' => false, 'message' => 'Failed to create zip']);
+            $file = basename($zipPath);
+            $download = '/admin/help/download-backup?file=' . rawurlencode($file);
+            $resp = $ok ? ['success' => true, 'message' => 'Plugins exported', 'path' => $zipPath, 'filename' => $file, 'download_url' => $download]
+                        : ['success' => false, 'message' => 'Failed to create zip'];
+            AuditLogger::info($ok ? 'plugins_exported' : 'plugins_export_failed', $ok ? ['path' => $zipPath] : ['message' => 'Failed to create zip']);
+            echo json_encode($resp);
         } catch (\Exception $e) {
+            AuditLogger::error('plugins_export_exception', ['error' => $e->getMessage()]);
             echo json_encode(['success' => false, 'message' => 'Export failed: ' . $e->getMessage()]);
         }
     }
@@ -75,27 +116,73 @@ class HelpController extends Controller
     {
         header('Content-Type: application/json');
         try {
-            if (!isset($_FILES['restore_zip']) || ($_FILES['restore_zip']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+            if (!isset($_FILES['restore_zip']) || (($_FILES['restore_zip']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK)) {
                 echo json_encode(['success' => false, 'message' => 'No restore file uploaded']);
                 return;
             }
-            $tmp = $_FILES['restore_zip']['tmp_name'];
+
+            $tmpZip = $_FILES['restore_zip']['tmp_name'];
             $zip = new \ZipArchive();
-            $res = $zip->open($tmp);
-            if ($res !== true) {
+            if ($zip->open($tmpZip) !== true) {
                 echo json_encode(['success' => false, 'message' => 'Invalid zip file']);
                 return;
             }
+
+            // Zip bomb safeguards
+            [ $unzBytes, $unzFiles ] = $this->sumZipUncompressed($zip);
+            $maxBytes = 200 * 1024 * 1024; // 200MB
+            $maxFiles = 15000;
+            if ($unzBytes > $maxBytes || $unzFiles > $maxFiles) {
+                $zip->close();
+                echo json_encode(['success' => false, 'message' => 'Restore package too large']);
+                return;
+            }
+
             $manifestIndex = $zip->locateName('manifest.json');
             $manifest = $manifestIndex !== false ? json_decode($zip->getFromIndex($manifestIndex), true) : null;
-            $hasDb = $zip->locateName('db.sql') !== false;
             $zip->close();
-            echo json_encode([
+
+            $restoreBase = (defined('STORAGE_PATH') ? STORAGE_PATH : dirname(__DIR__, 3) . '/storage');
+            $workDir = rtrim($restoreBase, '/\\') . '/tmp/restore-' . date('Ymd-His') . '-' . bin2hex(random_bytes(4));
+            @mkdir($workDir, 0755, true);
+            if (!$this->extractZipTo($tmpZip, $workDir)) {
+                echo json_encode(['success' => false, 'message' => 'Failed to extract restore package']);
+                return;
+            }
+
+            // Apply DB restore if present
+            $dbSql = $workDir . '/db.sql';
+            if (is_file($dbSql)) {
+                $sql = file_get_contents($dbSql);
+                $this->applySql($sql);
+            }
+
+            // Copy themes if present
+            $themesSrc = $workDir . '/themes';
+            $themesDst = (defined('BASE_PATH') ? BASE_PATH : dirname(__DIR__, 3)) . '/themes';
+            if (is_dir($themesSrc)) {
+                $this->copyDirectory($themesSrc, $themesDst);
+            }
+
+            // Copy plugins if present
+            $pluginsSrc = $workDir . '/plugins/calculator-plugins';
+            $pluginsDst = (defined('BASE_PATH') ? BASE_PATH : dirname(__DIR__, 3)) . '/plugins/calculator-plugins';
+            if (is_dir($pluginsSrc)) {
+                $this->copyDirectory($pluginsSrc, $pluginsDst);
+            }
+
+            // Cleanup workdir
+            $this->rrmdir($workDir);
+
+            $resp = [
                 'success' => true,
-                'message' => 'Restore package validated (dry run)',
-                'data' => [ 'manifest' => $manifest, 'has_db_sql' => $hasDb ]
-            ]);
-        } catch (\Exception $e) {
+                'message' => 'System restore completed',
+                'data' => [ 'manifest' => $manifest ]
+            ];
+            AuditLogger::info('system_restore_completed', ['has_manifest' => (bool)$manifest]);
+            echo json_encode($resp);
+        } catch (\Throwable $e) {
+            AuditLogger::error('system_restore_failed', ['error' => $e->getMessage()]);
             echo json_encode(['success' => false, 'message' => 'Restore failed: ' . $e->getMessage()]);
         }
     }
@@ -138,33 +225,27 @@ class HelpController extends Controller
 
     private function getSystemLogs()
     {
-        // Mock data for system logs
-        return [
-            [
-                'level' => 'INFO',
-                'message' => 'User login successful: admin',
-                'timestamp' => '2024-01-15 14:30:15',
-                'ip' => '192.168.1.100'
-            ],
-            [
-                'level' => 'WARNING',
-                'message' => 'Failed login attempt for user: testuser',
-                'timestamp' => '2024-01-15 14:25:30',
-                'ip' => '192.168.1.150'
-            ],
-            [
-                'level' => 'ERROR',
-                'message' => 'Database connection timeout',
-                'timestamp' => '2024-01-15 13:45:12',
-                'ip' => '127.0.0.1'
-            ],
-            [
-                'level' => 'INFO',
-                'message' => 'Calculation completed: Concrete Volume',
-                'timestamp' => '2024-01-15 13:30:45',
-                'ip' => '192.168.1.200'
-            ]
-        ];
+        try {
+            $dir = (defined('STORAGE_PATH') ? STORAGE_PATH : dirname(__DIR__, 3) . '/storage') . '/logs';
+            $file = $dir . '/' . date('Y-m-d') . '.log';
+            if (!is_file($file)) { return []; }
+            $lines = @file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+            $lines = array_slice($lines, -50); // last 50
+            $out = [];
+            foreach ($lines as $line) {
+                $obj = json_decode($line, true);
+                if (!is_array($obj)) { continue; }
+                $out[] = [
+                    'level' => strtoupper($obj['level'] ?? 'INFO'),
+                    'message' => (string)($obj['message'] ?? ''),
+                    'timestamp' => $obj['timestamp'] ?? date('Y-m-d H:i:s'),
+                    'ip' => $obj['context']['ip'] ?? ($_SERVER['REMOTE_ADDR'] ?? '-')
+                ];
+            }
+            return array_reverse($out); // newest last in file; reverse for UI
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     private function clearSystemLogs()
@@ -248,6 +329,172 @@ class HelpController extends Controller
         } catch (\Exception $e) {
             return ['success' => false, 'message' => 'Backup failed: ' . $e->getMessage()];
         }
+    }
+
+    private function createSystemBackupPackage(): array
+    {
+        try {
+            // Generate DB SQL first
+            $db = $this->createBackup();
+            if (!($db['success'] ?? false)) {
+                return $db;
+            }
+            $backupDir = (defined('STORAGE_PATH') ? STORAGE_PATH : dirname(__DIR__, 3) . '/storage') . '/backups';
+            if (!is_dir($backupDir)) { @mkdir($backupDir, 0755, true); }
+            $zipPath = $backupDir . '/system-backup-' . date('Ymd-His') . '.zip';
+
+            $zip = new \ZipArchive();
+            if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+                return ['success' => false, 'message' => 'Cannot create backup zip'];
+            }
+
+            // Add manifest
+            $manifest = [
+                'app' => 'Bishwo Calculator',
+                'created_at' => date('c'),
+                'version' => '1.0.0'
+            ];
+            $zip->addFromString('manifest.json', json_encode($manifest, JSON_PRETTY_PRINT));
+
+            // Add DB dump
+            $zip->addFile($db['path'], 'db.sql');
+
+            // Add themes directory
+            $themesDir = (defined('BASE_PATH') ? BASE_PATH : dirname(__DIR__, 3)) . '/themes';
+            if (is_dir($themesDir)) {
+                $this->zipAddDirectory($zip, realpath($themesDir), 'themes');
+            }
+
+            // Add plugins directory (calculator-plugins)
+            $pluginsDir = (defined('BASE_PATH') ? BASE_PATH : dirname(__DIR__, 3)) . '/plugins/calculator-plugins';
+            if (is_dir($pluginsDir)) {
+                $this->zipAddDirectory($zip, realpath($pluginsDir), 'plugins/calculator-plugins');
+            }
+
+            $zip->close();
+            $file = basename($zipPath);
+            $download = '/admin/help/download-backup?file=' . rawurlencode($file);
+            return ['success' => true, 'message' => 'System backup created', 'path' => $zipPath, 'filename' => $file, 'download_url' => $download];
+        } catch (\Throwable $e) {
+            return ['success' => false, 'message' => 'Backup failed: ' . $e->getMessage()];
+        }
+    }
+
+    public function downloadBackup(): void
+    {
+        $base = (defined('STORAGE_PATH') ? STORAGE_PATH : dirname(__DIR__, 3) . '/storage');
+        $dir = rtrim($base, '/\\') . '/backups';
+        $file = $_GET['file'] ?? '';
+        $file = basename($file);
+        $path = $dir . '/' . $file;
+        if (!$file || !is_file($path)) {
+            http_response_code(404);
+            echo 'Not found';
+            return;
+        }
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="' . $file . '"');
+        header('Content-Length: ' . filesize($path));
+        readfile($path);
+    }
+
+    private function zipAddDirectory(\ZipArchive $zip, string $source, string $base): void
+    {
+        $source = realpath($source);
+        if ($source === false) return;
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+        foreach ($files as $file) {
+            $filePath = realpath($file);
+            $localName = $base . '/' . ltrim(str_replace($source, '', $filePath), DIRECTORY_SEPARATOR);
+            if (is_dir($file)) {
+                $zip->addEmptyDir($localName);
+            } else {
+                $zip->addFile($filePath, $localName);
+            }
+        }
+    }
+
+    private function extractZipTo(string $zipFile, string $destination): bool
+    {
+        $zip = new \ZipArchive();
+        if ($zip->open($zipFile) !== true) { return false; }
+        $ok = $zip->extractTo($destination);
+        $zip->close();
+        if (!$ok) return false;
+        // post-extract sanity
+        [ $bytes, $files ] = $this->dirStats($destination);
+        $maxBytes = 200 * 1024 * 1024; // 200MB
+        $maxFiles = 15000;
+        if ($bytes > $maxBytes || $files > $maxFiles) {
+            $this->rrmdir($destination);
+            return false;
+        }
+        return true;
+    }
+
+    private function dirStats(string $dir): array
+    {
+        $bytes = 0; $count = 0;
+        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS));
+        foreach ($it as $file) {
+            if ($file->isFile()) { $bytes += $file->getSize(); $count++; }
+        }
+        return [$bytes, $count];
+    }
+
+    private function rrmdir(string $dir): void
+    {
+        if (!is_dir($dir)) return;
+        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
+        foreach ($it as $file) {
+            if ($file->isDir()) { @rmdir($file->getRealPath()); } else { @unlink($file->getRealPath()); }
+        }
+        @rmdir($dir);
+    }
+
+    private function copyDirectory(string $src, string $dst): void
+    {
+        if (!is_dir($src)) return;
+        if (!is_dir($dst)) { @mkdir($dst, 0755, true); }
+        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($src, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+        $srcReal = realpath($src) ?: $src;
+        foreach ($it as $file) {
+            $fileReal = $file->getRealPath();
+            $rel = ltrim(str_replace($srcReal, '', $fileReal), DIRECTORY_SEPARATOR);
+            $target = $dst . DIRECTORY_SEPARATOR . $rel;
+            if ($file->isDir()) {
+                if (!is_dir($target)) { @mkdir($target, 0755, true); }
+            } else {
+                @copy($file->getRealPath(), $target);
+            }
+        }
+    }
+
+    private function sumZipUncompressed(\ZipArchive $zip): array
+    {
+        $bytes = 0; $files = 0;
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $stat = $zip->statIndex($i);
+            if (!$stat) continue;
+            if (substr($stat['name'], -1) === '/') { continue; }
+            $bytes += $stat['size'];
+            $files++;
+        }
+        return [$bytes, $files];
+    }
+
+    private function applySql(string $sql): void
+    {
+        $pdo = Database::getInstance()->getPdo();
+        $pdo->exec('SET FOREIGN_KEY_CHECKS=0');
+        // Split on semicolons at end of line; naive but works for our generated dumps
+        $statements = preg_split('/;\s*\n/', $sql);
+        foreach ($statements as $stmt) {
+            $trim = trim($stmt);
+            if ($trim === '') continue;
+            $pdo->exec($trim);
+        }
+        $pdo->exec('SET FOREIGN_KEY_CHECKS=1');
     }
 }
 ?>

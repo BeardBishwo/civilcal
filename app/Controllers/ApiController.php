@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Auth;
 use App\Services\CalculationService;
+use App\Calculators\CalculatorFactory;
 
 class ApiController extends Controller
 {
@@ -163,40 +164,34 @@ class ApiController extends Controller
     
     private function getAvailableCalculators()
     {
-        // This would typically come from database
-        return [
-            [
-                'category' => 'civil',
-                'tools' => [
-                    [
-                        'slug' => 'concrete-volume',
-                        'name' => 'Concrete Volume Calculator',
-                        'description' => 'Calculate volume of concrete required',
-                        'inputs' => [
-                            ['name' => 'length', 'type' => 'number', 'required' => true, 'label' => 'Length (m)'],
-                            ['name' => 'width', 'type' => 'number', 'required' => true, 'label' => 'Width (m)'],
-                            ['name' => 'height', 'type' => 'number', 'required' => true, 'label' => 'Height (m)']
-                        ]
-                    ]
-                ]
-            ]
-        ];
+        $flat = CalculatorFactory::getAvailableCalculators();
+        $grouped = [];
+        foreach ($flat as $c) {
+            $cat = $c['category'] ?? 'general';
+            if (!isset($grouped[$cat])) {
+                $grouped[$cat] = [ 'category' => $cat, 'tools' => [] ];
+            }
+            $grouped[$cat]['tools'][] = [
+                'slug' => $c['slug'] ?? '',
+                'name' => $c['name'] ?? ($c['slug'] ?? ''),
+                'subcategory' => $c['subcategory'] ?? null,
+                'path' => $c['path'] ?? null
+            ];
+        }
+        return array_values($grouped);
     }
     
     private function getCalculatorInfo($category, $tool)
     {
-        $calculators = $this->getAvailableCalculators();
-        
-        foreach ($calculators as $cat) {
-            if ($cat['category'] === $category) {
+        foreach ($this->getAvailableCalculators() as $cat) {
+            if (($cat['category'] ?? '') === $category) {
                 foreach ($cat['tools'] as $calculator) {
-                    if ($calculator['slug'] === $tool) {
+                    if (($calculator['slug'] ?? '') === $tool) {
                         return $calculator;
                     }
                 }
             }
         }
-        
         return null;
     }
     

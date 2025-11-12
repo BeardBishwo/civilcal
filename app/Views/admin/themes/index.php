@@ -168,6 +168,9 @@ $error = $data['error'] ?? null;
                     <small class="text-muted">by <?= htmlspecialchars($activeTheme['author']) ?></small>
                 </div>
                 <div>
+                    <button class="btn btn-outline-primary me-2" id="customizeThemeBtn" data-theme-id="<?= (int)($activeTheme['id'] ?? 0) ?>">
+                        <i class="bi bi-sliders me-1"></i>Customize
+                    </button>
                     <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#deactivateThemeModal">
                         <i class="bi bi-pause-circle me-1"></i>Deactivate
                     </button>
@@ -288,7 +291,7 @@ $error = $data['error'] ?? null;
                                     </button>
                                 <?php endif; ?>
 
-                                <button class="btn btn-outline-primary btn-sm preview-theme" data-theme-id="<?= $theme['id'] ?>">
+                                <button class="btn btn-outline-primary btn-sm preview-theme" data-theme-id="<?= $theme['id'] ?>" data-preview="<?= htmlspecialchars($theme['screenshot_path'] ?? '') ?>" data-name="<?= htmlspecialchars($theme['display_name'] ?? $theme['name']) ?>">
                                     <i class="bi bi-eye me-1"></i>Preview
                                 </button>
 
@@ -490,6 +493,105 @@ $error = $data['error'] ?? null;
     </div>
 </div>
 
+<!-- Theme Preview Modal -->
+<div class="modal fade" id="themePreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="themePreviewTitle">Theme Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <img id="themePreviewImage" src="" alt="Theme Preview" class="img-fluid rounded d-none">
+                    <div id="themePreviewFallback" class="alert alert-info d-none mt-3">No preview image found for this theme.</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="customizeThemeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-sliders me-2"></i>Customize Theme</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="customizeThemeForm">
+                <div class="modal-body">
+                    <input type="hidden" id="customizeThemeId" value="<?= (int)($activeTheme['id'] ?? 0) ?>">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label">Primary</label>
+                            <div class="input-group">
+                                <input type="color" class="form-control form-control-color" id="colorPrimaryPicker">
+                                <input type="text" class="form-control" id="colorPrimary">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Secondary</label>
+                            <div class="input-group">
+                                <input type="color" class="form-control form-control-color" id="colorSecondaryPicker">
+                                <input type="text" class="form-control" id="colorSecondary">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Accent</label>
+                            <div class="input-group">
+                                <input type="color" class="form-control form-control-color" id="colorAccentPicker">
+                                <input type="text" class="form-control" id="colorAccent">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Background</label>
+                            <div class="input-group">
+                                <input type="color" class="form-control form-control-color" id="colorBackgroundPicker">
+                                <input type="text" class="form-control" id="colorBackground">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Text Primary</label>
+                            <div class="input-group">
+                                <input type="color" class="form-control form-control-color" id="colorTextPicker">
+                                <input type="text" class="form-control" id="colorText">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Text Secondary</label>
+                            <div class="input-group">
+                                <input type="color" class="form-control form-control-color" id="colorTextSecondaryPicker">
+                                <input type="text" class="form-control" id="colorTextSecondary">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Typography</label>
+                            <select id="typographyStyle" class="form-select">
+                                <option value="modern">Modern</option>
+                                <option value="classic">Classic</option>
+                                <option value="rounded">Rounded</option>
+                            </select>
+                        </div>
+                        <div class="col-6 d-flex align-items-end">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="darkModeEnabled">
+                                <label class="form-check-label" for="darkModeEnabled">Dark mode by default</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Loading Overlay -->
 <div class="loading-overlay d-none" id="loadingOverlay">
     <div class="text-center">
@@ -577,6 +679,52 @@ function filterThemes() {
     });
 }
 
+// Customize Theme
+(function(){
+  const customizeBtn = document.getElementById('customizeThemeBtn');
+  const modalEl = document.getElementById('customizeThemeModal');
+  if (!customizeBtn || !modalEl) return;
+  const colorsCfg = <?= json_encode($activeTheme['config']['colors'] ?? []) ?>;
+  const settingsCfg = <?= json_encode($activeTheme['settings'] ?? []) ?>;
+  const fallback = (k, def) => (settingsCfg && settingsCfg[k]) || (colorsCfg && colorsCfg[k]) || def;
+  const assignField = (pickerId, inputId, val) => { const p=document.getElementById(pickerId), i=document.getElementById(inputId); if(p) p.value=val||'#000000'; if(i) i.value=val||''; if(p&&i){ p.addEventListener('input',()=>{ i.value=p.value; }); i.addEventListener('input',()=>{ if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(i.value)) p.value=i.value; }); } };
+  const openModal = ()=>{
+    assignField('colorPrimaryPicker','colorPrimary', fallback('primary','#2563eb'));
+    assignField('colorSecondaryPicker','colorSecondary', fallback('secondary','#64748b'));
+    assignField('colorAccentPicker','colorAccent', fallback('accent','#0ea5e9'));
+    assignField('colorBackgroundPicker','colorBackground', fallback('background','#ffffff'));
+    assignField('colorTextPicker','colorText', fallback('text','#1e293b'));
+    assignField('colorTextSecondaryPicker','colorTextSecondary', fallback('text_secondary','#64748b'));
+    const dark = document.getElementById('darkModeEnabled'); if (dark) dark.checked = !!(settingsCfg && settingsCfg['dark_mode_enabled']);
+    const typo = document.getElementById('typographyStyle'); if (typo) typo.value = (settingsCfg && settingsCfg['typography_style']) || 'modern';
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) { new bootstrap.Modal(modalEl).show(); } else { modalEl.classList.add('show'); modalEl.style.display='block'; }
+  };
+  customizeBtn.addEventListener('click', openModal);
+
+  document.getElementById('customizeThemeForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const id = document.getElementById('customizeThemeId').value;
+    const payload = {
+      primary: document.getElementById('colorPrimary').value,
+      secondary: document.getElementById('colorSecondary').value,
+      accent: document.getElementById('colorAccent').value,
+      background: document.getElementById('colorBackground').value,
+      text: document.getElementById('colorText').value,
+      text_secondary: document.getElementById('colorTextSecondary').value,
+      dark_mode_enabled: document.getElementById('darkModeEnabled').checked,
+      typography_style: document.getElementById('typographyStyle').value
+    };
+    const headers = { 'Content-Type':'application/json', 'X-Requested-With':'XMLHttpRequest' };
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]'); const csrf = csrfMeta ? csrfMeta.getAttribute('content') : null; if (csrf) headers['X-CSRF-Token'] = csrf;
+    fetch(`/admin/themes/${id}/settings`, { method:'POST', headers, body: JSON.stringify(payload) })
+      .then(r=>r.json())
+      .then(d=>{
+        if (d.success) { alert('Theme settings saved. Reloading to apply...'); location.reload(); }
+        else { alert('Error: ' + (d.message||'Unable to save')); }
+      });
+  });
+})();
+
 function clearFilters() {
     document.getElementById('themeSearch').value = '';
     document.getElementById('statusFilter').value = '';
@@ -626,6 +774,34 @@ function initThemeActions() {
                 validateTheme(themeId);
             } else if (action === 'backup') {
                 createBackup(themeId);
+            }
+        });
+    });
+
+    // Preview theme
+    document.querySelectorAll('.preview-theme').forEach(button => {
+        button.addEventListener('click', function() {
+            const url = this.dataset.preview || '';
+            const name = this.dataset.name || 'Theme Preview';
+            const modalEl = document.getElementById('themePreviewModal');
+            const img = document.getElementById('themePreviewImage');
+            const title = document.getElementById('themePreviewTitle');
+            const fallback = document.getElementById('themePreviewFallback');
+            title.textContent = name;
+            if (url) {
+                img.src = url + (url.indexOf('?') > -1 ? '&' : '?') + 't=' + Date.now();
+                img.classList.remove('d-none');
+                fallback.classList.add('d-none');
+            } else {
+                img.classList.add('d-none');
+                fallback.classList.remove('d-none');
+            }
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const m = new bootstrap.Modal(modalEl);
+                m.show();
+            } else {
+                modalEl.classList.add('show');
+                modalEl.style.display = 'block';
             }
         });
     });

@@ -81,6 +81,24 @@ class PluginManager {
             // Extract files
             $zip->extractTo($extractPath);
             $zip->close();
+
+            // Validate manifest
+            if (!$this->validatePluginManifest($extractPath)) {
+                // cleanup on invalid manifest
+                $this->removeDirectory($extractPath);
+                Logger::warning('plugin_manifest_invalid', ['zip' => basename($zipFile)]);
+                return false;
+            }
+
+            // Zip bomb guard: enforce limits
+            [$totalBytes, $fileCount] = $this->dirStats($extractPath);
+            $maxBytes = 50 * 1024 * 1024; // 50 MB
+            $maxFiles = 5000;
+            if ($totalBytes > $maxBytes || $fileCount > $maxFiles) {
+                $this->removeDirectory($extractPath);
+                Logger::warning('plugin_zip_limits_exceeded', ['bytes' => $totalBytes, 'files' => $fileCount]);
+                return false;
+            }
             
             // Register in database
             return $this->registerPlugin($extractPath);
@@ -252,34 +270,97 @@ class PluginManager {
      */
     private function getPluginCalculators() {
         $pluginCalculators = [];
-        
         try {
-            $stmt = $this->db->prepare("SELECT * FROM plugins WHERE type = 'calculator' AND is_active = 1");
+            $stmt = $this->db->prepare("SELECT * FROM plugins WHERE is_active = 1");
             $stmt->execute();
             $activePlugins = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            
             foreach ($activePlugins as $plugin) {
                 $pluginConfig = $this->getPlugin($plugin['slug']);
-                if ($pluginConfig && isset($pluginConfig['calculators'])) {
-                    foreach ($pluginConfig['calculators'] as $calcSlug => $calcConfig) {
-                        $pluginCalculators[] = [
-                            'type' => 'plugin',
-                            'discipline' => $calcConfig['category'],
-                            'category' => $calcConfig['category'],
-                            'calculator' => $calcSlug,
-                            'file_path' => $plugin['plugin_path'] . '/' . $calcConfig['file'],
-                            'name' => $calcConfig['name'],
-                            'plugin_slug' => $plugin['slug'],
-                            'plugin_name' => $plugin['name']
-                        ];
-                    }
+                if (!$pluginConfig || empty($pluginConfig['calculators']) || !is_array($pluginConfig['calculators'])) {
+                    continue;
+                }
+                $base = rtrim($plugin['plugin_path'] ?? '', "/\\");
+                foreach ($pluginConfig['calculators'] as $calcSlug => $calcConfig) {
+                    $cat = $calcConfig['category'] ?? ($calcConfig['discipline'] ?? 'general');
+                    $fileRel = $calcConfig['file'] ?? ($calcConfig['file_path'] ?? '');
+                    if (!$fileRel || !$base) { continue; }
+                    $full = $base . '/' . ltrim($fileRel, '/\\');
+                    if (!is_file($full)) { continue; }
+                    $pluginCalculators[] = [
+                        'type' => 'plugin',
+                        'discipline' => $cat,
+                        'category' => $cat,
+                        'calculator' => is_string($calcSlug) ? $calcSlug : (pathinfo($fileRel, PATHINFO_FILENAME) ?: ''),
+                        'file_path' => $full,
+                        'name' => $calcConfig['name'] ?? (is_string($calcSlug) ? ucwords(str_replace(['-','_'],' ',$calcSlug)) : ''),
+                        'plugin_slug' => $plugin['slug'] ?? null,
+                        'plugin_name' => $plugin['name'] ?? null
+                    ];
                 }
             }
         } catch (\Exception $e) {
             error_log("Error getting plugin calculators: " . $e->getMessage());
         }
-        
         return $pluginCalculators;
+    }
+
+    /**
+     * Validate plugin.json manifest and required files
+     */
+    private function validatePluginManifest(string $pluginDir): bool
+    {
+        $manifest = rtrim($pluginDir, "/\\") . '/plugin.json';
+        if (!is_file($manifest)) {
+            return false;
+        }
+        $data = json_decode(file_get_contents($manifest), true);
+        if (!is_array($data)) {
+            return false;
+        }
+        // Required fields
+        $name = $data['name'] ?? ($data['id'] ?? null);
+        $version = $data['version'] ?? null;
+        $entry = $data['entrypoint'] ?? ($data['main_file'] ?? null);
+        if (!$name || !$version) {
+            return false;
+        }
+        // If entry defined, ensure file exists
+        if ($entry) {
+            $entryPath = rtrim($pluginDir, "/\\") . '/' . ltrim($entry, '/\\');
+            if (!is_file($entryPath)) {
+                return false;
+            }
+        }
+        // calculators mapping optional; if present, ensure array and validate entries
+        if (isset($data['calculators'])) {
+            if (!is_array($data['calculators'])) { return false; }
+            $baseReal = realpath($pluginDir) ?: $pluginDir;
+            foreach ($data['calculators'] as $slug => $cfg) {
+                if (!is_array($cfg)) { return false; }
+                $nameOk = isset($cfg['name']) && is_string($cfg['name']) && $cfg['name'] !== '';
+                $catOk = isset($cfg['category']) && is_string($cfg['category']) && $cfg['category'] !== '';
+                $fileRel = $cfg['file'] ?? ($cfg['file_path'] ?? null);
+                if (!$nameOk || !$catOk || !$fileRel) { return false; }
+                $full = rtrim($pluginDir, "/\\") . '/' . ltrim($fileRel, '/\\');
+                $fullReal = realpath($full);
+                if ($fullReal === false || !is_file($fullReal)) { return false; }
+                // Prevent path traversal: ensure file is inside plugin dir
+                if (strpos($fullReal, $baseReal) !== 0) { return false; }
+            }
+        }
+        return true;
+    }
+
+    private function dirStats(string $dir): array
+    {
+        $bytes = 0; $count = 0;
+        $it = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+        foreach ($it as $file) {
+            if ($file->isFile()) { $bytes += $file->getSize(); $count++; }
+        }
+        return [$bytes, $count];
     }
     
     /**

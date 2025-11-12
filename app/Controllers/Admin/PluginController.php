@@ -11,9 +11,10 @@ class PluginController extends Controller
 {
     public function index()
     {
-        // Mock data for plugins
-        $plugins = [];
-        $activePlugins = [];
+        // Load plugins from PluginManager
+        $pm = new PluginManager();
+        $plugins = $pm->scanPlugins();
+        $activePlugins = array_values(array_filter($plugins, function($p){ return !empty($p['is_active']); }));
         
         // Load the plugins management view
         include __DIR__ . '/../../Views/admin/plugins/index.php';
@@ -135,6 +136,54 @@ class PluginController extends Controller
             echo json_encode(['success' => false, 'message' => 'Invalid action']);
         } catch (\Throwable $e) {
             AuditLogger::error('plugin_toggle_exception', ['message' => $e->getMessage()]);
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    public function details($slug)
+    {
+        header('Content-Type: application/json');
+        try {
+            $pm = new PluginManager();
+            $plugin = $pm->getPlugin($slug);
+            if (!$plugin) {
+                echo json_encode(['success' => false, 'message' => 'Plugin not found']);
+                return;
+            }
+            echo json_encode(['success' => true, 'data' => $plugin]);
+        } catch (\Throwable $e) {
+            AuditLogger::error('plugin_details_exception', ['slug' => $slug, 'message' => $e->getMessage()]);
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    public function delete($slug)
+    {
+        header('Content-Type: application/json');
+        try {
+            $pm = new PluginManager();
+            $ok = $pm->deletePlugin($slug);
+            if ($ok) {
+                AuditLogger::info('plugin_deleted', ['slug' => $slug]);
+                echo json_encode(['success' => true, 'message' => 'Plugin deleted']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to delete plugin']);
+            }
+        } catch (\Throwable $e) {
+            AuditLogger::error('plugin_delete_exception', ['slug' => $slug, 'message' => $e->getMessage()]);
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    public function refresh()
+    {
+        header('Content-Type: application/json');
+        try {
+            $pm = new PluginManager();
+            $list = $pm->scanPlugins();
+            echo json_encode(['success' => true, 'count' => count($list)]);
+        } catch (\Throwable $e) {
+            AuditLogger::error('plugin_refresh_exception', ['message' => $e->getMessage()]);
             echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }

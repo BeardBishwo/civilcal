@@ -342,6 +342,20 @@ class Theme
         }
     }
     
+    public function updateSettings($id, array $settings)
+    {
+        try {
+            $stmt = $this->db->prepare("UPDATE {$this->table} SET settings_json = :settings_json, updated_at = NOW() WHERE id = :id");
+            return $stmt->execute([
+                ':id' => $id,
+                ':settings_json' => json_encode($settings)
+            ]);
+        } catch (PDOException $e) {
+            error_log("Theme Model Error (updateSettings): " . $e->getMessage());
+            return false;
+        }
+    }
+    
     /**
      * Get theme statistics
      */

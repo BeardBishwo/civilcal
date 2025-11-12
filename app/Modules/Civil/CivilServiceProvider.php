@@ -7,8 +7,7 @@ class CivilServiceProvider extends BaseProvider
 {
     public function register($router): void
     {
-        // Register Civil module specific routes here in future
-        // Example (when controller exists):
-        // $router->add('GET', '/api/v1/civil/health', 'Api\\Civil\\StatusController@health');
+        // Register Civil module health endpoint
+        $router->add('GET', '/api/v1/civil/health', 'Api\\Civil\\StatusController@health');
     }
 }

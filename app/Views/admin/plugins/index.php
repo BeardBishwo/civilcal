@@ -10,8 +10,8 @@ $content = '
             <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadPluginModal">
                 <i class="bi bi-upload me-2"></i>Upload Plugin
             </button>
-            <button class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-cloud-download me-2"></i>Marketplace
+            <button class="btn btn-outline-secondary btn-sm" id="pluginsRefreshBtn">
+                <i class="bi bi-arrow-repeat me-2"></i>Refresh
             </button>
         </div>
     </div>
@@ -26,23 +26,7 @@ $content = '
                 <div class="card-body">
                     <div class="row">';
                     
-                    // Mock active plugins data
-                    $activePlugins = [
-                        [
-                            'name' => 'PDF Export',
-                            'description' => 'Export calculation results to PDF',
-                            'version' => '2.1.0',
-                            'author' => 'Bishwo Team',
-                            'status' => 'active'
-                        ],
-                        [
-                            'name' => 'User Analytics',
-                            'description' => 'Track user behavior and calculator usage',
-                            'version' => '1.5.2',
-                            'author' => 'Analytics Team',
-                            'status' => 'active'
-                        ]
-                    ];
+                    // $activePlugins provided by controller
                     
                     if (empty($activePlugins)) {
                         $content .= '
@@ -52,28 +36,33 @@ $content = '
                         </div>';
                     } else {
                         foreach ($activePlugins as $plugin) {
+                            $pName = htmlspecialchars($plugin['name'] ?? $plugin['slug'] ?? 'Unknown');
+                            $pDesc = htmlspecialchars($plugin['description'] ?? '-');
+                            $pVer = htmlspecialchars($plugin['version'] ?? '-');
+                            $pAuthor = htmlspecialchars($plugin['author'] ?? '-');
+                            $dataPlugin = $plugin['name'] ?? ($plugin['slug'] ?? '');
                             $content .= '
                             <div class="col-md-6 col-lg-4 mb-3">
                                 <div class="card h-100">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h6 class="card-title mb-0">' . htmlspecialchars($plugin['name']) . '</h6>
+                                            <h6 class="card-title mb-0">' . $pName . '</h6>
                                             <span class="badge bg-success">Active</span>
                                         </div>
-                                        <p class="card-text small text-muted">' . htmlspecialchars($plugin['description']) . '</p>
+                                        <p class="card-text small text-muted">' . $pDesc . '</p>
                                         <div class="plugin-meta small text-muted">
-                                            <div><strong>Version:</strong> ' . ($plugin['version']) . '</div>
-                                            <div><strong>Author:</strong> ' . ($plugin['author']) . '</div>
+                                            <div><strong>Version:</strong> ' . $pVer . '</div>
+                                            <div><strong>Author:</strong> ' . $pAuthor . '</div>
                                         </div>
                                     </div>
                                     <div class="card-footer bg-transparent py-2">
                                         <div class="btn-group w-100">
                                             <button class="btn btn-outline-warning btn-sm toggle-plugin" 
-                                                    data-plugin="' . $plugin['name'] . '" data-action="disable">
+                                                    data-plugin="' . htmlspecialchars($dataPlugin) . '" data-action="disable">
                                                 <i class="bi bi-pause me-1"></i>Disable
                                             </button>
-                                            <button class="btn btn-outline-primary btn-sm">
-                                                <i class="bi bi-gear me-1"></i>Settings
+                                            <button class="btn btn-outline-primary btn-sm plugin-details" data-slug="' . htmlspecialchars($plugin['slug'] ?? '') . '">
+                                                <i class="bi bi-info-circle me-1"></i>Details
                                             </button>
                                         </div>
                                     </div>
@@ -111,57 +100,29 @@ $content = '
                             </thead>
                             <tbody>';
                             
-                            // Mock all plugins data
-                            $plugins = [
-                                [
-                                    'name' => 'PDF Export',
-                                    'folder' => 'pdf-export',
-                                    'description' => 'Export calculation results to PDF',
-                                    'version' => '2.1.0',
-                                    'author' => 'Bishwo Team',
-                                    'status' => 'active'
-                                ],
-                                [
-                                    'name' => 'User Analytics',
-                                    'folder' => 'user-analytics',
-                                    'description' => 'Track user behavior and calculator usage',
-                                    'version' => '1.5.2',
-                                    'author' => 'Analytics Team',
-                                    'status' => 'active'
-                                ],
-                                [
-                                    'name' => 'Email Notifications',
-                                    'folder' => 'email-notifications',
-                                    'description' => 'Send email notifications for important events',
-                                    'version' => '1.0.3',
-                                    'author' => 'Communication Team',
-                                    'status' => 'inactive'
-                                ],
-                                [
-                                    'name' => 'Social Sharing',
-                                    'folder' => 'social-sharing',
-                                    'description' => 'Share calculations on social media',
-                                    'version' => '1.2.0',
-                                    'author' => 'Social Team',
-                                    'status' => 'inactive'
-                                ]
-                            ];
+                            // $plugins provided by controller
                             
                             foreach ($plugins as $plugin) {
-                                $isActive = $plugin['status'] === 'active';
+                                $isActive = !empty($plugin['is_active']);
+                                $pName = htmlspecialchars($plugin['name'] ?? $plugin['slug'] ?? 'Unknown');
+                                $pSlug = htmlspecialchars($plugin['slug'] ?? '-');
+                                $pDesc = htmlspecialchars($plugin['description'] ?? '-');
+                                $pVer = htmlspecialchars($plugin['version'] ?? '-');
+                                $pAuthor = htmlspecialchars($plugin['author'] ?? '-');
+                                $dataPlugin = $plugin['name'] ?? ($plugin['slug'] ?? '');
                                 
                                 $content .= '
                                 <tr>
                                     <td>
-                                        <div class="fw-bold">' . htmlspecialchars($plugin['name']) . '</div>
-                                        <small class="text-muted">' . ($plugin['folder']) . '</small>
+                                        <div class="fw-bold">' . $pName . '</div>
+                                        <small class="text-muted">' . $pSlug . '</small>
                                     </td>
-                                    <td>' . htmlspecialchars($plugin['description']) . '</td>
-                                    <td><span class="badge bg-secondary">' . ($plugin['version']) . '</span></td>
-                                    <td>' . htmlspecialchars($plugin['author']) . '</td>
+                                    <td>' . $pDesc . '</td>
+                                    <td><span class="badge bg-secondary">' . $pVer . '</span></td>
+                                    <td>' . $pAuthor . '</td>
                                     <td>
                                         <span class="badge ' . ($isActive ? 'bg-success' : 'bg-secondary') . '">
-                                            ' . ucfirst($plugin['status']) . '
+                                            ' . ($isActive ? 'Active' : 'Inactive') . '
                                         </span>
                                     </td>
                                     <td>
@@ -170,24 +131,24 @@ $content = '
                                         if ($isActive) {
                                             $content .= '
                                             <button class="btn btn-outline-warning toggle-plugin" 
-                                                    data-plugin="' . $plugin['name'] . '" data-action="disable"
+                                                    data-plugin="' . htmlspecialchars($dataPlugin) . '" data-action="disable"
                                                     title="Disable Plugin">
                                                 <i class="bi bi-pause"></i>
                                             </button>';
                                         } else {
                                             $content .= '
                                             <button class="btn btn-outline-success toggle-plugin" 
-                                                    data-plugin="' . $plugin['name'] . '" data-action="enable"
+                                                    data-plugin="' . htmlspecialchars($dataPlugin) . '" data-action="enable"
                                                     title="Enable Plugin">
                                                 <i class="bi bi-play"></i>
                                             </button>';
                                         }
                                         
                                         $content .= '
-                                            <button class="btn btn-outline-info" title="Plugin Settings">
-                                                <i class="bi bi-gear"></i>
+                                            <button class="btn btn-outline-primary plugin-details" data-slug="' . $pSlug . '" title="Details">
+                                                <i class="bi bi-info-circle"></i>
                                             </button>
-                                            <button class="btn btn-outline-danger" title="Delete Plugin">
+                                            <button class="btn btn-outline-danger plugin-delete" data-slug="' . $pSlug . '" title="Delete Plugin">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -270,6 +231,24 @@ $content = '
     </div>
 </div>
 
+<!-- Plugin Details Modal -->
+<div class="modal fade" id="pluginDetailsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Plugin Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="pluginDetailsBody" class="small text-muted">Loading...</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 // Toggle plugin status
 document.querySelectorAll(".toggle-plugin").forEach(button => {
@@ -303,6 +282,71 @@ document.querySelectorAll(".toggle-plugin").forEach(button => {
         }
     });
 });
+
+// Handle plugin details modal
+document.querySelectorAll(".plugin-details").forEach(button => {
+    button.addEventListener("click", function() {
+        const pluginSlug = this.dataset.slug;
+        const modalEl = document.getElementById("pluginDetailsModal");
+        const modalBody = document.getElementById("pluginDetailsBody");
+        fetch("/admin/plugins/details/" + encodeURIComponent(pluginSlug), {
+            method: "GET",
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+        .then(response => response.json())
+        .then(res => {
+            if (!res.success) {
+                modalBody.innerHTML = "<div class=\"alert alert-danger mb-0\">" + (res.message || "Failed to load details") + "</div>";
+            } else {
+                const d = res.data || {};
+                modalBody.innerHTML = ""
+                  + "<div><strong>Name:</strong> " + (d.name || d.slug || "-") + "</div>"
+                  + "<div><strong>Slug:</strong> " + (d.slug || "-") + "</div>"
+                  + "<div><strong>Version:</strong> " + (d.version || "-") + "</div>"
+                  + "<div><strong>Author:</strong> " + (d.author || "-") + "</div>"
+                  + "<div><strong>Description:</strong> " + (d.description || "-") + "</div>"
+                  + "<div><strong>Active:</strong> " + ((d.is_active ? "Yes" : "No")) + "</div>"
+                  + "<div><strong>Path:</strong> " + (d.plugin_path || "-") + "</div>";
+            }
+            if (window.bootstrap) new bootstrap.Modal(modalEl).show();
+        });
+    });
+});
+
+// Handle plugin delete action
+document.querySelectorAll(".plugin-delete").forEach(button => {
+    button.addEventListener("click", function() {
+        const pluginSlug = this.dataset.slug;
+        const csrfMeta = document.querySelector("meta[name=\"csrf-token\"]");
+        const csrf = csrfMeta ? csrfMeta.getAttribute("content") : null;
+        if (!pluginSlug) return;
+        if (confirm("Are you sure you want to delete this plugin?")) {
+            fetch("/admin/plugins/delete/" + encodeURIComponent(pluginSlug), {
+                method: "POST",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRF-Token": csrf
+                }
+            })
+            .then(r => r.json())
+            .then(res => { if (res.success) location.reload(); else alert("Error: " + (res.message || "Delete failed")); });
+        }
+    });
+});
+
+// Handle plugins refresh
+const refreshBtn = document.getElementById("pluginsRefreshBtn");
+if (refreshBtn) {
+    refreshBtn.addEventListener("click", function() {
+        const headers = { "X-Requested-With": "XMLHttpRequest" };
+        const csrfMeta = document.querySelector("meta[name=\"csrf-token\"]");
+        const csrf = csrfMeta ? csrfMeta.getAttribute("content") : null;
+        if (csrf) { headers["X-CSRF-Token"] = csrf; }
+        fetch("/admin/plugins/refresh", { method: "POST", headers: headers })
+            .then(r => r.json())
+            .then(d => { if (d.success) { location.reload(); } else { alert("Error: " + (d.message || "Refresh failed")); } });
+    });
+}
 </script>
 <script>
 // Handle plugin upload with progress and result modal
