@@ -100,9 +100,6 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
     <link rel="stylesheet" href="<?php echo app_base_url('assets/css/theme.css?v=' . filemtime(dirname(__DIR__) . '/assets/css/theme.css')); ?>">
     <link rel="stylesheet" href="<?php echo app_base_url('assets/css/footer.css?v=' . filemtime(dirname(__DIR__) . '/assets/css/footer.css')); ?>">
     <link rel="stylesheet" href="<?php echo app_base_url('assets/css/back-to-top.css?v=' . filemtime(dirname(__DIR__) . '/assets/css/back-to-top.css')); ?>">
-    <?php if (strpos($__req_path, 'index') !== false || $__req_path === $__base || $__req_path === $__base . '/'): ?>
-    <link rel="stylesheet" href="<?php echo app_base_url('assets/css/home.css?v=' . filemtime(dirname(__DIR__) . '/assets/css/home.css')); ?>">
-    <?php endif; ?>
     <style>
         /* Enhanced Header Styles */
         :root {
