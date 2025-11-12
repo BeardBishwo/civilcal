@@ -1802,8 +1802,8 @@ if (!empty($_COOKIE['site_theme']) && $_COOKIE['site_theme'] === 'dark') {
             const q = input.value.trim();
             if(q.length < 2){ results.innerHTML = ''; return; }
             debounceTimer = setTimeout(()=>{
-                // Use dynamic base URL to avoid path issues
-                const baseUrl = window.location.pathname.includes('/aec-calculator/') ? '/aec-calculator' : '';
+                // Use server-provided base URL to avoid path issues
+                const baseUrl = '<?php echo rtrim(app_base_url(), '/'); ?>';
                 fetch(`${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`)
                 .then(r=>r.json())
                 .then(data=>{

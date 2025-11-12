@@ -148,7 +148,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </div>
             </form>
         </div>
-        <a href="/aec-calculator/modules/plumbing/index.php" class="back-button">
+        <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/plumbing/index.php') : '../modules/plumbing/index.php'; ?>" class="back-button">
             <i class="fas fa-arrow-left me-2"></i>Back to Plumbing
         </a>
     </div>

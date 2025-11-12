@@ -24,7 +24,7 @@ class HomeController extends Controller
             'viewHelper' => $this->view // Pass View object to templates
         ];
         
-        $this->view->render('home/index', $data);
+        $this->view->render('index', $data);
     }
 
     

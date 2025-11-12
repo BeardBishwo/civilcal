@@ -8,7 +8,7 @@ require_once __DIR__ . '/../../../includes/header.php';
         <h1 class="text-white">
             <i class="fas fa-pump me-2"></i>Pump Sizing Calculator
         </h1>
-        <a href="/aec-calculator/modules/plumbing/index.php" class="btn btn-outline-light btn-sm">
+        <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/plumbing/index.php') : '../modules/plumbing/index.php'; ?>" class="btn btn-outline-light btn-sm">
             <i class="fas fa-arrow-left"></i> Back to Plumbing
         </a>
     </div>

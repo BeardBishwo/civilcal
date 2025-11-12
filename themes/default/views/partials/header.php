@@ -1,871 +1,2181 @@
+<?php
+// Safe session start
+if (session_status() == PHP_SESSION_NONE) {
+    @session_start();
+}
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/VersionChecker.php';
+
+// Check for updates if admin is logged in
+$updateAvailable = null;
+if (!empty($_SESSION['is_admin'])) {
+    $updateAvailable = VersionChecker::checkForUpdates();
+}
+
+$site_meta = get_site_meta();
+$title_safe = htmlspecialchars($page_title ?? $site_meta['title'] ?? 'AEC Calculator');
+$desc_safe = htmlspecialchars($site_meta['description'] ?? 'Professional Engineering Calculators Suite');
+$logo = $site_meta['logo'] ?? app_base_url('assets/images/applogo.png');
+$logo_text = $site_meta['logo_text'] ?? 'EngiCal Pro';
+$header_style = $site_meta['header_style'] ?? 'logo_text';
+$favicon = $site_meta['favicon'] ?? app_base_url('assets/images/favicon.png');
+
+// User data for personalized UI
+// Support both new structure ($_SESSION['user']) and legacy session keys (user_id, username, full_name, role)
+$user = [];
+if (!empty($_SESSION['user']) && is_array($_SESSION['user'])) {
+    $user = $_SESSION['user'];
+} else {
+    // Build a user array from legacy session vars if present
+    if (!empty($_SESSION['user_id']) || !empty($_SESSION['username']) || !empty($_SESSION['full_name'])) {
+        $user = [
+            'id' => $_SESSION['user_id'] ?? null,
+            'username' => $_SESSION['username'] ?? '',
+            'full_name' => $_SESSION['full_name'] ?? '',
+            'role' => $_SESSION['role'] ?? ''
+        ];
+    }
+}
+
+$userName = trim($user['full_name'] ?? $user['username'] ?? '');
+$userInitial = !empty($userName) ? strtoupper(substr($userName, 0, 1)) : '';
+$userRole = $user['role'] ?? '';
+$engineerRoles = $user['engineer_roles'] ?? [];
+
+// Calculate search statistics
+$search_stats = ['categories' => 0, 'subcategories' => 0, 'tools' => 0];
+$modules_dir = __DIR__ . '/../modules';
+if (is_dir($modules_dir)) {
+    $categories = scandir($modules_dir);
+    foreach ($categories as $category) {
+        if ($category === '.' || $category === '..' || !is_dir($modules_dir . '/' . $category)) continue;
+        $search_stats['categories']++;
+        
+        $subcategories = scandir($modules_dir . '/' . $category);
+        foreach ($subcategories as $subcategory) {
+            if ($subcategory === '.' || $subcategory === '..' || !is_dir($modules_dir . '/' . $category . '/' . $subcategory)) continue;
+            $search_stats['subcategories']++;
+            
+            $files = scandir($modules_dir . '/' . $category . '/' . $subcategory);
+            foreach ($files as $file) {
+                if (pathinfo($file, PATHINFO_EXTENSION) === 'php') {
+                    $search_stats['tools']++;
+                }
+            }
+        }
+    }
+}
+
+// Ensure is_admin flag is available (legacy support)
+if (empty($_SESSION['is_admin']) && !empty($userRole) && strtolower($userRole) === 'admin') {
+    $_SESSION['is_admin'] = true;
+}
+// Server-side theme detection via cookie (so first render can have the correct theme)
+$body_class = '';
+if (!empty($_COOKIE['site_theme']) && $_COOKIE['site_theme'] === 'dark') {
+    $body_class = 'dark-theme';
+}
+
+// Mark homepage body with 'index-page' so home-specific gradient styles apply
+$__req_path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+$__base = defined('APP_BASE') ? rtrim(APP_BASE, '/') : '';
+if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_path, -10) === '/index.php')) {
+    $body_class = trim($body_class . ' index-page');
+}
+
+?>
 <!DOCTYPE html>
-<html lang="en" class="<?php
-    $dark = (isset($theme_data['features']['dark_mode']) && $theme_data['features']['dark_mode']);
-    try {
-        $tm0 = new \App\Services\ThemeManager();
-        $md0 = $tm0->getThemeMetadata();
-        if (isset($md0['settings']['dark_mode_enabled']) && $md0['settings']['dark_mode_enabled']) { $dark = true; }
-    } catch (\Throwable $e) {}
-    echo $dark ? 'dark' : '';
-?>">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo isset($page_title) ? $page_title . ' | ' : ''; ?>Bishwo Calculator - Engineering & Construction Calculators</title>
-    
-    <!-- Meta Description -->
-    <meta name="description" content="Professional engineering calculators for civil, electrical, plumbing, HVAC, fire protection, structural analysis, and construction estimation. Streamline your engineering workflow with precision tools.">
-    <meta name="keywords" content="engineering calculator, construction calculator, civil engineering, electrical calculator, plumbing calculator, HVAC calculator, structural analysis, cost estimation, project management">
-    <meta name="author" content="Bishwo Calculator">
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="<?php echo isset($page_title) ? $page_title . ' | ' : ''; ?>Bishwo Calculator">
-    <meta property="og:description" content="Professional engineering calculators for civil, electrical, plumbing, HVAC, fire protection, structural analysis, and construction estimation.">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="<?php echo $base_url; ?>assets/images/banner.jpg">
-    <meta property="og:url" content="<?php echo $base_url . $_SERVER['REQUEST_URI']; ?>">
-    
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="<?php echo isset($page_title) ? $page_title . ' | ' : ''; ?>Bishwo Calculator">
-    <meta name="twitter:description" content="Professional engineering calculators for civil, electrical, plumbing, HVAC, fire protection, structural analysis, and construction estimation.">
-    <meta name="twitter:image" content="<?php echo $base_url; ?>assets/images/banner.jpg">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="<?php echo $base_url; ?>assets/images/favicon.png">
-    <link rel="apple-touch-icon" href="<?php echo $base_url; ?>assets/images/applogo.png">
-    
-    <!-- Preconnect to External Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkfQJa+GQZ4zJQFzFZC2Z1C1QvZ1C6Zhz+Kbx5Q5v8Q7Zx1Zq9a2Yx4Yw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    
-    <?php
-    // Load theme styles
-    if (isset($theme) && method_exists($theme, 'loadThemeStyles')) {
-        $theme->loadThemeStyles();
-    }
-    
-    // Load category-specific styles
-    if (isset($category) && isset($theme) && method_exists($theme, 'loadCategoryStyles')) {
-        $theme->loadCategoryStyles($category);
-    }
-    ?>
-    
-    <?php
-    try {
-        $tm = new \App\Services\ThemeManager();
-        $meta = $tm->getThemeMetadata();
-        $cfg = $meta['config'] ?? [];
-        $settings = $meta['settings'] ?? [];
-        $colors = $cfg['colors'] ?? [];
-        $primary = $settings['primary'] ?? ($colors['primary'] ?? '#2563eb');
-        $secondary = $settings['secondary'] ?? ($colors['secondary'] ?? '#64748b');
-        $accent = $settings['accent'] ?? ($colors['accent'] ?? '#0ea5e9');
-        $bgPrimary = $settings['background'] ?? ($colors['background'] ?? '#ffffff');
-        $textPrimary = $settings['text'] ?? ($colors['text'] ?? '#1e293b');
-        $textSecondary = $settings['text_secondary'] ?? ($colors['text_secondary'] ?? '#64748b');
-    } catch (\Throwable $e) {
-        $primary = '#2563eb'; $secondary = '#64748b'; $accent = '#0ea5e9';
-        $bgPrimary = '#ffffff'; $textPrimary = '#1e293b'; $textSecondary = '#64748b';
-    }
-    ?>
+    <title><?php echo $title_safe; ?></title>
+    <meta name="description" content="<?php echo $desc_safe; ?>">
+    <link rel="manifest" href="<?php echo app_base_url('manifest.json'); ?>">
+    <meta name="theme-color" content="#667eea">
+    <link rel="icon" href="<?php echo htmlspecialchars($favicon); ?>">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo app_base_url('assets/css/theme.css?v=' . filemtime(dirname(__DIR__) . '/assets/css/theme.css')); ?>">
+    <link rel="stylesheet" href="<?php echo app_base_url('assets/css/footer.css?v=' . filemtime(dirname(__DIR__) . '/assets/css/footer.css')); ?>">
+    <link rel="stylesheet" href="<?php echo app_base_url('assets/css/back-to-top.css?v=' . filemtime(dirname(__DIR__) . '/assets/css/back-to-top.css')); ?>">
+    <?php if (strpos($__req_path, 'index') !== false || $__req_path === $__base || $__req_path === $__base . '/'): ?>
+    <link rel="stylesheet" href="<?php echo app_base_url('assets/css/home.css?v=' . filemtime(dirname(__DIR__) . '/assets/css/home.css')); ?>">
+    <?php endif; ?>
     <style>
+        /* Enhanced Header Styles */
         :root {
-            /* Primary Colors */
-            --primary-color: <?= htmlspecialchars($primary) ?>;
-            --primary-dark: <?= htmlspecialchars($primary) ?>;
-            --primary-light: <?= htmlspecialchars($primary) ?>;
-            --secondary-color: <?= htmlspecialchars($secondary) ?>;
-            --accent-color: <?= htmlspecialchars($accent) ?>;
-            
-            /* Text Colors */
-            --text-primary: <?= htmlspecialchars($textPrimary) ?>;
-            --text-secondary: <?= htmlspecialchars($textSecondary) ?>;
-            --text-light: #94a3b8;
-            --text-muted: #cbd5e1;
-            
-            /* Background Colors */
-            --bg-primary: <?= htmlspecialchars($bgPrimary) ?>;
-            --bg-secondary: #f8fafc;
-            --bg-tertiary: #f1f5f9;
-            --bg-dark: #0f172a;
-            
-            /* Border Colors */
-            --border-color: #e2e8f0;
-            --border-light: #f1f5f9;
-            --border-dark: #cbd5e1;
-            
-            /* Shadow Colors */
-            --shadow-light: rgba(0, 0, 0, 0.05);
-            --shadow-medium: rgba(0, 0, 0, 0.1);
-            --shadow-dark: rgba(0, 0, 0, 0.25);
-            
-            /* Typography */
-            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --font-mono: 'JetBrains Mono', 'Monaco', 'Consolas', monospace;
-            --font-size-xs: 0.75rem;
-            --font-size-sm: 0.875rem;
-            --font-size-base: 1rem;
-            --font-size-lg: 1.125rem;
-            --font-size-xl: 1.25rem;
-            --font-size-2xl: 1.5rem;
-            --font-size-3xl: 1.875rem;
-            --font-size-4xl: 2.25rem;
-            
-            /* Spacing */
-            --spacing-xs: 0.25rem;
-            --spacing-sm: 0.5rem;
-            --spacing-md: 1rem;
-            --spacing-lg: 1.5rem;
-            --spacing-xl: 2rem;
-            --spacing-2xl: 3rem;
-            --spacing-3xl: 4rem;
-            
-            /* Border Radius */
-            --radius-sm: 0.375rem;
-            --radius-md: 0.5rem;
-            --radius-lg: 0.75rem;
-            --radius-xl: 1rem;
-            
-            /* Transitions */
-            --transition-fast: 0.15s ease-in-out;
-            --transition-normal: 0.3s ease-in-out;
-            --transition-slow: 0.5s ease-in-out;
-            
-            /* Z-index */
-            --z-dropdown: 1000;
-            --z-sticky: 1020;
-            --z-fixed: 1030;
-            --z-modal-backdrop: 1040;
-            --z-modal: 1050;
-            --z-popover: 1060;
-            --z-tooltip: 1070;
-            --z-toast: 1080;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
-        
-        .dark {
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --text-light: #94a3b8;
-            --text-muted: #64748b;
-            
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --bg-dark: #020617;
-            
-            --border-color: #334155;
-            --border-light: #475569;
-            --border-dark: #64748b;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: var(--font-family);
-            font-size: var(--font-size-base);
-            line-height: 1.6;
-            color: var(--text-primary);
-            background-color: var(--bg-primary);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        
-        /* Header Styles */
-        .header {
-            background: var(--bg-primary);
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 1px 3px var(--shadow-light);
+
+        .site-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-sm);
             position: sticky;
             top: 0;
-            z-index: var(--z-sticky);
-            transition: all var(--transition-normal);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            width: 100%;
+            left: 0;
+            right: 0;
         }
-        
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 var(--spacing-md);
+
+        /* Override theme.css max-width constraint for true full width */
+        .site-header .header-content,
+        .header-content {
+            max-width: none !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0.5rem 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 70px;
+            /* Slightly reduced gap so header items fit better at non-default zoom levels */
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        /* Ensure no body/html margins interfere */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
         }
         
-        /* Logo */
+        /* Fix for black strip issue - ensure proper background */
+        body {
+            background: #ffffff;
+            min-height: 100vh;
+        }
+        
+        /* Ensure main content area has proper styling */
+        .main-content {
+            background: #ffffff;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* Responsive section adjustments */
+        @media (max-width: 1024px) {
+            .header-left {
+                flex: 0 0 160px;
+                max-width: 160px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-left {
+                flex: 0 0 140px;
+                max-width: 140px;
+            }
+            
+            .header-middle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-left {
+                flex: 0 0 110px;
+                max-width: 110px;
+            }
+        }
+
+        .header-left {
+            /* Reduced base width so header-middle gains space to the left
+               without growing toward the right section. Keeps logo responsive. */
+            flex: 0 0 160px;
+            max-width: 160px;
+            min-width: 120px;
+            flex-shrink: 0;
+            /* Center logo horizontally and vertically inside the left area */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
+            box-sizing: border-box;
+        }
+
         .logo {
             display: flex;
             align-items: center;
+            gap: 0.75rem;
             text-decoration: none;
-            color: var(--text-primary);
             font-weight: 700;
-            font-size: var(--font-size-xl);
-            transition: color var(--transition-fast);
+            font-size: 1.5rem;
+            color: #2d3748;
+            transition: transform 0.2s ease;
         }
-        
+
         .logo:hover {
-            color: var(--primary-color);
+            transform: translateY(-1px);
         }
-        
-        .logo img {
-            height: 40px;
+
+        .logo-img {
+            height: 32px;
             width: auto;
-            margin-right: var(--spacing-sm);
+            border-radius: 6px;
+            /* keep logo tightly aligned to the left */
+            display: block;
         }
-        
-        /* Navigation */
-        .nav {
+
+        .header-middle {
+            flex: 1 1 auto;
+            max-width: none;
             display: flex;
             align-items: center;
-            gap: var(--spacing-lg);
+            justify-content: flex-start;
+            /* reduced padding-right so middle section doesn't push into header-right at smaller widths */
+            padding-right: 1.2rem;
+            /* Allow dropdowns to overflow the middle area so submenus are visible */
+            overflow: visible;
         }
-        
-        .nav-list {
+
+        .main-nav ul {
             display: flex;
             list-style: none;
-            gap: var(--spacing-lg);
             margin: 0;
             padding: 0;
+            /* tighten up horizontal gap between menu items slightly */
+            gap: 0.35rem;
         }
-        
-        .nav-item {
-            position: relative;
-        }
-        
-        .nav-link {
-            color: var(--text-secondary);
+
+        .main-nav a {
             text-decoration: none;
+            /* slightly reduced padding to help fit the login button at narrower widths/zoom */
+            padding: 0.45rem 0.9rem;
+            border-radius: 8px;
+            color: #4a5568;
             font-weight: 500;
-            padding: var(--spacing-sm) var(--spacing-md);
-            border-radius: var(--radius-md);
-            transition: all var(--transition-fast);
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: var(--spacing-xs);
+            gap: 0.45rem;
+            white-space: nowrap;
         }
-        
-        .nav-link:hover,
-        .nav-link.active {
-            color: var(--primary-color);
-            background-color: var(--bg-secondary);
+
+        .main-nav a:hover {
+            background: #f7fafc;
+            color: #667eea;
+            transform: translateY(-1px);
         }
-        
-        .nav-link i {
-            font-size: var(--font-size-sm);
+
+        .main-nav a i {
+            font-size: 0.875rem;
+            transition: transform 0.2s ease;
         }
-        
-        /* Dropdown */
-        .dropdown {
+
+        /* Make sure the chevron for dropdowns is always visible and not clipped */
+        .main-nav a .fa-chevron-down {
+            margin-left: 0.35rem;
+            font-size: 0.9rem;
+            color: inherit;
+            opacity: 0.95;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        /* Ensure parent has-dropdown establishes positioning context for dropdowns */
+        .has-dropdown {
             position: relative;
+            display: inline-block;
         }
-        
-        .dropdown-toggle {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font: inherit;
-            cursor: pointer;
-            padding: var(--spacing-sm) var(--spacing-md);
-            border-radius: var(--radius-md);
-            transition: all var(--transition-fast);
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-        }
-        
-        .dropdown-toggle:hover {
-            color: var(--primary-color);
-            background-color: var(--bg-secondary);
-        }
-        
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            box-shadow: 0 4px 12px var(--shadow-medium);
-            min-width: 200px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all var(--transition-normal);
-            z-index: var(--z-dropdown);
-        }
-        
-        .dropdown:hover .dropdown-menu {
+
+        .has-dropdown:hover .dropdown {
+            display: block;
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
         }
-        
-        .dropdown-item {
+
+        /* Support click-to-open for touch/mobile: .has-dropdown.open */
+        .has-dropdown.open .dropdown {
             display: block;
-            color: var(--text-secondary);
-            text-decoration: none;
-            padding: var(--spacing-sm) var(--spacing-md);
-            transition: all var(--transition-fast);
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            padding: 0.5rem;
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+            z-index: 1200;
+            list-style: none;
+            margin: 0;
         }
         
-        .dropdown-item:hover {
-            color: var(--primary-color);
-            background-color: var(--bg-secondary);
+        .dropdown > li {
+            margin: 0 !important;
+            padding: 0 !important;
+            display: block !important;
+        }
+
+        /* Reset any inherited styles */
+        .dropdown a.grid-item {
+            display: flex !important;
+            align-items: center !important;
+            padding: 10px 16px !important;
+            border-radius: 6px !important;
+            color: #4a5568 !important;
+            text-decoration: none !important;
+            transition: all 0.2s ease !important;
+            margin: 0 !important;
+            white-space: nowrap !important;
         }
         
-        /* Search */
-        .search {
+        /* Force icon sizing and spacing */
+        .dropdown a.grid-item i {
+            flex: 0 0 20px !important;
+            margin-right: 12px !important;
+            text-align: center !important;
+            font-size: 14px !important;
+            width: 20px !important;
+        }
+
+        /* Hover state */
+        .dropdown a.grid-item:hover {
+            background: #667eea !important;
+            color: white !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Dark theme support */
+        body.dark-theme .dropdown a.grid-item {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-theme .dropdown a.grid-item:hover {
+            background: rgba(102, 126, 234, 0.2) !important;
+            color: white !important;
+        }
+
+        .dropdown a i {
+            place-self: center start;
+        }
+
+        .dropdown li {
+            list-style: none;
+            margin: 2px 0;
+        }
+
+        .dropdown a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .search-container {
             position: relative;
-            margin: 0 var(--spacing-lg);
+            flex: 1 1 360px;
+            max-width: 420px;
+            margin-right: 1rem; /* prevent overlap with header-right */
         }
-        
+
         .search-input {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) 40px;
-            font-size: var(--font-size-sm);
-            color: var(--text-primary);
-            width: 300px;
-            transition: all var(--transition-fast);
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 50px;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
         }
-        
+
         .search-input:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-        
-        .search-icon {
+
+        .search-input::before {
+            content: '\f002';
+            font-family: 'Font Awesome 6 Free';
             position: absolute;
-            left: var(--spacing-md);
+            left: 1rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-light);
-            font-size: var(--font-size-sm);
+            color: #a0aec0;
         }
-        
-        /* Header Actions */
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-md);
-        }
-        
-        .theme-toggle,
-        .mobile-menu-toggle {
-            background: none;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: var(--spacing-sm);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-        }
-        
-        .theme-toggle:hover,
-        .mobile-menu-toggle:hover {
-            color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
-        .user-menu {
-            position: relative;
-        }
-        
-        .user-toggle {
-            background: none;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-            color: var(--text-secondary);
-            padding: var(--spacing-sm);
-            border-radius: var(--radius-md);
-            transition: all var(--transition-fast);
-        }
-        
-        .user-toggle:hover {
-            color: var(--primary-color);
-            background-color: var(--bg-secondary);
-        }
-        
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: var(--font-size-sm);
-        }
-        
-        /* Mobile Menu */
-        .mobile-menu {
-            display: none;
-            position: fixed;
-            top: 0;
+
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
             left: 0;
             right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: var(--z-modal-backdrop);
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            margin-top: 0.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
         }
-        
-        .mobile-menu-content {
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 280px;
-            background: var(--bg-primary);
-            padding: var(--spacing-xl);
-            overflow-y: auto;
+
+        .search-input:focus + .search-suggestions,
+        .search-suggestions:hover {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
         }
-        
-        .mobile-menu-header {
+
+        .header-right {
+            flex: 0 0 auto;
+            max-width: none;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: var(--spacing-xl);
-            padding-bottom: var(--spacing-lg);
-            border-bottom: 1px solid var(--border-color);
+            gap: 0.25rem;
+            flex-shrink: 0;
+            flex-wrap: nowrap;
+            justify-content: flex-end;
+            white-space: nowrap;
         }
-        
-        .mobile-nav {
-            list-style: none;
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            /* slightly tighter spacing to preserve space */
+            gap: 0.5rem;
+            flex-shrink: 0;
+            flex-wrap: nowrap;
+            width: auto; /* don't force full width which can push content */
+            justify-content: flex-end;
         }
-        
-        .mobile-nav-item {
-            margin-bottom: var(--spacing-sm);
+
+        /* Move user-greeting inside user-actions */
+        .user-actions .user-greeting {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+            background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(5,150,105,0.05));
+            border: 1px solid rgba(16,185,129,0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-weight: 500;
+            flex-shrink: 0;
+            white-space: nowrap;
         }
-        
-        .mobile-nav-link {
-            display: block;
-            color: var(--text-secondary);
+
+        /* Profile dropdown wrapper inside user-actions */
+        .user-actions .profile-dropdown-wrapper {
+            flex-shrink: 0;
+        }
+
+        .theme-toggle-btn {
+            background: none;
+            border: 1px solid #e2e8f0;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #4a5568;
+        }
+
+        /* Small search icon button for opening modal */
+        .search-toggle-btn {
+            background: none;
+            border: 1px solid #e2e8f0;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #4a5568;
+        }
+
+        .search-toggle-btn:hover {
+            background: #f7fafc;
+            color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .theme-toggle-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.1);
+        }
+
+        /* Header-specific button sizing to keep the header compact */
+        .header-right .btn {
+            padding: 0.45rem 0.8rem;
+            border-radius: 999px;
             text-decoration: none;
-            padding: var(--spacing-md);
-            border-radius: var(--radius-md);
-            transition: all var(--transition-fast);
+            font-weight: 600;
+            transition: all 0.15s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
-        
-        .mobile-nav-link:hover,
-        .mobile-nav-link.active {
-            color: var(--primary-color);
-            background-color: var(--bg-secondary);
+
+        /* Make login button responsive */
+        .login-btn {
+            margin-left: 0.25rem !important;
         }
-        
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .search {
-                display: none;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .header-container {
-                padding: 0 var(--spacing-sm);
-            }
-            
-            .nav {
-                display: none;
-            }
-            
-            .mobile-menu-toggle {
-                display: flex;
-            }
-            
-            .search-input {
-                width: 200px;
-            }
-        }
-        
+
         @media (max-width: 480px) {
-            .header-actions {
-                gap: var(--spacing-sm);
+            .login-btn .btn-text {
+                display: none;
             }
-            
-            .search-input {
-                width: 150px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-container">
-            <!-- Logo -->
-            <a href="<?php echo $base_url; ?>" class="logo">
-                <img src="<?php echo $base_url; ?>assets/images/applogo.png" alt="Bishwo Calculator" onerror="this.style.display='none'">
-                <span>Bishwo Calculator</span>
-            </a>
-            
-            <!-- Navigation -->
-            <nav class="nav" role="navigation" aria-label="Main navigation">
-                <ul class="nav-list">
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>">
-                            <i class="fas fa-home"></i>
-                            Home
-                        </a>
-                    </li>
-                    <?php
-                    try {
-                        $calcs = \App\Calculators\CalculatorFactory::getAvailableCalculators();
-                        $groups = [];
-                        foreach ($calcs as $c) {
-                            $cat = $c['category'] ?? 'general';
-                            if (!isset($groups[$cat])) $groups[$cat] = [];
-                            $groups[$cat][] = $c;
-                        }
-                        if (!empty($groups)) {
-                            echo '<li class="nav-item dropdown">';
-                            echo '<button class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">';
-                            echo '<i class="fas fa-calculator"></i> Calculators <i class="fas fa-chevron-down"></i>';
-                            echo '</button>';
-                            echo '<div class="dropdown-menu" role="menu">';
-                            foreach ($groups as $cat => $items) {
-                                $catLabel = ucwords(str_replace(['-','_'], ' ', (string)$cat));
-                                echo '<div class="dropdown-item" style="font-weight:600; cursor:default;">' . htmlspecialchars($catLabel) . '</div>';
-                                foreach ($items as $it) {
-                                    $slug = $it['slug'] ?? '';
-                                    $name = $it['name'] ?? $slug;
-                                    if ($slug) {
-                                        $href = '/calculator/' . rawurlencode((string)$cat) . '/' . rawurlencode((string)$slug);
-                                        echo '<a href="' . $href . '" class="dropdown-item">' . htmlspecialchars((string)$name) . '</a>';
-                                    }
-                                }
-                                echo '<hr style="border:none;border-top:1px solid var(--border-color);margin:4px 0;">';
-                            }
-                            echo '</div>';
-                            echo '</li>';
-                        }
-                    } catch (\Throwable $e) { }
-                    ?>
-                    
-                    <!-- Civil Engineering Dropdown -->
-                    <li class="nav-item dropdown">
-                        <button class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-building"></i>
-                            Civil Engineering
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu" role="menu">
-                            <a href="<?php echo $base_url; ?>modules/civil/concrete/" class="dropdown-item">Concrete Calculators</a>
-                            <a href="<?php echo $base_url; ?>modules/civil/structural/" class="dropdown-item">Structural Analysis</a>
-                            <a href="<?php echo $base_url; ?>modules/civil/brickwork/" class="dropdown-item">Brickwork & Masonry</a>
-                            <a href="<?php echo $base_url; ?>modules/civil/earthwork/" class="dropdown-item">Earthwork & Excavation</a>
-                        </div>
-                    </li>
-                    
-                    <!-- Electrical Engineering Dropdown -->
-                    <li class="nav-item dropdown">
-                        <button class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-bolt"></i>
-                            Electrical
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu" role="menu">
-                            <a href="<?php echo $base_url; ?>modules/electrical/load-calculation/" class="dropdown-item">Load Calculations</a>
-                            <a href="<?php echo $base_url; ?>modules/electrical/wire-sizing/" class="dropdown-item">Wire Sizing</a>
-                            <a href="<?php echo $base_url; ?>modules/electrical/short-circuit/" class="dropdown-item">Short Circuit Analysis</a>
-                            <a href="<?php echo $base_url; ?>modules/electrical/voltage-drop/" class="dropdown-item">Voltage Drop</a>
-                        </div>
-                    </li>
-                    
-                    <!-- Mechanical/HVAC Dropdown -->
-                    <li class="nav-item dropdown">
-                        <button class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-wind"></i>
-                            Mechanical/HVAC
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu" role="menu">
-                            <a href="<?php echo $base_url; ?>modules/hvac/equipment-sizing/" class="dropdown-item">Equipment Sizing</a>
-                            <a href="<?php echo $base_url; ?>modules/hvac/duct-sizing/" class="dropdown-item">Duct Sizing</a>
-                            <a href="<?php echo $base_url; ?>modules/hvac/load-calculation/" class="dropdown-item">Load Calculations</a>
-                            <a href="<?php echo $base_url; ?>modules/hvac/energy-analysis/" class="dropdown-item">Energy Analysis</a>
-                        </div>
-                    </li>
-                    
-                    <!-- Plumbing Dropdown -->
-                    <li class="nav-item dropdown">
-                        <button class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-faucet"></i>
-                            Plumbing
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu" role="menu">
-                            <a href="<?php echo $base_url; ?>modules/plumbing/pipe_sizing/" class="dropdown-item">Pipe Sizing</a>
-                            <a href="<?php echo $base_url; ?>modules/plumbing/water_supply/" class="dropdown-item">Water Supply</a>
-                            <a href="<?php echo $base_url; ?>modules/plumbing/drainage/" class="dropdown-item">Drainage Systems</a>
-                            <a href="<?php echo $base_url; ?>modules/plumbing/hot_water/" class="dropdown-item">Hot Water Systems</a>
-                        </div>
-                    </li>
-                    
-                    <!-- Fire Protection Dropdown -->
-                    <li class="nav-item dropdown">
-                        <button class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-fire-extinguisher"></i>
-                            Fire Protection
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu" role="menu">
-                            <a href="<?php echo $base_url; ?>modules/fire/sprinklers/" class="dropdown-item">Sprinkler Systems</a>
-                            <a href="<?php echo $base_url; ?>modules/fire/fire-pumps/" class="dropdown-item">Fire Pumps</a>
-                            <a href="<?php echo $base_url; ?>modules/fire/standpipes/" class="dropdown-item">Standpipe Systems</a>
-                            <a href="<?php echo $base_url; ?>modules/fire/hydraulics/" class="dropdown-item">Hydraulic Calculations</a>
-                        </div>
-                    </li>
-                    
-                    <!-- Structural Engineering -->
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>modules/structural/" class="nav-link">
-                            <i class="fas fa-cubes"></i>
-                            Structural
-                        </a>
-                    </li>
-                    
-                    <!-- Site Engineering -->
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>modules/site/" class="nav-link">
-                            <i class="fas fa-hard-hat"></i>
-                            Site Engineering
-                        </a>
-                    </li>
-                    
-                    <!-- Estimation & Costing -->
-                    <li class="nav-item dropdown">
-                        <button class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-calculator"></i>
-                            Estimation
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu" role="menu">
-                            <a href="<?php echo $base_url; ?>modules/estimation/cost-estimation/" class="dropdown-item">Cost Estimation</a>
-                            <a href="<?php echo $base_url; ?>modules/estimation/quantity-takeoff/" class="dropdown-item">Quantity Takeoff</a>
-                            <a href="<?php echo $base_url; ?>modules/estimation/material-estimation/" class="dropdown-item">Material Estimation</a>
-                            <a href="<?php echo $base_url; ?>modules/estimation/project-financials/" class="dropdown-item">Project Financials</a>
-                        </div>
-                    </li>
-                    
-                    <!-- Project Management -->
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>modules/project-management/" class="nav-link">
-                            <i class="fas fa-tasks"></i>
-                            Project Management
-                        </a>
-                    </li>
-                    
-                    <!-- MEP Coordination -->
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>modules/mep/" class="nav-link">
-                            <i class="fas fa-sitemap"></i>
-                            MEP Coordination
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-            
-            <!-- Search -->
-            <?php if (isset($theme_data['features']['search']) && $theme_data['features']['search']): ?>
-            <div class="search" role="search">
-                <i class="fas fa-search search-icon"></i>
-                <input type="search" class="search-input" placeholder="Search calculators..." aria-label="Search calculators">
-            </div>
-            <?php endif; ?>
-            
-            <!-- Header Actions -->
-            <div class="header-actions">
-                <!-- Theme Toggle -->
-                <button class="theme-toggle" aria-label="Toggle dark mode" onclick="toggleTheme()">
-                    <i class="fas fa-moon"></i>
-                </button>
-                
-                <!-- User Menu -->
-                <div class="user-menu">
-                    <button class="user-toggle" aria-haspopup="true" aria-expanded="false">
-                        <div class="user-avatar">B</div>
-                        <span class="user-name">Bishwo</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="dropdown-menu" role="menu">
-                        <a href="<?php echo $base_url; ?>profile.php" class="dropdown-item">Profile</a>
-                        <a href="<?php echo $base_url; ?>settings.php" class="dropdown-item">Settings</a>
-                        <a href="<?php echo $base_url; ?>help.php" class="dropdown-item">Help & Support</a>
-                        <hr style="border: none; border-top: 1px solid var(--border-color); margin: var(--spacing-sm) 0;">
-                        <a href="<?php echo $base_url; ?>logout.php" class="dropdown-item">Logout</a>
-                    </div>
-                </div>
-                
-                <!-- Mobile Menu Toggle -->
-                <button class="mobile-menu-toggle" aria-label="Open mobile menu" onclick="toggleMobileMenu()">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-        </div>
-    </header>
-    
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-        <div class="mobile-menu-content">
-            <div class="mobile-menu-header">
-                <a href="<?php echo $base_url; ?>" class="logo">
-                    <img src="<?php echo $base_url; ?>assets/images/applogo.png" alt="Bishwo Calculator" onerror="this.style.display='none'">
-                    <span>Bishwo Calculator</span>
-                </a>
-                <button class="mobile-menu-toggle" aria-label="Close mobile menu" onclick="toggleMobileMenu()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <nav class="mobile-nav" role="navigation" aria-label="Mobile navigation">
-                <ul class="nav-list">
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>" class="mobile-nav-link">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>modules/civil/" class="mobile-nav-link">Civil Engineering</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>modules/electrical/" class="mobile-nav-link">Electrical Engineering</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>modules/hvac/" class="mobile-nav-link">Mechanical/HVAC</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>modules/plumbing/" class="mobile-nav-link">Plumbing</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>modules/fire/" class="mobile-nav-link">Fire Protection</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>modules/structural/" class="mobile-nav-link">Structural Engineering</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>modules/site/" class="mobile-nav-link">Site Engineering</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>modules/estimation/" class="mobile-nav-link">Estimation & Costing</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>modules/project-management/" class="mobile-nav-link">Project Management</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>modules/mep/" class="mobile-nav-link">MEP Coordination</a>
-                    </li>
-                </ul>
-            </nav>
-            
-            <!-- Mobile Search -->
-            <?php if (isset($theme_data['features']['search']) && $theme_data['features']['search']): ?>
-            <div class="search" style="margin-top: var(--spacing-xl);">
-                <i class="fas fa-search search-icon"></i>
-                <input type="search" class="search-input" placeholder="Search calculators..." aria-label="Search calculators">
-            </div>
-            <?php endif; ?>
-        </div>
-    </div>
-    
-    <script>
-        // Theme Toggle
-        function toggleTheme() {
-            const html = document.documentElement;
-            const isDark = html.classList.contains('dark');
-            
-            if (isDark) {
-                html.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            } else {
-                html.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
+            .login-btn {
+                padding: 0.5rem;
+                border-radius: 50%;
+                width: 36px;
+                height: 36px;
+                justify-content: center;
             }
         }
-        
-        // Mobile Menu Toggle
-        function toggleMobileMenu() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            const isOpen = mobileMenu.style.display === 'block';
-            
-            if (isOpen) {
-                mobileMenu.style.display = 'none';
-                mobileMenu.setAttribute('aria-hidden', 'true');
-            } else {
-                mobileMenu.style.display = 'block';
-                mobileMenu.setAttribute('aria-hidden', 'false');
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #edf2f7;
+            transform: translateY(-1px);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            border-color: #667eea;
+        }
+
+        .user-dropdown {
+            right: 0;
+            left: auto;
+        }
+
+        .user-info {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: #718096;
+            background: #f7fafc;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .hamburger-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: #4a5568;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .hamburger-btn:hover {
+            background: #f7fafc;
+            color: #667eea;
+        }
+
+        .mobile-nav {
+            display: none;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            padding: 1rem 2rem;
+        }
+
+        .mobile-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .mobile-nav a {
+            display: block;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            color: #4a5568;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-nav a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .update-notification {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .header-content {
+                gap: 1rem;
             }
         }
-        
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const mobileMenu = document.getElementById('mobileMenu');
-            const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-            
-            if (mobileMenu.style.display === 'block' && 
-                !mobileMenu.contains(event.target) && 
-                !mobileMenuToggle.contains(event.target)) {
-                toggleMobileMenu();
+
+        @media (max-width: 768px) {
+            .header-content {
+                gap: 0.5rem;
             }
-        });
-        
-        // Close mobile menu on escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                const mobileMenu = document.getElementById('mobileMenu');
-                if (mobileMenu.style.display === 'block') {
-                    toggleMobileMenu();
+            
+            .header-middle {
+                display: none;
+            }
+            
+            .hamburger-btn {
+                display: block;
+            }
+            
+            .mobile-nav.active {
+                display: block;
+            }
+            
+            .user-actions .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+            }
+            
+            /* Responsive user greeting inside user-actions */
+            .user-actions .user-greeting {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.75rem;
+            }
+            
+            /* Hide user greeting text on very small screens */
+            @media (max-width: 640px) {
+                .user-actions .user-greeting {
+                    display: none;
                 }
             }
-        });
-        
-        // Initialize theme from localStorage
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-                document.documentElement.classList.add('dark');
+        }
+
+        @media (max-width: 480px) {
+            .header-content {
+                margin: 0 10px;
+                gap: 0.25rem;
+                width: calc(100% - 20px);
             }
-        });
-        
-        // Search functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInputs = document.querySelectorAll('.search-input');
             
-            searchInputs.forEach(input => {
-                input.addEventListener('keyup', function(e) {
-                    if (e.key === 'Enter') {
-                        performSearch(this.value);
-                    }
-                });
-            });
-        });
-        
-        function performSearch(query) {
-            if (query.trim()) {
-                // Redirect to search results page
-                window.location.href = '<?php echo $base_url; ?>search.php?q=' + encodeURIComponent(query);
+            .logo span {
+                display: none;
+            }
+            
+            .user-actions .btn-text {
+                display: none;
+            }
+            
+            .user-actions .btn {
+                padding: 0.5rem;
+                border-radius: 50%;
+                width: 36px;
+                height: 36px;
+                justify-content: center;
+            }
+            
+            .profile-btn {
+                width: 36px;
+                height: 36px;
+                padding: 0.5rem;
+            }
+            
+            .header-right {
+                gap: 0.25rem;
             }
         }
+
+        /* Modal search styles */
+        .search-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+            padding: 1rem;
+        }
+
+        .search-modal.active { display: flex; }
+
+        .search-modal .modal-content {
+            width: 100%;
+            max-width: 760px;
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 20px 40px rgba(2,6,23,0.4);
+        }
+
+        body.dark-theme .search-modal .modal-content {
+            background: rgba(6,8,12,0.95);
+            color: #e6eefc;
+        }
+
+        .search-modal .modal-input {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 0.75rem;
+        }
+
+        .search-modal .modal-close {
+            position: absolute;
+            right: 1.25rem;
+            top: 1.25rem;
+            background: none;
+            border: none;
+            color: #718096;
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 480px) {
+            .header-content {
+                gap: 0.25rem;
+            }
+            
+            .logo span {
+                display: none;
+            }
+            
+            .user-actions .btn-text {
+                display: none;
+            }
+        }
+
+        /* Dark theme overrides for header elements to keep contrast */
+        body.dark-theme {
+            --glass-bg: rgba(8,10,15,0.6);
+            --glass-border: rgba(255,255,255,0.03);
+            color: #e6eefc;
+        }
+
+        body.dark-theme .site-header {
+            background: rgba(6,8,12,0.72);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+            color: #e6eefc;
+        }
+
+        /* Nav links in dark mode */
+        body.dark-theme .main-nav a {
+            color: #cbd5e1;
+        }
+
+        /* Hover state: avoid bright white background which hides text */
+        body.dark-theme .main-nav a:hover {
+            background: rgba(255,255,255,0.06);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        /* Dropdown in dark mode */
+        body.dark-theme .dropdown {
+            background: linear-gradient(180deg, rgba(10,12,16,0.95), rgba(6,8,12,0.95));
+            border: 1px solid rgba(255,255,255,0.04);
+            color: #e6eefc;
+            box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+        }
+
+        body.dark-theme .dropdown a {
+            color: #e6eefc;
+        }
+
+        /* Ensure buttons remain visible in dark mode */
+        body.dark-theme .btn-primary {
+            background: linear-gradient(135deg, #7c3aed 0%, #9f7aea 100%);
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(124,58,237,0.25);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        body.dark-theme .btn-secondary {
+            background: rgba(255,255,255,0.03);
+            color: #e6eefc;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        /* Make sure search suggestions are readable in both themes */
+        .search-suggestions a, .search-suggestions div {
+            color: #2d3748;
+        }
+        body.dark-theme .search-suggestions a, body.dark-theme .search-suggestions div {
+            color: #e6eefc;
+        }
+
+        /* Avoid header text blending into white backgrounds */
+        .site-header, .header-content, .main-nav a, .user-actions .btn-text, .logo span {
+            color: inherit;
+        }
+
+        body.dark-theme .dropdown a:hover {
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+        }
+
+        /* Search input in dark mode */
+        body.dark-theme .search-input {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            color: #e6eefc;
+        }
+
+        body.dark-theme .search-suggestions {
+            background: rgba(6,8,12,0.95);
+            border: 1px solid rgba(255,255,255,0.04);
+            color: #e6eefc;
+        }
+
+        /* Explicit light-mode rules to avoid text blending into white backgrounds */
+        body:not(.dark-theme) .main-nav a {
+            color: #2d3748; /* dark slate */
+        }
+
+        body:not(.dark-theme) .main-nav a:hover {
+            background: #f7fafc;
+            color: #667eea;
+        }
+
+        body:not(.dark-theme) .dropdown {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #2d3748;
+        }
+
+        body:not(.dark-theme) .dropdown a {
+            color: #4a5568;
+        }
+
+        body:not(.dark-theme) .user-actions .btn-text {
+            color: #2d3748;
+        }
+
+        body:not(.dark-theme) .search-suggestions a,
+        body:not(.dark-theme) .search-suggestions div {
+            color: #2d3748;
+        }
+    </style>
+    <style>
+    /* Enhanced Search Toggle Button - Visible in both light and dark themes */
+    .search-toggle-btn{
+        background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(124,58,237,0.1));
+        border: 1px solid rgba(102,126,234,0.2);
+        color: #667eea;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0.5rem 0.6rem;
+        margin-left: 0.25rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .search-toggle-btn:hover{
+        background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(124,58,237,0.2));
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+    }
+
+    body.dark-theme .search-toggle-btn{
+        background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15));
+        border: 1px solid rgba(139,92,246,0.3);
+        color: #a78bfa;
+    }
+
+    body.dark-theme .search-toggle-btn:hover{
+        background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(59,130,246,0.25));
+        box-shadow: 0 4px 12px rgba(139,92,246,0.4);
+    }
+
+    /* Beautiful Glassmorphism Search Modal */
+    .search-modal{
+        display: none;
+        position: fixed;
+        z-index: 1200;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        background: linear-gradient(135deg, 
+            rgba(102,126,234,0.1) 0%, 
+            rgba(124,58,237,0.1) 50%, 
+            rgba(16,185,129,0.1) 100%);
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .search-modal.active{ display: flex; }
+
+    .search-modal .modal-content{
+        background: linear-gradient(135deg, 
+            rgba(255,255,255,0.25) 0%, 
+            rgba(255,255,255,0.1) 100%);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.18);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                    0 0 0 1px rgba(255,255,255,0.05) inset;
+        width: min(800px, 95%);
+        max-height: 85vh;
+        border-radius: 20px;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+        animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .search-modal .modal-content::before{
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255,255,255,0.6), 
+            transparent);
+    }
+
+    body.dark-theme .search-modal .modal-content{
+        background: linear-gradient(135deg, 
+            rgba(15,23,42,0.4) 0%, 
+            rgba(30,41,59,0.2) 100%);
+        border: 1px solid rgba(148,163,184,0.18);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6),
+                    0 0 0 1px rgba(148,163,184,0.05) inset;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .search-modal .modal-input{
+        width: 100%;
+        padding: 1.25rem 1.5rem;
+        font-size: 1.1rem;
+        border: 2px solid rgba(102,126,234,0.2);
+        border-radius: 12px;
+        background: rgba(255,255,255,0.9);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Animated gradient border effect */
+    .search-modal .modal-input::before{
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c, #10b981, #3b82f6, #667eea);
+        background-size: 400% 400%;
+        border-radius: 14px;
+        z-index: -1;
+        animation: gradientBorder 3s ease infinite;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .search-modal .modal-input:focus::before{
+        opacity: 1;
+    }
+
+    @keyframes gradientBorder {
+        0% { background-position: 0% 50%; }
+        25% { background-position: 100% 50%; }
+        50% { background-position: 100% 100%; }
+        75% { background-position: 0% 100%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    body.dark-theme .search-modal .modal-input::before{
+        background: linear-gradient(45deg, #a78bfa, #3b82f6, #06b6d4, #10b981, #f59e0b, #ef4444, #a78bfa);
+        background-size: 400% 400%;
+    }
+
+    .search-modal .modal-input:focus{
+        outline: none;
+        border-color: rgba(102,126,234,0.6);
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.1),
+                    0 4px 20px rgba(102,126,234,0.15);
+        background: rgba(255,255,255,0.95);
+    }
+
+    body.dark-theme .search-modal .modal-input{
+        background: rgba(15,23,42,0.6);
+        border: 2px solid rgba(139,92,246,0.3);
+        color: #e2e8f0;
+    }
+
+    body.dark-theme .search-modal .modal-input:focus{
+        border-color: rgba(139,92,246,0.6);
+        box-shadow: 0 0 0 3px rgba(139,92,246,0.1),
+                    0 4px 20px rgba(139,92,246,0.15);
+        background: rgba(15,23,42,0.8);
+    }
+
+    .search-modal .modal-close{
+        position: absolute;
+        right: 0.75rem;
+        top: 0.75rem;
+        background: linear-gradient(135deg, rgba(239,68,68,0.9), rgba(220,38,38,0.9));
+        border: 2px solid rgba(255,255,255,0.2);
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(239,68,68,0.4), 0 0 0 2px rgba(255,255,255,0.1);
+        z-index: 15;
+    }
+
+    .search-modal .modal-close:hover{
+        background: linear-gradient(135deg, rgba(220,38,38,1), rgba(185,28,28,1));
+        transform: scale(1.1) rotate(90deg);
+        box-shadow: 0 6px 25px rgba(239,68,68,0.6), 0 0 0 2px rgba(255,255,255,0.2);
+    }
+
+    body.dark-theme .search-modal .modal-close{
+        background: linear-gradient(135deg, rgba(248,113,113,0.9), rgba(239,68,68,0.9));
+        border: 2px solid rgba(148,163,184,0.2);
+        color: white;
+        box-shadow: 0 4px 20px rgba(248,113,113,0.4), 0 0 0 2px rgba(148,163,184,0.1);
+    }
+
+    body.dark-theme .search-modal .modal-close:hover{
+        background: linear-gradient(135deg, rgba(239,68,68,1), rgba(220,38,38,1));
+        box-shadow: 0 6px 25px rgba(248,113,113,0.6), 0 0 0 2px rgba(148,163,184,0.2);
+    }
+
+    @media (max-width: 768px) {
+        .search-modal .modal-close {
+            right: 0.5rem;
+            top: 0.5rem;
+            width: 32px;
+            height: 32px;
+            font-size: 0.7rem;
+        }
+    }
+
+    /* Search Results Styling */
+    .search-result-item{
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid rgba(102,126,234,0.1);
+        transition: all 0.2s ease;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        background: rgba(255,255,255,0.5);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .search-result-item:hover{
+        background: rgba(102,126,234,0.08);
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(102,126,234,0.1);
+    }
+
+    body.dark-theme .search-result-item{
+        background: rgba(15,23,42,0.3);
+        border-bottom: 1px solid rgba(139,92,246,0.1);
+    }
+
+    body.dark-theme .search-result-item:hover{
+        background: rgba(139,92,246,0.1);
+        box-shadow: 0 4px 12px rgba(139,92,246,0.2);
+    }
+
+    .search-result-item a{
+        color: inherit;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .category-badge, .subcategory-badge{
+        font-size: 0.75rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 20px;
+        margin-right: 0.5rem;
+        display: inline-block;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .category-badge{
+        background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(124,58,237,0.2));
+        color: #5b67d8;
+        border: 1px solid rgba(102,126,234,0.3);
+    }
+
+    .subcategory-badge{
+        background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.2));
+        color: #059669;
+        border: 1px solid rgba(16,185,129,0.3);
+    }
+
+    body.dark-theme .category-badge{
+        background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(124,58,237,0.2));
+        color: #a78bfa;
+        border: 1px solid rgba(139,92,246,0.3);
+    }
+
+    body.dark-theme .subcategory-badge{
+        background: linear-gradient(135deg, rgba(52,211,153,0.2), rgba(34,197,94,0.2));
+        color: #34d399;
+        border: 1px solid rgba(52,211,153,0.3);
+    }
+
+    @media (min-width: 769px){
+    /* Hide the inline search on wider screens; use the search icon */
+    .search-container{ display: none; }
+    }    .profile-btn {
+        background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(124,58,237,0.05));
+        border: 1px solid rgba(139,92,246,0.2);
+        color: #8b5cf6 !important;
+        cursor: pointer;
+        font-size: 0.875rem;
+        padding: 0.75rem;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .profile-btn:hover {
+        background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(124,58,237,0.1));
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(139,92,246,0.3);
+        color: #7c3aed !important;
+    }
+
+    body.dark-theme .profile-btn {
+        background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(139,92,246,0.1));
+        border: 1px solid rgba(168,85,247,0.3);
+        color: #a78bfa !important;
+    }
+
+    body.dark-theme .profile-btn:hover {
+        background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(139,92,246,0.15));
+        color: #c084fc !important;
+    }
+
+    body.dark-theme .user-actions .user-greeting {
+        background: linear-gradient(135deg, rgba(52,211,153,0.15), rgba(34,197,94,0.1));
+        border: 1px solid rgba(52,211,153,0.3);
+        color: #a7f3d0;
+    }
+
+    /* Quick favorites button */
+    .quick-favorites-btn {
+        background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(217,119,6,0.05));
+        border: 1px solid rgba(245,158,11,0.2);
+        color: #d97706;
+        cursor: pointer;
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+        margin-left: 0.25rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .quick-favorites-btn:hover {
+        background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.1));
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(245,158,11,0.3);
+        color: #b45309;
+    }
+
+    body.dark-theme .quick-favorites-btn {
+        background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.1));
+        border: 1px solid rgba(251,191,36,0.3);
+        color: #fbbf24;
+    }
+
+    body.dark-theme .quick-favorites-btn:hover {
+        background: linear-gradient(135deg, rgba(251,191,36,0.25), rgba(245,158,11,0.15));
+        color: #f59e0b;
+    }
+
+    /* Favorites dropdown */
+    .favorites-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 12px;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        min-width: 300px;
+        z-index: 1000;
+        margin-top: 0.5rem;
+    }
+
+    .favorites-dropdown.active { display: block; }
+
+    .favorites-dropdown .dropdown-header {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .favorites-dropdown .favorite-item {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .favorites-dropdown .favorite-item:hover {
+        background: rgba(102,126,234,0.1);
+    }
+
+    .favorites-dropdown .favorite-item:last-child {
+        border-bottom: none;
+    }
+
+    body.dark-theme .favorites-dropdown {
+        background: rgba(15,23,42,0.95);
+        border: 1px solid rgba(148,163,184,0.2);
+    }
+
+    body.dark-theme .favorites-dropdown .dropdown-header {
+        color: #e2e8f0;
+        border-bottom-color: rgba(148,163,184,0.2);
+    }
+
+    body.dark-theme .favorites-dropdown .favorite-item {
+        border-bottom-color: rgba(148,163,184,0.1);
+    }
+
+    /* Help button */
+    .help-btn {
+        background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(37,99,235,0.05));
+        border: 1px solid rgba(59,130,246,0.2);
+        color: #2563eb;
+        cursor: pointer;
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+        margin-left: 0.25rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .help-btn:hover {
+        background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(37,99,235,0.1));
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+        color: #1d4ed8;
+    }
+
+    body.dark-theme .help-btn {
+        background: linear-gradient(135deg, rgba(96,165,250,0.15), rgba(59,130,246,0.1));
+        border: 1px solid rgba(96,165,250,0.3);
+m        color: #93c5fd;
+    }
+
+    body.dark-theme .help-btn:hover {
+        background: linear-gradient(135deg, rgba(96,165,250,0.25), rgba(59,130,246,0.15));
+        color: #60a5fa;
+    }
+
+    /* Profile dropdown */
+    .profile-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 12px;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        min-width: 200px;
+        z-index: 1000;
+        margin-top: 0.5rem;
+        overflow: hidden;
+    }
+
+    .profile-dropdown.active { display: block; }
+
+    .profile-dropdown .menu-item {
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .profile-dropdown .menu-item:hover {
+        background: rgba(102,126,234,0.1);
+    }
+
+    .profile-dropdown .menu-item:last-child {
+        border-bottom: none;
+    }
+
+    .profile-dropdown .menu-item i {
+        font-size: 1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .profile-dropdown .menu-item .text {
+        font-weight: 500;
+    }
+
+    body.dark-theme .profile-dropdown {
+        background: rgba(15,23,42,0.95);
+        border: 1px solid rgba(148,163,184,0.2);
+    }
+
+    body.dark-theme .profile-dropdown .menu-item {
+        border-bottom-color: rgba(148,163,184,0.1);
+    }
+
+    body.dark-theme .profile-dropdown .menu-item:hover {
+        background: rgba(139,92,246,0.1);
+    }
+
+    /* Update badge for profile dropdown */
+    .update-badge {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        font-size: 0.65rem;
+        padding: 0.1rem 0.4rem;
+        border-radius: 10px;
+        margin-left: auto;
+        font-weight: 600;
+        animation: pulse 2s infinite;
+    }
+
+    /* Responsive profile button */
+    @media (max-width: 768px) {
+        .profile-btn {
+            width: 36px;
+            height: 36px;
+            padding: 0.5rem;
+        }
+        
+        .profile-dropdown-wrapper {
+            margin-left: 0.25rem;
+        }
+    }
+
+    /* Hide inline search on desktop; use icon-triggered modal instead */
+    @media (min-width: 769px) {
+        .search-container { display: none; }
+    }
+    </style>
+</head>
+<body class="<?php echo htmlspecialchars($body_class); ?>">
+    <header class="site-header" id="siteHeader">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="<?php echo app_base_url('index.php'); ?>" class="logo">
+                    <?php if ($header_style === 'logo_only' || $header_style === 'logo_text'): ?>
+                        <img src="<?php echo htmlspecialchars($logo); ?>" alt="<?php echo $title_safe; ?> Logo" class="logo-img">
+                    <?php endif; ?>
+                    <?php if ($header_style === 'text_only' || $header_style === 'logo_text'): ?>
+                        <span><?php echo htmlspecialchars($logo_text); ?></span>
+                    <?php endif; ?>
+                </a>
+            </div>
+
+            <div class="header-middle">
+                <nav class="main-nav">
+                    <ul>
+                        <li>
+                            <a href="<?php echo app_base_url('civil.php'); ?>">
+                                <i class="fas fa-hard-hat"></i>
+                                Civil
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<?php echo app_base_url('electrical.php'); ?>">
+                                <i class="fas fa-bolt"></i>
+                                Electrical
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<?php echo app_base_url('plumbing.php'); ?>">
+                                <i class="fas fa-faucet"></i>
+                                Plumbing
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<?php echo app_base_url('hvac.php'); ?>">
+                                <i class="fas fa-wind"></i>
+                                HVAC
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<?php echo app_base_url('fire.php'); ?>">
+                                <i class="fas fa-fire-extinguisher"></i>
+                                Fire Protection
+                            </a>
+                        </li>
+                        <li class="has-dropdown">
+                            <a href="#" aria-haspopup="true" aria-expanded="false" role="button" tabindex="0">
+                                <i class="fas fa-layer-group"></i>
+                                More Tools 
+                                <i class="fas fa-chevron-down"></i>
+                            </a>
+                            <ul class="dropdown" role="menu">
+                                <li role="none"><a href="<?php echo app_base_url('site.php'); ?>" class="grid-item" role="menuitem"><i class="fas fa-map-marked-alt"></i>Site Development</a></li>
+                                <li role="none"><a href="<?php echo app_base_url('structural.php'); ?>" class="grid-item" role="menuitem"><i class="fas fa-building"></i>Structural Analysis</a></li>
+                                <li role="none"><a href="<?php echo app_base_url('mep.php'); ?>" class="grid-item" role="menuitem"><i class="fas fa-cogs"></i>MEP Coordination</a></li>
+                                <li role="none"><a href="<?php echo app_base_url('estimation.php'); ?>" class="grid-item" role="menuitem"><i class="fas fa-calculator"></i>Estimation Suite</a></li>
+                                <li role="none"><a href="<?php echo app_base_url('management.php'); ?>" class="grid-item" role="menuitem"><i class="fas fa-project-diagram"></i>Management</a></li>
+                            </ul>
+                        </li>
+                        </li>
+                    </ul>
+                </nav>
+
+                <div class="search-container">
+                    <input type="search" id="globalSearch" placeholder="Search 50+ engineering tools..." class="search-input">
+                    <div id="searchSuggestions" class="search-suggestions">
+                        <!-- Search suggestions will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="user-actions">
+                    <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button id="searchToggleBtn" class="search-toggle-btn" title="Search">
+                        <i class="fas fa-search"></i>
+                    </button>
+
+                    <!-- User greeting (shown for all users) -->
+                    <div class="user-greeting">
+                        Hello, <strong><?php 
+                            if (!empty($userName)) {
+                                echo htmlspecialchars(explode(' ', $userName)[0]);
+                            } else {
+                                echo 'Guest';
+                            }
+                        ?></strong> 👋
+                    </div>
+
+                    <!-- Login Button (Only for guests) -->
+                    <?php 
+                    $is_logged_in = !empty($_SESSION['user']) || !empty($_SESSION['user_id']) || !empty($_SESSION['username']) || !empty($_SESSION['full_name']);
+                    if (!$is_logged_in): ?>
+                        <a href="<?php echo app_base_url('login.php'); ?>" class="btn btn-primary login-btn">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span class="btn-text">Login</span>
+                        </a>
+                    <?php endif; ?>
+
+                    <?php if (!empty($_SESSION['user'])): ?>
+                        <?php if (!empty($_SESSION['is_admin']) && $updateAvailable): ?>
+                            <div class="update-notification" title="Update Available">
+                                <i class="fas fa-download"></i>
+                                v<?php echo htmlspecialchars($updateAvailable['latest']); ?>
+                            </div>
+                        <?php endif; ?>
+                    <?php endif; ?>
+
+                    <!-- Profile Dropdown (Only for logged-in users) -->
+                    <?php 
+                    $is_logged_in = !empty($_SESSION['user']) || !empty($_SESSION['user_id']) || !empty($_SESSION['username']) || !empty($_SESSION['full_name']);
+                    if ($is_logged_in): ?>
+                        <div class="profile-dropdown-wrapper">
+                            <button class="profile-btn" id="profileToggleBtn" title="Profile Menu">
+                                <i class="fas fa-user-circle"></i>
+                            </button>
+                            <div class="profile-dropdown" id="profileDropdown">
+                                <a href="<?php echo app_base_url('profile.php'); ?>" class="menu-item">
+                                    <i class="fas fa-user-edit" style="color: #8b5cf6;"></i>
+                                    <span class="text">Profile Settings</span>
+                                </a>
+                                <?php if (!empty($_SESSION['is_admin'])): ?>
+                                    <a href="<?php echo app_base_url('admin/index.php'); ?>" class="menu-item">
+                                        <i class="fas fa-shield-alt" style="color: #ef4444;"></i>
+                                        <span class="text">Admin Panel</span>
+                                    </a>
+                                <?php endif; ?>
+                                <a href="#" class="menu-item" id="favoritesMenuItem">
+                                    <i class="fas fa-star" style="color: #f59e0b;"></i>
+                                    <span class="text">Favorites</span>
+                                </a>
+                                <a href="#" class="menu-item" id="helpMenuItem">
+                                    <i class="fas fa-question-circle" style="color: #3b82f6;"></i>
+                                    <span class="text">Help</span>
+                                </a>
+                                <a href="<?php echo app_base_url('logout.php'); ?>" class="menu-item">
+                                    <i class="fas fa-sign-out-alt" style="color: #6b7280;"></i>
+                                    <span class="text">Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <button class="hamburger-btn" id="hamburgerBtn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+        </div>
+
+        <div class="mobile-nav" id="mobileNav">
+            <ul>
+                <li><a href="<?php echo app_base_url('civil.php'); ?>"><i class="fas fa-hard-hat"></i> Civil</a></li>
+                <li><a href="<?php echo app_base_url('electrical.php'); ?>"><i class="fas fa-bolt"></i> Electrical</a></li>
+                <li><a href="<?php echo app_base_url('plumbing.php'); ?>"><i class="fas fa-faucet"></i> Plumbing</a></li>
+                <li><a href="<?php echo app_base_url('hvac.php'); ?>"><i class="fas fa-wind"></i> HVAC</a></li>
+                <li><a href="<?php echo app_base_url('fire.php'); ?>"><i class="fas fa-fire-extinguisher"></i> Fire Protection</a></li>
+                <li><a href="<?php echo app_base_url('site.php'); ?>"><i class="fas fa-map-marked-alt"></i> Site Development</a></li>
+                <li><a href="<?php echo app_base_url('estimation.php'); ?>"><i class="fas fa-calculator"></i> Estimation</a></li>
+                <li><a href="<?php echo app_base_url('structural.php'); ?>"><i class="fas fa-building"></i> Structural</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Search modal popup (hidden by default) -->
+    <div id="searchModal" class="search-modal" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="searchModalLabel">
+            <button class="modal-close" id="searchModalClose" aria-label="Close search">
+                Esc
+            </button>
+            <input id="searchModalInput" class="modal-input" type="search" 
+                   placeholder="Search calculators, tools, and utilities..." 
+                   aria-label="Search" />
+            <div id="searchModalResults" style="margin-top: 1rem; max-height: 60vh; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <main class="main-content">
+
+    <script>
+    // Header search modal toggle with typing effect
+    (function(){
+        const toggleBtn = document.getElementById('searchToggleBtn');
+        const modal = document.getElementById('searchModal');
+        const closeBtn = document.getElementById('searchModalClose');
+        const input = document.getElementById('searchModalInput');
+        const results = document.getElementById('searchModalResults');
+
+        if(!toggleBtn || !modal) return;
+
+        // Typing effect configuration
+        const typingData = {
+            phrases: [
+                'Search 1 main category • 4 subcategories • 14 tools/calculators',
+                'Search concrete volume • rebar calculation • foundation design',
+                'Search civil tools • structural analysis • earthwork calculations',
+                'Search calculators for engineering projects',
+                'Search 14 engineering calculators and tools',
+                'Search design tools and calculators',
+                'Search engineering utilities and apps'
+            ],
+            typingSpeed: 50,
+            deletingSpeed: 30,
+            pauseBetween: 2000
+        };
+
+        let typingIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typingTimeout;
+
+        function typeText() {
+            const currentPhrase = typingData.phrases[typingIndex];
+            
+            if (isDeleting) {
+                input.placeholder = currentPhrase.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                input.placeholder = currentPhrase.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let timeout = isDeleting ? typingData.deletingSpeed : typingData.typingSpeed;
+
+            if (!isDeleting && charIndex === currentPhrase.length) {
+                timeout = typingData.pauseBetween;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                typingIndex = (typingIndex + 1) % typingData.phrases.length;
+                timeout = 500;
+            }
+
+            typingTimeout = setTimeout(typeText, timeout);
+        }
+
+        function startTypingEffect() {
+            stopTypingEffect();
+            charIndex = 0;
+            isDeleting = false;
+            typingIndex = 0;
+            typeText();
+        }
+
+        function stopTypingEffect() {
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+            }
+        }
+
+        function openModal(){
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden','false');
+            input.focus();
+            input.select();
+            startTypingEffect();
+        }
+
+        function closeModal(){
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden','true');
+            results.innerHTML = '';
+            input.value = '';
+            stopTypingEffect();
+            // Reset to default placeholder
+            input.placeholder = 'Search calculators, tools, and utilities...';
+        }
+
+        toggleBtn.addEventListener('click', openModal);
+        closeBtn && closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', function(e){ if(e.target===modal) closeModal(); });
+
+        // Add ESC key support to close modal
+        document.addEventListener('keydown', function(e){
+            if(e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Stop typing effect when user starts typing
+        input.addEventListener('input', function(){
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+                typingTimeout = null;
+            }
+            // User typed something, keep their text
+        });
+
+        let debounceTimer = null;
+        input.addEventListener('input', function(){
+            clearTimeout(debounceTimer);
+            const q = input.value.trim();
+            if(q.length < 2){ results.innerHTML = ''; return; }
+            debounceTimer = setTimeout(()=>{
+                // Use dynamic base URL to avoid path issues
+                const baseUrl = window.location.pathname.includes('/aec-calculator/') ? '/aec-calculator' : '';
+                fetch(`${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`)
+                .then(r=>r.json())
+                .then(data=>{
+                    // Render enhanced results with categories and direct links
+                    if(!data || !Array.isArray(data)){ 
+                        results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-exclamation-circle" style="margin-right:0.5rem;"></i>No results</div>'; 
+                        return; 
+                    }
+                    if(data.length === 0){ 
+                        results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-search" style="margin-right:0.5rem;"></i>No calculators found matching your search</div>'; 
+                        return; 
+                    }
+                    
+                    results.innerHTML = data.map(item=>{
+                        const categoryBadge = item.category ? `<span class="category-badge">${item.category}</span>` : '';
+                        const subcategoryBadge = item.subcategory ? `<span class="subcategory-badge">${item.subcategory}</span>` : '';
+                        const snippet = item.description ? `<div style="font-size:.9rem;color:#64748b;margin-top:.4rem;line-height:1.4;">${item.description}</div>` : '';
+                        const url = item.url || '#';
+                        
+                        return `<div class="search-result-item" style="cursor:pointer;" onclick="window.location.href='${url}'">
+                            <div style="display:flex;align-items:flex-start;gap:1rem;">
+                                <div style="flex:1;">
+                                    <div style="font-weight:600;font-size:1rem;color:#1e293b;margin-bottom:0.5rem;">${item.name}</div>
+                                    ${snippet}
+                                    <div style="margin-top:0.75rem;display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                                        ${categoryBadge} ${subcategoryBadge}
+                                        ${item.type === 'history' ? '<span class="history-badge" style="font-size:.75rem;color:#059669;background:rgba(5,150,105,0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(5,150,105,0.2);"><i class="fas fa-history" style="margin-right:.25rem;"></i>Recent</span>' : ''}
+                                    </div>
+                                </div>
+                                <div style="color:#94a3b8;font-size:0.875rem;flex-shrink:0;">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }).catch(err=>{
+                    results.innerHTML = '<div style="text-align:center;padding:2rem;color:#ef4444;"><i class="fas fa-exclamation-triangle" style="margin-right:0.5rem;"></i>Search failed. Please try again.</div>';
+                    console.error('Search error', err);
+                });
+            }, 300);
+        });
+    })();
+
+    // Profile dropdown functionality with hover and click
+    (function(){
+        const profileToggle = document.getElementById('profileToggleBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+        const profileWrapper = document.querySelector('.profile-dropdown-wrapper');
+
+        // Profile dropdown toggle
+        if (profileToggle && profileDropdown && profileWrapper) {
+            let dropdownTimeout;
+            
+            // Show on hover
+            profileWrapper.addEventListener('mouseenter', function() {
+                clearTimeout(dropdownTimeout);
+                profileDropdown.classList.add('active');
+            });
+
+            // Hide on mouse leave
+            profileWrapper.addEventListener('mouseleave', function() {
+                dropdownTimeout = setTimeout(() => {
+                    profileDropdown.classList.remove('active');
+                }, 200);
+            });
+
+            // Toggle on click
+            profileToggle.addEventListener('click', function(e){
+                e.stopPropagation();
+                profileDropdown.classList.toggle('active');
+            });
+
+            // Close profile dropdown when clicking outside
+            document.addEventListener('click', function(e){
+                if (!profileToggle.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.remove('active');
+                }
+            });
+        }
+    })();
+
+    // Favorites and Help functionality
+    (function(){
+        const favoritesItem = document.getElementById('favoritesMenuItem');
+        const helpItem = document.getElementById('helpMenuItem');
+
+        if (favoritesItem) {
+            favoritesItem.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Favorites feature coming soon!');
+            });
+        }
+
+        if (helpItem) {
+            helpItem.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Help documentation coming soon!');
+            });
+        }
+    })();
+
+    // Global function to open search modal from favorites
+    window.openSearchModal = function() {
+        const searchModal = document.getElementById('searchModal');
+        const searchToggleBtn = document.getElementById('searchToggleBtn');
+        if (searchModal && searchToggleBtn) {
+            searchToggleBtn.click();
+        }
+    };
+
+        // Enhanced JavaScript for header functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.getElementById('siteHeader');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const mobileNav = document.getElementById('mobileNav');
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const globalSearch = document.getElementById('globalSearch');
+            const searchSuggestions = document.getElementById('searchSuggestions');
+
+            // Scroll effect for header
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // Mobile menu toggle
+            hamburgerBtn.addEventListener('click', function() {
+                mobileNav.classList.toggle('active');
+                this.innerHTML = mobileNav.classList.contains('active') ? 
+                    '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+            });
+
+            // Theme toggle
+            themeToggleBtn.addEventListener('click', function() {
+                const isDark = document.body.classList.toggle('dark-theme');
+                this.innerHTML = isDark ? 
+                    '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+                
+                // Save theme preference
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                // Also persist to a cookie so server-side can read it on next page load
+                const expires = new Date();
+                expires.setFullYear(expires.getFullYear() + 1);
+                document.cookie = `site_theme=${isDark ? 'dark' : 'light'}; path=/; expires=${expires.toUTCString()}; samesite=Lax`;
+            });
+
+            // Load saved theme or default to dark
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || !savedTheme) {
+                document.body.classList.add('dark-theme');
+                themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+
+            // Enhanced search functionality 
+            let searchTimer = null;
+
+            function displaySearchResults(results) {
+                if (results.length === 0) {
+                    searchSuggestions.innerHTML = '<div class="p-3 text-gray-500">No tools found</div>';
+                    return;
+                }
+
+                searchSuggestions.innerHTML = results.map(result => `
+                    <a href="${result.url}" class="block p-3 hover:bg-blue-50 border-b border-gray-100 last:border-0">
+                        <div class="font-medium text-gray-800">${result.name}</div>
+                        <div class="text-sm text-gray-500">${result.category}</div>
+                    </a>
+                `).join('');
+            }
+
+            // Close mobile menu and any open dropdowns when clicking outside the header
+            document.addEventListener('click', function(event) {
+                if (!header.contains(event.target)) {
+                    mobileNav.classList.remove('active');
+                    hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    // Close any open dropdowns
+                    document.querySelectorAll('.has-dropdown.open').forEach(d => d.classList.remove('open'));
+                    // Update aria-expanded attributes
+                    document.querySelectorAll('.has-dropdown [aria-expanded="true"]').forEach(el => el.setAttribute('aria-expanded', 'false'));
+                }
+            });
+
+            // Enhanced dropdown functionality for both hover and click
+            document.querySelectorAll('.has-dropdown').forEach(dropdown => {
+                const trigger = dropdown.querySelector('[role="button"]');
+                const menu = dropdown.querySelector('.dropdown');
+                
+                // Show on hover for desktop
+                dropdown.addEventListener('mouseenter', () => {
+                    if (window.innerWidth > 768) {
+                        dropdown.classList.add('open');
+                        if (trigger) trigger.setAttribute('aria-expanded', 'true');
+                    }
+                });
+                
+                dropdown.addEventListener('mouseleave', () => {
+                    if (window.innerWidth > 768) {
+                        dropdown.classList.remove('open');
+                        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+                    }
+                });
+                
+                // Toggle on click for mobile/touch
+                trigger.addEventListener('click', (e) => {
+                    if (window.innerWidth <= 768 || 'ontouchstart' in window) {
+                        e.preventDefault();
+                        const wasOpen = dropdown.classList.contains('open');
+                        
+                        // Close all other dropdowns
+                        document.querySelectorAll('.has-dropdown.open').forEach(d => {
+                            if (d !== dropdown) {
+                                d.classList.remove('open');
+                                const t = d.querySelector('[aria-expanded]');
+                                if (t) t.setAttribute('aria-expanded', 'false');
+                            }
+                        });
+                        
+                        // Toggle this dropdown
+                        dropdown.classList.toggle('open');
+                        trigger.setAttribute('aria-expanded', !wasOpen);
+                    }
+                });
+
+                // Keyboard support (Enter/Space)
+                if (trigger) {
+                    trigger.addEventListener('keydown', function(ev) {
+                        if (ev.key === 'Enter' || ev.key === ' ') {
+                            ev.preventDefault();
+                            drop.classList.toggle('open');
+                            trigger.setAttribute('aria-expanded', drop.classList.contains('open') ? 'true' : 'false');
+                        }
+                    });
+                }
+            });
+
+            // Header dynamic update helpers (allow login page to refresh header without full reload)
+            const HEADER_STATUS_URL = '<?php echo app_base_url('api/header_status.php'); ?>';
+
+            function buildUserActionsHtml(user, isAdmin) {
+                const name = user.name || '';
+                const initial = user.initial || (name ? name.charAt(0).toUpperCase() : 'U');
+                const role = user.role || '';
+
+                return `
+                    <div class="has-dropdown">
+                        <div class="user-avatar" title="${escapeHtml(name)}">${escapeHtml(initial)}</div>
+                        <ul class="dropdown user-dropdown">
+                            <li class="user-info">
+                                <div class="user-name">${escapeHtml(name)}</div>
+                                ${role ? `<div class="user-role">${escapeHtml(role)}</div>` : ''}
+                            </li>
+                            ${isAdmin ? `<li><a href="${escapeHtml('<?php echo app_base_url("admin/index.php"); ?>')}"><i class="fas fa-cog"></i> Admin Panel</a></li>` : ''}
+                            <li><a href="<?php echo app_base_url('dashboard.php'); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                            <li><a href="<?php echo app_base_url('profile.php'); ?>"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
+                            <li><a href="<?php echo app_base_url('logout.php'); ?>"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                `;
+            }
+
+                // Allow immediate header update using server-returned user object (from login API)
+                window.applyHeaderUser = function(serverUser, isAdmin) {
+                    if (!serverUser) return;
+                    // serverUser may contain full_name, username or name/initial from header_status
+                    var name = serverUser.full_name || serverUser.name || serverUser.username || '';
+                    var initial = serverUser.initial || (name ? name.charAt(0).toUpperCase() : 'U');
+                    var role = serverUser.role || serverUser.user_role || serverUser.role_name || '';
+                    var userObj = { name: name, initial: initial, role: role };
+                    try {
+                        const ua = document.querySelector('.user-actions');
+                        if (!ua) return;
+                        ua.innerHTML = buildUserActionsHtml(userObj, !!isAdmin);
+                    } catch (e) {
+                        console.warn('applyHeaderUser failed', e);
+                    }
+                };
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                return String(str).replace(/[&<>"'`]/g, function (s) {
+                    return ({'&':'&','<':'<','>':'>','"':'"',"'":'&#39;', '`':'&#96;'})[s];
+                });
+            }
+
+            window.refreshHeaderFromServer = async function() {
+                try {
+                    const res = await fetch(HEADER_STATUS_URL, { credentials: 'include' });
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    const ua = document.querySelector('.user-actions');
+                    if (!ua) return;
+
+                    if (data.logged_in) {
+                        ua.innerHTML = buildUserActionsHtml(data.user, data.is_admin);
+                    } else {
+                        ua.innerHTML = '<a href="<?php echo app_base_url('login.php'); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
+                    }
+                } catch (e) {
+                    console.warn('refreshHeaderFromServer failed', e);
+                }
+            };
+
+            // Apply logged-out header - now shows login button
+            if (!document.querySelector('.user-actions .has-dropdown')) {
+                // No user actions dropdown found, means not logged in
+            }
+
+            // Intercept logout link clicks to update header immediately (AJAX-friendly)
+            document.addEventListener('click', function(ev){
+                const a = ev.target.closest && ev.target.closest('a');
+                if (!a) return;
+                const href = a.getAttribute('href') || '';
+                if (href.indexOf('logout.php') !== -1) {
+                    // Prevent default navigation to allow immediate header update
+                    ev.preventDefault();
+                    (async function(){
+                        try {
+                            // Call logout endpoint (GET). include credentials to ensure session is destroyed.
+                            await fetch(href, { method: 'GET', credentials: 'include' });
+                        } catch (e) {
+                            // ignore network errors
+                        }
+                        // Update header - show login button
+                        try {
+                            const ua = document.querySelector('.user-actions');
+                            if (ua) ua.innerHTML = '<a href="<?php echo app_base_url('login.php'); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
+                        } catch (e) {
+                            console.warn('Header update failed', e);
+                        }
+                        // Then navigate to the logout href (redirect) or homepage
+                        window.location.href = href || '<?php echo app_base_url('index.php'); ?>';
+                    })();
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(event) {
+                // Ctrl+K or / for search
+                if ((event.ctrlKey && event.key === 'k') || event.key === '/') {
+                    event.preventDefault();
+                    globalSearch.focus();
+                }
+                
+                // Escape to close mobile menu
+                if (event.key === 'Escape') {
+                    mobileNav.classList.remove('active');
+                    hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+            });
+
+            // Add search shortcut hint
+            globalSearch.addEventListener('focus', function() {
+                this.setAttribute('placeholder', 'Press Ctrl+K to search quickly...');
+            });
+
+            globalSearch.addEventListener('blur', function() {
+                this.setAttribute('placeholder', 'Search 50+ engineering tools...');
+            });
+        });
     </script>
 </body>
 </html>

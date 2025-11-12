@@ -1,12 +1,13 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/aec-calculator/includes/functions.php';
+$base = defined('APP_BASE') ? rtrim(APP_BASE, '/') : '/aec-calculator';
+require_once $_SERVER['DOCUMENT_ROOT'] . $base . '/includes/functions.php';
 $page_title = 'Concrete Volume Calculator';
 $breadcrumb = [
     ['name' => 'Home', 'url' => app_base_url('index.php')],
     ['name' => 'Civil', 'url' => app_base_url('civil.php')],
     ['name' => 'Concrete Volume', 'url' => '#']
 ];
-require_once $_SERVER['DOCUMENT_ROOT'] . '/aec-calculator/includes/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . $base . '/includes/header.php';
 ?>
 
 <div class="container">
@@ -55,5 +56,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/aec-calculator/includes/header.php';
 </script>
 
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/aec-calculator/includes/footer.php';
+$base = defined('APP_BASE') ? rtrim(APP_BASE, '/') : '/aec-calculator';
+require_once $_SERVER['DOCUMENT_ROOT'] . $base . '/includes/footer.php';
 ?>

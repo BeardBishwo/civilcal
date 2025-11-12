@@ -6,8 +6,8 @@
  * @package MEP
  * @subpackage Mechanical
  */
-
-require_once rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . '/aec-calculator/modules/mep/bootstrap.php';
+$base = defined('APP_BASE') ? rtrim(APP_BASE, '/') : '/aec-calculator';
+require_once rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $base . '/modules/mep/bootstrap.php';
 // header is included later in the file — use AEC_ROOT for consistent path
 
 // Equipment database array

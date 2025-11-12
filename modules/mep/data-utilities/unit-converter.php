@@ -4,8 +4,8 @@
  * Comprehensive unit conversion utility for MEP engineering calculations
  * Supports multiple unit systems and conversion types
  */
-
-require_once rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . '/aec-calculator/modules/mep/bootstrap.php';
+$base = defined('APP_BASE') ? rtrim(APP_BASE, '/') : '/aec-calculator';
+require_once rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $base . '/modules/mep/bootstrap.php';
 
 // Initialize database connection
 $db = new Database();

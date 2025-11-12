@@ -1,2 +1,359 @@
-<br />
-<b>Parse error</b>:  syntax error, unexpected identifier &quot;http&quot;, expecting &quot;;&quot; in <b>C:\laragon\www\Bishwo_Calculator\public\index.php</b> on line <b>234</b><br />
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProCalculator - Premium Engineering Calculator Platform</title>
+    <meta name="description" content="Professional engineering calculators with $100K premium quality. Advanced glassmorphism design with comprehensive calculation tools.">
+    
+    <!-- ProCalculator Premium CSS -->
+    <link rel="stylesheet" href="http://localhost:8080\/assets/themes/procalculator/assets/css/procalculator-premium.css">
+
+    
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="procalculator-home">
+    <!-- Navigation Header -->
+    
+    
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-background">
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+                <div class="shape shape-4"></div>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="bi bi-stars"></i>
+                    <span>Premium $100K Quality Platform</span>
+                </div>
+                
+                <h1 class="hero-title">
+                    <span class="title-line">Professional</span>
+                    <span class="title-line gradient-text">Engineering</span>
+                    <span class="title-line">Calculators</span>
+                </h1>
+                
+                <p class="hero-description">
+                    Advanced calculation platform with premium glassmorphism design, 
+                    comprehensive engineering tools, and professional-grade features.
+                </p>
+                
+                <div class="hero-actions">
+                    <a href="/calculators" class="btn btn-primary btn-lg">
+                        <i class="bi bi-calculator"></i>
+                        Start Calculating
+                    </a>
+                    <a href="/features" class="btn btn-outline btn-lg">
+                        <i class="bi bi-info-circle"></i>
+                        Explore Features
+                    </a>
+                </div>
+                
+                <!-- Stats Display -->
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">56+</div>
+                        <div class="stat-label">Calculators</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">1,234+</div>
+                        <div class="stat-label">Professionals</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">15,420+</div>
+                        <div class="stat-label">Calculations</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">25+</div>
+                        <div class="stat-label">Countries</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Featured Calculators Section -->
+    <section class="featured-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Featured Calculators</h2>
+                <p class="section-subtitle">Professional tools trusted by engineers worldwide</p>
+            </div>
+            
+            <div class="calculators-grid">
+                                <div class="calculator-card" data-category="civil">
+                    <div class="card-icon">
+                        <i class="bi bi-bi-cone"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Concrete Volume</h3>
+                        <p class="card-description">Calculate concrete volume for construction projects</p>
+                        <a href="/calculator/civil/concrete-volume" 
+                           class="card-link">
+                            Use Calculator
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                    <div class="card-glow"></div>
+                </div>
+                                <div class="calculator-card" data-category="electrical">
+                    <div class="card-icon">
+                        <i class="bi bi-bi-lightning-charge"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Electrical Load</h3>
+                        <p class="card-description">Calculate electrical load for buildings</p>
+                        <a href="/calculator/electrical/load-calculation" 
+                           class="card-link">
+                            Use Calculator
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                    <div class="card-glow"></div>
+                </div>
+                                <div class="calculator-card" data-category="structural">
+                    <div class="card-icon">
+                        <i class="bi bi-bi-bricks"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Beam Design</h3>
+                        <p class="card-description">Design and analyze structural beams</p>
+                        <a href="/calculator/structural/beam-design" 
+                           class="card-link">
+                            Use Calculator
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                    <div class="card-glow"></div>
+                </div>
+                                <div class="calculator-card" data-category="hvac">
+                    <div class="card-icon">
+                        <i class="bi bi-bi-thermometer-snow"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Cooling Load</h3>
+                        <p class="card-description">Calculate HVAC cooling load requirements</p>
+                        <a href="/calculator/hvac/cooling-load" 
+                           class="card-link">
+                            Use Calculator
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                    <div class="card-glow"></div>
+                </div>
+                            </div>
+        </div>
+    </section>
+    
+    <!-- Premium Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Premium Features</h2>
+                <p class="section-subtitle">Why professionals choose ProCalculator</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h3 class="feature-title">Professional Grade</h3>
+                    <p class="feature-description">
+                        $100K quality with industry-standard calculations and professional validation.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-palette"></i>
+                    </div>
+                    <h3 class="feature-title">Glassmorphism Design</h3>
+                    <p class="feature-description">
+                        Modern glassmorphism interface with premium animations and effects.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h3 class="feature-title">Team Collaboration</h3>
+                    <p class="feature-description">
+                        Share calculations, collaborate with teams, and manage projects efficiently.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-cloud-arrow-up"></i>
+                    </div>
+                    <h3 class="feature-title">Cloud Sync</h3>
+                    <p class="feature-description">
+                        Access your calculations from anywhere with secure cloud synchronization.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    </div>
+                    <h3 class="feature-title">PDF Export</h3>
+                    <p class="feature-description">
+                        Generate professional reports and documentation in PDF format.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-lock"></i>
+                    </div>
+                    <h3 class="feature-title">Advanced Security</h3>
+                    <p class="feature-description">
+                        Enterprise-level security with encryption and secure data handling.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials Section -->
+    <section class="testimonials-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">What Professionals Say</h2>
+                <p class="section-subtitle">Trusted by engineers and construction professionals</p>
+            </div>
+            
+            <div class="testimonials-slider">
+                                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <div class="testimonial-rating">
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                    </div>
+                        <blockquote class="testimonial-text">
+                            "Bishwo Calculator has saved me countless hours on project estimations. The concrete and rebar calculators are incredibly accurate."
+                        </blockquote>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="/assets/images/avatars/1.jpg" 
+                                 alt="John Smith">
+                        </div>
+                        <div class="author-info">
+                            <h4 class="author-name">John Smith</h4>
+                            <p class="author-role">Civil Engineer</p>
+                            <p class="author-company">ABC Construction</p>
+                        </div>
+                    </div>
+                </div>
+                                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <div class="testimonial-rating">
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                    </div>
+                        <blockquote class="testimonial-text">
+                            "As an electrical designer, I use the load calculation and voltage drop tools daily. They&#039;re reliable and easy to use."
+                        </blockquote>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="/assets/images/avatars/2.jpg" 
+                                 alt="Sarah Johnson">
+                        </div>
+                        <div class="author-info">
+                            <h4 class="author-name">Sarah Johnson</h4>
+                            <p class="author-role">Electrical Designer</p>
+                            <p class="author-company">XYZ Engineering</p>
+                        </div>
+                    </div>
+                </div>
+                                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <div class="testimonial-rating">
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                    </div>
+                        <blockquote class="testimonial-text">
+                            "The beam and column design calculators have become essential tools in our design workflow. Highly recommended!"
+                        </blockquote>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="/assets/images/avatars/3.jpg" 
+                                 alt="Mike Chen">
+                        </div>
+                        <div class="author-info">
+                            <h4 class="author-name">Mike Chen</h4>
+                            <p class="author-role">Structural Engineer</p>
+                            <p class="author-company">Structural Solutions Inc.</p>
+                        </div>
+                    </div>
+                </div>
+                            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to Upgrade Your Calculations?</h2>
+                <p class="cta-description">
+                    Join thousands of professionals who trust ProCalculator for their engineering needs.
+                </p>
+                <div class="cta-actions">
+                                        <a href="/register" class="btn btn-primary btn-lg">
+                        <i class="bi bi-person-plus"></i>
+                        Create Account
+                    </a>
+                    <a href="/login" class="btn btn-outline btn-lg">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Sign In
+                    </a>
+                                    </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+        
+    <!-- ProCalculator Core JavaScript -->
+    <script src="http://localhost:8080\/assets/themes/procalculator/assets/js/procalculator-core.js"></script>
+
+    
+    <!-- Initialize Premium Features -->
+    <script>
+        ProCalculator.init({
+            theme: 'premium',
+            animations: true,
+            glassmorphism: true,
+            notifications: true
+        });
+    </script>
+</body>
+</html>

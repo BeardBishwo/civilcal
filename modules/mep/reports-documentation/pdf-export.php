@@ -5,7 +5,8 @@
  * Supports multiple report types, custom templates, and high-quality output
  */
 
-require_once rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . '/aec-calculator/modules/mep/bootstrap.php';
+$base = defined('APP_BASE') ? rtrim(APP_BASE, '/') : '/aec-calculator';
+require_once rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $base . '/modules/mep/bootstrap.php';
 
 // Initialize database connection
 $db = new Database();
