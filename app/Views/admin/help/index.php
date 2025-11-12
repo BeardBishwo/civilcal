@@ -13,6 +13,15 @@ $content = '
             <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#systemInfoModal">
                 <i class="bi bi-info-circle me-2"></i>System Info
             </button>
+            <button class="btn btn-outline-primary btn-sm" id="exportThemes">
+                <i class="bi bi-folder2-open me-2"></i>Export Themes
+            </button>
+            <button class="btn btn-outline-primary btn-sm" id="exportPlugins">
+                <i class="bi bi-puzzle me-2"></i>Export Plugins
+            </button>
+            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#restoreModal">
+                <i class="bi bi-arrow-counterclockwise me-2"></i>Restore
+            </button>
         </div>
     </div>
 
@@ -263,12 +272,42 @@ $content = '
     </div>
 </div>
 
+<div class="modal fade" id="restoreModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">System Restore</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="restoreForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Restore Package (.zip)</label>
+                        <input type="file" class="form-control" name="restore_zip" id="restoreFile" accept=".zip" required>
+                        <small class="form-text text-muted">Include manifest.json and optional db.sql</small>
+                    </div>
+                </form>
+                <div id="restoreResult" class="d-none"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="restoreForm" class="btn btn-primary">Validate Package</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
 <script>
 // Clear logs
 document.getElementById("clearLogs").addEventListener("click", function() {
     if (confirm("Are you sure you want to clear all system logs? This action cannot be undone.")) {
+        const headers1 = { "X-Requested-With": "XMLHttpRequest" };
+        const csrfMeta1 = document.querySelector("meta[name=\"csrf-token\"]");
+        const csrf1 = csrfMeta1 ? csrfMeta1.getAttribute("content") : null;
+        if (csrf1) { headers1["X-CSRF-Token"] = csrf1; }
         fetch("/admin/help/clear-logs", {
-            method: "POST"
+            method: "POST",
+            headers: headers1
         })
         .then(response => response.json())
         .then(data => {
@@ -285,8 +324,13 @@ document.getElementById("clearLogs").addEventListener("click", function() {
 // Create backup
 document.getElementById("createBackup").addEventListener("click", function() {
     if (confirm("Create a system backup? This may take a few minutes.")) {
+        const headers2 = { "X-Requested-With": "XMLHttpRequest" };
+        const csrfMeta2 = document.querySelector("meta[name=\"csrf-token\"]");
+        const csrf2 = csrfMeta2 ? csrfMeta2.getAttribute("content") : null;
+        if (csrf2) { headers2["X-CSRF-Token"] = csrf2; }
         fetch("/admin/help/backup", {
-            method: "POST"
+            method: "POST",
+            headers: headers2
         })
         .then(response => response.json())
         .then(data => {
@@ -297,6 +341,46 @@ document.getElementById("createBackup").addEventListener("click", function() {
             }
         });
     }
+});
+
+// Export themes
+document.getElementById("exportThemes").addEventListener("click", function() {
+    const headers = { "X-Requested-With": "XMLHttpRequest" };
+    const csrfMeta = document.querySelector("meta[name=\"csrf-token\"]");
+    const csrf = csrfMeta ? csrfMeta.getAttribute("content") : null;
+    if (csrf) { headers["X-CSRF-Token"] = csrf; }
+    fetch("/admin/help/export-themes", { method: "POST", headers: headers })
+        .then(r => r.json())
+        .then(d => { alert(d.success ? (d.message + (d.path ? "\nSaved: " + d.path : "")) : ("Error: " + d.message)); });
+});
+
+// Export plugins
+document.getElementById("exportPlugins").addEventListener("click", function() {
+    const headers = { "X-Requested-With": "XMLHttpRequest" };
+    const csrfMeta = document.querySelector("meta[name=\"csrf-token\"]");
+    const csrf = csrfMeta ? csrfMeta.getAttribute("content") : null;
+    if (csrf) { headers["X-CSRF-Token"] = csrf; }
+    fetch("/admin/help/export-plugins", { method: "POST", headers: headers })
+        .then(r => r.json())
+        .then(d => { alert(d.success ? (d.message + (d.path ? "\nSaved: " + d.path : "")) : ("Error: " + d.message)); });
+});
+
+// Restore validate
+document.getElementById("restoreForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const fd = new FormData(this);
+    const headers = { "X-Requested-With": "XMLHttpRequest" };
+    const csrfMeta = document.querySelector("meta[name=\"csrf-token\"]");
+    const csrf = csrfMeta ? csrfMeta.getAttribute("content") : null;
+    if (csrf) { headers["X-CSRF-Token"] = csrf; }
+    fetch("/admin/help/restore", { method: "POST", headers: headers, body: fd })
+        .then(r => r.json())
+        .then(d => {
+            const out = document.getElementById("restoreResult");
+            out.className = d.success ? "alert alert-success" : "alert alert-danger";
+            out.classList.remove("d-none");
+            out.textContent = d.message || (d.success ? "Validated" : "Failed");
+        });
 });
 </script>
 ';

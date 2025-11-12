@@ -67,6 +67,13 @@ $router->add('GET', '/api/calculator/{category}/{tool}', 'ApiController@getCalcu
 $router->add('GET', '/api/calculations', 'ApiController@getUserCalculations', ['auth']);
 $router->add('GET', '/api/calculations/{id}', 'ApiController@getCalculation', ['auth']);
 
+// API v1 Routes (versioned, API-key or session auth handled in controller)
+$router->add('POST', '/api/v1/calculate', 'ApiController@calculate');
+$router->add('GET', '/api/v1/calculators', 'ApiController@getCalculators');
+$router->add('GET', '/api/v1/calculator/{category}/{tool}', 'ApiController@getCalculator');
+$router->add('GET', '/api/v1/calculations', 'ApiController@getUserCalculations');
+$router->add('GET', '/api/v1/calculations/{id}', 'ApiController@getCalculation');
+
 // Admin Routes
 $router->add('GET', '/admin', 'Admin\DashboardController@index', ['auth', 'admin']);
 $router->add('GET', '/admin/users', 'Admin\UserController@index', ['auth', 'admin']);
@@ -102,6 +109,7 @@ $router->add('POST', '/api/widgets/setting/{id}', 'ApiController@updateWidgetSet
 // Plugin Management Routes
 $router->add('GET', '/admin/plugins', 'Admin\PluginController@index', ['auth', 'admin']);
 $router->add('POST', '/admin/plugins/upload', 'Admin\PluginController@upload', ['auth', 'admin']);
+$router->add('POST', '/admin/plugins/toggle', 'Admin\PluginController@toggle', ['auth', 'admin']);
 $router->add('POST', '/admin/plugins/toggle/{slug}/{action}', 'Admin\PluginController@toggle', ['auth', 'admin']);
 $router->add('POST', '/admin/plugins/delete/{slug}', 'Admin\PluginController@delete', ['auth', 'admin']);
 $router->add('GET', '/admin/plugins/details/{slug}', 'Admin\PluginController@details', ['auth', 'admin']);
@@ -202,6 +210,9 @@ $router->add('POST', '/admin/subscriptions/create-plan', 'Admin\SubscriptionCont
 $router->add('GET', '/admin/help', 'Admin\HelpController@index', ['auth', 'admin']);
 $router->add('POST', '/admin/help/clear-logs', 'Admin\HelpController@clearLogs', ['auth', 'admin']);
 $router->add('POST', '/admin/help/backup', 'Admin\HelpController@backupSystem', ['auth', 'admin']);
+$router->add('POST', '/admin/help/export-themes', 'Admin\HelpController@exportThemes', ['auth', 'admin']);
+$router->add('POST', '/admin/help/export-plugins', 'Admin\HelpController@exportPlugins', ['auth', 'admin']);
+$router->add('POST', '/admin/help/restore', 'Admin\HelpController@restore', ['auth', 'admin']);
 
 // Email Manager Admin Routes
 $router->add('GET', '/admin/email-manager', 'Admin\EmailManagerController@dashboard', ['auth', 'admin']);
@@ -233,4 +244,14 @@ $router->add('GET', '/api/comments/{shareId}', 'CommentController@getByShare');
 $router->add('POST', '/api/comments/{id}/vote', 'CommentController@vote', ['auth']);
 $router->add('POST', '/api/share/{id}/embed', 'ShareController@generateEmbed', ['auth']);
 $router->add('POST', '/api/share', 'ShareController@store', ['auth']);
+
+// Load module service providers
+\App\Modules\ModuleManager::load($router);
+
+// Boot active plugins
+try {
+    (new \App\Services\PluginManager())->bootAll();
+} catch (\Throwable $e) {
+    \App\Services\Logger::exception($e, ['when' => 'boot_plugins_from_routes']);
+}
 ?>

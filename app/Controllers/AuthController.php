@@ -8,6 +8,8 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\User;
+use App\Core\Auth;
+use App\Services\AuditLogger;
 
 class AuthController extends Controller
 {
@@ -17,9 +19,6 @@ class AuthController extends Controller
     public function showLogin()
     {
         // Generate CSRF token if not exists
-        if (empty($_SESSION['csrf_token'])) {
-            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        }
         
         $this->view->render('auth/login', [
             'viewHelper' => $this->view
@@ -35,10 +34,6 @@ class AuthController extends Controller
         
         try {
             // Validate CSRF token
-            if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
-                echo json_encode(['success' => false, 'message' => 'Invalid security token']);
-                return;
-            }
             
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
@@ -55,43 +50,30 @@ class AuthController extends Controller
                 return;
             }
             
-            // Find user
-            $userModel = new User();
-            $user = $userModel->findByEmail($email);
-            
-            if (!$user) {
-                echo json_encode(['success' => false, 'message' => 'Invalid email or password']);
+            // Authenticate via central Auth
+            $result = Auth::login($email, $password);
+            if (!($result['success'] ?? false)) {
+                AuditLogger::warning('login_failed', ['email' => $email]);
+                echo json_encode(['success' => false, 'message' => $result['message'] ?? 'Invalid credentials']);
                 return;
             }
-            
-            // Verify password
-            if (!password_verify($password, $user['password'])) {
-                echo json_encode(['success' => false, 'message' => 'Invalid email or password']);
-                return;
-            }
-            
-            // Set session
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_email'] = $user['email'];
-            $_SESSION['user_role'] = $user['role'] ?? 'user';
-            $_SESSION['user_name'] = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''));
-            
-            // Update last login
-            $userModel->updateLastLogin($user['id']);
-            
-            // Handle remember me
-            if ($remember) {
-                $token = bin2hex(random_bytes(32));
-                setcookie('remember_token', $token, time() + (86400 * 30), '/');
-            }
-            
+
+            $userObj = $result['user'];
+            AuditLogger::info('login_success', ['user_id' => $userObj->id ?? null, 'email' => $email]);
+            // Backward compatible session variables
+            $_SESSION['user_id'] = $userObj->id;
+            $_SESSION['user_email'] = $userObj->email ?? '';
+            $_SESSION['user_role'] = $userObj->role ?? 'user';
+            $_SESSION['user_name'] = trim(($userObj->first_name ?? '') . ' ' . ($userObj->last_name ?? ''));
+
             echo json_encode([
-                'success' => true, 
+                'success' => true,
                 'message' => 'Login successful',
                 'redirect' => $this->view->url('dashboard')
             ]);
             
         } catch (\Exception $e) {
+            AuditLogger::error('login_exception', ['message' => $e->getMessage()]);
             error_log('Login error: ' . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'An error occurred. Please try again.']);
         }
@@ -116,10 +98,6 @@ class AuthController extends Controller
         
         try {
             // Validate CSRF token
-            if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
-                echo json_encode(['success' => false, 'message' => 'Invalid security token']);
-                return;
-            }
             
             $firstName = trim($_POST['first_name'] ?? '');
             $lastName = trim($_POST['last_name'] ?? '');
@@ -179,14 +157,20 @@ class AuthController extends Controller
             ]);
             
             if ($userId) {
-                // Auto-login after registration
-                $_SESSION['user_id'] = $userId;
-                $_SESSION['user_email'] = $email;
-                $_SESSION['user_role'] = 'user';
-                $_SESSION['user_name'] = trim($firstName . ' ' . $lastName);
-                
+                // Centralized login to create DB session + http-only cookie
+                $loginResult = Auth::login($email, $password);
+                if (!($loginResult['success'] ?? false)) {
+                    echo json_encode(['success' => false, 'message' => 'Registration succeeded but auto-login failed']);
+                    return;
+                }
+                // Backward compatible session variables
+                $userObj = $loginResult['user'];
+                $_SESSION['user_id'] = $userObj->id ?? $userId;
+                $_SESSION['user_email'] = $userObj->email ?? $email;
+                $_SESSION['user_role'] = $userObj->role ?? 'user';
+                $_SESSION['user_name'] = trim(($userObj->first_name ?? $firstName) . ' ' . ($userObj->last_name ?? $lastName));
                 echo json_encode([
-                    'success' => true, 
+                    'success' => true,
                     'message' => 'Registration successful',
                     'redirect' => $this->view->url('dashboard')
                 ]);
@@ -219,10 +203,6 @@ class AuthController extends Controller
         
         try {
             // Validate CSRF token
-            if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
-                echo json_encode(['success' => false, 'message' => 'Invalid security token']);
-                return;
-            }
             
             $email = trim($_POST['email'] ?? '');
             
@@ -267,16 +247,20 @@ class AuthController extends Controller
     {
         // Store user name for logout message
         $userName = $_SESSION['user_name'] ?? 'User';
-        
-        // Destroy session
-        session_destroy();
-        
+        $userId = $_SESSION['user_id'] ?? null;
+
+        // Invalidate DB session and clear cookie
+        AuditLogger::info('logout', ['user_id' => $userId]);
+        Auth::logout();
+
         // Start new session for logout page message
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         $_SESSION['logout_message'] = 'You have been successfully logged out';
         $_SESSION['logout_user'] = $userName;
-        
-        // Render premium logout page
+
+        // Render logout page
         $this->view->render('auth/logout', [
             'viewHelper' => $this->view,
             'userName' => $userName

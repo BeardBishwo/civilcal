@@ -3,6 +3,8 @@ namespace App\Controllers\Admin;
 
 use App\Core\Controller;
 use App\Services\ThemeManager;
+use App\Services\FileUploadService;
+use App\Services\AuditLogger;
 use Exception;
 
 class ThemeController extends Controller
@@ -67,8 +69,10 @@ class ThemeController extends Controller
             error_log("Theme Admin Activity: theme_activated - Theme ID: {$themeId}");
             
             if ($result['success']) {
+                AuditLogger::info('theme_activated', ['theme_id' => $themeId]);
                 $this->success('Theme activated successfully', $result);
             } else {
+                AuditLogger::warning('theme_activate_failed', ['theme_id' => $themeId, 'message' => $result['message'] ?? null]);
                 $this->error($result['message']);
             }
         } catch (Exception $e) {
@@ -97,8 +101,10 @@ class ThemeController extends Controller
             error_log("Theme Admin Activity: theme_deactivated - Theme ID: {$themeId}");
             
             if ($result['success']) {
+                AuditLogger::info('theme_deactivated', ['theme_id' => $themeId]);
                 $this->success('Theme deactivated successfully', $result);
             } else {
+                AuditLogger::warning('theme_deactivate_failed', ['theme_id' => $themeId, 'message' => $result['message'] ?? null]);
                 $this->error($result['message']);
             }
         } catch (Exception $e) {
@@ -129,8 +135,10 @@ class ThemeController extends Controller
             error_log("Theme Admin Activity: {$action} - Theme ID: {$themeId}");
             
             if ($result['success']) {
+                AuditLogger::info($action, ['theme_id' => $themeId]);
                 $this->success('Theme deleted successfully', $result);
             } else {
+                AuditLogger::warning('theme_delete_failed', ['theme_id' => $themeId, 'message' => $result['message'] ?? null]);
                 $this->error($result['message']);
             }
         } catch (Exception $e) {
@@ -159,8 +167,10 @@ class ThemeController extends Controller
             error_log("Theme Admin Activity: theme_restored - Theme ID: {$themeId}");
             
             if ($result['success']) {
+                AuditLogger::info('theme_restored', ['theme_id' => $themeId]);
                 $this->success('Theme restored successfully', $result);
             } else {
+                AuditLogger::warning('theme_restore_failed', ['theme_id' => $themeId, 'message' => $result['message'] ?? null]);
                 $this->error($result['message']);
             }
         } catch (Exception $e) {
@@ -189,8 +199,10 @@ class ThemeController extends Controller
             error_log("Theme Admin Activity: theme_hard_deleted - Theme ID: {$themeId}");
             
             if ($result['success']) {
+                AuditLogger::info('theme_hard_deleted', ['theme_id' => $themeId]);
                 $this->success('Theme permanently deleted', $result);
             } else {
+                AuditLogger::warning('theme_hard_delete_failed', ['theme_id' => $themeId, 'message' => $result['message'] ?? null]);
                 $this->error($result['message']);
             }
         } catch (Exception $e) {
@@ -212,14 +224,28 @@ class ThemeController extends Controller
                 return;
             }
 
-            $uploadedFile = $_FILES['theme_zip']['tmp_name'];
-            $result = $this->themeManager->installThemeFromZip($uploadedFile);
+            // Stage upload via FileUploadService (MIME + size checks)
+            $uploader = new FileUploadService();
+            $dest = (defined('STORAGE_PATH') ? STORAGE_PATH : sys_get_temp_dir()) . '/uploads/themes';
+            $upload = $uploader->uploadTheme($_FILES['theme_zip'], $dest);
+            if (!($upload['success'] ?? false)) {
+                $this->error($upload['message'] ?? 'Upload failed');
+                return;
+            }
+
+            $result = $this->themeManager->installThemeFromZip($upload['file_path']);
             
             // Log the action
             if ($result['success']) {
                 error_log("Theme Admin Activity: theme_uploaded - Theme: " . ($result['theme_name'] ?? 'Unknown'));
+                AuditLogger::info('theme_uploaded', [
+                    'theme_name' => $result['theme_name'] ?? null,
+                    'checksum' => $result['checksum'] ?? null,
+                    'file_size' => $result['file_size'] ?? null
+                ]);
                 $this->success('Theme uploaded successfully', $result);
             } else {
+                AuditLogger::warning('theme_upload_failed', ['message' => $result['message'] ?? null]);
                 $this->error($result['message']);
             }
         } catch (Exception $e) {

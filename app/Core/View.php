@@ -154,6 +154,27 @@ class View {
     public function getAvailableThemes() {
         return $this->themeManager->getAvailableThemes();
     }
+
+    public function csrfToken() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            $_SESSION['csrf_expiry'] = time() + 3600;
+        }
+        return $_SESSION['csrf_token'];
+    }
+
+    public function csrfField() {
+        $token = $this->csrfToken();
+        echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
+    }
+
+    public function csrfMetaTag() {
+        $token = $this->csrfToken();
+        echo '<meta name="csrf-token" content="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
+    }
     
     /**
      * Set active theme

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php $this->csrfMetaTag(); ?>
     <title><?php echo $this->getPageTitle() ?: 'Premium Calculator'; ?></title>
     
     <!-- Premium Theme CSS -->

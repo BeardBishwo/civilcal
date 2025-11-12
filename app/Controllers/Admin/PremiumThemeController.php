@@ -3,6 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Services\PremiumThemeManager;
+use App\Services\FileUploadService;
 use Exception;
 
 /**
@@ -252,7 +253,15 @@ class PremiumThemeController
                 return $this->redirect('/admin/premium-themes/install');
             }
             
-            $zipPath = $_FILES['theme_zip']['tmp_name'];
+            // Validate and stage upload via FileUploadService
+            $uploader = new FileUploadService();
+            $dest = (defined('STORAGE_PATH') ? STORAGE_PATH : sys_get_temp_dir()) . '/uploads/premium-themes';
+            $upload = $uploader->uploadTheme($_FILES['theme_zip'], $dest);
+            if (!($upload['success'] ?? false)) {
+                $this->addFlashMessage('error', $upload['message'] ?? 'Upload failed');
+                return $this->redirect('/admin/premium-themes/install');
+            }
+            $zipPath = $upload['file_path'];
             
             $result = $this->themeManager->installThemeFromZip($zipPath, $licenseKey, $userId);
             
@@ -687,7 +696,15 @@ class PremiumThemeController
                 return $this->redirect('/admin/premium-themes');
             }
             
-            $zipPath = $_FILES['theme_zip']['tmp_name'];
+            // Validate and stage upload via FileUploadService
+            $uploader = new FileUploadService();
+            $dest = (defined('STORAGE_PATH') ? STORAGE_PATH : sys_get_temp_dir()) . '/uploads/premium-themes';
+            $upload = $uploader->uploadTheme($_FILES['theme_zip'], $dest);
+            if (!($upload['success'] ?? false)) {
+                $this->addFlashMessage('error', $upload['message'] ?? 'Upload failed');
+                return $this->redirect('/admin/premium-themes');
+            }
+            $zipPath = $upload['file_path'];
             
             $result = $this->themeManager->installThemeFromZip($zipPath, $licenseKey, $userId);
             

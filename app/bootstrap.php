@@ -30,17 +30,53 @@ spl_autoload_register(function ($class) {
 $appConfig = require_once CONFIG_PATH . '/app.php';
 $dbConfig = require_once CONFIG_PATH . '/database.php';
 
-// Define debug constant
-define('APP_DEBUG', $appConfig['debug'] ?? true);
+// Define debug constant (config holds under 'app' key)
+$__debug = $appConfig['app']['debug'] ?? true;
+define('APP_DEBUG', $__debug);
 
-// Set error reporting
-if ($appConfig['debug'] ?? false) {
+// Ensure storage/logs exists
+$__logsDir = STORAGE_PATH . '/logs';
+if (!is_dir($__logsDir)) { @mkdir($__logsDir, 0755, true); }
+
+// Set error reporting and PHP error logging
+if ($__debug) {
     error_reporting(E_ALL);
-    ini_set('display_errors', 1);
+    ini_set('display_errors', '1');
 } else {
     error_reporting(0);
-    ini_set('display_errors', 0);
+    ini_set('display_errors', '0');
 }
+ini_set('log_errors', '1');
+ini_set('error_log', $__logsDir . '/php_error.log');
+
+// Global error/exception/shutdown handlers
+set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+    if (!(error_reporting() & $errno)) { return false; }
+    \App\Services\Logger::error($errstr, ['type' => $errno, 'file' => $errfile, 'line' => $errline]);
+    return false; // allow PHP's internal handler as well
+});
+
+set_exception_handler(function ($e) {
+    \App\Services\Logger::exception($e);
+    if (defined('APP_DEBUG') && APP_DEBUG) {
+        http_response_code(500);
+        echo 'Exception: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
+    } else {
+        http_response_code(500);
+        echo 'An error occurred. Please try again later.';
+    }
+});
+
+register_shutdown_function(function () {
+    $error = error_get_last();
+    if ($error && $error['type'] === E_ERROR) {
+        \App\Services\Logger::error($error['message'], [
+            'type' => $error['type'],
+            'file' => $error['file'],
+            'line' => $error['line']
+        ]);
+    }
+});
 
 // Start session
 if (session_status() === PHP_SESSION_NONE) {

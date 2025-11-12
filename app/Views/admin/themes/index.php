@@ -199,8 +199,9 @@ $error = $data['error'] ?? null;
                         <!-- Theme Preview -->
                         <div class="position-relative">
                             <div class="theme-preview bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
-                                <?php if (isset($theme['preview_image']) && $theme['preview_image']): ?>
-                                    <img src="<?= htmlspecialchars($theme['preview_image']) ?>" alt="Theme Preview" class="img-fluid rounded">
+                                <?php $preview = $theme['screenshot_path'] ?? ($theme['preview_image'] ?? null); ?>
+                                <?php if ($preview): ?>
+                                    <img src="<?= htmlspecialchars($preview) ?>" alt="Theme Preview" class="img-fluid rounded">
                                 <?php else: ?>
                                     <div class="text-center">
                                         <i class="bi bi-palette fs-1 text-muted"></i>
@@ -377,6 +378,33 @@ $error = $data['error'] ?? null;
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Result Modal -->
+<div class="modal fade" id="uploadResultModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Theme Upload Result</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="resultStatus" class="mb-2"></div>
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <img id="resultScreenshot" src="" alt="Preview" class="rounded d-none" style="width:72px;height:72px;object-fit:cover;">
+                    <div>
+                        <div class="small"><strong>Name:</strong> <span id="resultName">-</span></div>
+                        <div class="small"><strong>Checksum:</strong> <span id="resultChecksum">-</span></div>
+                        <div class="small"><strong>Size:</strong> <span id="resultSize">-</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="resultReloadBtn">Reload</button>
+            </div>
         </div>
     </div>
 </div>
@@ -612,11 +640,15 @@ function executeThemeAction(action, themeId) {
         formData.append('create_backup', '1');
     }
     
+    const headers = {
+        'X-Requested-With': 'XMLHttpRequest'
+    };
+    const csrfMeta1 = document.querySelector('meta[name="csrf-token"]');
+    const csrf1 = csrfMeta1 ? csrfMeta1.getAttribute('content') : null;
+    if (csrf1) { headers['X-CSRF-Token'] = csrf1; }
     fetch(`/admin/themes/${action}`, {
         method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
+        headers: headers,
         body: formData
     })
     .then(response => response.json())
@@ -736,14 +768,36 @@ function handleUploadSubmit(e) {
         hideUploadProgress();
         submitBtn.disabled = false;
         
+        const modalEl = document.getElementById('uploadResultModal');
+        const statusEl = document.getElementById('resultStatus');
+        const nameEl = document.getElementById('resultName');
+        const checksumEl = document.getElementById('resultChecksum');
+        const sizeEl = document.getElementById('resultSize');
+        const shotEl = document.getElementById('resultScreenshot');
+        const reloadBtn = document.getElementById('resultReloadBtn');
+        if (reloadBtn) reloadBtn.onclick = () => location.reload();
+
         if (xhr.status === 200) {
             try {
                 const response = JSON.parse(xhr.responseText);
                 if (response.success) {
-                    showAlert('success', response.message || 'Theme uploaded successfully');
-                    setTimeout(() => location.reload(), 1500);
+                    const data = response.data || {};
+                    statusEl.className = 'alert alert-success';
+                    statusEl.textContent = response.message || 'Theme uploaded successfully';
+                    nameEl.textContent = data.theme_name || '-';
+                    checksumEl.textContent = data.checksum || '-';
+                    sizeEl.textContent = data.file_size ? (Math.round((data.file_size/1024)*10)/10) + ' KB' : '-';
+                    if (data.screenshot_path) {
+                        shotEl.src = data.screenshot_path;
+                        shotEl.classList.remove('d-none');
+                    } else {
+                        shotEl.classList.add('d-none');
+                    }
+                    if (modalEl && window.bootstrap) new bootstrap.Modal(modalEl).show();
                 } else {
-                    showAlert('danger', response.message || 'Upload failed');
+                    statusEl.className = 'alert alert-danger';
+                    statusEl.textContent = response.message || 'Upload failed';
+                    if (modalEl && window.bootstrap) new bootstrap.Modal(modalEl).show();
                 }
             } catch (e) {
                 showAlert('danger', 'Invalid response from server');
@@ -761,12 +815,15 @@ function handleUploadSubmit(e) {
     
     xhr.open('POST', '/admin/themes/upload');
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    if (csrf) { xhr.setRequestHeader('X-CSRF-Token', csrf); }
     xhr.send(formData);
 }
 
 function initThemeValidation() {
     const validateForm = document.getElementById('validateThemeForm');
     const validateSelect = document.getElementById('validateThemeSelect');
+    // ... (rest of the code remains the same)
     
     if (validateForm) {
         validateForm.addEventListener('submit', function(e) {
@@ -794,11 +851,15 @@ function validateThemeByName(themeName) {
     const formData = new FormData();
     formData.append('theme_name', themeName);
     
+    const headers2 = {
+        'X-Requested-With': 'XMLHttpRequest'
+    };
+    const csrfMeta2 = document.querySelector('meta[name="csrf-token"]');
+    const csrf2 = csrfMeta2 ? csrfMeta2.getAttribute('content') : null;
+    if (csrf2) { headers2['X-CSRF-Token'] = csrf2; }
     fetch('/admin/themes/validate', {
         method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
+        headers: headers2,
         body: formData
     })
     .then(response => response.json())
@@ -899,11 +960,15 @@ function executeBulkAction() {
     
     showLoading();
     
+    const headers3 = {
+        'X-Requested-With': 'XMLHttpRequest'
+    };
+    const csrfMeta3 = document.querySelector('meta[name="csrf-token"]');
+    const csrf3 = csrfMeta3 ? csrfMeta3.getAttribute('content') : null;
+    if (csrf3) { headers3['X-CSRF-Token'] = csrf3; }
     fetch('/admin/themes/bulkAction', {
         method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
+        headers: headers3,
         body: formData
     })
     .then(response => response.json())

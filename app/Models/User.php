@@ -18,6 +18,16 @@ class User {
         return $stmt->fetch();
     }
     
+    public static function findByUsername($username) {
+        $db = Database::getInstance();
+        $pdo = $db->getPdo();
+        // Support login by username or email
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ? LIMIT 1");
+        $stmt->execute([$username, $username]);
+        $row = $stmt->fetch();
+        return $row ? (object) $row : null;
+    }
+    
     public function find($id) {
         $stmt = $this->db->getPdo()->prepare("SELECT * FROM users WHERE id = ?");
         $stmt->execute([$id]);

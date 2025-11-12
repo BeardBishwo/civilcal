@@ -222,6 +222,15 @@ $content = '
                             Upload a ZIP file containing your plugin with plugin.json manifest.
                         </small>
                     </div>
+                    <div class="upload-progress d-none" id="pluginUploadProgress">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small">Uploading plugin...</span>
+                            <span class="small" id="pluginUploadPercent">0%</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar" id="pluginUploadProgressBar" style="width: 0%"></div>
+                        </div>
+                    </div>
                     <div class="alert alert-warning">
                         <i class="bi bi-exclamation-triangle me-2"></i>
                         <strong>Security Notice:</strong><br>
@@ -232,6 +241,30 @@ $content = '
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="submit" form="uploadPluginForm" class="btn btn-primary">Upload Plugin</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Plugin Result Modal -->
+<div class="modal fade" id="uploadPluginResultModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Plugin Upload Result</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="pluginResultStatus" class="mb-2"></div>
+                <div>
+                    <div class="small"><strong>Name:</strong> <span id="pluginResultName">-</span></div>
+                    <div class="small"><strong>Checksum:</strong> <span id="pluginResultChecksum">-</span></div>
+                    <div class="small"><strong>Size:</strong> <span id="pluginResultSize">-</span></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="pluginResultReloadBtn">Reload</button>
             </div>
         </div>
     </div>
@@ -250,8 +283,13 @@ document.querySelectorAll(".toggle-plugin").forEach(button => {
             formData.append("plugin_name", pluginName);
             formData.append("action", action);
             
+            const headers = { "X-Requested-With": "XMLHttpRequest" };
+            const csrfMeta = document.querySelector("meta[name=\"csrf-token\"]");
+            const csrf = csrfMeta ? csrfMeta.getAttribute("content") : null;
+            if (csrf) { headers["X-CSRF-Token"] = csrf; }
             fetch("/admin/plugins/toggle", {
                 method: "POST",
+                headers: headers,
                 body: formData
             })
             .then(response => response.json())
@@ -265,6 +303,79 @@ document.querySelectorAll(".toggle-plugin").forEach(button => {
         }
     });
 });
+</script>
+<script>
+// Handle plugin upload with progress and result modal
+(function(){
+  const form = document.getElementById("uploadPluginForm");
+  if (!form) return;
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    const data = new FormData(form);
+    const xhr = new XMLHttpRequest();
+    const prog = document.getElementById("pluginUploadProgress");
+    const bar = document.getElementById("pluginUploadProgressBar");
+    const pct = document.getElementById("pluginUploadPercent");
+
+    if (prog) prog.classList.remove("d-none");
+    if (bar) bar.style.width = "0%";
+    if (pct) pct.textContent = "0%";
+
+    xhr.upload.addEventListener("progress", function(ev){
+      if (ev.lengthComputable) {
+        const percent = Math.round((ev.loaded / ev.total) * 100);
+        if (bar) bar.style.width = percent + "%";
+        if (pct) pct.textContent = percent + "%";
+      }
+    });
+
+    xhr.addEventListener("load", function(){
+      if (prog) prog.classList.add("d-none");
+      const modalEl = document.getElementById("uploadPluginResultModal");
+      const statusEl = document.getElementById("pluginResultStatus");
+      const nameEl = document.getElementById("pluginResultName");
+      const checksumEl = document.getElementById("pluginResultChecksum");
+      const sizeEl = document.getElementById("pluginResultSize");
+      const reloadBtn = document.getElementById("pluginResultReloadBtn");
+      if (reloadBtn) reloadBtn.onclick = () => location.reload();
+
+      if (xhr.status === 200) {
+        try {
+          const res = JSON.parse(xhr.responseText);
+          if (res.success) {
+            const d = res.data || {};
+            statusEl.className = "alert alert-success";
+            statusEl.textContent = res.message || "Plugin uploaded successfully";
+            nameEl.textContent = d.plugin_name || "-";
+            checksumEl.textContent = d.checksum || "-";
+            sizeEl.textContent = d.file_size ? (Math.round((d.file_size/1024)*10)/10) + " KB" : "-";
+          } else {
+            statusEl.className = "alert alert-danger";
+            statusEl.textContent = res.message || "Upload failed";
+          }
+        } catch (e) {
+          statusEl.className = "alert alert-danger";
+          statusEl.textContent = "Invalid response from server";
+        }
+        if (modalEl && window.bootstrap) new bootstrap.Modal(modalEl).show();
+      } else {
+        alert("Upload failed with status " + xhr.status);
+      }
+    });
+
+    xhr.addEventListener("error", function(){
+      if (prog) prog.classList.add("d-none");
+      alert("Upload failed due to network error");
+    });
+
+    xhr.open("POST", "/admin/plugins/upload");
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    const csrfMeta = document.querySelector("meta[name=\"csrf-token\"]");
+    const csrf = csrfMeta ? csrfMeta.getAttribute("content") : null;
+    if (csrf) xhr.setRequestHeader("X-CSRF-Token", csrf);
+    xhr.send(data);
+  });
+})();
 </script>
 ';
 

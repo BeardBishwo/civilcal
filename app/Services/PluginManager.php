@@ -1,13 +1,16 @@
 <?php
 namespace App\Services;
 
+use App\Core\Database;
+use App\Services\Logger;
+
 class PluginManager {
     private $db;
     private $pluginsDir;
     private $coreModulesDir;
     
     public function __construct() {
-        $this->db = new \App\Core\Database();
+        $this->db = Database::getInstance();
         $this->pluginsDir = BASE_PATH . '/plugins/calculator-plugins/';
         $this->coreModulesDir = BASE_PATH . '/modules/';
     }
@@ -104,6 +107,7 @@ class PluginManager {
                 name = VALUES(name), description = VALUES(description), version = VALUES(version), updated_at = CURRENT_TIMESTAMP
             ");
             
+            $mainFile = $pluginConfig['entrypoint'] ?? ($pluginConfig['main_file'] ?? '');
             return $stmt->execute([
                 $pluginConfig['name'],
                 $pluginConfig['slug'],
@@ -113,7 +117,7 @@ class PluginManager {
                 $pluginConfig['author'] ?? '',
                 $pluginConfig['author_url'] ?? '',
                 $pluginConfig['plugin_path'],
-                $pluginConfig['main_file'] ?? '',
+                $mainFile,
                 0, // Not active by default
                 0, // Not core plugin
                 json_encode($pluginConfig['settings'] ?? []),
@@ -377,6 +381,44 @@ class PluginManager {
                 is_dir($path) ? $this->removeDirectory($path) : unlink($path);
             }
             rmdir($dir);
+        }
+    }
+
+    /**
+     * Boot all active plugins by requiring their entrypoints
+     */
+    public function bootAll(): void {
+        try {
+            $stmt = $this->db->prepare("SELECT slug, plugin_path, main_file FROM plugins WHERE is_active = 1");
+            $stmt->execute();
+            $active = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            foreach ($active as $plugin) {
+                $entry = $plugin['main_file'] ?? '';
+                if (!$entry) {
+                    // Fallbacks
+                    $candidates = ['entrypoint.php','bootstrap.php','index.php'];
+                    foreach ($candidates as $cand) {
+                        if (is_file(rtrim($plugin['plugin_path'], '/\\') . '/' . $cand)) { $entry = $cand; break; }
+                    }
+                }
+                if ($entry) {
+                    $path = rtrim($plugin['plugin_path'], '/\\') . '/' . ltrim($entry, '/\\');
+                    if (is_file($path)) {
+                        try {
+                            require_once $path;
+                            Logger::info('plugin_booted', ['slug' => $plugin['slug'], 'entry' => $entry]);
+                        } catch (\Throwable $e) {
+                            Logger::exception($e, ['when' => 'boot_plugin', 'slug' => $plugin['slug']]);
+                        }
+                    } else {
+                        Logger::warning('plugin_entry_missing', ['slug' => $plugin['slug'], 'path' => $path]);
+                    }
+                } else {
+                    Logger::warning('plugin_entry_undefined', ['slug' => $plugin['slug']]);
+                }
+            }
+        } catch (\Throwable $e) {
+            Logger::exception($e, ['when' => 'boot_all_plugins']);
         }
     }
 }

@@ -9,15 +9,36 @@ class Router {
     private $middlewareMap = [
         'auth' => '\App\Middleware\AuthMiddleware',
         'guest' => '\App\Middleware\GuestMiddleware',
-        'admin' => '\App\Middleware\AdminMiddleware'
+        'admin' => '\App\Middleware\AdminMiddleware',
+        'cors' => '\App\Middleware\CorsMiddleware',
+        'csrf' => '\App\Middleware\CsrfMiddleware',
+        'security' => '\App\Middleware\SecurityMiddleware'
     ];
     
     public function add($method, $uri, $controller, $middleware = []) {
+        $mw = $middleware;
+        if (!in_array('security', $mw, true)) {
+            $mw[] = 'security';
+        }
+        if (stripos($uri, '/api') === 0 && !in_array('cors', $mw, true)) {
+            $mw[] = 'cors';
+        }
+        if (strtoupper($method) === 'OPTIONS' && !in_array('cors', $mw, true)) {
+            $mw[] = 'cors';
+        }
+        // Attach CSRF middleware for state-changing methods, except installer
+        $upperMethod = strtoupper($method);
+        if (in_array($upperMethod, ['POST','PUT','PATCH','DELETE'], true)
+            && stripos($uri, '/install') !== 0
+            && stripos($uri, '/api') !== 0
+            && !in_array('csrf', $mw, true)) {
+            $mw[] = 'csrf';
+        }
         $this->routes[] = [
             'method' => $method,
             'uri' => $uri,
             'controller' => $controller,
-            'middleware' => $middleware
+            'middleware' => $mw
         ];
     }
     
@@ -38,8 +59,9 @@ class Router {
         $debugMode = defined('APP_DEBUG') && APP_DEBUG;
         
         foreach ($this->routes as $route) {
-            if ($this->matchRoute($route, $uri, $method)) {
-                return $this->callRoute($route);
+            $matches = $this->matchRoute($route, $uri, $method);
+            if ($matches !== false) {
+                return $this->callRoute($route, $matches);
             }
         }
         
@@ -82,22 +104,56 @@ class Router {
     
     public function matchRoute($route, $uri, $method) {
         // Convert route URI to regex pattern
-        $pattern = preg_replace('/\{([a-z]+)\}/', '([^/]+)', $route['uri']);
+        $pattern = preg_replace('/\{([a-z_][a-z0-9_]*)\}/i', '([^/]+)', $route['uri']);
         $pattern = "#^$pattern$#";
         
-        return $route['method'] === $method && preg_match($pattern, $uri, $matches);
+        if ($route['method'] === $method && preg_match($pattern, $uri, $matches)) {
+            return $matches; // return captured parameters
+        }
+        return false;
     }
     
-    public function callRoute($route) {
+    public function callRoute($route, $matches = []) {
+        // Extract route parameters (exclude the full match at index 0)
+        $params = array_slice($matches, 1);
+        
+        // Build request array
+        $request = [
+            'method' => $_SERVER['REQUEST_METHOD'] ?? 'GET',
+            'uri' => parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH),
+            'params' => $params,
+            'get' => $_GET,
+            'post' => $_POST,
+            'cookies' => $_COOKIE,
+            'server' => $_SERVER,
+        ];
+        
         // Execute middleware
+        $pipeline = [];
         foreach ($route['middleware'] as $middlewareName) {
             // Map middleware name to class
             $middlewareClass = $this->middlewareMap[$middlewareName] ?? null;
             
             if ($middlewareClass && class_exists($middlewareClass)) {
                 $middleware = new $middlewareClass();
-                if (!$middleware->handle()) {
-                    return; // Middleware blocked the request
+                // Support both legacy boolean middlewares and pipeline middlewares
+                if (method_exists($middleware, 'handle')) {
+                    try {
+                        $ref = new \ReflectionMethod($middleware, 'handle');
+                        if ($ref->getNumberOfParameters() >= 2) {
+                            $pipeline[] = $middleware; // will be called as handle($request, $next)
+                        } else {
+                            // Legacy: handle() returns bool
+                            if ($middleware->handle() === false) {
+                                return; // blocked
+                            }
+                        }
+                    } catch (\ReflectionException $e) {
+                        // Fallback to legacy behavior
+                        if ($middleware->handle() === false) {
+                            return;
+                        }
+                    }
                 }
             }
         }
@@ -112,13 +168,27 @@ class Router {
             $controllerClass = "App\\Controllers\\{$controllerClass}";
         }
         
-        if (class_exists($controllerClass)) {
-            $controller = new $controllerClass();
-            call_user_func([$controller, $method]);
-        } else {
-            http_response_code(500);
-            echo "Controller not found: {$controllerClass}";
+        // Final controller invoker
+        $controllerInvoker = function($req) use ($controllerClass, $method, $params) {
+            if (class_exists($controllerClass)) {
+                $controller = new $controllerClass();
+                return call_user_func_array([$controller, $method], $params);
+            } else {
+                http_response_code(500);
+                echo "Controller not found: {$controllerClass}";
+                return null;
+            }
+        };
+        
+        // Build middleware pipeline (LIFO)
+        $next = $controllerInvoker;
+        foreach (array_reverse($pipeline) as $mw) {
+            $next = function($req) use ($mw, $next) {
+                return $mw->handle($req, $next);
+            };
         }
+        
+        return $next($request);
     }
 }
 ?>

@@ -17,15 +17,23 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Check if installation is completed (BASE_PATH now available)
 function isInstalled() {
-    $configFile = BASE_PATH . '/config/installed.lock';
+    $storageLock = BASE_PATH . '/storage/installed.lock';
+    $legacyLock = BASE_PATH . '/storage/install.lock';
+    $configLock = BASE_PATH . '/config/installed.lock';
     $envFile = BASE_PATH . '/.env';
-    
-    return file_exists($configFile) && file_exists($envFile);
+    return file_exists($storageLock) || file_exists($legacyLock) || (file_exists($configLock) && file_exists($envFile));
 }
 
 // Redirect to installer if not installed
 if (!isInstalled() && !isset($_GET['install'])) {
     header('Location: /install/');
+    exit;
+}
+
+// If system already installed but installer accessed
+if (isInstalled() && isset($_GET['install'])) {
+    http_response_code(403);
+    echo 'System already installed.';
     exit;
 }
 

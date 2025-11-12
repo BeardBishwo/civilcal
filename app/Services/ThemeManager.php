@@ -517,10 +517,79 @@ class ThemeManager
                 ];
             }
 
-            // Extract to themes directory
-            $extractPath = $this->themesPath . $themeName;
-            $zip->extractTo($extractPath);
+            // Secure extraction: extract to temp directory first and validate paths
+            $tempBase = (defined('STORAGE_PATH') ? STORAGE_PATH : sys_get_temp_dir()) . '/tmp_theme_' . bin2hex(random_bytes(8));
+            if (!is_dir($tempBase)) {
+                mkdir($tempBase, 0755, true);
+            }
+
+            $tempExtract = $tempBase . '/' . $themeName;
+            if (!is_dir($tempExtract)) {
+                mkdir($tempExtract, 0755, true);
+            }
+
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $entry = $zip->getNameIndex($i);
+                if ($entry === false) { continue; }
+                // Normalize entry path and prevent traversal
+                $entry = str_replace('..', '', $entry);
+                $entry = ltrim($entry, '/\\');
+                if ($entry === '' || substr($entry, -1) === '/') {
+                    // Directory entry
+                    $dirPath = $tempExtract . '/' . $entry;
+                    if (!is_dir($dirPath)) { mkdir($dirPath, 0755, true); }
+                    continue;
+                }
+                $dest = $tempExtract . '/' . $entry;
+                $destDir = dirname($dest);
+                if (!is_dir($destDir)) { mkdir($destDir, 0755, true); }
+                $contents = $zip->getFromIndex($i);
+                if ($contents === false) { continue; }
+                file_put_contents($dest, $contents);
+                // Verify path stays within tempExtract
+                $realTemp = realpath($tempExtract);
+                $realDest = realpath($dest);
+                if ($realTemp === false || $realDest === false || strpos($realDest, $realTemp) !== 0) {
+                    @unlink($dest);
+                    $zip->close();
+                    $this->rrmdir($tempBase);
+                    return [
+                        'success' => false,
+                        'message' => 'Invalid archive path detected'
+                    ];
+                }
+            }
             $zip->close();
+
+            // Move extracted theme into themes directory
+            $extractPath = $this->themesPath . $themeName;
+            if (is_dir($extractPath)) {
+                $this->rrmdir($extractPath);
+            }
+            $this->rcopy($tempExtract, $extractPath);
+            $this->rrmdir($tempBase);
+
+            $screenshotPath = null;
+            $candidates = ['screenshot.png','screenshot.jpg','screenshot.jpeg','preview.png','preview.jpg','preview.jpeg'];
+            foreach ($candidates as $cand) {
+                $p = $extractPath . '/' . $cand;
+                if (file_exists($p)) { $screenshotPath = $p; break; }
+            }
+            if ($screenshotPath === null) {
+                foreach ($candidates as $cand) {
+                    $p = $extractPath . '/assets/' . $cand;
+                    if (file_exists($p)) { $screenshotPath = $p; break; }
+                }
+            }
+            $publicScreenshotUrl = null;
+            if ($screenshotPath) {
+                $ext = strtolower(pathinfo($screenshotPath, PATHINFO_EXTENSION));
+                $publicDir = BASE_PATH . '/public/assets/theme-previews';
+                if (!is_dir($publicDir)) { @mkdir($publicDir, 0755, true); }
+                $publicFile = $publicDir . '/' . $themeName . '.' . $ext;
+                @copy($screenshotPath, $publicFile);
+                $publicScreenshotUrl = '/assets/theme-previews/' . $themeName . '.' . $ext;
+            }
 
             // Create theme in database
             $themeData = [
@@ -534,7 +603,8 @@ class ThemeManager
                 'price' => $themeConfig['price'] ?? 0.00,
                 'config' => $themeConfig,
                 'file_size' => filesize($zipFile),
-                'checksum' => hash_file('sha256', $zipFile)
+                'checksum' => hash_file('sha256', $zipFile),
+                'screenshot_path' => $publicScreenshotUrl
             ];
 
             $themeId = $this->themeModel->create($themeData);
@@ -544,7 +614,10 @@ class ThemeManager
                     'success' => true,
                     'message' => 'Theme installed successfully',
                     'theme_id' => $themeId,
-                    'theme_name' => $themeName
+                    'theme_name' => $themeName,
+                    'checksum' => $themeData['checksum'],
+                    'file_size' => $themeData['file_size'],
+                    'screenshot_path' => $themeData['screenshot_path']
                 ];
             }
 
@@ -560,6 +633,36 @@ class ThemeManager
                 'message' => 'Error installing theme: ' . $e->getMessage()
             ];
         }
+    }
+
+    private function rcopy($src, $dst) {
+        $dir = opendir($src);
+        @mkdir($dst, 0755, true);
+        while(false !== ($file = readdir($dir))) {
+            if (($file != '.') && ($file != '..')) {
+                if (is_dir($src . '/' . $file)) {
+                    $this->rcopy($src . '/' . $file, $dst . '/' . $file);
+                } else {
+                    copy($src . '/' . $file, $dst . '/' . $file);
+                }
+            }
+        }
+        closedir($dir);
+    }
+
+    private function rrmdir($dir) {
+        if (!is_dir($dir)) return;
+        $items = scandir($dir);
+        foreach ($items as $item) {
+            if ($item == '.' || $item == '..') continue;
+            $path = $dir . DIRECTORY_SEPARATOR . $item;
+            if (is_dir($path)) {
+                $this->rrmdir($path);
+            } else {
+                @unlink($path);
+            }
+        }
+        @rmdir($dir);
     }
 
     /**

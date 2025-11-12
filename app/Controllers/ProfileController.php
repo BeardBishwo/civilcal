@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\User;
+use App\Services\FileUploadService;
 use Exception;
 
 /**
@@ -275,13 +276,20 @@ class ProfileController extends Controller
         $userId = $this->getCurrentUserId();
         $user = $this->userModel->find($userId);
         
-        if (!$user || $user['avatar'] !== $filename) {
+        $safeFilename = basename($filename);
+        if (!$user || $user['avatar'] !== $safeFilename) {
             http_response_code(404);
             exit('Avatar not found');
         }
 
         $uploadDir = 'public/uploads/avatars/';
-        $filePath = $uploadDir . $filename;
+        $filePath = $uploadDir . $safeFilename;
+        $realBase = realpath($uploadDir) ?: $uploadDir;
+        $realFile = realpath($filePath);
+        if ($realFile === false || strpos($realFile, $realBase) !== 0) {
+            http_response_code(404);
+            exit('Avatar not found');
+        }
         
         if (file_exists($filePath)) {
             $imageInfo = getimagesize($filePath);
@@ -335,38 +343,17 @@ class ProfileController extends Controller
      */
     private function handleAvatarUpload($file)
     {
-        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-        $maxSize = 2 * 1024 * 1024; // 2MB
-        
-        // Validate file
-        if (!in_array($file['type'], $allowedTypes)) {
-            throw new Exception('Invalid file type. Only JPEG, PNG, and GIF are allowed');
+        // Delegate validation and safe move to centralized service
+        $uploader = new FileUploadService();
+        $dest = BASE_PATH . '/public/uploads/avatars';
+        $result = $uploader->uploadImage($file, $dest);
+        if (!($result['success'] ?? false)) {
+            throw new Exception($result['message'] ?? 'Failed to upload file');
         }
-        
-        if ($file['size'] > $maxSize) {
-            throw new Exception('File size too large. Maximum 2MB allowed');
-        }
-        
-        // Generate unique filename
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = uniqid('avatar_') . '.' . $extension;
-        
-        $uploadDir = 'public/uploads/avatars/';
-        
-        // Create directory if it doesn't exist
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
-        
-        $filePath = $uploadDir . $filename;
-        
-        if (move_uploaded_file($file['tmp_name'], $filePath)) {
-            // Resize image to 200x200
-            $this->resizeImage($filePath, 200, 200);
-            return $filename;
-        }
-        
-        throw new Exception('Failed to upload file');
+
+        // Resize image to 200x200 using the stored absolute path
+        $this->resizeImage($result['file_path'], 200, 200);
+        return $result['filename'];
     }
 
     /**

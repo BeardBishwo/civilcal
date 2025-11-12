@@ -234,9 +234,13 @@ function handleInstallationCompletion() {
             $errors[] = 'Failed to create .env file';
         }
         
-        // Create installation lock file
-        $lockPath = __DIR__ . '/../storage/install.lock';
-        if (file_put_contents($lockPath, date('Y-m-d H:i:s')) === false) {
+        // Create installation lock files (new + legacy)
+        $legacyLockPath = __DIR__ . '/../storage/install.lock';
+        $installedLockPath = __DIR__ . '/../storage/installed.lock';
+        if (file_put_contents($legacyLockPath, date('Y-m-d H:i:s')) === false) {
+            $errors[] = 'Failed to create legacy installation lock file';
+        }
+        if (file_put_contents($installedLockPath, date('Y-m-d H:i:s')) === false) {
             $errors[] = 'Failed to create installation lock file';
         }
         

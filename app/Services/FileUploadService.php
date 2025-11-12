@@ -19,8 +19,13 @@ class FileUploadService
     
     public function uploadTheme($file, $destination)
     {
-        // Check if it's a ZIP file
-        if ($file['type'] !== 'application/zip') {
+        // Check if it's a ZIP file using finfo and extension
+        $finfo = function_exists('finfo_open') ? finfo_open(FILEINFO_MIME_TYPE) : false;
+        $detected = $finfo ? finfo_file($finfo, $file['tmp_name']) : null;
+        if ($finfo) { finfo_close($finfo); }
+        $ext = strtolower(pathinfo($file['name'] ?? '', PATHINFO_EXTENSION));
+        $zipTypes = ['application/zip', 'application/x-zip-compressed', 'multipart/x-zip'];
+        if ($ext !== 'zip' || !$detected || !in_array($detected, $zipTypes, true)) {
             return ['success' => false, 'message' => 'Only ZIP files are allowed for themes'];
         }
         
@@ -35,11 +40,12 @@ class FileUploadService
         }
         
         // Generate unique filename
-        $filename = pathinfo($file['name'], PATHINFO_FILENAME) . '_' . uniqid() . '.zip';
+        $base = preg_replace('/[^a-z0-9-_]+/i', '-', pathinfo($file['name'], PATHINFO_FILENAME));
+        $filename = rtrim($base, '-') . '_' . uniqid('', true) . '.zip';
         $filePath = $destination . '/' . $filename;
         
         // Move uploaded file
-        if (move_uploaded_file($file['tmp_name'], $filePath)) {
+        if (is_uploaded_file($file['tmp_name']) && move_uploaded_file($file['tmp_name'], $filePath)) {
             return [
                 'success' => true, 
                 'file_path' => $filePath,
@@ -107,13 +113,21 @@ class FileUploadService
     private function uploadFile($file, $destination, $filename = null, $allowedTypes = [])
     {
         // Check for upload errors
-        if ($file['error'] !== UPLOAD_ERR_OK) {
+        if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
             return ['success' => false, 'message' => 'File upload error: ' . $file['error']];
+        }
+        if (!is_uploaded_file($file['tmp_name'])) {
+            return ['success' => false, 'message' => 'Invalid uploaded file'];
         }
         
         // Check file type
-        if (!empty($allowedTypes) && !in_array($file['type'], $allowedTypes)) {
-            return ['success' => false, 'message' => 'File type not allowed'];
+        if (!empty($allowedTypes)) {
+            $finfo = function_exists('finfo_open') ? finfo_open(FILEINFO_MIME_TYPE) : false;
+            $detected = $finfo ? finfo_file($finfo, $file['tmp_name']) : null;
+            if ($finfo) { finfo_close($finfo); }
+            if (!$detected || !in_array($detected, $allowedTypes, true)) {
+                return ['success' => false, 'message' => 'File type not allowed'];
+            }
         }
         
         // Check file size
@@ -128,14 +142,15 @@ class FileUploadService
         
         // Generate filename
         if (!$filename) {
-            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $filename = uniqid() . '_' . time() . '.' . $extension;
+            $extension = strtolower(pathinfo($file['name'] ?? '', PATHINFO_EXTENSION));
+            $safeBase = preg_replace('/[^a-z0-9-_]+/i', '-', pathinfo($file['name'] ?? 'file', PATHINFO_FILENAME));
+            $filename = rtrim($safeBase, '-') . '_' . uniqid('', true) . ($extension ? '.' . $extension : '');
         }
         
         $filePath = $destination . '/' . $filename;
         
         // Move uploaded file
-        if (move_uploaded_file($file['tmp_name'], $filePath)) {
+        if (is_uploaded_file($file['tmp_name']) && move_uploaded_file($file['tmp_name'], $filePath)) {
             return [
                 'success' => true, 
                 'file_path' => $filePath,

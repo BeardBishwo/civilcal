@@ -50,6 +50,10 @@ class Auth
             ");
             $stmt->execute([$user->id]);
             
+            // Regenerate session ID for security
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                session_regenerate_id(true);
+            }
             // Set session cookie
             setcookie('auth_token', $sessionToken, [
                 'expires' => time() + (30 * 24 * 60 * 60),
@@ -126,7 +130,8 @@ class Auth
                 ");
                 $stmt->execute([$token]);
                 
-                return new User($session);
+                // Return a simple user object with properties
+                return (object) $session;
             }
         }
         

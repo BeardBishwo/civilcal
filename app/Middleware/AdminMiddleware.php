@@ -7,20 +7,15 @@ class AdminMiddleware
 {
     public function handle($request, $next)
     {
-        // Create Auth instance
-        $auth = new Auth();
-        
         // Check if user is authenticated
-        if (!$auth->check()) {
+        if (!Auth::check()) {
             // Redirect to login if not authenticated
             header("Location: /login");
             exit;
         }
-
-        $user = $auth->user();
         
         // Check if user is admin
-        if (!$user || !$this->isAdmin($user)) {
+        if (!Auth::isAdmin()) {
             http_response_code(403);
             echo '
             <!DOCTYPE html>
@@ -58,14 +53,6 @@ class AdminMiddleware
         }
 
         return $next($request);
-    }
-    
-    /**
-     * Check if user has admin privileges
-     */
-    private function isAdmin($user)
-    {
-        return $user && (isset($user['role']) && $user['role'] === 'admin');
     }
 }
 ?>

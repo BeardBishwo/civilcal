@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /admin
+Disallow: /install
+Disallow: /config
+Disallow: /app
+Disallow: /storage
+Disallow: /vendor
+Disallow: /themes/*/views/admin
+Allow: /assets/

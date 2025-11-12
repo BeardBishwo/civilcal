@@ -1,0 +1,6 @@
+# Security: prevent execution of scripts in uploads
+Options -ExecCGI -Indexes
+<FilesMatch "\.(php|phtml|php5|php7|phar)$">
+  Require all denied
+</FilesMatch>
+RemoveHandler .php .phtml .php5 .php7 .phar
