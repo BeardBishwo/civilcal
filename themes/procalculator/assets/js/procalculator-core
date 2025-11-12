@@ -40,6 +40,9 @@ class ProCalculatorCore {
             // Initialize accessibility
             this.initAccessibility();
 
+            // Initialize theme toggle
+            this.initThemeToggle();
+
             this.isInitialized = true;
             console.log('✅ ProCalculator Premium Theme Loaded Successfully');
 
@@ -211,6 +214,138 @@ class ProCalculatorCore {
 
         // Keyboard navigation
         this.initKeyboardNavigation();
+    }
+
+    /**
+     * Initialize theme toggle functionality
+     */
+    initThemeToggle() {
+        // Wait for DOM to be fully loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.setupThemeToggle();
+            });
+        } else {
+            this.setupThemeToggle();
+        }
+    }
+
+    /**
+     * Setup theme toggle functionality
+     */
+    setupThemeToggle() {
+        console.log('Setting up theme toggle functionality');
+        
+        // Set initial theme based on saved preference or system preference
+        this.setInitialTheme();
+        
+        // Handle all theme toggle buttons (both guest and user)
+        const themeToggles = document.querySelectorAll('.dark-mode-toggle');
+        console.log('Found theme toggles:', themeToggles.length);
+        
+        if (themeToggles.length === 0) {
+            // Retry after a short delay in case DOM is not fully loaded
+            setTimeout(() => {
+                const retryToggles = document.querySelectorAll('.dark-mode-toggle');
+                console.log('Retry - Found theme toggles:', retryToggles.length);
+                if (retryToggles.length > 0) {
+                    retryToggles.forEach((toggle, index) => {
+                        console.log('Adding event listener to toggle', index);
+                        // Remove any existing event listeners to prevent duplicates
+                        toggle.removeEventListener('click', this.handleThemeToggleClick.bind(this));
+                        // Add event listener for theme toggle
+                        toggle.addEventListener('click', this.handleThemeToggleClick.bind(this));
+                    });
+                }
+            }, 500);
+            return;
+        }
+        
+        themeToggles.forEach((toggle, index) => {
+            console.log('Adding event listener to toggle', index);
+            // Remove any existing event listeners to prevent duplicates
+            toggle.removeEventListener('click', this.handleThemeToggleClick.bind(this));
+            // Add event listener for theme toggle
+            toggle.addEventListener('click', this.handleThemeToggleClick.bind(this));
+        });
+    }
+
+    /**
+     * Handle theme toggle click event
+     */
+    handleThemeToggleClick(e) {
+        e.preventDefault();
+        console.log('Theme toggle clicked');
+        this.toggleTheme();
+    }
+
+    /**
+     * Set initial theme based on saved preference or system preference
+     */
+    setInitialTheme() {
+        console.log('Setting initial theme');
+        const savedTheme = localStorage.getItem('procalculator-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+        
+        console.log('Theme preference:', { savedTheme, prefersDark, isDark });
+        
+        if (isDark) {
+            document.body.classList.add('dark-theme');
+            console.log('Dark theme applied');
+        }
+        
+        // Update all theme toggle icons after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            this.updateThemeToggleIcons(isDark);
+        }, 100); // Increased delay to ensure DOM is fully ready
+    }
+
+    /**
+     * Update all theme toggle icons
+     */
+    updateThemeToggleIcons(isDark) {
+        console.log('Updating theme toggle icons', isDark);
+        const toggles = document.querySelectorAll('.dark-mode-toggle');
+        console.log('Found toggles to update:', toggles.length);
+        
+        toggles.forEach((toggle, index) => {
+            const icon = toggle.querySelector('i');
+            if (icon) {
+                // Remove both classes first to ensure clean state
+                icon.classList.remove('fa-moon', 'fa-sun');
+                
+                if (isDark) {
+                    icon.classList.add('fa-sun');
+                    console.log('Toggle', index, 'set to sun icon');
+                } else {
+                    icon.classList.add('fa-moon');
+                    console.log('Toggle', index, 'set to moon icon');
+                }
+            } else {
+                console.log('No icon found for toggle', index);
+            }
+        });
+    }
+
+    /**
+     * Toggle between light and dark themes
+     */
+    toggleTheme() {
+        console.log('Toggling theme');
+        const isDark = document.body.classList.toggle('dark-theme');
+        console.log('Dark theme is now:', isDark);
+        
+        // Save preference to localStorage
+        localStorage.setItem('procalculator-theme', isDark ? 'dark' : 'light');
+        console.log('Theme preference saved');
+        
+        // Update all theme toggle icons
+        this.updateThemeToggleIcons(isDark);
+        
+        // Dispatch custom event for other components to listen to
+        document.dispatchEvent(new CustomEvent('themeChanged', { detail: { isDark } }));
+        console.log('Theme changed event dispatched');
     }
 
     /**
@@ -688,10 +823,14 @@ class ProCalculatorGlassmorphism {
 // Initialize ProCalculator when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        window.ProCalculator = new ProCalculatorCore();
+        if (!window.ProCalculator) {
+            window.ProCalculator = new ProCalculatorCore();
+        }
     });
 } else {
-    window.ProCalculator = new ProCalculatorCore();
+    if (!window.ProCalculator) {
+        window.ProCalculator = new ProCalculatorCore();
+    }
 }
 
 // Export for module usage

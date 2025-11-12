@@ -28,7 +28,8 @@
     <!-- ProCalculator Premium Theme Styles -->
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/procalculator-premium.css') ?>">
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/auth.css') ?>">
-    
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/dark-theme.css') ?>">
+
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     
@@ -1304,7 +1305,7 @@
     <div id="toast-container" class="pc-toast-container"></div>
 
     <!-- ProCalculator Premium Theme Scripts -->
-    <script src="/assets/themes/procalculator/js/procalculator-core.js"></script>
+    <!-- ProCalculator Core JavaScript loaded globally in footer -->
     <script src="<?= $viewHelper->themeUrl('assets/js/auth-enhanced.js') ?>"></script>
     
     <!-- Registration Page Specific Script -->

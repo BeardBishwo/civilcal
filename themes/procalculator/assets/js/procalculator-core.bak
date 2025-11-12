@@ -1,0 +1,39 @@
+    /**
+     * Setup theme toggle functionality
+     */
+    setupThemeToggle() {
+        console.log('_THEME_ Setting up theme toggle functionality');
+        
+        // Set initial theme based on saved preference or system preference
+        this.setInitialTheme();
+        
+        // Handle all theme toggle buttons (both guest and user)
+        const themeToggles = document.querySelectorAll('.dark-mode-toggle');
+        console.log('_THEME_ Theme toggles found:', themeToggles.length);
+        
+        if (themeToggles.length === 0) {
+            console.log('_THEME_ No theme toggles found, trying again in 500ms');
+            setTimeout(() => {
+                const retryToggles = document.querySelectorAll('.dark-mode-toggle');
+                console.log('_THEME_ Retry - Theme toggles found:', retryToggles.length);
+                if (retryToggles.length > 0) {
+                    retryToggles.forEach((toggle) => {
+                        console.log('_THEME_ Adding event listener to toggle');
+                        // Remove any existing event listeners to prevent duplicates
+                        toggle.removeEventListener('click', this.handleThemeToggleClick.bind(this));
+                        // Add event listener for theme toggle
+                        toggle.addEventListener('click', this.handleThemeToggleClick.bind(this));
+                    });
+                }
+            }, 500);
+            return;
+        }
+        
+        themeToggles.forEach((toggle) => {
+            console.log('_THEME_ Adding event listener to toggle');
+            // Remove any existing event listeners to prevent duplicates
+            toggle.removeEventListener('click', this.handleThemeToggleClick.bind(this));
+            // Add event listener for theme toggle
+            toggle.addEventListener('click', this.handleThemeToggleClick.bind(this));
+        });
+    }

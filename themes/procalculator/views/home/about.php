@@ -17,7 +17,8 @@ $user = $user ?? null;
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/components.css') ?>">
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/animations.css') ?>">
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/responsive.css') ?>">
-    
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/dark-theme.css') ?>">
+
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -267,6 +268,6 @@ $user = $user ?? null;
 <?php $viewHelper->partial('partials/footer'); ?>
 
 <!-- ProCalculator Core JavaScript -->
-<script src="/assets/themes/procalculator/js/procalculator-core.js"></script>
+<!-- ProCalculator Core JavaScript loaded globally in footer -->
 </body>
 </html>

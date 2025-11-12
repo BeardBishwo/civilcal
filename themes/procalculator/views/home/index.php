@@ -37,6 +37,7 @@ $testimonials = $testimonials ?? [];
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/components.css') ?>">
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/animations.css') ?>">
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/responsive.css') ?>">
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/dark-theme.css') ?>">
 
     
     <!-- Premium Fonts -->
@@ -294,8 +295,7 @@ $testimonials = $testimonials ?? [];
         console.log('🌙 Dark mode enabled:', document.documentElement.classList.contains('dark-mode'));
     </script>
     
-    <!-- ProCalculator Core JavaScript -->
-    <script src="/assets/themes/procalculator/js/procalculator-core.js"></script>
+    <!-- ProCalculator Core JavaScript loaded globally in footer -->
 
     
     <!-- Initialize Premium Features -->

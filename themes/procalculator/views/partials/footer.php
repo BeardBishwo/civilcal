@@ -163,4 +163,4 @@
     </footer>
 
     <!-- ProCalculator Core JavaScript (global include) -->
-    <script src="/assets/themes/procalculator/js/procalculator-core.js?v=1.0.0" defer></script>
+    <script src="<?= $viewHelper->themeUrl('assets/js/procalculator-core.js?v=1.0.0') ?>" defer></script>

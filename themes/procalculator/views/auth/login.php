@@ -28,7 +28,8 @@
     <!-- ProCalculator Premium Theme Styles -->
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/procalculator-premium.css') ?>">
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/auth.css') ?>">
-    
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/dark-theme.css') ?>">
+
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     
@@ -482,7 +483,7 @@
     <!-- ProCalculator Premium Theme Scripts -->
     <!-- Load auth-enhanced FIRST, then core -->
     <script src="<?= $viewHelper->themeUrl('assets/js/auth-enhanced.js') ?>"></script>
-    <script src="/assets/themes/procalculator/js/procalculator-core.js"></script>
+    <!-- ProCalculator Core JavaScript loaded globally in footer -->
     
     <!-- Initialize Auth Module -->
     <script>

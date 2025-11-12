@@ -17,7 +17,8 @@
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/components.css') ?>">
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/animations.css') ?>">
     <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/header-footer.css') ?>">
-    
+    <link rel="stylesheet" href="<?= $viewHelper->themeUrl('assets/css/dark-theme.css') ?>">
+
     <style>
         /* Premium Logout Page Styles */
         * {
