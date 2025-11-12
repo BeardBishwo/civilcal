@@ -227,6 +227,16 @@ $router->add('POST', '/admin/help/export-logs', 'Admin\HelpController@exportLogs
 $router->add('GET', '/admin/audit-logs', 'Admin\AuditLogController@index', ['auth', 'admin']);
 $router->add('GET', '/admin/audit-logs/download', 'Admin\AuditLogController@download', ['auth', 'admin']);
 
+// Theme Customization Routes
+$router->add('GET', '/admin/themes/:id/customize', 'Admin\ThemeCustomizeController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/themes/:id/save-colors', 'Admin\ThemeCustomizeController@saveColors', ['auth', 'admin']);
+$router->add('POST', '/admin/themes/:id/save-typography', 'Admin\ThemeCustomizeController@saveTypography', ['auth', 'admin']);
+$router->add('POST', '/admin/themes/:id/save-features', 'Admin\ThemeCustomizeController@saveFeatures', ['auth', 'admin']);
+$router->add('POST', '/admin/themes/:id/save-layout', 'Admin\ThemeCustomizeController@saveLayout', ['auth', 'admin']);
+$router->add('POST', '/admin/themes/:id/save-custom_css', 'Admin\ThemeCustomizeController@saveCustomCSS', ['auth', 'admin']);
+$router->add('GET', '/admin/themes/:id/preview', 'Admin\ThemeCustomizeController@preview', ['auth', 'admin']);
+$router->add('POST', '/admin/themes/:id/reset', 'Admin\ThemeCustomizeController@reset', ['auth', 'admin']);
+
 // Email Manager Admin Routes
 $router->add('GET', '/admin/email-manager', 'Admin\EmailManagerController@dashboard', ['auth', 'admin']);
 $router->add('GET', '/admin/email-manager/threads', 'Admin\EmailManagerController@threads', ['auth', 'admin']);

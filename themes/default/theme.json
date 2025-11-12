@@ -1,0 +1,57 @@
+{
+  "name": "default",
+  "display_name": "Default Theme",
+  "version": "1.0.0",
+  "author": "Bishwo Calculator Team",
+  "description": "Professional default theme with dark gradient background and glassmorphism effects",
+  "is_premium": false,
+  "price": 0,
+  "screenshot": "assets/images/screenshot.png",
+  "config": {
+    "colors": {
+      "primary": "#667eea",
+      "secondary": "#764ba2",
+      "accent": "#f093fb",
+      "background": "#0f0c29",
+      "text": "#f7fafc",
+      "text_secondary": "#a0aec0"
+    },
+    "typography": {
+      "font_family": "Segoe UI, Tahoma, Geneva, Verdana, sans-serif",
+      "heading_size": "4rem",
+      "body_size": "1rem",
+      "line_height": "1.6"
+    },
+    "features": {
+      "dark_mode": true,
+      "animations": true,
+      "glassmorphism": true,
+      "3d_effects": false
+    }
+  },
+  "styles": [
+    "assets/css/theme.css",
+    "assets/css/header.css",
+    "assets/css/footer.css",
+    "assets/css/home.css",
+    "assets/css/back-to-top.css"
+  ],
+  "scripts": [
+    "assets/js/main.js",
+    "assets/js/header.js",
+    "assets/js/home.js",
+    "assets/js/back-to-top.js"
+  ],
+  "category_styles": {
+    "civil": "assets/css/civil.css",
+    "electrical": "assets/css/electrical.css",
+    "plumbing": "assets/css/plumbing.css",
+    "hvac": "assets/css/hvac.css",
+    "fire": "assets/css/fire.css",
+    "structural": "assets/css/structural.css",
+    "site": "assets/css/site.css",
+    "estimation": "assets/css/estimation.css",
+    "management": "assets/css/management.css",
+    "mep": "assets/css/mep.css"
+  }
+}

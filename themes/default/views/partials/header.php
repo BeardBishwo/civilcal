@@ -3,9 +3,22 @@
 if (session_status() == PHP_SESSION_NONE) {
     @session_start();
 }
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/functions.php';
+
+// Get base path (4 levels up from partials: partials -> views -> default -> themes -> root)
+$basePath = dirname(__DIR__, 4);
+
+require_once $basePath . '/includes/config.php';
+require_once $basePath . '/includes/functions.php';
 require_once __DIR__ . '/VersionChecker.php';
+
+// Create ThemeManager instance for CSS/JS loading
+try {
+    $themeManager = new \App\Services\ThemeManager();
+} catch (Exception $e) {
+    // Fallback if ThemeManager fails
+    error_log("ThemeManager Error: " . $e->getMessage());
+    $themeManager = null;
+}
 
 // Check for updates if admin is logged in
 $updateAvailable = null;
@@ -97,9 +110,17 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
     <link rel="icon" href="<?php echo htmlspecialchars($favicon); ?>">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('assets/css/theme.css?v=' . filemtime(dirname(__DIR__) . '/assets/css/theme.css')); ?>">
-    <link rel="stylesheet" href="<?php echo app_base_url('assets/css/footer.css?v=' . filemtime(dirname(__DIR__) . '/assets/css/footer.css')); ?>">
-    <link rel="stylesheet" href="<?php echo app_base_url('assets/css/back-to-top.css?v=' . filemtime(dirname(__DIR__) . '/assets/css/back-to-top.css')); ?>">
+    <?php
+    if ($themeManager) {
+        $cssFiles = ['theme.css', 'footer.css', 'back-to-top.css', 'home.css'];
+        foreach ($cssFiles as $css) {
+            $cssPath = dirname(__DIR__) . '/assets/css/' . $css;
+            $mtime = file_exists($cssPath) ? filemtime($cssPath) : time();
+            $url = $themeManager->themeUrl('assets/css/' . $css . '?v=' . $mtime);
+            echo '<link rel="stylesheet" href="' . htmlspecialchars($url) . '">' . "\n    ";
+        }
+    }
+    ?>
     <style>
         /* Enhanced Header Styles */
         :root {

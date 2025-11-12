@@ -17,7 +17,10 @@ if ($show_footer): ?>
     </main>
     
     <!-- Back to Top Script -->
-    <script src="<?php echo app_base_url('assets/js/back-to-top.js'); ?>" 
+    <?php
+    $tm = new \App\Services\ThemeManager();
+    ?>
+    <script src="<?php echo $tm->themeUrl('assets/js/back-to-top.js'); ?>" 
             defer
             onerror="console.error('Error loading back-to-top.js:', event)"
             onload="console.log('Back to top script loaded successfully')">

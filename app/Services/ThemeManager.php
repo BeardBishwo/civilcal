@@ -69,6 +69,15 @@ class ThemeManager
             $this->activeTheme = $activeThemeData['name'];
             $this->currentTheme = $activeThemeData['config'] ?? [];
             
+            // Load theme.json if it exists
+            $configPath = $this->themesPath . $this->activeTheme . '/theme.json';
+            if (file_exists($configPath)) {
+                $themeConfig = json_decode(file_get_contents($configPath), true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $this->currentTheme = $themeConfig;
+                }
+            }
+            
             // Update session
             $_SESSION['active_theme'] = $this->activeTheme;
             $_SESSION['active_theme_id'] = $activeThemeData['id'];
@@ -76,6 +85,15 @@ class ThemeManager
             // Fallback to default
             $this->activeTheme = 'default';
             $this->currentTheme = $this->getDefaultThemeConfig();
+            
+            // Load default theme.json if exists
+            $configPath = $this->themesPath . 'default/theme.json';
+            if (file_exists($configPath)) {
+                $themeConfig = json_decode(file_get_contents($configPath), true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $this->currentTheme = $themeConfig;
+                }
+            }
         }
     }
 
@@ -849,20 +867,20 @@ class ThemeManager
 
     public function loadThemeStyles()
     {
-        if (isset($this->currentTheme['styles'])) {
-            foreach ($this->currentTheme['styles'] as $style) {
-                echo '<link rel="stylesheet" href="' . htmlspecialchars($this->getThemeAsset($style)) . '">' . PHP_EOL;
-            }
+        $styles = $this->currentTheme['styles'] ?? [];
+        foreach ($styles as $style) {
+            $url = $this->getThemeAssetUrl($style);
+            echo '<link rel="stylesheet" href="' . htmlspecialchars($url) . '">' . PHP_EOL;
         }
     }
 
 
     public function loadThemeScripts()
     {
-        if (isset($this->currentTheme['scripts'])) {
-            foreach ($this->currentTheme['scripts'] as $script) {
-                echo '<script src="' . htmlspecialchars($this->getThemeAsset($script)) . '"></script>' . PHP_EOL;
-            }
+        $scripts = $this->currentTheme['scripts'] ?? [];
+        foreach ($scripts as $script) {
+            $url = $this->getThemeAssetUrl($script);
+            echo '<script src="' . htmlspecialchars($url) . '"></script>' . PHP_EOL;
         }
     }
 
@@ -966,17 +984,13 @@ class ThemeManager
 
     public function themeUrl($path = '')
     {
-        // Remove 'assets/' prefix if present since we're already adding '/assets/themes/'
-        $cleanPath = ltrim($path, '/');
-        if (strpos($cleanPath, 'assets/') === 0) {
-            $cleanPath = substr($cleanPath, 7); // Remove 'assets/' prefix
-        }
-        return $this->baseUrl . '/assets/themes/' . $this->activeTheme . '/' . $cleanPath;
+        $path = ltrim($path, '/');
+        return $this->baseUrl . '/themes/' . $this->activeTheme . '/' . $path;
     }
 
     public function assetsUrl($path = '')
     {
-        return $this->baseUrl . '/assets/themes/' . $this->activeTheme . '/' . ltrim($path, '/');
+        return $this->baseUrl . '/themes/' . $this->activeTheme . '/' . ltrim($path, '/');
     }
 
 
@@ -1037,9 +1051,10 @@ class ThemeManager
      */
     public function loadCategoryStyle($category)
     {
-        if (isset($this->currentTheme['category_styles'][$category])) {
-            $style = $this->currentTheme['category_styles'][$category];
-            echo '<link rel="stylesheet" href="' . htmlspecialchars($this->getThemeAsset($style)) . '">' . PHP_EOL;
+        $categoryStyles = $this->currentTheme['category_styles'] ?? [];
+        if (isset($categoryStyles[$category])) {
+            $url = $this->getThemeAssetUrl($categoryStyles[$category]);
+            echo '<link rel="stylesheet" href="' . htmlspecialchars($url) . '">' . PHP_EOL;
         }
     }
 
@@ -1057,6 +1072,127 @@ class ThemeManager
         }
         
         return false;
+    }
+
+    /**
+     * Load theme.json configuration file
+     * 
+     * @param string $themeName
+     * @return array
+     */
+    public function loadThemeConfig($themeName)
+    {
+        $configPath = $this->themesPath . $themeName . '/theme.json';
+        
+        if (file_exists($configPath)) {
+            $config = json_decode(file_get_contents($configPath), true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $config;
+            }
+        }
+        
+        // Return default config if theme.json doesn't exist
+        return $this->getDefaultThemeConfig();
+    }
+
+    /**
+     * Get theme assets (CSS and JS files)
+     * 
+     * @param string $themeName
+     * @return array
+     */
+    public function getThemeAssets($themeName)
+    {
+        $config = $this->loadThemeConfig($themeName);
+        
+        return [
+            'styles' => $config['styles'] ?? [],
+            'scripts' => $config['scripts'] ?? [],
+            'category_styles' => $config['category_styles'] ?? [],
+            'colors' => $config['config']['colors'] ?? [],
+            'typography' => $config['config']['typography'] ?? [],
+            'features' => $config['config']['features'] ?? []
+        ];
+    }
+
+    /**
+     * Get active theme assets
+     * 
+     * @return array
+     */
+    public function getActiveThemeAssets()
+    {
+        return $this->getThemeAssets($this->activeTheme);
+    }
+
+    /**
+     * Get theme asset URL with cache busting
+     * Uses file modification time for cache busting
+     * 
+     * @param string $assetPath
+     * @return string
+     */
+    public function getThemeAssetUrl($assetPath)
+    {
+        $fullPath = $this->themesPath . $this->activeTheme . '/' . ltrim($assetPath, '/');
+        
+        if (file_exists($fullPath)) {
+            $mtime = filemtime($fullPath);
+            return $this->themeUrl($assetPath . '?v=' . $mtime);
+        }
+        
+        return $this->themeUrl($assetPath);
+    }
+
+    /**
+     * Get all CSS files for active theme
+     * 
+     * @return array
+     */
+    public function getThemeStyles()
+    {
+        $assets = $this->getActiveThemeAssets();
+        $styles = [];
+        
+        foreach ($assets['styles'] as $style) {
+            $styles[] = $this->getThemeAssetUrl($style);
+        }
+        
+        return $styles;
+    }
+
+    /**
+     * Get all JS files for active theme
+     * 
+     * @return array
+     */
+    public function getThemeScripts()
+    {
+        $assets = $this->getActiveThemeAssets();
+        $scripts = [];
+        
+        foreach ($assets['scripts'] as $script) {
+            $scripts[] = $this->getThemeAssetUrl($script);
+        }
+        
+        return $scripts;
+    }
+
+    /**
+     * Get category-specific CSS file
+     * 
+     * @param string $category
+     * @return string|null
+     */
+    public function getCategoryStyleUrl($category)
+    {
+        $assets = $this->getActiveThemeAssets();
+        
+        if (isset($assets['category_styles'][$category])) {
+            return $this->getThemeAssetUrl($assets['category_styles'][$category]);
+        }
+        
+        return null;
     }
 }
 ?>
