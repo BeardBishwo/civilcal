@@ -4,10 +4,10 @@ $breadcrumb = [
     ['name' => 'Home', 'url' => app_base_url('index.php')],
     ['name' => 'HVAC Engineering', 'url' => '#']
 ];
-require_once __DIR__ . '/includes/header.php';
+require_once dirname(__DIR__, 4) . '/includes/header.php';
 ?>
 
-<link rel="stylesheet" href="<?php echo app_base_url('assets/css/hvac.css'); ?>">
+<?php load_theme_css('hvac.css'); ?>
 
 <div class="container">
     <div class="hero">
@@ -35,10 +35,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/hvac/load-calculation/cooling-load.php"><span>Cooling Load Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/load-calculation/heating-load.php"><span>Heating Load Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/load-calculation/ventilation.php"><span>Ventilation Rate Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/load-calculation/infiltration.php"><span>Infiltration Load</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/load-calculation/cooling-load.php'); ?>"><span>Cooling Load Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/load-calculation/heating-load.php'); ?>"><span>Heating Load Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/load-calculation/ventilation.php'); ?>"><span>Ventilation Rate Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/load-calculation/infiltration.php'); ?>"><span>Infiltration Load</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -52,11 +52,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/hvac/duct-sizing/duct-by-velocity.php"><span>Duct Sizing by Velocity</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/duct-sizing/pressure-drop.php"><span>Duct Pressure Drop</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/duct-sizing/equivalent-round.php"><span>Equivalent Round Duct</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/duct-sizing/fitting-loss.php"><span>Duct Fitting Loss</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/duct-sizing/grille-sizing.php"><span>Grille & Diffuser Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/duct-sizing/duct-by-velocity.php'); ?>"><span>Duct Sizing by Velocity</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/duct-sizing/pressure-drop.php'); ?>"><span>Duct Pressure Drop</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/duct-sizing/equivalent-round.php'); ?>"><span>Equivalent Round Duct</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/duct-sizing/fitting-loss.php'); ?>"><span>Duct Fitting Loss</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/duct-sizing/grille-sizing.php'); ?>"><span>Grille & Diffuser Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -70,10 +70,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/hvac/psychrometrics/air-properties.php"><span>Air Properties Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/psychrometrics/enthalpy.php"><span>Enthalpy Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/psychrometrics/cooling-load-psych.php"><span>Cooling Load (Psych)</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/psychrometrics/sensible-heat-ratio.php"><span>Sensible Heat Ratio</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/psychrometrics/air-properties.php'); ?>"><span>Air Properties Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/psychrometrics/enthalpy.php'); ?>"><span>Enthalpy Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/psychrometrics/cooling-load-psych.php'); ?>"><span>Cooling Load (Psych)</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/psychrometrics/sensible-heat-ratio.php'); ?>"><span>Sensible Heat Ratio</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -87,10 +87,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/hvac/equipment-sizing/ac-sizing.php"><span>AC Unit Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/equipment-sizing/furnace-sizing.php"><span>Furnace Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/equipment-sizing/chiller-sizing.php"><span>Chiller Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/equipment-sizing/pump-sizing.php"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/equipment-sizing/ac-sizing.php'); ?>"><span>AC Unit Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/equipment-sizing/furnace-sizing.php'); ?>"><span>Furnace Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/equipment-sizing/chiller-sizing.php'); ?>"><span>Chiller Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/equipment-sizing/pump-sizing.php'); ?>"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -104,10 +104,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/hvac/energy-analysis/energy-consumption.php"><span>Energy Consumption</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/energy-analysis/payback-period.php"><span>Payback Period</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/energy-analysis/co2-emissions.php"><span>CO₂ Emissions</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/hvac/energy-analysis/insulation-savings.php"><span>Insulation Savings</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/energy-analysis/energy-consumption.php'); ?>"><span>Energy Consumption</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/energy-analysis/payback-period.php'); ?>"><span>Payback Period</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/energy-analysis/co2-emissions.php'); ?>"><span>CO₂ Emissions</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/energy-analysis/insulation-savings.php'); ?>"><span>Insulation Savings</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
     </div>
@@ -168,5 +168,5 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <?php
-require_once __DIR__ . '/includes/footer.php';
+require_once dirname(__DIR__, 4) . '/includes/footer.php';
 ?>

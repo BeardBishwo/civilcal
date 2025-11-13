@@ -4,10 +4,10 @@ $breadcrumb = [
     ['name' => 'Home', 'url' => app_base_url('index.php')],
     ['name' => 'Structural Engineering', 'url' => '#']
 ];
-require_once __DIR__ . '/includes/header.php';
+require_once dirname(__DIR__, 4) . '/includes/header.php';
 ?>
 
-<link rel="stylesheet" href="<?php echo function_exists('app_base_url') ? app_base_url('assets/css/structural.css') : 'assets/css/structural.css'; ?>">
+<?php load_theme_css('structural.css'); ?>
 
 <div class="container">
     <div class="hero">
@@ -38,11 +38,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/structural/beam-analysis/beam-design.php"><span>Beam Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/beam-analysis/beam-load-combination.php"><span>Load Combination</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/beam-analysis/cantilever-beam.php"><span>Cantilever Beam</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/beam-analysis/continuous-beam.php"><span>Continuous Beam</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/beam-analysis/simply-supported-beam.php"><span>Simply Supported Beam</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/beam-analysis/beam-design.php'); ?>"><span>Beam Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/beam-analysis/beam-load-combination.php'); ?>"><span>Load Combination</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/beam-analysis/cantilever-beam.php'); ?>"><span>Cantilever Beam</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/beam-analysis/continuous-beam.php'); ?>"><span>Continuous Beam</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/beam-analysis/simply-supported-beam.php'); ?>"><span>Simply Supported Beam</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -56,11 +56,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/structural/column-design/biaxial-column.php"><span>Biaxial Column</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/column-design/column-footing-link.php"><span>Column-Footing Link</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/column-design/long-column.php"><span>Long Column</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/column-design/short-column.php"><span>Short Column</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/column-design/steel-column-design.php"><span>Steel Column Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/column-design/biaxial-column.php'); ?>"><span>Biaxial Column</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/column-design/column-footing-link.php'); ?>"><span>Column-Footing Link</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/column-design/long-column.php'); ?>"><span>Long Column</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/column-design/short-column.php'); ?>"><span>Short Column</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/column-design/steel-column-design.php'); ?>"><span>Steel Column Design</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -74,11 +74,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/structural/steel-structure/connection-design.php"><span>Connection Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/steel-structure/purlin-design.php"><span>Purlin Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/steel-structure/steel-base-plate.php"><span>Base Plate Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/steel-structure/steel-beam-design.php"><span>Steel Beam Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/steel-structure/steel-truss-analysis.php"><span>Truss Analysis</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/steel-structure/connection-design.php'); ?>"><span>Connection Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/steel-structure/purlin-design.php'); ?>"><span>Purlin Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/steel-structure/steel-base-plate.php'); ?>"><span>Base Plate Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/steel-structure/steel-beam-design.php'); ?>"><span>Steel Beam Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/steel-structure/steel-truss-analysis.php'); ?>"><span>Truss Analysis</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -92,11 +92,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/structural/foundation-design/combined-footing.php"><span>Combined Footing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/foundation-design/foundation-pressure.php"><span>Foundation Pressure</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/foundation-design/isolated-footing.php"><span>Isolated Footing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/foundation-design/pile-foundation.php"><span>Pile Foundation</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/foundation-design/raft-foundation.php"><span>Raft Foundation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/foundation-design/combined-footing.php'); ?>"><span>Combined Footing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/foundation-design/foundation-pressure.php'); ?>"><span>Foundation Pressure</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/foundation-design/isolated-footing.php'); ?>"><span>Isolated Footing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/foundation-design/pile-foundation.php'); ?>"><span>Pile Foundation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/foundation-design/raft-foundation.php'); ?>"><span>Raft Foundation</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -110,11 +110,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/structural/slab-design/flat-slab.php"><span>Flat Slab Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/slab-design/one-way-slab.php"><span>One Way Slab</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/slab-design/two-way-slab.php"><span>Two Way Slab</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/slab-design/waffle-slab.php"><span>Waffle Slab</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/slab-design/slab-load-calculation.php"><span>Slab Load Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/slab-design/flat-slab.php'); ?>"><span>Flat Slab Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/slab-design/one-way-slab.php'); ?>"><span>One Way Slab</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/slab-design/two-way-slab.php'); ?>"><span>Two Way Slab</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/slab-design/waffle-slab.php'); ?>"><span>Waffle Slab</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/slab-design/slab-load-calculation.php'); ?>"><span>Slab Load Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -128,11 +128,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/structural/load-analysis/dead-load.php"><span>Dead Load</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/load-analysis/live-load.php"><span>Live Load</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/load-analysis/wind-load.php"><span>Wind Load</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/load-analysis/seismic-load.php"><span>Seismic Load</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/load-analysis/load-combination.php"><span>Load Combinations</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/load-analysis/dead-load.php'); ?>"><span>Dead Load</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/load-analysis/live-load.php'); ?>"><span>Live Load</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/load-analysis/wind-load.php'); ?>"><span>Wind Load</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/load-analysis/seismic-load.php'); ?>"><span>Seismic Load</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/load-analysis/load-combination.php'); ?>"><span>Load Combinations</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -146,11 +146,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/structural/reinforcement/bar-bending-schedule.php"><span>Bar Bending Schedule</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/reinforcement/detailing-drawing.php"><span>Detailing Drawing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/reinforcement/rebar-anchorage.php"><span>Rebar Anchorage</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/reinforcement/reinforcement-optimizer.php"><span>Reinforcement Optimizer</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/reinforcement/stirrup-design.php"><span>Stirrup Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reinforcement/bar-bending-schedule.php'); ?>"><span>Bar Bending Schedule</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reinforcement/detailing-drawing.php'); ?>"><span>Detailing Drawing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reinforcement/rebar-anchorage.php'); ?>"><span>Rebar Anchorage</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reinforcement/reinforcement-optimizer.php'); ?>"><span>Reinforcement Optimizer</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reinforcement/stirrup-design.php'); ?>"><span>Stirrup Design</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -164,11 +164,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/structural/reports/beam-report.php"><span>Beam Report</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/reports/column-report.php"><span>Column Report</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/reports/foundation-report.php"><span>Foundation Report</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/reports/full-structure-summary.php"><span>Full Structure Summary</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/structural/reports/load-analysis-summary.php"><span>Load Analysis Summary</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reports/beam-report.php'); ?>"><span>Beam Report</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reports/column-report.php'); ?>"><span>Column Report</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reports/foundation-report.php'); ?>"><span>Foundation Report</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reports/full-structure-summary.php'); ?>"><span>Full Structure Summary</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reports/load-analysis-summary.php'); ?>"><span>Load Analysis Summary</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
     </div>
@@ -229,5 +229,5 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <?php
-//require_once __DIR__ . '/includes/footer.php';
+require_once dirname(__DIR__, 4) . '/includes/footer.php';
 ?>

@@ -20,6 +20,9 @@ try {
     $themeManager = null;
 }
 
+// Include theme helper functions
+require_once __DIR__ . '/theme-helpers.php';
+
 // Check for updates if admin is logged in
 $updateAvailable = null;
 if (!empty($_SESSION['is_admin'])) {
@@ -170,13 +173,13 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         
         /* Fix for black strip issue - ensure proper background */
         body {
-            background: #ffffff;
+            background: linear-gradient(135deg, #0a0e27, #1a1a4d, #0f0f2e) !important;
             min-height: 100vh;
         }
         
         /* Ensure main content area has proper styling */
         .main-content {
-            background: #ffffff;
+            background: linear-gradient(135deg, #0a0e27, #1a1a4d, #0f0f2e) !important;
             min-height: calc(100vh - 60px);
         }
 
@@ -502,17 +505,41 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         }
 
         .theme-toggle-btn {
-            background: none;
-            border: 1px solid #e2e8f0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+            border: 1.5px solid rgba(102, 126, 234, 0.3);
             border-radius: 50%;
-            width: 34px;
-            height: 34px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s ease;
-            color: #4a5568;
+            transition: all 0.3s ease;
+            color: #667eea;
+            font-size: 1.1rem;
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .theme-toggle-btn::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        
+        .theme-toggle-btn:hover::after {
+            opacity: 1;
         }
 
         /* Small search icon button for opening modal */
@@ -536,10 +563,22 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         }
 
         .theme-toggle-btn:hover {
-            background: #667eea;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border-color: #667eea;
-            transform: scale(1.1);
+            transform: scale(1.15);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        body.dark-theme .theme-toggle-btn {
+            color: #f093fb;
+            border-color: rgba(240, 147, 251, 0.3);
+        }
+        
+        body.dark-theme .theme-toggle-btn:hover {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            border-color: #f093fb;
         }
 
         /* Header-specific button sizing to keep the header compact */
@@ -663,8 +702,8 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
 
         .mobile-nav {
             display: none;
-            background: white;
-            border-top: 1px solid #e2e8f0;
+            background: rgba(30, 30, 60, 0.95);
+            border-top: 1px solid rgba(0, 255, 255, 0.3);
             padding: 1rem 2rem;
         }
 
@@ -800,7 +839,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         .search-modal .modal-content {
             width: 100%;
             max-width: 760px;
-            background: white;
+            background: rgba(30, 30, 60, 0.95);
             border-radius: 12px;
             padding: 1rem;
             box-shadow: 0 20px 40px rgba(2,6,23,0.4);
@@ -939,9 +978,9 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         }
 
         body:not(.dark-theme) .dropdown {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            color: #2d3748;
+            background: rgba(30, 30, 60, 0.9);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            color: #ffffff;
         }
 
         body:not(.dark-theme) .dropdown a {
@@ -1608,7 +1647,7 @@ m        color: #93c5fd;
 
             <div class="header-right">
                 <div class="user-actions">
-                    <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle theme">
+                    <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle theme" data-label="Theme">
                         <i class="fas fa-moon"></i>
                     </button>
                     <button id="searchToggleBtn" class="search-toggle-btn" title="Search">
@@ -1680,7 +1719,7 @@ m        color: #93c5fd;
                         </div>
                     <?php endif; ?>
 
-                    <button class="hamburger-btn" id="hamburgerBtn">
+                    <button class="hamburger-btn" id="hamburgerBtn" title="Toggle navigation menu" aria-label="Toggle navigation menu" aria-expanded="false">
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>

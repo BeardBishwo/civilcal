@@ -4,10 +4,10 @@ $breadcrumb = [
     ['name' => 'Home', 'url' => app_base_url('index.php')],
     ['name' => 'Plumbing Engineering', 'url' => '#']
 ];
-require_once __DIR__ . '/includes/header.php';
+require_once dirname(__DIR__, 4) . '/includes/header.php';
 ?>
 
-<link rel="stylesheet" href="<?php echo app_base_url('assets/css/plumbing.css'); ?>">
+<?php load_theme_css('plumbing.css'); ?>
 
 <div class="container">
     <div class="hero">
@@ -20,9 +20,10 @@ require_once __DIR__ . '/includes/header.php';
         <a href="#pipeSizing" class="sub-nav-btn">Pipe Sizing</a>
         <a href="#waterSupply" class="sub-nav-btn">Water Supply</a>
         <a href="#drainage" class="sub-nav-btn">Drainage</a>
+        <a href="#pressure" class="sub-nav-btn">Pressure Loss</a>
         <a href="#hotWater" class="sub-nav-btn">Hot Water</a>
-        <a href="#fixtures" class="sub-nav-btn">Fixtures</a>
         <a href="#stormwater" class="sub-nav-btn">Stormwater</a>
+        <a href="#fixtures" class="sub-nav-btn">Fixture Units</a>
     </div>
 
     <div class="category-grid">
@@ -36,10 +37,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/plumbing/pipe_sizing/water-pipe-sizing.php"><span>Water Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/pipe_sizing/gas-pipe-sizing.php"><span>Gas Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/pipe_sizing/pipe-flow-capacity.php"><span>Pipe Flow Capacity</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/pipe_sizing/expansion-loop-sizing.php"><span>Expansion Loop Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/pipe_sizing/water-pipe-sizing.php'); ?>"><span>Water Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/pipe_sizing/gas-pipe-sizing.php'); ?>"><span>Gas Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/pipe_sizing/pipe-flow-capacity.php'); ?>"><span>Pipe Flow Capacity</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/pipe_sizing/expansion-loop-sizing.php'); ?>"><span>Expansion Loop Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -53,10 +54,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/plumbing/water_supply/water-demand-calculation.php"><span>Water Demand Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/water_supply/storage-tank-sizing.php"><span>Storage Tank Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/water_supply/pump-sizing.php"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/water_supply/water-hammer-calculation.php"><span>Water Hammer Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/water_supply/water-demand-calculation.php'); ?>"><span>Water Demand Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/water_supply/storage-tank-sizing.php'); ?>"><span>Storage Tank Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/water_supply/pump-sizing.php'); ?>"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/water_supply/water-hammer-calculation.php'); ?>"><span>Water Hammer Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -70,10 +71,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/plumbing/drainage/drainage-pipe-sizing.php"><span>Drain Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/drainage/storm-drainage.php"><span>Storm Water Drainage</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/drainage/vent-pipe-sizing.php"><span>Vent Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/drainage/grease-trap-sizing.php"><span>Grease Trap Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/drainage/drainage-pipe-sizing.php'); ?>"><span>Drain Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/drainage/storm-drainage.php'); ?>"><span>Storm Water Drainage</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/drainage/vent-pipe-sizing.php'); ?>"><span>Vent Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/drainage/grease-trap-sizing.php'); ?>"><span>Grease Trap Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -87,9 +88,9 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/plumbing/water_supply/pressure-loss.php"><span>Pipe Friction Loss</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/hot_water/heat-loss-calculation.php"><span>Heat Loss Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/water_supply/main-isolation-valve.php"><span>Isolation Valve Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/water_supply/pressure-loss.php'); ?>"><span>Pipe Friction Loss</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/hot_water/heat-loss-calculation.php'); ?>"><span>Heat Loss Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/water_supply/main-isolation-valve.php'); ?>"><span>Isolation Valve Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -103,10 +104,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/plumbing/hot_water/water-heater-sizing.php"><span>Water Heater Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/hot_water/recirculation-loop.php"><span>Recirculation Loop</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/hot_water/safety-valve.php"><span>Safety Valve Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/hot_water/storage-tank-sizing.php"><span>Hot Water Storage</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/hot_water/water-heater-sizing.php'); ?>"><span>Water Heater Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/hot_water/recirculation-loop.php'); ?>"><span>Recirculation Loop</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/hot_water/safety-valve.php'); ?>"><span>Safety Valve Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/hot_water/storage-tank-sizing.php'); ?>"><span>Hot Water Storage</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -120,10 +121,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/plumbing/stormwater/gutter-sizing.php"><span>Gutter Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/stormwater/downpipe-sizing.php"><span>Downpipe Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/stormwater/stormwater-storage.php"><span>Stormwater Storage</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/stormwater/pervious-area.php"><span>Pervious Area</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/stormwater/gutter-sizing.php'); ?>"><span>Gutter Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/stormwater/downpipe-sizing.php'); ?>"><span>Downpipe Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/stormwater/stormwater-storage.php'); ?>"><span>Stormwater Storage</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/stormwater/pervious-area.php'); ?>"><span>Pervious Area</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -137,10 +138,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/plumbing/fixtures/fixture-unit-calculation.php"><span>Fixture Unit Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/fixtures/shower-sizing.php"><span>Shower Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/fixtures/sink-sizing.php"><span>Sink Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/plumbing/fixtures/toilet-flow.php"><span>Toilet Flow</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/fixtures/fixture-unit-calculation.php'); ?>"><span>Fixture Unit Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/fixtures/shower-sizing.php'); ?>"><span>Shower Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/fixtures/sink-sizing.php'); ?>"><span>Sink Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/fixtures/toilet-flow.php'); ?>"><span>Toilet Flow</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
     </div>
@@ -201,5 +202,5 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <?php
-require_once __DIR__ . '/includes/footer.php';
+require_once dirname(__DIR__, 4) . '/includes/footer.php';
 ?>

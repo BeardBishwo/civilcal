@@ -4,10 +4,10 @@ $breadcrumb = [
     ['name' => 'Home', 'url' => app_base_url('index.php')],
     ['name' => 'Electrical Engineering', 'url' => '#']
 ];
-require_once __DIR__ . '/includes/header.php';
+require_once dirname(__DIR__, 4) . '/includes/header.php';
 ?>
 
-    <link rel="stylesheet" href="<?php echo app_base_url('assets/css/electrical.css'); ?>">
+    <?php load_theme_css('electrical.css'); ?>
 
 <div class="container">
     <div class="hero d-flex justify-content-between align-items-center">
@@ -37,10 +37,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/electrical/wire-sizing/wire-size-by-current.php"><span>Wire Size by Current</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/wire-sizing/wire-ampacity.php"><span>Wire Ampacity</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/wire-sizing/motor-circuit-wiring.php"><span>Motor Circuit Wiring</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/wire-sizing/transformer-kva-sizing.php"><span>Transformer kVA Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/wire-sizing/wire-size-by-current.php'); ?>"><span>Wire Size by Current</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/wire-sizing/wire-ampacity.php'); ?>"><span>Wire Ampacity</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/wire-sizing/motor-circuit-wiring.php'); ?>"><span>Motor Circuit Wiring</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/wire-sizing/transformer-kva-sizing.php'); ?>"><span>Transformer kVA Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -54,10 +54,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/electrical/voltage-drop/single-phase-voltage-drop.php"><span>Single Phase Voltage Drop</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/voltage-drop/three-phase-voltage-drop.php"><span>Three Phase Voltage Drop</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/voltage-drop/voltage-drop-sizing.php"><span>Voltage Drop Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/voltage-drop/voltage-regulation.php"><span>Voltage Regulation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/voltage-drop/single-phase-voltage-drop.php'); ?>"><span>Single Phase Voltage Drop</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/voltage-drop/three-phase-voltage-drop.php'); ?>"><span>Three Phase Voltage Drop</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/voltage-drop/voltage-drop-sizing.php'); ?>"><span>Voltage Drop Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/voltage-drop/voltage-regulation.php'); ?>"><span>Voltage Regulation</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -71,11 +71,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/electrical/load-calculation/general-lighting-load.php"><span>General Lighting Load</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/load-calculation/receptacle-load.php"><span>Receptacle Load</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/load-calculation/panel-schedule.php"><span>Panel Schedule</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/load-calculation/feeder-sizing.php"><span>Feeder Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/load-calculation/motor-full-load-amps.php"><span>Motor Full Load Currents</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/load-calculation/general-lighting-load.php'); ?>"><span>General Lighting Load</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/load-calculation/receptacle-load.php'); ?>"><span>Receptacle Load</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/load-calculation/panel-schedule.php'); ?>"><span>Panel Schedule</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/load-calculation/feeder-sizing.php'); ?>"><span>Feeder Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/load-calculation/motor-full-load-amps.php'); ?>"><span>Motor Full Load Currents</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -89,9 +89,9 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/electrical/short-circuit/available-fault-current.php"><span>Available Fault Current</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/short-circuit/ground-conductor-sizing.php"><span>Ground Conductor Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/short-circuit/power-factor-correction.php"><span>Power Factor Correction</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/short-circuit/available-fault-current.php'); ?>"><span>Available Fault Current</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/short-circuit/ground-conductor-sizing.php'); ?>"><span>Ground Conductor Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/short-circuit/power-factor-correction.php'); ?>"><span>Power Factor Correction</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -105,10 +105,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/electrical/conduit-sizing/conduit-fill-calculation.php"><span>Conduit Fill Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/conduit-sizing/cable-tray-sizing.php"><span>Cable Tray Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/conduit-sizing/junction-box-sizing.php"><span>Junction Box Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/electrical/conduit-sizing/entrance-service-sizing.php"><span>Entrance & Service Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/conduit-sizing/conduit-fill-calculation.php'); ?>"><span>Conduit Fill Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/conduit-sizing/cable-tray-sizing.php'); ?>"><span>Cable Tray Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/conduit-sizing/junction-box-sizing.php'); ?>"><span>Junction Box Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/conduit-sizing/entrance-service-sizing.php'); ?>"><span>Entrance & Service Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
     </div>
@@ -186,5 +186,5 @@ function renderRecentCalculations() {
 </style>
 
 <?php
-require_once __DIR__ . '/includes/footer.php';
+require_once dirname(__DIR__, 4) . '/includes/footer.php';
 ?>

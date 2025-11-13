@@ -30,11 +30,17 @@ RedirectMatch 403 ^/(app|config|database|includes|storage|vendor|tests)/.*$
     RewriteCond %{REQUEST_URI} public
     RewriteRule ^(.*)public/?(.*)$ /$1$2 [R=301,L]
     
+    # Serve existing files directly (don't route through PHP)
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule .* - [L]
+    
+    # Serve existing directories directly 
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule .* - [L]
+    
     # Serve static assets from public/assets
     RewriteRule ^assets/(.*)$ public/assets/$1 [L]
     
     # Route all other requests through public/index.php
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ public/index.php [L,QSA]
 </IfModule>

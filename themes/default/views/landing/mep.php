@@ -4,10 +4,10 @@ $breadcrumb = [
     ['name' => 'Home', 'url' => app_base_url('index.php')],
     ['name' => 'MEP Engineering', 'url' => '#']
 ];
-require_once __DIR__ . '/includes/header.php';
+require_once dirname(__DIR__, 4) . '/includes/header.php';
 ?>
 
-<link rel="stylesheet" href="<?php echo function_exists('app_base_url') ? app_base_url('assets/css/mep.css') : 'assets/css/mep.css'; ?>">
+<?php load_theme_css('mep.css'); ?>
 
 <div class="container">
     <div class="hero">
@@ -40,13 +40,13 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/mep/electrical/conduit-sizing.php"><span>Conduit Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/electrical/earthing-system.php"><span>Earthing System</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/electrical/emergency-power.php"><span>Emergency Power</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/electrical/lighting-layout.php"><span>Lighting Layout</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/electrical/mep-electrical-summary.php"><span>MEP Electrical Summary</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/electrical/panel-schedule.php"><span>Panel Schedule</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/electrical/transformer-sizing.php"><span>Transformer Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/electrical/conduit-sizing.php'); ?>"><span>Conduit Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/electrical/earthing-system.php'); ?>"><span>Earthing System</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/electrical/emergency-power.php'); ?>"><span>Emergency Power</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/electrical/lighting-layout.php'); ?>"><span>Lighting Layout</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/electrical/mep-electrical-summary.php'); ?>"><span>MEP Electrical Summary</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/electrical/panel-schedule.php'); ?>"><span>Panel Schedule</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/electrical/transformer-sizing.php'); ?>"><span>Transformer Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -60,9 +60,9 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/mep/mechanical/chilled-water-piping.php"><span>Chilled Water Piping</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/mechanical/equipment-database.php"><span>Equipment Database</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/mechanical/hvac-duct-sizing.php"><span>HVAC Duct Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/mechanical/chilled-water-piping.php'); ?>"><span>Chilled Water Piping</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/mechanical/equipment-database.php'); ?>"><span>Equipment Database</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/mechanical/hvac-duct-sizing.php'); ?>"><span>HVAC Duct Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -76,12 +76,12 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/mep/plumbing/drainage-system.php"><span>Drainage System</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/plumbing/plumbing-fixture-count.php"><span>Plumbing Fixture Count</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/plumbing/pump-selection.php"><span>Pump Selection</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/plumbing/storm-water.php"><span>Storm Water</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/plumbing/water-supply.php"><span>Water Supply</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/plumbing/water-tank-sizing.php"><span>Water Tank Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/plumbing/drainage-system.php'); ?>"><span>Drainage System</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/plumbing/plumbing-fixture-count.php'); ?>"><span>Plumbing Fixture Count</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/plumbing/pump-selection.php'); ?>"><span>Pump Selection</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/plumbing/storm-water.php'); ?>"><span>Storm Water</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/plumbing/water-supply.php'); ?>"><span>Water Supply</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/plumbing/water-tank-sizing.php'); ?>"><span>Water Tank Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -95,10 +95,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/mep/fire-protection/fire-hydrant-system.php"><span>Fire Hydrant System</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/fire-protection/fire-pump-sizing.php"><span>Fire Pump Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/fire-protection/fire-safety-zoning.php"><span>Fire Safety Zoning</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/fire-protection/fire-tank-sizing.php"><span>Fire Tank Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/fire-protection/fire-hydrant-system.php'); ?>"><span>Fire Hydrant System</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/fire-protection/fire-pump-sizing.php'); ?>"><span>Fire Pump Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/fire-protection/fire-safety-zoning.php'); ?>"><span>Fire Safety Zoning</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/fire-protection/fire-tank-sizing.php'); ?>"><span>Fire Tank Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -112,11 +112,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/mep/energy-efficiency/energy-consumption.php"><span>Energy Consumption</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/energy-efficiency/green-rating.php"><span>Green Rating</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/energy-efficiency/hvac-efficiency.php"><span>HVAC Efficiency</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/energy-efficiency/solar-system.php"><span>Solar System</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/energy-efficiency/water-efficiency.php"><span>Water Efficiency</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/energy-efficiency/energy-consumption.php'); ?>"><span>Energy Consumption</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/energy-efficiency/green-rating.php'); ?>"><span>Green Rating</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/energy-efficiency/hvac-efficiency.php'); ?>"><span>HVAC Efficiency</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/energy-efficiency/solar-system.php'); ?>"><span>Solar System</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/energy-efficiency/water-efficiency.php'); ?>"><span>Water Efficiency</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -130,11 +130,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/mep/coordination/bim-export.php"><span>BIM Export</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/coordination/clash-detection.php"><span>Clash Detection</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/coordination/coordination-map.php"><span>Coordination Map</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/coordination/space-allocation.php"><span>Space Allocation</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/coordination/system-priority.php"><span>System Priority</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/coordination/bim-export.php'); ?>"><span>BIM Export</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/coordination/clash-detection.php'); ?>"><span>Clash Detection</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/coordination/coordination-map.php'); ?>"><span>Coordination Map</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/coordination/space-allocation.php'); ?>"><span>Space Allocation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/coordination/system-priority.php'); ?>"><span>System Priority</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -148,11 +148,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/mep/cost-management/boq-generator.php"><span>BOQ Generator</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/cost-management/cost-optimization.php"><span>Cost Optimization</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/cost-management/cost-summary.php"><span>Cost Summary</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/cost-management/material-takeoff.php"><span>Material Takeoff</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/cost-management/vendor-pricing.php"><span>Vendor Pricing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/cost-management/boq-generator.php'); ?>"><span>BOQ Generator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/cost-management/cost-optimization.php'); ?>"><span>Cost Optimization</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/cost-management/cost-summary.php'); ?>"><span>Cost Summary</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/cost-management/material-takeoff.php'); ?>"><span>Material Takeoff</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/cost-management/vendor-pricing.php'); ?>"><span>Vendor Pricing</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -166,11 +166,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/mep/reports-documentation/clash-detection-report.php"><span>Clash Detection Report</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/reports-documentation/equipment-schedule.php"><span>Equipment Schedule</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/reports-documentation/load-summary.php"><span>Load Summary</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/reports-documentation/mep-summary.php"><span>MEP Summary</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/reports-documentation/pdf-export.php"><span>PDF Export</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/reports-documentation/clash-detection-report.php'); ?>"><span>Clash Detection Report</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/reports-documentation/equipment-schedule.php'); ?>"><span>Equipment Schedule</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/reports-documentation/load-summary.php'); ?>"><span>Load Summary</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/reports-documentation/mep-summary.php'); ?>"><span>MEP Summary</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/reports-documentation/pdf-export.php'); ?>"><span>PDF Export</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -184,12 +184,12 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/mep/data-utilities/api-endpoints.php"><span>API Endpoints</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/data-utilities/input-validator.php"><span>Input Validator</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/data-utilities/material-database.php"><span>Material Database</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/data-utilities/mep-config.php"><span>MEP Config</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules.mep/data-utilities/permissions.php"><span>Permissions</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/data-utilities/unit-converter.php"><span>Unit Converter</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/data-utilities/api-endpoints.php'); ?>"><span>API Endpoints</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/data-utilities/input-validator.php'); ?>"><span>Input Validator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/data-utilities/material-database.php'); ?>"><span>Material Database</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/data-utilities/mep-config.php'); ?>"><span>MEP Config</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/data-utilities/permissions.php'); ?>"><span>Permissions</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/data-utilities/unit-converter.php'); ?>"><span>Unit Converter</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -203,11 +203,11 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/mep/integration/autocad-layer-mapper.php"><span>AutoCAD Layer Mapper</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/integration/bim-integration.php"><span>BIM Integration</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/integration/cloud-sync.php"><span>Cloud Sync</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/integration/project-sharing.php"><span>Project Sharing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/mep/integration/revit-plugin.php"><span>Revit Plugin</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/integration/autocad-layer-mapper.php'); ?>"><span>AutoCAD Layer Mapper</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/integration/bim-integration.php'); ?>"><span>BIM Integration</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/integration/cloud-sync.php'); ?>"><span>Cloud Sync</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/integration/project-sharing.php'); ?>"><span>Project Sharing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/integration/revit-plugin.php'); ?>"><span>Revit Plugin</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
     </div>
@@ -268,5 +268,5 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <?php
-require_once __DIR__ . '/includes/footer.php';
+require_once dirname(__DIR__, 4) . '/includes/footer.php';
 ?>

@@ -1,8 +1,13 @@
 <?php
-
+$page_title = 'Project Management Suite';
+$breadcrumb = [
+    ['name' => 'Home', 'url' => app_base_url('index.php')],
+    ['name' => 'Project Management', 'url' => '#']
+];
+require_once dirname(__DIR__, 4) . '/includes/header.php';
 ?>
 
-<link rel="stylesheet" href="<?php echo function_exists('app_base_url') ? app_base_url('assets/css/management.css') : 'assets/css/management.css'; ?>">
+<?php load_theme_css('management.css'); ?>
 
 <div class="container">
     <div class="hero">
@@ -262,4 +267,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php require_once dirname(__DIR__, 4) . '/includes/footer.php'; ?>

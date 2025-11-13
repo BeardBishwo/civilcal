@@ -38,12 +38,12 @@ require_once __DIR__ . '/partials/header.php';
 
     <!-- Navigation -->
     <div class="main-nav">
-        <a href="<?php echo app_base_url('landing/civil.php'); ?>" class="nav-btn">Civil Construction</a>
-        <a href="<?php echo app_base_url('landing/plumbing.php'); ?>" class="nav-btn">Plumbing Services</a>
-        <a href="<?php echo app_base_url('landing/hvac.php'); ?>" class="nav-btn">HVAC Systems</a>
-        <a href="<?php echo app_base_url('landing/electrical.php'); ?>" class="nav-btn">Electrical Works</a>
-        <a href="<?php echo app_base_url('landing/fire.php'); ?>" class="nav-btn">Fire Protection</a>
-        <a href="<?php echo app_base_url('landing/site.php'); ?>" class="nav-btn">Site Development</a>
+        <a href="<?php echo app_base_url('civil'); ?>" class="nav-btn">Civil Construction</a>
+        <a href="<?php echo app_base_url('plumbing'); ?>" class="nav-btn">Plumbing Services</a>
+        <a href="<?php echo app_base_url('hvac'); ?>" class="nav-btn">HVAC Systems</a>
+        <a href="<?php echo app_base_url('electrical'); ?>" class="nav-btn">Electrical Works</a>
+        <a href="<?php echo app_base_url('fire'); ?>" class="nav-btn">Fire Protection</a>
+        <a href="<?php echo app_base_url('site'); ?>" class="nav-btn">Site Development</a>
     </div>
 
     <!-- Calculator Module -->

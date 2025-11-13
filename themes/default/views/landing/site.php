@@ -1,27 +1,27 @@
 <?php
-$page_title = 'Construction Site Tools';
+$page_title = 'Site Development Engineering Toolkit';
 $breadcrumb = [
     ['name' => 'Home', 'url' => app_base_url('index.php')],
-    ['name' => 'Site Tools', 'url' => '#']
+    ['name' => 'Site Development Engineering', 'url' => '#']
 ];
-require_once __DIR__ . '/includes/header.php';
+require_once dirname(__DIR__, 4) . '/includes/header.php';
 ?>
 
-<link rel="stylesheet" href="<?php echo function_exists('app_base_url') ? app_base_url('assets/css/site.css') : 'assets/css/site.css'; ?>">
+<?php load_theme_css('site.css'); ?>
 
 <div class="container">
     <div class="hero">
-        <h1>Construction Site Tools</h1>
-        <p>Specialized tools for construction site operations and field engineering</p>
+        <h1>Site Development Engineering Toolkit</h1>
+        <p>Professional calculators and reference tools for site development and construction professionals.</p>
     </div>
 
     <!-- Sub-navigation for categories -->
     <div class="sub-nav" id="sub-nav">
         <a href="#surveying" class="sub-nav-btn">Field Surveying</a>
         <a href="#earthwork" class="sub-nav-btn">Earthwork & Grading</a>
-        <a href="#concrete" class="sub-nav-btn">Concrete Tools</a>
+        <a href="#concrete" class="sub-nav-btn">Concrete Field Tools</a>
         <a href="#safety" class="sub-nav-btn">Site Safety</a>
-        <a href="#productivity" class="sub-nav-btn">Productivity</a>
+        <a href="#productivity" class="sub-nav-btn">Productivity Tools</a>
     </div>
 
     <div class="category-grid">
@@ -35,10 +35,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/site/surveying/slope-staking.php"><span>Slope Staking Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/surveying/batter-boards.php"><span>Batter Board Setup</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/surveying/horizontal-curve-staking.php"><span>Horizontal Curve Staking</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/surveying/grade-rod.php"><span>Grade Rod Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/surveying/slope-staking.php'); ?>"><span>Slope Staking Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/surveying/batter-boards.php'); ?>"><span>Batter Board Setup</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/surveying/horizontal-curve-staking.php'); ?>"><span>Horizontal Curve Staking</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/surveying/grade-rod.php'); ?>"><span>Grade Rod Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -52,10 +52,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/site/earthwork/swelling-shrinkage.php"><span>Swelling & Shrinkage</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/earthwork/equipment-production.php"><span>Equipment Production</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/earthwork/cut-fill-balancing.php"><span>Cut/Fill Balancing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/earthwork/slope-paving.php"><span>Slope Paving Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/earthwork/swelling-shrinkage.php'); ?>"><span>Swelling & Shrinkage</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/earthwork/equipment-production.php'); ?>"><span>Equipment Production</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/earthwork/cut-fill-balancing.php'); ?>"><span>Cut/Fill Balancing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/earthwork/slope-paving.php'); ?>"><span>Slope Paving Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -69,10 +69,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/site/concrete-tools/temperature-control.php"><span>Temperature Control</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/concrete-tools/yardage-adjustments.php"><span>Yardage Adjustments</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/concrete-tools/placement-rate.php"><span>Placement Rate Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/concrete-tools/testing-requirements.php"><span>Testing Requirements</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/concrete-tools/temperature-control.php'); ?>"><span>Temperature Control</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/concrete-tools/yardage-adjustments.php'); ?>"><span>Yardage Adjustments</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/concrete-tools/placement-rate.php'); ?>"><span>Placement Rate Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/concrete-tools/testing-requirements.php'); ?>"><span>Testing Requirements</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -86,10 +86,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/site/safety/fall-protection.php"><span>Fall Protection Planning</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/safety/trench-safety.php"><span>Trench Safety Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/safety/crane-setup.php"><span>Crane Setup Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/safety/evacuation-planning.php"><span>Evacuation Planning</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/safety/fall-protection.php'); ?>"><span>Fall Protection Planning</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/safety/trench-safety.php'); ?>"><span>Trench Safety Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/safety/crane-setup.php'); ?>"><span>Crane Setup Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/safety/evacuation-planning.php'); ?>"><span>Evacuation Planning</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -103,10 +103,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/site/productivity/labor-productivity.php"><span>Labor Productivity</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/productivity/equipment-utilization.php"><span>Equipment Utilization</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/productivity/schedule-compression.php"><span>Schedule Compression</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/site/productivity/cost-productivity.php"><span>Cost Productivity Analysis</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/productivity/labor-productivity.php'); ?>"><span>Labor Productivity</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/productivity/equipment-utilization.php'); ?>"><span>Equipment Utilization</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/productivity/schedule-compression.php'); ?>"><span>Schedule Compression</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/productivity/cost-productivity.php'); ?>"><span>Cost Productivity Analysis</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
     </div>
@@ -167,5 +167,5 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <?php
-require_once __DIR__ . '/includes/footer.php';
+require_once dirname(__DIR__, 4) . '/includes/footer.php';
 ?>

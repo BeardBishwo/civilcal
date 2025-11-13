@@ -4,10 +4,10 @@ $breadcrumb = [
     ['name' => 'Home', 'url' => app_base_url('index.php')],
     ['name' => 'Civil Engineering', 'url' => '#']
 ];
-require_once __DIR__ . '/includes/header.php';
+require_once dirname(__DIR__, 4) . '/includes/header.php';
 ?>
 
-<link rel="stylesheet" href="<?php echo app_base_url('assets/css/civil.css'); ?>">
+<?php load_theme_css('civil.css'); ?>
 
 <div class="container">
     <div class="hero">
@@ -34,10 +34,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/civil/concrete/concrete-volume.php"><span>Concrete Volume</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/civil/concrete/rebar-calculation.php"><span>Rebar Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/civil/concrete/concrete-mix.php"><span>Concrete Mix Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/civil/concrete/concrete-strength.php"><span>Concrete Strength</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/concrete/concrete-volume.php'); ?>"><span>Concrete Volume</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/concrete/rebar-calculation.php'); ?>"><span>Rebar Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/concrete/concrete-mix.php'); ?>"><span>Concrete Mix Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/concrete/concrete-strength.php'); ?>"><span>Concrete Strength</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -51,9 +51,9 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/civil/earthwork/cut-and-fill-volume.php"><span>Cut & Fill Volume</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/civil/earthwork/slope-calculation.php"><span>Slope Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/civil/earthwork/excavation-volume.php"><span>Excavation Volume</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/earthwork/cut-and-fill-volume.php'); ?>"><span>Cut & Fill Volume</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/earthwork/slope-calculation.php'); ?>"><span>Slope Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/earthwork/excavation-volume.php'); ?>"><span>Excavation Volume</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -67,10 +67,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/civil/structural/beam-load-capacity.php"><span>Beam Load Capacity</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/civil/structural/column-design.php"><span>Column Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/civil/structural/slab-design.php"><span>Slab Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/civil/structural/foundation-design.php"><span>Foundation Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/structural/beam-load-capacity.php'); ?>"><span>Beam Load Capacity</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/structural/column-design.php'); ?>"><span>Column Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/structural/slab-design.php'); ?>"><span>Slab Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/structural/foundation-design.php'); ?>"><span>Foundation Design</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -84,9 +84,9 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/civil/brickwork/brick-quantity.php"><span>Brick Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/civil/brickwork/mortar-ratio.php"><span>Mortar Ratio</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/civil/brickwork/plastering-estimator.php"><span>Plastering Estimator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/brickwork/brick-quantity.php'); ?>"><span>Brick Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/brickwork/mortar-ratio.php'); ?>"><span>Mortar Ratio</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/brickwork/plastering-estimator.php'); ?>"><span>Plastering Estimator</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
     </div>
@@ -147,5 +147,5 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <?php
-require_once __DIR__ . '/includes/footer.php';
+require_once dirname(__DIR__, 4) . '/includes/footer.php';
 ?>

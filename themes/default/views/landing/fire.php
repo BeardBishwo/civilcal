@@ -1,18 +1,18 @@
 <?php
-$page_title = 'Fire Protection Toolkit';
+$page_title = 'Fire Protection Engineering Toolkit';
 $breadcrumb = [
     ['name' => 'Home', 'url' => app_base_url('index.php')],
-    ['name' => 'Fire Protection', 'url' => '#']
+    ['name' => 'Fire Protection Engineering', 'url' => '#']
 ];
-require_once __DIR__ . '/includes/header.php';
+require_once dirname(__DIR__, 4) . '/includes/header.php';
 ?>
 
-<link rel="stylesheet" href="<?php echo function_exists('app_base_url') ? app_base_url('assets/css/fire.css') : 'assets/css/fire.css'; ?>">
+<?php load_theme_css('fire.css'); ?>
 
 <div class="container">
     <div class="hero">
-        <h1>Fire Protection Toolkit</h1>
-        <p>A comprehensive suite of calculators for fire protection engineering professionals.</p>
+        <h1>Fire Protection Engineering Toolkit</h1>
+        <p>Professional calculators and reference tools for fire protection engineers and designers.</p>
     </div>
 
     <!-- Sub-navigation for categories -->
@@ -35,9 +35,9 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/fire/sprinklers/sprinkler-layout.php"><span>Sprinkler Layout</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/fire/sprinklers/discharge-calculations.php"><span>Sprinkler Discharge</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/fire/sprinklers/pipe-sizing.php"><span>Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/sprinklers/sprinkler-layout.php'); ?>"><span>Sprinkler Layout</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/sprinklers/discharge-calculations.php'); ?>"><span>Sprinkler Discharge</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/sprinklers/pipe-sizing.php'); ?>"><span>Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -51,7 +51,7 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/fire/hydraulics/hazen-williams.php"><span>Hazen-Williams Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/hydraulics/hazen-williams.php'); ?>"><span>Hazen-Williams Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -65,9 +65,9 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/fire/standpipes/standpipe-classification.php"><span>Standpipe Classification</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/fire/standpipes/hose-demand.php"><span>Hose Demand</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/fire/standpipes/pressure-calculations.php"><span>Pressure Calculations</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/standpipes/standpipe-classification.php'); ?>"><span>Standpipe Classification</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/standpipes/hose-demand.php'); ?>"><span>Hose Demand</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/standpipes/pressure-calculations.php'); ?>"><span>Pressure Calculations</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -81,9 +81,9 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/fire/hazard-classification/occupancy-assessment.php"><span>Occupancy Assessment</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/fire/hazard-classification/commodity-classification.php"><span>Commodity Classification</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/fire/hazard-classification/design-density.php"><span>Design Density</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/hazard-classification/occupancy-assessment.php'); ?>"><span>Occupancy Assessment</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/hazard-classification/commodity-classification.php'); ?>"><span>Commodity Classification</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/hazard-classification/design-density.php'); ?>"><span>Design Density</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
 
@@ -97,9 +97,9 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="modules/fire/fire-pumps/pump-sizing.php"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/fire/fire-pumps/driver-power.php"><span>Driver Power</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="modules/fire/fire-pumps/jockey-pump.php"><span>Jockey Pump</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/fire-pumps/pump-sizing.php'); ?>"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/fire-pumps/driver-power.php'); ?>"><span>Driver Power</span> <i class="fas fa-arrow-right"></i></a></li>
+                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/fire-pumps/jockey-pump.php'); ?>"><span>Jockey Pump</span> <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </div>
     </div>
@@ -160,5 +160,5 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <?php
-require_once __DIR__ . '/includes/footer.php';
+require_once dirname(__DIR__, 4) . '/includes/footer.php';
 ?>

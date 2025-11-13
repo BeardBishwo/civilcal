@@ -4,10 +4,10 @@ $breadcrumb = [
 	['name' => 'Home', 'url' => app_base_url('index.php')],
 	['name' => 'Estimation', 'url' => '#']
 ];
-require_once __DIR__ . '/includes/header.php';
+require_once dirname(__DIR__, 4) . '/includes/header.php';
 ?>
 
-<link rel="stylesheet" href="<?php echo function_exists('app_base_url') ? app_base_url('assets/css/estimation.css') : 'assets/css/estimation.css'; ?>">
+<?php load_theme_css('estimation.css'); ?>
 
 <div class="container">
 	<div class="hero">
@@ -38,13 +38,13 @@ require_once __DIR__ . '/includes/header.php';
 				</div>
 			</div>
 			<ul class="tool-list">
-				<li class="tool-item"><a href="modules/estimation/quantity-takeoff/concrete-quantity.php"><span>Concrete Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/quantity-takeoff/brickwork-quantity.php"><span>Brickwork Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/quantity-takeoff/plaster-quantity.php"><span>Plaster Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/quantity-takeoff/flooring-quantity.php"><span>Flooring Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/quantity-takeoff/paint-quantity.php"><span>Paint Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/quantity-takeoff/formwork-quantity.php"><span>Formwork Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/quantity-takeoff/rebar-quantity.php"><span>Rebar Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/concrete-quantity.php'); ?>"><span>Concrete Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/brickwork-quantity.php'); ?>"><span>Brickwork Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/plaster-quantity.php'); ?>"><span>Plaster Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/flooring-quantity.php'); ?>"><span>Flooring Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/paint-quantity.php'); ?>"><span>Paint Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/formwork-quantity.php'); ?>"><span>Formwork Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/rebar-quantity.php'); ?>"><span>Rebar Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
 			</ul>
 		</div>
 
@@ -58,11 +58,11 @@ require_once __DIR__ . '/includes/header.php';
 				</div>
 			</div>
 			<ul class="tool-list">
-				<li class="tool-item"><a href="modules/estimation/material-estimation/concrete-materials.php"><span>Concrete Materials</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/material-estimation/masonry-materials.php"><span>Masonry Materials</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/material-estimation/plaster-materials.php"><span>Plaster Materials</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/material-estimation/tile-materials.php"><span>Tile Materials</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/material-estimation/paint-materials.php"><span>Paint Materials</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/material-estimation/concrete-materials.php'); ?>"><span>Concrete Materials</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/material-estimation/masonry-materials.php'); ?>"><span>Masonry Materials</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/material-estimation/plaster-materials.php'); ?>"><span>Plaster Materials</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/material-estimation/tile-materials.php'); ?>"><span>Tile Materials</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/material-estimation/paint-materials.php'); ?>"><span>Paint Materials</span> <i class="fas fa-arrow-right"></i></a></li>
 			</ul>
 		</div>
 
@@ -76,10 +76,10 @@ require_once __DIR__ . '/includes/header.php';
 				</div>
 			</div>
 			<ul class="tool-list">
-				<li class="tool-item"><a href="modules/estimation/cost-estimation/item-rate-analysis.php"><span>Item Rate Analysis</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/cost-estimation/boq-preparation.php"><span>BOQ Preparation</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/cost-estimation/project-cost-summary.php"><span>Project Cost Summary</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/cost-estimation/contingency-overheads.php"><span>Contingency & Overheads</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/cost-estimation/item-rate-analysis.php'); ?>"><span>Item Rate Analysis</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/cost-estimation/boq-preparation.php'); ?>"><span>BOQ Preparation</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/cost-estimation/project-cost-summary.php'); ?>"><span>Project Cost Summary</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/cost-estimation/contingency-overheads.php'); ?>"><span>Contingency & Overheads</span> <i class="fas fa-arrow-right"></i></a></li>
 			</ul>
 		</div>
 
@@ -93,9 +93,9 @@ require_once __DIR__ . '/includes/header.php';
 				</div>
 			</div>
 			<ul class="tool-list">
-				<li class="tool-item"><a href="modules/estimation/labor-estimation/labor-rate-analysis.php"><span>Labor Rate Analysis</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/labor-estimation/manpower-requirement.php"><span>Manpower Requirement</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/labor-estimation/labor-hour-calculation.php"><span>Labor Hour Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/labor-estimation/labor-rate-analysis.php'); ?>"><span>Labor Rate Analysis</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/labor-estimation/manpower-requirement.php'); ?>"><span>Manpower Requirement</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/labor-estimation/labor-hour-calculation.php'); ?>"><span>Labor Hour Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
 			</ul>
 		</div>
 
@@ -109,9 +109,9 @@ require_once __DIR__ . '/includes/header.php';
 				</div>
 			</div>
 			<ul class="tool-list">
-				<li class="tool-item"><a href="modules/estimation/equipment-estimation/equipment-hourly-rate.php"><span>Equipment Hourly Rate</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/equipment-estimation/machinery-usage.php"><span>Machinery Usage</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/equipment-estimation/fuel-consumption.php"><span>Fuel Consumption</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/equipment-estimation/equipment-hourly-rate.php'); ?>"><span>Equipment Hourly Rate</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/equipment-estimation/machinery-usage.php'); ?>"><span>Machinery Usage</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/equipment-estimation/fuel-consumption.php'); ?>"><span>Fuel Consumption</span> <i class="fas fa-arrow-right"></i></a></li>
 			</ul>
 		</div>
 
@@ -125,9 +125,9 @@ require_once __DIR__ . '/includes/header.php';
 				</div>
 			</div>
 			<ul class="tool-list">
-				<li class="tool-item"><a href="modules/estimation/project-financials/cash-flow-analysis.php"><span>Cash Flow Analysis</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/project-financials/profit-loss-analysis.php"><span>Profit & Loss</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/project-financials/npv-irr-analysis.php"><span>NPV / IRR Analysis</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/project-financials/cash-flow-analysis.php'); ?>"><span>Cash Flow Analysis</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/project-financials/profit-loss-analysis.php'); ?>"><span>Profit & Loss</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/project-financials/npv-irr-analysis.php'); ?>"><span>NPV / IRR Analysis</span> <i class="fas fa-arrow-right"></i></a></li>
 			</ul>
 		</div>
 
@@ -141,8 +141,8 @@ require_once __DIR__ . '/includes/header.php';
 				</div>
 			</div>
 			<ul class="tool-list">
-				<li class="tool-item"><a href="modules/estimation/tender-bidding/bid-price-comparison.php"><span>Bid Price Comparison</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/tender-bidding/bid-sheet-generator.php"><span>Bid Sheet Generator</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/tender-bidding/bid-price-comparison.php'); ?>"><span>Bid Price Comparison</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/tender-bidding/bid-sheet-generator.php'); ?>"><span>Bid Sheet Generator</span> <i class="fas fa-arrow-right"></i></a></li>
 			</ul>
 		</div>
 
@@ -156,9 +156,9 @@ require_once __DIR__ . '/includes/header.php';
 				</div>
 			</div>
 			<ul class="tool-list">
-				<li class="tool-item"><a href="modules/estimation/reports/summary-report.php"><span>Summary Report</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/reports/detailed-boq-report.php"><span>Detailed BOQ</span> <i class="fas fa-arrow-right"></i></a></li>
-				<li class="tool-item"><a href="modules/estimation/reports/financial-dashboard.php"><span>Financial Dashboard</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/reports/summary-report.php'); ?>"><span>Summary Report</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/reports/detailed-boq-report.php'); ?>"><span>Detailed BOQ</span> <i class="fas fa-arrow-right"></i></a></li>
+				<li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/reports/financial-dashboard.php'); ?>"><span>Financial Dashboard</span> <i class="fas fa-arrow-right"></i></a></li>
 			</ul>
 		</div>
 	</div>
@@ -236,5 +236,5 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <?php
-require_once __DIR__ . '/includes/footer.php';
+require_once dirname(__DIR__, 4) . '/includes/footer.php';
 ?>

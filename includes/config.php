@@ -1,8 +1,43 @@
 <?php
 // Environment settings
 define('ENVIRONMENT', getenv('APP_ENV') ?: 'development'); // 'development', 'staging', 'production'
-define('APP_BASE', '/aec-calculator');
-define('APP_URL', getenv('APP_URL') ?: 'http://localhost/aec-calculator');
+
+// Enhanced approach: determine APP_BASE dynamically from request context
+// Works with both .test domains and subdirectory installations
+function get_app_base() {
+    // For .test domains (document root), use empty base
+    if (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], '.test') !== false) {
+        return '';
+    }
+    
+    // For subdirectory installations, detect from SCRIPT_NAME
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $baseDir = dirname($scriptName);
+    
+    // Remove /public from path if present (for clean URLs)
+    if (substr($baseDir, -7) === '/public') {
+        $baseDir = substr($baseDir, 0, -7);
+    }
+    
+    // Normalize path
+    if ($baseDir === '/' || $baseDir === '\\' || $baseDir === '.') {
+        return '';
+    }
+    
+    return $baseDir;
+}
+
+define('APP_BASE', get_app_base());
+
+// Generate dynamic APP_URL based on current request
+function get_app_url() {
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $base = defined('APP_BASE') ? APP_BASE : '';
+    return $protocol . '://' . $host . $base;
+}
+
+define('APP_URL', getenv('APP_URL') ?: get_app_url());
 
 // Security settings
 define('REQUIRE_HTTPS', ENVIRONMENT === 'production');

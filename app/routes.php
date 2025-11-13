@@ -262,11 +262,17 @@ $router->add('GET', '/admin/error-logs/get-failed-calls', 'Admin\ErrorLogControl
 $router->add('POST', '/admin/error-logs/clear-logs', 'Admin\ErrorLogController@clearLogs', ['auth', 'admin']);
 $router->add('GET', '/admin/error-logs/export-logs', 'Admin\ErrorLogController@exportLogs', ['auth', 'admin']);
 
-// API Routes for Share & Comment System
-$router->add('GET', '/api/comments/{shareId}', 'CommentController@getByShare');
-$router->add('POST', '/api/comments/{id}/vote', 'CommentController@vote', ['auth']);
-$router->add('POST', '/api/share/{id}/embed', 'ShareController@generateEmbed', ['auth']);
-$router->add('POST', '/api/share', 'ShareController@store', ['auth']);
+// Landing Page Routes
+$router->add('GET', '/civil', 'LandingController@civil');
+$router->add('GET', '/electrical', 'LandingController@electrical');
+$router->add('GET', '/plumbing', 'LandingController@plumbing');
+$router->add('GET', '/hvac', 'LandingController@hvac');
+$router->add('GET', '/fire', 'LandingController@fire');
+$router->add('GET', '/site', 'LandingController@site');
+$router->add('GET', '/structural', 'LandingController@structural');
+$router->add('GET', '/estimation', 'LandingController@estimation');
+$router->add('GET', '/management', 'LandingController@management');
+$router->add('GET', '/mep', 'LandingController@mep');
 
 // Load module service providers
 \App\Modules\ModuleManager::load($router);
