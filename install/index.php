@@ -1,14 +1,21 @@
 <?php
 /**
- * Bishwo Calculator - Installation Wizard
- * Main Installation Entry Point
+ * Bishwo Calculator - Installation Router
+ * Redirects to the beautiful installer
  * 
  * @package BishwoCalculator
- * @version 1.0.0
+ * @version 2.0.0
  */
 
-// Start session for installation data persistence
-session_start();
+// Check if already installed
+if (file_exists(__DIR__ . '/../storage/install.lock')) {
+    header('Location: ../');
+    exit('Installation already completed!');
+}
+
+// Redirect to the beautiful installer
+header('Location: installer.php');
+exit;
 
 // Define installation steps
 define('INSTALL_STEPS', [

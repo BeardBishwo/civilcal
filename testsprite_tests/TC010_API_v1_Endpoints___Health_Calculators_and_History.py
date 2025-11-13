@@ -54,9 +54,9 @@ async def run_test():
         await asyncio.sleep(3) 
         # --> Assertions to verify final state
         try:
-            await expect(page.locator('text=System Failure Detected: API Health Check Failed').first).to_be_visible(timeout=1000)
+            await expect(page.locator('text=System is fully operational and healthy').first).to_be_visible(timeout=1000)
         except AssertionError:
-            raise AssertionError('Test case failed: The API health check did not return the expected 200 OK status with valid JSON response, indicating the system health endpoint is not functioning as required.')
+            raise AssertionError('Test case failed: The /api/v1/health endpoint did not return the expected 200 OK JSON response confirming system health, or the API endpoints did not return correct status codes and data formats as per the test plan.')
         await asyncio.sleep(5)
 
     finally:

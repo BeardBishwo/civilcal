@@ -1,0 +1,158 @@
+-- Bishwo Calculator Database Schema
+-- Created during installation
+
+-- Users table
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `first_name` varchar(50) DEFAULT NULL,
+  `last_name` varchar(50) DEFAULT NULL,
+  `company` varchar(100) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `role` enum('user','engineer','admin','super_admin') DEFAULT 'user',
+  `is_active` tinyint(1) DEFAULT 1,
+  `email_verified` tinyint(1) DEFAULT 0,
+  `email_verified_at` timestamp NULL DEFAULT NULL,
+  `terms_agreed` tinyint(1) DEFAULT 0,
+  `terms_agreed_at` timestamp NULL DEFAULT NULL,
+  `privacy_agreed` tinyint(1) DEFAULT 0,
+  `privacy_agreed_at` timestamp NULL DEFAULT NULL,
+  `marketing_emails` tinyint(1) DEFAULT 0,
+  `login_count` int(11) DEFAULT 0,
+  `last_login` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`),
+  KEY `idx_role` (`role`),
+  KEY `idx_active` (`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Admin modules table
+CREATE TABLE IF NOT EXISTS `admin_modules` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `version` varchar(50) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 0,
+  `settings` json DEFAULT NULL,
+  `installed_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `idx_active` (`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Login sessions table for device tracking
+CREATE TABLE IF NOT EXISTS `login_sessions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `device_type` varchar(50) DEFAULT NULL,
+  `browser` varchar(100) DEFAULT NULL,
+  `os` varchar(100) DEFAULT NULL,
+  `country` varchar(100) DEFAULT NULL,
+  `region` varchar(100) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `timezone` varchar(100) DEFAULT NULL,
+  `login_time` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_login_time` (`login_time`),
+  KEY `idx_country` (`country`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Calculation history table
+CREATE TABLE IF NOT EXISTS `calculation_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `calculator_type` varchar(100) NOT NULL,
+  `input_data` json NOT NULL,
+  `result_data` json NOT NULL,
+  `session_id` varchar(255) DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_calculator_type` (`calculator_type`),
+  KEY `idx_created_at` (`created_at`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- User favorites table
+CREATE TABLE IF NOT EXISTS `user_favorites` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `calculator_type` varchar(100) NOT NULL,
+  `favorite_name` varchar(255) DEFAULT NULL,
+  `input_data` json DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_calculator_type` (`calculator_type`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Analytics page views table
+CREATE TABLE IF NOT EXISTS `analytics_page_views` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `page_url` varchar(500) DEFAULT NULL,
+  `referrer` varchar(500) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `session_id` varchar(255) DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_created_at` (`created_at`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Analytics calculator usage table
+CREATE TABLE IF NOT EXISTS `analytics_calculator_usage` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `calculator_name` varchar(255) NOT NULL,
+  `calculation_data` json DEFAULT NULL,
+  `session_id` varchar(255) DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_calculator_name` (`calculator_name`),
+  KEY `idx_created_at` (`created_at`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Site settings table
+CREATE TABLE IF NOT EXISTS `site_settings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `setting_key` varchar(100) NOT NULL,
+  `setting_value` longtext DEFAULT NULL,
+  `setting_type` varchar(50) DEFAULT 'string',
+  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `setting_key` (`setting_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insert default settings
+INSERT IGNORE INTO `site_settings` (`setting_key`, `setting_value`, `setting_type`) VALUES
+('site_name', 'Bishwo Calculator', 'string'),
+('site_description', 'Professional Engineering Calculator Platform', 'string'),
+('site_url', 'http://localhost', 'string'),
+('contact_email', 'admin@example.com', 'string'),
+('default_language', 'en', 'string'),
+('timezone', 'UTC', 'string'),
+('enable_registration', '1', 'boolean'),
+('enable_analytics', '1', 'boolean'),
+('auto_delete_installer', '0', 'boolean');
+
+-- Insert default active modules
+INSERT IGNORE INTO `admin_modules` (`name`, `version`, `is_active`) VALUES
+('DashboardModule', '1.0.0', 1),
+('UserManagementModule', '1.0.0', 1),
+('SystemSettingsModule', '1.0.0', 1),
+('AnalyticsModule', '1.0.0', 1);

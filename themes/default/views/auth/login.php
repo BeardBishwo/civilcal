@@ -70,7 +70,7 @@ $csrf_token = Security::generateCsrfToken();
                         <span class="checkbox-text">Remember me for 30 days</span>
                     </label>
                     
-                    <a href="forgot.php" class="forgot-link">Forgot your password?</a>
+                    <a href="<?php echo app_base_url('forgot-password'); ?>" class="forgot-link">Forgot your password?</a>
                 </div>
             </div>
 
@@ -108,7 +108,7 @@ $csrf_token = Security::generateCsrfToken();
 
         <!-- Registration Link -->
         <div class="auth-footer">
-            <p>Don't have an account? <a href="register.php" class="auth-link">Create Professional Account</a></p>
+            <p>Don't have an account? <a href="<?php echo app_base_url('register'); ?>" class="auth-link">Create Professional Account</a></p>
             <p class="footer-note">
                 <i class="fas fa-info-circle"></i>
                 Join thousands of engineers using EngiCal Pro
@@ -670,7 +670,7 @@ async function handleLoginSubmission(e) {
         };
         
         // Send login request
-        const response = await fetch('api/login.php', {
+        const response = await fetch('<?php echo app_base_url('api/login'); ?>', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -697,7 +697,7 @@ async function handleLoginSubmission(e) {
                 resultDiv.innerHTML = `
                     <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
                     <h3>Email Verification Required</h3>
-                    <p>${result.message || 'Please check your email to verify your account before signing in.'} <a href="verify.php" style="color: #4f46e5;">Check verification status</a></p>
+                    <p>${result.message || 'Please check your email to verify your account before signing in.'} <a href="<?php echo app_base_url('verify'); ?>" style="color: #4f46e5;">Check verification status</a></p>
                 `;
                 resultDiv.style.display = 'block';
             } else {

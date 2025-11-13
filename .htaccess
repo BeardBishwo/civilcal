@@ -1,6 +1,21 @@
 # Set default directory index
 DirectoryIndex index.php
 
+# MIME Types for proper asset loading
+<IfModule mod_mime.c>
+    AddType text/css .css
+    AddType application/javascript .js
+    AddType image/png .png
+    AddType image/jpeg .jpg .jpeg
+    AddType image/gif .gif
+    AddType image/svg+xml .svg
+    AddType font/woff .woff
+    AddType font/woff2 .woff2
+    AddType font/truetype .ttf
+    AddType font/opentype .otf
+    AddType image/x-icon .ico
+</IfModule>
+
 # Security: Block access to sensitive directories and files
 <FilesMatch "^\.">
     Order allow,deny

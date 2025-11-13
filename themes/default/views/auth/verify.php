@@ -167,11 +167,11 @@ $csrf_token = Security::generateCsrfToken();
                     </div>
 
                     <div class="form-actions">
-                        <a href="profile.php" class="btn btn-primary">
+                        <a href="<?php echo app_base_url('profile'); ?>" class="btn btn-primary">
                             <i class="fas fa-tachometer-alt"></i>
                             Go to Dashboard
                         </a>
-                        <a href="civil.php" class="btn btn-secondary">
+                        <a href="<?php echo app_base_url('civil'); ?>" class="btn btn-secondary">
                             <i class="fas fa-calculator"></i>
                             Try Calculators
                         </a>
@@ -203,7 +203,7 @@ $csrf_token = Security::generateCsrfToken();
                     </div>
 
                     <div class="form-actions">
-                        <a href="profile.php" class="btn btn-primary">
+                        <a href="<?php echo app_base_url('profile'); ?>" class="btn btn-primary">
                             <i class="fas fa-tachometer-alt"></i>
                             Go to Dashboard
                         </a>
@@ -238,7 +238,7 @@ $csrf_token = Security::generateCsrfToken();
                             Resend Verification Email
                         </button>
                         <?php endif; ?>
-                        <a href="login.php" class="btn btn-secondary">
+                        <a href="<?php echo app_base_url('login'); ?>" class="btn btn-secondary">
                             <i class="fas fa-sign-in-alt"></i>
                             Back to Sign In
                         </a>
@@ -265,11 +265,11 @@ $csrf_token = Security::generateCsrfToken();
                     </div>
 
                     <div class="form-actions">
-                        <a href="login.php" class="btn btn-primary">
+                        <a href="<?php echo app_base_url('login'); ?>" class="btn btn-primary">
                             <i class="fas fa-sign-in-alt"></i>
                             Back to Sign In
                         </a>
-                        <a href="register.php" class="btn btn-secondary">
+                        <a href="<?php echo app_base_url('register'); ?>" class="btn btn-secondary">
                             <i class="fas fa-user-plus"></i>
                             Create New Account
                         </a>
@@ -281,8 +281,8 @@ $csrf_token = Security::generateCsrfToken();
         <!-- Footer -->
         <div class="auth-footer">
             <div class="footer-links">
-                <p><a href="login.php" class="auth-link"><i class="fas fa-arrow-left"></i> Back to Sign In</a></p>
-                <p>Need help? <a href="contact.php" class="auth-link">Contact Support</a></p>
+                <p><a href="<?php echo app_base_url('login'); ?>" class="auth-link"><i class="fas fa-arrow-left"></i> Back to Sign In</a></p>
+                <p>Need help? <a href="<?php echo app_base_url('contact'); ?>" class="auth-link">Contact Support</a></p>
             </div>
         </div>
     </div>
@@ -701,7 +701,7 @@ $csrf_token = Security::generateCsrfToken();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 <script>
 function resendVerification(email) {
-    fetch('api/resend_verification.php', {
+    fetch('<?php echo app_base_url('api/resend-verification'); ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

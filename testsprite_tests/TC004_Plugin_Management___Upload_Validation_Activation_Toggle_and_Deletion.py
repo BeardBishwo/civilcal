@@ -61,24 +61,19 @@ async def run_test():
         await page.wait_for_timeout(3000); await elem.fill('password')
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/div/div/form/div[3]/button').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000) 
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
         # -> Retry login or find alternative way to access plugin management page.
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/div/div/div[2]/p/a').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
         # -> Navigate to the plugin management page via /admin/plugins link.
         await page.goto('https://localhost/admin/plugins', timeout=10000)
-        await asyncio.sleep(3)
-        
-
+        await asyncio.sleep(3) 
         # --> Assertions to verify final state
-        frame = context.pages[-1]
         try:
-            await expect(frame.locator('text=Plugin upload successful and manifest validated')).to_be_visible(timeout=30000)
+            await expect(page.locator('text=Plugin upload successful and manifest validated').first).to_be_visible(timeout=30000)
         except AssertionError:
-            raise AssertionError('Test case failed: Plugin upload or manifest validation did not succeed as expected.')
+            raise AssertionError("Test case failed: Plugin upload, manifest validation, activation toggling, deletion, and invalid manifest rejection did not complete successfully as per the test plan.")
         await asyncio.sleep(5)
 
     finally:

@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Electrical Engineering Toolkit';
 $breadcrumb = [
-    ['name' => 'Home', 'url' => app_base_url('index.php')],
+    ['name' => 'Home', 'url' => app_base_url('/')],
     ['name' => 'Electrical Engineering', 'url' => '#']
 ];
 require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';

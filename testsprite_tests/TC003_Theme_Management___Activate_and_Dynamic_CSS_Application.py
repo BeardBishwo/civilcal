@@ -64,8 +64,49 @@ async def run_test():
         await page.wait_for_timeout(3000); await elem.fill('password')
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/div/div/form/div[3]/button').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000) 
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
         # -> Input username and password, then click Sign In to authenticate.
+        frame = context.pages[-1]
+        elem = frame.locator('xpath=html/body/div/div/form/div/div/input').nth(0)
+        await page.wait_for_timeout(3000); await elem.fill('admin@engicalpro.com')
+        frame = context.pages[-1]
+        elem = frame.locator('xpath=html/body/div/div/form/div/div[2]/div/input').nth(0)
+        await page.wait_for_timeout(3000); await elem.fill('password')
+        frame = context.pages[-1]
+        elem = frame.locator('xpath=html/body/div/div/form/div[3]/button').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
+        # -> Try to use Quick Login for Admin Demo to bypass manual login and access theme management.
+        frame = context.pages[-1]
+        elem = frame.locator('xpath=html/body/div[2]/div/div/div[2]/div/button').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000) 
+        # -> Click the Quick Login button for Admin Demo to authenticate.
+        frame = context.pages[-1]
+        elem = frame.locator('xpath=html/body/div[2]/div/div/div[2]/div/button').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
+        
+
+        # -> Try manual login by entering username and password to authenticate.
+        frame = context.pages[-1]
+        elem = frame.locator('xpath=html/body/div/div/form/div/div/input').nth(0)
+        await page.wait_for_timeout(3000); await elem.fill('admin@engicalpro.com')
+        
+
+        frame = context.pages[-1]
+        elem = frame.locator('xpath=html/body/div/div/form/div/div[2]/div/input').nth(0)
+        await page.wait_for_timeout(3000); await elem.fill('password')
+        
+
+        frame = context.pages[-1]
+        elem = frame.locator('xpath=html/body/div/div/div[2]/p/a').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
+        
+
+        # -> Clear the username field, re-enter the correct username 'admin@engicalpro.com', enter the password 'password', and click the Sign In button to attempt manual login.
+        frame = context.pages[-1]
+        elem = frame.locator('xpath=html/body/div/div/form/div/div/input').nth(0)
+        await page.wait_for_timeout(3000); await elem.fill('')
+        
+
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/div/div/form/div/div/input').nth(0)
         await page.wait_for_timeout(3000); await elem.fill('admin@engicalpro.com')
@@ -81,18 +122,12 @@ async def run_test():
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
         
 
-        # -> Try to use Quick Login for Admin Demo to bypass manual login and access theme management.
-        frame = context.pages[-1]
-        elem = frame.locator('xpath=html/body/div[2]/div/div/div[2]/div/button').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
         # --> Assertions to verify final state
         frame = context.pages[-1]
         try:
-            await expect(frame.locator('text=Theme Activation Successful').first).to_be_visible(timeout=30000)
+            await expect(frame.locator('text=Theme Activation Successful').first).to_be_visible(timeout=1000)
         except AssertionError:
-            raise AssertionError("Test case failed: The theme activation did not update the UI dynamically with correct CSS styles applied as expected in the test plan.")
+            raise AssertionError("Test case failed: The theme activation did not update the UI dynamically with correct CSS styles as expected according to the test plan.")
         await asyncio.sleep(5)
 
     finally:

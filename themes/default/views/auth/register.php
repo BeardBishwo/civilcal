@@ -71,6 +71,35 @@ $csrf_token = Security::generateCsrfToken();
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
+                    <!-- Password Strength Meter -->
+                    <div id="passwordStrength" class="password-strength" style="display: none;">
+                        <div class="strength-bar">
+                            <div class="strength-progress" id="strengthProgress"></div>
+                        </div>
+                        <div class="strength-text" id="strengthText">Password strength</div>
+                        <div class="password-requirements" id="passwordRequirements">
+                            <div class="requirement" data-requirement="length">
+                                <span class="requirement-icon">○</span>
+                                <span class="requirement-text">At least 8 characters</span>
+                            </div>
+                            <div class="requirement" data-requirement="uppercase">
+                                <span class="requirement-icon">○</span>
+                                <span class="requirement-text">One uppercase letter</span>
+                            </div>
+                            <div class="requirement" data-requirement="lowercase">
+                                <span class="requirement-icon">○</span>
+                                <span class="requirement-text">One lowercase letter</span>
+                            </div>
+                            <div class="requirement" data-requirement="number">
+                                <span class="requirement-icon">○</span>
+                                <span class="requirement-text">One number</span>
+                            </div>
+                            <div class="requirement" data-requirement="special">
+                                <span class="requirement-icon">○</span>
+                                <span class="requirement-text">One special character</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -151,22 +180,6 @@ $csrf_token = Security::generateCsrfToken();
                         </div>
                     </div>
 
-                    <!-- Contact Information -->
-                    <div class="form-row">
-                        <div class="form-group half-width">
-                            <label for="phone">Phone Number</label>
-                            <input type="tel" id="phone" name="phone" class="form-control" placeholder="+1 (555) 123-4567">
-                            <div class="field-message">Optional - for phone verification</div>
-                        </div>
-                        
-                        <div class="form-group half-width">
-                            <label class="checkbox-item" for="phone_verification">
-                                <input type="checkbox" id="phone_verification" name="phone_verification">
-                                <span class="checkmark"></span>
-                                <span class="checkbox-text">Enable phone verification</span>
-                            </label>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -233,8 +246,8 @@ $csrf_token = Security::generateCsrfToken();
                     <label class="checkbox-item">
                         <input type="checkbox" id="terms_agree" name="terms_agree" required>
                         <span class="checkbox-text">
-                            I agree to the <a href="terms.php" target="_blank">Terms of Service</a> 
-                            and <a href="privacy.php" target="_blank">Privacy Policy</a> *
+                            I agree to the <a href="<?php echo app_base_url('terms'); ?>" target="_blank">Terms of Service</a> 
+                            and <a href="<?php echo app_base_url('privacy'); ?>" target="_blank">Privacy Policy</a> *
                         </span>
                     </label>
                 </div>
@@ -923,6 +936,132 @@ select.form-control {
     color: white;
 }
 
+/* Password Strength Meter Styles */
+.password-strength {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.strength-bar {
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.strength-progress {
+    height: 100%;
+    width: 0%;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%);
+}
+
+.strength-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #374151;
+}
+
+.password-requirements {
+    display: grid;
+    gap: 8px;
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #6b7280;
+    transition: color 0.3s ease;
+}
+
+.requirement.met {
+    color: #10b981;
+}
+
+.requirement.met .requirement-icon {
+    color: #10b981;
+}
+
+.requirement-icon {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #d1d5db;
+    transition: color 0.3s ease;
+}
+
+.requirement.met .requirement-icon::before {
+    content: "✓";
+}
+
+.requirement:not(.met) .requirement-icon::before {
+    content: "○";
+}
+
+/* Form alignment fixes */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.95rem;
+}
+
+.input-with-status {
+    position: relative;
+}
+
+.input-status {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.status-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.status-icon.available {
+    color: #10b981;
+}
+
+.status-icon.taken {
+    color: #ef4444;
+}
+
+.status-icon.checking {
+    color: #f59e0b;
+}
+
+.field-message {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
 /* Address field styling */
 .address-group {
     margin-bottom: 1.5rem;
@@ -1061,7 +1200,7 @@ select.form-control {
 // Expose PHP specialties to JS so we can build a fallback control if checkboxes are missing
 const SPECIALTIES = <?php echo json_encode($specialties); ?>;
 // Use server-aware URL for username check (works when APP_BASE changes)
-const CHECK_USERNAME_URL = '<?php echo app_base_url('api/check_username.php'); ?>';
+const CHECK_USERNAME_URL = '<?php echo app_base_url('api/check-username'); ?>';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize form elements
@@ -1071,7 +1210,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ensureSpecialtyField();
 
     // Auto-detect location on page load
-    detectUserLocation();
+    autoDetectLocationOnLoad();
     
     // Set user agent
     document.getElementById('user_agent').value = navigator.userAgent;
@@ -1125,6 +1264,9 @@ function ensureSpecialtyField() {
 }
 
 function initializeForm() {
+    // Get password input reference
+    const passwordInput = document.getElementById('password');
+    
     // Password visibility toggle
     document.getElementById('togglePassword').addEventListener('click', function() {
         const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -1132,6 +1274,16 @@ function initializeForm() {
         this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
     });
     
+    // Password strength checking
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        checkPasswordStrength(password);
+    });
+
+    passwordInput.addEventListener('focus', function() {
+        document.getElementById('passwordStrength').style.display = 'block';
+    });
+
     // Username availability check
     const usernameInput = document.getElementById('username');
     let usernameTimeout;
@@ -1197,8 +1349,32 @@ function updateUsernameStatus(message, type) {
 
 async function checkUsernameAvailability(username) {
     try {
-        const response = await fetch(CHECK_USERNAME_URL + '?username=' + encodeURIComponent(username), { credentials: 'same-origin' });
+        console.log('Checking username:', username, 'URL:', CHECK_USERNAME_URL);
+        
+        const response = await fetch(CHECK_USERNAME_URL + '?username=' + encodeURIComponent(username), { 
+            credentials: 'same-origin',
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('Response status:', response.status, 'OK:', response.ok);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const textResponse = await response.text();
+            console.error('Non-JSON response:', textResponse);
+            throw new Error('Server returned non-JSON response');
+        }
+        
         const data = await response.json();
+        console.log('Response data:', data);
 
         if (data.error) {
             // API-side error (DB down, connection issues, validation error)
@@ -1218,11 +1394,107 @@ async function checkUsernameAvailability(username) {
             }
         }
     } catch (error) {
-        updateUsernameStatus('Error checking', 'error');
         console.error('Username check error:', error);
+        updateUsernameStatus('Connection error', 'error');
     }
 }
 
+function checkPasswordStrength(password) {
+    const strengthMeter = document.getElementById('passwordStrength');
+    const strengthProgress = document.getElementById('strengthProgress');
+    const strengthText = document.getElementById('strengthText');
+    const requirements = document.querySelectorAll('.requirement');
+    
+    if (!password) {
+        strengthMeter.style.display = 'none';
+        return;
+    }
+    
+    strengthMeter.style.display = 'block';
+    
+    // Check each requirement
+    const checks = {
+        length: password.length >= 8,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[^A-Za-z0-9]/.test(password)
+    };
+    
+    // Update requirement indicators
+    requirements.forEach(req => {
+        const type = req.dataset.requirement;
+        if (checks[type]) {
+            req.classList.add('met');
+        } else {
+            req.classList.remove('met');
+        }
+    });
+    
+    // Calculate strength score
+    const score = Object.values(checks).filter(Boolean).length;
+    const percentage = (score / 5) * 100;
+    
+    // Update progress bar
+    strengthProgress.style.width = percentage + '%';
+    
+    // Update strength text and color
+    let strengthLevel = '';
+    let color = '';
+    
+    if (score <= 1) {
+        strengthLevel = 'Very Weak';
+        color = '#ef4444';
+    } else if (score <= 2) {
+        strengthLevel = 'Weak';
+        color = '#f59e0b';
+    } else if (score <= 3) {
+        strengthLevel = 'Fair';
+        color = '#eab308';
+    } else if (score <= 4) {
+        strengthLevel = 'Good';
+        color = '#22c55e';
+    } else {
+        strengthLevel = 'Excellent';
+        color = '#10b981';
+    }
+    
+    strengthText.textContent = `Password strength: ${strengthLevel}`;
+    strengthText.style.color = color;
+    strengthProgress.style.background = color;
+}
+
+/**
+ * Auto-detect location when page loads (silent, no user interaction needed)
+ */
+async function autoDetectLocationOnLoad() {
+    try {
+        console.log('🌍 Auto-detecting location...');
+        
+        // Use our own API for location detection
+        const response = await fetch('<?php echo app_base_url('api/location'); ?>');
+        
+        if (response.ok) {
+            const result = await response.json();
+            
+            if (result.success && result.location) {
+                fillLocationFields(result.location, 'IP-based detection');
+                console.log('✅ Location auto-detected:', result.location);
+            }
+        } else {
+            console.warn('⚠️ Auto-detection failed, using fallback');
+            // Fallback to online service
+            await fallbackLocationDetection();
+        }
+    } catch (error) {
+        console.warn('⚠️ Auto-detection error:', error);
+        await fallbackLocationDetection();
+    }
+}
+
+/**
+ * Manual location detection when user clicks button
+ */
 async function detectUserLocation() {
     const detectBtn = document.getElementById('detectLocation');
     const originalText = detectBtn.innerHTML;
@@ -1231,82 +1503,188 @@ async function detectUserLocation() {
     detectBtn.disabled = true;
     
     try {
-        // Try multiple IP geolocation services
-        let geoData = null;
+        console.log('📍 Manual location detection requested...');
         
-        try {
-            const response = await fetch('https://ipapi.co/json/');
-            if (response.ok) {
-                geoData = await response.json();
-            }
-        } catch (e) {
-            console.warn('ipapi.co failed, trying ip-api.com');
-        }
-        
-        if (!geoData) {
-            try {
-                const response = await fetch('http://ip-api.com/json/');
-                if (response.ok) {
-                    const data = await response.json();
-                    geoData = {
-                        country: data.country,
-                        region: data.regionName,
-                        city: data.city,
-                        timezone: data.timezone,
-                        lat: data.lat,
-                        lon: data.lon,
-                        ip: data.query
-                    };
+        // First, ask for GPS permission if available
+        if (navigator.geolocation) {
+            const useGPS = await askForLocationPermission();
+            
+            if (useGPS) {
+                const position = await getCurrentPosition();
+                if (position) {
+                    await reverseGeocode(position.coords.latitude, position.coords.longitude);
+                    detectBtn.innerHTML = originalText;
+                    detectBtn.disabled = false;
+                    return;
                 }
-            } catch (e) {
-                console.warn('ip-api.com failed');
             }
         }
         
-        if (geoData) {
-            // Update form fields
-            if (geoData.country_name || geoData.country) {
-                document.getElementById('country').value = geoData.country_name || geoData.country;
-            }
-            if (geoData.region || geoData.regionName) {
-                document.getElementById('region').value = geoData.region || geoData.regionName;
-            }
-            if (geoData.city) {
-                document.getElementById('city').value = geoData.city;
-            }
-            if (geoData.timezone) {
-                document.getElementById('timezone').value = geoData.timezone;
-            }
+        // Fallback to IP-based detection
+        console.log('🔄 Using IP-based detection...');
+        const response = await fetch('<?php echo app_base_url('api/location'); ?>');
+        
+        if (response.ok) {
+            const result = await response.json();
             
-            // Set hidden fields
-            document.getElementById('ip_detected').value = geoData.ip || '';
-            document.getElementById('ip_geo_data').value = JSON.stringify(geoData);
-            
-            // Display coordinates if available
-            if (geoData.lat && geoData.lon) {
-                displayCoordinates(geoData.lat, geoData.lon);
+            if (result.success && result.location) {
+                fillLocationFields(result.location, 'IP-based detection');
             }
-            
-            // Expand location section if not already expanded
-            const locationSection = document.getElementById('locationSection');
-            if (!locationSection.classList.contains('expanded')) {
-                toggleSection('location');
-            }
-            
-            // Show success message
-            const fieldMessage = document.querySelector('#locationSection .field-message');
-            fieldMessage.innerHTML = '<i class="fas fa-check-circle" style="color: #10b981;"></i> Location detected successfully. You can update it if needed.';
         } else {
-            // Try GPS location detection as fallback
-            tryGPSLocation();
+            await fallbackLocationDetection();
         }
         
     } catch (error) {
-        console.error('Location detection failed:', error);
-        alert('Could not detect your location. Please fill in your address manually.');
+        console.error('❌ Location detection error:', error);
+        await fallbackLocationDetection();
     } finally {
         detectBtn.innerHTML = originalText;
         detectBtn.disabled = false;
+    }
+}
+
+/**
+ * Ask user for location permission
+ */
+async function askForLocationPermission() {
+    return new Promise((resolve) => {
+        if (confirm('🗺️ Allow location access for more accurate detection?\n\nClick "OK" to use GPS location, or "Cancel" to use IP-based detection.')) {
+            resolve(true);
+        } else {
+            resolve(false);
+        }
+    });
+}
+
+/**
+ * Get current GPS position
+ */
+async function getCurrentPosition() {
+    return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                console.log('📍 GPS position obtained:', position.coords);
+                resolve(position);
+            },
+            (error) => {
+                console.warn('❌ GPS error:', error.message);
+                resolve(null);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 300000 // 5 minutes
+            }
+        );
+    });
+}
+
+/**
+ * Reverse geocode GPS coordinates to address
+ */
+async function reverseGeocode(latitude, longitude) {
+    try {
+        const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=YOUR_API_KEY`);
+        
+        // Fallback to free service
+        const fallbackResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
+        
+        if (fallbackResponse.ok) {
+            const data = await fallbackResponse.json();
+            
+            const locationData = {
+                country: data.address?.country || 'Unknown',
+                region: data.address?.state || data.address?.region || 'Unknown',
+                city: data.address?.city || data.address?.town || data.address?.village || 'Unknown',
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                latitude: latitude,
+                longitude: longitude
+            };
+            
+            fillLocationFields(locationData, 'GPS location');
+        }
+        
+    } catch (error) {
+        console.error('🔄 Reverse geocoding failed:', error);
+        // Fallback to IP detection
+        await fallbackLocationDetection();
+    }
+}
+
+/**
+ * Fallback location detection using online service
+ */
+async function fallbackLocationDetection() {
+    try {
+        const response = await fetch('http://ip-api.com/json/?fields=status,country,regionName,city,timezone,lat,lon');
+        
+        if (response.ok) {
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                const locationData = {
+                    country: data.country || 'Unknown',
+                    region: data.regionName || 'Unknown',
+                    city: data.city || 'Unknown',
+                    timezone: data.timezone || 'UTC',
+                    latitude: data.lat || 0,
+                    longitude: data.lon || 0
+                };
+                
+                fillLocationFields(locationData, 'Fallback IP detection');
+                console.log('✅ Fallback location detected:', locationData);
+            }
+        }
+    } catch (error) {
+        console.error('❌ Fallback detection failed:', error);
+        // Use default values
+        fillLocationFields({
+            country: 'United States',
+            region: 'California',
+            city: 'San Francisco',
+            timezone: 'America/Los_Angeles'
+        }, 'Default location');
+    }
+}
+
+/**
+ * Fill location form fields with detected data
+ */
+function fillLocationFields(locationData, method) {
+    try {
+        // Fill form fields
+        if (locationData.country) {
+            document.getElementById('country').value = locationData.country;
+        }
+        if (locationData.region) {
+            document.getElementById('region').value = locationData.region;
+        }
+        if (locationData.city) {
+            document.getElementById('city').value = locationData.city;
+        }
+        if (locationData.timezone) {
+            document.getElementById('timezone').value = locationData.timezone;
+        }
+        
+        // Display coordinates if available
+        if (locationData.latitude && locationData.longitude) {
+            displayCoordinates(locationData.latitude, locationData.longitude);
+        }
+        
+        // Expand location section if not already expanded
+        const locationSection = document.getElementById('locationSection');
+        if (locationSection && !locationSection.classList.contains('expanded')) {
+            toggleSection('location');
+        }
+        
+        // Show success message
+        const fieldMessage = document.querySelector('#locationSection .field-message');
+        if (fieldMessage) {
+            fieldMessage.innerHTML = `<i class="fas fa-check-circle" style="color: #10b981;"></i> Location detected via ${method}. You can update it if needed.`;
+        }
+        
+    } catch (error) {
+        console.error('❌ Fill location fields error:', error);
     }
 }
 
@@ -1335,12 +1713,28 @@ async function handleFormSubmission(e) {
         resultDiv.style.display = 'block';
         return;
     }
-
-    const termsAgree = form.querySelector('#terms_agree:checked');
-    if (!termsAgree) {
+    
+    // Validate terms agreement (required)
+    const termsAgree = form.querySelector('#terms_agree');
+    if (!termsAgree || !termsAgree.checked) {
         resultDiv.className = 'result-message error';
-        resultDiv.innerHTML = '<p>You must agree to the Terms of Service and Privacy Policy.</p>';
+        resultDiv.innerHTML = '<p><i class="fas fa-exclamation-triangle"></i> You must agree to the Terms of Service and Privacy Policy to continue.</p>';
         resultDiv.style.display = 'block';
+        
+        // Scroll to terms section and highlight it
+        const termsSection = document.querySelector('.agreement-wrapper');
+        if (termsSection) {
+            termsSection.scrollIntoView({ behavior: 'smooth' });
+            termsSection.style.border = '2px solid #ef4444';
+            termsSection.style.borderRadius = '8px';
+            termsSection.style.padding = '15px';
+            
+            setTimeout(() => {
+                termsSection.style.border = '';
+                termsSection.style.borderRadius = '';
+                termsSection.style.padding = '';
+            }, 3000);
+        }
         return;
     }
     
@@ -1353,9 +1747,18 @@ async function handleFormSubmission(e) {
     try {
         // Collect form data
         const formData = new FormData(form);
-        const payload = {};
+        
+        // Log checkbox states for debugging
+        const termsChecked = form.querySelector('#terms_agree').checked;
+        const marketingChecked = form.querySelector('#marketing_agree').checked;
+        
+        console.log('📋 Form Submission - Agreement Status:');
+        console.log('✅ Terms & Privacy Agreement:', termsChecked ? 'AGREED' : 'NOT AGREED');
+        console.log('📧 Marketing Emails:', marketingChecked ? 'OPT-IN' : 'OPT-OUT');
         
         // Convert form data to object
+        const payload = {};
+        
         for (let [key, value] of formData.entries()) {
             if (key === 'engineer_roles[]') {
                 if (!payload.engineer_roles) payload.engineer_roles = [];
@@ -1365,8 +1768,12 @@ async function handleFormSubmission(e) {
             }
         }
         
+        // Ensure checkbox values are explicitly set (FormData might not capture unchecked checkboxes)
+        payload.terms_agree = termsChecked;
+        payload.marketing_agree = marketingChecked;
+        
         // Send registration request
-        const response = await fetch('/aec-calculator/api/register_enhanced.php', {
+        const response = await fetch('<?php echo app_base_url('api/register'); ?>', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -1580,7 +1580,7 @@ m        color: #93c5fd;
     <header class="site-header" id="siteHeader">
         <div class="header-content">
             <div class="header-left">
-                <a href="<?php echo app_base_url('index.php'); ?>" class="logo">
+                <a href="<?php echo app_base_url('/'); ?>" class="logo">
                     <?php if ($header_style === 'logo_only' || $header_style === 'logo_text'): ?>
                         <img src="<?php echo htmlspecialchars($logo); ?>" alt="<?php echo $title_safe; ?> Logo" class="logo-img">
                     <?php endif; ?>
@@ -1673,7 +1673,7 @@ m        color: #93c5fd;
                     <?php 
                     $is_logged_in = !empty($_SESSION['user']) || !empty($_SESSION['user_id']) || !empty($_SESSION['username']) || !empty($_SESSION['full_name']);
                     if (!$is_logged_in): ?>
-                        <a href="<?php echo app_base_url('login.php'); ?>" class="btn btn-primary login-btn">
+                        <a href="<?php echo app_base_url('login'); ?>" class="btn btn-primary login-btn">
                             <i class="fas fa-sign-in-alt"></i>
                             <span class="btn-text">Login</span>
                         </a>
@@ -1697,12 +1697,12 @@ m        color: #93c5fd;
                                 <i class="fas fa-user-circle"></i>
                             </button>
                             <div class="profile-dropdown" id="profileDropdown">
-                                <a href="<?php echo app_base_url('profile.php'); ?>" class="menu-item">
+                                <a href="<?php echo app_base_url('profile'); ?>" class="menu-item">
                                     <i class="fas fa-user-edit" style="color: #8b5cf6;"></i>
                                     <span class="text">Profile Settings</span>
                                 </a>
                                 <?php if (!empty($_SESSION['is_admin'])): ?>
-                                    <a href="<?php echo app_base_url('admin/index.php'); ?>" class="menu-item">
+                                    <a href="<?php echo app_base_url('admin'); ?>" class="menu-item">
                                         <i class="fas fa-shield-alt" style="color: #ef4444;"></i>
                                         <span class="text">Admin Panel</span>
                                     </a>
@@ -2129,10 +2129,10 @@ m        color: #93c5fd;
                                 <div class="user-name">${escapeHtml(name)}</div>
                                 ${role ? `<div class="user-role">${escapeHtml(role)}</div>` : ''}
                             </li>
-                            ${isAdmin ? `<li><a href="${escapeHtml('<?php echo app_base_url("admin/index.php"); ?>')}"><i class="fas fa-cog"></i> Admin Panel</a></li>` : ''}
-                            <li><a href="<?php echo app_base_url('dashboard.php'); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                            <li><a href="<?php echo app_base_url('profile.php'); ?>"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
-                            <li><a href="<?php echo app_base_url('logout.php'); ?>"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            ${isAdmin ? `<li><a href="${escapeHtml('<?php echo app_base_url("admin"); ?>')}"><i class="fas fa-cog"></i> Admin Panel</a></li>` : ''}
+                            <li><a href="<?php echo app_base_url('dashboard'); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                            <li><a href="<?php echo app_base_url('profile'); ?>"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
+                            <li><a href="<?php echo app_base_url('logout'); ?>"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                         </ul>
                     </div>
                 `;
@@ -2173,7 +2173,7 @@ m        color: #93c5fd;
                     if (data.logged_in) {
                         ua.innerHTML = buildUserActionsHtml(data.user, data.is_admin);
                     } else {
-                        ua.innerHTML = '<a href="<?php echo app_base_url('login.php'); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
+                        ua.innerHTML = '<a href="<?php echo app_base_url('login'); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
                     }
                 } catch (e) {
                     console.warn('refreshHeaderFromServer failed', e);
@@ -2203,12 +2203,12 @@ m        color: #93c5fd;
                         // Update header - show login button
                         try {
                             const ua = document.querySelector('.user-actions');
-                            if (ua) ua.innerHTML = '<a href="<?php echo app_base_url('login.php'); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
+                            if (ua) ua.innerHTML = '<a href="<?php echo app_base_url('login'); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
                         } catch (e) {
                             console.warn('Header update failed', e);
                         }
                         // Then navigate to the logout href (redirect) or homepage
-                        window.location.href = href || '<?php echo app_base_url('index.php'); ?>';
+                        window.location.href = href || '<?php echo app_base_url('/'); ?>';
                     })();
                 }
             });

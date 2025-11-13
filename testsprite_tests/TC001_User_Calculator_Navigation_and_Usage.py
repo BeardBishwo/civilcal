@@ -48,19 +48,21 @@ async def run_test():
         # Interact with the page elements to simulate user flow
         # -> Navigate to the home page using HTTPS scheme instead of HTTP.
         await page.goto('https://localhost/bishwo_calculator', timeout=10000)
-        await asyncio.sleep(3) 
+        await asyncio.sleep(3)
         # -> Click on the Civil dropdown menu to select a calculator.
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/header/div/div[2]/nav/ul/li/a').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
+        # -> Select a specific Civil calculator (e.g., Concrete Volume) to verify it opens successfully and displays the calculator interface.
+        frame = context.pages[-1]
+        elem = frame.locator('xpath=html/body/main/div/div[3]/div/ul/li/a').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000) 
         # --> Assertions to verify final state
         frame = context.pages[-1]
         try:
-            await expect(frame.locator('text=Calculator for Space Exploration').first).to_be_visible(timeout=1000)
+            await expect(frame.locator('text=Calculation Complete: Result is 42').first).to_be_visible(timeout=30000)
         except AssertionError:
-            raise AssertionError('Test case failed: The dynamic dropdown menu for Civil, Electrical, and HVAC calculators did not function as expected, preventing successful navigation and calculation.')
+            raise AssertionError("Test case failed: The dynamic dropdown menu calculators for Civil, Electrical, and HVAC modules did not function correctly as expected. The calculator interface did not open or return correct results, indicating failure in the test plan execution.")
         await asyncio.sleep(5)
 
     finally:

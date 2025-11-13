@@ -62,65 +62,43 @@ async def run_test():
         # -> Click on the HVAC module navigation link to verify it routes to the correct calculator page.
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/header/div/div[2]/nav/ul/li[4]/a').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000) 
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
         # -> Navigate to the Civil module page by clicking the Civil navigation link to verify its calculator page loads correctly.
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/header/div/div[2]/nav/ul/li/a').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
         # -> Navigate to the Electrical module page by clicking the Electrical navigation link to verify its calculator page loads correctly.
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/header/div/div[2]/nav/ul/li[2]/a').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
         # -> Verify that calculators specific to Civil, Electrical, and HVAC modules load without errors by opening a representative calculator from each module.
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/main/div/div[2]/a').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
         # -> Navigate to the Civil module page and open a representative calculator to verify it loads without errors.
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/header/div/div[2]/nav/ul/li/a').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
         # -> Navigate to the HVAC module page and open a representative calculator to verify it loads without errors.
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/header/div/div[2]/nav/ul/li[4]/a').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
         # -> Open a representative calculator from the HVAC module, such as 'Cooling Load Calculation', to verify it loads without errors.
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/main/div/div[3]/div/ul/li/a').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000) 
+        # -> Navigate back to the HVAC module main page to find navigation for Civil and Electrical modules or go to the homepage to locate all modules.
+        frame = context.pages[-1]
+        elem = frame.locator('xpath=html/body/div/div[3]/a').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
         
 
         # --> Assertions to verify final state
         frame = context.pages[-1]
-        await expect(frame.locator('text=Cooling Load Calculator').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Calculate cooling load estimation for different room types and occupancy conditions').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Cooling Load Estimation').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Area (m²)').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Area').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Room Type').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Office').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Residential').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Commercial').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Hospital').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Hotel Room').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Classroom').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Restaurant').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Occupants').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=People').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Equipment Load (Watts)').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Watts').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Lighting Load (Watts)').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Calculate Cooling Load').first).to_be_visible(timeout=30000)
-        await expect(frame.locator('text=Back to HVAC Tools').first).to_be_visible(timeout=30000)
+        try:
+            await expect(frame.locator('text=Advanced Plumbing Solutions').first).to_be_visible(timeout=1000)
+        except AssertionError:
+            raise AssertionError('Test case failed: Navigation modules for Civil, Electrical, and HVAC service providers are missing or do not link to the appropriate calculators as expected.')
         await asyncio.sleep(5)
 
     finally:

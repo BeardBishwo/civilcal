@@ -3,28 +3,31 @@
 namespace App\Services;
 
 use Exception;
+use MaxMind\Db\Reader;
 
 /**
- * GeolocationService - IP-based country detection using MaxMind GeoLite2 database
+ * GeolocationService - IP-based location detection using MaxMind GeoLite2 database
  * 
  * This service provides automatic detection of user location based on IP address
  * and enables location-based features for the Bishwo Calculator.
  */
 class GeolocationService
 {
-    private $dbPath;
-    private $database;
+    private $cityDbPath;
+    private $countryDbPath;
+    private $reader;
     private $isEnabled;
     private $defaultCountry = 'US';
 
     /**
      * Constructor
      * 
-     * @param string|null $dbPath Optional custom path to GeoLite2 database
+     * @param string|null $cityDbPath Optional custom path to GeoLite2-City database
      */
-    public function __construct($dbPath = null)
+    public function __construct($cityDbPath = null)
     {
-        $this->dbPath = $dbPath ?? storage_path('database/GeoLite2-Country.mmdb');
+        $this->cityDbPath = $cityDbPath ?? __DIR__ . '/../../storage/app/GeoLite2-City.mmdb';
+        $this->countryDbPath = __DIR__ . '/../../storage/app/GeoLite2-Country.mmdb';
         $this->isEnabled = $this->checkDatabaseAvailability();
         
         if ($this->isEnabled) {
@@ -39,19 +42,14 @@ class GeolocationService
      */
     private function checkDatabaseAvailability()
     {
-        // Check if database file exists
-        if (!file_exists($this->dbPath)) {
-            error_log("GeoLite2 database not found at: {$this->dbPath}");
+        // Check if city database file exists (primary)
+        if (!file_exists($this->cityDbPath)) {
+            error_log("GeoLite2 City database not found at: {$this->cityDbPath}");
             return false;
         }
 
-        // Check if required PHP extension is available
-        if (!extension_loaded('geoip')) {
-            // For MaxMind GeoLite2, we use the geoip extension
-            // If not available, we'll use alternative IP geolocation methods
-            return false;
-        }
-
+        // MaxMind DB reader doesn't require specific PHP extension
+        // We can use the composer package directly
         return true;
     }
 
@@ -63,23 +61,82 @@ class GeolocationService
     private function initializeDatabase()
     {
         try {
-            // Initialize MaxMind GeoLite2 database reader
-            // Note: This requires the geoip extension or maxmind-db-reader
-            if (extension_loaded('geoip')) {
-                // Using built-in geoip extension
-                $this->database = true; // geoip_open() equivalent
-            } else {
-                // Alternative: Use online IP geolocation service as fallback
-                $this->database = null;
-            }
+            // Initialize MaxMind DB reader for city database
+            $this->reader = new Reader($this->cityDbPath);
         } catch (Exception $e) {
             error_log("Failed to initialize GeoLite2 database: " . $e->getMessage());
             $this->isEnabled = false;
+            $this->reader = null;
         }
     }
 
     /**
-     * Get user's country based on IP address
+     * Get detailed location information including city, region, country, timezone
+     * 
+     * @param string|null $ipAddress Optional specific IP address
+     * @return array
+     */
+    public function getLocationDetails($ipAddress = null)
+    {
+        $ip = $ipAddress ?? $this->getClientIP();
+        
+        $result = [
+            'ip_address' => $ip,
+            'country' => 'United States',
+            'country_code' => 'US',
+            'region' => 'California',
+            'city' => 'San Francisco',
+            'timezone' => 'America/Los_Angeles',
+            'latitude' => 37.7749,
+            'longitude' => -122.4194,
+            'is_enabled' => $this->isEnabled,
+            'detection_method' => $this->isEnabled ? 'maxmind' : 'fallback'
+        ];
+
+        if (!$this->isEnabled || !$this->reader) {
+            // Fallback to online service
+            return $this->getLocationFromOnlineService($ip, $result);
+        }
+
+        try {
+            // Use MaxMind GeoLite2 City database
+            $record = $this->reader->get($ip);
+            
+            if ($record) {
+                // Country information
+                if (isset($record['country'])) {
+                    $result['country'] = $record['country']['names']['en'] ?? $result['country'];
+                    $result['country_code'] = $record['country']['iso_code'] ?? $result['country_code'];
+                }
+                
+                // Region/State information
+                if (isset($record['subdivisions'][0])) {
+                    $result['region'] = $record['subdivisions'][0]['names']['en'] ?? $result['region'];
+                }
+                
+                // City information
+                if (isset($record['city'])) {
+                    $result['city'] = $record['city']['names']['en'] ?? $result['city'];
+                }
+                
+                // Location coordinates
+                if (isset($record['location'])) {
+                    $result['latitude'] = $record['location']['latitude'] ?? $result['latitude'];
+                    $result['longitude'] = $record['location']['longitude'] ?? $result['longitude'];
+                    $result['timezone'] = $record['location']['time_zone'] ?? $result['timezone'];
+                }
+            }
+        } catch (Exception $e) {
+            error_log("GeoLocation MaxMind error: " . $e->getMessage());
+            // Fallback to online service
+            $result = $this->getLocationFromOnlineService($ip, $result);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get user's country based on IP address (legacy method)
      * 
      * @param string|null $ipAddress Optional specific IP address
      * @return array
@@ -131,7 +188,7 @@ class GeolocationService
         try {
             // Use MaxMind GeoIP2 library
             if (class_exists('\MaxMind\Db\Reader')) {
-                $reader = new \MaxMind\Db\Reader($this->dbPath);
+                $reader = new \MaxMind\Db\Reader($this->cityDbPath);
                 $record = $reader->get($ip);
                 
                 if ($record && isset($record['country'])) {
@@ -149,7 +206,49 @@ class GeolocationService
     }
 
     /**
-     * Get country from online IP geolocation service (fallback)
+     * Get detailed location from online IP geolocation service (fallback)
+     * 
+     * @param string $ip
+     * @param array $defaultResult
+     * @return array
+     */
+    private function getLocationFromOnlineService($ip, $defaultResult)
+    {
+        try {
+            // Use free IP geolocation service with detailed location data
+            $service = "http://ip-api.com/json/{$ip}?fields=status,message,country,countryCode,region,regionName,city,timezone,lat,lon";
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 5,
+                    'user_agent' => 'Bishwo-Calculator/1.0'
+                ]
+            ]);
+            
+            $response = @file_get_contents($service, false, $context);
+            
+            if ($response) {
+                $data = json_decode($response, true);
+                
+                if ($data && $data['status'] === 'success') {
+                    $defaultResult['country'] = $data['country'] ?? $defaultResult['country'];
+                    $defaultResult['country_code'] = $data['countryCode'] ?? $defaultResult['country_code'];
+                    $defaultResult['region'] = $data['regionName'] ?? $defaultResult['region'];
+                    $defaultResult['city'] = $data['city'] ?? $defaultResult['city'];
+                    $defaultResult['timezone'] = $data['timezone'] ?? $defaultResult['timezone'];
+                    $defaultResult['latitude'] = $data['lat'] ?? $defaultResult['latitude'];
+                    $defaultResult['longitude'] = $data['lon'] ?? $defaultResult['longitude'];
+                    $defaultResult['detection_method'] = 'online_service';
+                }
+            }
+        } catch (Exception $e) {
+            error_log("Online geolocation service error: " . $e->getMessage());
+        }
+
+        return $defaultResult;
+    }
+
+    /**
+     * Get country from online IP geolocation service (fallback) - legacy
      * 
      * @param string $ip
      * @param array $defaultResult
@@ -261,9 +360,9 @@ class GeolocationService
     {
         return [
             'enabled' => $this->isEnabled,
-            'database_path' => $this->dbPath,
-            'database_exists' => file_exists($this->dbPath),
-            'geoip_extension' => extension_loaded('geoip'),
+            'city_database_path' => $this->cityDbPath,
+            'city_database_exists' => file_exists($this->cityDbPath),
+            'maxmind_reader_available' => class_exists('\MaxMind\Db\Reader'),
             'default_country' => $this->defaultCountry
         ];
     }

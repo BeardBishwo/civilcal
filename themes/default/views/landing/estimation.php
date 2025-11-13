@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Estimation Suite';
 $breadcrumb = [
-	['name' => 'Home', 'url' => app_base_url('index.php')],
+	['name' => 'Home', 'url' => app_base_url('/')],
 	['name' => 'Estimation', 'url' => '#']
 ];
 require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';

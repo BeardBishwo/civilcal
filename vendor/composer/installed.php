@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'aec-calculator/framework',
-        'pretty_version' => 'dev-master',
-        'version' => 'dev-master',
-        'reference' => 'a5f70ef049319881424bdc5008ae5cbfe02ad405',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '30c85991c9a13721c598683e0cd15a2365b0357d',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -20,9 +20,9 @@
             'dev_requirement' => false,
         ),
         'aec-calculator/framework' => array(
-            'pretty_version' => 'dev-master',
-            'version' => 'dev-master',
-            'reference' => 'a5f70ef049319881424bdc5008ae5cbfe02ad405',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '30c85991c9a13721c598683e0cd15a2365b0357d',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

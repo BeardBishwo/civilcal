@@ -60,6 +60,98 @@ $router->add('POST', '/profile/password', 'ProfileController@changePassword', ['
 $router->add('POST', '/profile/delete', 'ProfileController@deleteAccount', ['auth']);
 $router->add('GET', '/profile/avatar/{filename}', 'ProfileController@serveAvatar', ['auth']);
 
+// Authentication API Routes (for frontend AJAX)
+$router->add('POST', '/api/login', 'Api\AuthController@login');
+$router->add('POST', '/api/register', 'Api\AuthController@register');
+$router->add('POST', '/api/forgot-password', 'Api\AuthController@forgotPassword');
+$router->add('GET', '/api/logout', 'Api\AuthController@logout');
+$router->add('GET', '/api/user-status', 'Api\AuthController@userStatus');
+$router->add('GET', '/api/check-username', 'Api\AuthController@checkUsername');
+$router->add('POST', '/api/resend-verification', 'Api\AuthController@resendVerification');
+$router->add('GET', '/api/location', 'Api\LocationController@getLocation');
+$router->add('GET', '/api/location/status', 'Api\LocationController@getStatus');
+$router->add('GET', '/api/marketing/stats', 'Api\MarketingController@getStats', ['auth', 'admin']);
+$router->add('GET', '/api/marketing/opt-in-users', 'Api\MarketingController@getOptInUsers', ['auth', 'admin']);
+$router->add('POST', '/api/marketing/update-preferences', 'Api\MarketingController@updatePreferences', ['auth']);
+
+// Admin Dashboard Routes (WordPress-like admin system)
+$router->add('GET', '/admin', 'Admin\MainDashboardController@index', ['auth', 'admin']);
+$router->add('GET', '/admin/dashboard', 'Admin\MainDashboardController@index', ['auth', 'admin']);
+
+// Module Management
+$router->add('GET', '/admin/modules', 'Admin\MainDashboardController@modules', ['auth', 'admin']);
+$router->add('POST', '/admin/modules/activate', 'Admin\MainDashboardController@activateModule', ['auth', 'admin']);
+$router->add('POST', '/admin/modules/deactivate', 'Admin\MainDashboardController@deactivateModule', ['auth', 'admin']);
+$router->add('GET', '/admin/modules/{module}/settings', 'Admin\MainDashboardController@moduleSettings', ['auth', 'admin']);
+$router->add('POST', '/admin/modules/settings/update', 'Admin\MainDashboardController@updateModuleSettings', ['auth', 'admin']);
+
+// Advanced Admin Features
+$router->add('GET', '/admin/menu-customization', 'Admin\MainDashboardController@menuCustomization', ['auth', 'admin']);
+$router->add('GET', '/admin/widget-management', 'Admin\MainDashboardController@widgetManagement', ['auth', 'admin']);
+$router->add('GET', '/admin/system-status', 'Admin\MainDashboardController@systemStatus', ['auth', 'admin']);
+
+// User Management Module Routes
+$router->add('GET', '/admin/users', 'Admin\UserManagementController@index', ['auth', 'admin']);
+$router->add('GET', '/admin/users/create', 'Admin\UserManagementController@create', ['auth', 'admin']);
+$router->add('POST', '/admin/users/store', 'Admin\UserManagementController@store', ['auth', 'admin']);
+$router->add('GET', '/admin/users/{id}/edit', 'Admin\UserManagementController@edit', ['auth', 'admin']);
+$router->add('POST', '/admin/users/{id}/update', 'Admin\UserManagementController@update', ['auth', 'admin']);
+$router->add('POST', '/admin/users/{id}/delete', 'Admin\UserManagementController@delete', ['auth', 'admin']);
+$router->add('GET', '/admin/users/roles', 'Admin\UserManagementController@roles', ['auth', 'admin']);
+$router->add('GET', '/admin/users/permissions', 'Admin\UserManagementController@permissions', ['auth', 'admin']);
+$router->add('GET', '/admin/users/bulk', 'Admin\UserManagementController@bulk', ['auth', 'admin']);
+
+// Analytics Module Routes
+$router->add('GET', '/admin/analytics', 'Admin\AnalyticsController@overview', ['auth', 'admin']);
+$router->add('GET', '/admin/analytics/overview', 'Admin\AnalyticsController@overview', ['auth', 'admin']);
+$router->add('GET', '/admin/analytics/users', 'Admin\AnalyticsController@users', ['auth', 'admin']);
+$router->add('GET', '/admin/analytics/calculators', 'Admin\AnalyticsController@calculators', ['auth', 'admin']);
+$router->add('GET', '/admin/analytics/performance', 'Admin\AnalyticsController@performance', ['auth', 'admin']);
+$router->add('GET', '/admin/analytics/reports', 'Admin\AnalyticsController@reports', ['auth', 'admin']);
+
+// Content Management Module Routes
+$router->add('GET', '/admin/content', 'Admin\ContentController@index', ['auth', 'admin']);
+$router->add('GET', '/admin/content/pages', 'Admin\ContentController@pages', ['auth', 'admin']);
+$router->add('GET', '/admin/content/menus', 'Admin\ContentController@menus', ['auth', 'admin']);
+$router->add('GET', '/admin/content/media', 'Admin\ContentController@media', ['auth', 'admin']);
+
+// System Settings Module Routes
+$router->add('GET', '/admin/settings', 'Admin\SettingsController@general', ['auth', 'admin']);
+$router->add('GET', '/admin/settings/general', 'Admin\SettingsController@general', ['auth', 'admin']);
+$router->add('GET', '/admin/settings/email', 'Admin\SettingsController@email', ['auth', 'admin']);
+$router->add('GET', '/admin/settings/security', 'Admin\SettingsController@security', ['auth', 'admin']);
+$router->add('GET', '/admin/settings/backup', 'Admin\SettingsController@backup', ['auth', 'admin']);
+$router->add('GET', '/admin/settings/performance', 'Admin\SettingsController@performance', ['auth', 'admin']);
+$router->add('POST', '/admin/settings/update', 'Admin\SettingsController@update', ['auth', 'admin']);
+
+// Theme & Customization Routes
+$router->add('GET', '/admin/themes', 'Admin\ThemeController@index', ['auth', 'admin']);
+$router->add('GET', '/admin/themes/customize', 'Admin\ThemeController@customize', ['auth', 'admin']);
+$router->add('POST', '/admin/themes/activate', 'Admin\ThemeController@activate', ['auth', 'admin']);
+
+// Plugin System Routes
+$router->add('GET', '/admin/plugins', 'Admin\PluginController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/plugins/install', 'Admin\PluginController@install', ['auth', 'admin']);
+$router->add('POST', '/admin/plugins/activate', 'Admin\PluginController@activate', ['auth', 'admin']);
+$router->add('POST', '/admin/plugins/deactivate', 'Admin\PluginController@deactivate', ['auth', 'admin']);
+
+// Admin API Routes (RESTful admin operations)
+$router->add('GET', '/api/admin/dashboard/stats', 'Api\AdminController@getDashboardStats', ['auth', 'admin']);
+$router->add('GET', '/api/admin/modules', 'Api\AdminController@getModules', ['auth', 'admin']);
+$router->add('POST', '/api/admin/modules/toggle', 'Api\AdminController@toggleModule', ['auth', 'admin']);
+$router->add('GET', '/api/admin/system/health', 'Api\AdminController@getSystemHealth', ['auth', 'admin']);
+$router->add('POST', '/api/admin/backup/create', 'Api\AdminController@createBackup', ['auth', 'admin']);
+$router->add('GET', '/api/admin/activity', 'Api\AdminController@getUserActivity', ['auth', 'admin']);
+
+// Debug & Testing Routes
+$router->add('GET', '/admin/debug', 'Admin\DebugController@index', ['auth', 'admin']);
+$router->add('GET', '/admin/debug/error-logs', 'Admin\DebugController@errorLogs', ['auth', 'admin']);
+$router->add('GET', '/admin/debug/tests', 'Admin\DebugController@runTests', ['auth', 'admin']);
+$router->add('POST', '/admin/debug/run-tests', 'Admin\DebugController@runTests', ['auth', 'admin']);
+$router->add('GET', '/admin/debug/live-errors', 'Admin\DebugController@liveErrors', ['auth', 'admin']);
+$router->add('POST', '/admin/debug/live-errors', 'Admin\DebugController@liveErrors', ['auth', 'admin']);
+$router->add('POST', '/admin/debug/clear-logs', 'Admin\DebugController@clearLogs', ['auth', 'admin']);
+
 // API Routes (Enhanced)
 $router->add('POST', '/api/calculate', 'ApiController@calculate');
 $router->add('GET', '/api/calculators', 'ApiController@getCalculators');

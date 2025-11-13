@@ -196,7 +196,7 @@ $csrf_token = Security::generateCsrfToken();
             </div>
 
             <div class="form-actions">
-                <a href="forgot.php" class="btn btn-primary">
+                <a href="<?php echo app_base_url('forgot-password'); ?>" class="btn btn-primary">
                     <i class="fas fa-redo"></i>
                     Request New Reset Link
                 </a>

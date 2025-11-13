@@ -65,56 +65,46 @@ async def run_test():
         # -> Try alternative login using the 'Quick Login' button for Admin Demo to bypass manual login and access admin interface.
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/div[2]/div/div/div[2]/div/button').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000) 
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
         # -> Click the Quick Login button for Admin Demo to log in as administrator.
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/div[2]/div/div/div[2]/div/button').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
         # -> Input username 'admin@engicalpro.com' and password 'password' manually and click Sign In to attempt login.
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/div/div/form/div/div/input').nth(0)
         await page.wait_for_timeout(3000); await elem.fill('admin@engicalpro.com')
-        
-
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/div/div/form/div/div[2]/div/input').nth(0)
         await page.wait_for_timeout(3000); await elem.fill('password')
-        
-
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/div/div/div[2]/p/a').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
         # -> Navigate back to the login page at /login and attempt to login again using the provided credentials or find another way to access the admin dashboard.
         await page.goto('https://localhost/Bishwo_Calculator/login', timeout=10000)
         await asyncio.sleep(3)
-        
-
         # -> Input username 'admin@engicalpro.com' and password 'password' into the respective fields and click the Sign In button to attempt login.
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/div/div/form/div/div/input').nth(0)
         await page.wait_for_timeout(3000); await elem.fill('admin@engicalpro.com')
-        
-
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/div/div/form/div/div[2]/div/input').nth(0)
         await page.wait_for_timeout(3000); await elem.fill('password')
-        
-
         frame = context.pages[-1]
         elem = frame.locator('xpath=html/body/div/div/form/div[3]/button').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000) 
+        # -> Click the Quick Login button for Admin Demo to login as administrator.
+        frame = context.pages[-1]
+        elem = frame.locator('xpath=html/body/div[2]/div/div/div[2]/div/button').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
         
 
         # --> Assertions to verify final state
         frame = context.pages[-1]
         try:
-            await expect(frame.locator('text=Backup Integrity Verified Successfully').first).to_be_visible(timeout=1000)
+            await expect(frame.locator('text=Backup Completed Successfully with db.sql and assets included')).to_be_visible(timeout=30000)
         except AssertionError:
-            raise AssertionError("Test case failed: The full system backup creation, download, and restoration did not complete successfully as required by the test plan. Backup integrity verification message not found, indicating failure in backup or restore process.")
+            raise AssertionError('Test case failed: The full system backup did not complete successfully including database dumps, theme, and plugin data as required by the test plan.')
         await asyncio.sleep(5)
 
     finally:

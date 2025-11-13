@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Fire Protection Engineering Toolkit';
 $breadcrumb = [
-    ['name' => 'Home', 'url' => app_base_url('index.php')],
+    ['name' => 'Home', 'url' => app_base_url('/')],
     ['name' => 'Fire Protection Engineering', 'url' => '#']
 ];
 require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
