@@ -9,7 +9,7 @@ if (!isLoggedIn()) {
 }
 
 $pageTitle = "Drainage System Calculator - MEP Suite";
-include AEC_ROOT . '/includes/header.php';
+include AEC_ROOT . '/themes/default/views/partials/header.php';
 
 // Handle form submission
 $results = [];
@@ -854,4 +854,5 @@ function checkCodeCompliance($buildingType, $systemType, $sanitaryDiameter, $ven
 }
 </style>
 
-<?php include AEC_ROOT . '/includes/footer.php'; ?>
+<?php include AEC_ROOT . '/themes/default/views/partials/footer.php'; ?>
+

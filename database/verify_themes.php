@@ -4,7 +4,7 @@
  * Checks if ProCalculator theme is registered
  */
 
-require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../app/Config/config.php';
 
 try {
     // Connect to database

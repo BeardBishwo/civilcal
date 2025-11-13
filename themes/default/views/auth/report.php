@@ -1,4 +1,4 @@
-<?php require_once dirname(__DIR__, 4) . '/includes/header.php'; ?>
+<?php require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php'; ?>
 
 <div class="container py-4">
     <div class="app-header">
@@ -56,4 +56,5 @@ document.getElementById('reportForm').addEventListener('submit', async function(
 });
 </script>
 
-<?php require_once dirname(__DIR__, 4) . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__, 4) . '/themes/default/views/partials/footer.php'; ?>
+

@@ -90,7 +90,7 @@ try {
 
 // Test 4: Test legacy Database class
 echo "\n4. Testing legacy Database class...\n";
-require_once __DIR__ . '/includes/Database.php';
+require_once __DIR__ . '/app/Core/DatabaseLegacy.php';
 try {
     $legacyDb = new Database();
     $conn = $legacyDb->getConnection();
@@ -118,3 +118,6 @@ echo "\n=== Configuration Verification Complete ===\n";
 echo "If all tests passed, your database configuration is working properly.\n";
 echo "You can now run the installation process.\n";
 ?>
+
+
+

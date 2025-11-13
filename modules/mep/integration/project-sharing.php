@@ -465,12 +465,12 @@ if (isset($_POST['action'])) {
     
     try {
         // Initialize database connection
-        require_once '../../includes/db.php';
+        require_once '../../../app/Config/db.php';
         $database = new Database();
         $db = $database->getConnection();
         
         // Initialize config
-        require_once '../../../includes/config.php';
+        require_once '../../../app/Config/config.php';
         $config = new Config();
         
         // Initialize logger

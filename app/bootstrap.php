@@ -28,7 +28,7 @@ spl_autoload_register(function ($class) {
 
 // Load configuration
 $appConfig = require_once CONFIG_PATH . '/app.php';
-$dbConfig = require_once CONFIG_PATH . '/database.php';
+$dbConfig = require_once BASE_PATH . '/app/Config/config.php';
 
 // Define debug constant (config holds under 'app' key)
 $__debug = $appConfig['app']['debug'] ?? true;

@@ -292,3 +292,5 @@ echo "<p>Check the results above to identify the issue causing the HTTP 500 erro
 echo "<p>Review any ✗ marked items as these indicate potential problems.</p>";
 echo "<p>Emergency log saved to: debug/emergency_diagnostic.log</p>";
 ?>
+
+

@@ -10,7 +10,7 @@
  * @version 1.0.0
  */
 
-require_once dirname(__DIR__, 2) . '/includes/db.php';
+require_once dirname(__DIR__, 2) . '/app/Config/db.php';
 
 try {
     $pdo = get_db();
@@ -218,3 +218,4 @@ try {
     echo "❌ Migration failed: " . $e->getMessage() . "\n";
     exit(1);
 }
+

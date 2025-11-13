@@ -2,9 +2,9 @@
 // MEP Cost Optimization Engine
 // Advanced cost optimization algorithms and recommendations for MEP projects
 
-require_once '../../../../includes/config.php';
-require_once '../../../../includes/Database.php';
-require_once '../../../../includes/functions.php';
+require_once '../../../app/Config/config.php';
+require_once '../../../../app/Core/DatabaseLegacy.php';
+require_once '../../../../app/Helpers/functions.php';
 
 // Initialize database connection
 $db = new Database();
@@ -1061,3 +1061,5 @@ $recommendations = $_SESSION['cost_recommendations'] ?? null;
     </script>
 </body>
 </html>
+
+

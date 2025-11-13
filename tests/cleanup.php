@@ -229,8 +229,8 @@ function backupInstallationFiles() {
     
     $fileList = [
         'index.php' => file_get_contents($installDir . '/index.php'),
-        'includes/Installer.php' => file_get_contents($installDir . '/includes/Installer.php'),
-        'includes/Requirements.php' => file_get_contents($installDir . '/includes/Requirements.php')
+        'install/includes/Installer.php' => file_get_contents($installDir . '/includes/Installer.php'),
+        'install/includes/Requirements.php' => file_get_contents($installDir . '/includes/Requirements.php')
     ];
     
     $backupContent = "Bishwo Calculator Installation Backup\n";
@@ -351,3 +351,5 @@ function updateVersionFile() {
     </div>
 </body>
 </html>
+
+

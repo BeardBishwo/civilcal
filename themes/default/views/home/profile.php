@@ -1,5 +1,5 @@
 <?php
-require_once 'includes/functions.php';
+require_once dirname(__DIR__, 4) . '/app/Helpers/functions.php';
 init_secure_session();
 
 $page_title = "User Profile";
@@ -10,7 +10,7 @@ if (empty($_SESSION['user_id'])) {
     exit;
 }
 
-require_once 'includes/header.php';
+require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
 
 // Reconstruct user array from session for compatibility
 $user = [
@@ -57,5 +57,7 @@ $profile_pic = app_base_url('assets/images/profile.png'); // Default profile pic
 </div>
 
 <?php
-require_once 'includes/footer.php';
+require_once dirname(__DIR__, 4) . '/themes/default/views/partials/footer.php';
 ?>
+
+

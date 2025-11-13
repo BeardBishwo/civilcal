@@ -175,3 +175,5 @@ file_put_contents($reportFile, $reportContent);
 echo "\n📄 Report saved to: structurereport.md\n";
 echo "\n🎉 Clean structure generation complete!\n";
 ?>
+
+

@@ -5,7 +5,7 @@
  * Includes generator sizing, UPS calculations, and code compliance
  */
 
-require_once '../../../includes/config.php';
+require_once '../../../app/Config/config.php';
 
 // Get system parameters
 $totalConnectedLoad = filter_input(INPUT_POST, 'total_connected_load', FILTER_VALIDATE_FLOAT);
@@ -325,7 +325,7 @@ function generateEmergencyPowerRecommendations($capacity, $essential, $complianc
     return $recommendations;
 }
 
-include '../../../includes/header.php';
+include '../../../themes/default/views/partials/header.php';
 ?>
 
 <div class="container">
@@ -725,4 +725,5 @@ include '../../../includes/header.php';
 }
 </style>
 
-<?php include '../../../includes/footer.php'; ?>
+<?php include '../../../themes/default/views/partials/footer.php'; ?>
+

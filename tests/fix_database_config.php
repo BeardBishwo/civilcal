@@ -127,3 +127,5 @@ echo "<a href='install/index.php'>📋 Run Installation</a> | ";
 echo "<a href='public/index.php'>🚀 Main Application</a>";
 echo "</p>";
 ?>
+
+

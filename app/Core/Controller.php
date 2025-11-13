@@ -10,8 +10,9 @@ class Controller {
     
     public function __construct() {
         // Load configuration first
-        require_once __DIR__ . '/../../includes/config.php';
-        require_once __DIR__ . '/../../includes/db.php';
+        require_once __DIR__ . '/../Config/config.php';
+        require_once __DIR__ . '/../Config/db.php';
+        require_once __DIR__ . '/../Helpers/functions.php';
         
         // Initialize session if not already started
         if (session_status() === PHP_SESSION_NONE) {
@@ -21,17 +22,25 @@ class Controller {
         // Initialize database connection using global function
         $this->db = get_db();
         
-        // Initialize authentication
-        $this->auth = new Auth();
+        // Initialize authentication (if Auth class exists)
+        if (class_exists('Auth')) {
+            $this->auth = new Auth();
+        }
         
-        // Initialize theme manager
-        $this->initTheme();
+        // Initialize theme manager (if method exists)
+        if (method_exists($this, 'initTheme')) {
+            $this->initTheme();
+        }
         
-        // Initialize view with theme support
-        $this->view = new View();
+        // Initialize view (if View class exists)
+        if (class_exists('View')) {
+            $this->view = new View();
+        }
         
-        // Initialize session
-        $this->session = new Session();
+        // Initialize session (if Session class exists)
+        if (class_exists('Session')) {
+            $this->session = new Session();
+        }
     }
 
 

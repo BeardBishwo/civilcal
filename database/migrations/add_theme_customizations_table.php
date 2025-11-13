@@ -8,7 +8,7 @@
  * @author Bishwo Calculator Team
  */
 
-require_once __DIR__ . '/../../includes/config.php';
+require_once __DIR__ . '/../../app/Config/config.php';
 
 class AddThemeCustomizationsTable
 {
@@ -85,3 +85,4 @@ if (php_sapi_name() === 'cli') {
     echo json_encode($result) . PHP_EOL;
 }
 ?>
+

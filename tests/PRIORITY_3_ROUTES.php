@@ -17,3 +17,5 @@ $router->get('/admin/themes/:id/preview', 'Admin\ThemeCustomizeController@previe
 $router->post('/admin/themes/:id/reset', 'Admin\ThemeCustomizeController@reset');
 
 ?>
+
+

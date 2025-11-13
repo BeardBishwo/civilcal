@@ -1,7 +1,7 @@
 <?php
 // index.php - Homepage with 3D animated calculator tools
-//require_once 'includes/functions.php';
-//require_once 'includes/header.php';
+//require_once 'app/Helpers/functions.php';
+//require_once 'themes/default/views/partials/header.php';
 //$settings = get_site_settings();
 //$meta = get_site_meta();
 ?>
@@ -679,5 +679,8 @@
 </script>
 
 <?php
-require_once 'includes/footer.php';
+require_once 'themes/default/views/partials/footer.php';
 ?>
+
+
+

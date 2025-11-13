@@ -1,7 +1,7 @@
 <?php
 $base = defined('APP_BASE') ? rtrim(APP_BASE, '/') : '/aec-calculator';
 require_once rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $base . '/modules/mep/bootstrap.php';
-include AEC_ROOT . '/includes/header.php';
+include AEC_ROOT . '/themes/default/views/partials/header.php';
 ?>
 
 <div class="container-fluid">
@@ -243,4 +243,4 @@ document.getElementById('calculateBtn').addEventListener('click', function() {
 });
 </script>
 
-<?php include AEC_ROOT . '/includes/footer.php'; ?>
+<?php include AEC_ROOT . '/themes/default/views/partials/footer.php'; ?>

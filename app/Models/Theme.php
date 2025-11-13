@@ -22,8 +22,8 @@ class Theme
     public function __construct()
     {
         // Include the database configuration
-        require_once __DIR__ . '/../../includes/config.php';
-        require_once __DIR__ . '/../../includes/db.php';
+        require_once __DIR__ . '/../Config/config.php';
+        require_once __DIR__ . '/../Config/db.php';
         
         // Get database connection using the global get_db() function
         $this->db = get_db();

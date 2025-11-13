@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../../includes/header.php';
+require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
 ?>
 
 <div class="container py-4">
@@ -511,11 +511,11 @@ function saveRecentCalculation(name, data) {
 }
 </script>
 
-<?php require_once __DIR__ . '/../../../includes/footer.php'; ?>
+<?php require_once __DIR__ . '/../../../themes/default/views/partials/footer.php'; ?>
 
 <style>
 .calculator-form { background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px; }
 .result-card { background: var(--success-color); color: white; padding: 1rem; border-radius: 8px; }
 </style>
 
-<?php require_once __DIR__ . '/../../../includes/footer.php'; ?>
+<?php require_once __DIR__ . '/../../../themes/default/views/partials/footer.php'; ?>

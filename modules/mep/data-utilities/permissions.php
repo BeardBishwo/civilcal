@@ -1,6 +1,6 @@
 <?php
-require_once '../../../../includes/config.php';
-require_once '../../../includes/Security.php';
+require_once '../../../app/Config/config.php';
+require_once '../../../app/Services/Security.php';
 
 class MEPPermissions {
     private $db;
@@ -915,3 +915,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>
 </body>
 </html>
+

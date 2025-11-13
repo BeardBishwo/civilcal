@@ -614,7 +614,7 @@ function getCategories() {
     </style>
 </head>
 <body>
-    <?php include AEC_ROOT . '/includes/header.php'; ?>
+    <?php include AEC_ROOT . '/themes/default/views/partials/header.php'; ?>
     
     <div class="converter-container">
         <div class="page-header">
@@ -774,7 +774,7 @@ function getCategories() {
         </div>
     </div>
     
-    <?php include AEC_ROOT . '/includes/footer.php'; ?>
+    <?php include AEC_ROOT . '/themes/default/views/partials/footer.php'; ?>
     
     <script>
         let currentCategory = 'length';
@@ -980,3 +980,4 @@ function getCategories() {
     </script>
 </body>
 </html>
+

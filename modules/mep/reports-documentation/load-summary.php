@@ -5,9 +5,9 @@
  * Includes heating, cooling, electrical, and plumbing load calculations
  */
 
-require_once '../../../includes/config.php';
-require_once '../../../includes/Database.php';
-require_once '../../../includes/functions.php';
+require_once '../../../app/Config/config.php';
+require_once '../../../app/Core/DatabaseLegacy.php';
+require_once '../../../app/Helpers/functions.php';
 
 // Initialize database connection
 $db = new Database();
@@ -745,7 +745,7 @@ function exportLoadData($data) {
     </style>
 </head>
 <body>
-    <?php include '../../../includes/header.php'; ?>
+    <?php include '../../../themes/default/views/partials/header.php'; ?>
     
     <div class="load-container">
         <div class="page-header">
@@ -847,7 +847,7 @@ function exportLoadData($data) {
         </div>
     </div>
     
-    <?php include '../../../includes/footer.php'; ?>
+    <?php include '../../../themes/default/views/partials/footer.php'; ?>
     
     <script>
         function calculateLoads() {
@@ -1069,3 +1069,6 @@ function exportLoadData($data) {
     </script>
 </body>
 </html>
+
+
+

@@ -1,12 +1,12 @@
 <?php
 $page_title = 'Sign In - EngiCal Pro';
-require_once dirname(__DIR__, 4) . '/includes/functions.php';
+require_once dirname(__DIR__, 4) . '/app/Helpers/functions.php';
 
 // Start session early to ensure CSRF token availability
 init_secure_session();
 
 // Minimal security setup without full header
-require_once dirname(__DIR__, 4) . '/includes/Security.php';
+require_once dirname(__DIR__, 4) . '/app/Services/Security.php';
 $csrf_token = Security::generateCsrfToken();
 ?>
 <!DOCTYPE html>
@@ -767,3 +767,6 @@ async function handleLoginSubmission(e) {
 
 </body>
 </html>
+
+
+

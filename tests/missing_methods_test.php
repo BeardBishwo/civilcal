@@ -3,8 +3,8 @@
  * Test for missing methods in ThemeManager
  */
 
-require_once __DIR__ . '/../includes/config.php';
-require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../app/Config/config.php';
+require_once __DIR__ . '/../app/Config/db.php';
 require_once __DIR__ . '/../app/bootstrap.php';
 
 try {
@@ -38,3 +38,5 @@ try {
     echo "✗ Error: " . $e->getMessage() . "\n";
 }
 ?>
+
+

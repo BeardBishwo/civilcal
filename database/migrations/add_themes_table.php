@@ -9,7 +9,7 @@
  */
 
 // Include configuration to access database constants
-require_once __DIR__ . '/../../includes/config.php';
+require_once __DIR__ . '/../../app/Config/config.php';
 
 class AddThemesTable
 {
@@ -191,3 +191,4 @@ if (php_sapi_name() === 'cli' || basename($_SERVER['PHP_SELF']) === basename(__F
     $result = $migration->up();
     echo json_encode($result, JSON_PRETTY_PRINT);
 }
+

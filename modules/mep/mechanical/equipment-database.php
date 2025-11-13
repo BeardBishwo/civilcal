@@ -126,7 +126,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'compare') {
     </style>
 </head>
 <body>
-    <?php include AEC_ROOT . '/includes/header.php'; ?>
+    <?php include AEC_ROOT . '/themes/default/views/partials/header.php'; ?>
     
     <div class="container">
         <h1>HVAC Equipment Database</h1>
@@ -322,3 +322,4 @@ if (isset($_POST['action']) && $_POST['action'] === 'compare') {
     </script>
 </body>
 </html>
+

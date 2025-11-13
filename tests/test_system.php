@@ -41,3 +41,5 @@ echo "<p><a href='install/index.php'>🔧 Installation</a> | ";
 echo "<a href='install_test_installation.php'>🔍 System Test</a> | ";
 echo "<a href='simple_db_test.php'>💾 Database Test</a></p>";
 ?>
+
+

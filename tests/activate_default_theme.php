@@ -3,8 +3,8 @@
 define('BASE_PATH', __DIR__);
 define('APP_PATH', BASE_PATH . '/app');
 
-require_once 'includes/config.php';
-require_once 'includes/db.php';
+require_once 'app/Config/config.php';
+require_once 'app/Config/db.php';
 require_once 'app/Models/Theme.php';
 
 // Get the default theme
@@ -25,3 +25,4 @@ if ($defaultTheme) {
 } else {
     echo "Default theme not found in database.\n";
 }
+

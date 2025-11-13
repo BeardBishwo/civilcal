@@ -3,8 +3,8 @@
 define('BASE_PATH', __DIR__);
 define('APP_PATH', BASE_PATH . '/app');
 
-require_once 'includes/config.php';
-require_once 'includes/db.php';
+require_once 'app/Config/config.php';
+require_once 'app/Config/db.php';
 
 $db = get_db();
 
@@ -29,3 +29,4 @@ if ($activeTheme) {
 } else {
     echo "No active theme found\n";
 }
+

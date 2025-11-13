@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Reset Password - EngiCal Pro';
-require_once dirname(__DIR__, 4) . '/includes/header.php';
-require_once dirname(__DIR__, 4) . '/includes/Security.php';
+require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
+require_once dirname(__DIR__, 4) . '/app/Services/Security.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -792,5 +792,8 @@ async function handleResetSubmission(e) {
 </script>
 
 <?php
-require_once dirname(__DIR__, 4) . '/includes/footer.php';
+require_once dirname(__DIR__, 4) . '/themes/default/views/partials/footer.php';
 ?>
+
+
+

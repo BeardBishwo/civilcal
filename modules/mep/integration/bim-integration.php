@@ -1,5 +1,5 @@
 <?php
-require_once '../../../../includes/config.php';
+require_once '../../../app/Config/config.php';
 
 class BIMIntegration {
     private $db;

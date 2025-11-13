@@ -64,8 +64,8 @@ echo "\n";
 // Test 4: Database connection test
 echo "<h2>✅ Test 4: Database Connection Test</h2>\n";
 try {
-    if (file_exists('includes/Database.php')) {
-        require_once 'includes/Database.php';
+    if (file_exists('app/Core/DatabaseLegacy.php')) {
+        require_once 'app/Core/DatabaseLegacy.php';
         $db = new Database();
         if ($db->testConnection()) {
             echo "✅ Database connection successful\n";
@@ -98,3 +98,6 @@ echo "<li>Verify the premium ProCalculator theme is loading correctly</li>\n";
 echo "</ol>\n";
 
 ?>
+
+
+

@@ -73,3 +73,4 @@ function load_theme_js($filename, $defer = false) {
 }
 
 ?>
+

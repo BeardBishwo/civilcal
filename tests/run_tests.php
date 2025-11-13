@@ -382,3 +382,5 @@ class TestSuite
 // Run the test suite
 $testSuite = new TestSuite();
 $testSuite->runAllTests();
+
+

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../../../includes/Database.php';
+require_once '../../../app/Core/DatabaseLegacy.php';
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../../login.php');
@@ -316,7 +316,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include '../../../includes/header.php';
+include '../../../themes/default/views/partials/header.php';
 ?>
 
 <div class="container-fluid">
@@ -832,4 +832,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<?php include '../../../includes/footer.php'; ?>
+<?php include '../../../themes/default/views/partials/footer.php'; ?>
+
+

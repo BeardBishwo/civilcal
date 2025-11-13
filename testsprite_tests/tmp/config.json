@@ -8,5 +8,9 @@
     "envs": {
       "API_KEY": "sk-user-5O4tgUViz7LhNMacDTD43BoH2Fczea6DDU-FNks6GEocgTd1o_Bjpt62kFbJDqfLB1vPU_1DHH8jmq0sTbDtZ0PPGM4dnQFlL0NV6skpC3eNpKwjRmGhOvCv7ygLA_l7_DM"
     }
-  }
+  },
+  "scope": "codebase",
+  "type": "frontend",
+  "localEndpoint": "http://localhost:80/bishwo_calculator",
+  "serverPort": 49765
 }

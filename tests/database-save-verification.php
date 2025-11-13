@@ -15,7 +15,7 @@ $requiredFiles = [
     '../config/database.php' => 'Database configuration',
     '../app/Core/Database.php' => 'Database class',
     '../database/migrations/001_create_users_table.php' => 'User migration',
-    'includes/Installer.php' => 'Installer class'
+    '../install/includes/Installer.php' => 'Installer class'
 ];
 
 echo "1. Checking required files...\n";
@@ -266,3 +266,5 @@ function generateEnvFile() {
     return $content;
 }
 ?>
+
+

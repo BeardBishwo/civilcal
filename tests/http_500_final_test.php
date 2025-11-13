@@ -8,8 +8,8 @@ echo "=== Testing HTTP 500 Error Resolution ===\n";
 try {
     // Test 1: Load configuration
     echo "1. Testing configuration loading...\n";
-    require_once __DIR__ . '/../includes/config.php';
-    require_once __DIR__ . '/../includes/db.php';
+    require_once __DIR__ . '/../app/Config/config.php';
+    require_once __DIR__ . '/../app/Config/db.php';
     echo "   ✓ Configuration loaded\n";
     
     // Test 2: Database connection
@@ -95,3 +95,5 @@ try {
     echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
 }
 ?>
+
+

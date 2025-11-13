@@ -4,7 +4,7 @@ $breadcrumb = [
     ['name' => 'Home', 'url' => app_base_url('index.php')],
     ['name' => 'Site Development Engineering', 'url' => '#']
 ];
-require_once dirname(__DIR__, 4) . '/includes/header.php';
+require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
 ?>
 
 <?php load_theme_css('site.css'); ?>
@@ -167,5 +167,6 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <?php
-require_once dirname(__DIR__, 4) . '/includes/footer.php';
+require_once dirname(__DIR__, 4) . '/themes/default/views/partials/footer.php';
 ?>
+

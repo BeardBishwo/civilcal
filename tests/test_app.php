@@ -32,3 +32,5 @@ if (file_exists($logFile)) {
     echo "<p>No error log found.</p>";
 }
 ?>
+
+

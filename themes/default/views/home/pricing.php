@@ -1,4 +1,4 @@
-<?php require_once 'includes/header.php'; ?>
+<?php require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php'; ?>
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8 text-center">
@@ -22,13 +22,13 @@
 
 <?php
 // Pass PayPal client ID to the client side (use config value)
-require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/../../../../app/Config/config.php';
 $paypalClientId = defined('PAYPAL_CLIENT_ID') ? PAYPAL_CLIENT_ID : '';
 $mode = defined('PAYPAL_MODE') ? PAYPAL_MODE : 'sandbox';
 ?>
 
 <?php if (!$paypalClientId): ?>
-    <div class="container"><div class="alert alert-warning">PayPal is not configured. Set PAYPAL_CLIENT_ID and PAYPAL_SECRET in <code>includes/config.php</code>.</div></div>
+    <div class="container"><div class="alert alert-warning">PayPal is not configured. Set PAYPAL_CLIENT_ID and PAYPAL_SECRET in <code>app/Config/config.php</code>.</div></div>
 <?php endif; ?>
 
 <script src="https://www.paypal.com/sdk/js?client-id=<?php echo htmlspecialchars($paypalClientId); ?>&currency=USD<?php echo $mode==='sandbox' ? '&intent=capture' : ''; ?>"></script>
@@ -61,4 +61,6 @@ $mode = defined('PAYPAL_MODE') ? PAYPAL_MODE : 'sandbox';
     }).render('#paypal-button-container');
 </script>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php require_once dirname(__DIR__, 4) . '/themes/default/views/partials/footer.php'; ?>
+
+

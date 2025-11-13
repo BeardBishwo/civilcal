@@ -5,9 +5,9 @@
  * Generates detailed equipment lists with specifications and schedules
  */
 
-require_once '../../../includes/config.php';
-require_once '../../../includes/Database.php';
-require_once '../../../includes/functions.php';
+require_once '../../../app/Config/config.php';
+require_once '../../../app/Core/DatabaseLegacy.php';
+require_once '../../../app/Helpers/functions.php';
 
 // Initialize database connection
 $db = new Database();
@@ -1184,7 +1184,7 @@ function exportEquipmentSchedule($data) {
     </style>
 </head>
 <body>
-    <?php include '../../../includes/header.php'; ?>
+    <?php include '../../../themes/default/views/partials/header.php'; ?>
     
     <div class="equipment-container">
         <div class="page-header">
@@ -1263,7 +1263,7 @@ function exportEquipmentSchedule($data) {
         </div>
     </div>
     
-    <?php include '../../../includes/footer.php'; ?>
+    <?php include '../../../themes/default/views/partials/footer.php'; ?>
     
     <script>
         function generateSchedule() {
@@ -1457,3 +1457,6 @@ function exportEquipmentSchedule($data) {
     </script>
 </body>
 </html>
+
+
+

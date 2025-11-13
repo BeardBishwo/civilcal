@@ -9,7 +9,7 @@ if (!isLoggedIn()) {
 }
 
 $pageTitle = "Water Tank Sizing Calculator - MEP Suite";
-include AEC_ROOT . '/includes/header.php';
+include AEC_ROOT . '/themes/default/views/partials/header.php';
 
 // Handle form submission
 $results = [];
@@ -1065,4 +1065,5 @@ function generateMaintenanceSchedule($tankType, $buildingType) {
 }
 </style>
 
-<?php include AEC_ROOT . '/includes/footer.php'; ?>
+<?php include AEC_ROOT . '/themes/default/views/partials/footer.php'; ?>
+

@@ -72,3 +72,5 @@ echo "<br>";
 echo "<a href='install_test_installation.php'>Back to Debug Tool</a> | ";
 echo "<a href='public/index.php'>Try Application</a>";
 ?>
+
+

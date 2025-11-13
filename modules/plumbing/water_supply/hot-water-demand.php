@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../../includes/header.php';
+require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
 ?>
 
 <div class="container py-4">
@@ -584,4 +584,5 @@ function saveRecentCalculation(name, data) {
 }
 </script>
 
-<?php require_once __DIR__ . '/../../../includes/footer.php'; ?>
+<?php require_once __DIR__ . '/../../../themes/default/views/partials/footer.php'; ?>
+

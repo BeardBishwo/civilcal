@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../../includes/header.php';
+require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
 ?>
 
 <div class="container py-4">
@@ -9,4 +9,5 @@ require_once __DIR__ . '/../../../includes/header.php';
     <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/plumbing/index.php') : '../modules/plumbing/index.php'; ?>" class="btn btn-outline-light">Back</a>
 </div>
 
-<?php require_once __DIR__ . '/../../../includes/footer.php'; ?>
+<?php require_once __DIR__ . '/../../../themes/default/views/partials/footer.php'; ?>
+

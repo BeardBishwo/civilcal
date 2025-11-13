@@ -9,8 +9,8 @@
 echo "=== Testing Database Configuration ===\n";
 
 try {
-    require_once __DIR__ . '/../includes/config.php';
-    require_once __DIR__ . '/../includes/db.php';
+    require_once __DIR__ . '/../app/Config/config.php';
+    require_once __DIR__ . '/../app/Config/db.php';
     
     $db = get_db();
     if ($db) {
@@ -101,3 +101,5 @@ echo "\n=== Test Summary ===\n";
 echo "If all tests show ✓, the HTTP 500 error should be resolved.\n";
 echo "Check error logs in debug/logs/ if any issues remain.\n";
 ?>
+
+

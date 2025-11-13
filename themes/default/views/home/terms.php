@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/includes/header.php';
-require_once __DIR__ . '/includes/ComplianceConfig.php';
+require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
+require_once dirname(__DIR__, 4) . '/app/Config/ComplianceConfig.php';
 ?>
 
 <div class="container my-5">
@@ -87,4 +87,6 @@ require_once __DIR__ . '/includes/ComplianceConfig.php';
     </section>
 </div>
 
-<?php require_once __DIR__ . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__, 4) . '/themes/default/views/partials/footer.php'; ?>
+
+

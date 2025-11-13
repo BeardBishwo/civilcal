@@ -276,7 +276,7 @@ function testSecurityConfig() {
         $configFiles = [
             'config/app.php',
             'config/database.php',
-            'includes/config.php'
+            'app/Config/config.php'
         ];
         
         foreach ($configFiles as $file) {
@@ -320,3 +320,5 @@ testSecurityConfig();
 echo "=== COMPREHENSIVE TESTING COMPLETE ===\n";
 echo "Status: ALL SYSTEMS TESTED\n";
 ?>
+
+

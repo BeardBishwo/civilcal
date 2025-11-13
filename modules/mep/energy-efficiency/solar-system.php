@@ -5,9 +5,9 @@
  * Solar panel sizing, energy generation, financial analysis, and system integration
  */
 
-require_once '../../../includes/config.php';
-require_once '../../../includes/Database.php';
-require_once '../../../includes/functions.php';
+require_once '../../../app/Config/config.php';
+require_once '../../../app/Core/DatabaseLegacy.php';
+require_once '../../../app/Helpers/functions.php';
 
 // Initialize database connection
 $db = new Database();
@@ -973,7 +973,7 @@ function saveSolarProject($data, $project_id) {
     </style>
 </head>
 <body>
-    <?php include '../../../includes/header.php'; ?>
+    <?php include '../../../themes/default/views/partials/header.php'; ?>
     
     <div class="solar-container">
         <div class="page-header">
@@ -1117,7 +1117,7 @@ function saveSolarProject($data, $project_id) {
         </div>
     </div>
     
-    <?php include '../../../includes/footer.php'; ?>
+    <?php include '../../../themes/default/views/partials/footer.php'; ?>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -1352,3 +1352,6 @@ function saveSolarProject($data, $project_id) {
     </script>
 </body>
 </html>
+
+
+

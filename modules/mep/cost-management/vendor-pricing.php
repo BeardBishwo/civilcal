@@ -7,8 +7,8 @@
  */
 
 session_start();
-require_once '../../../includes/Database.php';
-require_once '../../../includes/functions.php';
+require_once '../../../app/Core/DatabaseLegacy.php';
+require_once '../../../app/Helpers/functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -1556,3 +1556,5 @@ function searchMaterials($query, $db) {
     </script>
 </body>
 </html>
+
+

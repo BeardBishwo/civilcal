@@ -4,8 +4,8 @@
  * Executes database migrations to update the schema
  */
 
-require_once '../includes/config.php';
-require_once '../includes/Database.php';
+require_once '../app/Config/config.php';
+require_once '../app/Core/DatabaseLegacy.php';
 
 try {
     echo "Starting database migration...\n";
@@ -108,3 +108,4 @@ try {
     exit(1);
 }
 ?>
+

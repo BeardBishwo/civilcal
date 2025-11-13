@@ -108,3 +108,5 @@ echo "✅ Multi-Currency: ₹ (India), रू (Nepal), $ (International)\n";
 echo "✅ Security: Signature verification implemented\n";
 echo "\n🎉 Payment Integration System is OPERATIONAL!\n";
 echo "Run the full test suite with: php tests/payment_system_test.php\n";
+
+

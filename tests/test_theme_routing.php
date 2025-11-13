@@ -1,6 +1,6 @@
 <?php
 // Test to verify theme routing is working correctly
-require_once 'includes/config.php';
+require_once 'app/Config/config.php';
 
 // Simulate the view rendering process
 $viewPath = BASE_PATH . '/themes/default/views/home/index.php';
@@ -42,3 +42,5 @@ echo "2. View class looks for: themes/default/views/home/index.php\n";
 echo "3. If found, renders premium design\n";
 echo "4. If not found, would fall back to public/index.php\n";
 ?>
+
+

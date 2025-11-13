@@ -9,3 +9,5 @@ echo "renderView: " . (method_exists($themeManager, 'renderView') ? "EXISTS" : "
 echo "loadCategoryStyle: " . (method_exists($themeManager, 'loadCategoryStyle') ? "EXISTS" : "MISSING") . "\n";
 echo "setTheme: " . (method_exists($themeManager, 'setTheme') ? "EXISTS" : "MISSING") . "\n";
 ?>
+
+

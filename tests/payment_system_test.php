@@ -447,7 +447,7 @@ class PaymentSystemTestSuite
     {
         // Test Security Constants
         $this->runTest('Security Constants', function() {
-            if (file_exists('includes/SecurityConstants.php')) {
+            if (file_exists('../app/Services/Security.php')) {
                 return ['status' => 'pass', 'details' => 'Security constants file exists'];
             } else {
                 return ['status' => 'warning', 'details' => 'Security constants file not found'];
@@ -456,7 +456,7 @@ class PaymentSystemTestSuite
 
         // Test CSRF Protection
         $this->runTest('CSRF Protection Setup', function() {
-            $securityFile = 'includes/Security.php';
+            $securityFile = 'app/Services/Security.php';
             if (file_exists($securityFile)) {
                 $content = file_get_contents($securityFile);
                 if (strpos($content, 'CSRF') !== false || strpos($content, 'csrf') !== false) {
@@ -571,3 +571,6 @@ class PaymentSystemTestSuite
 // Run the payment system test suite
 $paymentTestSuite = new PaymentSystemTestSuite();
 $paymentTestSuite->runAllTests();
+
+
+

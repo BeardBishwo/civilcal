@@ -46,3 +46,5 @@ echo "HTTP_HOST: " . ($_SERVER['HTTP_HOST'] ?? 'unknown') . "\n";
 echo "DOCUMENT_ROOT: " . ($_SERVER['DOCUMENT_ROOT'] ?? 'unknown') . "\n";
 echo "SCRIPT_NAME: " . ($_SERVER['SCRIPT_NAME'] ?? 'unknown') . "\n";
 ?>
+
+

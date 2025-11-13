@@ -1,6 +1,6 @@
 <?php
-require_once '../../../includes/config.php';
-require_once '../../../includes/header.php';
+require_once '../../../app/Config/config.php';
+require_once '../../../themes/default/views/partials/header.php';
 ?>
 
 <div class="container-fluid">
@@ -326,4 +326,5 @@ function updateLoadSummary() {
 }
 </script>
 
-<?php require_once '../../../includes/footer.php'; ?>
+<?php require_once '../../../themes/default/views/partials/footer.php'; ?>
+

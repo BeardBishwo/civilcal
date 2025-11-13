@@ -5,7 +5,7 @@
  * Includes soil resistivity, electrode sizing, and safety calculations
  */
 
-require_once '../../../includes/config.php';
+require_once '../../../app/Config/config.php';
 
 // Get system parameters
 $systemVoltage = filter_input(INPUT_POST, 'system_voltage', FILTER_VALIDATE_FLOAT);
@@ -398,7 +398,7 @@ function generateEarthingRecommendations($actual, $required, $touchCompliant, $s
     return $recommendations;
 }
 
-include '../../../includes/header.php';
+include '../../../themes/default/views/partials/header.php';
 ?>
 
 <div class="container">
@@ -752,4 +752,5 @@ include '../../../includes/header.php';
 }
 </style>
 
-<?php include '../../../includes/footer.php'; ?>
+<?php include '../../../themes/default/views/partials/footer.php'; ?>
+

@@ -104,3 +104,5 @@ echo "<p>If you can see this page, PHP is working correctly and the application 
 echo "<p>The 404 errors are likely due to web server configuration, not application issues.</p>";
 echo "</div>";
 ?>
+
+

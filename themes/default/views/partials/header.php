@@ -7,9 +7,13 @@ if (session_status() == PHP_SESSION_NONE) {
 // Get base path (4 levels up from partials: partials -> views -> default -> themes -> root)
 $basePath = dirname(__DIR__, 4);
 
-require_once $basePath . '/includes/config.php';
-require_once $basePath . '/includes/functions.php';
-require_once __DIR__ . '/VersionChecker.php';
+require_once $basePath . '/app/Config/config.php';
+require_once $basePath . '/app/Helpers/functions.php';
+// Load VersionChecker if it exists
+$versionCheckerPath = $basePath . '/app/Services/VersionChecker.php';
+if (file_exists($versionCheckerPath)) {
+    require_once $versionCheckerPath;
+}
 
 // Create ThemeManager instance for CSS/JS loading
 try {
@@ -2236,3 +2240,4 @@ m        color: #93c5fd;
     </script>
 </body>
 </html>
+

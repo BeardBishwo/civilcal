@@ -1,5 +1,5 @@
 <?php
-// includes/back-to-top.php - Back to Top Button Component
+// Back to Top Button Component
 // Include this file in your header.php after the main content
 ?>
 
@@ -10,3 +10,4 @@
     <span class="back-to-top-text">Back to Top</span>
 </div>
 <!-- Debug: back-to-top.php end -->
+

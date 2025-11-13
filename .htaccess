@@ -1,0 +1,28 @@
+# Set default directory index
+DirectoryIndex index.php
+
+# Security: Block access to sensitive directories and files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block access to sensitive directories
+RedirectMatch 403 ^/(app|config|database|storage|vendor|tests)/.*$
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Redirect /public/ URLs to clean URLs
+    RewriteCond %{REQUEST_URI} public
+    RewriteRule ^(.*)public/?(.*)$ /$1$2 [R=301,L]
+    
+    # Serve static files directly
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule .* - [L]
+    
+    # Route everything else through index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [L,QSA]
+</IfModule>

@@ -4,7 +4,7 @@
  * Creates the aec_calculator database
  */
 
-require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../app/Config/config.php';
 
 try {
     // Connect to MySQL server (without database)

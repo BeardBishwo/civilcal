@@ -28,3 +28,4 @@ if ($show_footer): ?>
 
     </body>
 </html>
+

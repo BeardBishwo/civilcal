@@ -186,3 +186,5 @@ if (file_exists('themes/default/assets/css/premium.css')) {
 echo "<hr>\n";
 echo "<p style='text-align: center; color: #666; font-size: 12px;'>Premium Theme Integration Test Completed - " . date('Y-m-d H:i:s') . "</p>\n";
 ?>
+
+

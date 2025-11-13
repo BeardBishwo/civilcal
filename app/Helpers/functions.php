@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../Config/config.php';
 // Initialize secure session
 function init_secure_session() {
     if (session_status() === PHP_SESSION_ACTIVE) return;
@@ -113,7 +113,7 @@ function get_site_meta(): array {
 		'logo' => app_base_url('assets/icons/icon-192.png'),
 		'favicon' => app_base_url('assets/icons/icon-192.png'),
 		'admin_name' => defined('ADMIN_USER') ? ADMIN_USER : '',
-		'admin_email' => defined('MAIL_TO') ? MAIL_TO : '',
+		'admin_email' => defined('MAIL_TO') ? MAIL_TO : 'admin@example.com',
 		'canonical' => null,
 	];
 

@@ -7,8 +7,8 @@
  * @subpackage Mechanical
  */
 
-require_once '../../../includes/config.php';
-require_once '../../includes/db.php';
+require_once '../../../app/Config/config.php';
+require_once '../../../app/Config/db.php';
 
 // Initialize variables
 $airflow = $velocity = $pressure_drop = $duct_type = '';
@@ -100,7 +100,7 @@ if ($_POST) {
     </style>
 </head>
 <body>
-    <?php include '../../../includes/header.php'; ?>
+    <?php include '../../../themes/default/views/partials/header.php'; ?>
     
     <div class="container">
         <h1>HVAC Duct Sizing Calculator</h1>
@@ -181,3 +181,4 @@ if ($_POST) {
     </div>
 </body>
 </html>
+

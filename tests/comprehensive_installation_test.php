@@ -374,3 +374,5 @@ class InstallationSystemTest
 $test = new InstallationSystemTest();
 $test->runAllTests();
 $test->cleanup();
+
+

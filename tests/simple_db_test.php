@@ -90,3 +90,5 @@ echo "<p><a href='install_test_installation.php'>🔧 Installation Debug Tool</a
 echo "<a href='public/index.php'>🚀 Try Main Application</a> | ";
 echo "<a href='install/index.php'>📋 Installation Wizard</a></p>";
 ?>
+
+

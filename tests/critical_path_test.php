@@ -81,8 +81,8 @@ try {
     // Test file structure
     $requiredFiles = [
         'public/index.php',
-        'includes/config.php',
-        'includes/db.php',
+        'app/Config/config.php',
+        'app/Config/db.php',
         'app/bootstrap.php'
     ];
     
@@ -104,3 +104,5 @@ try {
     exit(1);
 }
 ?>
+
+

@@ -15,9 +15,9 @@
  */
 
 // Include required files
-require_once '../../../includes/config.php';
-require_once '../../../includes/Database.php';
-require_once '../../../includes/functions.php';
+require_once '../../../app/Config/config.php';
+require_once '../../../app/Core/DatabaseLegacy.php';
+require_once '../../../app/Helpers/functions.php';
 
 // Initialize database connection
 $db = new Database();
@@ -180,7 +180,7 @@ $db = new Database();
     </style>
 </head>
 <body>
-    <?php include '../../../includes/header.php'; ?>
+    <?php include '../../../themes/default/views/partials/header.php'; ?>
     
     <div class="priority-container">
         <div class="page-header">
@@ -445,7 +445,7 @@ $db = new Database();
         </div>
     </div>
     
-    <?php include '../../../includes/footer.php'; ?>
+    <?php include '../../../themes/default/views/partials/footer.php'; ?>
     
     <script>
         document.getElementById('priorityAnalysisForm').addEventListener('submit', function(e) {
@@ -619,3 +619,6 @@ $db = new Database();
     </script>
 </body>
 </html>
+
+
+

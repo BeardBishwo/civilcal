@@ -2,9 +2,9 @@
 // Fire Pump Sizing Calculator
 // NFPA 20 Compliant Fire Pump Selection and Sizing
 
-require_once '../../../includes/config.php';
-require_once '../../../includes/Database.php';
-require_once '../../../includes/functions.php';
+require_once '../../../app/Config/config.php';
+require_once '../../../app/Core/DatabaseLegacy.php';
+require_once '../../../app/Helpers/functions.php';
 
 // Check if user is logged in
 if (!isLoggedIn()) {
@@ -13,7 +13,7 @@ if (!isLoggedIn()) {
 }
 
 $page_title = "Fire Pump Sizing Calculator";
-include '../../../includes/header.php';
+include '../../../themes/default/views/partials/header.php';
 
 // Handle form submission
 $results = null;
@@ -656,4 +656,7 @@ h6 {
 }
 </style>
 
-<?php include '../../../includes/footer.php'; ?>
+<?php include '../../../themes/default/views/partials/footer.php'; ?>
+
+
+

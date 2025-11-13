@@ -14,7 +14,7 @@ echo "=============================================\n\n";
 echo "1. Testing installation files...\n";
 $installFiles = [
     'install/index.php' => 'Main installer',
-    'install/includes/Installer.php' => 'Installer class',
+    '../install/includes/Installer.php' => 'Installer class',
     'install/ajax/test-email.php' => 'Email testing endpoint',
     'install/assets/css/install.css' => 'Installation styles',
     'install/assets/js/install.js' => 'Installation JavaScript'
@@ -214,3 +214,5 @@ function generateEnvFile() {
     return $content;
 }
 ?>
+
+

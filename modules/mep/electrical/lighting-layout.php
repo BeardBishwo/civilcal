@@ -5,7 +5,7 @@
  * Includes illuminance calculations, fixture spacing, and energy efficiency
  */
 
-require_once '../../../includes/config.php';
+require_once '../../../app/Config/config.php';
 
 // Get room parameters
 $roomLength = filter_input(INPUT_POST, 'room_length', FILTER_VALIDATE_FLOAT);
@@ -249,7 +249,7 @@ function generateLightingRecommendations($actual, $target, $spacingRatio, $glare
     return $recommendations;
 }
 
-include '../../../includes/header.php';
+include '../../../themes/default/views/partials/header.php';
 ?>
 
 <div class="container">
@@ -671,4 +671,5 @@ document.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('resize', drawLightingDiagram);
 </script>
 
-<?php include '../../../includes/footer.php'; ?>
+<?php include '../../../themes/default/views/partials/footer.php'; ?>
+

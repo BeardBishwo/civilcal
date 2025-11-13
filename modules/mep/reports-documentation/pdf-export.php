@@ -661,7 +661,7 @@ function getExportTemplates() {
     </style>
 </head>
 <body>
-    <?php include AEC_ROOT . '/includes/header.php'; ?>
+    <?php include AEC_ROOT . '/themes/default/views/partials/header.php'; ?>
     
     <div class="export-container">
         <div class="page-header">
@@ -836,7 +836,7 @@ function getExportTemplates() {
         </div>
     </div>
     
-    <?php include AEC_ROOT . '/includes/footer.php'; ?>
+    <?php include AEC_ROOT . '/themes/default/views/partials/footer.php'; ?>
     
     <script>
         // Template selection
@@ -954,3 +954,4 @@ function getExportTemplates() {
     </script>
 </body>
 </html>
+

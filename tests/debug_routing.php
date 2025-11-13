@@ -34,3 +34,5 @@ if (file_exists($themeIndexFile)) {
     echo "Theme file size: " . filesize($themeIndexFile) . " bytes\n";
 }
 ?>
+
+

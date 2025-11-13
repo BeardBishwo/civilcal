@@ -191,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include AEC_ROOT . '/includes/header.php';
+include AEC_ROOT . '/themes/default/views/partials/header.php';
 ?>
 
 <div class="container-fluid">
@@ -555,4 +555,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<?php include AEC_ROOT . '/includes/footer.php'; ?>
+<?php include AEC_ROOT . '/themes/default/views/partials/footer.php'; ?>
+

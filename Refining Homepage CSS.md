@@ -1,3 +1,59 @@
+**Current status of auth pages**
+
+- `themes/default/views/auth/login.php` submits via JS `fetch('api/login.php', …)` while the router expects POST requests at `/login`. Because `api/login.php` doesn’t exist in this project, the form never reaches `AuthController@login`.  
+- [themes/default/views/auth/register.php](cci:7://file:///c:/laragon/www/Bishwo_Calculator/themes/default/views/auth/register.php:0:0-0:0) posts to `/aec-calculator/api/register_enhanced.php` (hard-coded domain). That endpoint also does not exist, so registration fails before hitting `AuthController@register`.  
+- Both pages rely on inline assets (e.g., `<link rel="icon" href="assets/…">`) that assume they live under `/themes/default/views/auth/`. When served through `/login` and `/register`, those relative paths break.  
+- Forgot-password view is likely similar (needs same review).  
+- DB config loads credentials from `.env` ([config/database.php](cci:7://file:///c:/laragon/www/Bishwo_Calculator/config/database.php:0:0-0:0)). We need to confirm Laragon database (e.g., `bishwo_calculator`) exists and tables such as `users` are populated for login tests.
+
+**Detailed TODOs**
+
+1. **Normalize asset URLs in auth views**  
+   - Replace hard-coded relative paths with helper functions (`theme_asset()`, etc.) so CSS/JS/images load whether routed or direct.
+
+2. **Fix login form submission**  
+   - Set `<form method="POST" action="<?php echo app_base_url('login'); ?>">`.  
+   - Remove JS fetch or adapt it to call `/login` (same origin) and handle JSON returned by `AuthController@login`.  
+   - Update inputs to match controller expectations (`email` not `username_email`, or adjust controller to accept username/email).
+
+3. **Fix register form submission**  
+   - Set action to `/register` with `POST`.  
+  - Align field names with controller: it expects `first_name`, `last_name`, etc., whereas the view currently uses combined fields (`full_name`, `engineer_roles[]`). Decide whether to simplify form or expand controller to handle extra data.  
+   - Remove `/aec-calculator/` hard-coded URLs. Replace with `app_base_url()`.
+
+4. **Forgot-password page**  
+   - Ensure form posts to `/forgot-password` route with proper fields (`email`).  
+   - Confirm controller method `showForgotPassword` exists (it’s referenced in routes; verify view file and endpoint).
+
+5. **CSRF handling**  
+   - Controller currently expects standard POST; views generate tokens using `Security::generateCsrfToken()`. Ensure controller validates using same helper (currently TODO). Add validation to controller or remove tokens until support is added.
+
+6. **Database validation**  
+   - Verify `.env` (or Laragon) has correct `DB_*` values and that the `users` table exists.  
+   - Seed at least one test user to confirm login path works once forms are fixed.
+
+7. **Update internal links**  
+   - Search entire project for `aec-calculator` and replace with correct base (`app_base_url()` or `theme_asset()`).  
+   - Ensure all auth links (login/register/forgot) use clean URLs without `.php` suffix unless intentionally direct.
+
+8. **End-to-end testing**  
+   - After fixes, test via browser:  
+     1. Navigate to `/register`, create account, confirm redirect to dashboard.  
+     2. Log out, then log in with new credentials.  
+     3. Trigger forgot-password flow and verify email/error handling.
+
+9. **Debug logging**  
+   - If errors persist, enable logging (`storage/logs`) and inspect for DB or validation issues.  
+   - Consider adding frontend error display for failed fetch/POST responses.
+
+Let me know which items you’d like tackled first, and I can start implementing them.
+
+
+
+
+
+
+-----------------------
 # Cascade Chat Conversation
 
   Note: _This is purely the output of the chat conversation and does not contain any raw data, codebase snippets, etc. used to generate the output._

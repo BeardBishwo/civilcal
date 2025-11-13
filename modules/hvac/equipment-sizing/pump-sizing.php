@@ -1,9 +1,9 @@
 <?php
 // Start session and include necessary files
 session_start();
-require_once '../../../includes/db.php';
-require_once '../../../includes/functions.php';
-require_once '../../../includes/header.php';
+require_once '../../../app/Config/db.php';
+require_once '../../../app/Helpers/functions.php';
+require_once '../../../themes/default/views/partials/header.php';
 ?>
 
 <div class="container-fluid py-4">
@@ -520,4 +520,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 </style>
 
-<?php require_once '../../../includes/footer.php'; ?>
+<?php require_once '../../../themes/default/views/partials/footer.php'; ?>
+
+
+

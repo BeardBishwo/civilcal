@@ -147,7 +147,7 @@ $pageTitle = $page_title ?? 'User Profile';
 </head>
 
 <body>
-    <?php include 'includes/header.php'; ?>
+    <?php include 'themes/default/views/partials/header.php'; ?>
     
     <div class="container-fluid py-4">
         <div class="row">
@@ -446,6 +446,7 @@ $pageTitle = $page_title ?? 'User Profile';
     <!-- Profile JavaScript -->
     <script src="public/assets/js/profile.js"></script>
     
-    <?php include 'includes/footer.php'; ?>
+    <?php include 'themes/default/views/partials/footer.php'; ?>
 </body>
 </html>
+

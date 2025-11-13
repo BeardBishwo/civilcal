@@ -5,7 +5,7 @@
  * Integrates all electrical calculations and provides system overview
  */
 
-require_once '../../../includes/config.php';
+require_once '../../../app/Config/config.php';
 
 // Get summary parameters
 $projectName = filter_input(INPUT_POST, 'project_name', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: 'MEP Project';
@@ -381,7 +381,7 @@ function generateElectricalRecommendations($buildingType, $demandLoad, $powerQua
     return $recommendations;
 }
 
-include '../../../includes/header.php';
+include '../../../themes/default/views/partials/header.php';
 ?>
 
 <div class="container">
@@ -772,5 +772,6 @@ h5 {
 </style>
 
 <?php
-include '../../../includes/footer.php';
+include '../../../themes/default/views/partials/footer.php';
 ?>
+

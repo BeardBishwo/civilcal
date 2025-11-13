@@ -1,7 +1,7 @@
 <?php
-require_once '../../../includes/config.php';
-require_once '../../../includes/Database.php';
-require_once '../../../includes/functions.php';
+require_once '../../../app/Config/config.php';
+require_once '../../../app/Core/DatabaseLegacy.php';
+require_once '../../../app/Helpers/functions.php';
 
 // Check if user is logged in
 if (!isLoggedIn()) {
@@ -10,7 +10,7 @@ if (!isLoggedIn()) {
 }
 
 $pageTitle = "Storm Water Management Calculator - MEP Suite";
-include '../../../includes/header.php';
+include '../../../themes/default/views/partials/header.php';
 
 // Handle form submission
 $results = [];
@@ -870,4 +870,7 @@ function checkRegulatoryCompliance($designStorm, $detentionRequired, $storageVol
 }
 </style>
 
-<?php include '../../../includes/footer.php'; ?>
+<?php include '../../../themes/default/views/partials/footer.php'; ?>
+
+
+

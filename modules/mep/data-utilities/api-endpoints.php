@@ -5,9 +5,9 @@
  * Version: 1.0.0
  */
 
-require_once '../../../../includes/config.php';
-require_once '../../../../includes/Database.php';
-require_once '../../../includes/Security.php';
+require_once '../../../app/Config/config.php';
+require_once '../../../../app/Core/DatabaseLegacy.php';
+require_once '../../../app/Services/Security.php';
 
 class MEPAPIEndpoints {
     private $db;
@@ -1002,7 +1002,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 // Display API management interface
 if (!isset($_POST['action'])) {
-    include '../../../../includes/header.php';
+    include '../../../../themes/default/views/partials/header.php';
     ?>
     
     <div class="container-fluid">
@@ -1632,6 +1632,8 @@ if (!isset($_POST['action'])) {
     </style>
     
     <?php
-    include '../../../../includes/footer.php';
+    include '../../../../themes/default/views/partials/footer.php';
 }
 ?>
+
+

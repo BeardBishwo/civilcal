@@ -194,7 +194,7 @@ echo "<div class='test-section'>";
 echo "<h2>7. Installation Steps Test</h2>";
 
 try {
-    require_once 'includes/Installer.php';
+    require_once '../install/includes/Installer.php';
     $installer = new Installer();
     $steps = ['welcome', 'requirements', 'permissions', 'database', 'admin', 'email', 'finish'];
 
@@ -240,3 +240,5 @@ echo "<li>Run full installation process</li>";
 echo "</ul>";
 echo "</div>";
 ?>
+
+

@@ -1,7 +1,7 @@
 <?php
-require_once '../../../includes/config.php';
-require_once '../../includes/db.php';
-require_once '../../../includes/functions.php';
+require_once '../../../app/Config/config.php';
+require_once '../../../app/Config/db.php';
+require_once '../../../app/Helpers/functions.php';
 
 // Get calculation results from database if available
 $calculationId = $_GET['id'] ?? null;
@@ -14,7 +14,7 @@ if ($calculationId) {
 }
 
 $pageTitle = "Pump Selection Calculator";
-include '../../../includes/header.php';
+include '../../../themes/default/views/partials/header.php';
 ?>
 
 <div class="container-fluid">
@@ -637,4 +637,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<?php include '../../../includes/footer.php'; ?>
+<?php include '../../../themes/default/views/partials/footer.php'; ?>
+
+

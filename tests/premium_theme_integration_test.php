@@ -8,7 +8,7 @@
  * @version 1.0.0
  */
 
-require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../app/Config/db.php';
 require_once __DIR__ . '/../app/Services/PremiumThemeManager.php';
 
 echo "=== Premium Theme System Test ===\n\n";
@@ -150,3 +150,5 @@ echo "- Database-powered settings storage\n";
 echo "- Admin dashboard interface\n";
 
 ?>
+
+

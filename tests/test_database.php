@@ -57,3 +57,5 @@ echo "<h3>Test Complete</h3>";
 echo "<a href='install_test_installation.php'>Back to Debug Tool</a> | ";
 echo "<a href='public/index.php'>Go to Application</a>";
 ?>
+
+
