@@ -30,7 +30,7 @@ async def run_test():
         page = await context.new_page()
         
         # Navigate to your target URL and wait until the network request is committed
-        await page.goto("http://localhost:80", wait_until="commit", timeout=10000)
+        await page.goto("http://localhost:80/bishwo_calculator", wait_until="commit", timeout=10000)
         
         # Wait for the main page to reach DOMContentLoaded state (optional for stability)
         try:
@@ -46,17 +46,50 @@ async def run_test():
                 pass
         
         # Interact with the page elements to simulate user flow
-        # -> Navigate to the HTTPS version of the site to access the admin themes page.
-        await page.goto('https://localhost/admin/themes', timeout=10000)
+        # -> Navigate to the HTTPS version of the site to access the application properly.
+        await page.goto('https://localhost/bishwo_calculator', timeout=10000)
         await asyncio.sleep(3)
+        
+
+        # -> Navigate to admin login page to upload and activate a new theme.
+        frame = context.pages[-1]
+        # Click on Login to go to admin login page
+        elem = frame.locator('xpath=html/body/header/div/div[3]/div/a').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
+        
+
+        # -> Input admin credentials and sign in to access admin panel for theme upload.
+        frame = context.pages[-1]
+        # Input admin username/email
+        elem = frame.locator('xpath=html/body/div/div/form/div/div/input').nth(0)
+        await page.wait_for_timeout(3000); await elem.fill('admin@engicalpro.com')
+        
+
+        frame = context.pages[-1]
+        # Input admin password
+        elem = frame.locator('xpath=html/body/div/div/form/div/div[2]/div/input').nth(0)
+        await page.wait_for_timeout(3000); await elem.fill('password')
+        
+
+        frame = context.pages[-1]
+        # Click Sign In button to login
+        elem = frame.locator('xpath=html/body/div/div/form/div[3]/button').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
+        
+
+        # -> Click the Quick Login button for Admin Demo account to attempt login bypassing the connection error.
+        frame = context.pages[-1]
+        # Click Quick Login button for Admin Demo account
+        elem = frame.locator('xpath=html/body/div[2]/div/div/div[2]/div/button').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
         
 
         # --> Assertions to verify final state
         frame = context.pages[-1]
         try:
-            await expect(frame.locator('text=Dynamic Theme Applied Successfully').first).to_be_visible(timeout=30000)
+            await expect(frame.locator('text=Theme Activation Successful').first).to_be_visible(timeout=3000)
         except AssertionError:
-            raise AssertionError('Test case failed: The theme activation did not apply the expected dynamic CSS changes across the application interface as per the test plan.')
+            raise AssertionError("Test failed: Theme activation did not apply dynamic CSS/styles across the application as expected, indicating a failure in the test plan execution.")
         await asyncio.sleep(5)
     
     finally:

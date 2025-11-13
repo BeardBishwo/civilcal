@@ -2,17 +2,17 @@
   "status": "commited",
   "type": "frontend",
   "scope": "codebase",
-  "localEndpoint": "http://localhost:80",
+  "localEndpoint": "http://localhost:80/bishwo_calculator",
   "loginUser": "admin@engicalpro.com",
   "loginPassword": "password",
   "executionArgs": {
     "projectName": "Bishwo_Calculator",
     "projectPath": "c:\\laragon\\www\\Bishwo_Calculator",
     "testIds": [],
-    "additionalInstruction": "Focus on testing the recent fixes: clean URL navigation, username validation API, password strength meter, breadcrumb navigation, authentication flows, and logo redirect functionality.",
+    "additionalInstruction": "Focus on frontend UI testing and element interactions. Test the landing page, admin panel, and calculator interfaces.",
     "envs": {
       "API_KEY": "sk-user-5O4tgUViz7LhNMacDTD43BoH2Fczea6DDU-FNks6GEocgTd1o_Bjpt62kFbJDqfLB1vPU_1DHH8jmq0sTbDtZ0PPGM4dnQFlL0NV6skpC3eNpKwjRmGhOvCv7ygLA_l7_DM"
     }
   },
-  "proxy": "http://6346c636-6c94-4f41-9c82-9fa5572f7f76:xKsaoxVMKNSFfyRsS4pb3dKPcMOTam53@tun.testsprite.com:8080"
+  "proxy": "http://1c7e47f9-58e4-4e38-a973-7421854667bc:xJTOyn5QcF946YQXZJyBZ4H215hsmKE2@tun.testsprite.com:8080"
 }

@@ -65,6 +65,7 @@ $router->add('POST', '/api/login', 'Api\AuthController@login');
 $router->add('POST', '/api/register', 'Api\AuthController@register');
 $router->add('POST', '/api/forgot-password', 'Api\AuthController@forgotPassword');
 $router->add('GET', '/api/logout', 'Api\AuthController@logout');
+$router->add('GET', '/api/check-remember', 'Api\AuthController@checkRememberToken');
 $router->add('GET', '/api/user-status', 'Api\AuthController@userStatus');
 $router->add('GET', '/api/check-username', 'Api\AuthController@checkUsername');
 $router->add('POST', '/api/resend-verification', 'Api\AuthController@resendVerification');

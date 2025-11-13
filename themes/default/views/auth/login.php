@@ -80,10 +80,10 @@ $csrf_token = Security::generateCsrfToken();
                 <div class="security-text">
                     <strong>Your account is protected with:</strong>
                     <ul>
-                        <li>SSL encryption</li>
-                        <li>Failed login attempt protection</li>
-                        <li>IP-based security monitoring</li>
-                        <li>Two-factor authentication available</li>
+                        <li>Secure password hashing</li>
+                        <li>CSRF attack protection</li>
+                        <li>Session-based authentication</li>
+                        <li>Input validation and sanitization</li>
                     </ul>
                 </div>
             </div>
@@ -111,7 +111,7 @@ $csrf_token = Security::generateCsrfToken();
             <p>Don't have an account? <a href="<?php echo app_base_url('register'); ?>" class="auth-link">Create Professional Account</a></p>
             <p class="footer-note">
                 <i class="fas fa-info-circle"></i>
-                Join thousands of engineers using EngiCal Pro
+                Join thousands of engineers using Civil Calculator
             </p>
         </div>
     </div>
@@ -554,19 +554,48 @@ $csrf_token = Security::generateCsrfToken();
 }
 
 .demo-login {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
     color: white;
     border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.8rem;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.demo-login::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.demo-login:hover::before {
+    left: 100%;
 }
 
 .demo-login:hover {
     transform: translateY(-1px);
     box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+}
+
+.demo-login:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .demo-note {
@@ -631,15 +660,44 @@ function initializeLoginForm() {
     // Form submission
     document.getElementById('loginForm').addEventListener('submit', handleLoginSubmission);
 
-    // Demo login buttons
+    // Demo login buttons with enhanced functionality
     document.querySelectorAll('.demo-login').forEach(button => {
-        button.addEventListener('click', function() {
-            // Fill form fields with demo credentials
-            document.getElementById('username_email').value = this.dataset.email;
-            document.getElementById('password').value = this.dataset.password;
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
             
-            // Submit the form
-            document.getElementById('loginForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+            const email = this.dataset.email;
+            const password = this.dataset.password;
+            
+            // Add visual feedback
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            this.disabled = true;
+            
+            // Fill form fields with demo credentials
+            const usernameField = document.getElementById('username_email');
+            const passwordField = document.getElementById('password');
+            
+            if (usernameField && passwordField) {
+                usernameField.value = email;
+                passwordField.value = password;
+                
+                // Add a small delay for visual effect
+                setTimeout(() => {
+                    // Trigger form submission
+                    document.getElementById('loginForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                    
+                    // Reset button after a delay
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    }, 2000);
+                }, 500);
+            } else {
+                // Reset button if form fields not found
+                this.innerHTML = originalText;
+                this.disabled = false;
+                console.error('Login form fields not found');
+            }
         });
     });
 }

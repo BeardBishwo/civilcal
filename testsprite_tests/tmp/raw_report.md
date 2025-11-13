@@ -13,219 +13,168 @@
 ## 2️⃣ Requirement Validation Summary
 
 #### Test TC001
-- **Test Name:** User calculator navigation basic flow
-- **Test Code:** [TC001_User_calculator_navigation_basic_flow.py](./TC001_User_calculator_navigation_basic_flow.py)
-- **Test Error:** Testing stopped due to critical PHP fatal error on 'Concrete Volume' calculator page caused by missing backend file. This issue must be fixed before further testing can continue.
+- **Test Name:** User Calculator Navigation and Opening
+- **Test Code:** [TC001_User_Calculator_Navigation_and_Opening.py](./TC001_User_Calculator_Navigation_and_Opening.py)
+- **Test Error:** Testing stopped due to fatal error on calculator page 'Concrete Volume'. Missing required file caused the page to fail loading. Further testing cannot proceed until this is resolved.
 Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
 [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/Bishwo_Calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Refused to apply style from 'https://localhost/Bishwo_Calculator/assets/css/civil.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled. (at https://localhost/bishwo_calculator/civil:2076:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/818354df-5c10-4941-b36a-3e4ed92ceed7
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/199b1b45-cfb9-4c8b-a4ba-74c2e55655a3
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC002
-- **Test Name:** Theme upload and validation
-- **Test Code:** [TC002_Theme_upload_and_validation.py](./TC002_Theme_upload_and_validation.py)
-- **Test Error:** The admin login page is currently inaccessible due to a 500 Internal Server Error. This prevents logging in as administrator and testing theme upload functionality. The issue needs to be resolved on the server side before further testing can proceed.
+- **Test Name:** Theme Upload and Validation
+- **Test Code:** [TC002_Theme_Upload_and_Validation.py](./TC002_Theme_Upload_and_Validation.py)
+- **Test Error:** The /admin/themes page is currently inaccessible due to a 500 Internal Server Error. Theme upload and validation testing cannot proceed until the server issue is resolved.
 Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
 [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/admin/themes:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/admin/login:0:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/ea5296cf-91b2-4aec-a534-8ab8d1e370ef
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/f5fdd306-908b-4efb-83b4-70aefcb948fc
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC003
-- **Test Name:** Theme activation and dynamic CSS application
-- **Test Code:** [TC003_Theme_activation_and_dynamic_CSS_application.py](./TC003_Theme_activation_and_dynamic_CSS_application.py)
-- **Test Error:** Cannot proceed with theme activation and verification due to server error on /admin/themes page. Task stopped.
+- **Test Name:** Theme Activation and Dynamic CSS Application
+- **Test Code:** [TC003_Theme_Activation_and_Dynamic_CSS_Application.py](./TC003_Theme_Activation_and_Dynamic_CSS_Application.py)
+- **Test Error:** The task to validate dynamic theme activation and CSS application could not be completed due to a persistent server connection error preventing admin login and theme upload. The issue has been reported as a blocker. No further testing could be performed.
 Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/admin/themes:0:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/c2414782-f2c2-4237-91b6-45b8101fdf55
+[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
+[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
+[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
+[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/c10795a4-fbbd-41f4-a241-be1e91e602d6
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC004
-- **Test Name:** Theme customization and preview
-- **Test Code:** [TC004_Theme_customization_and_preview.py](./TC004_Theme_customization_and_preview.py)
-- **Test Error:** The test to verify that administrators can customize theme settings at /admin/themes and preview changes before activation could not be completed due to a persistent connection error preventing admin login. The issue has been reported. Please resolve the server connectivity problem to enable further testing.
+- **Test Name:** Theme Customization and Settings Persistence
+- **Test Code:** [TC004_Theme_Customization_and_Settings_Persistence.py](./TC004_Theme_Customization_and_Settings_Persistence.py)
+- **Test Error:** The theme customization interface at /admin/themes is not accessible due to a 500 Internal Server Error. Therefore, I could not perform the customization, save settings, or verify changes. The task cannot be completed as intended.
 Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/api/login.php:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token '<', "<h1>404 - "... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/7c01246a-97ee-4bcb-a160-c20cc139c303
+[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/admin/themes:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/e6abb4ee-2f8a-443a-b1c5-80a0ec60a16c
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC005
-- **Test Name:** Plugin upload and manifest validation
-- **Test Code:** [TC005_Plugin_upload_and_manifest_validation.py](./TC005_Plugin_upload_and_manifest_validation.py)
-- **Test Error:** Testing stopped due to connection error preventing admin login and access to plugin management interface. Cannot verify plugin upload and manifest validation without admin access.
+- **Test Name:** Plugin Upload and Manifest Validation
+- **Test Code:** [TC005_Plugin_Upload_and_Manifest_Validation.py](./TC005_Plugin_Upload_and_Manifest_Validation.py)
+- **Test Error:** Testing cannot proceed due to persistent connection error preventing login and access to plugin management interface. Please resolve server connectivity issues first.
 Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
 [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/Bishwo_Calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Refused to apply style from 'https://localhost/Bishwo_Calculator/assets/css/management.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled. (at https://localhost/bishwo_calculator/management:2076:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/Bishwo_Calculator/api/login.php:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token '<', "<h1>404 - "... is not valid JSON (at https://localhost/Bishwo_Calculator/login:743:16)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/Bishwo_Calculator/api/login.php:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token '<', "<h1>404 - "... is not valid JSON (at https://localhost/Bishwo_Calculator/login:743:16)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/d71a77a6-c97f-4238-957e-2e999b83ff71
+[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
+[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
+[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
+[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/95188746-660b-4165-8694-ce3d6c0701e9
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC006
-- **Test Name:** Plugin activation toggle and deletion
-- **Test Code:** [TC006_Plugin_activation_toggle_and_deletion.py](./TC006_Plugin_activation_toggle_and_deletion.py)
-- **Test Error:** Testing cannot proceed because the login process fails with a connection error, preventing access to plugin management. The issue must be resolved before plugin activation, deactivation, and deletion can be verified.
+- **Test Name:** Plugin Activation Toggle and Deletion
+- **Test Code:** [TC006_Plugin_Activation_Toggle_and_Deletion.py](./TC006_Plugin_Activation_Toggle_and_Deletion.py)
+- **Test Error:** Testing stopped due to persistent connection error preventing login and access to admin panel. Unable to perform plugin activation and deletion tests as required.
 Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
 [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/api/login.php:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token '<', "<h1>404 - "... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/api/login.php:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token '<', "<h1>404 - "... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/be118d5f-32c0-4178-a265-c8aa6a83490e
+[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
+[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
+[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
+[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/bfd9bbcf-c750-4706-af38-ba719398f6d8
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC007
-- **Test Name:** Backup creation and export
-- **Test Code:** [TC007_Backup_creation_and_export.py](./TC007_Backup_creation_and_export.py)
-- **Test Error:** Cannot proceed with backup creation test due to 500 Internal Server Error at /admin/help. The server error prevents verifying backup creation and download functionality. Please fix the server error to continue testing.
+- **Test Name:** Backup Creation and Download
+- **Test Code:** [TC007_Backup_Creation_and_Download.py](./TC007_Backup_Creation_and_Download.py)
+- **Test Error:** The backup system verification task cannot proceed because the admin panel login is blocked by a persistent server connection error. Multiple login attempts including demo quick login failed. Please resolve the server connectivity issue to enable backup testing.
 Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/admin/help:0:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/357d8879-1426-4bf7-90c6-6f47e8bbc02a
+[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
+[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
+[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
+[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/b5e3651c-4588-4aea-b59f-711a1edcb683
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC008
-- **Test Name:** Restore from backup
-- **Test Code:** [TC008_Restore_from_backup.py](./TC008_Restore_from_backup.py)
-- **Test Error:** The test to verify that an administrator can restore the system to a previous state using a backup file could not be completed due to a persistent connection error preventing admin login. The connection error was reported as a website issue. Further testing requires resolving the server connectivity problem to enable admin access and restore functionality verification.
+- **Test Name:** Backup Restore Functionality
+- **Test Code:** [TC008_Backup_Restore_Functionality.py](./TC008_Backup_Restore_Functionality.py)
+- **Test Error:** The testing task to verify system backup and restore functionality could not be completed due to a critical server connection error preventing login to the admin panel. The issue was reported as requested. No further testing was possible without resolving this connectivity problem.
 Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
 [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/api/login.php:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token '<', "<h1>404 - "... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/d1b3991e-9a20-4343-a87b-09664e5179c6
+[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
+[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/71198000-805b-4ec1-8706-6a1464e6c06a
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC009
-- **Test Name:** Audit log viewing and filtering
-- **Test Code:** [TC009_Audit_log_viewing_and_filtering.py](./TC009_Audit_log_viewing_and_filtering.py)
-- **Test Error:** The /admin/audit-logs page is currently inaccessible due to a 500 Internal Server Error. This blocks verification of audit log access, filtering, and download functionality. Please resolve the server error to continue testing.
+- **Test Name:** Audit Log Filtering and Download
+- **Test Code:** [TC009_Audit_Log_Filtering_and_Download.py](./TC009_Audit_Log_Filtering_and_Download.py)
+- **Test Error:** The audit logs admin page is currently inaccessible due to a server error (500 Internal Server Error). Testing of filtering and downloading audit logs cannot proceed until this issue is resolved.
 Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
 [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/admin/audit-logs:0:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/b020d57b-6ec8-422b-8f83-e299db5b1eab
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/d468b5fb-9913-40ee-a067-96b02f383bf0
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC010
-- **Test Name:** Admin POST routes security: rate limiting and CSRF protection
-- **Test Code:** [TC010_Admin_POST_routes_security_rate_limiting_and_CSRF_protection.py](./TC010_Admin_POST_routes_security_rate_limiting_and_CSRF_protection.py)
-- **Test Error:** Testing cannot proceed because the server is unreachable, causing connection errors on login attempts. Unable to verify rate limiting and CSRF protections on administrative POST routes. Please resolve the server connectivity issue and retry.
+- **Test Name:** Rate Limiting and CSRF Protection on Admin POST Routes
+- **Test Code:** [TC010_Rate_Limiting_and_CSRF_Protection_on_Admin_POST_Routes.py](./TC010_Rate_Limiting_and_CSRF_Protection_on_Admin_POST_Routes.py)
+- **Test Error:** Testing stopped due to server connection error preventing login and access to admin POST routes. Unable to verify rate limiting and CSRF protections without backend connectivity.
 Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
 [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/api/login.php:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token '<', "<h1>404 - "... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/4fbb9691-32a6-47ea-beda-beb2d2156fc6
+[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
+[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/1587d666-1c0c-4934-8bfd-f2bb96a8a3b1
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC011
-- **Test Name:** Structured logging and audit logs generation
-- **Test Code:** [TC011_Structured_logging_and_audit_logs_generation.py](./TC011_Structured_logging_and_audit_logs_generation.py)
-- **Test Error:** Testing stopped due to persistent server connection error preventing login and audit log verification. Manual and quick login attempts failed. Please resolve server connectivity issues to continue testing.
+- **Test Name:** Structured Logging and Audit Logs Integrity
+- **Test Code:** [TC011_Structured_Logging_and_Audit_Logs_Integrity.py](./TC011_Structured_Logging_and_Audit_Logs_Integrity.py)
+- **Test Error:** The task to confirm that general and audit logs are structured properly, contain required fields, and record critical events cannot be completed because the admin panel or log viewer interface is not accessible. The page /Bishwo_Calculator/modules/index.php returns a 404 error. System events and user actions were triggered successfully on the frontend to generate logs, but verification of these logs is not possible without access to the log viewer. Please resolve the missing admin panel or provide access to the logs for further testing.
 Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
 [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/api/login.php:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token '<', "<h1>404 - "... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/api/login.php:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token '<', "<h1>404 - "... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/a445c7f4-3f54-4162-a7e6-e3644fe88058
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/Bishwo_Calculator/assets/icons/icon-192.png:0:0)
+[ERROR] Refused to apply style from 'https://localhost/Bishwo_Calculator/assets/css/site.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled. (at https://localhost/bishwo_calculator/site:2076:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/Bishwo_Calculator/modules/index.php:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/fa4ce864-4746-47e6-bfea-343319083632
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC012
-- **Test Name:** API v1 health endpoint returns 200 OK JSON
-- **Test Code:** [TC012_API_v1_health_endpoint_returns_200_OK_JSON.py](./TC012_API_v1_health_endpoint_returns_200_OK_JSON.py)
-- **Test Error:** The API endpoint /api/v1/health does not reliably return a 200 OK status and valid JSON. Instead, it returns a 500 Internal Server Error indicating a server-side problem or misconfiguration. The health check endpoint is currently not functional as expected.
+- **Test Name:** API Health Endpoint Response
+- **Test Code:** [TC012_API_Health_Endpoint_Response.py](./TC012_API_Health_Endpoint_Response.py)
+- **Test Error:** The health endpoint /api/v1/health is currently returning a 500 Internal Server Error, preventing validation of its status and JSON content. Further testing cannot proceed until this server error is resolved.
 Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
 [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/api/v1/health:0:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/688bd516-51f5-4084-a9ca-3ff3943e7149
-- **Status:** ❌ Failed
-- **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
----
-
-#### Test TC013
-- **Test Name:** API v1 calculators and history endpoints data validation
-- **Test Code:** [TC013_API_v1_calculators_and_history_endpoints_data_validation.py](./TC013_API_v1_calculators_and_history_endpoints_data_validation.py)
-- **Test Error:** API endpoints /api/v1/calculators and /api/v1/history both returned 500 Internal Server Errors. No valid JSON data could be verified. The server needs to be fixed to proceed with validation of the API responses.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/api/v1/calculators:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/api/v1/history?user=admin@engicalpro.com:0:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/1ec3f887-df3c-46a4-9ba0-992c6df61128
-- **Status:** ❌ Failed
-- **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
----
-
-#### Test TC014
-- **Test Name:** Edge case: Calculator selection with no available calculators
-- **Test Code:** [TC014_Edge_case_Calculator_selection_with_no_available_calculators.py](./TC014_Edge_case_Calculator_selection_with_no_available_calculators.py)
-- **Test Error:** Reported the issue about inability to simulate 'no calculators available' state under Electrical module. Stopping further actions as the test cannot proceed without this simulation.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/26f47eee-46ec-461d-bddf-631897e1919d
-- **Status:** ❌ Failed
-- **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
----
-
-#### Test TC015
-- **Test Name:** Theme upload with corrupted or partial files
-- **Test Code:** [TC015_Theme_upload_with_corrupted_or_partial_files.py](./TC015_Theme_upload_with_corrupted_or_partial_files.py)
-- **Test Error:** Testing cannot proceed due to server connection error on login. Authentication failed and theme upload validation cannot be performed. Please resolve server connectivity issues first.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/api/login.php:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token '<', "<h1>404 - "... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/af532a3a-f7b9-479b-a390-326bebd40442
-- **Status:** ❌ Failed
-- **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
----
-
-#### Test TC016
-- **Test Name:** Backup restore with invalid or corrupted backup file
-- **Test Code:** [TC016_Backup_restore_with_invalid_or_corrupted_backup_file.py](./TC016_Backup_restore_with_invalid_or_corrupted_backup_file.py)
-- **Test Error:** Cannot proceed with the test as the restore interface at /admin/help returns a 500 Internal Server Error. The system does not allow uploading or restoring backups currently. Please fix the server error to continue testing the restore process with corrupted backup files.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/admin/help:0:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/a59fc7ec-8d98-4c53-b07c-85f0c0e2c3e4/e0f1a36b-7c34-4440-ae3b-864407f0372b
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/0dd5b5ed-d098-4a55-a78a-1cd809c8eee1
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---

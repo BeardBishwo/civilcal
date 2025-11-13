@@ -46,50 +46,17 @@ async def run_test():
                 pass
         
         # Interact with the page elements to simulate user flow
-        # -> Navigate to the HTTPS version of the site to access the calculator page properly.
-        await page.goto('https://localhost/bishwo_calculator', timeout=10000)
+        # -> Navigate to the correct HTTPS URL for the audit logs admin page.
+        await page.goto('https://localhost/admin/audit-logs', timeout=10000)
         await asyncio.sleep(3)
-        
-
-        # -> Click on the Login link to sign in as admin.
-        frame = context.pages[-1]
-        # Click on the Login link to open the login page.
-        elem = frame.locator('xpath=html/body/header/div/div[3]/div/a').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
-        # -> Input admin username and password, then click Sign In.
-        frame = context.pages[-1]
-        # Input admin username/email
-        elem = frame.locator('xpath=html/body/div/div/form/div/div/input').nth(0)
-        await page.wait_for_timeout(3000); await elem.fill('admin@engicalpro.com')
-        
-
-        frame = context.pages[-1]
-        # Input admin password
-        elem = frame.locator('xpath=html/body/div/div/form/div/div[2]/div/input').nth(0)
-        await page.wait_for_timeout(3000); await elem.fill('password')
-        
-
-        frame = context.pages[-1]
-        # Click Sign In button to submit login form
-        elem = frame.locator('xpath=html/body/div/div/form/div[3]/button').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
-        # -> Attempt to use the 'Admin Demo' Quick Login button to bypass manual login and check if connection error persists.
-        frame = context.pages[-1]
-        # Click 'Admin Demo' Quick Login button to attempt login bypassing manual input
-        elem = frame.locator('xpath=html/body/div[2]/div/div/div[2]/div/button').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
         
 
         # --> Assertions to verify final state
         frame = context.pages[-1]
         try:
-            await expect(frame.locator('text=Plugin activation successful').first).to_be_visible(timeout=1000)
+            await expect(frame.locator('text=Filtered audit logs download successful').first).to_be_visible(timeout=1000)
         except AssertionError:
-            raise AssertionError("Test case failed: Plugin activation status toggling and deletion did not reflect correctly in system behavior and UI as per the test plan.")
+            raise AssertionError('Test case failed: Audit log viewer filtering and download verification did not pass as expected. The filtered logs were not correctly displayed or downloaded, indicating potential data loss or incorrect filtering.')
         await asyncio.sleep(5)
     
     finally:

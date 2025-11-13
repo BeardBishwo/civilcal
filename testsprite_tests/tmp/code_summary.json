@@ -1,60 +1,163 @@
 {
-  "tech_stack": ["PHP 7.4+", "Custom MVC", "MySQL/MariaDB", "HTML5/CSS3/JS", "FastRoute", "Composer", "mPDF", "Stripe"],
+  "tech_stack": [
+    "php",
+    "html5",
+    "css3", 
+    "javascript",
+    "mysql",
+    "apache",
+    "composer",
+    "mvc_architecture",
+    "responsive_design",
+    "ajax",
+    "rest_api",
+    "session_management",
+    "bootstrap_css",
+    "fontawesome",
+    "chartjs"
+  ],
   "features": [
     {
-      "name": "Engineering Calculators",
-      "description": "6 specialized engineering discipline calculators with complex formulas",
-      "files": ["modules/civil/", "modules/electrical/", "modules/hvac/", "modules/fire/", "modules/plumbing/", "modules/structural/"]
+      "name": "landing_page",
+      "description": "Beautiful responsive landing page with animations and calculator categories",
+      "files": [
+        "themes/landing/index.php",
+        "themes/landing/assets/css/landing.css",
+        "themes/landing/assets/js/landing.js",
+        "public/css/landing.css",
+        "public/js/landing.js"
+      ]
     },
     {
-      "name": "User Authentication System", 
-      "description": "Complete user registration, login, password reset with session management",
-      "files": ["app/Controllers/AuthController.php", "app/Models/User.php", "themes/default/views/auth/"]
+      "name": "user_authentication",
+      "description": "Complete authentication system with login, registration, password reset",
+      "files": [
+        "app/Controllers/Api/AuthController.php",
+        "app/Models/User.php",
+        "themes/auth/login.php",
+        "themes/auth/register.php",
+        "themes/auth/forgot-password.php"
+      ]
     },
     {
-      "name": "Admin Panel",
-      "description": "Comprehensive admin dashboard with user management and system settings",
-      "files": ["app/Controllers/AdminController.php", "app/Views/admin/", "app/Middleware/AdminMiddleware.php"]
+      "name": "user_dashboard",
+      "description": "User dashboard with calculation history, favorites, and profile management",
+      "files": [
+        "app/Controllers/UserController.php",
+        "themes/user/dashboard.php",
+        "themes/user/profile.php",
+        "themes/user/calculations.php",
+        "themes/user/assets/css/dashboard.css"
+      ]
     },
     {
-      "name": "Neon Cyberpunk Theme",
-      "description": "Modern responsive theme with neon colors, animations, and cyberpunk aesthetics",
-      "files": ["themes/default/assets/css/", "themes/default/assets/js/", "themes/default/views/"]
+      "name": "engineering_calculators",
+      "description": "Comprehensive engineering calculation modules for different disciplines",
+      "files": [
+        "modules/civil/concrete/concrete-volume.php",
+        "modules/civil/steel/beam-weight.php",
+        "modules/electrical/load-calculation.php",
+        "modules/mechanical/pipe-sizing.php",
+        "modules/structural/beam-analysis.php",
+        "app/Controllers/CalculatorController.php"
+      ]
     },
     {
-      "name": "Theme Management System",
-      "description": "Dynamic theme switching and customization with asset management",
-      "files": ["app/Services/ThemeManager.php", "app/Views/admin/themes/", "themes/"]
+      "name": "admin_panel",
+      "description": "WordPress-like admin panel with modular architecture and beautiful UI",
+      "files": [
+        "app/Controllers/Admin/MainDashboardController.php",
+        "app/Controllers/Admin/DebugController.php",
+        "themes/admin/layouts/main.php",
+        "themes/admin/views/dashboard.php",
+        "themes/admin/views/modules.php",
+        "themes/admin/views/debug/dashboard.php",
+        "themes/admin/assets/css/admin.css",
+        "themes/admin/assets/js/admin.js"
+      ]
     },
     {
-      "name": "Security Framework",
-      "description": "CSRF protection, input validation, SQL injection prevention, secure sessions",
-      "files": ["app/Services/Security.php", "app/Middleware/SecurityMiddleware.php", "app/Core/Controller.php"]
+      "name": "module_system",
+      "description": "WordPress-like modular architecture for extensible functionality",
+      "files": [
+        "app/Core/AdminModule.php",
+        "app/Core/AdminModuleManager.php",
+        "app/Modules/Admin/DashboardModule.php",
+        "app/Modules/Admin/UserManagementModule.php",
+        "app/Modules/Analytics/AnalyticsModule.php"
+      ]
     },
     {
-      "name": "Clean URL System",
-      "description": "SEO-friendly URLs with .htaccess routing and MVC pattern",
-      "files": ["index.php", ".htaccess", "app/routes.php", "app/Core/Router.php"]
+      "name": "debug_system",
+      "description": "Comprehensive debugging tools with error logging and system monitoring",
+      "files": [
+        "app/Controllers/Admin/DebugController.php",
+        "themes/admin/views/debug/dashboard.php",
+        "themes/admin/views/debug/error-logs.php",
+        "test_system_verification.php",
+        "debug_demo.php"
+      ]
     },
     {
-      "name": "Database Management",
-      "description": "PDO-based database layer with migrations and model relationships",
-      "files": ["app/Config/db.php", "app/Core/Database.php", "database/migrations/", "app/Models/"]
+      "name": "installer_system",
+      "description": "Beautiful installation wizard with auto-deletion functionality",
+      "files": [
+        "install/installer.php",
+        "install/steps/welcome.php",
+        "install/steps/database.php",
+        "install/steps/admin.php",
+        "install/steps/complete.php",
+        "install/database.sql",
+        "app/Services/InstallerService.php"
+      ]
+    },
+    {
+      "name": "geolocation_service",
+      "description": "Location detection and tracking for user analytics",
+      "files": [
+        "app/Services/GeoLocationService.php",
+        "app/Controllers/Api/LocationController.php"
+      ]
+    },
+    {
+      "name": "marketing_system",
+      "description": "User agreement tracking and marketing preferences management",
+      "files": [
+        "app/Controllers/Api/MarketingController.php",
+        "app/Models/User.php",
+        "test_agreements.php"
+      ]
+    },
+    {
+      "name": "api_system",
+      "description": "RESTful API endpoints for frontend integration and mobile apps",
+      "files": [
+        "app/Controllers/Api/AuthController.php",
+        "app/Controllers/Api/AdminController.php",
+        "app/Controllers/Api/MarketingController.php",
+        "app/Controllers/ApiController.php",
+        "app/routes.php"
+      ]
+    },
+    {
+      "name": "responsive_ui",
+      "description": "Mobile-first responsive design with modern animations and interactions",
+      "files": [
+        "themes/landing/assets/css/landing.css",
+        "themes/admin/assets/css/admin.css",
+        "themes/user/assets/css/dashboard.css",
+        "public/css/style.css"
+      ]
+    },
+    {
+      "name": "database_layer",
+      "description": "Database abstraction layer with migration support",
+      "files": [
+        "app/Core/Database.php",
+        "app/Models/User.php",
+        "database/migrations/",
+        "install/database.sql"
+      ]
     }
-  ],
-  "key_paths": {
-    "routes": "app/routes.php",
-    "theme_manager": "app/Services/ThemeManager.php",
-    "theme_views": "themes/default/views",
-    "admin_theme_ui": "app/Views/admin/themes/index.php",
-    "plugin_manager": "app/Services/PluginManager.php",
-    "controllers": "app/Controllers/*"
-  },
-  "critical_flows": [
-    "User: Home -> Navigate calculators via dynamic dropdown -> Open calculator page",
-    "Admin: /admin/themes -> Upload -> Validate -> Activate -> Customize settings -> Verify dynamic CSS applied",
-    "Admin: /admin/help -> Backup/Export/Restore -> Download artifacts",
-    "Admin: /admin/audit-logs -> Filter & download",
-    "API v1: /api/v1/health -> 200 JSON"
   ]
 }

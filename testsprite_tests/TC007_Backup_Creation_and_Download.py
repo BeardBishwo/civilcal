@@ -46,21 +46,21 @@ async def run_test():
                 pass
         
         # Interact with the page elements to simulate user flow
-        # -> Navigate to the HTTPS version of the site to access the calculator page properly.
+        # -> Navigate to the HTTPS version of the site to access the admin panel.
         await page.goto('https://localhost/bishwo_calculator', timeout=10000)
         await asyncio.sleep(3)
         
 
-        # -> Click on the Login link to sign in as admin.
+        # -> Click on the Login link to access the admin panel.
         frame = context.pages[-1]
-        # Click on the Login link to open the login page.
+        # Click on the Login link to access the admin panel
         elem = frame.locator('xpath=html/body/header/div/div[3]/div/a').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
         
 
         # -> Input admin username and password, then click Sign In.
         frame = context.pages[-1]
-        # Input admin username/email
+        # Input admin username
         elem = frame.locator('xpath=html/body/div/div/form/div/div/input').nth(0)
         await page.wait_for_timeout(3000); await elem.fill('admin@engicalpro.com')
         
@@ -72,14 +72,14 @@ async def run_test():
         
 
         frame = context.pages[-1]
-        # Click Sign In button to submit login form
+        # Click Sign In button
         elem = frame.locator('xpath=html/body/div/div/form/div[3]/button').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
         
 
-        # -> Attempt to use the 'Admin Demo' Quick Login button to bypass manual login and check if connection error persists.
+        # -> Attempt to use the Admin Demo Quick Login button to bypass manual login and access the admin panel.
         frame = context.pages[-1]
-        # Click 'Admin Demo' Quick Login button to attempt login bypassing manual input
+        # Click Admin Demo Quick Login button to attempt login bypass
         elem = frame.locator('xpath=html/body/div[2]/div/div/div[2]/div/button').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
         
@@ -87,9 +87,9 @@ async def run_test():
         # --> Assertions to verify final state
         frame = context.pages[-1]
         try:
-            await expect(frame.locator('text=Plugin activation successful').first).to_be_visible(timeout=1000)
+            await expect(frame.locator('text=Backup Completed Successfully').first).to_be_visible(timeout=30000)
         except AssertionError:
-            raise AssertionError("Test case failed: Plugin activation status toggling and deletion did not reflect correctly in system behavior and UI as per the test plan.")
+            raise AssertionError("Test case failed: Backup system did not complete successfully or backup files (db.sql and assets) are not available as expected.")
         await asyncio.sleep(5)
     
     finally:

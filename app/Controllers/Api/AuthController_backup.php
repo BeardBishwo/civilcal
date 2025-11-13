@@ -25,7 +25,6 @@ class AuthController extends Controller
             $input = json_decode(file_get_contents('php://input'), true);
             $username = $input['username_email'] ?? $input['username'] ?? $_POST['username_email'] ?? $_POST['username'] ?? '';
             $password = $input['password'] ?? $_POST['password'] ?? '';
-            $rememberMe = $input['remember_me'] ?? $_POST['remember_me'] ?? false;
 
             if (empty($username) || empty($password)) {
                 http_response_code(400);
@@ -48,27 +47,6 @@ class AuthController extends Controller
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['user'] = $user;
                 $_SESSION['is_admin'] = $user['is_admin'] ?? false;
-
-                // Handle "Remember Me" functionality
-                if ($rememberMe) {
-                    // Generate secure remember token
-                    $rememberToken = bin2hex(random_bytes(32));
-                    
-                    // Set secure cookie for 30 days
-                    $expire = time() + (30 * 24 * 60 * 60); // 30 days
-                    setcookie('remember_token', $rememberToken, [
-                        'expires' => $expire,
-                        'path' => '/',
-                        'domain' => '',
-                        'secure' => isset($_SERVER['HTTPS']), // Only over HTTPS if available
-                        'httponly' => true, // Prevent JavaScript access
-                        'samesite' => 'Strict' // CSRF protection
-                    ]);
-                    
-                    // Store token hash in database (you'd need to add this column)
-                    // For now, just log it for demo purposes
-                    error_log("Remember token set for user {$user['username']}: expires " . date('Y-m-d H:i:s', $expire));
-                }
 
                 // Check for installer auto-deletion on first admin login
                 if (($user['role'] === 'admin' || $user['role'] === 'super_admin') && 
@@ -123,37 +101,19 @@ class AuthController extends Controller
             $username = $input['username'] ?? '';
             $email = $input['email'] ?? '';
             $password = $input['password'] ?? '';
-            $fullName = $input['full_name'] ?? '';
-            $phoneNumber = $input['phone_number'] ?? '';
-            $engineerRoles = $input['engineer_roles'] ?? [];
 
-            if (empty($username) || empty($email) || empty($password) || empty($fullName) || empty($phoneNumber)) {
+            if (empty($username) || empty($email) || empty($password)) {
                 http_response_code(400);
-                echo json_encode(['error' => 'All required fields must be filled: username, email, password, full name, and phone number']);
+                echo json_encode(['error' => 'All fields are required']);
                 return;
             }
-
-            // Validate that at least one engineering specialty is selected
-            if (empty($engineerRoles) || !is_array($engineerRoles) || count($engineerRoles) == 0) {
-                http_response_code(400);
-                echo json_encode(['error' => 'Please select at least one engineering specialty']);
-                return;
-            }
-
-            // Parse full name into first and last name
-            $nameParts = explode(' ', trim($fullName), 2);
-            $firstName = $nameParts[0] ?? '';
-            $lastName = $nameParts[1] ?? '';
 
             // Create user
             $userModel = new User();
             $result = $userModel->create([
                 'username' => $username,
                 'email' => $email,
-                'password' => password_hash($password, PASSWORD_DEFAULT),
-                'first_name' => $firstName,
-                'last_name' => $lastName,
-                'phone' => $phoneNumber
+                'password' => password_hash($password, PASSWORD_DEFAULT)
             ]);
 
             if ($result) {
@@ -184,9 +144,6 @@ class AuthController extends Controller
             if (session_status() == PHP_SESSION_NONE) {
                 session_start();
             }
-            
-            // Clear remember me cookie if it exists
-            $this->clearRememberToken();
             
             session_destroy();
             
@@ -305,65 +262,6 @@ class AuthController extends Controller
             error_log('checkUsername error: ' . $e->getMessage());
             http_response_code(500);
             echo json_encode(['error' => 'Error checking username availability']);
-        }
-    }
-
-    /**
-     * Check if user has valid remember me token and auto-login
-     */
-    public function checkRememberToken()
-    {
-        header('Content-Type: application/json');
-        
-        try {
-            // Check if remember token exists in cookies
-            if (!isset($_COOKIE['remember_token'])) {
-                echo json_encode(['success' => false, 'message' => 'No remember token']);
-                return;
-            }
-            
-            $token = $_COOKIE['remember_token'];
-            
-            // For production, you'd validate this token against database
-            // For now, we'll just check if it's a valid format and not expired
-            if (strlen($token) === 64) { // 32 bytes = 64 hex chars
-                // In a real app, you'd:
-                // 1. Hash the token and look it up in database
-                // 2. Get associated user_id
-                // 3. Validate token hasn't expired
-                // 4. Auto-login the user
-                
-                echo json_encode([
-                    'success' => true, 
-                    'message' => 'Remember token valid',
-                    'auto_login' => true
-                ]);
-            } else {
-                // Invalid token format
-                $this->clearRememberToken();
-                echo json_encode(['success' => false, 'message' => 'Invalid token format']);
-            }
-            
-        } catch (Exception $e) {
-            error_log('checkRememberToken error: ' . $e->getMessage());
-            echo json_encode(['success' => false, 'error' => 'Token validation failed']);
-        }
-    }
-    
-    /**
-     * Clear remember me token/cookie
-     */
-    private function clearRememberToken()
-    {
-        if (isset($_COOKIE['remember_token'])) {
-            setcookie('remember_token', '', [
-                'expires' => time() - 3600, // Expire in the past
-                'path' => '/',
-                'domain' => '',
-                'secure' => isset($_SERVER['HTTPS']),
-                'httponly' => true,
-                'samesite' => 'Strict'
-            ]);
         }
     }
 }

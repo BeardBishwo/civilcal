@@ -145,10 +145,19 @@ $csrf_token = Security::generateCsrfToken();
                     <!-- Professional Details -->
                     <div class="form-row">
                         <div class="form-group half-width">
-                            <label for="full_name">Full Name</label>
-                            <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Your full name">
+                            <label for="full_name">Full Name *</label>
+                            <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Your full name" required>
+                            <div class="field-message">Enter your complete legal name</div>
                         </div>
                         
+                        <div class="form-group half-width">
+                            <label for="phone_number">Phone Number *</label>
+                            <input type="tel" id="phone_number" name="phone_number" class="form-control" placeholder="+1 (555) 123-4567" required>
+                            <div class="field-message">Include country code for international numbers</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
                         <div class="form-group half-width">
                             <label for="role">Professional Role</label>
                             <select id="role" name="role" class="form-control">
@@ -616,11 +625,11 @@ select.form-control {
 .checkbox-item {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     white-space: nowrap;
     gap: 12px;
     cursor: pointer;
-    padding: 8px 20px;
+    padding: 12px 16px;
     border: 2px solid #e5e7eb;
     border-radius: 8px;
     transition: all 0.2s ease;
@@ -628,7 +637,7 @@ select.form-control {
     background: white;
     margin-bottom: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    height: 48px;
+    height: 52px;
     width: 100%;
     max-width: 280px;
     margin: 0 auto;
@@ -669,7 +678,7 @@ select.form-control {
 }
 
 .checkbox-grid .checkbox-item {
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .checkbox-item input[type="checkbox"]:checked {
@@ -991,18 +1000,36 @@ select.form-control {
 }
 
 .requirement-icon {
-    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid #d1d5db;
+    font-size: 0.7rem;
     font-weight: bold;
     color: #d1d5db;
-    transition: color 0.3s ease;
+    background-color: transparent;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.requirement.met .requirement-icon {
+    background-color: #10b981;
+    border-color: #10b981;
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
 }
 
 .requirement.met .requirement-icon::before {
     content: "✓";
+    font-weight: 900;
 }
 
 .requirement:not(.met) .requirement-icon::before {
-    content: "○";
+    content: "";
 }
 
 /* Form alignment fixes */
@@ -1308,6 +1335,29 @@ function initializeForm() {
 
     // Copy coordinates click wired after DOM ready
     document.getElementById('copyCoordinates').addEventListener('click', copyCoordinates);
+    
+    // Form submission validation
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        // Check if at least one engineering specialty is selected
+        const specialtyCheckboxes = document.querySelectorAll('input[name="engineer_roles[]"]:checked');
+        
+        if (specialtyCheckboxes.length === 0) {
+            e.preventDefault();
+            
+            // Scroll to the professional section
+            document.getElementById('professionalSection').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+            
+            // Show error message
+            showSpecialtyError();
+            return false;
+        }
+        
+        // Clear any previous error message
+        clearSpecialtyError();
+    });
 }
 
 
@@ -1462,6 +1512,48 @@ function checkPasswordStrength(password) {
     strengthText.textContent = `Password strength: ${strengthLevel}`;
     strengthText.style.color = color;
     strengthProgress.style.background = color;
+}
+
+// Engineering specialty validation functions
+function showSpecialtyError() {
+    // Remove any existing error message
+    clearSpecialtyError();
+    
+    // Create error message
+    const errorDiv = document.createElement('div');
+    errorDiv.id = 'specialtyError';
+    errorDiv.className = 'field-message';
+    errorDiv.style.color = '#ef4444';
+    errorDiv.style.marginTop = '10px';
+    errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Please select at least one engineering specialty.';
+    
+    // Insert error message after the checkbox grid
+    const checkboxGrid = document.querySelector('.checkbox-grid');
+    if (checkboxGrid && checkboxGrid.parentNode) {
+        checkboxGrid.parentNode.insertBefore(errorDiv, checkboxGrid.nextSibling);
+    }
+    
+    // Add error styling to the professional section
+    const professionalSection = document.getElementById('professionalSection');
+    if (professionalSection) {
+        professionalSection.style.borderColor = '#ef4444';
+        professionalSection.style.backgroundColor = '#fef2f2';
+    }
+}
+
+function clearSpecialtyError() {
+    // Remove error message
+    const errorDiv = document.getElementById('specialtyError');
+    if (errorDiv) {
+        errorDiv.remove();
+    }
+    
+    // Reset professional section styling
+    const professionalSection = document.getElementById('professionalSection');
+    if (professionalSection) {
+        professionalSection.style.borderColor = '#4f46e5';
+        professionalSection.style.backgroundColor = '';
+    }
 }
 
 /**

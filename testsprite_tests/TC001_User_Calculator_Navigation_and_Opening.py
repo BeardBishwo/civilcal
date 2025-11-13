@@ -46,50 +46,24 @@ async def run_test():
                 pass
         
         # Interact with the page elements to simulate user flow
-        # -> Navigate to the HTTPS version of the site to access the calculator page properly.
+        # -> Navigate to the home page using HTTPS scheme.
         await page.goto('https://localhost/bishwo_calculator', timeout=10000)
         await asyncio.sleep(3)
         
 
-        # -> Click on the Login link to sign in as admin.
+        # -> Click on 'Concrete Volume' calculator under Civil module to open it and verify the page loads correctly.
         frame = context.pages[-1]
-        # Click on the Login link to open the login page.
-        elem = frame.locator('xpath=html/body/header/div/div[3]/div/a').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
-        # -> Input admin username and password, then click Sign In.
-        frame = context.pages[-1]
-        # Input admin username/email
-        elem = frame.locator('xpath=html/body/div/div/form/div/div/input').nth(0)
-        await page.wait_for_timeout(3000); await elem.fill('admin@engicalpro.com')
-        
-
-        frame = context.pages[-1]
-        # Input admin password
-        elem = frame.locator('xpath=html/body/div/div/form/div/div[2]/div/input').nth(0)
-        await page.wait_for_timeout(3000); await elem.fill('password')
-        
-
-        frame = context.pages[-1]
-        # Click Sign In button to submit login form
-        elem = frame.locator('xpath=html/body/div/div/form/div[3]/button').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
-        # -> Attempt to use the 'Admin Demo' Quick Login button to bypass manual login and check if connection error persists.
-        frame = context.pages[-1]
-        # Click 'Admin Demo' Quick Login button to attempt login bypassing manual input
-        elem = frame.locator('xpath=html/body/div[2]/div/div/div[2]/div/button').nth(0)
+        # Click on 'Concrete Volume' calculator under Civil module
+        elem = frame.locator('xpath=html/body/main/div[2]/div[4]/div/ul/li/a').nth(0)
         await page.wait_for_timeout(3000); await elem.click(timeout=5000)
         
 
         # --> Assertions to verify final state
         frame = context.pages[-1]
         try:
-            await expect(frame.locator('text=Plugin activation successful').first).to_be_visible(timeout=1000)
+            await expect(frame.locator('text=Calculator Not Found Error')).to_be_visible(timeout=5000)
         except AssertionError:
-            raise AssertionError("Test case failed: Plugin activation status toggling and deletion did not reflect correctly in system behavior and UI as per the test plan.")
+            raise AssertionError('Test case failed: The calculator page did not load correctly or the expected error message for non-existent calculator was not displayed as per the test plan.')
         await asyncio.sleep(5)
     
     finally:
