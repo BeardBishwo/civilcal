@@ -33,8 +33,16 @@ class Controller {
         }
         
         // Initialize view (if View class exists)
-        if (class_exists('View')) {
-            $this->view = new View();
+        if (class_exists('\App\Core\View')) {
+            try {
+                $this->view = new \App\Core\View();
+            } catch (Exception $e) {
+                error_log("View initialization failed: " . $e->getMessage());
+                $this->view = null;
+            }
+        } else {
+            error_log("View class not found");
+            $this->view = null;
         }
         
         // Initialize session (if Session class exists)

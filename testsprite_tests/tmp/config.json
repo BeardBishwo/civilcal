@@ -1,16 +1,18 @@
 {
-  "status": "init",
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:80/bishwo_calculator",
+  "loginUser": "admin@engicalpro.com",
+  "loginPassword": "password",
   "executionArgs": {
     "projectName": "Bishwo_Calculator",
     "projectPath": "c:\\laragon\\www\\Bishwo_Calculator",
     "testIds": [],
-    "additionalInstruction": "Focus tests on:\n1) Home page header contains Calculators dropdown populated via API/Factory and links are valid.\n2) Visiting /calculator/civil shows a grid of calculators with links to /calculator/civil/<slug>.\n3) Visiting a tool URL renders breadcrumb and an Open Module button.\n4) Admin login (mock or bypass if not available), visit /admin/themes, click Customize, change primary color, save, and verify CSS variables on reload reflect new value.\n5) Basic smoke: /api/v1/health returns JSON with success and active theme info.\nIf login is required for admin pages and credentials are unknown, stub/bypass by setting a session or mocking auth middleware if supported by the environment.\nUse robust selectors (by text and roles) and tolerate minor layout differences.",
+    "additionalInstruction": "Test the complete Bishwo Calculator engineering application including homepage, neon theme, engineering category navigation, user authentication, and calculator functionality. Focus on the clean URL system and responsive design.",
     "envs": {
       "API_KEY": "sk-user-5O4tgUViz7LhNMacDTD43BoH2Fczea6DDU-FNks6GEocgTd1o_Bjpt62kFbJDqfLB1vPU_1DHH8jmq0sTbDtZ0PPGM4dnQFlL0NV6skpC3eNpKwjRmGhOvCv7ygLA_l7_DM"
     }
   },
-  "scope": "codebase",
-  "type": "frontend",
-  "localEndpoint": "http://localhost:80/bishwo_calculator",
-  "serverPort": 49765
+  "proxy": "http://18df8413-142e-4498-a2c2-4b7d9887bb4a:DWe5bXF3AAA7lByHk4utImf1ZpNf2ajA@tun.testsprite.com:8080"
 }

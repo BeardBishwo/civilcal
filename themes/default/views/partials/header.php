@@ -1594,31 +1594,31 @@ m        color: #93c5fd;
                 <nav class="main-nav">
                     <ul>
                         <li>
-                            <a href="<?php echo app_base_url('civil.php'); ?>">
+                            <a href="<?php echo app_base_url('civil'); ?>">
                                 <i class="fas fa-hard-hat"></i>
                                 Civil
                             </a>
                         </li>
                         <li>
-                            <a href="<?php echo app_base_url('electrical.php'); ?>">
+                            <a href="<?php echo app_base_url('electrical'); ?>">
                                 <i class="fas fa-bolt"></i>
                                 Electrical
                             </a>
                         </li>
                         <li>
-                            <a href="<?php echo app_base_url('plumbing.php'); ?>">
+                            <a href="<?php echo app_base_url('plumbing'); ?>">
                                 <i class="fas fa-faucet"></i>
                                 Plumbing
                             </a>
                         </li>
                         <li>
-                            <a href="<?php echo app_base_url('hvac.php'); ?>">
+                            <a href="<?php echo app_base_url('hvac'); ?>">
                                 <i class="fas fa-wind"></i>
                                 HVAC
                             </a>
                         </li>
                         <li>
-                            <a href="<?php echo app_base_url('fire.php'); ?>">
+                            <a href="<?php echo app_base_url('fire'); ?>">
                                 <i class="fas fa-fire-extinguisher"></i>
                                 Fire Protection
                             </a>
@@ -1630,11 +1630,11 @@ m        color: #93c5fd;
                                 <i class="fas fa-chevron-down"></i>
                             </a>
                             <ul class="dropdown" role="menu">
-                                <li role="none"><a href="<?php echo app_base_url('site.php'); ?>" class="grid-item" role="menuitem"><i class="fas fa-map-marked-alt"></i>Site Development</a></li>
-                                <li role="none"><a href="<?php echo app_base_url('structural.php'); ?>" class="grid-item" role="menuitem"><i class="fas fa-building"></i>Structural Analysis</a></li>
-                                <li role="none"><a href="<?php echo app_base_url('mep.php'); ?>" class="grid-item" role="menuitem"><i class="fas fa-cogs"></i>MEP Coordination</a></li>
-                                <li role="none"><a href="<?php echo app_base_url('estimation.php'); ?>" class="grid-item" role="menuitem"><i class="fas fa-calculator"></i>Estimation Suite</a></li>
-                                <li role="none"><a href="<?php echo app_base_url('management.php'); ?>" class="grid-item" role="menuitem"><i class="fas fa-project-diagram"></i>Management</a></li>
+                                <li role="none"><a href="<?php echo app_base_url('site'); ?>" class="grid-item" role="menuitem"><i class="fas fa-map-marked-alt"></i>Site Development</a></li>
+                                <li role="none"><a href="<?php echo app_base_url('structural'); ?>" class="grid-item" role="menuitem"><i class="fas fa-building"></i>Structural Analysis</a></li>
+                                <li role="none"><a href="<?php echo app_base_url('mep'); ?>" class="grid-item" role="menuitem"><i class="fas fa-cogs"></i>MEP Coordination</a></li>
+                                <li role="none"><a href="<?php echo app_base_url('estimation'); ?>" class="grid-item" role="menuitem"><i class="fas fa-calculator"></i>Estimation Suite</a></li>
+                                <li role="none"><a href="<?php echo app_base_url('management'); ?>" class="grid-item" role="menuitem"><i class="fas fa-project-diagram"></i>Management</a></li>
                             </ul>
                         </li>
                         </li>
@@ -1731,14 +1731,14 @@ m        color: #93c5fd;
 
         <div class="mobile-nav" id="mobileNav">
             <ul>
-                <li><a href="<?php echo app_base_url('civil.php'); ?>"><i class="fas fa-hard-hat"></i> Civil</a></li>
-                <li><a href="<?php echo app_base_url('electrical.php'); ?>"><i class="fas fa-bolt"></i> Electrical</a></li>
-                <li><a href="<?php echo app_base_url('plumbing.php'); ?>"><i class="fas fa-faucet"></i> Plumbing</a></li>
-                <li><a href="<?php echo app_base_url('hvac.php'); ?>"><i class="fas fa-wind"></i> HVAC</a></li>
-                <li><a href="<?php echo app_base_url('fire.php'); ?>"><i class="fas fa-fire-extinguisher"></i> Fire Protection</a></li>
-                <li><a href="<?php echo app_base_url('site.php'); ?>"><i class="fas fa-map-marked-alt"></i> Site Development</a></li>
-                <li><a href="<?php echo app_base_url('estimation.php'); ?>"><i class="fas fa-calculator"></i> Estimation</a></li>
-                <li><a href="<?php echo app_base_url('structural.php'); ?>"><i class="fas fa-building"></i> Structural</a></li>
+                <li><a href="<?php echo app_base_url('civil'); ?>"><i class="fas fa-hard-hat"></i> Civil</a></li>
+                <li><a href="<?php echo app_base_url('electrical'); ?>"><i class="fas fa-bolt"></i> Electrical</a></li>
+                <li><a href="<?php echo app_base_url('plumbing'); ?>"><i class="fas fa-faucet"></i> Plumbing</a></li>
+                <li><a href="<?php echo app_base_url('hvac'); ?>"><i class="fas fa-wind"></i> HVAC</a></li>
+                <li><a href="<?php echo app_base_url('fire'); ?>"><i class="fas fa-fire-extinguisher"></i> Fire Protection</a></li>
+                <li><a href="<?php echo app_base_url('site'); ?>"><i class="fas fa-map-marked-alt"></i> Site Development</a></li>
+                <li><a href="<?php echo app_base_url('estimation'); ?>"><i class="fas fa-calculator"></i> Estimation</a></li>
+                <li><a href="<?php echo app_base_url('structural'); ?>"><i class="fas fa-building"></i> Structural</a></li>
             </ul>
         </div>
     </header>

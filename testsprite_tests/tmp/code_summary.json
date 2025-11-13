@@ -1,22 +1,46 @@
 {
-  "project": "Bishwo_Calculator",
-  "stack": {
-    "language": "php",
-    "framework": "custom MVC",
-    "views": "PHP templates under themes/<active>/views",
-    "assets": "public/assets/themes/<active> and themes/<active>/assets",
-    "db": "PDO via includes/db.php",
-    "routing": "app/routes.php with custom Router"
-  },
+  "tech_stack": ["PHP 7.4+", "Custom MVC", "MySQL/MariaDB", "HTML5/CSS3/JS", "FastRoute", "Composer", "mPDF", "Stripe"],
   "features": [
-    "Themes: install, activate, validate, preview, backups, settings",
-    "Plugins: upload, toggle, delete, details, refresh, plugin manifest validation",
-    "Modules: service providers (Civil, Electrical, HVAC) + module navigation",
-    "API v1: calculators, health endpoints, history",
-    "Backup/Restore: full system backup with db.sql + themes/plugins",
-    "Audit Log viewer with filters & download",
-    "Rate limiting + CSRF on admin POST routes",
-    "Logger + AuditLogger for structured logs"
+    {
+      "name": "Engineering Calculators",
+      "description": "6 specialized engineering discipline calculators with complex formulas",
+      "files": ["modules/civil/", "modules/electrical/", "modules/hvac/", "modules/fire/", "modules/plumbing/", "modules/structural/"]
+    },
+    {
+      "name": "User Authentication System", 
+      "description": "Complete user registration, login, password reset with session management",
+      "files": ["app/Controllers/AuthController.php", "app/Models/User.php", "themes/default/views/auth/"]
+    },
+    {
+      "name": "Admin Panel",
+      "description": "Comprehensive admin dashboard with user management and system settings",
+      "files": ["app/Controllers/AdminController.php", "app/Views/admin/", "app/Middleware/AdminMiddleware.php"]
+    },
+    {
+      "name": "Neon Cyberpunk Theme",
+      "description": "Modern responsive theme with neon colors, animations, and cyberpunk aesthetics",
+      "files": ["themes/default/assets/css/", "themes/default/assets/js/", "themes/default/views/"]
+    },
+    {
+      "name": "Theme Management System",
+      "description": "Dynamic theme switching and customization with asset management",
+      "files": ["app/Services/ThemeManager.php", "app/Views/admin/themes/", "themes/"]
+    },
+    {
+      "name": "Security Framework",
+      "description": "CSRF protection, input validation, SQL injection prevention, secure sessions",
+      "files": ["app/Services/Security.php", "app/Middleware/SecurityMiddleware.php", "app/Core/Controller.php"]
+    },
+    {
+      "name": "Clean URL System",
+      "description": "SEO-friendly URLs with .htaccess routing and MVC pattern",
+      "files": ["index.php", ".htaccess", "app/routes.php", "app/Core/Router.php"]
+    },
+    {
+      "name": "Database Management",
+      "description": "PDO-based database layer with migrations and model relationships",
+      "files": ["app/Config/db.php", "app/Core/Database.php", "database/migrations/", "app/Models/"]
+    }
   ],
   "key_paths": {
     "routes": "app/routes.php",
