@@ -1,18 +1,7 @@
 {
   "status": "commited",
-  "type": "frontend",
+  "type": "backend",
   "scope": "codebase",
-  "localEndpoint": "http://localhost:80/bishwo_calculator",
-  "loginUser": "admin@engicalpro.com",
-  "loginPassword": "password",
-  "executionArgs": {
-    "projectName": "Bishwo_Calculator",
-    "projectPath": "c:\\laragon\\www\\Bishwo_Calculator",
-    "testIds": [],
-    "additionalInstruction": "Focus on frontend UI testing and element interactions. Test the landing page, admin panel, and calculator interfaces.",
-    "envs": {
-      "API_KEY": "sk-user-5O4tgUViz7LhNMacDTD43BoH2Fczea6DDU-FNks6GEocgTd1o_Bjpt62kFbJDqfLB1vPU_1DHH8jmq0sTbDtZ0PPGM4dnQFlL0NV6skpC3eNpKwjRmGhOvCv7ygLA_l7_DM"
-    }
-  },
-  "proxy": "http://1c7e47f9-58e4-4e38-a973-7421854667bc:xJTOyn5QcF946YQXZJyBZ4H215hsmKE2@tun.testsprite.com:8080"
+  "localEndpoint": "http://localhost:59643/login",
+  "backendAuthType": "basic token"
 }

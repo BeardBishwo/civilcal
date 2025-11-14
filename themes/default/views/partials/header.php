@@ -605,6 +605,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         /* Make login button responsive */
         .login-btn {
             margin-left: 0.25rem !important;
+            margin-right: 0.75rem !important;
         }
 
         @media (max-width: 480px) {
@@ -1715,7 +1716,7 @@ m        color: #93c5fd;
                                     <i class="fas fa-question-circle" style="color: #3b82f6;"></i>
                                     <span class="text">Help</span>
                                 </a>
-                                <a href="<?php echo app_base_url('logout.php'); ?>" class="menu-item">
+                                <a href="<?php echo app_base_url('logout'); ?>" class="menu-item">
                                     <i class="fas fa-sign-out-alt" style="color: #6b7280;"></i>
                                     <span class="text">Logout</span>
                                 </a>
@@ -1759,6 +1760,25 @@ m        color: #93c5fd;
     <main class="main-content">
 
     <script>
+    // Helper functions for search result styling
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? 
+            `${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)}` : 
+            '108,117,125';
+    }
+    
+    function adjustColor(hex, percent) {
+        const num = parseInt(hex.replace("#",""), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = (num >> 16) + amt;
+        const G = (num >> 8 & 0x00FF) + amt;
+        const B = (num & 0x0000FF) + amt;
+        return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 +
+            (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255))
+            .toString(16).slice(1);
+    }
+
     // Header search modal toggle with typing effect
     (function(){
         const toggleBtn = document.getElementById('searchToggleBtn');
@@ -1889,22 +1909,30 @@ m        color: #93c5fd;
                     }
                     
                     results.innerHTML = data.map(item=>{
-                        const categoryBadge = item.category ? `<span class="category-badge">${item.category}</span>` : '';
-                        const subcategoryBadge = item.subcategory ? `<span class="subcategory-badge">${item.subcategory}</span>` : '';
+                        const icon = item.icon || 'fas fa-calculator';
+                        const color = item.color || '#6c757d';
+                        const categoryBadge = item.category ? `<span class="category-badge" style="font-size:.75rem;color:${color};background:rgba(${hexToRgb(color)},0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(${hexToRgb(color)},0.2);font-weight:500;">${item.category}</span>` : '';
+                        const subcategoryBadge = item.subcategory ? `<span class="subcategory-badge" style="font-size:.75rem;color:#64748b;background:rgba(100,116,139,0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(100,116,139,0.2);margin-left:0.25rem;">${item.subcategory}</span>` : '';
                         const snippet = item.description ? `<div style="font-size:.9rem;color:#64748b;margin-top:.4rem;line-height:1.4;">${item.description}</div>` : '';
                         const url = item.url || '#';
                         
-                        return `<div class="search-result-item" style="cursor:pointer;" onclick="window.location.href='${url}'">
+                        return `<div class="search-result-item" style="cursor:pointer;padding:1rem;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:0.75rem;transition:all 0.2s ease;background:white;" 
+                                     onmouseover="this.style.borderColor='${color}';this.style.boxShadow='0 4px 20px rgba(${hexToRgb(color)},0.15)';this.style.transform='translateY(-2px)';" 
+                                     onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='none';this.style.transform='translateY(0)';"
+                                     onclick="window.location.href='${url}';closeModal();">
                             <div style="display:flex;align-items:flex-start;gap:1rem;">
-                                <div style="flex:1;">
-                                    <div style="font-weight:600;font-size:1rem;color:#1e293b;margin-bottom:0.5rem;">${item.name}</div>
+                                <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg, ${color}, ${adjustColor(color, -20)});display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;flex-shrink:0;box-shadow:0 4px 12px rgba(${hexToRgb(color)},0.3);">
+                                    <i class="${icon}"></i>
+                                </div>
+                                <div style="flex:1;min-width:0;">
+                                    <div style="font-weight:600;font-size:1.1rem;color:#1e293b;margin-bottom:0.5rem;line-height:1.3;">${item.name}</div>
                                     ${snippet}
                                     <div style="margin-top:0.75rem;display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-                                        ${categoryBadge} ${subcategoryBadge}
-                                        ${item.type === 'history' ? '<span class="history-badge" style="font-size:.75rem;color:#059669;background:rgba(5,150,105,0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(5,150,105,0.2);"><i class="fas fa-history" style="margin-right:.25rem;"></i>Recent</span>' : ''}
+                                        ${categoryBadge}${subcategoryBadge}
+                                        ${item.type === 'history' ? '<span class="history-badge" style="font-size:.75rem;color:#059669;background:rgba(5,150,105,0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(5,150,105,0.2);font-weight:500;"><i class="fas fa-history" style="margin-right:.25rem;"></i>Recent</span>' : ''}
                                     </div>
                                 </div>
-                                <div style="color:#94a3b8;font-size:0.875rem;flex-shrink:0;">
+                                <div style="color:#94a3b8;font-size:1rem;flex-shrink:0;opacity:0.7;transition:all 0.2s ease;">
                                     <i class="fas fa-arrow-right"></i>
                                 </div>
                             </div>
@@ -2190,7 +2218,7 @@ m        color: #93c5fd;
                 const a = ev.target.closest && ev.target.closest('a');
                 if (!a) return;
                 const href = a.getAttribute('href') || '';
-                if (href.indexOf('logout.php') !== -1) {
+                if (href.indexOf('logout') !== -1) {
                     // Prevent default navigation to allow immediate header update
                     ev.preventDefault();
                     (async function(){

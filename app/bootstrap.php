@@ -78,8 +78,15 @@ register_shutdown_function(function () {
     }
 });
 
-// Start session
+// Configure and start session
 if (session_status() === PHP_SESSION_NONE) {
+    // Session security configuration - must be set before session_start()
+    ini_set('session.cookie_httponly', '1');
+    ini_set('session.use_only_cookies', '1');
+    ini_set('session.cookie_samesite', 'Lax');
+    if (defined('ENVIRONMENT') && ENVIRONMENT === 'production') {
+        ini_set('session.cookie_secure', '1');
+    }
     session_start();
 }
 ?>

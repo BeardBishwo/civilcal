@@ -51,19 +51,7 @@ define('RATE_LIMIT_MAX_REQUESTS', [
     'api' => 1000        // Max API requests per hour per token
 ]);
 
-// Session security - configure before session starts
-if (session_status() === PHP_SESSION_NONE) {
-    ini_set('session.cookie_httponly', '1');
-    ini_set('session.use_only_cookies', '1');
-    ini_set('session.cookie_samesite', 'Lax');
-    if (ENVIRONMENT === 'production') {
-        ini_set('session.cookie_secure', '1');
-    }
-    session_start();
-} else {
-    // Log warning if session was already started
-    error_log('Warning: Session was started before config.php. Session settings may not be applied.');
-}
+// Session is now configured and started in bootstrap.php
 
 // Database configuration
 define('DB_HOST', getenv('DB_HOST') ?: '127.0.0.1');

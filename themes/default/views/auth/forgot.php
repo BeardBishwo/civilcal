@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Reset Password - EngiCal Pro';
+$page_title = 'Reset Password - Civil Calculator';
 require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
 require_once dirname(__DIR__, 4) . '/app/Services/Security.php';
 
@@ -70,8 +70,8 @@ $csrf_token = Security::generateCsrfToken();
         <!-- Additional Options -->
         <div class="auth-footer">
             <div class="footer-links">
-                <p><a href="login_enhanced.php" class="auth-link"><i class="fas fa-arrow-left"></i> Back to Sign In</a></p>
-                <p>Don't have an account? <a href="register_enhanced.php" class="auth-link">Create Account</a></p>
+                <p><a href="<?php echo app_base_url('login'); ?>" class="auth-link"><i class="fas fa-arrow-left"></i> Back to Sign In</a></p>
+                <p>Don't have an account? <a href="<?php echo app_base_url('register'); ?>" class="auth-link">Create Account</a></p>
             </div>
         </div>
     </div>
@@ -97,7 +97,7 @@ $csrf_token = Security::generateCsrfToken();
                 <h4><i class="fas fa-shield-alt"></i> Account Security</h4>
                 <ul>
                     <li>Reset links expire after 1 hour</li>
-                    <li>Only use official EngiCal Pro emails</li>
+                    <li>Only use official Civil Calculator emails</li>
                     <li>Never share your reset link</li>
                     <li>Contact support if you didn't request reset</li>
                 </ul>
@@ -106,7 +106,7 @@ $csrf_token = Security::generateCsrfToken();
         
         <div class="contact-info">
             <p><i class="fas fa-headset"></i> <strong>Still need help?</strong></p>
-            <p>Contact our support team at <a href="mailto:support@engicalpro.com">support@engicalpro.com</a></p>
+            <p>Contact our support team at <a href="mailto:support@civilcalculator.com">support@civilcalculator.com</a></p>
         </div>
     </div>
 </div>
@@ -503,8 +503,8 @@ async function handleForgotSubmission(e) {
             email: formData.get('email')
         };
         
-        // Send forgot password request
-        const response = await fetch('/aec-calculator/api/forgot_password.php', {
+        // Send forgot password request (using direct endpoint to bypass routing issues)
+        const response = await fetch('<?php echo app_base_url('direct_forgot_password.php'); ?>', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -524,7 +524,7 @@ async function handleForgotSubmission(e) {
                 <p>${result.message || 'If the email exists in our system, you will receive password reset instructions shortly.'}</p>
                 <p><small>Check your inbox (and spam folder) for the password reset link.</small></p>
                 <div style="margin-top: 15px;">
-                    <a href="login_enhanced.php" class="auth-link" style="color: #065f46;">
+                    <a href="<?php echo app_base_url('login'); ?>" class="auth-link" style="color: #065f46;">
                         <i class="fas fa-arrow-left"></i> Back to Sign In
                     </a>
                 </div>

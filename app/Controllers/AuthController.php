@@ -189,7 +189,7 @@ class AuthController extends Controller
      */
     public function showForgotPassword()
     {
-        $this->view->render('auth/forgot-password', [
+        $this->view->render('auth/forgot', [
             'viewHelper' => $this->view
         ]);
     }
@@ -202,9 +202,13 @@ class AuthController extends Controller
         header('Content-Type: application/json');
         
         try {
-            // Validate CSRF token
+            // Get input data (handle both JSON and form data)
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (!$input) {
+                $input = $_POST;
+            }
             
-            $email = trim($_POST['email'] ?? '');
+            $email = trim($input['email'] ?? '');
             
             // Validate input
             if (empty($email)) {

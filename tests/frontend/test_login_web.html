@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-form { max-width: 400px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #4f46e5; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        .result { margin-top: 20px; padding: 15px; border-radius: 5px; }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #dc2626; }
+        .demo-buttons { margin-top: 20px; }
+        .demo-btn { background: #10b981; color: white; padding: 8px 15px; border: none; border-radius: 5px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="test-form">
+        <h2>🔐 Login Test</h2>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username/Email:</label>
+                <input type="text" id="username" name="username_email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="remember_me" value="1"> Remember me for 30 days
+                </label>
+            </div>
+            
+            <button type="submit">Login</button>
+        </form>
+        
+        <div class="demo-buttons">
+            <h3>Quick Demo Login:</h3>
+            <button class="demo-btn" onclick="quickLogin('uniquebishwo@gmail.com', 'c9PU7XAsAADYk_A')">
+                👤 Your Personal Account
+            </button>
+            <button class="demo-btn" onclick="quickLogin('engineer@engicalpro.com', 'Engineer123!')">
+                🔧 Engineer Demo
+            </button>
+            <button class="demo-btn" onclick="quickLogin('admin@engicalpro.com', 'password')">
+                👑 Admin Demo
+            </button>
+        </div>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function quickLogin(email, password) {
+            document.getElementById('username').value = email;
+            document.getElementById('password').value = password;
+            document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const payload = {
+                username_email: formData.get('username_email'),
+                password: formData.get('password'),
+                remember_me: formData.get('remember_me') ? 1 : 0
+            };
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>🔄 Logging in...</p>';
+            
+            try {
+                const response = await fetch('/direct_login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h3>✅ Login Successful!</h3>
+                        <p><strong>Welcome:</strong> ${result.user.username}</p>
+                        <p><strong>Email:</strong> ${result.user.email}</p>
+                        <p><strong>Full Name:</strong> ${result.user.full_name}</p>
+                        <p><strong>Admin:</strong> ${result.user.is_admin ? 'Yes' : 'No'}</p>
+                        <p>🎉 ${result.message}</p>
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        <h3>❌ Login Failed</h3>
+                        <p>${result.error || result.message}</p>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Connection Error</h3>
+                    <p>Unable to connect to server: ${error.message}</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

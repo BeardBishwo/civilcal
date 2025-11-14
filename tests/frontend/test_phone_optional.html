@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Number Optional Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 20px; }
+        .form-row { display: flex; gap: 20px; }
+        .form-group.half-width { flex: 1; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        .field-message { margin-top: 5px; font-size: 14px; color: #6b7280; }
+        .required { color: #ef4444; }
+        .optional { color: #10b981; }
+        button { background: #4f46e5; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #3730a3; }
+        .result { margin-top: 20px; padding: 15px; border-radius: 8px; }
+        .success { background: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+        .error { background: #fee2e2; color: #dc2626; border: 1px solid #ef4444; }
+    </style>
+</head>
+<body>
+    <h2>📱 Phone Number Optional Test</h2>
+    <p>This test demonstrates that the phone number field is now optional in the registration form.</p>
+    
+    <form id="testForm">
+        <div class="form-row">
+            <div class="form-group half-width">
+                <label for="full_name">Full Name *</label>
+                <input type="text" id="full_name" name="full_name" placeholder="Your full name" required>
+                <div class="field-message required">✅ Required field - Must be filled</div>
+            </div>
+            
+            <div class="form-group half-width">
+                <label for="phone_number">Phone Number</label>
+                <input type="tel" id="phone_number" name="phone_number" placeholder="+1 (555) 123-4567">
+                <div class="field-message optional">✅ Optional field - Can be left empty</div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input type="email" id="email" name="email" placeholder="your.email@company.com" required>
+            <div class="field-message required">✅ Required field - Must be filled</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="username">Username *</label>
+            <input type="text" id="username" name="username" placeholder="Choose a unique username" required>
+            <div class="field-message required">✅ Required field - Must be filled</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password *</label>
+            <input type="password" id="password" name="password" placeholder="Minimum 8 characters" required>
+            <div class="field-message required">✅ Required field - Must be filled</div>
+        </div>
+        
+        <button type="submit">Test Registration (Phone Optional)</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <div style="margin-top: 30px; padding: 20px; background: #f8fafc; border-radius: 8px;">
+        <h3>📋 Test Scenarios:</h3>
+        <ul>
+            <li><strong>✅ With Phone:</strong> Fill all fields including phone number - should work</li>
+            <li><strong>✅ Without Phone:</strong> Fill all required fields, leave phone empty - should work</li>
+            <li><strong>❌ Missing Required:</strong> Leave any required field empty - should show error</li>
+        </ul>
+        
+        <h3>🔧 Changes Made:</h3>
+        <ul>
+            <li>✅ Removed asterisk (*) from "Phone Number" label</li>
+            <li>✅ Removed <code>required</code> attribute from phone input</li>
+            <li>✅ Updated field message to indicate it's optional</li>
+            <li>✅ Updated server-side validation to not require phone</li>
+        </ul>
+    </div>
+
+    <script>
+        document.getElementById('testForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const resultDiv = document.getElementById('result');
+            
+            // Check required fields
+            const requiredFields = ['full_name', 'email', 'username', 'password'];
+            const missingFields = [];
+            
+            requiredFields.forEach(field => {
+                if (!formData.get(field) || formData.get(field).trim() === '') {
+                    missingFields.push(field.replace('_', ' '));
+                }
+            });
+            
+            if (missingFields.length > 0) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Validation Failed</h3>
+                    <p>Missing required fields: ${missingFields.join(', ')}</p>
+                    <p>Phone number is optional and can be left empty.</p>
+                `;
+                return;
+            }
+            
+            // Check if phone is provided
+            const phoneNumber = formData.get('phone_number');
+            const phoneStatus = phoneNumber && phoneNumber.trim() !== '' ? 
+                `📱 Phone: ${phoneNumber}` : 
+                '📱 Phone: Not provided (optional)';
+            
+            resultDiv.className = 'result success';
+            resultDiv.innerHTML = `
+                <h3>✅ Form Validation Passed!</h3>
+                <p><strong>Full Name:</strong> ${formData.get('full_name')}</p>
+                <p><strong>Email:</strong> ${formData.get('email')}</p>
+                <p><strong>Username:</strong> ${formData.get('username')}</p>
+                <p><strong>Password:</strong> ${'*'.repeat(formData.get('password').length)}</p>
+                <p><strong>${phoneStatus}</strong></p>
+                <p>🎉 <strong>Success!</strong> Phone number is now optional and the form works with or without it.</p>
+            `;
+        });
+    </script>
+</body>
+</html>

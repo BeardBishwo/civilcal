@@ -16,16 +16,32 @@ class AuthController extends Controller
         header('Content-Type: application/json');
         
         try {
+            // Log the request for debugging
+            error_log('API Login request received - Method: ' . $_SERVER['REQUEST_METHOD']);
+            
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                error_log('API Login error: Invalid method ' . $_SERVER['REQUEST_METHOD']);
                 http_response_code(405);
                 echo json_encode(['error' => 'Method not allowed']);
                 return;
             }
 
-            $input = json_decode(file_get_contents('php://input'), true);
+            $rawInput = file_get_contents('php://input');
+            error_log('API Login raw input: ' . $rawInput);
+            
+            $input = json_decode($rawInput, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                error_log('API Login JSON decode error: ' . json_last_error_msg());
+                http_response_code(400);
+                echo json_encode(['error' => 'Invalid JSON input']);
+                return;
+            }
+            
             $username = $input['username_email'] ?? $input['username'] ?? $_POST['username_email'] ?? $_POST['username'] ?? '';
             $password = $input['password'] ?? $_POST['password'] ?? '';
             $rememberMe = $input['remember_me'] ?? $_POST['remember_me'] ?? false;
+            
+            error_log('API Login attempt for username: ' . $username);
 
             if (empty($username) || empty($password)) {
                 http_response_code(400);
@@ -97,7 +113,7 @@ class AuthController extends Controller
                         'role' => $user['role'] ?? 'user',
                         'is_admin' => $user['is_admin'] ?? false
                     ],
-                    'redirect_url' => $user['is_admin'] ? '/admin/dashboard' : '/profile'
+                    'redirect_url' => ($user['is_admin'] ?? false) ? '/admin/dashboard' : '/profile'
                 ]);
             } else {
                 http_response_code(401);
@@ -105,9 +121,18 @@ class AuthController extends Controller
             }
 
         } catch (Exception $e) {
-            error_log('Login error: ' . $e->getMessage());
+            error_log('API Login exception: ' . $e->getMessage());
+            error_log('API Login exception trace: ' . $e->getTraceAsString());
+            error_log('API Login exception file: ' . $e->getFile() . ':' . $e->getLine());
             http_response_code(500);
-            echo json_encode(['error' => 'Login failed due to server error']);
+            echo json_encode([
+                'error' => 'Login failed due to server error',
+                'debug' => [
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
+            ]);
         }
     }
 
@@ -126,10 +151,12 @@ class AuthController extends Controller
             $fullName = $input['full_name'] ?? '';
             $phoneNumber = $input['phone_number'] ?? '';
             $engineerRoles = $input['engineer_roles'] ?? [];
+            $termsAgree = $input['terms_agree'] ?? false;
+            $marketingAgree = $input['marketing_agree'] ?? false;
 
-            if (empty($username) || empty($email) || empty($password) || empty($fullName) || empty($phoneNumber)) {
+            if (empty($username) || empty($email) || empty($password) || empty($fullName)) {
                 http_response_code(400);
-                echo json_encode(['error' => 'All required fields must be filled: username, email, password, full name, and phone number']);
+                echo json_encode(['error' => 'All required fields must be filled: username, email, password, and full name']);
                 return;
             }
 
@@ -140,12 +167,19 @@ class AuthController extends Controller
                 return;
             }
 
+            // Validate terms agreement (required)
+            if (!$termsAgree) {
+                http_response_code(400);
+                echo json_encode(['error' => 'You must agree to the Terms of Service and Privacy Policy to register']);
+                return;
+            }
+
             // Parse full name into first and last name
             $nameParts = explode(' ', trim($fullName), 2);
             $firstName = $nameParts[0] ?? '';
             $lastName = $nameParts[1] ?? '';
 
-            // Create user
+            // Create user with agreement preferences
             $userModel = new User();
             $result = $userModel->create([
                 'username' => $username,
@@ -153,13 +187,16 @@ class AuthController extends Controller
                 'password' => password_hash($password, PASSWORD_DEFAULT),
                 'first_name' => $firstName,
                 'last_name' => $lastName,
-                'phone' => $phoneNumber
+                'phone' => $phoneNumber,
+                'terms_agree' => $termsAgree,
+                'marketing_agree' => $marketingAgree
             ]);
 
             if ($result) {
                 echo json_encode([
                     'success' => true,
-                    'message' => 'Registration successful'
+                    'message' => 'Registration successful',
+                    'user_id' => $result
                 ]);
             } else {
                 http_response_code(400);

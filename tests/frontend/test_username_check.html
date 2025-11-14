@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Username Availability Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        .input-with-status { position: relative; }
+        .input-status { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 5px; }
+        .status-icon { font-weight: bold; font-size: 18px; }
+        .status-text { font-size: 14px; font-weight: 500; }
+        .field-message { margin-top: 8px; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+        
+        /* Username Suggestions Styles */
+        .username-suggestions {
+            margin-top: 10px;
+            padding: 12px;
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+        }
+        
+        .suggestions-label {
+            font-size: 14px;
+            color: #92400e;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .suggestions-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .suggestion-item {
+            background: #4f46e5;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        
+        .suggestion-item:hover {
+            background: #3730a3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+        }
+        
+        .demo-buttons { margin-top: 20px; }
+        .demo-btn { background: #10b981; color: white; padding: 8px 15px; border: none; border-radius: 5px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>🔍 Username Availability Checker</h2>
+    
+    <div class="form-group">
+        <label for="username">Username:</label>
+        <div class="input-with-status">
+            <input type="text" id="username" placeholder="Enter username to check availability">
+            <div class="input-status" id="usernameStatus">
+                <span class="status-icon"></span>
+                <span class="status-text">Enter username</span>
+            </div>
+        </div>
+        <div id="usernameMsg" class="field-message" style="color: #6b7280;">
+            <i class="fas fa-info-circle"></i> Choose a unique username (3-20 characters)
+        </div>
+    </div>
+    
+    <div class="demo-buttons">
+        <h3>Quick Test Usernames:</h3>
+        <button class="demo-btn" onclick="testUsername('uniquebishwo')">
+            👤 uniquebishwo (taken)
+        </button>
+        <button class="demo-btn" onclick="testUsername('engineer_demo')">
+            🔧 engineer_demo (taken)
+        </button>
+        <button class="demo-btn" onclick="testUsername('newuser123')">
+            ✨ newuser123 (likely available)
+        </button>
+        <button class="demo-btn" onclick="testUsername('ab')">
+            ❌ ab (too short)
+        </button>
+        <button class="demo-btn" onclick="testUsername('verylongusernamethatistoolong')">
+            ❌ verylongusernamethatistoolong (too long)
+        </button>
+    </div>
+
+    <script>
+        let usernameTimeout;
+        
+        function testUsername(username) {
+            document.getElementById('username').value = username;
+            checkUsernameAvailability(username);
+        }
+        
+        document.getElementById('username').addEventListener('input', function() {
+            clearTimeout(usernameTimeout);
+            const username = this.value.trim();
+
+            if (username.length < 3) {
+                updateUsernameStatus('Enter username', 'neutral');
+                return;
+            }
+
+            if (username.length > 20 || !/^[a-zA-Z0-9_]+$/.test(username)) {
+                updateUsernameStatus('Invalid format', 'error');
+                return;
+            }
+
+            updateUsernameStatus('Checking...', 'checking');
+            usernameTimeout = setTimeout(() => checkUsernameAvailability(username), 500);
+        });
+        
+        function updateUsernameStatus(message, type, suggestions = []) {
+            const statusElement = document.getElementById('usernameStatus');
+            const textElement = statusElement.querySelector('.status-text');
+            const iconElement = statusElement.querySelector('.status-icon');
+            const messageElement = document.getElementById('usernameMsg');
+            
+            textElement.textContent = message;
+            iconElement.className = 'status-icon';
+            
+            // Clear previous message
+            messageElement.innerHTML = '';
+            
+            // Update status styling
+            statusElement.className = 'input-status';
+            
+            if (type === 'available') {
+                statusElement.classList.add('available');
+                iconElement.innerHTML = '✓';
+                iconElement.style.color = '#10b981';
+                textElement.style.color = '#10b981';
+                messageElement.innerHTML = '<div class="field-message" style="color: #10b981;"><i class="fas fa-check-circle"></i> Great! This username is available</div>';
+            } else if (type === 'taken') {
+                statusElement.classList.add('taken');
+                iconElement.innerHTML = '✗';
+                iconElement.style.color = '#ef4444';
+                textElement.style.color = '#ef4444';
+                
+                // Show suggestions if available
+                if (suggestions && suggestions.length > 0) {
+                    const suggestionsHtml = `
+                        <div class="field-message" style="color: #ef4444; margin-bottom: 8px;">
+                            <i class="fas fa-exclamation-triangle"></i> Username is already taken
+                        </div>
+                        <div class="username-suggestions">
+                            <div class="suggestions-label">Try these available alternatives:</div>
+                            <div class="suggestions-list">
+                                ${suggestions.map(s => `
+                                    <span class="suggestion-item" onclick="selectUsername('${s}')" title="Click to use this username">
+                                        ${s}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    messageElement.innerHTML = suggestionsHtml;
+                } else {
+                    messageElement.innerHTML = '<div class="field-message" style="color: #ef4444;"><i class="fas fa-exclamation-triangle"></i> Username is already taken</div>';
+                }
+            } else if (type === 'checking') {
+                statusElement.classList.add('checking');
+                iconElement.innerHTML = '⟳';
+                iconElement.style.color = '#3b82f6';
+                textElement.style.color = '#3b82f6';
+                messageElement.innerHTML = '<div class="field-message" style="color: #3b82f6;"><i class="fas fa-spinner fa-spin"></i> Checking availability...</div>';
+            } else if (type === 'error') {
+                statusElement.classList.add('error');
+                iconElement.innerHTML = '!';
+                iconElement.style.color = '#ef4444';
+                textElement.style.color = '#ef4444';
+                messageElement.innerHTML = '<div class="field-message" style="color: #ef4444;"><i class="fas fa-exclamation-triangle"></i> ' + message + '</div>';
+            } else {
+                iconElement.innerHTML = '';
+                iconElement.style.color = '#6b7280';
+                textElement.style.color = '#6b7280';
+                if (message === 'Enter username') {
+                    messageElement.innerHTML = '<div class="field-message" style="color: #6b7280;"><i class="fas fa-info-circle"></i> Choose a unique username (3-20 characters)</div>';
+                }
+            }
+        }
+        
+        function selectUsername(username) {
+            const usernameInput = document.getElementById('username');
+            usernameInput.value = username;
+            usernameInput.focus();
+            checkUsernameAvailability(username);
+        }
+        
+        async function checkUsernameAvailability(username) {
+            try {
+                console.log('Checking username:', username);
+                
+                // Simulate API call for demo purposes
+                const mockResponse = await simulateUsernameCheck(username);
+                
+                if (mockResponse.error) {
+                    updateUsernameStatus(mockResponse.error, 'error');
+                    return;
+                }
+
+                if (mockResponse.available) {
+                    updateUsernameStatus('Available', 'available');
+                } else {
+                    updateUsernameStatus('Taken', 'taken', mockResponse.suggestions || []);
+                }
+            } catch (error) {
+                console.error('Username check error:', error);
+                updateUsernameStatus('Connection error', 'error');
+            }
+        }
+        
+        // Mock API simulation for demo
+        async function simulateUsernameCheck(username) {
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            // Mock taken usernames
+            const takenUsernames = ['uniquebishwo', 'engineer_demo', 'admin_demo', 'test', 'user', 'admin'];
+            
+            if (username.length < 3) {
+                return { available: false, error: 'Username too short' };
+            }
+            
+            if (username.length > 20) {
+                return { available: false, error: 'Username too long' };
+            }
+            
+            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                return { available: false, error: 'Invalid characters' };
+            }
+            
+            if (takenUsernames.includes(username.toLowerCase())) {
+                return {
+                    available: false,
+                    suggestions: [
+                        username + '1',
+                        username + '2023',
+                        username + '_user',
+                        username + 'x',
+                        'new_' + username
+                    ]
+                };
+            }
+            
+            return { available: true };
+        }
+    </script>
+</body>
+</html>

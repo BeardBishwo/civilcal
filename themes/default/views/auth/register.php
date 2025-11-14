@@ -151,9 +151,9 @@ $csrf_token = Security::generateCsrfToken();
                         </div>
                         
                         <div class="form-group half-width">
-                            <label for="phone_number">Phone Number *</label>
-                            <input type="tel" id="phone_number" name="phone_number" class="form-control" placeholder="+1 (555) 123-4567" required>
-                            <div class="field-message">Include country code for international numbers</div>
+                            <label for="phone_number">Phone Number</label>
+                            <input type="tel" id="phone_number" name="phone_number" class="form-control" placeholder="+1 (555) 123-4567">
+                            <div class="field-message">Optional field - Include country code for international numbers</div>
                         </div>
                     </div>
                     
@@ -265,9 +265,12 @@ $csrf_token = Security::generateCsrfToken();
                     <label class="checkbox-item">
                         <input type="checkbox" id="marketing_agree" name="marketing_agree">
                         <span class="checkbox-text">
-                            I would like to receive engineering tips and product updates via email (optional)
+                            📧 I would like to receive engineering tips, product updates, and promotional content via email (optional)
                         </span>
                     </label>
+                    <div class="field-message" style="margin-left: 30px; font-size: 0.875rem; color: #6b7280;">
+                        Your preference will be saved and can be updated anytime in your account settings
+                    </div>
                 </div>
             </div>
 
@@ -1220,14 +1223,87 @@ select.form-control {
         font-size: 1.875rem;
     }
 }
+
+/* Username Suggestions Styles */
+.username-suggestions {
+    margin-top: 10px;
+    padding: 12px;
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+}
+
+.suggestions-label {
+    font-size: 0.875rem;
+    color: #92400e;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.suggestions-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.suggestion-item {
+    background: #4f46e5;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.suggestion-item:hover {
+    background: #3730a3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+}
+
+.suggestion-item:active {
+    transform: translateY(0);
+}
+
+/* Input status improvements */
+.input-status.available .status-icon {
+    animation: checkmark 0.3s ease;
+}
+
+.input-status.taken .status-icon {
+    animation: shake 0.5s ease;
+}
+
+.input-status.checking .status-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes checkmark {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 <script>
 // Expose PHP specialties to JS so we can build a fallback control if checkboxes are missing
 const SPECIALTIES = <?php echo json_encode($specialties); ?>;
-// Use server-aware URL for username check (works when APP_BASE changes)
-const CHECK_USERNAME_URL = '<?php echo app_base_url('api/check-username'); ?>';
+// Use direct endpoint to bypass routing issues
+const CHECK_USERNAME_URL = '<?php echo app_base_url('direct_check_username.php'); ?>';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize form elements
@@ -1311,6 +1387,14 @@ function initializeForm() {
         document.getElementById('passwordStrength').style.display = 'block';
     });
 
+    // Location detection button
+    const detectLocationBtn = document.getElementById('detectLocation');
+    if (detectLocationBtn) {
+        detectLocationBtn.addEventListener('click', function() {
+            detectUserLocation();
+        });
+    }
+
     // Username availability check
     const usernameInput = document.getElementById('username');
     let usernameTimeout;
@@ -1361,7 +1445,7 @@ function initializeForm() {
 }
 
 
-function updateUsernameStatus(message, type) {
+function updateUsernameStatus(message, type, suggestions = []) {
     const statusElement = document.getElementById('usernameStatus');
     const textElement = statusElement.querySelector('.status-text');
     const iconElement = statusElement.querySelector('.status-icon');
@@ -1370,31 +1454,73 @@ function updateUsernameStatus(message, type) {
     textElement.textContent = message;
     iconElement.className = 'status-icon';
     
+    // Clear previous message
     messageElement.innerHTML = '';
     
-    switch(type) {
-        case 'available':
-            iconElement.classList.add('available');
-            iconElement.innerHTML = '<i class="fas fa-check"></i>';
-            messageElement.innerHTML = '<div class="field-message" style="color: #10b981;"><i class="fas fa-check-circle"></i> Username is available!</div>';
-            break;
-        case 'taken':
-            iconElement.classList.add('taken');
-            iconElement.innerHTML = '<i class="fas fa-times"></i>';
-            messageElement.innerHTML = '<div class="field-message" style="color: #ef4444;"><i class="fas fa-exclamation-circle"></i> Username is already taken</div>';
-            break;
-        case 'checking':
-            iconElement.classList.add('checking');
-            iconElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            break;
-        case 'error':
-            iconElement.classList.add('taken');
-            iconElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
-            messageElement.innerHTML = '<div class="field-message" style="color: #ef4444;"><i class="fas fa-exclamation-triangle"></i> ' + message + '</div>';
-            break;
-        default:
-            iconElement.innerHTML = '';
+    // Update status styling
+    statusElement.className = 'input-status';
+    
+    if (type === 'available') {
+        statusElement.classList.add('available');
+        iconElement.innerHTML = '&#10003;';
+        iconElement.style.color = '#10b981';
+        textElement.style.color = '#10b981';
+        messageElement.innerHTML = '<div class="field-message" style="color: #10b981;"><i class="fas fa-check-circle"></i> Great! This username is available</div>';
+    } else if (type === 'taken') {
+        statusElement.classList.add('taken');
+        iconElement.innerHTML = '&#10005;';
+        iconElement.style.color = '#ef4444';
+        textElement.style.color = '#ef4444';
+        
+        // Show suggestions if available
+        if (suggestions && suggestions.length > 0) {
+            const suggestionsHtml = `
+                <div class="field-message" style="color: #ef4444; margin-bottom: 8px;">
+                    <i class="fas fa-exclamation-triangle"></i> Username is already taken
+                </div>
+                <div class="username-suggestions">
+                    <div class="suggestions-label">Try these available alternatives:</div>
+                    <div class="suggestions-list">
+                        ${suggestions.map(s => `
+                            <span class="suggestion-item" onclick="selectUsername('${s}')" title="Click to use this username">
+                                ${s}
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            messageElement.innerHTML = suggestionsHtml;
+        } else {
+            messageElement.innerHTML = '<div class="field-message" style="color: #ef4444;"><i class="fas fa-exclamation-triangle"></i> Username is already taken</div>';
+        }
+    } else if (type === 'checking') {
+        statusElement.classList.add('checking');
+        iconElement.innerHTML = '&#10247;';
+        iconElement.style.color = '#3b82f6';
+        textElement.style.color = '#3b82f6';
+        messageElement.innerHTML = '<div class="field-message" style="color: #3b82f6;"><i class="fas fa-spinner fa-spin"></i> Checking availability...</div>';
+    } else if (type === 'error') {
+        statusElement.classList.add('error');
+        iconElement.innerHTML = '&#33;';
+        iconElement.style.color = '#ef4444';
+        textElement.style.color = '#ef4444';
+        messageElement.innerHTML = '<div class="field-message" style="color: #ef4444;"><i class="fas fa-exclamation-triangle"></i> ' + message + '</div>';
+    } else {
+        iconElement.innerHTML = '';
+        iconElement.style.color = '#6b7280';
+        textElement.style.color = '#6b7280';
+        if (message === 'Enter username') {
+            messageElement.innerHTML = '<div class="field-message" style="color: #6b7280;"><i class="fas fa-info-circle"></i> Choose a unique username (3-20 characters)</div>';
+        }
     }
+}
+
+// Function to select a suggested username
+function selectUsername(username) {
+    const usernameInput = document.getElementById('username');
+    usernameInput.value = username;
+    usernameInput.focus();
+    checkUsernameAvailability(username);
 }
 
 async function checkUsernameAvailability(username) {
@@ -1435,13 +1561,7 @@ async function checkUsernameAvailability(username) {
         if (data.available) {
             updateUsernameStatus('Available', 'available');
         } else {
-            updateUsernameStatus('Taken', 'taken');
-            if (data.suggestions && data.suggestions.length > 0) {
-                const suggestionsHtml = '<div class="field-message" style="margin-top: 8px;">Try: ' + 
-                    data.suggestions.map(s => `<span style="color: #4f46e5; cursor: pointer; text-decoration: underline;" onclick="document.getElementById('username').value = '${s}'; checkUsernameAvailability('${s}');">${s}</span>`).join(', ') + 
-                    '</div>';
-                document.getElementById('usernameMsg').innerHTML += suggestionsHtml;
-            }
+            updateUsernameStatus('Taken', 'taken', data.suggestions || []);
         }
     } catch (error) {
         console.error('Username check error:', error);
@@ -1590,6 +1710,7 @@ async function autoDetectLocationOnLoad() {
 async function detectUserLocation() {
     const detectBtn = document.getElementById('detectLocation');
     const originalText = detectBtn.innerHTML;
+    const addressInput = document.getElementById('address');
     
     detectBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting...';
     detectBtn.disabled = true;
@@ -1597,41 +1718,165 @@ async function detectUserLocation() {
     try {
         console.log('📍 Manual location detection requested...');
         
-        // First, ask for GPS permission if available
-        if (navigator.geolocation) {
-            const useGPS = await askForLocationPermission();
-            
-            if (useGPS) {
-                const position = await getCurrentPosition();
-                if (position) {
-                    await reverseGeocode(position.coords.latitude, position.coords.longitude);
-                    detectBtn.innerHTML = originalText;
-                    detectBtn.disabled = false;
-                    return;
-                }
-            }
+        // Check if geolocation is supported
+        if (!navigator.geolocation) {
+            throw new Error('Geolocation is not supported by this browser');
         }
         
-        // Fallback to IP-based detection
-        console.log('🔄 Using IP-based detection...');
-        const response = await fetch('<?php echo app_base_url('api/location'); ?>');
+        // Ask user for permission with better messaging
+        const userConfirmed = confirm(
+            '🗺️ Location Access Request\n\n' +
+            'This will ask for your location permission to automatically fill your address.\n\n' +
+            '✅ Click "OK" to allow location access\n' +
+            '❌ Click "Cancel" to skip automatic detection\n\n' +
+            'Your location data is only used to fill the address field and is not stored.'
+        );
         
-        if (response.ok) {
-            const result = await response.json();
+        if (userConfirmed) {
+            detectBtn.innerHTML = '<i class="fas fa-location-dot fa-pulse"></i> Requesting permission...';
             
-            if (result.success && result.location) {
-                fillLocationFields(result.location, 'IP-based detection');
+            // Request GPS position with better options
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        console.log('📍 GPS position obtained:', pos.coords);
+                        resolve(pos);
+                    },
+                    (error) => {
+                        console.warn('❌ GPS error:', error.message);
+                        let errorMsg = 'Location access denied or failed.';
+                        
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMsg = 'Location access was denied. Please enable location permissions in your browser settings.';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMsg = 'Location information is unavailable.';
+                                break;
+                            case error.TIMEOUT:
+                                errorMsg = 'Location request timed out.';
+                                break;
+                        }
+                        
+                        reject(new Error(errorMsg));
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 15000,
+                        maximumAge: 60000 // 1 minute
+                    }
+                );
+            });
+            
+            if (position) {
+                detectBtn.innerHTML = '<i class="fas fa-map"></i> Getting address...';
+                
+                // Use a free geocoding service or create a simple address
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                
+                // Try to get address using a free service
+                try {
+                    const geocodeResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+                    
+                    if (geocodeResponse.ok) {
+                        const geocodeData = await geocodeResponse.json();
+                        
+                        if (geocodeData && geocodeData.display_name) {
+                            addressInput.value = geocodeData.display_name;
+                            
+                            // Show success message
+                            showLocationSuccess('Location detected successfully!');
+                        } else {
+                            throw new Error('No address found');
+                        }
+                    } else {
+                        throw new Error('Geocoding service unavailable');
+                    }
+                } catch (geocodeError) {
+                    // Fallback: show coordinates
+                    addressInput.value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+                    showLocationSuccess('Location coordinates detected! You can edit the address manually.');
+                }
             }
         } else {
-            await fallbackLocationDetection();
+            // User cancelled - show helpful message
+            showLocationInfo('Location detection cancelled. You can enter your address manually.');
         }
         
     } catch (error) {
         console.error('❌ Location detection error:', error);
-        await fallbackLocationDetection();
+        showLocationError(error.message || 'Location detection failed. Please enter your address manually.');
     } finally {
         detectBtn.innerHTML = originalText;
         detectBtn.disabled = false;
+    }
+}
+
+/**
+ * Show location success message
+ */
+function showLocationSuccess(message) {
+    showLocationMessage(message, 'success');
+}
+
+/**
+ * Show location error message
+ */
+function showLocationError(message) {
+    showLocationMessage(message, 'error');
+}
+
+/**
+ * Show location info message
+ */
+function showLocationInfo(message) {
+    showLocationMessage(message, 'info');
+}
+
+/**
+ * Show location message with different types
+ */
+function showLocationMessage(message, type) {
+    // Remove any existing message
+    const existingMessage = document.querySelector('.location-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+    
+    // Create new message element
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `location-message location-${type}`;
+    
+    let icon = 'fas fa-info-circle';
+    let color = '#3b82f6';
+    
+    if (type === 'success') {
+        icon = 'fas fa-check-circle';
+        color = '#10b981';
+    } else if (type === 'error') {
+        icon = 'fas fa-exclamation-triangle';
+        color = '#ef4444';
+    }
+    
+    messageDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; border-radius: 8px; background: rgba(${type === 'success' ? '16,185,129' : type === 'error' ? '239,68,68' : '59,130,246'},0.1); border: 1px solid rgba(${type === 'success' ? '16,185,129' : type === 'error' ? '239,68,68' : '59,130,246'},0.3); color: ${color}; font-size: 14px; margin-top: 8px;">
+            <i class="${icon}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Insert after the address input
+    const addressInput = document.getElementById('address');
+    if (addressInput && addressInput.parentNode) {
+        addressInput.parentNode.insertBefore(messageDiv, addressInput.nextSibling);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (messageDiv && messageDiv.parentNode) {
+                messageDiv.remove();
+            }
+        }, 5000);
     }
 }
 

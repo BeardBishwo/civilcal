@@ -145,6 +145,17 @@ $csrf_token = Security::generateCsrfToken();
                     </button>
                 </div>
             </div>
+            
+            <div class="demo-account">
+                <strong>Your Personal Account:</strong>
+                <div class="demo-credentials">
+                    <code>uniquebishwo@gmail.com</code>
+                    <code>c9PU7XAsAADYk_A</code>
+                    <button class="btn btn-sm demo-login" data-email="uniquebishwo@gmail.com" data-password="c9PU7XAsAADYk_A">
+                        <i class="fas fa-user-crown"></i> Personal Login
+                    </button>
+                </div>
+            </div>
         </div>
         
         <p class="demo-note">
@@ -727,7 +738,10 @@ async function handleLoginSubmission(e) {
             csrf_token: formData.get('csrf_token')
         };
         
-        // Send login request
+        console.log('Login request payload:', payload);
+        console.log('Login API URL:', '<?php echo app_base_url('api/login'); ?>');
+        
+        // Send login request to API endpoint
         const response = await fetch('<?php echo app_base_url('api/login'); ?>', {
             method: 'POST',
             headers: {
@@ -738,7 +752,17 @@ async function handleLoginSubmission(e) {
             body: JSON.stringify(payload)
         });
         
+        console.log('Login response status:', response.status);
+        console.log('Login response headers:', response.headers);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Login response error:', errorText);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
         const result = await response.json();
+        console.log('Login response data:', result);
         
                 if (result.success) {
             // Success
@@ -803,14 +827,35 @@ async function handleLoginSubmission(e) {
         
     } catch (error) {
         // Network or server error
+        console.error('Login error details:', {
+            message: error.message,
+            stack: error.stack,
+            name: error.name,
+            error: error
+        });
+        
+        let errorMessage = 'Unable to connect to server. Please check your internet connection and try again.';
+        let errorDetails = '';
+        
+        if (error.message) {
+            errorDetails = `<br><small>Error: ${error.message}</small>`;
+        }
+        
+        // Check if it's a network error or parsing error
+        if (error.name === 'SyntaxError') {
+            errorMessage = 'Server returned invalid response. Please try again.';
+            errorDetails = '<br><small>The server response could not be parsed.</small>';
+        } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            errorMessage = 'Network connection failed. Please check your internet connection.';
+            errorDetails = '<br><small>Unable to reach the login server.</small>';
+        }
+        
         resultDiv.className = 'result-message error';
         resultDiv.innerHTML = `
             <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
             <h3>Connection Error</h3>
-            <p>Unable to connect to server. Please check your internet connection and try again.</p>
+            <p>${errorMessage}${errorDetails}</p>
         `;
-        
-        console.error('Login error:', error);
         
     } finally {
         // Reset button state
