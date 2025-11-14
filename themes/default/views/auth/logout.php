@@ -112,6 +112,44 @@ $metaDescription = 'You have been successfully logged out of Civil Calculator.';
             color: #92400e;
         }
         
+        .auto-redirect-notice {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e0f2fe;
+            border: 1px solid #0288d1;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: #01579b;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        
+        .auto-redirect-notice i {
+            color: #0288d1;
+        }
+        
+        .auto-redirect-notice strong {
+            color: #01579b;
+            font-weight: 700;
+        }
+        
+        .cancel-redirect {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .cancel-redirect:hover {
+            background: #d32f2f;
+        }
+        
         @media (max-width: 480px) {
             .logout-card {
                 padding: 30px 20px;
@@ -124,6 +162,18 @@ $metaDescription = 'You have been successfully logged out of Civil Calculator.';
             .btn {
                 width: 100%;
                 justify-content: center;
+            }
+            
+            .auto-redirect-notice {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .cancel-redirect {
+                width: 100%;
+                padding: 10px;
+                font-size: 0.875rem;
             }
         }
     </style>
@@ -163,6 +213,12 @@ $metaDescription = 'You have been successfully logged out of Civil Calculator.';
                 <i class="fas fa-shield-alt"></i>
                 <strong>Security Tip:</strong> For your security, close your browser if you're on a shared computer.
             </div>
+            
+            <div class="auto-redirect-notice" id="redirectNotice">
+                <i class="fas fa-clock"></i>
+                <span>Redirecting to homepage in <strong id="countdown">5</strong> seconds...</span>
+                <button onclick="cancelRedirect()" class="cancel-redirect">Cancel</button>
+            </div>
         </div>
     </div>
     
@@ -181,10 +237,43 @@ $metaDescription = 'You have been successfully logged out of Civil Calculator.';
             sessionStorage.clear();
         }
         
-        // Auto-redirect after 30 seconds
-        setTimeout(function() {
-            window.location.href = '<?php echo app_base_url(''); ?>';
-        }, 30000);
+        // Auto-redirect with countdown
+        let countdownTime = 5;
+        let redirectTimer;
+        let countdownInterval;
+        
+        function startRedirectCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            const redirectNotice = document.getElementById('redirectNotice');
+            
+            // Show the redirect notice
+            redirectNotice.style.display = 'block';
+            
+            // Update countdown every second
+            countdownInterval = setInterval(function() {
+                countdownTime--;
+                countdownElement.textContent = countdownTime;
+                
+                if (countdownTime <= 0) {
+                    clearInterval(countdownInterval);
+                    window.location.href = '<?php echo app_base_url(''); ?>';
+                }
+            }, 1000);
+            
+            // Set the redirect timer
+            redirectTimer = setTimeout(function() {
+                window.location.href = '<?php echo app_base_url(''); ?>';
+            }, 5000);
+        }
+        
+        function cancelRedirect() {
+            clearTimeout(redirectTimer);
+            clearInterval(countdownInterval);
+            document.getElementById('redirectNotice').style.display = 'none';
+        }
+        
+        // Start countdown after 2 seconds
+        setTimeout(startRedirectCountdown, 2000);
     </script>
 </body>
 </html>

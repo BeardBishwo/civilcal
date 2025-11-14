@@ -1,468 +1,615 @@
 <?php
-$content = '
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="h4 mb-1">System Settings</h2>
-            <p class="text-muted mb-0">Configure your calculator system</p>
-        </div>
-        <div class="quick-actions">
-            <button type="submit" form="settingsForm" class="btn btn-primary btn-sm">
-                <i class="bi bi-check-circle me-2"></i>Save Settings
-            </button>
-            <button class="btn btn-outline-secondary btn-sm" id="resetSettings">
-                <i class="bi bi-arrow-clockwise me-2"></i>Reset to Default
-            </button>
-        </div>
-    </div>
+$page_title = 'Admin Settings - ' . ($page_title ?? 'Settings');
+require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
+?>
 
-    <!-- Settings Tabs -->
-    <div class="row">
-        <div class="col-lg-3">
-            <div class="card">
-                <div class="card-body">
-                    <div class="nav flex-column nav-pills" id="settingsTabs" role="tablist">
-                        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#general" type="button">
-                            <i class="bi bi-gear me-2"></i>General Settings
-                        </button>
-                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#email" type="button">
-                            <i class="bi bi-envelope me-2"></i>Email Settings
-                        </button>
-                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#security" type="button">
-                            <i class="bi bi-shield-lock me-2"></i>Security
-                        </button>
-                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#payment" type="button">
-                            <i class="bi bi-credit-card me-2"></i>Payment Gateway
-                        </button>
-                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#api" type="button">
-                            <i class="bi bi-key me-2"></i>API Settings
-                        </button>
-                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#maintenance" type="button">
-                            <i class="bi bi-tools me-2"></i>Maintenance
-                        </button>
+<style>
+    .admin-layout {
+        display: flex;
+        min-height: calc(100vh - 80px);
+        background: #f8fafc;
+    }
+    
+    body.dark-theme .admin-layout {
+        background: #0f172a;
+    }
+    
+    .admin-sidebar {
+        width: 280px;
+        background: white;
+        border-right: 1px solid #e2e8f0;
+        padding: 0;
+        position: sticky;
+        top: 80px;
+        height: calc(100vh - 80px);
+        overflow-y: auto;
+    }
+    
+    body.dark-theme .admin-sidebar {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    
+    .admin-content {
+        flex: 1;
+        padding: 2rem;
+        max-width: calc(100% - 280px);
+        overflow-y: auto;
+    }
+    
+    .sidebar-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f9fafb;
+    }
+    
+    body.dark-theme .sidebar-header {
+        background: #0f172a;
+        border-color: #334155;
+    }
+    
+    .sidebar-nav {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .sidebar-nav a {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 1.5rem;
+        color: #4b5563;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+    }
+    
+    .sidebar-nav a:hover {
+        background: #f3f4f6;
+        color: #1f2937;
+        border-left-color: #3b82f6;
+    }
+    
+    .sidebar-nav a.active {
+        background: #eff6ff;
+        color: #2563eb;
+        border-left-color: #3b82f6;
+    }
+    
+    body.dark-theme .sidebar-nav a {
+        color: #d1d5db;
+    }
+    
+    body.dark-theme .sidebar-nav a:hover {
+        background: #374151;
+        color: #f9fafb;
+    }
+    
+    body.dark-theme .sidebar-nav a.active {
+        background: #1e3a8a;
+        color: #93c5fd;
+    }
+    
+    .settings-header {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+    }
+    
+    body.dark-theme .settings-header {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    
+    .settings-section {
+        background: white;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+    }
+    
+    body.dark-theme .settings-section {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    
+    .section-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        background: #f9fafb;
+    }
+    
+    body.dark-theme .section-header {
+        background: #0f172a;
+        border-color: #334155;
+    }
+    
+    .section-title {
+        margin: 0 0 0.5rem 0;
+        color: #1f2937;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    
+    body.dark-theme .section-title {
+        color: #f9fafb;
+    }
+    
+    .section-description {
+        margin: 0;
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    
+    body.dark-theme .section-description {
+        color: #9ca3af;
+    }
+    
+    .section-content {
+        padding: 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 2rem;
+    }
+    
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    body.dark-theme .form-label {
+        color: #d1d5db;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        background: white;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    body.dark-theme .form-input {
+        background: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+    
+    .form-textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+    }
+    
+    .form-description {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 0.5rem;
+    }
+    
+    body.dark-theme .form-description {
+        color: #9ca3af;
+    }
+    
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 48px;
+        height: 24px;
+    }
+    
+    .toggle-input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #d1d5db;
+        transition: 0.3s;
+        border-radius: 24px;
+    }
+    
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+    }
+    
+    .toggle-input:checked + .toggle-slider {
+        background-color: #3b82f6;
+    }
+    
+    .toggle-input:checked + .toggle-slider:before {
+        transform: translateX(24px);
+    }
+    
+    .save-button {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+    }
+    
+    .save-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    
+    .save-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .success-message {
+        background: #dcfdf7;
+        color: #065f46;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border: 1px solid #a7f3d0;
+    }
+    
+    body.dark-theme .success-message {
+        background: #064e3b;
+        color: #6ee7b7;
+        border-color: #047857;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    @media (max-width: 1024px) {
+        .admin-layout {
+            flex-direction: column;
+        }
+        
+        .admin-sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            top: 0;
+        }
+        
+        .admin-content {
+            max-width: 100%;
+        }
+    }
+</style>
+
+<div class="admin-layout">
+    <!-- Admin Sidebar -->
+    <nav class="admin-sidebar">
+        <div class="sidebar-header">
+            <h3 style="margin: 0; color: #1f2937; font-size: 1.125rem; font-weight: 600;">
+                <i class="fas fa-cogs me-2"></i> Settings
+            </h3>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <?php foreach ($settings_sections as $section): ?>
+            <li>
+                <a href="<?php echo $section['url']; ?>" 
+                   class="<?php echo $current_section === $section['id'] ? 'active' : ''; ?>">
+                    <i class="<?php echo $section['icon']; ?>"></i>
+                    <div>
+                        <div style="font-weight: 600;"><?php echo htmlspecialchars($section['name']); ?></div>
+                        <div style="font-size: 0.75rem; color: #9ca3af; font-weight: normal;">
+                            <?php echo htmlspecialchars($section['description']); ?>
+                        </div>
+                    </div>
+                </a>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="admin-content">
+        <!-- Settings Header -->
+        <div class="settings-header">
+            <h1 style="margin: 0 0 0.5rem 0; color: #1f2937; font-size: 2rem; font-weight: 700;">
+                <?php echo htmlspecialchars($page_title); ?>
+            </h1>
+            <p style="margin: 0; color: #6b7280; font-size: 1.125rem;">
+                Configure your site settings and preferences
+            </p>
+        </div>
+        
+        <?php if (isset($_GET['updated'])): ?>
+        <div class="success-message">
+            <i class="fas fa-check-circle me-2"></i>
+            Settings updated successfully!
+        </div>
+        <?php endif; ?>
+        
+        <!-- Settings Form -->
+        <form id="settingsForm" method="POST" action="/admin/settings/update">
+            <input type="hidden" name="section" value="<?php echo htmlspecialchars($current_section); ?>">
+            
+            <?php
+            // Get the appropriate settings based on current section
+            $settings_data = null;
+            switch ($current_section) {
+                case 'general':
+                    $settings_data = $general_settings ?? [];
+                    break;
+                case 'application':
+                    $settings_data = $app_settings ?? [];
+                    break;
+                case 'users':
+                    $settings_data = $user_settings ?? [];
+                    break;
+                case 'security':
+                    $settings_data = $security_settings ?? [];
+                    break;
+                case 'email':
+                    $settings_data = $email_settings ?? [];
+                    break;
+                case 'api':
+                    $settings_data = $api_settings ?? [];
+                    break;
+                case 'performance':
+                    $settings_data = $performance_settings ?? [];
+                    break;
+                case 'advanced':
+                    $settings_data = $advanced_settings ?? [];
+                    break;
+            }
+            ?>
+            
+            <?php if ($settings_data): ?>
+                <?php foreach ($settings_data as $section_key => $section_data): ?>
+                <div class="settings-section">
+                    <div class="section-header">
+                        <h3 class="section-title"><?php echo htmlspecialchars($section_data['title']); ?></h3>
+                        <p class="section-description"><?php echo htmlspecialchars($section_data['description']); ?></p>
+                    </div>
+                    
+                    <div class="section-content">
+                        <?php foreach ($section_data['fields'] as $field): ?>
+                        <div class="form-group">
+                            <label class="form-label" for="<?php echo htmlspecialchars($field['name']); ?>">
+                                <?php echo htmlspecialchars($field['label']); ?>
+                                <?php if ($field['required'] ?? false): ?>
+                                    <span style="color: #ef4444;">*</span>
+                                <?php endif; ?>
+                            </label>
+                            
+                            <?php if ($field['type'] === 'text' || $field['type'] === 'email' || $field['type'] === 'url'): ?>
+                                <input type="<?php echo htmlspecialchars($field['type']); ?>" 
+                                       class="form-input" 
+                                       id="<?php echo htmlspecialchars($field['name']); ?>"
+                                       name="settings[<?php echo htmlspecialchars($field['name']); ?>]"
+                                       value="<?php echo htmlspecialchars($field['value'] ?? ''); ?>"
+                                       <?php echo ($field['required'] ?? false) ? 'required' : ''; ?>>
+                                       
+                            <?php elseif ($field['type'] === 'number'): ?>
+                                <input type="number" 
+                                       class="form-input" 
+                                       id="<?php echo htmlspecialchars($field['name']); ?>"
+                                       name="settings[<?php echo htmlspecialchars($field['name']); ?>]"
+                                       value="<?php echo htmlspecialchars($field['value'] ?? ''); ?>"
+                                       min="<?php echo $field['min'] ?? ''; ?>"
+                                       max="<?php echo $field['max'] ?? ''; ?>"
+                                       <?php echo ($field['required'] ?? false) ? 'required' : ''; ?>>
+                                       
+                            <?php elseif ($field['type'] === 'password'): ?>
+                                <input type="password" 
+                                       class="form-input" 
+                                       id="<?php echo htmlspecialchars($field['name']); ?>"
+                                       name="settings[<?php echo htmlspecialchars($field['name']); ?>]"
+                                       value="<?php echo htmlspecialchars($field['value'] ?? ''); ?>">
+                                       
+                            <?php elseif ($field['type'] === 'textarea'): ?>
+                                <textarea class="form-input form-textarea" 
+                                          id="<?php echo htmlspecialchars($field['name']); ?>"
+                                          name="settings[<?php echo htmlspecialchars($field['name']); ?>]"
+                                          <?php echo ($field['required'] ?? false) ? 'required' : ''; ?>><?php echo htmlspecialchars($field['value'] ?? ''); ?></textarea>
+                                          
+                            <?php elseif ($field['type'] === 'select'): ?>
+                                <select class="form-input form-select" 
+                                        id="<?php echo htmlspecialchars($field['name']); ?>"
+                                        name="settings[<?php echo htmlspecialchars($field['name']); ?>]"
+                                        <?php echo ($field['required'] ?? false) ? 'required' : ''; ?>>
+                                    <?php foreach ($field['options'] as $value => $label): ?>
+                                        <option value="<?php echo htmlspecialchars($value); ?>"
+                                                <?php echo ($field['value'] ?? '') === $value ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($label); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                
+                            <?php elseif ($field['type'] === 'toggle'): ?>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" 
+                                               class="toggle-input"
+                                               id="<?php echo htmlspecialchars($field['name']); ?>"
+                                               name="settings[<?php echo htmlspecialchars($field['name']); ?>]"
+                                               value="1"
+                                               <?php echo ($field['value'] ?? false) ? 'checked' : ''; ?>>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span style="font-size: 0.875rem; color: #6b7280;">
+                                        <?php echo ($field['value'] ?? false) ? 'Enabled' : 'Disabled'; ?>
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <?php if (!empty($field['description'])): ?>
+                                <p class="form-description"><?php echo htmlspecialchars($field['description']); ?></p>
+                            <?php endif; ?>
+                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="col-lg-9">
-            <form id="settingsForm">
-                <div class="tab-content" id="settingsTabContent">
-                    
-                    <!-- General Settings -->
-                    <div class="tab-pane fade show active" id="general">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0"><i class="bi bi-gear me-2"></i>General Settings</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Site Name</label>
-                                            <input type="text" class="form-control" name="site_name" 
-                                                   value="Bishwo Calculator" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Site URL</label>
-                                            <input type="url" class="form-control" name="site_url" 
-                                                   value="http://localhost/bishwo_calculator" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label class="form-label">Site Description</label>
-                                    <textarea class="form-control" name="site_description" rows="3">Professional Engineering Calculators</textarea>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Admin Email</label>
-                                            <input type="email" class="form-control" name="admin_email" 
-                                                   value="admin@bishwocalculator.com" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Timezone</label>
-                                            <select class="form-select" name="timezone">
-                                                <option value="Asia/Kathmandu" selected>Kathmandu (GMT+5:45)</option>
-                                                <option value="UTC">UTC</option>
-                                                <option value="America/New_York">New York (GMT-5)</option>
-                                                <option value="Europe/London">London (GMT+0)</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Date Format</label>
-                                            <select class="form-select" name="date_format">
-                                                <option value="Y-m-d" selected>YYYY-MM-DD</option>
-                                                <option value="d/m/Y">DD/MM/YYYY</option>
-                                                <option value="m/d/Y">MM/DD/YYYY</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Items Per Page</label>
-                                            <input type="number" class="form-control" name="items_per_page" 
-                                                   value="20" min="5" max="100">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Email Settings -->
-                    <div class="tab-pane fade" id="email">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0"><i class="bi bi-envelope me-2"></i>Email Settings</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">SMTP Host</label>
-                                            <input type="text" class="form-control" name="smtp_host" 
-                                                   value="smtp.gmail.com">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">SMTP Port</label>
-                                            <input type="number" class="form-control" name="smtp_port" 
-                                                   value="587">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">SMTP Username</label>
-                                            <input type="text" class="form-control" name="smtp_username" 
-                                                   value="">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">SMTP Password</label>
-                                            <input type="password" class="form-control" name="smtp_password" 
-                                                   value="">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Encryption</label>
-                                            <select class="form-select" name="smtp_encryption">
-                                                <option value="tls" selected>TLS</option>
-                                                <option value="ssl">SSL</option>
-                                                <option value="">None</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">From Name</label>
-                                            <input type="text" class="form-control" name="from_name" 
-                                                   value="Bishwo Calculator">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label class="form-label">From Email</label>
-                                    <input type="email" class="form-control" name="from_email" 
-                                           value="noreply@bishwocalculator.com">
-                                </div>
-                                
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle me-2"></i>
-                                    <strong>Test Email Configuration:</strong> 
-                                    <button type="button" class="btn btn-sm btn-outline-primary ms-2">Send Test Email</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Security Settings -->
-                    <div class="tab-pane fade" id="security">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0"><i class="bi bi-shield-lock me-2"></i>Security Settings</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Max Login Attempts</label>
-                                            <input type="number" class="form-control" name="login_attempts" 
-                                                   value="5" min="1" max="10">
-                                            <small class="form-text text-muted">Number of failed login attempts before lockout</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Lockout Time (minutes)</label>
-                                            <input type="number" class="form-control" name="lockout_time" 
-                                                   value="15" min="1" max="60">
-                                            <small class="form-text text-muted">Time to lock account after max attempts</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Minimum Password Length</label>
-                                            <input type="number" class="form-control" name="password_min_length" 
-                                                   value="8" min="6" max="20">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Password Requirements</label>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="require_strong_password" 
-                                                       value="1" checked>
-                                                <label class="form-check-label">Require strong passwords (uppercase, lowercase, numbers, symbols)</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="enable_2fa" 
-                                               value="1">
-                                        <label class="form-check-label">Enable Two-Factor Authentication (2FA)</label>
-                                    </div>
-                                    <small class="form-text text-muted">Users will be required to set up 2FA on next login</small>
-                                </div>
-                                
-                                <div class="alert alert-warning">
-                                    <i class="bi bi-exclamation-triangle me-2"></i>
-                                    <strong>Security Notice:</strong> Always keep your system updated and use strong security settings.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Payment Gateway Settings -->
-                    <div class="tab-pane fade" id="payment">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0"><i class="bi bi-credit-card me-2"></i>Payment Gateway Settings</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row mb-4">
-                                    <div class="col-12">
-                                        <h6 class="text-success mb-3">💳 Supported Payment Methods</h6>
-                                        <p class="text-muted">
-                                            <span class="badge bg-primary me-2">PayPal</span> International users (USD)
-                                            <span class="badge bg-info me-2 ms-3">PayTM/UPI</span> Indian users (₹)
-                                            <span class="badge bg-success me-2 ms-3">eSewa</span> Nepali users (रू)
-                                            <span class="badge bg-warning me-2 ms-3">Khalti</span> Nepali users (रू)
-                                        </p>
-                                    </div>
-                                </div>
-                                
-                                <!-- PayPal Settings -->
-                                <div class="mb-4">
-                                    <h6 class="border-bottom pb-2 mb-3">🌎 PayPal Configuration</h6>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">PayPal Email</label>
-                                                <input type="email" class="form-control" name="paypal_email" 
-                                                       value="<?= $settings[\"paypal_email\"] ?? \"\" ?>" placeholder="your-paypal@email.com">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">PayPal Environment</label>
-                                                <select class="form-select" name="paypal_sandbox">
-                                                    <option value="false" <?= ($settings[\"paypal_sandbox\"] ?? false) == false ? \"selected\" : \"\" ?>>Production</option>
-                                                    <option value="true" <?= ($settings[\"paypal_sandbox\"] ?? false) == true ? \"selected\" : \"\" ?>>Sandbox (Testing)</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- PayTM/UPI Settings -->
-                                <div class="mb-4">
-                                    <h6 class="border-bottom pb-2 mb-3">🇮🇳 PayTM/UPI Configuration (India)</h6>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">PayTM Merchant ID</label>
-                                                <input type="text" class="form-control" name="paytm_merchant_id" 
-                                                       value="<?= $settings[\"paytm_merchant_id\"] ?? \"\" ?>" placeholder="Your PayTM Merchant ID">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">PayTM Merchant Key</label>
-                                                <input type="password" class="form-control" name="paytm_merchant_key" 
-                                                       value="<?= $settings[\"paytm_merchant_key\"] ?? \"\" ?>" placeholder="Your PayTM Merchant Key">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">PayTM Website</label>
-                                                <select class="form-select" name="paytm_website">
-                                                    <option value="WEBSTAGING" <?= ($settings[\"paytm_website\"] ?? \"\") == \"WEBSTAGING\" ? \"selected\" : \"\" ?>>Staging</option>
-                                                    <option value="DEFAULT" <?= ($settings[\"paytm_website\"] ?? \"\") == \"DEFAULT\" ? \"selected\" : \"\" ?>>Production</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">PayTM Industry Type</label>
-                                                <input type="text" class="form-control" name="paytm_industry_type" 
-                                                       value="<?= $settings[\"paytm_industry_type\"] ?? \"Retail\" ?>" placeholder="Retail">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- eSewa Settings -->
-                                <div class="mb-4">
-                                    <h6 class="border-bottom pb-2 mb-3">🇳🇵 eSewa Configuration (Nepal)</h6>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">eSewa Merchant Code</label>
-                                                <input type="text" class="form-control" name="esewa_merchant_code" 
-                                                       value="<?= $settings[\"esewa_merchant_code\"] ?? \"\" ?>" placeholder="Your eSewa Merchant Code">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">eSewa Secret Key</label>
-                                                <input type="password" class="form-control" name="esewa_secret_key" 
-                                                       value="<?= $settings[\"esewa_secret_key\"] ?? \"\" ?>" placeholder="Your eSewa Secret Key">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Khalti Settings -->
-                                <div class="mb-4">
-                                    <h6 class="border-bottom pb-2 mb-3">🇳🇵 Khalti Configuration (Nepal)</h6>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Khalti Public Key</label>
-                                                <input type="text" class="form-control" name="khalti_public_key" 
-                                                       value="<?= $settings[\"khalti_public_key\"] ?? \"\" ?>" placeholder="Your Khalti Public Key">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Khalti Secret Key</label>
-                                                <input type="password" class="form-control" name="khalti_secret_key" 
-                                                       value="<?= $settings[\"khalti_secret_key\"] ?? \"\" ?>" placeholder="Your Khalti Secret Key">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Pricing Configuration -->
-                                <div class="mb-4">
-                                    <h6 class="border-bottom pb-2 mb-3">💰 Country-Specific Pricing</h6>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">🇮🇳 India (₹INR)</label>
-                                                <input type="number" class="form-control" name="pricing_india" 
-                                                       value="<?= $settings[\"pricing_india\"] ?? \"499\" ?>" placeholder="499">
-                                                <small class="form-text text-muted">USD 1 = ₹85 (approx.)</small>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">🇳🇵 Nepal (रूNPR)</label>
-                                                <input type="number" class="form-control" name="pricing_nepal" 
-                                                       value="<?= $settings[\"pricing_nepal\"] ?? \"799\" ?>" placeholder="799">
-                                                <small class="form-text text-muted">USD 1 = रू130 (approx.)</small>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">🌍 International (USD)</label>
-                                                <input type="number" class="form-control" name="pricing_usd" 
-                                                       value="<?= $settings[\"pricing_usd\"] ?? \"15\" ?>" placeholder="15">
-                                                <small class="form-text text-muted">Default USD pricing</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle me-2"></i>
-                                    <strong>Configuration Tips:</strong>
-                                    <ul class="mb-0 mt-2">
-                                        <li>Use sandbox/test mode during development</li>
-                                        <li>Country detection is based on user IP geolocation</li>
-                                        <li>Payment methods are automatically shown based on user location</li>
-                                        <li>All payment confirmations are logged for audit purposes</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
+                <?php endforeach; ?>
+                
+                <!-- Save Button -->
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" class="save-button" style="background: #6b7280;" onclick="resetForm()">
+                        <i class="fas fa-undo me-2"></i> Reset
+                    </button>
+                    <button type="submit" class="save-button" id="saveButton">
+                        <i class="fas fa-save me-2"></i> Save Settings
+                    </button>
                 </div>
-            </form>
-        </div>
-    </div>
+            <?php else: ?>
+                <div class="settings-section">
+                    <div class="section-content" style="text-align: center; padding: 4rem;">
+                        <i class="fas fa-cog" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                        <h3 style="color: #6b7280; margin: 0 0 0.5rem 0;">Settings Section</h3>
+                        <p style="color: #9ca3af; margin: 0;">This settings section is coming soon.</p>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </form>
+    </main>
 </div>
 
 <script>
-document.getElementById("settingsForm").addEventListener("submit", function(e) {
-    e.preventDefault();
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('settingsForm');
+    const saveButton = document.getElementById('saveButton');
     
-    const formData = new FormData(this);
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Show loading state
+        saveButton.disabled = true;
+        saveButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
+        
+        // Submit form data
+        const formData = new FormData(form);
+        formData.append('ajax', '1');
+        
+        fetch('/admin/settings/update', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Settings saved successfully!', 'success');
+            } else {
+                showNotification('Failed to save settings: ' + data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Network error occurred', 'error');
+        })
+        .finally(() => {
+            // Reset button state
+            saveButton.disabled = false;
+            saveButton.innerHTML = '<i class="fas fa-save me-2"></i> Save Settings';
+        });
+    });
     
-    fetch("/admin/settings/save", {
-        method: "POST",
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("Settings saved successfully!");
-        } else {
-            alert("Error: " + data.message);
-        }
+    // Toggle switch labels
+    document.querySelectorAll('.toggle-input').forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            const label = this.closest('.form-group').querySelector('span');
+            if (label && (label.textContent.includes('Enabled') || label.textContent.includes('Disabled'))) {
+                label.textContent = this.checked ? 'Enabled' : 'Disabled';
+            }
+        });
     });
 });
 
-document.getElementById("resetSettings").addEventListener("click", function() {
-    if (confirm("Are you sure you want to reset all settings to default? This cannot be undone.")) {
-        // Reset logic would go here
-        alert("Settings reset to default values.");
+function resetForm() {
+    if (confirm('Are you sure you want to reset all changes?')) {
+        document.getElementById('settingsForm').reset();
+        showNotification('Form reset successfully', 'info');
     }
-});
-</script>
-';
+}
 
-include __DIR__ . '/../../layouts/admin.php';
-?>
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        z-index: 9999;
+        transition: all 0.3s ease;
+        transform: translateX(100%);
+        ${type === 'success' ? 'background: #10b981;' : 
+          type === 'error' ? 'background: #ef4444;' : 'background: #3b82f6;'}
+    `;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'}-circle me-2"></i>
+        ${message}
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+</script>
+
+<?php require_once dirname(__DIR__, 4) . '/themes/default/views/partials/footer.php'; ?>

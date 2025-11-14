@@ -799,7 +799,7 @@ async function handleLoginSubmission(e) {
 
                 // Redirect after short delay so user sees header update
                 setTimeout(() => {
-                    window.location.href = result.redirect_url || 'profile.php';
+                    window.location.href = result.redirect_url || '/';
                 }, 500);
             }
                 } else {

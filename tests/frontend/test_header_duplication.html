@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Duplication Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .debug-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .debug-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .debug-section h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007cba;
+            padding-bottom: 10px;
+        }
+        
+        .element-count {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .element-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .highlight {
+            background: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #f44336;
+        }
+        
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .warning {
+            background: #fff3e0;
+            color: #ef6c00;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #ff9800;
+        }
+        
+        button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #005a8b;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h2>🔍 Header Duplication Debug Tool</h2>
+        <p>This tool helps identify duplicate header elements and CSS issues</p>
+        
+        <div class="debug-section">
+            <h3>📊 Element Count Analysis</h3>
+            <button onclick="analyzeElements()">🔄 Analyze Current Page</button>
+            <button onclick="checkCSS()">🎨 Check CSS Issues</button>
+            <button onclick="checkJavaScript()">⚡ Check JavaScript</button>
+            
+            <div id="elementAnalysis"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>🔍 Specific Element Detection</h3>
+            <div id="specificElements"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>🎨 CSS Analysis</h3>
+            <div id="cssAnalysis"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>📋 Recommendations</h3>
+            <div id="recommendations"></div>
+        </div>
+    </div>
+
+    <script>
+        function analyzeElements() {
+            const analysis = document.getElementById('elementAnalysis');
+            analysis.innerHTML = '<p>🔄 Analyzing elements...</p>';
+            
+            // Count specific elements that might be duplicated
+            const elements = {
+                'Headers (header tag)': document.querySelectorAll('header').length,
+                'Site Headers (.site-header)': document.querySelectorAll('.site-header').length,
+                'Header Content (.header-content)': document.querySelectorAll('.header-content').length,
+                'Logo Links (.logo)': document.querySelectorAll('.logo').length,
+                'Logo Images (.logo-img)': document.querySelectorAll('.logo-img').length,
+                'Login Buttons (.login-btn)': document.querySelectorAll('.login-btn').length,
+                'User Actions (.user-actions)': document.querySelectorAll('.user-actions').length,
+                'User Greeting (.user-greeting)': document.querySelectorAll('.user-greeting').length,
+                'Navigation (.main-nav)': document.querySelectorAll('.main-nav').length
+            };
+            
+            let html = '<div class="element-count">';
+            let hasIssues = false;
+            
+            for (const [element, count] of Object.entries(elements)) {
+                const isIssue = count > 1;
+                if (isIssue) hasIssues = true;
+                
+                html += `<div style="margin: 5px 0; ${isIssue ? 'color: #d32f2f; font-weight: bold;' : 'color: #388e3c;'}">
+                    ${element}: <span class="${isIssue ? 'highlight' : ''}">${count}</span>
+                    ${isIssue ? ' ⚠️ DUPLICATE DETECTED!' : ' ✅'}
+                </div>`;
+            }
+            
+            html += '</div>';
+            
+            if (hasIssues) {
+                html += '<div class="error">🚨 <strong>Duplicate elements detected!</strong> This could be causing the visual duplication you\'re seeing.</div>';
+            } else {
+                html += '<div class="success">✅ <strong>No duplicate elements found.</strong> The issue might be CSS-related.</div>';
+            }
+            
+            analysis.innerHTML = html;
+            
+            // Show specific elements
+            showSpecificElements();
+        }
+        
+        function showSpecificElements() {
+            const container = document.getElementById('specificElements');
+            
+            // Get all logo elements
+            const logos = document.querySelectorAll('.logo');
+            const loginBtns = document.querySelectorAll('.login-btn');
+            const userGreetings = document.querySelectorAll('.user-greeting');
+            
+            let html = '<h4>🔍 Detected Elements:</h4>';
+            
+            html += '<div class="element-list">';
+            
+            html += '<strong>Logo Elements:</strong><br>';
+            logos.forEach((logo, index) => {
+                html += `Logo ${index + 1}: ${logo.outerHTML.substring(0, 100)}...<br>`;
+            });
+            
+            html += '<br><strong>Login Buttons:</strong><br>';
+            loginBtns.forEach((btn, index) => {
+                html += `Login Button ${index + 1}: ${btn.outerHTML.substring(0, 100)}...<br>`;
+            });
+            
+            html += '<br><strong>User Greetings:</strong><br>';
+            userGreetings.forEach((greeting, index) => {
+                html += `Greeting ${index + 1}: ${greeting.outerHTML.substring(0, 100)}...<br>`;
+            });
+            
+            html += '</div>';
+            
+            container.innerHTML = html;
+        }
+        
+        function checkCSS() {
+            const analysis = document.getElementById('cssAnalysis');
+            analysis.innerHTML = '<p>🔄 Analyzing CSS...</p>';
+            
+            let html = '<h4>🎨 CSS Analysis:</h4>';
+            
+            // Check for potential CSS issues
+            const headers = document.querySelectorAll('header, .site-header');
+            
+            html += '<div class="element-list">';
+            
+            headers.forEach((header, index) => {
+                const styles = window.getComputedStyle(header);
+                html += `<strong>Header ${index + 1}:</strong><br>`;
+                html += `Display: ${styles.display}<br>`;
+                html += `Position: ${styles.position}<br>`;
+                html += `Z-index: ${styles.zIndex}<br>`;
+                html += `Visibility: ${styles.visibility}<br>`;
+                html += `Opacity: ${styles.opacity}<br>`;
+                html += `Transform: ${styles.transform}<br><br>`;
+            });
+            
+            html += '</div>';
+            
+            // Check for overlapping elements
+            if (headers.length > 1) {
+                html += '<div class="warning">⚠️ Multiple header elements detected. Check if they\'re overlapping or positioned incorrectly.</div>';
+            }
+            
+            analysis.innerHTML = html;
+        }
+        
+        function checkJavaScript() {
+            const analysis = document.getElementById('cssAnalysis');
+            
+            let html = '<h4>⚡ JavaScript Analysis:</h4>';
+            
+            // Check for dynamic element creation
+            const scripts = document.querySelectorAll('script');
+            html += `<p>Found ${scripts.length} script tags on the page.</p>`;
+            
+            // Check for any cloning or duplication in JavaScript
+            html += '<div class="element-list">';
+            html += 'Checking for common duplication patterns...<br>';
+            
+            // Look for innerHTML modifications that might duplicate content
+            const bodyHTML = document.body.innerHTML;
+            if (bodyHTML.includes('cloneNode')) {
+                html += '⚠️ Found cloneNode usage - check for element cloning<br>';
+            }
+            if (bodyHTML.includes('appendChild')) {
+                html += 'ℹ️ Found appendChild usage - check for dynamic element creation<br>';
+            }
+            if (bodyHTML.includes('innerHTML')) {
+                html += 'ℹ️ Found innerHTML usage - check for content replacement<br>';
+            }
+            
+            html += '</div>';
+            
+            analysis.innerHTML = html;
+        }
+        
+        function generateRecommendations() {
+            const recs = document.getElementById('recommendations');
+            
+            let html = '<h4>💡 Troubleshooting Steps:</h4>';
+            html += '<ol>';
+            html += '<li><strong>Check Browser Developer Tools:</strong> Press F12 and inspect the header elements to see if there are actually duplicate DOM elements.</li>';
+            html += '<li><strong>Clear Browser Cache:</strong> Hard refresh (Ctrl+F5) to ensure you\'re seeing the latest version.</li>';
+            html += '<li><strong>Check CSS Z-index:</strong> Multiple elements might be stacked on top of each other.</li>';
+            html += '<li><strong>Inspect Network Tab:</strong> Check if CSS/JS files are loading multiple times.</li>';
+            html += '<li><strong>Check for CSS Transforms:</strong> Elements might be visually duplicated by CSS transforms or pseudo-elements.</li>';
+            html += '<li><strong>Validate HTML:</strong> Ensure there are no unclosed tags causing rendering issues.</li>';
+            html += '</ol>';
+            
+            html += '<h4>🔧 Quick Fixes:</h4>';
+            html += '<ul>';
+            html += '<li>If you see duplicate DOM elements, check for multiple header includes in PHP files</li>';
+            html += '<li>If DOM is correct but visually duplicated, check CSS for ::before or ::after pseudo-elements</li>';
+            html += '<li>Check for JavaScript that might be cloning or moving elements</li>';
+            html += '<li>Verify that CSS files aren\'t conflicting or overriding each other</li>';
+            html += '</ul>';
+            
+            recs.innerHTML = html;
+        }
+        
+        // Auto-run analysis on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            analyzeElements();
+            generateRecommendations();
+            console.log('🔍 Header duplication debug tool loaded');
+        });
+        
+        // Add some utility functions for manual testing
+        window.debugHeader = {
+            countElements: () => {
+                console.log('Header elements:', document.querySelectorAll('header').length);
+                console.log('Logo elements:', document.querySelectorAll('.logo').length);
+                console.log('Login buttons:', document.querySelectorAll('.login-btn').length);
+            },
+            
+            highlightDuplicates: () => {
+                document.querySelectorAll('.logo').forEach((el, i) => {
+                    el.style.border = `3px solid ${i === 0 ? 'green' : 'red'}`;
+                });
+            },
+            
+            removeDuplicates: () => {
+                const logos = document.querySelectorAll('.logo');
+                for (let i = 1; i < logos.length; i++) {
+                    logos[i].remove();
+                }
+            }
+        };
+    </script>
+</body>
+</html>

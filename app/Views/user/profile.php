@@ -185,9 +185,12 @@ $pageTitle = $page_title ?? 'User Profile';
                     <div class="mb-4">
                         <div class="avatar-upload-area" id="avatarUploadArea" onclick="document.getElementById('avatarInput').click()">
                             <img src="<?php 
-                                echo !empty($user['avatar']) 
-                                    ? '/profile/avatar/' . htmlspecialchars($user['avatar'])
-                                    : 'https://ui-avatars.com/api/?name=' . urlencode($user['first_name'] . ' ' . $user['last_name']) . '&size=120&background=0d6efd&color=fff';
+                                $avatar = $user['avatar'] ?? null;
+                                $firstName = $user['first_name'] ?? '';
+                                $lastName = $user['last_name'] ?? '';
+                                echo !empty($avatar)
+                                    ? '/profile/avatar/' . htmlspecialchars($avatar)
+                                    : 'https://ui-avatars.com/api/?name=' . urlencode(trim($firstName . ' ' . $lastName)) . '&size=120&background=0d6efd&color=fff';
                             ?>" 
                             alt="Profile Avatar" class="avatar-preview mb-2" id="avatarPreview">
                             <br>
@@ -217,29 +220,33 @@ $pageTitle = $page_title ?? 'User Profile';
                     
                     <!-- User Info -->
                     <div class="text-start">
-                        <h6 class="mb-3"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></h6>
-                        <?php if (!empty($user['professional_title'])): ?>
+                        <h6 class="mb-3"><?php 
+                            $firstName = $user['first_name'] ?? '';
+                            $lastName  = $user['last_name'] ?? '';
+                            echo htmlspecialchars(trim($firstName . ' ' . $lastName));
+                        ?></h6>
+                        <?php if (!empty($user['professional_title'] ?? null)): ?>
                             <p class="text-muted mb-1">
                                 <i class="fas fa-briefcase me-2"></i>
-                                <?php echo htmlspecialchars($user['professional_title']); ?>
+                                <?php echo htmlspecialchars($user['professional_title'] ?? ''); ?>
                             </p>
                         <?php endif; ?>
-                        <?php if (!empty($user['company'])): ?>
+                        <?php if (!empty($user['company'] ?? null)): ?>
                             <p class="text-muted mb-1">
                                 <i class="fas fa-building me-2"></i>
-                                <?php echo htmlspecialchars($user['company']); ?>
+                                <?php echo htmlspecialchars($user['company'] ?? ''); ?>
                             </p>
                         <?php endif; ?>
-                        <?php if (!empty($user['location'])): ?>
+                        <?php if (!empty($user['location'] ?? null)): ?>
                             <p class="text-muted mb-1">
                                 <i class="fas fa-map-marker-alt me-2"></i>
-                                <?php echo htmlspecialchars($user['location']); ?>
+                                <?php echo htmlspecialchars($user['location'] ?? ''); ?>
                             </p>
                         <?php endif; ?>
                         <p class="text-muted">
                             <i class="fas fa-envelope me-2"></i>
-                            <?php echo htmlspecialchars($user['email']); ?>
-                            <?php if (!empty($user['email_verified_at'])): ?>
+                            <?php echo htmlspecialchars($user['email'] ?? ''); ?>
+                            <?php if (!empty($user['email_verified_at'] ?? null)): ?>
                                 <i class="fas fa-check-circle text-success ms-1" title="Email verified"></i>
                             <?php else: ?>
                                 <i class="fas fa-exclamation-triangle text-warning ms-1" title="Email not verified"></i>

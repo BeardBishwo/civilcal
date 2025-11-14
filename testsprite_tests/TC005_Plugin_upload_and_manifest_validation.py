@@ -30,7 +30,7 @@ async def run_test():
         page = await context.new_page()
         
         # Navigate to your target URL and wait until the network request is committed
-        await page.goto("http://localhost:80/bishwo_calculator", wait_until="commit", timeout=10000)
+        await page.goto("http://localhost:80/register", wait_until="commit", timeout=10000)
         
         # Wait for the main page to reach DOMContentLoaded state (optional for stability)
         try:
@@ -46,50 +46,26 @@ async def run_test():
                 pass
         
         # Interact with the page elements to simulate user flow
-        # -> Navigate to the plugin management interface using HTTPS scheme.
-        await page.goto('https://localhost/bishwo_calculator', timeout=10000)
+        # -> Navigate to the registration page using HTTPS scheme instead of HTTP.
+        await page.goto('https://localhost/register', timeout=10000)
         await asyncio.sleep(3)
         
 
-        # -> Click on the Login link to authenticate as admin.
-        frame = context.pages[-1]
-        # Click on the Login link to authenticate as admin
-        elem = frame.locator('xpath=html/body/header/div/div[3]/div/a').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
+        # -> Report the server error issue or try to navigate to the admin login or plugin management page directly to continue testing plugin upload.
+        await page.goto('https://localhost/admin/login', timeout=10000)
+        await asyncio.sleep(3)
         
 
-        # -> Input admin username and password, then click Sign In.
-        frame = context.pages[-1]
-        # Input admin username or email
-        elem = frame.locator('xpath=html/body/div/div/form/div/div/input').nth(0)
-        await page.wait_for_timeout(3000); await elem.fill('admin@engicalpro.com')
-        
-
-        frame = context.pages[-1]
-        # Input admin password
-        elem = frame.locator('xpath=html/body/div/div/form/div/div[2]/div/input').nth(0)
-        await page.wait_for_timeout(3000); await elem.fill('password')
-        
-
-        frame = context.pages[-1]
-        # Click Sign In button to authenticate as admin
-        elem = frame.locator('xpath=html/body/div/div/form/div[3]/button').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
-        # -> Click the Quick Login button for Admin Demo to attempt login via demo credentials.
-        frame = context.pages[-1]
-        # Click Quick Login button for Admin Demo to attempt login via demo credentials
-        elem = frame.locator('xpath=html/body/div[2]/div/div/div[2]/div/button').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
+        # -> Try to navigate to a different page or report the server error issue.
+        await page.goto('https://localhost/admin/plugins', timeout=10000)
+        await asyncio.sleep(3)
         
 
         # --> Assertions to verify final state
-        frame = context.pages[-1]
         try:
-            await expect(frame.locator('text=Plugin upload successful').first).to_be_visible(timeout=1000)
+            await expect(page.locator('text=Plugin upload completed successfully').first).to_be_visible(timeout=30000)
         except AssertionError:
-            raise AssertionError("Test failed: Plugin uploads must be accepted only if manifest files are valid and properly structured; invalid manifests should produce errors. This assertion fails immediately to indicate the test plan execution failure.")
+            raise AssertionError('Test case failed: Plugin upload and manifest validation did not succeed as expected. The test plan requires verifying plugin upload success and proper error handling for invalid manifests.')
         await asyncio.sleep(5)
     
     finally:

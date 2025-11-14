@@ -30,7 +30,7 @@ async def run_test():
         page = await context.new_page()
         
         # Navigate to your target URL and wait until the network request is committed
-        await page.goto("http://localhost:80/bishwo_calculator", wait_until="commit", timeout=10000)
+        await page.goto("http://localhost:80/register", wait_until="commit", timeout=10000)
         
         # Wait for the main page to reach DOMContentLoaded state (optional for stability)
         try:
@@ -46,17 +46,17 @@ async def run_test():
                 pass
         
         # Interact with the page elements to simulate user flow
-        # -> Navigate to the correct HTTPS URL for the admin themes page.
-        await page.goto('https://localhost/admin/themes', timeout=10000)
+        # -> Navigate to the admin login page using HTTPS and then proceed to /admin/themes after login.
+        await page.goto('https://localhost/admin/login', timeout=10000)
         await asyncio.sleep(3)
         
 
         # --> Assertions to verify final state
         frame = context.pages[-1]
         try:
-            await expect(frame.locator('text=Theme Upload Successful').first).to_be_visible(timeout=30000)
+            await expect(frame.locator('text=Theme upload completed successfully').first).to_be_visible(timeout=30000)
         except AssertionError:
-            raise AssertionError('Test case failed: Theme upload validation did not pass as expected. The theme was either not listed with a preview option after uploading a valid theme, or invalid themes were not properly rejected with clear error messages.')
+            raise AssertionError("Test case failed: The theme upload validation did not pass as expected. Either the valid theme package upload was unsuccessful or the invalid theme package did not trigger the appropriate validation errors.")
         await asyncio.sleep(5)
     
     finally:

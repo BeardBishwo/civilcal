@@ -1,246 +1,190 @@
-<?php
-$content = '
-<div class="container-fluid">
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="h4 mb-1">Dashboard Overview</h2>
-            <p class="text-muted mb-0">Welcome back, ' . htmlspecialchars($currentUser['username'] ?? 'Admin') . '! Here\'s what\'s happening with your calculators.</p>
-        </div>
-        <div class="quick-actions">
-            <button class="btn btn-primary btn-sm"><i class="bi bi-plus-circle me-2"></i>Add Calculator</button>
-            <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-download me-2"></i>Export Report</button>
-        </div>
-    </div>
-
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card stat-card border-left-primary">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Users
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800 stat-number">' . ($stats['total_users'] ?? '1,234') . '</div>
-                            <small class="stat-label">+12% from last month</small>
-                        </div>
-                        <div class="col-auto">
-                            <i class="bi bi-people fa-2x text-primary"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card stat-card border-left-success">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Active Modules
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800 stat-number">' . ($stats['active_modules'] ?? '12') . '</div>
-                            <small class="stat-label">8 categories, 4 custom</small>
-                        </div>
-                        <div class="col-auto">
-                            <i class="bi bi-grid-3x3-gap fa-2x text-success"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card stat-card border-left-info">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Total Calculators
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800 stat-number">' . ($stats['total_calculators'] ?? '56') . '</div>
-                            <small class="stat-label">+3 new this week</small>
-                        </div>
-                        <div class="col-auto">
-                            <i class="bi bi-calculator fa-2x text-info"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card stat-card border-left-warning">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                API Requests
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800 stat-number">' . ($stats['api_requests'] ?? '789') . '</div>
-                            <small class="stat-label">Today\'s count</small>
-                        </div>
-                        <div class="col-auto">
-                            <i class="bi bi-hdd-network fa-2x text-warning"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Bishwo Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .quick-action {
+            background: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: left;
+            width: 100%;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        .quick-action:hover {
+            background: #f8f9fa;
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <div class="container">
+            <h1><i class="fas fa-tachometer-alt me-3"></i>Admin Dashboard</h1>
+            <p class="mb-0">Welcome back! Here's an overview of your engineering calculator platform.</p>
         </div>
     </div>
 
-    <!-- Charts Row -->
-    <div class="row mb-4">
-        <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">User Growth Analytics</h6>
-                    <div class="dropdown no-arrow">
-                        <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-three-dots-vertical text-gray-400"></i>
+    <div class="container">
+        <div class="row">
+            <!-- Statistics Cards -->
+            <div class="col-md-3">
+                <div class="stat-card text-center">
+                    <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                    <div class="stat-number">1,247</div>
+                    <div class="text-muted">Total Users</div>
+                    <small class="text-success"><i class="fas fa-arrow-up"></i> +12% this month</small>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="stat-card text-center">
+                    <i class="fas fa-calculator fa-2x text-success mb-2"></i>
+                    <div class="stat-number">15,673</div>
+                    <div class="text-muted">Calculations</div>
+                    <small class="text-success"><i class="fas fa-arrow-up"></i> +8% this month</small>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="stat-card text-center">
+                    <i class="fas fa-puzzle-piece fa-2x text-warning mb-2"></i>
+                    <div class="stat-number">12</div>
+                    <div class="text-muted">Active Modules</div>
+                    <small class="text-success"><i class="fas fa-check"></i> All operational</small>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="stat-card text-center">
+                    <i class="fas fa-chart-line fa-2x text-info mb-2"></i>
+                    <div class="stat-number">98.5%</div>
+                    <div class="text-muted">System Health</div>
+                    <small class="text-success"><i class="fas fa-check-circle"></i> Excellent</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-bar me-2"></i>System Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <h3 class="text-primary">892</h3>
+                                <p class="text-muted">Active Users</p>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <h3 class="text-success">2,341</h3>
+                                <p class="text-muted">Monthly Calculations</p>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <h3 class="text-warning">67%</h3>
+                                <p class="text-muted">Storage Used</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6>Recent Activity</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-user-plus text-primary me-2"></i>
+                                    New user registered - <small class="text-muted">2 hours ago</small>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-cog text-success me-2"></i>
+                                    System settings updated - <small class="text-muted">4 hours ago</small>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-database text-info me-2"></i>
+                                    Database backup completed - <small class="text-muted">1 day ago</small>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="/bishwo_calculator/admin/settings" class="quick-action btn">
+                            <i class="fas fa-cog text-primary me-2"></i>
+                            <strong>Settings</strong><br>
+                            <small class="text-muted">Configure system settings</small>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
-                            <a class="dropdown-item" href="#">Export Data</a>
-                            <a class="dropdown-item" href="#">Print Chart</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Refresh</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="chart-area">
-                        <canvas id="userGrowthChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Calculator Usage</h6>
-                </div>
-                <div class="card-body">
-                    <div class="chart-pie pt-4 pb-2">
-                        <canvas id="calculatorUsageChart" height="250"></canvas>
+                        
+                        <a href="/bishwo_calculator/admin/users" class="quick-action btn">
+                            <i class="fas fa-users text-success me-2"></i>
+                            <strong>Manage Users</strong><br>
+                            <small class="text-muted">User accounts and roles</small>
+                        </a>
+                        
+                        <a href="/bishwo_calculator/admin/setup/checklist" class="quick-action btn">
+                            <i class="fas fa-tasks text-warning me-2"></i>
+                            <strong>Setup Checklist</strong><br>
+                            <small class="text-muted">Complete site setup</small>
+                        </a>
+                        
+                        <a href="/bishwo_calculator/help" class="quick-action btn">
+                            <i class="fas fa-question-circle text-info me-2"></i>
+                            <strong>Help Center</strong><br>
+                            <small class="text-muted">Documentation and support</small>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Recent Activity & Quick Stats -->
-    <div class="row">
-        <!-- Recent Activity -->
-        <div class="col-lg-8 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Activity</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-borderless table-hover">
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Action</th>
-                                    <th>Calculator</th>
-                                    <th>Time</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="/assets/images/avatar1.jpg" class="rounded-circle me-2" width="30" height="30" alt="User">
-                                            <div>John Doe</div>
-                                        </div>
-                                    </td>
-                                    <td>Used Calculator</td>
-                                    <td>Concrete Volume</td>
-                                    <td>2 minutes ago</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="/assets/images/avatar2.jpg" class="rounded-circle me-2" width="30" height="30" alt="User">
-                                            <div>Jane Smith</div>
-                                        </div>
-                                    </td>
-                                    <td>Created Project</td>
-                                    <td>Structural Analysis</td>
-                                    <td>15 minutes ago</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="/assets/images/avatar3.jpg" class="rounded-circle me-2" width="30" height="30" alt="User">
-                                            <div>Mike Johnson</div>
-                                        </div>
-                                    </td>
-                                    <td>Exported Report</td>
-                                    <td>Electrical Load</td>
-                                    <td>1 hour ago</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <a href="/admin/activity" class="btn btn-sm btn-outline-primary">View All Activity</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- System Status -->
-        <div class="col-lg-4 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">System Status</h6>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>Server Load</span>
-                            <span class="text-success">24%</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 24%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>Database</span>
-                            <span class="text-success">Online</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>Storage</span>
-                            <span class="text-warning">65%</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: 65%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="alert alert-info mt-3">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <strong>System Uptime:</strong> 99.8%
-                    </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="alert alert-success">
+                    <h5><i class="fas fa-check-circle me-2"></i>System Status: Operational</h5>
+                    <p class="mb-0">All systems are running normally. Last checked: <?php echo date('Y-m-d H:i:s'); ?></p>
                 </div>
             </div>
         </div>
     </div>
-</div>
-';
 
-// Include the layout
-include __DIR__ . '/../layouts/admin.php';
-?>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

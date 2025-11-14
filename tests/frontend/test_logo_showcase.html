@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beautiful Logo Showcase - EngiCal Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4f46e5, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+        
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .logo-demo {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-demo:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .logo-demo h3 {
+            margin-bottom: 1.5rem;
+            color: #374151;
+            font-size: 1.2rem;
+        }
+        
+        /* Logo Styles */
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #2d3748;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 8px 12px;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .logo:hover::before {
+            left: 100%;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05) translateY(-1px);
+            background: rgba(79, 70, 229, 0.05);
+        }
+        
+        .logo-img {
+            height: 40px;
+            width: auto;
+            border-radius: 8px;
+            display: block;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        
+        .logo:hover .logo-img {
+            transform: rotate(2deg) scale(1.05);
+            filter: drop-shadow(0 4px 12px rgba(79, 70, 229, 0.3));
+        }
+        
+        .logo span {
+            background: linear-gradient(135deg, #4f46e5, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            letter-spacing: -0.02em;
+            position: relative;
+        }
+        
+        .logo span::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #4f46e5, #f59e0b);
+            transition: width 0.3s ease;
+        }
+        
+        .logo:hover span::after {
+            width: 100%;
+        }
+        
+        /* Style Variations */
+        .logo.minimal-style {
+            padding: 4px 8px;
+            gap: 8px;
+        }
+        
+        .logo.minimal-style .logo-img {
+            filter: none;
+        }
+        
+        .logo.minimal-style span {
+            background: #2d3748;
+            -webkit-background-clip: unset;
+            -webkit-text-fill-color: unset;
+            background-clip: unset;
+        }
+        
+        .logo.premium-style {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid rgba(79, 70, 229, 0.2);
+        }
+        
+        .logo.premium-style:hover {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(16, 185, 129, 0.15));
+            border-color: rgba(79, 70, 229, 0.3);
+        }
+        
+        /* Hover Effects */
+        .logo.glow-effect:hover {
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .logo.bounce-effect:hover .logo-img {
+            animation: logoBounce 0.6s ease;
+        }
+        
+        @keyframes logoBounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
+            60% { transform: translateY(-4px); }
+        }
+        
+        .logo.pulse-effect:hover {
+            animation: logoPulse 1s infinite;
+        }
+        
+        @keyframes logoPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Text Positions */
+        .logo.text-bottom {
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .logo.text-top {
+            flex-direction: column-reverse;
+            gap: 4px;
+        }
+        
+        /* Size Variations */
+        .logo.size-small {
+            font-size: 1.2rem;
+        }
+        
+        .logo.size-small .logo-img {
+            height: 28px;
+        }
+        
+        .logo.size-large {
+            font-size: 1.8rem;
+            padding: 12px 16px;
+        }
+        
+        .logo.size-large .logo-img {
+            height: 48px;
+        }
+        
+        .admin-info {
+            background: #e0f2fe;
+            border: 1px solid #0288d1;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .admin-info h3 {
+            color: #01579b;
+            margin-bottom: 1rem;
+        }
+        
+        .admin-info p {
+            color: #0277bd;
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            background: #4f46e5;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #3730a3;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Beautiful Logo Showcase</h1>
+            <p>Admin-configurable logo with multiple styles and animations</p>
+        </div>
+        
+        <div class="showcase-grid">
+            <!-- Modern Style -->
+            <div class="logo-demo">
+                <h3>🚀 Modern Style (Default)</h3>
+                <a href="#" class="logo">
+                    <img src="/bishwo_calculator/assets/icons/icon-192.png" alt="Logo" class="logo-img">
+                    <span>EngiCal Pro</span>
+                </a>
+            </div>
+            
+            <!-- Minimal Style -->
+            <div class="logo-demo">
+                <h3>✨ Minimal Style</h3>
+                <a href="#" class="logo minimal-style">
+                    <img src="/bishwo_calculator/assets/icons/icon-192.png" alt="Logo" class="logo-img">
+                    <span>EngiCal Pro</span>
+                </a>
+            </div>
+            
+            <!-- Premium Style -->
+            <div class="logo-demo">
+                <h3>💎 Premium Style</h3>
+                <a href="#" class="logo premium-style">
+                    <img src="/bishwo_calculator/assets/icons/icon-192.png" alt="Logo" class="logo-img">
+                    <span>EngiCal Pro</span>
+                </a>
+            </div>
+            
+            <!-- Glow Effect -->
+            <div class="logo-demo">
+                <h3>✨ Glow Effect</h3>
+                <a href="#" class="logo glow-effect">
+                    <img src="/bishwo_calculator/assets/icons/icon-192.png" alt="Logo" class="logo-img">
+                    <span>EngiCal Pro</span>
+                </a>
+            </div>
+            
+            <!-- Bounce Effect -->
+            <div class="logo-demo">
+                <h3>🎾 Bounce Effect</h3>
+                <a href="#" class="logo bounce-effect">
+                    <img src="/bishwo_calculator/assets/icons/icon-192.png" alt="Logo" class="logo-img">
+                    <span>EngiCal Pro</span>
+                </a>
+            </div>
+            
+            <!-- Pulse Effect -->
+            <div class="logo-demo">
+                <h3>💓 Pulse Effect</h3>
+                <a href="#" class="logo pulse-effect">
+                    <img src="/bishwo_calculator/assets/icons/icon-192.png" alt="Logo" class="logo-img">
+                    <span>EngiCal Pro</span>
+                </a>
+            </div>
+            
+            <!-- Text Bottom -->
+            <div class="logo-demo">
+                <h3>⬇️ Text Bottom</h3>
+                <a href="#" class="logo text-bottom">
+                    <img src="/bishwo_calculator/assets/icons/icon-192.png" alt="Logo" class="logo-img">
+                    <span>EngiCal Pro</span>
+                </a>
+            </div>
+            
+            <!-- Text Top -->
+            <div class="logo-demo">
+                <h3>⬆️ Text Top</h3>
+                <a href="#" class="logo text-top">
+                    <img src="/bishwo_calculator/assets/icons/icon-192.png" alt="Logo" class="logo-img">
+                    <span>EngiCal Pro</span>
+                </a>
+            </div>
+            
+            <!-- Small Size -->
+            <div class="logo-demo">
+                <h3>🔍 Small Size</h3>
+                <a href="#" class="logo size-small">
+                    <img src="/bishwo_calculator/assets/icons/icon-192.png" alt="Logo" class="logo-img">
+                    <span>EngiCal Pro</span>
+                </a>
+            </div>
+            
+            <!-- Large Size -->
+            <div class="logo-demo">
+                <h3>🔍 Large Size</h3>
+                <a href="#" class="logo size-large">
+                    <img src="/bishwo_calculator/assets/icons/icon-192.png" alt="Logo" class="logo-img">
+                    <span>EngiCal Pro</span>
+                </a>
+            </div>
+            
+            <!-- Logo Only -->
+            <div class="logo-demo">
+                <h3>🖼️ Logo Only</h3>
+                <a href="#" class="logo">
+                    <img src="/bishwo_calculator/assets/icons/icon-192.png" alt="Logo" class="logo-img">
+                </a>
+            </div>
+            
+            <!-- Text Only -->
+            <div class="logo-demo">
+                <h3>📝 Text Only</h3>
+                <a href="#" class="logo">
+                    <span>EngiCal Pro</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="admin-info">
+            <h3>🔧 Admin Configuration</h3>
+            <p>All these logo styles can be configured through the admin panel. Administrators can:</p>
+            <ul>
+                <li>✅ Upload custom logo images</li>
+                <li>✅ Change logo text and font settings</li>
+                <li>✅ Choose from multiple style variations</li>
+                <li>✅ Configure hover effects and animations</li>
+                <li>✅ Set brand colors and spacing</li>
+                <li>✅ Control logo size and positioning</li>
+                <li>✅ Toggle logo/text visibility</li>
+                <li>✅ Live preview changes</li>
+            </ul>
+            
+            <div style="margin-top: 1.5rem;">
+                <a href="/admin/logo-settings" class="btn">
+                    <i class="fas fa-cog"></i>
+                    Configure Logo Settings
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Add some interactive demo functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎨 Logo showcase loaded!');
+            
+            // Add click handlers for demo purposes
+            document.querySelectorAll('.logo').forEach(logo => {
+                logo.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Create a temporary notification
+                    const notification = document.createElement('div');
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: #10b981;
+                        color: white;
+                        padding: 12px 20px;
+                        border-radius: 8px;
+                        z-index: 1000;
+                        font-weight: 600;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                        transform: translateX(100%);
+                        transition: transform 0.3s ease;
+                    `;
+                    notification.textContent = '✨ Logo clicked! This would navigate to homepage.';
+                    
+                    document.body.appendChild(notification);
+                    
+                    // Animate in
+                    setTimeout(() => {
+                        notification.style.transform = 'translateX(0)';
+                    }, 100);
+                    
+                    // Remove after 3 seconds
+                    setTimeout(() => {
+                        notification.style.transform = 'translateX(100%)';
+                        setTimeout(() => {
+                            document.body.removeChild(notification);
+                        }, 300);
+                    }, 3000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

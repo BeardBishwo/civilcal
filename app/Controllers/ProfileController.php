@@ -277,7 +277,8 @@ class ProfileController extends Controller
         $user = $this->userModel->find($userId);
         
         $safeFilename = basename($filename);
-        if (!$user || $user['avatar'] !== $safeFilename) {
+        // Use null-coalescing so missing avatar column does not trigger warnings
+        if (!$user || (($user['avatar'] ?? null) !== $safeFilename)) {
             http_response_code(404);
             exit('Avatar not found');
         }
@@ -309,7 +310,7 @@ class ProfileController extends Controller
     /**
      * Get current user ID
      */
-    private function getCurrentUserId()
+    protected function getCurrentUserId()
     {
         return $_SESSION['user_id'] ?? 1;
     }

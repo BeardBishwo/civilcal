@@ -119,7 +119,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <?php
     if ($themeManager) {
-        $cssFiles = ['theme.css', 'footer.css', 'back-to-top.css', 'home.css'];
+        $cssFiles = ['theme.css', 'footer.css', 'back-to-top.css', 'home.css', 'logo-enhanced.css'];
         foreach ($cssFiles as $css) {
             $cssPath = dirname(__DIR__) . '/assets/css/' . $css;
             $mtime = file_exists($cssPath) ? filemtime($cssPath) : time();
@@ -128,6 +128,19 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         }
     }
     ?>
+    <style>
+        /* Logo CSS Variables from Admin Settings */
+        :root {
+            --logo-spacing: <?php echo $site_meta['logo_settings']['spacing'] ?? '12px'; ?>;
+            --logo-text-weight: <?php echo $site_meta['logo_settings']['text_weight'] ?? '700'; ?>;
+            --logo-text-size: <?php echo $site_meta['logo_settings']['text_size'] ?? '1.5rem'; ?>;
+            --logo-height: <?php echo $site_meta['logo_settings']['logo_height'] ?? '40px'; ?>;
+            --logo-border-radius: <?php echo $site_meta['logo_settings']['border_radius'] ?? '8px'; ?>;
+            --brand-primary: <?php echo $site_meta['brand_colors']['primary'] ?? '#4f46e5'; ?>;
+            --brand-secondary: <?php echo $site_meta['brand_colors']['secondary'] ?? '#10b981'; ?>;
+            --brand-accent: <?php echo $site_meta['brand_colors']['accent'] ?? '#f59e0b'; ?>;
+        }
+    </style>
     <style>
         /* Enhanced Header Styles */
         :root {
@@ -139,9 +152,8 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         }
 
         .site-header {
-            background: var(--glass-bg);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
+            -webkit-backdrop-filter: blur(20px);
             box-shadow: var(--shadow-sm);
             position: sticky;
             top: 0;
@@ -151,13 +163,33 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             left: 0;
             right: 0;
         }
+        
+        /* Light theme header */
+        body:not(.dark-theme) .site-header {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            color: #1a202c;
+        }
+        
+        /* Dark theme header */
+        body.dark-theme .site-header {
+            background: rgba(6,8,12,0.72);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+            color: #e6eefc;
+        }
 
         /* Override theme.css max-width constraint for true full width */
         .site-header .header-content,
         .header-content {
             max-width: none !important;
-            width: 100% !important;
-            margin: 0 !important;
+            width: calc(100% - 20px) !important;
+            margin: 0 10px !important;
+            box-sizing: border-box;
+            padding: 0 10px;
+        }
+
+        .header-content {
             padding: 0.5rem 0;
             display: flex;
             align-items: center;
@@ -175,16 +207,36 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             overflow-x: hidden;
         }
         
-        /* Fix for black strip issue - ensure proper background */
+        /* Theme-aware body backgrounds */
         body {
-            background: linear-gradient(135deg, #0a0e27, #1a1a4d, #0f0f2e) !important;
             min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
         }
         
-        /* Ensure main content area has proper styling */
-        .main-content {
+        /* Light theme (default) */
+        body:not(.dark-theme) {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%) !important;
+            color: #1a202c;
+        }
+        
+        /* Dark theme */
+        body.dark-theme {
             background: linear-gradient(135deg, #0a0e27, #1a1a4d, #0f0f2e) !important;
+            color: #e2e8f0;
+        }
+        
+        /* Ensure main content area follows theme */
+        .main-content {
             min-height: calc(100vh - 60px);
+            transition: background 0.3s ease;
+        }
+        
+        body:not(.dark-theme) .main-content {
+            background: inherit;
+        }
+        
+        body.dark-theme .main-content {
+            background: inherit;
         }
 
         /* Responsive section adjustments */
@@ -232,30 +284,14 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: <?php echo $site_meta['logo_settings']['spacing'] ?? '12px'; ?>;
             text-decoration: none;
-            font-weight: 700;
-            font-size: 1.5rem;
+            font-weight: <?php echo $site_meta['logo_settings']['text_weight'] ?? '700'; ?>;
+            font-size: <?php echo $site_meta['logo_settings']['text_size'] ?? '1.5rem'; ?>;
             color: #2d3748;
-            transition: transform 0.2s ease;
-        }
-
-        .logo:hover {
-            transform: translateY(-1px);
-        }
-
-        .logo-img {
-            height: 32px;
-            width: auto;
-            border-radius: 6px;
-            /* keep logo tightly aligned to the left */
-            display: block;
-        }
-
-        .header-middle {
-            flex: 1 1 auto;
-            max-width: none;
-            display: flex;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 8px 12px;
+            border-radius: <?php echo $site_meta['logo_settings']['border_radius'] ?? '8px'; ?>;
             align-items: center;
             justify-content: flex-start;
             /* reduced padding-right so middle section doesn't push into header-right at smaller widths */
@@ -478,29 +514,67 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         .user-actions {
             display: flex;
             align-items: center;
-            /* slightly tighter spacing to preserve space */
-            gap: 0.5rem;
+            /* consistent equal spacing between all elements */
+            gap: 0.75rem;
             flex-shrink: 0;
             flex-wrap: nowrap;
             width: auto; /* don't force full width which can push content */
             justify-content: flex-end;
+            padding: 0 0.5rem; /* increased padding to prevent scrollbar overlap */
+            margin-right: 5px; /* extra margin to ensure login button is visible */
         }
 
         /* Move user-greeting inside user-actions */
         .user-actions .user-greeting {
-            padding: 0.25rem 0.75rem;
+            padding: 0.4rem 0.75rem;
             font-size: 0.8rem;
             background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(5,150,105,0.05));
             border: 1px solid rgba(16,185,129,0.2);
-            border-radius: 20px;
+            border-radius: 12px;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 0.25rem;
             font-weight: 500;
-            flex-shrink: 0;
+            flex-shrink: 1;
+            min-width: 0;
+            max-width: 200px;
+            text-align: center;
+            line-height: 1.2;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            /* Allow text to wrap to multiple lines */
+            white-space: normal;
+            /* Auto-fit text size based on container width */
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
+        }
+        
+        /* Auto-resize text for very long names */
+        .user-actions .user-greeting strong {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
             white-space: nowrap;
+        }
+        
+        /* Two-line layout for longer names */
+        @media (max-width: 900px) {
+            .user-actions .user-greeting {
+                flex-direction: column;
+                padding: 0.3rem 0.6rem;
+                gap: 0.1rem;
+                min-height: 2.2rem;
+                justify-content: center;
+            }
+            
+            .user-actions .user-greeting strong {
+                max-width: 100px;
+                font-size: 0.75rem;
+            }
         }
 
         /* Profile dropdown wrapper inside user-actions */
@@ -523,6 +597,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             font-size: 1.1rem;
             font-weight: 600;
             position: relative;
+            flex-shrink: 0;
         }
         
         .theme-toggle-btn::after {
@@ -551,13 +626,15 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             background: none;
             border: 1px solid #e2e8f0;
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            transition: all 0.2s ease;
             color: #4a5568;
+            flex-shrink: 0; /* prevent shrinking */
         }
 
         .search-toggle-btn:hover {
@@ -602,10 +679,9 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             flex-shrink: 0;
         }
 
-        /* Make login button responsive */
+        /* Login button consistent spacing - no extra margins */
         .login-btn {
-            margin-left: 0.25rem !important;
-            margin-right: 0.75rem !important;
+            /* Remove conflicting margins to rely on gap from user-actions */
         }
 
         @media (max-width: 480px) {
@@ -689,15 +765,26 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         }
 
         .hamburger-btn {
-            display: none;
+            display: none !important; /* Force hide on desktop */
             background: none;
-            border: none;
-            font-size: 1.25rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.1rem;
             color: #4a5568;
             cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 6px;
             transition: all 0.2s ease;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Ensure hamburger is hidden on desktop screens */
+        @media (min-width: 769px) {
+            .hamburger-btn {
+                display: none !important;
+            }
         }
 
         .hamburger-btn:hover {
@@ -754,20 +841,32 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         @media (max-width: 1024px) {
             .header-content {
                 gap: 1rem;
+                padding: 0 15px; /* increased padding on smaller screens */
+            }
+            
+            .user-actions {
+                margin-right: 10px; /* more margin on smaller screens */
+                padding: 0 0.75rem;
             }
         }
 
         @media (max-width: 768px) {
             .header-content {
                 gap: 0.5rem;
+                padding: 0 12px; /* ensure adequate padding */
             }
             
             .header-middle {
                 display: none;
             }
             
+            .user-actions {
+                margin-right: 8px;
+                gap: 0.5rem; /* reduce gap on mobile to fit better */
+            }
+            
             .hamburger-btn {
-                display: block;
+                display: flex !important;
             }
             
             .mobile-nav.active {
@@ -781,14 +880,30 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             
             /* Responsive user greeting inside user-actions */
             .user-actions .user-greeting {
-                padding: 0.3rem 0.6rem;
-                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+                font-size: clamp(0.65rem, 1.8vw, 0.75rem);
+                max-width: 150px;
+                min-height: 2rem;
             }
             
-            /* Hide user greeting text on very small screens */
+            .user-actions .user-greeting strong {
+                max-width: 80px;
+                font-size: 0.7rem;
+            }
+        }
+            
+            /* Compact layout for small screens */
             @media (max-width: 640px) {
                 .user-actions .user-greeting {
-                    display: none;
+                    padding: 0.2rem 0.4rem;
+                    font-size: 0.65rem;
+                    max-width: 120px;
+                    min-height: 1.8rem;
+                }
+                
+                .user-actions .user-greeting strong {
+                    max-width: 60px;
+                    font-size: 0.65rem;
                 }
             }
         }
@@ -972,9 +1087,9 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             color: #e6eefc;
         }
 
-        /* Explicit light-mode rules to avoid text blending into white backgrounds */
+        /* Comprehensive light theme styles */
         body:not(.dark-theme) .main-nav a {
-            color: #2d3748; /* dark slate */
+            color: #2d3748;
         }
 
         body:not(.dark-theme) .main-nav a:hover {
@@ -983,13 +1098,19 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         }
 
         body:not(.dark-theme) .dropdown {
-            background: rgba(30, 30, 60, 0.9);
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            color: #ffffff;
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #1a202c;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
         body:not(.dark-theme) .dropdown a {
             color: #4a5568;
+        }
+
+        body:not(.dark-theme) .dropdown a:hover {
+            background: #f7fafc;
+            color: #667eea;
         }
 
         body:not(.dark-theme) .user-actions .btn-text {
@@ -999,6 +1120,45 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         body:not(.dark-theme) .search-suggestions a,
         body:not(.dark-theme) .search-suggestions div {
             color: #2d3748;
+        }
+
+        body:not(.dark-theme) .search-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #1a202c;
+        }
+
+        body:not(.dark-theme) .search-suggestions {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #1a202c;
+        }
+
+        body:not(.dark-theme) .user-greeting {
+            background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(5,150,105,0.05));
+            border: 1px solid rgba(16,185,129,0.2);
+            color: #1a202c;
+        }
+
+        body:not(.dark-theme) .theme-toggle-btn {
+            color: #4a5568;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body:not(.dark-theme) .theme-toggle-btn:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+
+        body:not(.dark-theme) .search-toggle-btn {
+            color: #4a5568;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body:not(.dark-theme) .search-toggle-btn:hover {
+            background: #f7fafc;
+            color: #667eea;
         }
     </style>
     <style>
@@ -1581,11 +1741,50 @@ m        color: #93c5fd;
     <header class="site-header" id="siteHeader">
         <div class="header-content">
             <div class="header-left">
-                <a href="<?php echo app_base_url('/'); ?>" class="logo">
-                    <?php if ($header_style === 'logo_only' || $header_style === 'logo_text'): ?>
-                        <img src="<?php echo htmlspecialchars($logo); ?>" alt="<?php echo $title_safe; ?> Logo" class="logo-img">
+                <?php
+                // Build logo classes based on admin settings
+                $logoClasses = ['logo'];
+                $logoStyle = $site_meta['logo_settings']['logo_style'] ?? 'modern';
+                $hoverEffect = $site_meta['logo_settings']['hover_effect'] ?? 'scale';
+                $textPosition = $site_meta['logo_settings']['text_position'] ?? 'right';
+                $shadow = $site_meta['logo_settings']['shadow'] ?? 'subtle';
+                
+                // Add style classes
+                if ($logoStyle !== 'modern') {
+                    $logoClasses[] = $logoStyle . '-style';
+                }
+                
+                // Add hover effect classes
+                if ($hoverEffect === 'glow') {
+                    $logoClasses[] = 'glow-effect';
+                } elseif ($hoverEffect === 'bounce') {
+                    $logoClasses[] = 'bounce-effect';
+                } elseif ($hoverEffect === 'pulse') {
+                    $logoClasses[] = 'pulse-effect';
+                }
+                
+                // Add text position classes
+                if ($textPosition === 'bottom') {
+                    $logoClasses[] = 'text-bottom';
+                } elseif ($textPosition === 'top') {
+                    $logoClasses[] = 'text-top';
+                }
+                
+                $logoClassString = implode(' ', $logoClasses);
+                ?>
+                <a href="<?php echo app_base_url('/'); ?>" class="<?php echo $logoClassString; ?>">
+                    <?php if (($site_meta['logo_settings']['show_logo'] ?? true) && ($header_style === 'logo_only' || $header_style === 'logo_text')): ?>
+                        <?php
+                        $imgClasses = ['logo-img'];
+                        if ($shadow === 'strong') {
+                            $imgClasses[] = 'strong-shadow';
+                        }
+                        ?>
+                        <img src="<?php echo htmlspecialchars($logo); ?>" 
+                             alt="<?php echo $title_safe; ?> Logo" 
+                             class="<?php echo implode(' ', $imgClasses); ?>">
                     <?php endif; ?>
-                    <?php if ($header_style === 'text_only' || $header_style === 'logo_text'): ?>
+                    <?php if (($site_meta['logo_settings']['show_text'] ?? true) && ($header_style === 'text_only' || $header_style === 'logo_text')): ?>
                         <span><?php echo htmlspecialchars($logo_text); ?></span>
                     <?php endif; ?>
                 </a>
@@ -1636,6 +1835,7 @@ m        color: #93c5fd;
                                 <li role="none"><a href="<?php echo app_base_url('mep'); ?>" class="grid-item" role="menuitem"><i class="fas fa-cogs"></i>MEP Coordination</a></li>
                                 <li role="none"><a href="<?php echo app_base_url('estimation'); ?>" class="grid-item" role="menuitem"><i class="fas fa-calculator"></i>Estimation Suite</a></li>
                                 <li role="none"><a href="<?php echo app_base_url('management'); ?>" class="grid-item" role="menuitem"><i class="fas fa-project-diagram"></i>Management</a></li>
+                                <li role="none"><a href="<?php echo app_base_url('developers'); ?>" class="grid-item" role="menuitem"><i class="fas fa-code"></i>API & Developers</a></li>
                             </ul>
                         </li>
                         </li>
@@ -1660,8 +1860,8 @@ m        color: #93c5fd;
                     </button>
 
                     <!-- User greeting (shown for all users) -->
-                    <div class="user-greeting">
-                        Hello, <strong><?php 
+                    <div class="user-greeting" id="userGreeting">
+                        Hi, <strong><?php 
                             if (!empty($userName)) {
                                 echo htmlspecialchars(explode(' ', $userName)[0]);
                             } else {
@@ -1712,7 +1912,7 @@ m        color: #93c5fd;
                                     <i class="fas fa-star" style="color: #f59e0b;"></i>
                                     <span class="text">Favorites</span>
                                 </a>
-                                <a href="#" class="menu-item" id="helpMenuItem">
+                                <a href="<?php echo app_base_url('help'); ?>" class="menu-item" id="helpMenuItem">
                                     <i class="fas fa-question-circle" style="color: #3b82f6;"></i>
                                     <span class="text">Help</span>
                                 </a>
@@ -1855,6 +2055,84 @@ m        color: #93c5fd;
             input.focus();
             input.select();
             startTypingEffect();
+            
+            // Load popular calculators when modal opens
+            loadPopularCalculators();
+        }
+        
+        function loadPopularCalculators() {
+            const currentPath = window.location.pathname;
+            let baseUrl = '';
+            
+            // Detect if we're in a subdirectory
+            if (currentPath.includes('/Bishwo_Calculator/')) {
+                baseUrl = '/Bishwo_Calculator';
+            } else if (currentPath.includes('/bishwo_calculator/')) {
+                baseUrl = '/bishwo_calculator';
+            } else if (currentPath.includes('/aec-calculator/')) {
+                baseUrl = '/aec-calculator';
+            }
+            
+            console.log('Loading popular calculators from:', `${baseUrl}/api/search.php`);
+            
+            fetch(`${baseUrl}/api/search.php`)
+                .then(r => {
+                    console.log('Popular calculators response status:', r.status);
+                    return r.json();
+                })
+                .then(data => {
+                    console.log('Popular calculators data:', data);
+                    if (Array.isArray(data) && data.length > 0) {
+                        renderSearchResults(data);
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to load popular calculators:', err);
+                    results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-calculator" style="margin-right:0.5rem;"></i>Popular calculators will appear here</div>';
+                });
+        }
+        
+        function renderSearchResults(data) {
+            if (!data || !Array.isArray(data)) {
+                results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-exclamation-circle" style="margin-right:0.5rem;"></i>No results</div>';
+                return;
+            }
+            
+            if (data.length === 0) {
+                results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-search" style="margin-right:0.5rem;"></i>No calculators found matching your search</div>';
+                return;
+            }
+            
+            results.innerHTML = data.map(item => {
+                const icon = item.icon || 'fas fa-calculator';
+                const color = item.color || '#6c757d';
+                const categoryBadge = item.category ? `<span class="category-badge" style="font-size:.75rem;color:${color};background:rgba(${hexToRgb(color)},0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(${hexToRgb(color)},0.2);font-weight:500;">${item.category}</span>` : '';
+                const subcategoryBadge = item.subcategory ? `<span class="subcategory-badge" style="font-size:.75rem;color:#64748b;background:rgba(100,116,139,0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(100,116,139,0.2);margin-left:0.25rem;">${item.subcategory}</span>` : '';
+                const snippet = item.description ? `<div style="font-size:.9rem;color:#64748b;margin-top:.4rem;line-height:1.4;">${item.description}</div>` : '';
+                const url = item.url || '#';
+                
+                return `<div class="search-result-item" style="cursor:pointer;padding:1rem;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:0.75rem;transition:all 0.2s ease;background:white;" 
+                             onmouseover="this.style.borderColor='${color}';this.style.boxShadow='0 4px 20px rgba(${hexToRgb(color)},0.15)';this.style.transform='translateY(-2px)';" 
+                             onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='none';this.style.transform='translateY(0)';"
+                             onclick="window.location.href='${url}';closeModal();">
+                    <div style="display:flex;align-items:flex-start;gap:1rem;">
+                        <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg, ${color}, ${adjustColor(color, -20)});display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;flex-shrink:0;box-shadow:0 4px 12px rgba(${hexToRgb(color)},0.3);">
+                            <i class="${icon}"></i>
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-weight:600;font-size:1.1rem;color:#1e293b;margin-bottom:0.5rem;line-height:1.3;">${item.name}</div>
+                            ${snippet}
+                            <div style="margin-top:0.75rem;display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                                ${categoryBadge}${subcategoryBadge}
+                                ${item.type === 'history' ? '<span class="history-badge" style="font-size:.75rem;color:#059669;background:rgba(5,150,105,0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(5,150,105,0.2);font-weight:500;"><i class="fas fa-history" style="margin-right:.25rem;"></i>Recent</span>' : ''}
+                            </div>
+                        </div>
+                        <div style="color:#94a3b8;font-size:1rem;flex-shrink:0;opacity:0.7;transition:all 0.2s ease;">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         function closeModal(){
@@ -1894,53 +2172,35 @@ m        color: #93c5fd;
             if(q.length < 2){ results.innerHTML = ''; return; }
             debounceTimer = setTimeout(()=>{
                 // Use dynamic base URL to avoid path issues
-                const baseUrl = window.location.pathname.includes('/aec-calculator/') ? '/aec-calculator' : '';
+                const currentPath = window.location.pathname;
+                let baseUrl = '';
+                
+                // Detect if we're in a subdirectory
+                if (currentPath.includes('/Bishwo_Calculator/')) {
+                    baseUrl = '/Bishwo_Calculator';
+                } else if (currentPath.includes('/bishwo_calculator/')) {
+                    baseUrl = '/bishwo_calculator';
+                } else if (currentPath.includes('/aec-calculator/')) {
+                    baseUrl = '/aec-calculator';
+                }
+                
+                console.log('Search API URL:', `${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`);
                 fetch(`${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`)
                 .then(r=>r.json())
                 .then(data=>{
-                    // Render enhanced results with categories and direct links
-                    if(!data || !Array.isArray(data)){ 
-                        results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-exclamation-circle" style="margin-right:0.5rem;"></i>No results</div>'; 
-                        return; 
-                    }
-                    if(data.length === 0){ 
-                        results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-search" style="margin-right:0.5rem;"></i>No calculators found matching your search</div>'; 
-                        return; 
-                    }
-                    
-                    results.innerHTML = data.map(item=>{
-                        const icon = item.icon || 'fas fa-calculator';
-                        const color = item.color || '#6c757d';
-                        const categoryBadge = item.category ? `<span class="category-badge" style="font-size:.75rem;color:${color};background:rgba(${hexToRgb(color)},0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(${hexToRgb(color)},0.2);font-weight:500;">${item.category}</span>` : '';
-                        const subcategoryBadge = item.subcategory ? `<span class="subcategory-badge" style="font-size:.75rem;color:#64748b;background:rgba(100,116,139,0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(100,116,139,0.2);margin-left:0.25rem;">${item.subcategory}</span>` : '';
-                        const snippet = item.description ? `<div style="font-size:.9rem;color:#64748b;margin-top:.4rem;line-height:1.4;">${item.description}</div>` : '';
-                        const url = item.url || '#';
-                        
-                        return `<div class="search-result-item" style="cursor:pointer;padding:1rem;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:0.75rem;transition:all 0.2s ease;background:white;" 
-                                     onmouseover="this.style.borderColor='${color}';this.style.boxShadow='0 4px 20px rgba(${hexToRgb(color)},0.15)';this.style.transform='translateY(-2px)';" 
-                                     onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='none';this.style.transform='translateY(0)';"
-                                     onclick="window.location.href='${url}';closeModal();">
-                            <div style="display:flex;align-items:flex-start;gap:1rem;">
-                                <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg, ${color}, ${adjustColor(color, -20)});display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;flex-shrink:0;box-shadow:0 4px 12px rgba(${hexToRgb(color)},0.3);">
-                                    <i class="${icon}"></i>
-                                </div>
-                                <div style="flex:1;min-width:0;">
-                                    <div style="font-weight:600;font-size:1.1rem;color:#1e293b;margin-bottom:0.5rem;line-height:1.3;">${item.name}</div>
-                                    ${snippet}
-                                    <div style="margin-top:0.75rem;display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-                                        ${categoryBadge}${subcategoryBadge}
-                                        ${item.type === 'history' ? '<span class="history-badge" style="font-size:.75rem;color:#059669;background:rgba(5,150,105,0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(5,150,105,0.2);font-weight:500;"><i class="fas fa-history" style="margin-right:.25rem;"></i>Recent</span>' : ''}
-                                    </div>
-                                </div>
-                                <div style="color:#94a3b8;font-size:1rem;flex-shrink:0;opacity:0.7;transition:all 0.2s ease;">
-                                    <i class="fas fa-arrow-right"></i>
-                                </div>
-                            </div>
-                        </div>`;
-                    }).join('');
+                    console.log('Search results received:', data);
+                    renderSearchResults(data);
                 }).catch(err=>{
-                    results.innerHTML = '<div style="text-align:center;padding:2rem;color:#ef4444;"><i class="fas fa-exclamation-triangle" style="margin-right:0.5rem;"></i>Search failed. Please try again.</div>';
-                    console.error('Search error', err);
+                    console.error('Search API Error:', err);
+                    console.error('Search URL was:', `${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`);
+                    
+                    results.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">
+                        <i class="fas fa-exclamation-triangle" style="margin-right:0.5rem;"></i>
+                        Search failed. Please try again.
+                        <div style="font-size:0.8rem;margin-top:0.5rem;color:#64748b;">
+                            Check browser console for details
+                        </div>
+                    </div>`;
                 });
             }, 300);
         });
@@ -1995,13 +2255,6 @@ m        color: #93c5fd;
                 alert('Favorites feature coming soon!');
             });
         }
-
-        if (helpItem) {
-            helpItem.addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('Help documentation coming soon!');
-            });
-        }
     })();
 
     // Global function to open search modal from favorites
@@ -2050,14 +2303,27 @@ m        color: #93c5fd;
                 const expires = new Date();
                 expires.setFullYear(expires.getFullYear() + 1);
                 document.cookie = `site_theme=${isDark ? 'dark' : 'light'}; path=/; expires=${expires.toUTCString()}; samesite=Lax`;
+                
+                // Log theme change for debugging
+                console.log('Theme changed to:', isDark ? 'dark' : 'light');
             });
 
-            // Load saved theme or default to dark
+            // Load saved theme - default to light theme now
             const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark' || !savedTheme) {
+            const cookieTheme = document.cookie.split(';').find(row => row.startsWith('site_theme='))?.split('=')[1];
+            
+            // Check both localStorage and cookie, prioritize localStorage
+            const preferredTheme = savedTheme || cookieTheme || 'light';
+            
+            if (preferredTheme === 'dark') {
                 document.body.classList.add('dark-theme');
                 themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                document.body.classList.remove('dark-theme');
+                themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
             }
+            
+            console.log('Initial theme loaded:', preferredTheme);
 
             // Enhanced search functionality 
             let searchTimer = null;
@@ -2265,6 +2531,100 @@ m        color: #93c5fd;
                 this.setAttribute('placeholder', 'Search 50+ engineering tools...');
             });
         });
+        
+        // Auto-fit user greeting text
+        (function() {
+            const userGreeting = document.getElementById('userGreeting');
+            if (!userGreeting) return;
+            
+            function autoFitGreeting() {
+                const greeting = userGreeting;
+                const strongElement = greeting.querySelector('strong');
+                if (!strongElement) return;
+                
+                const nameText = strongElement.textContent.trim();
+                const nameLength = nameText.length;
+                
+                // Reset classes
+                greeting.classList.remove('long-name', 'very-long-name', 'extra-long-name');
+                
+                // Add appropriate class based on name length
+                if (nameLength > 15) {
+                    greeting.classList.add('extra-long-name');
+                } else if (nameLength > 10) {
+                    greeting.classList.add('very-long-name');
+                } else if (nameLength > 7) {
+                    greeting.classList.add('long-name');
+                }
+                
+                // Dynamic font size adjustment
+                let fontSize = '0.8rem';
+                if (nameLength > 15) {
+                    fontSize = '0.65rem';
+                } else if (nameLength > 10) {
+                    fontSize = '0.7rem';
+                } else if (nameLength > 7) {
+                    fontSize = '0.75rem';
+                }
+                
+                greeting.style.fontSize = fontSize;
+                
+                // Adjust strong element max-width
+                let maxWidth = '120px';
+                if (nameLength > 15) {
+                    maxWidth = '90px';
+                } else if (nameLength > 10) {
+                    maxWidth = '100px';
+                } else if (nameLength > 7) {
+                    maxWidth = '110px';
+                }
+                
+                strongElement.style.maxWidth = maxWidth;
+                
+                console.log(`Auto-fit greeting: "${nameText}" (${nameLength} chars) -> ${fontSize}, max-width: ${maxWidth}`);
+            }
+            
+            // Run on page load
+            autoFitGreeting();
+            
+            // Run on window resize
+            window.addEventListener('resize', autoFitGreeting);
+            
+            // Add CSS classes for different name lengths
+            const style = document.createElement('style');
+            style.textContent = `
+                .user-greeting.long-name {
+                    padding: 0.35rem 0.65rem;
+                }
+                
+                .user-greeting.very-long-name {
+                    padding: 0.3rem 0.6rem;
+                    flex-direction: column;
+                    gap: 0.1rem;
+                    min-height: 2.2rem;
+                }
+                
+                .user-greeting.extra-long-name {
+                    padding: 0.25rem 0.5rem;
+                    flex-direction: column;
+                    gap: 0.05rem;
+                    min-height: 2.4rem;
+                    max-width: 180px;
+                }
+                
+                @media (max-width: 768px) {
+                    .user-greeting.long-name,
+                    .user-greeting.very-long-name,
+                    .user-greeting.extra-long-name {
+                        flex-direction: column;
+                        padding: 0.25rem 0.5rem;
+                        min-height: 2rem;
+                        max-width: 140px;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        })();
     </script>
 </body>
 </html>

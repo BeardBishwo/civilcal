@@ -118,34 +118,37 @@ class User {
     // Profile Management Methods
     public function getProfileCompletion($userId) {
         $user = $this->find($userId);
-        if (!$user) return 0;
+        if (!$user || !is_array($user)) {
+            return 0;
+        }
         
+        // Use null-coalescing for optional fields so missing columns don't trigger warnings
         $fields = [
-            'avatar' => $user['avatar'],
-            'professional_title' => $user['professional_title'],
-            'company' => $user['company'],
-            'phone' => $user['phone'],
-            'bio' => $user['bio'],
-            'website' => $user['website'],
-            'location' => $user['location'],
-            'email_verified_at' => $user['email_verified_at']
+            'avatar'            => $user['avatar'] ?? null,
+            'professional_title'=> $user['professional_title'] ?? null,
+            'company'           => $user['company'] ?? null,
+            'phone'             => $user['phone'] ?? null,
+            'bio'               => $user['bio'] ?? null,
+            'website'           => $user['website'] ?? null,
+            'location'          => $user['location'] ?? null,
+            'email_verified_at' => $user['email_verified_at'] ?? null,
         ];
         
         $completed = 0;
         $total = count($fields);
         
-        foreach ($fields as $field) {
-            if (!empty($field)) {
+        foreach ($fields as $value) {
+            if (!empty($value)) {
                 $completed++;
             }
         }
         
-        return round(($completed / $total) * 100);
+        return $total > 0 ? round(($completed / $total) * 100) : 0;
     }
     
     public function hasVerifiedEmail($userId) {
         $user = $this->find($userId);
-        return $user && !empty($user['email_verified_at']);
+        return $user && !empty($user['email_verified_at'] ?? null);
     }
     
     public function markEmailAsVerified($userId) {

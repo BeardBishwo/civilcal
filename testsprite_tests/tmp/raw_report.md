@@ -5,7 +5,7 @@
 
 ## 1️⃣ Document Metadata
 - **Project Name:** Bishwo_Calculator
-- **Date:** 2025-11-13
+- **Date:** 2025-11-14
 - **Prepared by:** TestSprite AI Team
 
 ---
@@ -13,176 +13,973 @@
 ## 2️⃣ Requirement Validation Summary
 
 #### Test TC001
-- **Test Name:** User Calculator Navigation and Opening
-- **Test Code:** [TC001_User_Calculator_Navigation_and_Opening.py](./TC001_User_Calculator_Navigation_and_Opening.py)
-- **Test Error:** Testing stopped due to fatal error on calculator page 'Concrete Volume'. Missing required file caused the page to fail loading. Further testing cannot proceed until this is resolved.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/199b1b45-cfb9-4c8b-a4ba-74c2e55655a3
-- **Status:** ❌ Failed
+- **Test Name:** verify_calculator_navigation_and_display
+- **Test Code:** [TC001_verify_calculator_navigation_and_display.py](./TC001_verify_calculator_navigation_and_display.py)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/da2bf492-9b02-4212-9da6-c9fffd47cef0/ce76abac-d4fe-4ea9-9f74-fef415c8cea8
+- **Status:** ✅ Passed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC002
-- **Test Name:** Theme Upload and Validation
-- **Test Code:** [TC002_Theme_Upload_and_Validation.py](./TC002_Theme_Upload_and_Validation.py)
-- **Test Error:** The /admin/themes page is currently inaccessible due to a 500 Internal Server Error. Theme upload and validation testing cannot proceed until the server issue is resolved.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/admin/themes:0:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/f5fdd306-908b-4efb-83b4-70aefcb948fc
+- **Test Name:** validate_theme_upload_activation_and_dynamic_css_application
+- **Test Code:** [TC002_validate_theme_upload_activation_and_dynamic_css_application.py](./TC002_validate_theme_upload_activation_and_dynamic_css_application.py)
+- **Test Error:** Traceback (most recent call last):
+  File "/var/task/handler.py", line 258, in run_with_retry
+    exec(code, exec_env)
+  File "<string>", line 94, in <module>
+  File "<string>", line 31, in test_validate_theme_upload_activation_and_dynamic_css_application
+AssertionError: Theme upload failed: 200 <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - EngiCal Pro</title>
+    <link rel="icon" href="assets/images/favicon.png">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <!-- Header Section -->
+        <div class="auth-header">
+            <h1>Welcome Back</h1>
+            <p class="auth-subtitle">Sign in to your EngiCal Pro account</p>
+        </div>
+
+        <form id="loginForm" class="auth-form">
+            <input type="hidden" name="csrf_token" value="6d793dd1b2ceb30814021125ef63d32774c1f19028c11f1a1a33a0d6dc8a54ee">
+            
+            <!-- Login Fields -->
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="username_email">Username or Email</label>
+                    <input type="text" 
+                           id="username_email" 
+                           name="username_email" 
+                           class="form-control" 
+                           placeholder="Enter your username or email"
+                           autocomplete="username"
+                           required>
+                    <div class="field-message">Enter your username or email address</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-field">
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               class="form-control" 
+                               placeholder="Enter your password"
+                               autocomplete="current-password"
+                               required>
+                        <button type="button" class="password-toggle" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="form-options">
+                    <label class="checkbox-item remember-me">
+                        <input type="checkbox" id="remember_me" name="remember_me">
+                        <span class="checkmark"></span>
+                        <span class="checkbox-text">Remember me for 30 days</span>
+                    </label>
+                    
+                    <a href="/Bishwo_Calculator/forgot-password" class="forgot-link">Forgot your password?</a>
+                </div>
+            </div>
+
+            <!-- Security Features Info -->
+            <div class="security-notice">
+                <i class="fas fa-shield-alt"></i>
+                <div class="security-text">
+                    <strong>Your account is protected with:</strong>
+                    <ul>
+                        <li>Secure password hashing</li>
+                        <li>CSRF attack protection</li>
+                        <li>Session-based authentication</li>
+                        <li>Input validation and sanitization</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg" id="loginBtn">
+                    <span class="btn-text">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign In
+                    </span>
+                    <span class="btn-loading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Signing In...
+                    </span>
+                </button>
+            </div>
+
+            <!-- Login Result -->
+            <div id="loginResult" class="result-message" style="display: none;"></div>
+        </form>
+
+        <!-- Registration Link -->
+        <div class="auth-footer">
+            <p>Don't have an account? <a href="/Bishwo_Calculator/register" class="auth-link">Create Professional Account</a></p>
+            <p class="footer-note">
+                <i class="fas fa-info-circle"></i>
+                Join thousands of engineers using Civil Calculator
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Login Demo Section -->
+<div class="demo-section">
+    <div class="demo-card">
+        <h3><i class="fas fa-rocket"></i> Quick Demo Access</h3>
+        <p>Try the enhanced authentication system with these demo accounts:</p>
+        
+        <div class="demo-accounts">
+            <div class="demo-account">
+                <strong>Engineer Demo:</strong>
+                <div class="demo-credentials">
+                    <code>engineer@engicalpro.com</code>
+                    <code>Engineer123!</code>
+                    <button class="btn btn-sm demo-login" data-email="engineer@engicalpro.com" data-password="Engineer123!">
+                        <i class="fas fa-bolt"></i> Quick Login
+                    </button>
+                </div>
+            </div>
+            
+            <div class="demo-account">
+                <strong>Admin Demo:</strong>
+                <div class="demo-credentials">
+                    <code>admin@engicalpro.com</code>
+                    <code>password</code>
+                    <button class="btn btn-sm demo-login" data-email="admin@engicalpro.com" data-password="password">
+                        <i class="fas fa-bolt"></i> Quick Login
+                    </button>
+                </div>
+            </div>
+            
+            <div class="demo-account">
+                <strong>Your Personal Account:</strong>
+                <div class="demo-credentials">
+                    <code>uniquebishwo@gmail.com</code>
+                    <code>c9PU7XAsAADYk_A</code>
+                    <button class="btn btn-sm demo-login" data-email="uniquebishwo@gmail.com" data-password="c9PU7XAsAADYk_A">
+                        <i class="fas fa-user-crown"></i> Personal Login
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <p class="demo-note">
+            <small><i class="fas fa-info-circle"></i> These are demo credentials for testing purposes only.</small>
+        </p>
+    </div>
+</div>
+
+<!-- CSS Styles -->
+<style>
+.auth-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 100%;
+    max-width: 450px;
+}
+
+.auth-header {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+    text-align: center;
+    padding: 40px 30px;
+}
+
+.auth-header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+.auth-subtitle {
+    margin: 10px 0 0;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.auth-form {
+    padding: 40px;
+}
+
+.form-section {
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.field-message {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 5px;
+}
+
+.password-field {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 5px;
+}
+
+.password-toggle:hover {
+    color: #4f46e5;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.remember-me .checkmark {
+    height: 18px;
+    width: 18px;
+    background-color: #fff;
+    border: 2px solid #d1d5db;
+    border-radius: 4px;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.remember-me input[type="checkbox"]:checked ~ .checkmark {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+}
+
+.remember-me input[type="checkbox"]:checked ~ .checkmark:after {
+    display: block;
+}
+
+.remember-me .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 5px;
+    top: 1px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.remember-me .checkbox-text {
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+.forgot-link {
+    color: #4f46e5;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+.security-notice {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #bae6fd;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 25px 0;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.security-notice i {
+    color: #0369a1;
+    font-size: 1.5rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.security-text {
+    flex: 1;
+}
+
+.security-text strong {
+    color: #0c4a6e;
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.security-text ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.security-text li {
+    color: #0c4a6e;
+    font-size: 0.85rem;
+    margin: 4px 0;
+    padding-left: 15px;
+    position: relative;
+}
+
+.security-text li:before {
+    content: "✓";
+    color: #059669;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.form-actions {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+    padding: 16px 40px;
+    font-size: 1.1rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+}
+
+.result-message {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.result-message.success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #10b981;
+}
+
+.result-message.error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #ef4444;
+}
+
+.result-message.warning {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #f59e0b;
+}
+
+.auth-footer {
+    text-align: center;
+    padding: 30px;
+    background-color: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+
+.auth-footer p {
+    color: #374151; /* Darker text color */
+    margin: 0 0 10px 0;
+}
+
+.auth-link {
+    color: #4f46e5;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
+
+.footer-note {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Demo Section */
+.demo-section {
+    margin-top: 30px;
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.demo-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.demo-card h3 {
+    margin: 0 0 15px;
+    color: #374151;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.demo-card h3 i {
+    color: #4f46e5;
+}
+
+.demo-card p {
+    margin: 0 0 20px;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.demo-accounts {
+    margin-bottom: 15px;
+}
+
+.demo-account {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.demo-account:last-child {
+    margin-bottom: 0;
+}
+
+.demo-account strong {
+    color: #1e293b;
+    display: block;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.demo-credentials {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.demo-credentials code {
+    background: #1e293b;
+    color: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-family: 'Courier New', monospace;
+}
+
+.demo-login {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.demo-login::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.demo-login:hover::before {
+    left: 100%;
+}
+
+.demo-login:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+}
+
+.demo-login:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.demo-note {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.demo-note small {
+    color: #6b7280;
+}
+
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 10px;
+    }
+    
+    .auth-form {
+        padding: 25px;
+    }
+    
+    .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .demo-credentials {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .demo-credentials code {
+        width: 100%;
+    }
+    
+    .security-notice {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .demo-card {
+        padding: 20px;
+    }
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializeLoginForm();
+});
+
+function initializeLoginForm() {
+    // Password visibility toggle
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordField = document.getElementById('password');
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+        this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+
+    // Form submission
+    document.getElementById('loginForm').addEventListener('submit', handleLoginSubmission);
+
+    // Demo login buttons with enhanced functionality
+    document.querySelectorAll('.demo-login').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const email = this.dataset.email;
+            const password = this.dataset.password;
+            
+            // Add visual feedback
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            this.disabled = true;
+            
+            // Fill form fields with demo credentials
+            const usernameField = document.getElementById('username_email');
+            const passwordField = document.getElementById('password');
+            
+            if (usernameField && passwordField) {
+                usernameField.value = email;
+                passwordField.value = password;
+                
+                // Add a small delay for visual effect
+                setTimeout(() => {
+                    // Trigger form submission
+                    document.getElementById('loginForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                    
+                    // Reset button after a delay
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    }, 2000);
+                }, 500);
+            } else {
+                // Reset button if form fields not found
+                this.innerHTML = originalText;
+                this.disabled = false;
+                console.error('Login form fields not found');
+            }
+        });
+    });
+}
+
+async function handleLoginSubmission(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitBtn = document.getElementById('loginBtn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnLoading = submitBtn.querySelector('.btn-loading');
+    const resultDiv = document.getElementById('loginResult');
+    
+    // Show loading state
+    submitBtn.disabled = true;
+    btnText.style.display = 'none';
+    btnLoading.style.display = 'inline-flex';
+    resultDiv.style.display = 'none';
+    
+    try {
+        // Collect form data
+        const formData = new FormData(form);
+        const payload = {
+            username_email: formData.get('username_email'),
+            password: formData.get('password'),
+            remember_me: formData.get('remember_me') ? 1 : 0,
+            csrf_token: formData.get('csrf_token')
+        };
+        
+        console.log('Login request payload:', payload);
+        console.log('Login API URL:', '/Bishwo_Calculator/api/login');
+        
+        // Send login request to API endpoint
+        const response = await fetch('/Bishwo_Calculator/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': payload.csrf_token
+            },
+            credentials: 'include',
+            body: JSON.stringify(payload)
+        });
+        
+        console.log('Login response status:', response.status);
+        console.log('Login response headers:', response.headers);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Login response error:', errorText);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('Login response data:', result);
+        
+                if (result.success) {
+            // Success
+            resultDiv.className = 'result-message success';
+            resultDiv.innerHTML = `
+                <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                <h3>Login Successful!</h3>
+                <p>${result.message || 'Welcome back! Redirecting to dashboard...'}</p>
+            `;
+            
+            // If email verification is required, show a message and don't redirect
+            if (result.email_verification_required) {
+                resultDiv.className = 'result-message warning';
+                resultDiv.innerHTML = `
+                    <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                    <h3>Email Verification Required</h3>
+                    <p>${result.message || 'Please check your email to verify your account before signing in.'} <a href="/Bishwo_Calculator/verify" style="color: #4f46e5;">Check verification status</a></p>
+                `;
+                resultDiv.style.display = 'block';
+            } else {
+                // Update header immediately using returned user payload (avoid cookie timing issues)
+                try {
+                    if (window.applyHeaderUser && result.user) {
+                        // prefer explicit is_admin flag from API if available
+                        const isAdmin = !!result.is_admin || (result.user && result.user.role && result.user.role.toLowerCase() === 'admin');
+                        window.applyHeaderUser(result.user, isAdmin);
+                    } else if (window.refreshHeaderFromServer) {
+                        // fallback to server refresh
+                        await window.refreshHeaderFromServer();
+                    }
+                } catch (e) {
+                    console.warn('Header update failed', e);
+                }
+
+                // Redirect after short delay so user sees header update
+                setTimeout(() => {
+                    window.location.href = result.redirect_url || '/';
+                }, 500);
+            }
+                } else {
+            // Error
+            let errorMessage = result.error || 'Login failed';
+            
+            // Show specific error for email verification
+            if (result.email_verification_required) {
+                errorMessage += ' <a href="verify.php" style="color: #4f46e5;">Resend verification email</a>';
+                resultDiv.className = 'result-message warning';
+            } else {
+                resultDiv.className = 'result-message error';
+                } 
+            
+            resultDiv.innerHTML = `
+                <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                <h3>Login Failed</h3>
+                <p>${errorMessage}</p>
+            `;
+            
+            if (result.attempts_remaining !== undefined) {
+                resultDiv.innerHTML += `<p><small>Attempts remaining: ${result.attempts_remaining}</small></p>`;
+            }
+        }
+        
+    } catch (error) {
+        // Network or server error
+        console.error('Login error details:', {
+            message: error.message,
+            stack: error.stack,
+            name: error.name,
+            error: error
+        });
+        
+        let errorMessage = 'Unable to connect to server. Please check your internet connection and try again.';
+        let errorDetails = '';
+        
+        if (error.message) {
+            errorDetails = `<br><small>Error: ${error.message}</small>`;
+        }
+        
+        // Check if it's a network error or parsing error
+        if (error.name === 'SyntaxError') {
+            errorMessage = 'Server returned invalid response. Please try again.';
+            errorDetails = '<br><small>The server response could not be parsed.</small>';
+        } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            errorMessage = 'Network connection failed. Please check your internet connection.';
+            errorDetails = '<br><small>Unable to reach the login server.</small>';
+        }
+        
+        resultDiv.className = 'result-message error';
+        resultDiv.innerHTML = `
+            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+            <h3>Connection Error</h3>
+            <p>${errorMessage}${errorDetails}</p>
+        `;
+        
+    } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        btnText.style.display = 'inline-flex';
+        btnLoading.style.display = 'none';
+        resultDiv.style.display = 'block';
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+</script>
+
+</body>
+</html>
+
+
+
+
+
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/da2bf492-9b02-4212-9da6-c9fffd47cef0/c14cd10b-4316-4479-9b99-ed9388dcd80a
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC003
-- **Test Name:** Theme Activation and Dynamic CSS Application
-- **Test Code:** [TC003_Theme_Activation_and_Dynamic_CSS_Application.py](./TC003_Theme_Activation_and_Dynamic_CSS_Application.py)
-- **Test Error:** The task to validate dynamic theme activation and CSS application could not be completed due to a persistent server connection error preventing admin login and theme upload. The issue has been reported as a blocker. No further testing could be performed.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/c10795a4-fbbd-41f4-a241-be1e91e602d6
+- **Test Name:** test_plugin_upload_toggle_and_manifest_validation
+- **Test Code:** [TC003_test_plugin_upload_toggle_and_manifest_validation.py](./TC003_test_plugin_upload_toggle_and_manifest_validation.py)
+- **Test Error:** Traceback (most recent call last):
+  File "/var/task/handler.py", line 258, in run_with_retry
+    exec(code, exec_env)
+  File "<string>", line 105, in <module>
+  File "<string>", line 50, in test_plugin_upload_toggle_and_manifest_validation
+AssertionError: System error detected on http://localhost:80/bishwo_calculator/profile
+
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/da2bf492-9b02-4212-9da6-c9fffd47cef0/17d46e79-0423-4ece-9df5-182ca6d47dd4
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC004
-- **Test Name:** Theme Customization and Settings Persistence
-- **Test Code:** [TC004_Theme_Customization_and_Settings_Persistence.py](./TC004_Theme_Customization_and_Settings_Persistence.py)
-- **Test Error:** The theme customization interface at /admin/themes is not accessible due to a 500 Internal Server Error. Therefore, I could not perform the customization, save settings, or verify changes. The task cannot be completed as intended.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/admin/themes:0:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/e6abb4ee-2f8a-443a-b1c5-80a0ec60a16c
+- **Test Name:** backup_and_restore_system_state_verification
+- **Test Code:** [TC004_backup_and_restore_system_state_verification.py](./TC004_backup_and_restore_system_state_verification.py)
+- **Test Error:** Traceback (most recent call last):
+  File "/var/task/handler.py", line 258, in run_with_retry
+    exec(code, exec_env)
+  File "<string>", line 64, in <module>
+  File "<string>", line 26, in test_backup_and_restore_system_state_verification
+  File "<string>", line 19, in check_page_no_errors
+AssertionError: PHP warnings found in /profile
+
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/da2bf492-9b02-4212-9da6-c9fffd47cef0/a828bbd4-df8d-41c7-b39b-819338ace829
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC005
-- **Test Name:** Plugin Upload and Manifest Validation
-- **Test Code:** [TC005_Plugin_Upload_and_Manifest_Validation.py](./TC005_Plugin_Upload_and_Manifest_Validation.py)
-- **Test Error:** Testing cannot proceed due to persistent connection error preventing login and access to plugin management interface. Please resolve server connectivity issues first.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/95188746-660b-4165-8694-ce3d6c0701e9
+- **Test Name:** audit_log_filtering_and_download_functionality
+- **Test Code:** [TC005_audit_log_filtering_and_download_functionality.py](./TC005_audit_log_filtering_and_download_functionality.py)
+- **Test Error:** Traceback (most recent call last):
+  File "/var/task/handler.py", line 258, in run_with_retry
+    exec(code, exec_env)
+  File "<string>", line 89, in <module>
+  File "<string>", line 22, in test_audit_log_filtering_and_download_functionality
+AssertionError: PHP warning found in audit logs page HTML
+
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/da2bf492-9b02-4212-9da6-c9fffd47cef0/c98f7d1a-cfd0-4a0d-a329-c756ea16dc88
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC006
-- **Test Name:** Plugin Activation Toggle and Deletion
-- **Test Code:** [TC006_Plugin_Activation_Toggle_and_Deletion.py](./TC006_Plugin_Activation_Toggle_and_Deletion.py)
-- **Test Error:** Testing stopped due to persistent connection error preventing login and access to admin panel. Unable to perform plugin activation and deletion tests as required.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/bfd9bbcf-c750-4706-af38-ba719398f6d8
+- **Test Name:** admin_post_routes_rate_limiting_and_csrf_protection
+- **Test Code:** [TC006_admin_post_routes_rate_limiting_and_csrf_protection.py](./TC006_admin_post_routes_rate_limiting_and_csrf_protection.py)
+- **Test Error:** Traceback (most recent call last):
+  File "/var/task/handler.py", line 258, in run_with_retry
+    exec(code, exec_env)
+  File "<string>", line 96, in <module>
+  File "<string>", line 53, in test_admin_post_routes_rate_limiting_and_csrf_protection
+AssertionError: POST /admin/themes without CSRF should be rejected, got 404
+
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/da2bf492-9b02-4212-9da6-c9fffd47cef0/021694da-0959-4fd9-9265-33f70eb6f40b
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC007
-- **Test Name:** Backup Creation and Download
-- **Test Code:** [TC007_Backup_Creation_and_Download.py](./TC007_Backup_Creation_and_Download.py)
-- **Test Error:** The backup system verification task cannot proceed because the admin panel login is blocked by a persistent server connection error. Multiple login attempts including demo quick login failed. Please resolve the server connectivity issue to enable backup testing.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/b5e3651c-4588-4aea-b59f-711a1edcb683
-- **Status:** ❌ Failed
+- **Test Name:** structured_logging_for_general_and_audit_events
+- **Test Code:** [TC007_structured_logging_for_general_and_audit_events.py](./TC007_structured_logging_for_general_and_audit_events.py)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/da2bf492-9b02-4212-9da6-c9fffd47cef0/14a7c990-72b1-4a2d-a498-5ca0866820be
+- **Status:** ✅ Passed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC008
-- **Test Name:** Backup Restore Functionality
-- **Test Code:** [TC008_Backup_Restore_Functionality.py](./TC008_Backup_Restore_Functionality.py)
-- **Test Error:** The testing task to verify system backup and restore functionality could not be completed due to a critical server connection error preventing login to the admin panel. The issue was reported as requested. No further testing was possible without resolving this connectivity problem.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/71198000-805b-4ec1-8706-6a1464e6c06a
-- **Status:** ❌ Failed
-- **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
----
-
-#### Test TC009
-- **Test Name:** Audit Log Filtering and Download
-- **Test Code:** [TC009_Audit_Log_Filtering_and_Download.py](./TC009_Audit_Log_Filtering_and_Download.py)
-- **Test Error:** The audit logs admin page is currently inaccessible due to a server error (500 Internal Server Error). Testing of filtering and downloading audit logs cannot proceed until this issue is resolved.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/admin/audit-logs:0:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/d468b5fb-9913-40ee-a067-96b02f383bf0
-- **Status:** ❌ Failed
-- **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
----
-
-#### Test TC010
-- **Test Name:** Rate Limiting and CSRF Protection on Admin POST Routes
-- **Test Code:** [TC010_Rate_Limiting_and_CSRF_Protection_on_Admin_POST_Routes.py](./TC010_Rate_Limiting_and_CSRF_Protection_on_Admin_POST_Routes.py)
-- **Test Error:** Testing stopped due to server connection error preventing login and access to admin POST routes. Unable to verify rate limiting and CSRF protections without backend connectivity.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/Bishwo_Calculator/api/login:0:0)
-[ERROR] Login error: SyntaxError: Unexpected token 'E', "Exception:"... is not valid JSON (at https://localhost/bishwo_calculator/login:743:16)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/1587d666-1c0c-4934-8bfd-f2bb96a8a3b1
-- **Status:** ❌ Failed
-- **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
----
-
-#### Test TC011
-- **Test Name:** Structured Logging and Audit Logs Integrity
-- **Test Code:** [TC011_Structured_Logging_and_Audit_Logs_Integrity.py](./TC011_Structured_Logging_and_Audit_Logs_Integrity.py)
-- **Test Error:** The task to confirm that general and audit logs are structured properly, contain required fields, and record critical events cannot be completed because the admin panel or log viewer interface is not accessible. The page /Bishwo_Calculator/modules/index.php returns a 404 error. System events and user actions were triggered successfully on the frontend to generate logs, but verification of these logs is not possible without access to the log viewer. Please resolve the missing admin panel or provide access to the logs for further testing.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/bishwo_calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/Bishwo_Calculator/assets/icons/icon-192.png:0:0)
-[ERROR] Refused to apply style from 'https://localhost/Bishwo_Calculator/assets/css/site.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled. (at https://localhost/bishwo_calculator/site:2076:0)
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at https://localhost/Bishwo_Calculator/modules/index.php:0:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/fa4ce864-4746-47e6-bfea-343319083632
-- **Status:** ❌ Failed
-- **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
----
-
-#### Test TC012
-- **Test Name:** API Health Endpoint Response
-- **Test Code:** [TC012_API_Health_Endpoint_Response.py](./TC012_API_Health_Endpoint_Response.py)
-- **Test Error:** The health endpoint /api/v1/health is currently returning a 500 Internal Server Error, preventing validation of its status and JSON content. Further testing cannot proceed until this server error is resolved.
-Browser Console Logs:
-[ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) (at http://localhost/bishwo_calculator:0:0)
-[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (at https://localhost/api/v1/health:0:0)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/012568fa-5490-4d12-a0bc-518e6a49a9c1/0dd5b5ed-d098-4a55-a78a-1cd809c8eee1
-- **Status:** ❌ Failed
+- **Test Name:** api_health_endpoint_response_validation
+- **Test Code:** [TC008_api_health_endpoint_response_validation.py](./TC008_api_health_endpoint_response_validation.py)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/da2bf492-9b02-4212-9da6-c9fffd47cef0/8f139437-21e1-4ed9-b843-b06ec7a87e0b
+- **Status:** ✅ Passed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 
 ## 3️⃣ Coverage & Matching Metrics
 
-- **0.00** of tests passed
+- **37.50** of tests passed
 
 | Requirement        | Total Tests | ✅ Passed | ❌ Failed  |
 |--------------------|-------------|-----------|------------|

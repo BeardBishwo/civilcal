@@ -1,0 +1,61 @@
+/* Temporary fix for header duplication issues */
+
+/* Ensure only one header is visible */
+.site-header:not(:first-of-type) {
+    display: none !important;
+}
+
+/* Ensure only one logo is visible */
+.logo:not(:first-of-type) {
+    display: none !important;
+}
+
+/* Ensure only one login button is visible */
+.login-btn:not(:first-of-type) {
+    display: none !important;
+}
+
+/* Ensure only one user greeting is visible */
+.user-greeting:not(:first-of-type) {
+    display: none !important;
+}
+
+/* Fix any potential z-index stacking issues */
+.site-header {
+    position: relative;
+    z-index: 1000;
+}
+
+/* Prevent any pseudo-element duplication */
+.logo::before,
+.logo::after,
+.login-btn::before,
+.login-btn::after {
+    display: none !important;
+}
+
+/* Fix any transform issues that might cause visual duplication */
+.site-header,
+.header-content,
+.logo,
+.login-btn {
+    transform: none !important;
+}
+
+/* Ensure proper box-sizing */
+.site-header * {
+    box-sizing: border-box;
+}
+
+/* Debug: Add borders to identify elements (remove after debugging) */
+/*
+.site-header {
+    border: 2px solid red !important;
+}
+.logo {
+    border: 2px solid blue !important;
+}
+.login-btn {
+    border: 2px solid green !important;
+}
+*/

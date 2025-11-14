@@ -1,0 +1,208 @@
+/* Enhanced Logo Styles - Admin Configurable */
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--logo-spacing, 12px);
+    text-decoration: none;
+    font-weight: var(--logo-text-weight, 700);
+    font-size: var(--logo-text-size, 1.5rem);
+    color: #2d3748;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 8px 12px;
+    border-radius: var(--logo-border-radius, 8px);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Shimmer effect on hover */
+.logo::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.logo:hover::before {
+    left: 100%;
+}
+
+/* Hover effects */
+.logo:hover {
+    transform: scale(1.05) translateY(-1px);
+    background: rgba(79, 70, 229, 0.05);
+}
+
+.logo.glow-effect:hover {
+    box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Logo image styling */
+.logo-img {
+    height: var(--logo-height, 40px);
+    width: auto;
+    border-radius: var(--logo-border-radius, 8px);
+    display: block;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.logo-img.strong-shadow {
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+}
+
+.logo:hover .logo-img {
+    transform: rotate(2deg) scale(1.05);
+    filter: drop-shadow(0 4px 12px rgba(79, 70, 229, 0.3));
+}
+
+/* Logo text styling */
+.logo span {
+    background: linear-gradient(135deg, 
+        var(--brand-primary, #4f46e5), 
+        var(--brand-secondary, #10b981));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.02em;
+    position: relative;
+}
+
+.logo span::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        var(--brand-primary, #4f46e5), 
+        var(--brand-accent, #f59e0b));
+    transition: width 0.3s ease;
+}
+
+.logo:hover span::after {
+    width: 100%;
+}
+
+/* Logo style variations */
+.logo.minimal-style {
+    padding: 4px 8px;
+    gap: 8px;
+}
+
+.logo.minimal-style .logo-img {
+    filter: none;
+}
+
+.logo.minimal-style span {
+    background: #2d3748;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: unset;
+    background-clip: unset;
+}
+
+.logo.premium-style {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(16, 185, 129, 0.1));
+    border: 1px solid rgba(79, 70, 229, 0.2);
+}
+
+.logo.premium-style:hover {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(16, 185, 129, 0.15));
+    border-color: rgba(79, 70, 229, 0.3);
+}
+
+/* Text position variations */
+.logo.text-bottom {
+    flex-direction: column;
+    gap: 4px;
+}
+
+.logo.text-top {
+    flex-direction: column-reverse;
+    gap: 4px;
+}
+
+/* Size variations */
+.logo.size-small {
+    --logo-height: 28px;
+    --logo-text-size: 1.2rem;
+    --logo-spacing: 8px;
+    padding: 6px 10px;
+}
+
+.logo.size-large {
+    --logo-height: 48px;
+    --logo-text-size: 1.8rem;
+    --logo-spacing: 16px;
+    padding: 12px 16px;
+}
+
+/* Animation variations */
+.logo.bounce-effect:hover .logo-img {
+    animation: logoBounce 0.6s ease;
+}
+
+@keyframes logoBounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-8px); }
+    60% { transform: translateY(-4px); }
+}
+
+.logo.pulse-effect:hover {
+    animation: logoPulse 1s infinite;
+}
+
+@keyframes logoPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Dark theme support */
+body.dark-theme .logo span {
+    background: linear-gradient(135deg, #818cf8, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.dark-theme .logo.minimal-style span {
+    background: #e2e8f0;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: unset;
+    background-clip: unset;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .logo {
+        --logo-height: 32px;
+        --logo-text-size: 1.3rem;
+        --logo-spacing: 10px;
+        padding: 6px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        --logo-height: 28px;
+        --logo-text-size: 1.1rem;
+        --logo-spacing: 8px;
+        padding: 4px 8px;
+    }
+    
+    .logo span {
+        display: none; /* Hide text on very small screens if needed */
+    }
+    
+    .logo.always-show-text span {
+        display: block;
+    }
+}

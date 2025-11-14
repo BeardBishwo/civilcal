@@ -86,6 +86,40 @@ $router->add('POST', '/admin/modules/deactivate', 'Admin\MainDashboardController
 $router->add('GET', '/admin/modules/{module}/settings', 'Admin\MainDashboardController@moduleSettings', ['auth', 'admin']);
 $router->add('POST', '/admin/modules/settings/update', 'Admin\MainDashboardController@updateModuleSettings', ['auth', 'admin']);
 
+// Logo & Branding Settings
+$router->add('GET', '/admin/logo-settings', 'Admin\LogoController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/logo-settings', 'Admin\LogoController@update', ['auth', 'admin']);
+
+// Admin Setup Checklist
+$router->add('GET', '/admin/setup/checklist', 'Admin\SetupController@checklist', ['auth', 'admin']);
+$router->add('POST', '/admin/setup/update-item', 'Admin\SetupController@updateItem', ['auth', 'admin']);
+
+// Comprehensive Admin Settings Routes
+$router->add('GET', '/admin/settings', 'Admin\SettingsController@index', ['auth', 'admin']);
+$router->add('GET', '/admin/settings/general', 'Admin\SettingsController@general', ['auth', 'admin']);
+$router->add('GET', '/admin/settings/application', 'Admin\SettingsController@application', ['auth', 'admin']);
+$router->add('GET', '/admin/settings/users', 'Admin\SettingsController@users', ['auth', 'admin']);
+$router->add('GET', '/admin/settings/security', 'Admin\SettingsController@security', ['auth', 'admin']);
+$router->add('GET', '/admin/settings/email', 'Admin\SettingsController@email', ['auth', 'admin']);
+$router->add('GET', '/admin/settings/api', 'Admin\SettingsController@api', ['auth', 'admin']);
+$router->add('GET', '/admin/settings/performance', 'Admin\SettingsController@performance', ['auth', 'admin']);
+$router->add('GET', '/admin/settings/advanced', 'Admin\SettingsController@advanced', ['auth', 'admin']);
+$router->add('POST', '/admin/settings/update', 'Admin\SettingsController@update', ['auth', 'admin']);
+
+// Help Center Routes
+$router->add('GET', '/help', 'HelpController@index');
+$router->add('GET', '/help/search', 'HelpController@search');
+$router->add('GET', '/help/category/{category}', 'HelpController@category');
+$router->add('GET', '/help/article/{slug}', 'HelpController@article');
+
+// Developer Documentation Routes
+$router->add('GET', '/developers', 'DeveloperController@index');
+$router->add('GET', '/developers/{category}', 'DeveloperController@category');
+$router->add('GET', '/developers/{category}/{endpoint}', 'DeveloperController@endpoint');
+$router->add('GET', '/developers/sdk', 'DeveloperController@sdk');
+$router->add('GET', '/developers/sdk/{language}', 'DeveloperController@sdk');
+$router->add('GET', '/developers/playground', 'DeveloperController@playground');
+
 // Advanced Admin Features
 $router->add('GET', '/admin/menu-customization', 'Admin\MainDashboardController@menuCustomization', ['auth', 'admin']);
 $router->add('GET', '/admin/widget-management', 'Admin\MainDashboardController@widgetManagement', ['auth', 'admin']);
@@ -169,10 +203,8 @@ $router->add('GET', '/api/v1/calculations/{id}', 'ApiController@getCalculation')
 // API v1 Health
 $router->add('GET', '/api/v1/health', 'Api\\V1\\HealthController@health');
 
-// Admin Routes
-$router->add('GET', '/admin', 'Admin\DashboardController@index', ['auth', 'admin']);
+// Additional Admin Routes (using existing controllers)
 $router->add('GET', '/admin/users', 'Admin\UserController@index', ['auth', 'admin']);
-$router->add('GET', '/admin/settings', 'Admin\SettingsController@index', ['auth', 'admin']);
 $router->add('POST', '/admin/settings/save', 'Admin\SettingsController@saveSettings', ['auth', 'admin']);
 
 // Calculators Management Routes

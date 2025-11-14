@@ -7,15 +7,46 @@ class AdminMiddleware
 {
     public function handle($request, $next)
     {
+        // Start session if not already started
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        
         // Check if user is authenticated
-        if (!Auth::check()) {
+        $isAuthenticated = false;
+        $isAdmin = false;
+        
+        // Check session-based authentication first
+        if (!empty($_SESSION['user_id']) || !empty($_SESSION['user'])) {
+            $isAuthenticated = true;
+            // Check admin status from session
+            $isAdmin = !empty($_SESSION['is_admin']) || 
+                      (!empty($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']) ||
+                      (!empty($_SESSION['user']['role']) && in_array($_SESSION['user']['role'], ['admin', 'super_admin']));
+        }
+        
+        // Fallback: Check cookie-based authentication
+        if (!$isAuthenticated) {
+            $user = Auth::check();
+            if ($user) {
+                $isAuthenticated = true;
+                $isAdmin = Auth::isAdmin();
+                // Sync session with cookie auth
+                $_SESSION['user_id'] = $user->id;
+                $_SESSION['username'] = $user->username;
+                $_SESSION['user'] = (array) $user;
+                $_SESSION['is_admin'] = $isAdmin;
+            }
+        }
+        
+        if (!$isAuthenticated) {
             // Redirect to login if not authenticated
             header("Location: /login");
             exit;
         }
         
         // Check if user is admin
-        if (!Auth::isAdmin()) {
+        if (!$isAdmin) {
             http_response_code(403);
             echo '
             <!DOCTYPE html>

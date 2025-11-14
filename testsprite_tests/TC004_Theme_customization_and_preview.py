@@ -30,7 +30,7 @@ async def run_test():
         page = await context.new_page()
         
         # Navigate to your target URL and wait until the network request is committed
-        await page.goto("http://localhost:80", wait_until="commit", timeout=10000)
+        await page.goto("http://localhost:80/register", wait_until="commit", timeout=10000)
         
         # Wait for the main page to reach DOMContentLoaded state (optional for stability)
         try:
@@ -46,43 +46,16 @@ async def run_test():
                 pass
         
         # Interact with the page elements to simulate user flow
-        # -> Navigate to https://localhost/ to access the site securely.
-        await page.goto('https://localhost/', timeout=10000)
+        # -> Navigate to the HTTPS version of the registration page or the admin themes page to start theme customization.
+        await page.goto('https://localhost/admin/themes', timeout=10000)
         await asyncio.sleep(3)
         
 
-        # -> Click on the Login link to proceed with admin authentication.
-        frame = context.pages[-1]
-        # Click on Login link to open login page
-        elem = frame.locator('xpath=html/body/header/div/div[3]/div/a').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
-        # -> Input admin username and password, then click Sign In to authenticate.
-        frame = context.pages[-1]
-        # Input admin username or email
-        elem = frame.locator('xpath=html/body/div/div/form/div/div/input').nth(0)
-        await page.wait_for_timeout(3000); await elem.fill('admin@engicalpro.com')
-        
-
-        frame = context.pages[-1]
-        # Input admin password
-        elem = frame.locator('xpath=html/body/div/div/form/div/div[2]/div/input').nth(0)
-        await page.wait_for_timeout(3000); await elem.fill('password')
-        
-
-        frame = context.pages[-1]
-        # Click Sign In button to login as admin
-        elem = frame.locator('xpath=html/body/div/div/form/div[3]/button').nth(0)
-        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
-        
-
         # --> Assertions to verify final state
-        frame = context.pages[-1]
         try:
-            await expect(frame.locator('text=Theme Customization Successful').first).to_be_visible(timeout=5000)
+            await expect(page.locator('text=Theme Customization Successful').first).to_be_visible(timeout=1000)
         except AssertionError:
-            raise AssertionError('Test case failed: The theme preview did not display the customized theme correctly as expected in the test plan.')
+            raise AssertionError('Test failed: Theme customization preview did not display modified styles dynamically, or live theme was affected before activation as per the test plan.')
         await asyncio.sleep(5)
     
     finally:

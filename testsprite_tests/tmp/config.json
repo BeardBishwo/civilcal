@@ -2,6 +2,18 @@
   "status": "commited",
   "type": "backend",
   "scope": "codebase",
-  "localEndpoint": "http://localhost:59643/login",
-  "backendAuthType": "basic token"
+  "localEndpoint": "http://localhost:80/bishwo_calculator",
+  "backendAuthType": "basic token",
+  "backendUsername": "uniquebishwo@gmail.com",
+  "backendPassword": "c9PU7XAsAADYk_A",
+  "executionArgs": {
+    "projectName": "Bishwo_Calculator",
+    "projectPath": "c:\\laragon\\www\\Bishwo_Calculator",
+    "testIds": [],
+    "additionalInstruction": "Focus tests on profile page (/profile), admin dashboard (/admin), and help center (/help). Ensure no PHP warnings or missing table errors appear, and navigation works.",
+    "envs": {
+      "API_KEY": "sk-user-5O4tgUViz7LhNMacDTD43BoH2Fczea6DDU-FNks6GEocgTd1o_Bjpt62kFbJDqfLB1vPU_1DHH8jmq0sTbDtZ0PPGM4dnQFlL0NV6skpC3eNpKwjRmGhOvCv7ygLA_l7_DM"
+    }
+  },
+  "proxy": "http://0875f8e5-11af-49d2-95cb-c6df5081e303:TukobH3bfoyVydSgqlTTMMZocrblt1En@tun.testsprite.com:8080"
 }

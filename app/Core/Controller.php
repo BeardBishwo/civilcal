@@ -106,16 +106,48 @@ class Controller {
         $data['page_description'] = isset($_SESSION['page_description']) ? $_SESSION['page_description'] : 'Professional engineering calculations and design tools';
         $data['page_keywords'] = isset($_SESSION['page_keywords']) ? $_SESSION['page_keywords'] : 'engineering, calculator, design, construction';
         
-        // Add theme metadata
-        $data['theme_metadata'] = $this->view->getThemeMetadata();
-        $data['active_theme'] = $this->view->getActiveTheme();
-        $data['theme_config'] = $this->view->getThemeConfig();
+        // Add theme metadata (with null checks)
+        if ($this->view && method_exists($this->view, 'getThemeMetadata')) {
+            $data['theme_metadata'] = $this->view->getThemeMetadata();
+            $data['active_theme'] = $this->view->getActiveTheme();
+            $data['theme_config'] = $this->view->getThemeConfig();
+        } else {
+            // Fallback theme data
+            $data['theme_metadata'] = [];
+            $data['active_theme'] = 'default';
+            $data['theme_config'] = [];
+        }
         
         // Clear session data for next request
         unset($_SESSION['current_category'], $_SESSION['page_title'], $_SESSION['page_description'], $_SESSION['page_keywords']);
         
         // Render the view
-        $this->view->render($view, $data);
+        if ($this->view && method_exists($this->view, 'render')) {
+            $this->view->render($view, $data);
+        } else {
+            // Fallback: simple include-based rendering
+            $this->simpleRender($view, $data);
+        }
+    }
+    
+    /**
+     * Simple fallback rendering when View class is not available
+     */
+    private function simpleRender($view, $data = []) {
+        // Extract data for template use
+        extract($data);
+        
+        // Build view path
+        $viewPath = __DIR__ . '/../Views/' . str_replace('.', '/', $view) . '.php';
+        
+        if (file_exists($viewPath)) {
+            include $viewPath;
+        } else {
+            // Show basic error page
+            echo "<h1>View Error</h1>";
+            echo "<p>View file not found: " . htmlspecialchars($view) . "</p>";
+            echo "<p>Expected path: " . htmlspecialchars($viewPath) . "</p>";
+        }
     }
     
     /**
@@ -168,8 +200,27 @@ class Controller {
      * Get current user
      */
     protected function getUser() {
-        // Placeholder - will be implemented when Auth class is complete
-        return isset($_SESSION['user']) ? $_SESSION['user'] : null;
+        // Support both new structure ($_SESSION['user']) and legacy session keys
+        if (!empty($_SESSION['user']) && is_array($_SESSION['user'])) {
+            return $_SESSION['user'];
+        } else if (!empty($_SESSION['user_id'])) {
+            // Build user array from legacy session vars
+            return [
+                'id' => $_SESSION['user_id'],
+                'username' => $_SESSION['username'] ?? '',
+                'email' => $_SESSION['email'] ?? '',
+                'role' => $_SESSION['role'] ?? 'user'
+            ];
+        }
+        return null;
+    }
+    
+    /**
+     * Get current user ID
+     */
+    protected function getCurrentUserId() {
+        $user = $this->getUser();
+        return $user ? ($user['id'] ?? null) : null;
     }
     
     /**

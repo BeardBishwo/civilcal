@@ -1,0 +1,42 @@
+[
+  {
+    "id": "TC001",
+    "title": "verify_calculator_navigation_and_display",
+    "description": "Test that the user can navigate calculators via the dynamic dropdown on the home page and that the selected calculator page loads correctly without errors."
+  },
+  {
+    "id": "TC002",
+    "title": "validate_theme_upload_activation_and_dynamic_css_application",
+    "description": "Test the theme management workflow by uploading a new theme, validating it against rules, activating it, customizing settings, and verifying that dynamic CSS is applied correctly on the front end."
+  },
+  {
+    "id": "TC003",
+    "title": "test_plugin_upload_toggle_and_manifest_validation",
+    "description": "Test plugin management by uploading a new plugin, validating its manifest for compatibility, toggling activation status, and ensuring no system errors occur during these operations."
+  },
+  {
+    "id": "TC004",
+    "title": "backup_and_restore_system_state_verification",
+    "description": "Test the backup and restore functionality by creating backups that include database dumps and theme/plugin data, restoring from backups, and verifying the system returns to the exact previous state."
+  },
+  {
+    "id": "TC005",
+    "title": "audit_log_filtering_and_download_functionality",
+    "description": "Test the audit log viewer by applying various filters to the logs, downloading selected log files, and verifying the integrity and correctness of the downloaded data."
+  },
+  {
+    "id": "TC006",
+    "title": "admin_post_routes_rate_limiting_and_csrf_protection",
+    "description": "Test that all administrative POST routes enforce rate limiting and require valid CSRF tokens to prevent unauthorized or excessive requests."
+  },
+  {
+    "id": "TC007",
+    "title": "structured_logging_for_general_and_audit_events",
+    "description": "Verify that system logs and audit logs are structured correctly, include necessary event details, and are stored appropriately for audit and debugging purposes."
+  },
+  {
+    "id": "TC008",
+    "title": "api_health_endpoint_response_validation",
+    "description": "Test the /api/v1/health endpoint to ensure it returns a 200 OK status with a valid JSON response indicating system availability."
+  }
+]
