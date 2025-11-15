@@ -1,0 +1,145 @@
+=================================================================
+           IDE DEBUGGER RUNTIME TEST - BISHWO CALCULATOR         
+=================================================================
+
+Starting comprehensive debugging session...
+Time: 2025-11-15 01:05:50
+PHP Version: 8.3.16
+Memory Limit: 512M
+Max Execution Time: 0s
+
+TEST 1: Bootstrap Loading
+-----------------------------------------------------------------
+✓ Bootstrap loaded successfully
+  BASE_PATH: C:\laragon\www\Bishwo_Calculator
+  APP_PATH: C:\laragon\www\Bishwo_Calculator/app
+  Memory after bootstrap: 0.56 MB
+
+TEST 2: Constants and Configuration
+-----------------------------------------------------------------
+✓ BASE_PATH = C:\laragon\www\Bishwo_Calculator
+✓ APP_PATH = C:\laragon\www\Bishwo_Calculator/app
+✓ CONFIG_PATH = C:\laragon\www\Bishwo_Calculator/config
+✓ STORAGE_PATH = C:\laragon\www\Bishwo_Calculator/storage
+
+TEST 3: Helper Functions
+-----------------------------------------------------------------
+✓ app_base_url() exists
+✓ asset_url() exists
+✓ csrf_token() exists
+✓ verify_csrf() exists
+✓ is_logged_in() exists
+✓ current_user() exists
+✓ redirect() exists
+✓ old() exists
+✓ flash() exists
+✓ get_flash() exists
+  → app_base_url('/test') = /test
+  → csrf_token() = d6af1f288578236d...
+
+TEST 4: Core Classes Autoloading
+-----------------------------------------------------------------
+✓ App\Core\Router exists
+  → Methods: 5
+✓ App\Core\View exists
+  → Methods: 22
+✓ App\Core\Controller exists
+  → Methods: 21
+✓ App\Core\Database exists
+  → Methods: 12
+✓ App\Services\Logger exists
+  → Methods: 9
+✓ App\Services\PluginManager exists
+  → Methods: 20
+✓ App\Services\ThemeManager exists
+  → Methods: 46
+
+TEST 5: Class Instantiation & Method Testing
+-----------------------------------------------------------------
+✓ Router instantiated
+  → Test route added successfully
+✓ View instantiated
+✓ ThemeManager instantiated
+  → themeUrl test: http://localhost/public/theme-assets.php?path=default%2Fassets%2Fcss%2Ftest.css
+✓ Database connection established
+
+TEST 6: File System & Permissions
+-----------------------------------------------------------------
+✓ storage (0777)
+✓ logs (0777)
+✓ css (0777)
+✓ views (0777)
+✓ index.php (0666)
+✓ routes.php (0666)
+
+TEST 7: CSS/JS Asset Loading
+-----------------------------------------------------------------
+CSS Files:
+  ✓ theme.css (39.17 KB)
+  ✓ footer.css (0.98 KB)
+  ✓ home.css (14.7 KB)
+  ✓ back-to-top.css (5.27 KB)
+  ✓ logo-enhanced.css (4.73 KB)
+
+JavaScript:
+  ✓ JS directory exists (4 files)
+
+TEST 8: Routes File Validation
+-----------------------------------------------------------------
+✓ Routes file has valid syntax
+  → File size: 30.74 KB
+
+TEST 9: Session Handling
+-----------------------------------------------------------------
+✓ Session is active
+  → Session ID: 5o19mtbd0tctbed6...
+✓ CSRF token generated: d6af1f288578236d...
+
+TEST 10: Memory & Performance Profiling
+-----------------------------------------------------------------
+Memory Usage:
+  → Start: 0.5 MB
+  → End: 1.18 MB
+  → Used: 0.68 MB
+  → Peak: 1.19 MB
+
+Execution Time:
+  → Total: 210.65 ms
+  → Average per test: 3.05 ms
+
+=================================================================
+                        TEST SUMMARY                             
+=================================================================
+
+Tests Executed: 9
+Passed: 9 ✓
+Failed: 0 ✗
+Success Rate: 100%
+
+=================================================================
+                     DEBUG LOG SUMMARY                           
+=================================================================
+
+✓ Debug log saved to: C:\laragon\www\Bishwo_Calculator/storage/logs/debug_ide_2025-11-15_01-05-51.json
+
+=================================================================
+                   STACK TRACE ANALYSIS                          
+=================================================================
+
+✓ No critical errors detected in execution flow
+
+=================================================================
+                     RECOMMENDATIONS                             
+=================================================================
+
+✅ All tests passed! System is working correctly.
+
+Next steps:
+  1. Clear browser cache and test pages manually
+  2. Check browser console (F12) for any runtime errors
+  3. Verify CSS/JS loading in browser network tab
+  4. Test user registration and login flows
+
+=================================================================
+                    DEBUG SESSION COMPLETE                       
+=================================================================

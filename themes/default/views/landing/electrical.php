@@ -4,9 +4,9 @@ $breadcrumb = [
     ['name' => 'Home', 'url' => app_base_url('/')],
     ['name' => 'Electrical Engineering', 'url' => '#']
 ];
-require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
 ?>
 
+    <?php if (!function_exists('load_theme_css')) { require_once __DIR__ . '/../partials/theme-helpers.php'; } ?>
     <?php load_theme_css('electrical.css'); ?>
 
 <div class="container">
@@ -185,7 +185,5 @@ function renderRecentCalculations() {
 .recent-item { background: rgba(255,255,255,0.03); }
 </style>
 
-<?php
-require_once dirname(__DIR__, 4) . '/themes/default/views/partials/footer.php';
-?>
+<?php ?>
 

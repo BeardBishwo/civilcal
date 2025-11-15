@@ -66,24 +66,14 @@ class Router {
             }
         }
         
-        // 404 Not Found - Show debug info in development
         http_response_code(404);
         if ($debugMode) {
             echo "<h1>404 - Page Not Found</h1>";
-            echo "<p><strong>Requested URI:</strong> {$_SERVER['REQUEST_URI']}</p>";
-            echo "<p><strong>Matched URI:</strong> $uri</p>";
-            echo "<p><strong>Method:</strong> $method</p>";
-            echo "<p><strong>Base Path:</strong> " . ($basePath ?? 'none') . "</p>";
-            echo "<p><strong>Registered Routes:</strong></p>";
-            echo "<ul>";
-            foreach ($this->routes as $route) {
-                echo "<li>{$route['method']} {$route['uri']} → {$route['controller']}</li>";
-            }
-            echo "</ul>";
         } else {
-            echo "404 - Page Not Found";
+            $view = new \App\Core\View();
+            $view->render('errors/404', ['title'=>'Not Found']);
         }
-    }
+        }
     
     public function getBasePath() {
         // Detect base path for subdirectory installations

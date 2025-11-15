@@ -178,17 +178,16 @@ function checkDatabaseSession() {
         $pdo = new PDO("mysql:host=localhost;dbname=bishwo_calculator", 'root', '');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
-        // Get the most recent session
+        // Get the most recent session by last_activity (table has no created_at column)
         $stmt = $pdo->query("
             SELECT 
                 id as session_id,
                 user_id,
                 session_token,
-                created_at,
                 last_activity,
                 expires_at
             FROM user_sessions 
-            ORDER BY created_at DESC 
+            ORDER BY last_activity DESC 
             LIMIT 1
         ");
         
@@ -199,7 +198,8 @@ function checkDatabaseSession() {
                 'found' => true,
                 'session_id' => $session['session_id'],
                 'user_id' => $session['user_id'],
-                'created_at' => $session['created_at'],
+                // Map created_at in summary output to last_activity for compatibility
+                'created_at' => $session['last_activity'],
                 'last_activity' => $session['last_activity'],
                 'expires_at' => $session['expires_at']
             ];

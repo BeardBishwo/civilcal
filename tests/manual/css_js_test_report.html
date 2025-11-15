@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>CSS/JS Loading & Tests Verification</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; }
+.container { max-width: 1400px; margin: 0 auto; }
+.header { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 30px; text-align: center; }
+.header h1 { color: #667eea; font-size: 2.5em; margin-bottom: 10px; }
+.header p { color: #666; font-size: 1.1em; }
+.section { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
+.section h2 { color: #333; border-bottom: 3px solid #667eea; padding-bottom: 10px; margin-bottom: 20px; font-size: 1.8em; }
+.section h3 { color: #555; margin: 20px 0 10px; font-size: 1.3em; border-left: 4px solid #10b981; padding-left: 12px; }
+.test-item { padding: 12px; margin: 8px 0; border-radius: 8px; display: flex; align-items: center; transition: all 0.3s; }
+.test-item:hover { transform: translateX(5px); }
+.test-item.pass { background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-left: 5px solid #28a745; }
+.test-item.fail { background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-left: 5px solid #dc3545; }
+.test-item.warn { background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left: 5px solid #ffc107; }
+.test-item.info { background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); border-left: 5px solid #17a2b8; }
+.icon { font-size: 1.5em; margin-right: 15px; min-width: 30px; text-align: center; }
+.pass .icon { color: #28a745; }
+.fail .icon { color: #dc3545; }
+.warn .icon { color: #ffc107; }
+.info .icon { color: #17a2b8; }
+.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0; }
+.summary-card { background: white; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+.summary-card.success { border-top: 5px solid #28a745; }
+.summary-card.error { border-top: 5px solid #dc3545; }
+.summary-card.warning { border-top: 5px solid #ffc107; }
+.summary-card h3 { font-size: 3em; margin: 10px 0; font-weight: bold; }
+.summary-card p { color: #666; font-size: 1.1em; }
+.file-list { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0; max-height: 300px; overflow-y: auto; }
+.file-list ul { list-style: none; }
+.file-list li { padding: 5px 10px; margin: 3px 0; background: white; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.9em; }
+.file-list li.directory { font-weight: bold; color: #667eea; }
+.badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; font-weight: bold; margin-left: 10px; }
+.badge.success { background: #28a745; color: white; }
+.badge.error { background: #dc3545; color: white; }
+.badge.warning { background: #ffc107; color: #333; }
+.footer { text-align: center; padding: 20px; color: white; margin-top: 30px; }
+pre { background: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 0.9em; margin: 10px 0; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class='container'>
+<div class='header'>
+<h1>🔍 CSS/JS Loading & Tests Verification</h1>
+<p>Comprehensive system check for asset loading and test file validation</p>
+<p style='color: #999; margin-top: 10px;'><strong>Generated:</strong> 2025-11-15 00:58:00</p>
+</div>
+<div class='section'>
+<h2>📄 CSS Files Verification</h2>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div><strong>CSS Directory Found:</strong> 17 files detected</div>
+</div>
+<div class='file-list'>
+<strong>CSS Files:</strong>
+<ul>
+<li>📄 back-to-top.css <span class='badge success'>5.27 KB</span></li>
+<li>📄 civil.css <span class='badge success'>3.83 KB</span></li>
+<li>📄 electrical.css <span class='badge success'>3.8 KB</span></li>
+<li>📄 estimation.css <span class='badge success'>3.93 KB</span></li>
+<li>📄 fire.css <span class='badge success'>3.83 KB</span></li>
+<li>📄 footer.css <span class='badge success'>1008 B</span></li>
+<li>📄 header.css <span class='badge success'>8.11 KB</span></li>
+<li>📄 home.css <span class='badge success'>14.7 KB</span></li>
+<li>📄 hvac.css <span class='badge success'>3.88 KB</span></li>
+<li>📄 logo-enhanced.css <span class='badge success'>4.73 KB</span></li>
+<li>📄 management.css <span class='badge success'>3.48 KB</span></li>
+<li>📄 mep.css <span class='badge success'>3.88 KB</span></li>
+<li>📄 plumbing.css <span class='badge success'>3.83 KB</span></li>
+<li>📄 site.css <span class='badge success'>6.39 KB</span></li>
+<li>📄 structural.css <span class='badge success'>4.19 KB</span></li>
+<li>📄 test.css <span class='badge success'>57 B</span></li>
+<li>📄 theme.css <span class='badge success'>39.17 KB</span></li>
+</ul>
+</div>
+</div>
+<div class='section'>
+<h2>📜 JavaScript Files Verification</h2>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div><strong>JS Directory Found:</strong> 4 files detected</div>
+</div>
+<div class='file-list'>
+<strong>JavaScript Files:</strong>
+<ul>
+<li>📄 back-to-top.js <span class='badge success'>2.66 KB</span></li>
+<li>📄 header.js <span class='badge success'>5.35 KB</span></li>
+<li>📄 main.js <span class='badge success'>1.25 KB</span></li>
+<li>📄 tilt.js <span class='badge success'>931 B</span></li>
+</ul>
+</div>
+</div>
+<div class='section'>
+<h2>🔗 Theme Assets Proxy Check</h2>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div><strong>Theme Assets Proxy Found:</strong> public/theme-assets.php</div>
+</div>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div><strong>Proxy Syntax Valid:</strong> No syntax errors</div>
+</div>
+</div>
+<div class='section'>
+<h2>📑 Page Templates Verification</h2>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div>
+<strong>Homepage Template:</strong> Found<br>
+<small>⚡ Contains JS references</small></div>
+</div>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div>
+<strong>Header Template:</strong> Found<br>
+<small>🎨 Contains CSS references</small> <small>⚡ Contains JS references</small></div>
+</div>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div>
+<strong>Footer Template:</strong> Found<br>
+<small>⚡ Contains JS references</small></div>
+</div>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div>
+<strong>Login Template:</strong> Found<br>
+<small>🎨 Contains CSS references</small> <small>⚡ Contains JS references</small></div>
+</div>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div>
+<strong>Register Template:</strong> Found<br>
+<small>🎨 Contains CSS references</small> <small>⚡ Contains JS references</small></div>
+</div>
+</div>
+<div class='section'>
+<h2>🧪 Tests Folder Comprehensive Verification</h2>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div><strong>Tests Directory Found:</strong> C:\laragon\www\Bishwo_Calculator/tests</div>
+</div>
+<h3>📁 api/</h3>
+<div class='file-list'>
+<ul>
+<li>✓ simple_login.php <span class='badge success'>2.9 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_api_direct.php <span class='badge success'>3.39 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_api_endpoint.php <span class='badge success'>129 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_api_simple.php <span class='badge success'>2.77 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_direct_login.php <span class='badge success'>2.65 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_direct_login_simple.php <span class='badge success'>2.79 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_login_api.php <span class='badge success'>4.48 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_login_direct.php <span class='badge success'>4.72 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_login_endpoint.php <span class='badge success'>5.27 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_login_fixed.php <span class='badge success'>1.39 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_remember_me.php <span class='badge success'>8.55 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_search_api.php <span class='badge success'>5.64 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_session_management.php <span class='badge success'>7.1 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_simple_login.php <span class='badge success'>1.52 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_working_login.php <span class='badge success'>1.82 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ working_login.php <span class='badge success'>2.58 KB</span> <span class='badge success'>Valid</span></li>
+</ul>
+</div>
+<h3>📁 database/</h3>
+<div class='file-list'>
+<ul>
+<li>✓ add_user_account.php <span class='badge success'>3.04 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ check_table.php <span class='badge success'>0 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ database-save-verification.php <span class='badge success'>10.54 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ database_operations_test.php <span class='badge success'>8.47 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ fix_database_config.php <span class='badge success'>5.16 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ setup_demo_users.php <span class='badge success'>0 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_db_connection.php <span class='badge success'>2.59 KB</span> <span class='badge success'>Valid</span></li>
+</ul>
+</div>
+<h3>📁 email/</h3>
+<div class='file-list'>
+<ul>
+<li>✓ email-test-verification.php <span class='badge success'>2.58 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ email_system_test.php <span class='badge success'>7.49 KB</span> <span class='badge success'>Valid</span></li>
+</ul>
+</div>
+<h3>📁 frontend/</h3>
+<div class='test-item info'>
+<span class='icon'>ℹ</span>
+<div><strong>No PHP test files in frontend/</strong></div>
+</div>
+<h3>📁 installation/</h3>
+<div class='file-list'>
+<ul>
+<li>✓ comprehensive_installation_test.php <span class='badge success'>13.68 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ debug_installation.php <span class='badge success'>9.54 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ emergency_access.php <span class='badge success'>4.77 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ emergency_diagnostic.php <span class='badge success'>8.83 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ install_test_installation.php <span class='badge success'>7.93 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ installation_system_test.php <span class='badge success'>7.56 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ laragon_setup_helper.php <span class='badge success'>3.62 KB</span> <span class='badge success'>Valid</span></li>
+</ul>
+</div>
+<h3>📁 legacy/</h3>
+<div class='file-list'>
+<ul>
+<li>✓ Final.php <span class='badge success'>8.03 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ PRIORITY_3_ROUTES.php <span class='badge success'>944 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ admin-creation-debug.php <span class='badge success'>6.09 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ basic_test.php <span class='badge success'>1.08 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ check_html_css_links.php <span class='badge success'>2.18 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ check_methods.php <span class='badge success'>558 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ clean_project_structure.php <span class='badge success'>5.69 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ cleanup.php <span class='badge success'>12.07 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ comprehensive_functional_test.php <span class='badge success'>11.96 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ critical_path_test.php <span class='badge success'>3.44 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ direct_homepage_test.php <span class='badge success'>2.6 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ final_method_check.php <span class='badge success'>1.31 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ final_verification.php <span class='badge success'>2.26 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ fix_remaining_includes.php <span class='badge success'>4.39 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ fix_testsprite_issues.php <span class='badge success'>5.16 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ geolocation_traditional_units_test.php <span class='badge success'>9.49 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ index.php <span class='badge success'>277 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ index_final.php <span class='badge success'>8.44 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ index_fixed.php <span class='badge success'>1.09 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ index_simple.php <span class='badge success'>7.1 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ index_working.php <span class='badge success'>6.88 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ missing_methods_test.php <span class='badge success'>1.28 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ oindex.php <span class='badge success'>23.45 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ procalculator_verification.php <span class='badge success'>3.46 KB</span> <span class='badge success'>Valid</span></li>
+<li>✗ renderPartial_test.php <span class='badge error'>1.57 KB</span> <span class='badge error'>Syntax Error</span></li>
+<li>✓ run_all_tests.php <span class='badge success'>2.51 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ run_tests.php <span class='badge success'>14.84 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ simple_db_test.php <span class='badge success'>3.91 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ simple_method_test.php <span class='badge success'>241 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ simple_renderPartial_test.php <span class='badge success'>53 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ simple_test.php <span class='badge success'>453 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ test-installation.php <span class='badge success'>8.08 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test.php <span class='badge success'>423 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_app.php <span class='badge success'>1.25 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_app_functionality.php <span class='badge success'>4.54 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_assets.php <span class='badge success'>1.29 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_config.php <span class='badge success'>394 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_database.php <span class='badge success'>2.35 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_database_config.php <span class='badge success'>4.26 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_database_connection.php <span class='badge success'>3.56 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_database_isolated.php <span class='badge success'>4.24 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_direct.php <span class='badge success'>5.03 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_final.php <span class='badge success'>1.57 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_homecontroller_execution.php <span class='badge success'>3.57 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_homepage_css_debug.php <span class='badge success'>4.23 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_installation.php <span class='badge success'>16.51 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_premium_theme.php <span class='badge success'>8.79 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_production_router.php <span class='badge success'>1.4 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_remember_me.php <span class='badge success'>3.33 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_route_matching.php <span class='badge success'>3.05 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_router_global.php <span class='badge success'>2.6 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_routes_loading.php <span class='badge success'>2.03 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_simple_homecontroller.php <span class='badge success'>2.84 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_system.php <span class='badge success'>1.32 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_theme_routing.php <span class='badge success'>1.92 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_theme_styles_loading.php <span class='badge success'>2.69 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ update_modules.php <span class='badge success'>2.75 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ verify_database.php <span class='badge success'>3.03 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ verify_files_exist.php <span class='badge success'>1.58 KB</span> <span class='badge success'>Valid</span></li>
+<li>✗ write_test.php <span class='badge error'>256 B</span> <span class='badge error'>Syntax Error</span></li>
+</ul>
+</div>
+<h3>📁 location/</h3>
+<div class='test-item info'>
+<span class='icon'>ℹ</span>
+<div><strong>No PHP test files in location/</strong></div>
+</div>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div><strong>organize_tests.php</strong> <span class='badge success'>5.29 KB</span> <span class='badge success'>Valid</span></div>
+</div>
+<h3>📁 payment/</h3>
+<div class='file-list'>
+<ul>
+<li>✓ payment_system_test.php <span class='badge success'>23.14 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ payment_verification_test.php <span class='badge success'>4.6 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ quick_payment_test.php <span class='badge success'>3.63 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ saas_system_test.php <span class='badge success'>4.17 KB</span> <span class='badge success'>Valid</span></li>
+</ul>
+</div>
+<h3>📁 registration/</h3>
+<div class='file-list'>
+<ul>
+<li>✓ test_agreements.php <span class='badge success'>3.18 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_marketing_agreement.php <span class='badge success'>4.43 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_marketing_preferences.php <span class='badge success'>5.21 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_registration_api.php <span class='badge success'>10.03 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_registration_system.php <span class='badge success'>6.1 KB</span> <span class='badge success'>Valid</span></li>
+</ul>
+</div>
+<h3>📁 routing/</h3>
+<div class='file-list'>
+<ul>
+<li>✓ debug_router.php <span class='badge success'>2.64 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ debug_routing.php <span class='badge success'>1.25 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ debug_url.php <span class='badge success'>2.76 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ debug_urls.php <span class='badge success'>1.84 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ router_detailed_test.php <span class='badge success'>4.86 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ router_test.php <span class='badge success'>1.09 KB</span> <span class='badge success'>Valid</span></li>
+</ul>
+</div>
+<h3>📁 search/</h3>
+<div class='file-list'>
+<ul>
+<li>✓ test_search.php <span class='badge success'>2.47 KB</span> <span class='badge success'>Valid</span></li>
+</ul>
+</div>
+<h3>📁 server/</h3>
+<div class='file-list'>
+<ul>
+<li>✓ check_error_logs.php <span class='badge success'>3.1 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ comprehensive_test.php <span class='badge success'>9.79 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ debug_demo.php <span class='badge success'>2.23 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ debug_full_index.php <span class='badge success'>3.73 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ debug_index.php <span class='badge success'>1.62 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ debug_theme_urls.php <span class='badge success'>1.01 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ file_system_test.php <span class='badge success'>7.5 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ http_500_final_test.php <span class='badge success'>3.24 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ http_500_verification.php <span class='badge success'>3.08 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ mvc_comprehensive_test.php <span class='badge success'>8.39 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ mvc_structure_test.php <span class='badge success'>2.29 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_browser_urls.php <span class='badge success'>1.53 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_demo_accounts.php <span class='badge success'>2.51 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_login_page.php <span class='badge success'>1.7 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_main_page.php <span class='badge success'>1.85 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_php.php <span class='badge success'>190 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_server.php <span class='badge success'>1.98 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_server_info.php <span class='badge success'>1.98 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_system_verification.php <span class='badge success'>9.22 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_web_server.php <span class='badge success'>2.43 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ web_application_test.php <span class='badge success'>6.62 KB</span> <span class='badge success'>Valid</span></li>
+</ul>
+</div>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div><strong>test_runner.php</strong> <span class='badge success'>3.87 KB</span> <span class='badge success'>Valid</span></div>
+</div>
+<h3>📁 theme/</h3>
+<div class='file-list'>
+<ul>
+<li>✓ activate_default_theme.php <span class='badge success'>762 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ check_theme.php <span class='badge success'>286 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ check_themes.php <span class='badge success'>777 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ premium_theme_integration_test.php <span class='badge success'>4.49 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ serve_css.php <span class='badge success'>473 B</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_css.php <span class='badge success'>1.97 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ test_css_loading.php <span class='badge success'>2.1 KB</span> <span class='badge success'>Valid</span></li>
+<li>✓ verify_css_loading.php <span class='badge success'>4.12 KB</span> <span class='badge success'>Valid</span></li>
+</ul>
+</div>
+<h3>📁 username/</h3>
+<div class='file-list'>
+<ul>
+<li>✓ test_username_availability.php <span class='badge success'>7.13 KB</span> <span class='badge success'>Valid</span></li>
+</ul>
+</div>
+</div>
+<div class='section'>
+<h2>🎨 CSS Loading Simulation Test</h2>
+<p>Testing if CSS would be properly loaded on these pages:</p>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div><strong>Homepage</strong> (/) - CSS Loading: READY</div>
+</div>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div><strong>Login</strong> (/login) - CSS Loading: READY</div>
+</div>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div><strong>Register</strong> (/register) - CSS Loading: READY</div>
+</div>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div><strong>Dashboard</strong> (/dashboard) - CSS Loading: READY</div>
+</div>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div><strong>Admin</strong> (/admin) - CSS Loading: READY</div>
+</div>
+<div class='test-item pass'>
+<span class='icon'>✓</span>
+<div><strong>Calculators</strong> (/calculators) - CSS Loading: READY</div>
+</div>
+</div>
+<div class='section'>
+<h2>⚠️ Common CSS/JS Loading Issues Check</h2>
+<div class='test-item warn'>
+<span class='icon'>⚠</span>
+<div><strong>Potential Issue:</strong> APP_BASE constant not defined - may cause incorrect asset paths</div>
+</div>
+</div>
+<div class='section'>
+<h2>💡 Recommendations & Fixes</h2>
+<div class='test-item info'>
+<span class='icon'>💡</span>
+<div><strong>To fix CSS/JS loading issues:</strong></div>
+</div>
+<ol style='margin-left: 20px; line-height: 2;'>
+<li>Verify <code>public/theme-assets.php</code> exists and has no syntax errors</li>
+<li>Check that <code>app/Services/ThemeManager.php</code> is working correctly</li>
+<li>Ensure all CSS files exist in <code>themes/default/assets/css/</code></li>
+<li>Verify the header template includes CSS loading code</li>
+<li>Check browser console (F12) for 404 errors on CSS/JS files</li>
+<li>Verify <code>APP_BASE</code> and <code>APP_URL</code> constants are set correctly</li>
+<li>Test asset URLs directly: <code>/public/theme-assets.php?path=default/assets/css/theme.css</code></li>
+</ol>
+<h3>Quick Fix Commands:</h3>
+<pre># Check if CSS files exist
+ls -la themes/default/assets/css/
+
+# Test theme-assets.php syntax
+php -l public/theme-assets.php
+
+# Test ThemeManager syntax
+php -l app/Services/ThemeManager.php
+
+# Check file permissions
+ls -la themes/default/assets/
+</pre>
+</div>
+<div class='section'>
+<h2>📊 Overall Summary</h2>
+<div class='summary'>
+<div class='summary-card success'>
+<h3>172</h3>
+<p>Tests Passed</p>
+</div>
+<div class='summary-card error'>
+<h3>2</h3>
+<p>Tests Failed</p>
+</div>
+<div class='summary-card warning'>
+<h3>1</h3>
+<p>Warnings</p>
+</div>
+<div class='summary-card'>
+<h3>17</h3>
+<p>CSS Files</p>
+</div>
+<div class='summary-card'>
+<h3>4</h3>
+<p>JS Files</p>
+</div>
+<div class='summary-card'>
+<h3>140</h3>
+<p>Test Files</p>
+</div>
+</div>
+<div style='margin-top: 30px; padding: 20px; background: #f8d7da; border-radius: 10px; text-align: center;'>
+<h2 style='color: #721c24; margin: 0;'>❌ ISSUES FOUND</h2>
+<p style='color: #721c24; margin-top: 10px;'>2 critical issue(s) detected. Please review and fix.</p>
+</div>
+</div>
+</div>
+<div class='footer'>
+<p>Generated by Bishwo Calculator Test Suite</p>
+<p style='margin-top: 10px;'><a href='/' style='color: white; text-decoration: underline;'>← Back to Home</a> | <a href='javascript:location.reload()' style='color: white; text-decoration: underline;'>🔄 Refresh</a></p>
+</div>
+</body>
+</html>

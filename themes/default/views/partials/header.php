@@ -7,10 +7,10 @@ if (session_status() == PHP_SESSION_NONE) {
 // Get base path (4 levels up from partials: partials -> views -> default -> themes -> root)
 $basePath = dirname(__DIR__, 4);
 
-require_once $basePath . '/app/Config/config.php';
-require_once $basePath . '/app/Helpers/functions.php';
+require_once $basePath . "/app/Config/config.php";
+require_once $basePath . "/app/Helpers/functions.php";
 // Load VersionChecker if it exists
-$versionCheckerPath = $basePath . '/app/Services/VersionChecker.php';
+$versionCheckerPath = $basePath . "/app/Services/VersionChecker.php";
 if (file_exists($versionCheckerPath)) {
     require_once $versionCheckerPath;
 }
@@ -25,62 +25,84 @@ try {
 }
 
 // Include theme helper functions
-require_once __DIR__ . '/theme-helpers.php';
+require_once __DIR__ . "/theme-helpers.php";
 
 // Check for updates if admin is logged in
 $updateAvailable = null;
-if (!empty($_SESSION['is_admin'])) {
+if (!empty($_SESSION["is_admin"])) {
     $updateAvailable = VersionChecker::checkForUpdates();
 }
 
 $site_meta = get_site_meta();
-$title_safe = htmlspecialchars($page_title ?? $site_meta['title'] ?? 'AEC Calculator');
-$desc_safe = htmlspecialchars($site_meta['description'] ?? 'Professional Engineering Calculators Suite');
-$logo = $site_meta['logo'] ?? app_base_url('assets/images/applogo.png');
-$logo_text = $site_meta['logo_text'] ?? 'EngiCal Pro';
-$header_style = $site_meta['header_style'] ?? 'logo_text';
-$favicon = $site_meta['favicon'] ?? app_base_url('assets/images/favicon.png');
+$title_safe = htmlspecialchars(
+    $page_title ?? ($site_meta["title"] ?? "AEC Calculator"),
+);
+$desc_safe = htmlspecialchars(
+    $site_meta["description"] ?? "Professional Engineering Calculators Suite",
+);
+$logo = $site_meta["logo"] ?? app_base_url("assets/icons/icon-192.png");
+$logo_text = $site_meta["logo_text"] ?? "EngiCal Pro";
+$header_style = $site_meta["header_style"] ?? "logo_text";
+$favicon = $site_meta["favicon"] ?? app_base_url("assets/images/favicon.png");
 
 // User data for personalized UI
 // Support both new structure ($_SESSION['user']) and legacy session keys (user_id, username, full_name, role)
 $user = [];
-if (!empty($_SESSION['user']) && is_array($_SESSION['user'])) {
-    $user = $_SESSION['user'];
+if (!empty($_SESSION["user"]) && is_array($_SESSION["user"])) {
+    $user = $_SESSION["user"];
 } else {
     // Build a user array from legacy session vars if present
-    if (!empty($_SESSION['user_id']) || !empty($_SESSION['username']) || !empty($_SESSION['full_name'])) {
+    if (
+        !empty($_SESSION["user_id"]) ||
+        !empty($_SESSION["username"]) ||
+        !empty($_SESSION["full_name"])
+    ) {
         $user = [
-            'id' => $_SESSION['user_id'] ?? null,
-            'username' => $_SESSION['username'] ?? '',
-            'full_name' => $_SESSION['full_name'] ?? '',
-            'role' => $_SESSION['role'] ?? ''
+            "id" => $_SESSION["user_id"] ?? null,
+            "username" => $_SESSION["username"] ?? "",
+            "full_name" => $_SESSION["full_name"] ?? "",
+            "role" => $_SESSION["role"] ?? "",
         ];
     }
 }
 
-$userName = trim($user['full_name'] ?? $user['username'] ?? '');
-$userInitial = !empty($userName) ? strtoupper(substr($userName, 0, 1)) : '';
-$userRole = $user['role'] ?? '';
-$engineerRoles = $user['engineer_roles'] ?? [];
+$userName = trim($user["full_name"] ?? ($user["username"] ?? ""));
+$userInitial = !empty($userName) ? strtoupper(substr($userName, 0, 1)) : "";
+$userRole = $user["role"] ?? "";
+$engineerRoles = $user["engineer_roles"] ?? [];
 
 // Calculate search statistics
-$search_stats = ['categories' => 0, 'subcategories' => 0, 'tools' => 0];
-$modules_dir = __DIR__ . '/../modules';
+$search_stats = ["categories" => 0, "subcategories" => 0, "tools" => 0];
+$modules_dir = __DIR__ . "/../modules";
 if (is_dir($modules_dir)) {
     $categories = scandir($modules_dir);
     foreach ($categories as $category) {
-        if ($category === '.' || $category === '..' || !is_dir($modules_dir . '/' . $category)) continue;
-        $search_stats['categories']++;
-        
-        $subcategories = scandir($modules_dir . '/' . $category);
+        if (
+            $category === "." ||
+            $category === ".." ||
+            !is_dir($modules_dir . "/" . $category)
+        ) {
+            continue;
+        }
+        $search_stats["categories"]++;
+
+        $subcategories = scandir($modules_dir . "/" . $category);
         foreach ($subcategories as $subcategory) {
-            if ($subcategory === '.' || $subcategory === '..' || !is_dir($modules_dir . '/' . $category . '/' . $subcategory)) continue;
-            $search_stats['subcategories']++;
-            
-            $files = scandir($modules_dir . '/' . $category . '/' . $subcategory);
+            if (
+                $subcategory === "." ||
+                $subcategory === ".." ||
+                !is_dir($modules_dir . "/" . $category . "/" . $subcategory)
+            ) {
+                continue;
+            }
+            $search_stats["subcategories"]++;
+
+            $files = scandir(
+                $modules_dir . "/" . $category . "/" . $subcategory,
+            );
             foreach ($files as $file) {
-                if (pathinfo($file, PATHINFO_EXTENSION) === 'php') {
-                    $search_stats['tools']++;
+                if (pathinfo($file, PATHINFO_EXTENSION) === "php") {
+                    $search_stats["tools"]++;
                 }
             }
         }
@@ -88,22 +110,29 @@ if (is_dir($modules_dir)) {
 }
 
 // Ensure is_admin flag is available (legacy support)
-if (empty($_SESSION['is_admin']) && !empty($userRole) && strtolower($userRole) === 'admin') {
-    $_SESSION['is_admin'] = true;
+if (
+    empty($_SESSION["is_admin"]) &&
+    !empty($userRole) &&
+    strtolower($userRole) === "admin"
+) {
+    $_SESSION["is_admin"] = true;
 }
 // Server-side theme detection via cookie (so first render can have the correct theme)
-$body_class = '';
-if (!empty($_COOKIE['site_theme']) && $_COOKIE['site_theme'] === 'dark') {
-    $body_class = 'dark-theme';
+$body_class = "";
+if (!empty($_COOKIE["site_theme"]) && $_COOKIE["site_theme"] === "dark") {
+    $body_class = "dark-theme";
 }
 
 // Mark homepage body with 'index-page' so home-specific gradient styles apply
-$__req_path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
-$__base = defined('APP_BASE') ? rtrim(APP_BASE, '/') : '';
-if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_path, -10) === '/index.php')) {
-    $body_class = trim($body_class . ' index-page');
+$__req_path = parse_url($_SERVER["REQUEST_URI"] ?? "", PHP_URL_PATH);
+$__base = defined("APP_BASE") ? rtrim(APP_BASE, "/") : "";
+if (
+    $__req_path === $__base ||
+    $__req_path === $__base . "/" ||
+    substr($__req_path, -10) === "/index.php"
+) {
+    $body_class = trim($body_class . " index-page");
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -112,33 +141,65 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $title_safe; ?></title>
     <meta name="description" content="<?php echo $desc_safe; ?>">
-    <link rel="manifest" href="<?php echo app_base_url('manifest.json'); ?>">
+    <link rel="manifest" href="<?php echo app_base_url("manifest.json"); ?>">
     <meta name="theme-color" content="#667eea">
     <link rel="icon" href="<?php echo htmlspecialchars($favicon); ?>">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <?php
-    if ($themeManager) {
-        $cssFiles = ['theme.css', 'footer.css', 'back-to-top.css', 'home.css', 'logo-enhanced.css'];
-        foreach ($cssFiles as $css) {
-            $cssPath = dirname(__DIR__) . '/assets/css/' . $css;
-            $mtime = file_exists($cssPath) ? filemtime($cssPath) : time();
-            $url = $themeManager->themeUrl('assets/css/' . $css . '?v=' . $mtime);
-            echo '<link rel="stylesheet" href="' . htmlspecialchars($url) . '">' . "\n    ";
+    // Load CSS files via ThemeManager proxy to ensure correct URL resolution
+    // for both Laragon (document root c:\laragon\www) and built-in server (document root public/)
+    $cssFiles = [
+        "theme.css",
+        "footer.css",
+        "back-to-top.css",
+        "home.css",
+        "logo-enhanced.css",
+    ];
+    foreach ($cssFiles as $css) {
+        $cssPath = dirname(__DIR__) . "/assets/css/" . $css;
+        $mtime = file_exists($cssPath) ? filemtime($cssPath) : time();
+        
+        // Use ThemeManager to generate the correct proxy URL
+        if ($themeManager) {
+            $url = $themeManager->themeUrl("assets/css/" . $css . "?v=" . $mtime);
+        } else {
+            // Fallback if ThemeManager is unavailable
+            $url = app_base_url(
+                "themes/default/assets/css/" . $css . "?v=" . $mtime,
+            );
         }
+        
+        echo '<link rel="stylesheet" href="' .
+            htmlspecialchars($url) .
+            '">' .
+            "\n    ";
     }
     ?>
     <style>
         /* Logo CSS Variables from Admin Settings */
         :root {
-            --logo-spacing: <?php echo $site_meta['logo_settings']['spacing'] ?? '12px'; ?>;
-            --logo-text-weight: <?php echo $site_meta['logo_settings']['text_weight'] ?? '700'; ?>;
-            --logo-text-size: <?php echo $site_meta['logo_settings']['text_size'] ?? '1.5rem'; ?>;
-            --logo-height: <?php echo $site_meta['logo_settings']['logo_height'] ?? '40px'; ?>;
-            --logo-border-radius: <?php echo $site_meta['logo_settings']['border_radius'] ?? '8px'; ?>;
-            --brand-primary: <?php echo $site_meta['brand_colors']['primary'] ?? '#4f46e5'; ?>;
-            --brand-secondary: <?php echo $site_meta['brand_colors']['secondary'] ?? '#10b981'; ?>;
-            --brand-accent: <?php echo $site_meta['brand_colors']['accent'] ?? '#f59e0b'; ?>;
+            --logo-spacing: <?php echo $site_meta["logo_settings"]["spacing"] ??
+                "12px"; ?>;
+            --logo-text-weight: <?php echo $site_meta["logo_settings"][
+                "text_weight"
+            ] ?? "700"; ?>;
+            --logo-text-size: <?php echo $site_meta["logo_settings"][
+                "text_size"
+            ] ?? "1.5rem"; ?>;
+            --logo-height: <?php echo $site_meta["logo_settings"][
+                "logo_height"
+            ] ?? "40px"; ?>;
+            --logo-border-radius: <?php echo $site_meta["logo_settings"][
+                "border_radius"
+            ] ?? "8px"; ?>;
+            --brand-primary: <?php echo $site_meta["brand_colors"]["primary"] ??
+                "#4f46e5"; ?>;
+            --brand-secondary: <?php echo $site_meta["brand_colors"][
+                "secondary"
+            ] ?? "#10b981"; ?>;
+            --brand-accent: <?php echo $site_meta["brand_colors"]["accent"] ??
+                "#f59e0b"; ?>;
         }
     </style>
     <style>
@@ -163,14 +224,14 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             left: 0;
             right: 0;
         }
-        
+
         /* Light theme header */
         body:not(.dark-theme) .site-header {
             background: rgba(255, 255, 255, 0.95);
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             color: #1a202c;
         }
-        
+
         /* Dark theme header */
         body.dark-theme .site-header {
             background: rgba(6,8,12,0.72);
@@ -206,35 +267,35 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             width: 100%;
             overflow-x: hidden;
         }
-        
+
         /* Theme-aware body backgrounds */
         body {
             min-height: 100vh;
             transition: background 0.3s ease, color 0.3s ease;
         }
-        
+
         /* Light theme (default) */
         body:not(.dark-theme) {
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%) !important;
             color: #1a202c;
         }
-        
+
         /* Dark theme */
         body.dark-theme {
             background: linear-gradient(135deg, #0a0e27, #1a1a4d, #0f0f2e) !important;
             color: #e2e8f0;
         }
-        
+
         /* Ensure main content area follows theme */
         .main-content {
             min-height: calc(100vh - 60px);
             transition: background 0.3s ease;
         }
-        
+
         body:not(.dark-theme) .main-content {
             background: inherit;
         }
-        
+
         body.dark-theme .main-content {
             background: inherit;
         }
@@ -252,7 +313,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
                 flex: 0 0 140px;
                 max-width: 140px;
             }
-            
+
             .header-middle {
                 display: none;
             }
@@ -284,14 +345,20 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         .logo {
             display: flex;
             align-items: center;
-            gap: <?php echo $site_meta['logo_settings']['spacing'] ?? '12px'; ?>;
+            gap: <?php echo $site_meta["logo_settings"]["spacing"] ??
+                "12px"; ?>;
             text-decoration: none;
-            font-weight: <?php echo $site_meta['logo_settings']['text_weight'] ?? '700'; ?>;
-            font-size: <?php echo $site_meta['logo_settings']['text_size'] ?? '1.5rem'; ?>;
+            font-weight: <?php echo $site_meta["logo_settings"][
+                "text_weight"
+            ] ?? "700"; ?>;
+            font-size: <?php echo $site_meta["logo_settings"]["text_size"] ??
+                "1.5rem"; ?>;
             color: #2d3748;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             padding: 8px 12px;
-            border-radius: <?php echo $site_meta['logo_settings']['border_radius'] ?? '8px'; ?>;
+            border-radius: <?php echo $site_meta["logo_settings"][
+                "border_radius"
+            ] ?? "8px"; ?>;
             align-items: center;
             justify-content: flex-start;
             /* reduced padding-right so middle section doesn't push into header-right at smaller widths */
@@ -383,7 +450,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             list-style: none;
             margin: 0;
         }
-        
+
         .dropdown > li {
             margin: 0 !important;
             padding: 0 !important;
@@ -402,7 +469,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             margin: 0 !important;
             white-space: nowrap !important;
         }
-        
+
         /* Force icon sizing and spacing */
         .dropdown a.grid-item i {
             flex: 0 0 20px !important;
@@ -551,7 +618,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             /* Auto-fit text size based on container width */
             font-size: clamp(0.7rem, 2vw, 0.8rem);
         }
-        
+
         /* Auto-resize text for very long names */
         .user-actions .user-greeting strong {
             max-width: 120px;
@@ -560,7 +627,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             display: inline-block;
             white-space: nowrap;
         }
-        
+
         /* Two-line layout for longer names */
         @media (max-width: 900px) {
             .user-actions .user-greeting {
@@ -570,7 +637,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
                 min-height: 2.2rem;
                 justify-content: center;
             }
-            
+
             .user-actions .user-greeting strong {
                 max-width: 100px;
                 font-size: 0.75rem;
@@ -599,7 +666,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             position: relative;
             flex-shrink: 0;
         }
-        
+
         .theme-toggle-btn::after {
             content: attr(data-label);
             position: absolute;
@@ -616,7 +683,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             pointer-events: none;
             transition: opacity 0.2s ease;
         }
-        
+
         .theme-toggle-btn:hover::after {
             opacity: 1;
         }
@@ -650,12 +717,12 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             transform: scale(1.15);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
-        
+
         body.dark-theme .theme-toggle-btn {
             color: #f093fb;
             border-color: rgba(240, 147, 251, 0.3);
         }
-        
+
         body.dark-theme .theme-toggle-btn:hover {
             background: linear-gradient(135deg, #f093fb, #f5576c);
             color: white;
@@ -779,7 +846,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             align-items: center;
             justify-content: center;
         }
-        
+
         /* Ensure hamburger is hidden on desktop screens */
         @media (min-width: 769px) {
             .hamburger-btn {
@@ -843,7 +910,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
                 gap: 1rem;
                 padding: 0 15px; /* increased padding on smaller screens */
             }
-            
+
             .user-actions {
                 margin-right: 10px; /* more margin on smaller screens */
                 padding: 0 0.75rem;
@@ -855,29 +922,29 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
                 gap: 0.5rem;
                 padding: 0 12px; /* ensure adequate padding */
             }
-            
+
             .header-middle {
                 display: none;
             }
-            
+
             .user-actions {
                 margin-right: 8px;
                 gap: 0.5rem; /* reduce gap on mobile to fit better */
             }
-            
+
             .hamburger-btn {
                 display: flex !important;
             }
-            
+
             .mobile-nav.active {
                 display: block;
             }
-            
+
             .user-actions .btn {
                 padding: 0.5rem 1rem;
                 font-size: 0.75rem;
             }
-            
+
             /* Responsive user greeting inside user-actions */
             .user-actions .user-greeting {
                 padding: 0.25rem 0.5rem;
@@ -885,13 +952,13 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
                 max-width: 150px;
                 min-height: 2rem;
             }
-            
+
             .user-actions .user-greeting strong {
                 max-width: 80px;
                 font-size: 0.7rem;
             }
         }
-            
+
             /* Compact layout for small screens */
             @media (max-width: 640px) {
                 .user-actions .user-greeting {
@@ -900,7 +967,7 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
                     max-width: 120px;
                     min-height: 1.8rem;
                 }
-                
+
                 .user-actions .user-greeting strong {
                     max-width: 60px;
                     font-size: 0.65rem;
@@ -914,15 +981,15 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
                 gap: 0.25rem;
                 width: calc(100% - 20px);
             }
-            
+
             .logo span {
                 display: none;
             }
-            
+
             .user-actions .btn-text {
                 display: none;
             }
-            
+
             .user-actions .btn {
                 padding: 0.5rem;
                 border-radius: 50%;
@@ -930,13 +997,13 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
                 height: 36px;
                 justify-content: center;
             }
-            
+
             .profile-btn {
                 width: 36px;
                 height: 36px;
                 padding: 0.5rem;
             }
-            
+
             .header-right {
                 gap: 0.25rem;
             }
@@ -994,11 +1061,11 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
             .header-content {
                 gap: 0.25rem;
             }
-            
+
             .logo span {
                 display: none;
             }
-            
+
             .user-actions .btn-text {
                 display: none;
             }
@@ -1205,9 +1272,9 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         height: 100%;
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
-        background: linear-gradient(135deg, 
-            rgba(102,126,234,0.1) 0%, 
-            rgba(124,58,237,0.1) 50%, 
+        background: linear-gradient(135deg,
+            rgba(102,126,234,0.1) 0%,
+            rgba(124,58,237,0.1) 50%,
             rgba(16,185,129,0.1) 100%);
         align-items: center;
         justify-content: center;
@@ -1217,8 +1284,8 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
     .search-modal.active{ display: flex; }
 
     .search-modal .modal-content{
-        background: linear-gradient(135deg, 
-            rgba(255,255,255,0.25) 0%, 
+        background: linear-gradient(135deg,
+            rgba(255,255,255,0.25) 0%,
             rgba(255,255,255,0.1) 100%);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
@@ -1241,15 +1308,15 @@ if ($__req_path === $__base || $__req_path === $__base . '/' || (substr($__req_p
         left: 0;
         right: 0;
         height: 1px;
-        background: linear-gradient(90deg, 
-            transparent, 
-            rgba(255,255,255,0.6), 
+        background: linear-gradient(90deg,
+            transparent,
+            rgba(255,255,255,0.6),
             transparent);
     }
 
     body.dark-theme .search-modal .modal-content{
-        background: linear-gradient(135deg, 
-            rgba(15,23,42,0.4) 0%, 
+        background: linear-gradient(135deg,
+            rgba(15,23,42,0.4) 0%,
             rgba(30,41,59,0.2) 100%);
         border: 1px solid rgba(148,163,184,0.18);
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6),
@@ -1725,7 +1792,7 @@ m        color: #93c5fd;
             height: 36px;
             padding: 0.5rem;
         }
-        
+
         .profile-dropdown-wrapper {
             margin-left: 0.25rem;
         }
@@ -1743,48 +1810,52 @@ m        color: #93c5fd;
             <div class="header-left">
                 <?php
                 // Build logo classes based on admin settings
-                $logoClasses = ['logo'];
-                $logoStyle = $site_meta['logo_settings']['logo_style'] ?? 'modern';
-                $hoverEffect = $site_meta['logo_settings']['hover_effect'] ?? 'scale';
-                $textPosition = $site_meta['logo_settings']['text_position'] ?? 'right';
-                $shadow = $site_meta['logo_settings']['shadow'] ?? 'subtle';
-                
+                $logoClasses = ["logo"];
+                $logoStyle =
+                    $site_meta["logo_settings"]["logo_style"] ?? "modern";
+                $hoverEffect =
+                    $site_meta["logo_settings"]["hover_effect"] ?? "scale";
+                $textPosition =
+                    $site_meta["logo_settings"]["text_position"] ?? "right";
+                $shadow = $site_meta["logo_settings"]["shadow"] ?? "subtle";
+
                 // Add style classes
-                if ($logoStyle !== 'modern') {
-                    $logoClasses[] = $logoStyle . '-style';
+                if ($logoStyle !== "modern") {
+                    $logoClasses[] = $logoStyle . "-style";
                 }
-                
+
                 // Add hover effect classes
-                if ($hoverEffect === 'glow') {
-                    $logoClasses[] = 'glow-effect';
-                } elseif ($hoverEffect === 'bounce') {
-                    $logoClasses[] = 'bounce-effect';
-                } elseif ($hoverEffect === 'pulse') {
-                    $logoClasses[] = 'pulse-effect';
+                if ($hoverEffect === "glow") {
+                    $logoClasses[] = "glow-effect";
+                } elseif ($hoverEffect === "bounce") {
+                    $logoClasses[] = "bounce-effect";
+                } elseif ($hoverEffect === "pulse") {
+                    $logoClasses[] = "pulse-effect";
                 }
-                
+
                 // Add text position classes
-                if ($textPosition === 'bottom') {
-                    $logoClasses[] = 'text-bottom';
-                } elseif ($textPosition === 'top') {
-                    $logoClasses[] = 'text-top';
+                if ($textPosition === "bottom") {
+                    $logoClasses[] = "text-bottom";
+                } elseif ($textPosition === "top") {
+                    $logoClasses[] = "text-top";
                 }
-                
-                $logoClassString = implode(' ', $logoClasses);
+
+                $logoClassString = implode(" ", $logoClasses);
                 ?>
-                <a href="<?php echo app_base_url('/'); ?>" class="<?php echo $logoClassString; ?>">
-                    <?php if (($site_meta['logo_settings']['show_logo'] ?? true) && ($header_style === 'logo_only' || $header_style === 'logo_text')): ?>
-                        <?php
-                        $imgClasses = ['logo-img'];
-                        if ($shadow === 'strong') {
-                            $imgClasses[] = 'strong-shadow';
-                        }
-                        ?>
-                        <img src="<?php echo htmlspecialchars($logo); ?>" 
-                             alt="<?php echo $title_safe; ?> Logo" 
-                             class="<?php echo implode(' ', $imgClasses); ?>">
-                    <?php endif; ?>
-                    <?php if (($site_meta['logo_settings']['show_text'] ?? true) && ($header_style === 'text_only' || $header_style === 'logo_text')): ?>
+                <a href="<?php echo app_base_url(
+                    "/",
+                ); ?>" class="<?php echo $logoClassString; ?>">
+                    <?php
+                    $imgClasses = ["logo-img"];
+                    if ($shadow === "strong") {
+                        $imgClasses[] = "strong-shadow";
+                    }
+                    ?>
+                    <?php if (!empty($logo)): ?>
+                        <img src="<?php echo htmlspecialchars($logo); ?>"
+                             alt="<?php echo $title_safe; ?> Logo"
+                             class="<?php echo implode(" ", $imgClasses); ?>">
+                    <?php else: ?>
                         <span><?php echo htmlspecialchars($logo_text); ?></span>
                     <?php endif; ?>
                 </a>
@@ -1793,52 +1864,72 @@ m        color: #93c5fd;
             <div class="header-middle">
                 <nav class="main-nav">
                     <ul>
-                        <li>
-                            <a href="<?php echo app_base_url('civil'); ?>">
-                                <i class="fas fa-hard-hat"></i>
-                                Civil
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<?php echo app_base_url('electrical'); ?>">
-                                <i class="fas fa-bolt"></i>
-                                Electrical
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<?php echo app_base_url('plumbing'); ?>">
-                                <i class="fas fa-faucet"></i>
-                                Plumbing
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<?php echo app_base_url('hvac'); ?>">
-                                <i class="fas fa-wind"></i>
-                                HVAC
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<?php echo app_base_url('fire'); ?>">
-                                <i class="fas fa-fire-extinguisher"></i>
-                                Fire Protection
-                            </a>
-                        </li>
+                        <?php
+                        $menuSvc = new \App\Services\MenuService();
+                        $primaryMenu = $menuSvc->get("primary");
+                        if (is_array($primaryMenu) && count($primaryMenu) > 0) {
+                            foreach ($primaryMenu as $item) {
+                                $label = htmlspecialchars($item["label"] ?? "");
+                                $url = app_base_url(
+                                    ltrim($item["url"] ?? "#", "/"),
+                                );
+                                $icon = htmlspecialchars($item["icon"] ?? "");
+                                echo '<li><a href="' .
+                                    $url .
+                                    '">' .
+                                    ($icon
+                                        ? '<i class="' . $icon . '"></i> '
+                                        : "") .
+                                    $label .
+                                    "</a></li>";
+                            }
+                        } else {
+                             ?>
+                        <li><a href="<?php echo app_base_url(
+                            "civil",
+                        ); ?>"><i class="fas fa-hard-hat"></i>Civil</a></li>
+                        <li><a href="<?php echo app_base_url(
+                            "electrical",
+                        ); ?>"><i class="fas fa-bolt"></i>Electrical</a></li>
+                        <li><a href="<?php echo app_base_url(
+                            "plumbing",
+                        ); ?>"><i class="fas fa-faucet"></i>Plumbing</a></li>
+                        <li><a href="<?php echo app_base_url(
+                            "hvac",
+                        ); ?>"><i class="fas fa-wind"></i>HVAC</a></li>
+                        <li><a href="<?php echo app_base_url(
+                            "fire",
+                        ); ?>"><i class="fas fa-fire-extinguisher"></i>Fire Protection</a></li>
                         <li class="has-dropdown">
                             <a href="#" aria-haspopup="true" aria-expanded="false" role="button" tabindex="0">
                                 <i class="fas fa-layer-group"></i>
-                                More Tools 
+                                More Tools
                                 <i class="fas fa-chevron-down"></i>
                             </a>
                             <ul class="dropdown" role="menu">
-                                <li role="none"><a href="<?php echo app_base_url('site'); ?>" class="grid-item" role="menuitem"><i class="fas fa-map-marked-alt"></i>Site Development</a></li>
-                                <li role="none"><a href="<?php echo app_base_url('structural'); ?>" class="grid-item" role="menuitem"><i class="fas fa-building"></i>Structural Analysis</a></li>
-                                <li role="none"><a href="<?php echo app_base_url('mep'); ?>" class="grid-item" role="menuitem"><i class="fas fa-cogs"></i>MEP Coordination</a></li>
-                                <li role="none"><a href="<?php echo app_base_url('estimation'); ?>" class="grid-item" role="menuitem"><i class="fas fa-calculator"></i>Estimation Suite</a></li>
-                                <li role="none"><a href="<?php echo app_base_url('management'); ?>" class="grid-item" role="menuitem"><i class="fas fa-project-diagram"></i>Management</a></li>
-                                <li role="none"><a href="<?php echo app_base_url('developers'); ?>" class="grid-item" role="menuitem"><i class="fas fa-code"></i>API & Developers</a></li>
+                                <li role="none"><a href="<?php echo app_base_url(
+                                    "site",
+                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-map-marked-alt"></i>Site Development</a></li>
+                                <li role="none"><a href="<?php echo app_base_url(
+                                    "structural",
+                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-building"></i>Structural Analysis</a></li>
+                                <li role="none"><a href="<?php echo app_base_url(
+                                    "mep",
+                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-cogs"></i>MEP Coordination</a></li>
+                                <li role="none"><a href="<?php echo app_base_url(
+                                    "estimation",
+                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-calculator"></i>Estimation Suite</a></li>
+                                <li role="none"><a href="<?php echo app_base_url(
+                                    "management",
+                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-project-diagram"></i>Management</a></li>
+                                <li role="none"><a href="<?php echo app_base_url(
+                                    "developers",
+                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-code"></i>API & Developers</a></li>
                             </ul>
                         </li>
-                        </li>
+                        <?php
+                        }
+                        ?>
                     </ul>
                 </nav>
 
@@ -1861,49 +1952,67 @@ m        color: #93c5fd;
 
                     <!-- User greeting (shown for all users) -->
                     <div class="user-greeting" id="userGreeting">
-                        Hi, <strong><?php 
-                            if (!empty($userName)) {
-                                echo htmlspecialchars(explode(' ', $userName)[0]);
-                            } else {
-                                echo 'Guest';
-                            }
-                        ?></strong> 👋
+                        Hi, <strong><?php if (!empty($userName)) {
+                            echo htmlspecialchars(explode(" ", $userName)[0]);
+                        } else {
+                            echo "Guest";
+                        } ?></strong> 👋
                     </div>
 
                     <!-- Login Button (Only for guests) -->
-                    <?php 
-                    $is_logged_in = !empty($_SESSION['user']) || !empty($_SESSION['user_id']) || !empty($_SESSION['username']) || !empty($_SESSION['full_name']);
+                    <?php
+                    $is_logged_in =
+                        !empty($_SESSION["user"]) ||
+                        !empty($_SESSION["user_id"]) ||
+                        !empty($_SESSION["username"]) ||
+                        !empty($_SESSION["full_name"]);
                     if (!$is_logged_in): ?>
-                        <a href="<?php echo app_base_url('login'); ?>" class="btn btn-primary login-btn">
+                        <a href="<?php echo app_base_url(
+                            "login",
+                        ); ?>" class="btn btn-primary login-btn">
                             <i class="fas fa-sign-in-alt"></i>
                             <span class="btn-text">Login</span>
                         </a>
-                    <?php endif; ?>
+                    <?php endif;
+                    ?>
 
-                    <?php if (!empty($_SESSION['user'])): ?>
-                        <?php if (!empty($_SESSION['is_admin']) && $updateAvailable): ?>
+                    <?php if (!empty($_SESSION["user"])): ?>
+                        <?php if (
+                            !empty($_SESSION["is_admin"]) &&
+                            $updateAvailable
+                        ): ?>
                             <div class="update-notification" title="Update Available">
                                 <i class="fas fa-download"></i>
-                                v<?php echo htmlspecialchars($updateAvailable['latest']); ?>
+                                v<?php echo htmlspecialchars(
+                                    $updateAvailable["latest"],
+                                ); ?>
                             </div>
                         <?php endif; ?>
                     <?php endif; ?>
 
                     <!-- Profile Dropdown (Only for logged-in users) -->
-                    <?php 
-                    $is_logged_in = !empty($_SESSION['user']) || !empty($_SESSION['user_id']) || !empty($_SESSION['username']) || !empty($_SESSION['full_name']);
+                    <?php
+                    $is_logged_in =
+                        !empty($_SESSION["user"]) ||
+                        !empty($_SESSION["user_id"]) ||
+                        !empty($_SESSION["username"]) ||
+                        !empty($_SESSION["full_name"]);
                     if ($is_logged_in): ?>
                         <div class="profile-dropdown-wrapper">
                             <button class="profile-btn" id="profileToggleBtn" title="Profile Menu">
                                 <i class="fas fa-user-circle"></i>
                             </button>
                             <div class="profile-dropdown" id="profileDropdown">
-                                <a href="<?php echo app_base_url('profile'); ?>" class="menu-item">
+                                <a href="<?php echo app_base_url(
+                                    "user/profile",
+                                ); ?>" class="menu-item">
                                     <i class="fas fa-user-edit" style="color: #8b5cf6;"></i>
                                     <span class="text">Profile Settings</span>
                                 </a>
-                                <?php if (!empty($_SESSION['is_admin'])): ?>
-                                    <a href="<?php echo app_base_url('admin'); ?>" class="menu-item">
+                                <?php if (!empty($_SESSION["is_admin"])): ?>
+                                    <a href="<?php echo app_base_url(
+                                        "admin",
+                                    ); ?>" class="menu-item">
                                         <i class="fas fa-shield-alt" style="color: #ef4444;"></i>
                                         <span class="text">Admin Panel</span>
                                     </a>
@@ -1912,17 +2021,22 @@ m        color: #93c5fd;
                                     <i class="fas fa-star" style="color: #f59e0b;"></i>
                                     <span class="text">Favorites</span>
                                 </a>
-                                <a href="<?php echo app_base_url('help'); ?>" class="menu-item" id="helpMenuItem">
+                                <a href="<?php echo app_base_url(
+                                    "help",
+                                ); ?>" class="menu-item" id="helpMenuItem">
                                     <i class="fas fa-question-circle" style="color: #3b82f6;"></i>
                                     <span class="text">Help</span>
                                 </a>
-                                <a href="<?php echo app_base_url('logout'); ?>" class="menu-item">
+                                <a href="<?php echo app_base_url(
+                                    "logout",
+                                ); ?>" class="menu-item">
                                     <i class="fas fa-sign-out-alt" style="color: #6b7280;"></i>
                                     <span class="text">Logout</span>
                                 </a>
                             </div>
                         </div>
-                    <?php endif; ?>
+                    <?php endif;
+                    ?>
 
                     <button class="hamburger-btn" id="hamburgerBtn" title="Toggle navigation menu" aria-label="Toggle navigation menu" aria-expanded="false">
                         <i class="fas fa-bars"></i>
@@ -1932,14 +2046,30 @@ m        color: #93c5fd;
 
         <div class="mobile-nav" id="mobileNav">
             <ul>
-                <li><a href="<?php echo app_base_url('civil'); ?>"><i class="fas fa-hard-hat"></i> Civil</a></li>
-                <li><a href="<?php echo app_base_url('electrical'); ?>"><i class="fas fa-bolt"></i> Electrical</a></li>
-                <li><a href="<?php echo app_base_url('plumbing'); ?>"><i class="fas fa-faucet"></i> Plumbing</a></li>
-                <li><a href="<?php echo app_base_url('hvac'); ?>"><i class="fas fa-wind"></i> HVAC</a></li>
-                <li><a href="<?php echo app_base_url('fire'); ?>"><i class="fas fa-fire-extinguisher"></i> Fire Protection</a></li>
-                <li><a href="<?php echo app_base_url('site'); ?>"><i class="fas fa-map-marked-alt"></i> Site Development</a></li>
-                <li><a href="<?php echo app_base_url('estimation'); ?>"><i class="fas fa-calculator"></i> Estimation</a></li>
-                <li><a href="<?php echo app_base_url('structural'); ?>"><i class="fas fa-building"></i> Structural</a></li>
+                <li><a href="<?php echo app_base_url(
+                    "civil",
+                ); ?>"><i class="fas fa-hard-hat"></i> Civil</a></li>
+                <li><a href="<?php echo app_base_url(
+                    "electrical",
+                ); ?>"><i class="fas fa-bolt"></i> Electrical</a></li>
+                <li><a href="<?php echo app_base_url(
+                    "plumbing",
+                ); ?>"><i class="fas fa-faucet"></i> Plumbing</a></li>
+                <li><a href="<?php echo app_base_url(
+                    "hvac",
+                ); ?>"><i class="fas fa-wind"></i> HVAC</a></li>
+                <li><a href="<?php echo app_base_url(
+                    "fire",
+                ); ?>"><i class="fas fa-fire-extinguisher"></i> Fire Protection</a></li>
+                <li><a href="<?php echo app_base_url(
+                    "site",
+                ); ?>"><i class="fas fa-map-marked-alt"></i> Site Development</a></li>
+                <li><a href="<?php echo app_base_url(
+                    "estimation",
+                ); ?>"><i class="fas fa-calculator"></i> Estimation</a></li>
+                <li><a href="<?php echo app_base_url(
+                    "structural",
+                ); ?>"><i class="fas fa-building"></i> Structural</a></li>
             </ul>
         </div>
     </header>
@@ -1950,8 +2080,8 @@ m        color: #93c5fd;
             <button class="modal-close" id="searchModalClose" aria-label="Close search">
                 Esc
             </button>
-            <input id="searchModalInput" class="modal-input" type="search" 
-                   placeholder="Search calculators, tools, and utilities..." 
+            <input id="searchModalInput" class="modal-input" type="search"
+                   placeholder="Search calculators, tools, and utilities..."
                    aria-label="Search" />
             <div id="searchModalResults" style="margin-top: 1rem; max-height: 60vh; overflow-y: auto;"></div>
         </div>
@@ -1963,11 +2093,11 @@ m        color: #93c5fd;
     // Helper functions for search result styling
     function hexToRgb(hex) {
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? 
-            `${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)}` : 
+        return result ?
+            `${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)}` :
             '108,117,125';
     }
-    
+
     function adjustColor(hex, percent) {
         const num = parseInt(hex.replace("#",""), 16);
         const amt = Math.round(2.55 * percent);
@@ -2012,7 +2142,7 @@ m        color: #93c5fd;
 
         function typeText() {
             const currentPhrase = typingData.phrases[typingIndex];
-            
+
             if (isDeleting) {
                 input.placeholder = currentPhrase.substring(0, charIndex - 1);
                 charIndex--;
@@ -2055,15 +2185,15 @@ m        color: #93c5fd;
             input.focus();
             input.select();
             startTypingEffect();
-            
+
             // Load popular calculators when modal opens
             loadPopularCalculators();
         }
-        
+
         function loadPopularCalculators() {
             const currentPath = window.location.pathname;
             let baseUrl = '';
-            
+
             // Detect if we're in a subdirectory
             if (currentPath.includes('/Bishwo_Calculator/')) {
                 baseUrl = '/Bishwo_Calculator';
@@ -2072,9 +2202,9 @@ m        color: #93c5fd;
             } else if (currentPath.includes('/aec-calculator/')) {
                 baseUrl = '/aec-calculator';
             }
-            
+
             console.log('Loading popular calculators from:', `${baseUrl}/api/search.php`);
-            
+
             fetch(`${baseUrl}/api/search.php`)
                 .then(r => {
                     console.log('Popular calculators response status:', r.status);
@@ -2091,18 +2221,18 @@ m        color: #93c5fd;
                     results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-calculator" style="margin-right:0.5rem;"></i>Popular calculators will appear here</div>';
                 });
         }
-        
+
         function renderSearchResults(data) {
             if (!data || !Array.isArray(data)) {
                 results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-exclamation-circle" style="margin-right:0.5rem;"></i>No results</div>';
                 return;
             }
-            
+
             if (data.length === 0) {
                 results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-search" style="margin-right:0.5rem;"></i>No calculators found matching your search</div>';
                 return;
             }
-            
+
             results.innerHTML = data.map(item => {
                 const icon = item.icon || 'fas fa-calculator';
                 const color = item.color || '#6c757d';
@@ -2110,9 +2240,9 @@ m        color: #93c5fd;
                 const subcategoryBadge = item.subcategory ? `<span class="subcategory-badge" style="font-size:.75rem;color:#64748b;background:rgba(100,116,139,0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(100,116,139,0.2);margin-left:0.25rem;">${item.subcategory}</span>` : '';
                 const snippet = item.description ? `<div style="font-size:.9rem;color:#64748b;margin-top:.4rem;line-height:1.4;">${item.description}</div>` : '';
                 const url = item.url || '#';
-                
-                return `<div class="search-result-item" style="cursor:pointer;padding:1rem;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:0.75rem;transition:all 0.2s ease;background:white;" 
-                             onmouseover="this.style.borderColor='${color}';this.style.boxShadow='0 4px 20px rgba(${hexToRgb(color)},0.15)';this.style.transform='translateY(-2px)';" 
+
+                return `<div class="search-result-item" style="cursor:pointer;padding:1rem;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:0.75rem;transition:all 0.2s ease;background:white;"
+                             onmouseover="this.style.borderColor='${color}';this.style.boxShadow='0 4px 20px rgba(${hexToRgb(color)},0.15)';this.style.transform='translateY(-2px)';"
                              onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='none';this.style.transform='translateY(0)';"
                              onclick="window.location.href='${url}';closeModal();">
                     <div style="display:flex;align-items:flex-start;gap:1rem;">
@@ -2174,7 +2304,7 @@ m        color: #93c5fd;
                 // Use dynamic base URL to avoid path issues
                 const currentPath = window.location.pathname;
                 let baseUrl = '';
-                
+
                 // Detect if we're in a subdirectory
                 if (currentPath.includes('/Bishwo_Calculator/')) {
                     baseUrl = '/Bishwo_Calculator';
@@ -2183,7 +2313,7 @@ m        color: #93c5fd;
                 } else if (currentPath.includes('/aec-calculator/')) {
                     baseUrl = '/aec-calculator';
                 }
-                
+
                 console.log('Search API URL:', `${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`);
                 fetch(`${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`)
                 .then(r=>r.json())
@@ -2193,7 +2323,7 @@ m        color: #93c5fd;
                 }).catch(err=>{
                     console.error('Search API Error:', err);
                     console.error('Search URL was:', `${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`);
-                    
+
                     results.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">
                         <i class="fas fa-exclamation-triangle" style="margin-right:0.5rem;"></i>
                         Search failed. Please try again.
@@ -2215,7 +2345,7 @@ m        color: #93c5fd;
         // Profile dropdown toggle
         if (profileToggle && profileDropdown && profileWrapper) {
             let dropdownTimeout;
-            
+
             // Show on hover
             profileWrapper.addEventListener('mouseenter', function() {
                 clearTimeout(dropdownTimeout);
@@ -2287,23 +2417,23 @@ m        color: #93c5fd;
             // Mobile menu toggle
             hamburgerBtn.addEventListener('click', function() {
                 mobileNav.classList.toggle('active');
-                this.innerHTML = mobileNav.classList.contains('active') ? 
+                this.innerHTML = mobileNav.classList.contains('active') ?
                     '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
             });
 
             // Theme toggle
             themeToggleBtn.addEventListener('click', function() {
                 const isDark = document.body.classList.toggle('dark-theme');
-                this.innerHTML = isDark ? 
+                this.innerHTML = isDark ?
                     '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-                
+
                 // Save theme preference
                 localStorage.setItem('theme', isDark ? 'dark' : 'light');
                 // Also persist to a cookie so server-side can read it on next page load
                 const expires = new Date();
                 expires.setFullYear(expires.getFullYear() + 1);
                 document.cookie = `site_theme=${isDark ? 'dark' : 'light'}; path=/; expires=${expires.toUTCString()}; samesite=Lax`;
-                
+
                 // Log theme change for debugging
                 console.log('Theme changed to:', isDark ? 'dark' : 'light');
             });
@@ -2311,10 +2441,10 @@ m        color: #93c5fd;
             // Load saved theme - default to light theme now
             const savedTheme = localStorage.getItem('theme');
             const cookieTheme = document.cookie.split(';').find(row => row.startsWith('site_theme='))?.split('=')[1];
-            
+
             // Check both localStorage and cookie, prioritize localStorage
             const preferredTheme = savedTheme || cookieTheme || 'light';
-            
+
             if (preferredTheme === 'dark') {
                 document.body.classList.add('dark-theme');
                 themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
@@ -2322,10 +2452,10 @@ m        color: #93c5fd;
                 document.body.classList.remove('dark-theme');
                 themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
             }
-            
+
             console.log('Initial theme loaded:', preferredTheme);
 
-            // Enhanced search functionality 
+            // Enhanced search functionality
             let searchTimer = null;
 
             function displaySearchResults(results) {
@@ -2358,7 +2488,7 @@ m        color: #93c5fd;
             document.querySelectorAll('.has-dropdown').forEach(dropdown => {
                 const trigger = dropdown.querySelector('[role="button"]');
                 const menu = dropdown.querySelector('.dropdown');
-                
+
                 // Show on hover for desktop
                 dropdown.addEventListener('mouseenter', () => {
                     if (window.innerWidth > 768) {
@@ -2366,20 +2496,20 @@ m        color: #93c5fd;
                         if (trigger) trigger.setAttribute('aria-expanded', 'true');
                     }
                 });
-                
+
                 dropdown.addEventListener('mouseleave', () => {
                     if (window.innerWidth > 768) {
                         dropdown.classList.remove('open');
                         if (trigger) trigger.setAttribute('aria-expanded', 'false');
                     }
                 });
-                
+
                 // Toggle on click for mobile/touch
                 trigger.addEventListener('click', (e) => {
                     if (window.innerWidth <= 768 || 'ontouchstart' in window) {
                         e.preventDefault();
                         const wasOpen = dropdown.classList.contains('open');
-                        
+
                         // Close all other dropdowns
                         document.querySelectorAll('.has-dropdown.open').forEach(d => {
                             if (d !== dropdown) {
@@ -2388,7 +2518,7 @@ m        color: #93c5fd;
                                 if (t) t.setAttribute('aria-expanded', 'false');
                             }
                         });
-                        
+
                         // Toggle this dropdown
                         dropdown.classList.toggle('open');
                         trigger.setAttribute('aria-expanded', !wasOpen);
@@ -2408,7 +2538,9 @@ m        color: #93c5fd;
             });
 
             // Header dynamic update helpers (allow login page to refresh header without full reload)
-            const HEADER_STATUS_URL = '<?php echo app_base_url('api/header_status.php'); ?>';
+            const HEADER_STATUS_URL = '<?php echo app_base_url(
+                "api/header_status.php",
+            ); ?>';
 
             function buildUserActionsHtml(user, isAdmin) {
                 const name = user.name || '';
@@ -2423,10 +2555,18 @@ m        color: #93c5fd;
                                 <div class="user-name">${escapeHtml(name)}</div>
                                 ${role ? `<div class="user-role">${escapeHtml(role)}</div>` : ''}
                             </li>
-                            ${isAdmin ? `<li><a href="${escapeHtml('<?php echo app_base_url("admin"); ?>')}"><i class="fas fa-cog"></i> Admin Panel</a></li>` : ''}
-                            <li><a href="<?php echo app_base_url('dashboard'); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                            <li><a href="<?php echo app_base_url('profile'); ?>"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
-                            <li><a href="<?php echo app_base_url('logout'); ?>"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            ${isAdmin ? `<li><a href="${escapeHtml('<?php echo app_base_url(
+                                "admin",
+                            ); ?>')}"><i class="fas fa-cog"></i> Admin Panel</a></li>` : ''}
+                            <li><a href="<?php echo app_base_url(
+                                "dashboard",
+                            ); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                            <li><a href="<?php echo app_base_url(
+                                "profile",
+                            ); ?>"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
+                            <li><a href="<?php echo app_base_url(
+                                "logout",
+                            ); ?>"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                         </ul>
                     </div>
                 `;
@@ -2467,7 +2607,9 @@ m        color: #93c5fd;
                     if (data.logged_in) {
                         ua.innerHTML = buildUserActionsHtml(data.user, data.is_admin);
                     } else {
-                        ua.innerHTML = '<a href="<?php echo app_base_url('login'); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
+                        ua.innerHTML = '<a href="<?php echo app_base_url(
+                            "login",
+                        ); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
                     }
                 } catch (e) {
                     console.warn('refreshHeaderFromServer failed', e);
@@ -2497,12 +2639,16 @@ m        color: #93c5fd;
                         // Update header - show login button
                         try {
                             const ua = document.querySelector('.user-actions');
-                            if (ua) ua.innerHTML = '<a href="<?php echo app_base_url('login'); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
+                            if (ua) ua.innerHTML = '<a href="<?php echo app_base_url(
+                                "login",
+                            ); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
                         } catch (e) {
                             console.warn('Header update failed', e);
                         }
                         // Then navigate to the logout href (redirect) or homepage
-                        window.location.href = href || '<?php echo app_base_url('/'); ?>';
+                        window.location.href = href || '<?php echo app_base_url(
+                            "/",
+                        ); ?>';
                     })();
                 }
             });
@@ -2514,7 +2660,7 @@ m        color: #93c5fd;
                     event.preventDefault();
                     globalSearch.focus();
                 }
-                
+
                 // Escape to close mobile menu
                 if (event.key === 'Escape') {
                     mobileNav.classList.remove('active');
@@ -2531,23 +2677,23 @@ m        color: #93c5fd;
                 this.setAttribute('placeholder', 'Search 50+ engineering tools...');
             });
         });
-        
+
         // Auto-fit user greeting text
         (function() {
             const userGreeting = document.getElementById('userGreeting');
             if (!userGreeting) return;
-            
+
             function autoFitGreeting() {
                 const greeting = userGreeting;
                 const strongElement = greeting.querySelector('strong');
                 if (!strongElement) return;
-                
+
                 const nameText = strongElement.textContent.trim();
                 const nameLength = nameText.length;
-                
+
                 // Reset classes
                 greeting.classList.remove('long-name', 'very-long-name', 'extra-long-name');
-                
+
                 // Add appropriate class based on name length
                 if (nameLength > 15) {
                     greeting.classList.add('extra-long-name');
@@ -2556,7 +2702,7 @@ m        color: #93c5fd;
                 } else if (nameLength > 7) {
                     greeting.classList.add('long-name');
                 }
-                
+
                 // Dynamic font size adjustment
                 let fontSize = '0.8rem';
                 if (nameLength > 15) {
@@ -2566,9 +2712,9 @@ m        color: #93c5fd;
                 } else if (nameLength > 7) {
                     fontSize = '0.75rem';
                 }
-                
+
                 greeting.style.fontSize = fontSize;
-                
+
                 // Adjust strong element max-width
                 let maxWidth = '120px';
                 if (nameLength > 15) {
@@ -2578,32 +2724,32 @@ m        color: #93c5fd;
                 } else if (nameLength > 7) {
                     maxWidth = '110px';
                 }
-                
+
                 strongElement.style.maxWidth = maxWidth;
-                
+
                 console.log(`Auto-fit greeting: "${nameText}" (${nameLength} chars) -> ${fontSize}, max-width: ${maxWidth}`);
             }
-            
+
             // Run on page load
             autoFitGreeting();
-            
+
             // Run on window resize
             window.addEventListener('resize', autoFitGreeting);
-            
+
             // Add CSS classes for different name lengths
             const style = document.createElement('style');
             style.textContent = `
                 .user-greeting.long-name {
                     padding: 0.35rem 0.65rem;
                 }
-                
+
                 .user-greeting.very-long-name {
                     padding: 0.3rem 0.6rem;
                     flex-direction: column;
                     gap: 0.1rem;
                     min-height: 2.2rem;
                 }
-                
+
                 .user-greeting.extra-long-name {
                     padding: 0.25rem 0.5rem;
                     flex-direction: column;
@@ -2611,7 +2757,7 @@ m        color: #93c5fd;
                     min-height: 2.4rem;
                     max-width: 180px;
                 }
-                
+
                 @media (max-width: 768px) {
                     .user-greeting.long-name,
                     .user-greeting.very-long-name,
@@ -2628,4 +2774,3 @@ m        color: #93c5fd;
     </script>
 </body>
 </html>
-

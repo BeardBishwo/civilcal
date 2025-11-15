@@ -5,7 +5,7 @@
 
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
 // Handle preflight requests
@@ -26,8 +26,20 @@ try {
     // Include necessary files
     require_once __DIR__ . '/app/bootstrap.php';
     
-    $username = trim($_GET['username'] ?? '');
-    
+    // Support both JSON POST and query string access
+    $rawBody = file_get_contents('php://input');
+    $jsonInput = json_decode($rawBody, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        $jsonInput = [];
+    }
+
+    $username = trim(
+        $jsonInput['username']
+            ?? $_POST['username']
+            ?? $_GET['username']
+            ?? ''
+    );
+
     if (empty($username)) {
         ob_clean();
         echo json_encode([

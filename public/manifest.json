@@ -1,0 +1,68 @@
+{
+  "name": "EngiCal Pro - Engineering Calculator",
+  "short_name": "EngiCal Pro",
+  "description": "Professional Engineering Calculators Suite - Advanced tools for Civil, Electrical, HVAC, Plumbing, and Fire Protection calculations",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "utilities",
+    "productivity",
+    "education"
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Civil Tools",
+      "short_name": "Civil",
+      "description": "Access civil engineering calculators",
+      "url": "/civil",
+      "icons": [
+        {
+          "src": "/assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Electrical Tools",
+      "short_name": "Electrical",
+      "description": "Access electrical engineering calculators",
+      "url": "/electrical",
+      "icons": [
+        {
+          "src": "/assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "HVAC Tools",
+      "short_name": "HVAC",
+      "description": "Access HVAC calculators",
+      "url": "/hvac",
+      "icons": [
+        {
+          "src": "/assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

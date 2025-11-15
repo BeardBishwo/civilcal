@@ -40,21 +40,27 @@ class ThemeManager
      */
     private function getBaseUrl()
     {
+        if (defined('APP_URL') && APP_URL) {
+            return rtrim(APP_URL, '/');
+        }
+
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
         $baseDir = dirname($scriptName);
-        
-        // Remove /public from path if present (for clean URLs)
+
+        if (defined('APP_BASE')) {
+            $baseDir = APP_BASE;
+        }
+
         if (substr($baseDir, -7) === '/public') {
             $baseDir = substr($baseDir, 0, -7);
         }
-        
-        // Normalize path
-        if ($baseDir === '/' || $baseDir === '\\') {
+
+        if ($baseDir === '/' || $baseDir === '\\' || $baseDir === '.') {
             $baseDir = '';
         }
-        
+
         return $protocol . '://' . $host . $baseDir;
     }
 
@@ -985,7 +991,37 @@ class ThemeManager
     public function themeUrl($path = '')
     {
         $path = ltrim($path, '/');
-        return $this->baseUrl . '/themes/' . $this->activeTheme . '/' . $path;
+        $extraQuery = '';
+
+        if (strpos($path, '?') !== false) {
+            [$pathOnly, $query] = explode('?', $path, 2);
+            $path = $pathOnly;
+            $extraQuery = $query ? '&' . $query : '';
+        }
+
+        $params = http_build_query([
+            'path' => $this->activeTheme . '/' . $path,
+        ]);
+
+        // Default assumption: the public/ directory is the web root
+        $proxy = '/theme-assets.php';
+
+        // If the application's public directory is NOT the web root (for example,
+        // when running under Laragon at http://localhost/Bishwo_Calculator where
+        // DOCUMENT_ROOT is c:\laragon\www), then theme-assets.php actually lives
+        // under /public and must be referenced with that prefix.
+        $publicDir = BASE_PATH . '/public';
+        $themesProxyInPublic = $publicDir . $proxy;
+        $docRoot = isset($_SERVER['DOCUMENT_ROOT']) ? realpath($_SERVER['DOCUMENT_ROOT']) : null;
+        $publicReal = realpath($publicDir);
+
+        if ($publicReal && $docRoot && $docRoot !== $publicReal) {
+            if (file_exists($themesProxyInPublic)) {
+                $proxy = '/public' . $proxy;
+            }
+        }
+
+        return $this->baseUrl . $proxy . '?' . $params . $extraQuery;
     }
 
     public function assetsUrl($path = '')

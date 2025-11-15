@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>CSS Loading Diagnostic</title>
+<style>
+body { font-family: Arial, sans-serif; max-width: 1200px; margin: 20px auto; padding: 20px; background: #f5f5f5; }
+.pass { background: #d4edda; border-left: 4px solid #28a745; padding: 15px; margin: 10px 0; }
+.fail { background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; margin: 10px 0; }
+.info { background: #d1ecf1; border-left: 4px solid #17a2b8; padding: 15px; margin: 10px 0; }
+.code { background: #2d3748; color: #e2e8f0; padding: 10px; border-radius: 5px; overflow-x: auto; }
+h1 { color: #333; }
+h2 { color: #555; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+</style>
+</head>
+<body>
+<h1>🔍 CSS Loading Diagnostic Report</h1>
+<p><strong>Time:</strong> 2025-11-15 00:59:33</p>
+<h2>1. Basic Configuration Check</h2>
+<div class='pass'>✓ BASE_PATH = C:\laragon\www\Bishwo_Calculator</div>
+<div class='pass'>✓ APP_PATH = C:\laragon\www\Bishwo_Calculator/app</div>
+<div class='pass'>✓ APP_BASE = </div>
+<div class='pass'>✓ APP_URL = http://localhost</div>
+<h2>2. CSS Files Check</h2>
+<div class='pass'>✓ CSS directory exists: C:\laragon\www\Bishwo_Calculator/themes/default/assets/css</div>
+<div class='pass'>✓ theme.css exists (39.17 KB)</div>
+<div class='pass'>✓ footer.css exists (0.98 KB)</div>
+<div class='pass'>✓ back-to-top.css exists (5.27 KB)</div>
+<div class='pass'>✓ home.css exists (14.7 KB)</div>
+<div class='pass'>✓ logo-enhanced.css exists (4.73 KB)</div>
+<h2>3. Theme Assets Proxy Check</h2>
+<div class='pass'>✓ Theme assets proxy exists</div>
+<div class='pass'>✓ Proxy has valid syntax</div>
+<h2>4. ThemeManager Service Check</h2>
+<div class='pass'>✓ ThemeManager class exists</div>
+<div class='pass'>✓ ThemeManager instantiated successfully</div>
+<div class='info'>ℹ Generated URL: <code>http://localhost/public/theme-assets.php?path=default%2Fassets%2Fcss%2Ftheme.css</code></div>
+<div class='info'>ℹ Test this URL in browser: <a href='http://localhost/public/theme-assets.php?path=default%2Fassets%2Fcss%2Ftheme.css' target='_blank'>http://localhost/public/theme-assets.php?path=default%2Fassets%2Fcss%2Ftheme.css</a></div>
+<h2>5. Header Template Check</h2>
+<div class='pass'>✓ Header template exists</div>
+<div class='pass'>✓ Header contains CSS link tags</div>
+<div class='pass'>✓ Header uses ThemeManager for CSS loading</div>
+<h2>6. Browser Test URLs</h2>
+<div class='info'>
+<p><strong>Test these URLs directly in your browser:</strong></p>
+<ol>
+<li><strong>Direct CSS file:</strong> <a href='/themes/default/assets/css/theme.css' target='_blank'>/themes/default/assets/css/theme.css</a></li>
+<li><strong>Via theme-assets proxy:</strong> <a href='/public/theme-assets.php?path=default/assets/css/theme.css' target='_blank'>/public/theme-assets.php?path=default/assets/css/theme.css</a></li>
+<li><strong>Homepage:</strong> <a href='/' target='_blank'>/</a></li>
+<li><strong>Login page:</strong> <a href='/login' target='_blank'>/login</a></li>
+</ol>
+</div>
+<h2>7. Common Issues & Solutions</h2>
+<div class='info'>
+<h3>If CSS is NOT loading, check these:</h3>
+<ol>
+<li><strong>Browser Console (F12):</strong> Check for 404 errors or CORS errors</li>
+<li><strong>Network Tab:</strong> See if CSS files are being requested</li>
+<li><strong>View Page Source:</strong> Check if &lt;link&gt; tags are present in HTML</li>
+<li><strong>File Permissions:</strong> Ensure web server can read CSS files</li>
+<li><strong>htaccess:</strong> Verify URL rewriting is working</li>
+<li><strong>APP_BASE:</strong> Must match your installation path (e.g., '/' or '/bishwo')</li>
+</ol>
+</div>
+<h2>8. Quick Fix: Direct CSS Include (Temporary)</h2>
+<div class='info'>
+<p>If theme-assets.php is not working, you can temporarily use direct CSS includes:</p>
+<pre class='code'>&lt;!-- Add this to themes/default/views/partials/header.php --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;/themes/default/assets/css/theme.css&quot;&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;/themes/default/assets/css/footer.css&quot;&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;/themes/default/assets/css/home.css&quot;&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;/themes/default/assets/css/logo-enhanced.css&quot;&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;/themes/default/assets/css/back-to-top.css&quot;&gt;</pre>
+</div>
+<h2>9. Test: Render Sample CSS URL</h2>
+<div class='info'>
+<p><strong>Generated CSS URLs:</strong></p>
+<ul>
+<li><code>theme.css</code> → <a href='http://localhost/public/theme-assets.php?path=default%2Fassets%2Fcss%2Ftheme.css' target='_blank'>http://localhost/public/theme-assets.php?path=default%2Fassets%2Fcss%2Ftheme.css</a></li>
+<li><code>footer.css</code> → <a href='http://localhost/public/theme-assets.php?path=default%2Fassets%2Fcss%2Ffooter.css' target='_blank'>http://localhost/public/theme-assets.php?path=default%2Fassets%2Fcss%2Ffooter.css</a></li>
+<li><code>home.css</code> → <a href='http://localhost/public/theme-assets.php?path=default%2Fassets%2Fcss%2Fhome.css' target='_blank'>http://localhost/public/theme-assets.php?path=default%2Fassets%2Fcss%2Fhome.css</a></li>
+</ul>
+</div>
+<h2>10. Recommended Actions</h2>
+<div class='pass'>
+<h3>✅ No major issues detected</h3>
+<p>CSS loading infrastructure appears to be configured correctly.</p>
+<p><strong>Next steps:</strong></p>
+<ol>
+<li>Clear browser cache and hard refresh (Ctrl+Shift+R or Cmd+Shift+R)</li>
+<li>Check browser console (F12) for any errors</li>
+<li>Verify file permissions on themes/default/assets/</li>
+<li>Test the URLs listed above in your browser</li>
+</ol>
+</div>
+<hr style='margin: 30px 0;'>
+<p style='text-align: center; color: #666;'>
+<a href='/'>← Back to Home</a> | 
+<a href='javascript:location.reload()'>🔄 Refresh Diagnostic</a>
+</p>
+</body>
+</html>

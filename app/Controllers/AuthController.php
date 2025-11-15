@@ -19,9 +19,9 @@ class AuthController extends Controller
     public function showLogin()
     {
         // Generate CSRF token if not exists
-        
-        $this->view->render('auth/login', [
-            'viewHelper' => $this->view
+
+        $this->view->render("auth/login", [
+            "viewHelper" => $this->view,
         ]);
     }
 
@@ -30,52 +30,83 @@ class AuthController extends Controller
      */
     public function login()
     {
-        header('Content-Type: application/json');
-        
+        header("Content-Type: application/json");
+
         try {
-            // Validate CSRF token
-            
-            $email = $_POST['email'] ?? '';
-            $password = $_POST['password'] ?? '';
-            $remember = isset($_POST['remember']);
-            
-            // Validate input
-            if (empty($email) || empty($password)) {
-                echo json_encode(['success' => false, 'message' => 'Email and password are required']);
-                return;
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
             }
-            
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                echo json_encode(['success' => false, 'message' => 'Invalid email address']);
-                return;
-            }
-            
-            // Authenticate via central Auth
-            $result = Auth::login($email, $password);
-            if (!($result['success'] ?? false)) {
-                AuditLogger::warning('login_failed', ['email' => $email]);
-                echo json_encode(['success' => false, 'message' => $result['message'] ?? 'Invalid credentials']);
+            $token = $_POST["csrf_token"] ?? "";
+            $valid =
+                !empty($_SESSION["csrf_token"]) &&
+                hash_equals($_SESSION["csrf_token"], $token);
+            $notExpired =
+                empty($_SESSION["csrf_expiry"]) ||
+                time() <= $_SESSION["csrf_expiry"];
+            if (!$valid || !$notExpired) {
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Invalid or expired session",
+                ]);
                 return;
             }
 
-            $userObj = $result['user'];
-            AuditLogger::info('login_success', ['user_id' => $userObj->id ?? null, 'email' => $email]);
+            $identity =
+                $_POST["email"] ??
+                ($_POST["username_email"] ?? ($_POST["username"] ?? ""));
+            $password = $_POST["password"] ?? "";
+            $remember =
+                isset($_POST["remember"]) || isset($_POST["remember_me"]);
+
+            // Validate input
+            if (empty($identity) || empty($password)) {
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Email and password are required",
+                ]);
+                return;
+            }
+
+            // Authenticate via central Auth
+            $result = Auth::login($identity, $password);
+            if (!($result["success"] ?? false)) {
+                AuditLogger::warning("login_failed", ["identity" => $identity]);
+                echo json_encode([
+                    "success" => false,
+                    "message" => $result["message"] ?? "Invalid credentials",
+                ]);
+                return;
+            }
+
+            $userObj = $result["user"];
+            AuditLogger::info("login_success", [
+                "user_id" => $userObj->id ?? null,
+                "username_or_email" => $identity,
+            ]);
             // Backward compatible session variables
-            $_SESSION['user_id'] = $userObj->id;
-            $_SESSION['user_email'] = $userObj->email ?? '';
-            $_SESSION['user_role'] = $userObj->role ?? 'user';
-            $_SESSION['user_name'] = trim(($userObj->first_name ?? '') . ' ' . ($userObj->last_name ?? ''));
+            $_SESSION["user_id"] = $userObj->id;
+            $_SESSION["user_email"] = $userObj->email ?? "";
+            $_SESSION["user_role"] = $userObj->role ?? "user";
+            $_SESSION["user_name"] = trim(
+                ($userObj->first_name ?? "") .
+                    " " .
+                    ($userObj->last_name ?? ""),
+            );
 
             echo json_encode([
-                'success' => true,
-                'message' => 'Login successful',
-                'redirect' => $this->view->url('dashboard')
+                "success" => true,
+                "message" => "Login successful",
+                "redirect" => $this->view->url("dashboard"),
             ]);
-            
         } catch (\Exception $e) {
-            AuditLogger::error('login_exception', ['message' => $e->getMessage()]);
-            error_log('Login error: ' . $e->getMessage());
-            echo json_encode(['success' => false, 'message' => 'An error occurred. Please try again.']);
+            AuditLogger::error("login_exception", [
+                "message" => $e->getMessage(),
+            ]);
+            error_log("Login error: " . $e->getMessage());
+            echo json_encode([
+                "success" => false,
+                "message" => "An error occurred. Please try again.",
+            ]);
         }
     }
 
@@ -84,8 +115,8 @@ class AuthController extends Controller
      */
     public function showRegister()
     {
-        $this->view->render('auth/register', [
-            'viewHelper' => $this->view
+        $this->view->render("auth/register", [
+            "viewHelper" => $this->view,
         ]);
     }
 
@@ -94,93 +125,158 @@ class AuthController extends Controller
      */
     public function register()
     {
-        header('Content-Type: application/json');
-        
+        header("Content-Type: application/json");
+
         try {
-            // Validate CSRF token
-            
-            $firstName = trim($_POST['first_name'] ?? '');
-            $lastName = trim($_POST['last_name'] ?? '');
-            $email = trim($_POST['email'] ?? '');
-            $username = trim($_POST['username'] ?? '');
-            $company = trim($_POST['company'] ?? '');
-            $profession = trim($_POST['profession'] ?? '');
-            $password = $_POST['password'] ?? '';
-            $confirmPassword = $_POST['confirm_password'] ?? '';
-            $termsAccepted = isset($_POST['terms']);
-            
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            $token = $_POST["csrf_token"] ?? "";
+            $valid =
+                !empty($_SESSION["csrf_token"]) &&
+                hash_equals($_SESSION["csrf_token"], $token);
+            $notExpired =
+                empty($_SESSION["csrf_expiry"]) ||
+                time() <= $_SESSION["csrf_expiry"];
+            if (!$valid || !$notExpired) {
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Invalid or expired session",
+                ]);
+                return;
+            }
+
+            $firstName = trim($_POST["first_name"] ?? "");
+            $lastName = trim($_POST["last_name"] ?? "");
+            $fullName = trim($_POST["full_name"] ?? "");
+            $email = trim($_POST["email"] ?? "");
+            $username = trim($_POST["username"] ?? "");
+            $company = trim($_POST["company"] ?? "");
+            $profession = trim($_POST["profession"] ?? "");
+            $password = $_POST["password"] ?? "";
+            $confirmPassword =
+                $_POST["confirm_password"] ?? ($_POST["password"] ?? "");
+            $termsAccepted =
+                isset($_POST["terms"]) || isset($_POST["terms_agree"]);
+
+            if ((!$firstName || !$lastName) && $fullName) {
+                $parts = preg_split("/\s+/", $fullName);
+                $firstName = $firstName ?: $parts[0] ?? "";
+                $lastName =
+                    $lastName ?:
+                    (count($parts) > 1
+                        ? implode(" ", array_slice($parts, 1))
+                        : "");
+            }
+
             // Validate input
-            if (empty($firstName) || empty($lastName) || empty($email) || empty($password)) {
-                echo json_encode(['success' => false, 'message' => 'All required fields must be filled']);
+            if (
+                empty($firstName) ||
+                empty($lastName) ||
+                empty($email) ||
+                empty($password)
+            ) {
+                echo json_encode([
+                    "success" => false,
+                    "message" => "All required fields must be filled",
+                ]);
                 return;
             }
-            
+
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                echo json_encode(['success' => false, 'message' => 'Invalid email address']);
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Invalid email address",
+                ]);
                 return;
             }
-            
+
             if (strlen($password) < 8) {
-                echo json_encode(['success' => false, 'message' => 'Password must be at least 8 characters']);
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Password must be at least 8 characters",
+                ]);
                 return;
             }
-            
+
             if ($password !== $confirmPassword) {
-                echo json_encode(['success' => false, 'message' => 'Passwords do not match']);
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Passwords do not match",
+                ]);
                 return;
             }
-            
+
             if (!$termsAccepted) {
-                echo json_encode(['success' => false, 'message' => 'You must accept the terms and conditions']);
+                echo json_encode([
+                    "success" => false,
+                    "message" => "You must accept the terms and conditions",
+                ]);
                 return;
             }
-            
+
             // Check if user exists
             $userModel = new User();
             $existingUser = $userModel->findByEmail($email);
-            
+
             if ($existingUser) {
-                echo json_encode(['success' => false, 'message' => 'Email already registered']);
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Email already registered",
+                ]);
                 return;
             }
-            
+
             // Create user
             $userId = $userModel->create([
-                'first_name' => $firstName,
-                'last_name' => $lastName,
-                'email' => $email,
-                'username' => $username,
-                'company' => $company,
-                'profession' => $profession,
-                'password' => password_hash($password, PASSWORD_DEFAULT),
-                'role' => 'user'
+                "first_name" => $firstName,
+                "last_name" => $lastName,
+                "email" => $email,
+                "username" => $username,
+                "company" => $company,
+                "profession" => $profession,
+                "password" => password_hash($password, PASSWORD_DEFAULT),
+                "role" => "user",
             ]);
-            
+
             if ($userId) {
                 // Centralized login to create DB session + http-only cookie
                 $loginResult = Auth::login($email, $password);
-                if (!($loginResult['success'] ?? false)) {
-                    echo json_encode(['success' => false, 'message' => 'Registration succeeded but auto-login failed']);
+                if (!($loginResult["success"] ?? false)) {
+                    echo json_encode([
+                        "success" => false,
+                        "message" =>
+                            "Registration succeeded but auto-login failed",
+                    ]);
                     return;
                 }
                 // Backward compatible session variables
-                $userObj = $loginResult['user'];
-                $_SESSION['user_id'] = $userObj->id ?? $userId;
-                $_SESSION['user_email'] = $userObj->email ?? $email;
-                $_SESSION['user_role'] = $userObj->role ?? 'user';
-                $_SESSION['user_name'] = trim(($userObj->first_name ?? $firstName) . ' ' . ($userObj->last_name ?? $lastName));
+                $userObj = $loginResult["user"];
+                $_SESSION["user_id"] = $userObj->id ?? $userId;
+                $_SESSION["user_email"] = $userObj->email ?? $email;
+                $_SESSION["user_role"] = $userObj->role ?? "user";
+                $_SESSION["user_name"] = trim(
+                    ($userObj->first_name ?? $firstName) .
+                        " " .
+                        ($userObj->last_name ?? $lastName),
+                );
                 echo json_encode([
-                    'success' => true,
-                    'message' => 'Registration successful',
-                    'redirect' => $this->view->url('dashboard')
+                    "success" => true,
+                    "message" => "Registration successful",
+                    "redirect" => $this->view->url("dashboard"),
                 ]);
             } else {
-                echo json_encode(['success' => false, 'message' => 'Registration failed. Please try again.']);
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Registration failed. Please try again.",
+                ]);
             }
-            
         } catch (\Exception $e) {
-            error_log('Registration error: ' . $e->getMessage());
-            echo json_encode(['success' => false, 'message' => 'An error occurred. Please try again.']);
+            error_log("Registration error: " . $e->getMessage());
+            echo json_encode([
+                "success" => false,
+                "message" => "An error occurred. Please try again.",
+            ]);
         }
     }
 
@@ -189,8 +285,8 @@ class AuthController extends Controller
      */
     public function showForgotPassword()
     {
-        $this->view->render('auth/forgot', [
-            'viewHelper' => $this->view
+        $this->view->render("auth/forgot", [
+            "viewHelper" => $this->view,
         ]);
     }
 
@@ -199,48 +295,76 @@ class AuthController extends Controller
      */
     public function forgotPassword()
     {
-        header('Content-Type: application/json');
-        
+        header("Content-Type: application/json");
+
         try {
             // Get input data (handle both JSON and form data)
-            $input = json_decode(file_get_contents('php://input'), true);
+            $input = json_decode(file_get_contents("php://input"), true);
             if (!$input) {
                 $input = $_POST;
             }
-            
-            $email = trim($input['email'] ?? '');
-            
+            if ($input === $_POST) {
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+                }
+                $token = $_POST["csrf_token"] ?? "";
+                $valid =
+                    !empty($_SESSION["csrf_token"]) &&
+                    hash_equals($_SESSION["csrf_token"], $token);
+                $notExpired =
+                    empty($_SESSION["csrf_expiry"]) ||
+                    time() <= $_SESSION["csrf_expiry"];
+                if (!$valid || !$notExpired) {
+                    echo json_encode([
+                        "success" => false,
+                        "message" => "Invalid or expired session",
+                    ]);
+                    return;
+                }
+            }
+
+            $email = trim($input["email"] ?? "");
+
             // Validate input
             if (empty($email)) {
-                echo json_encode(['success' => false, 'message' => 'Email address is required']);
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Email address is required",
+                ]);
                 return;
             }
-            
+
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                echo json_encode(['success' => false, 'message' => 'Invalid email address']);
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Invalid email address",
+                ]);
                 return;
             }
-            
+
             // Check if user exists
             $userModel = new User();
             $user = $userModel->findByEmail($email);
-            
+
             // Always return success to prevent email enumeration
             // In production, send actual reset email here
             if ($user) {
                 // TODO: Generate reset token and send email
                 // For now, just log it
-                error_log('Password reset requested for: ' . $email);
+                error_log("Password reset requested for: " . $email);
             }
-            
+
             echo json_encode([
-                'success' => true, 
-                'message' => 'If an account exists with this email, a password reset link has been sent.'
+                "success" => true,
+                "message" =>
+                    "If an account exists with this email, a password reset link has been sent.",
             ]);
-            
         } catch (\Exception $e) {
-            error_log('Forgot password error: ' . $e->getMessage());
-            echo json_encode(['success' => false, 'message' => 'An error occurred. Please try again.']);
+            error_log("Forgot password error: " . $e->getMessage());
+            echo json_encode([
+                "success" => false,
+                "message" => "An error occurred. Please try again.",
+            ]);
         }
     }
 
@@ -250,24 +374,24 @@ class AuthController extends Controller
     public function logout()
     {
         // Store user name for logout message
-        $userName = $_SESSION['user_name'] ?? 'User';
-        $userId = $_SESSION['user_id'] ?? null;
+        $userName = $_SESSION["user_name"] ?? "User";
+        $userId = $_SESSION["user_id"] ?? null;
 
         // Invalidate DB session and clear cookie
-        AuditLogger::info('logout', ['user_id' => $userId]);
+        AuditLogger::info("logout", ["user_id" => $userId]);
         Auth::logout();
 
         // Start new session for logout page message
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        $_SESSION['logout_message'] = 'You have been successfully logged out';
-        $_SESSION['logout_user'] = $userName;
+        $_SESSION["logout_message"] = "You have been successfully logged out";
+        $_SESSION["logout_user"] = $userName;
 
         // Render logout page
-        $this->view->render('auth/logout', [
-            'viewHelper' => $this->view,
-            'userName' => $userName
+        $this->view->render("auth/logout", [
+            "viewHelper" => $this->view,
+            "userName" => $userName,
         ]);
     }
 }

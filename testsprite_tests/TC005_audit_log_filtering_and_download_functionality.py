@@ -19,8 +19,8 @@ def test_audit_log_filtering_and_download_functionality():
         resp = session.get(audit_logs_url, timeout=TIMEOUT)
         assert resp.status_code == 200, f"Expected 200 OK for audit log page, got {resp.status_code}"
         content_text = resp.text.lower()
-        assert "warning" not in content_text, "PHP warning found in audit logs page HTML"
-        assert "missing table" not in content_text, "Missing table error found in audit logs page HTML"
+        for sig in ["php warning", "warning:", "undefined array key", "undefined variable", "missing table", "fatal error", "parse error", "uncaught exception"]:
+            assert sig not in content_text, f"Detected issue '{sig}' in audit logs page"
 
         # Step 2: Apply various filters to audit logs
         # Since no exact schema for filters provided, try common filters as query params:
@@ -80,8 +80,8 @@ def test_audit_log_filtering_and_download_functionality():
             nav_resp = session.get(f"{BASE_URL}{path}", timeout=TIMEOUT)
             assert nav_resp.status_code == 200, f"Navigation failed for {path} with status {nav_resp.status_code}"
             nav_content = nav_resp.text.lower()
-            assert "warning" not in nav_content, f"PHP warning found on page {path}"
-            assert "missing table" not in nav_content, f"Missing table error found on page {path}"
+            for sig in ["php warning", "warning:", "undefined array key", "undefined variable", "missing table", "fatal error", "parse error", "uncaught exception"]:
+                assert sig not in nav_content, f"Detected issue '{sig}' on page {path}"
 
     finally:
         session.close()

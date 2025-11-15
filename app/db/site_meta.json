@@ -1,31 +1,32 @@
 {
-    "title": "EngiCal Pro",
-    "description": "Professional Engineering Calculators Suite - Advanced tools for Civil, Electrical, HVAC, Plumbing, and Fire Protection calculations",
-    "keywords": "engineering, calculator, civil, electrical, HVAC, plumbing, fire protection, AEC, professional, calculations",
-    "logo": "/bishwo_calculator/assets/icons/icon-192.png",
-    "logo_text": "EngiCal Pro",
-    "header_style": "logo_text",
-    "logo_style": "modern",
-    "logo_size": "medium",
-    "logo_animation": "hover_scale",
-    "favicon": "/bishwo_calculator/assets/icons/icon-192.png",
-    "admin_name": "Administrator",
-    "admin_email": "admin@engicalpro.com",
-    "brand_colors": {
-        "primary": "#4f46e5",
-        "secondary": "#10b981",
-        "accent": "#f59e0b"
-    },
-    "logo_settings": {
-        "show_logo": true,
-        "show_text": true,
-        "text_position": "right",
-        "logo_height": "40px",
-        "text_size": "1.5rem",
-        "text_weight": "700",
-        "spacing": "12px",
-        "border_radius": "8px",
-        "shadow": "subtle",
-        "hover_effect": "scale"
-    }
+  "title": "EngiCal Pro",
+  "description": "Professional Engineering Calculators Suite - Advanced tools for Civil, Electrical, HVAC, Plumbing, and Fire Protection calculations",
+  "keywords": "engineering, calculator, civil, electrical, HVAC, plumbing, fire protection, AEC, professional, calculations",
+  "logo": "/themes/default/assets/images/logo.png",
+  "logo_text": "EngiCal Pro",
+  "header_style": "logo_text",
+  "logo_style": "modern",
+  "logo_size": "medium",
+  "logo_animation": "hover_scale",
+  "favicon": "/themes/default/assets/images/favicon.png",
+  "banner": "/themes/default/assets/images/banner.jpg",
+  "admin_name": "Administrator",
+  "admin_email": "admin@engicalpro.com",
+  "brand_colors": {
+    "primary": "#4f46e5",
+    "secondary": "#10b981",
+    "accent": "#f59e0b"
+  },
+  "logo_settings": {
+    "show_logo": true,
+    "show_text": true,
+    "text_position": "right",
+    "logo_height": "40px",
+    "text_size": "1.5rem",
+    "text_weight": "700",
+    "spacing": "12px",
+    "border_radius": "8px",
+    "shadow": "subtle",
+    "hover_effect": "scale"
+  }
 }

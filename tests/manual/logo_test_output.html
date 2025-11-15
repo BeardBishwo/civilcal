@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Logo and Favicon Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; border-bottom: 3px solid #4f46e5; padding-bottom: 10px; }
+        h2 { color: #4f46e5; margin-top: 30px; }
+        .info-box { background: #f0f9ff; border-left: 4px solid #4f46e5; padding: 15px; margin: 15px 0; }
+        .success { background: #f0fdf4; border-left-color: #10b981; }
+        .error { background: #fef2f2; border-left-color: #ef4444; }
+        .warning { background: #fffbeb; border-left-color: #f59e0b; }
+        code { background: #e5e7eb; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        th { background: #f9fafb; font-weight: 600; color: #374151; }
+        img { max-width: 200px; height: auto; border: 1px solid #e5e7eb; padding: 5px; background: white; }
+        .favicon-display { width: 32px; height: 32px; }
+        .logo-display { max-height: 60px; width: auto; }
+        .visual-test { margin: 20px 0; padding: 20px; background: #f9fafb; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h1>🔍 Logo and Favicon Test Report</h1>
+        <h2>📋 Configuration Values</h2>
+        <table>
+            <tr><th>Setting</th><th>Value</th></tr>
+            <tr><td><strong>APP_BASE</strong></td><td><code></code></td></tr>
+            <tr><td><strong>Document Root</strong></td><td><code></code></td></tr>
+
+Warning: Undefined array key "HTTP_HOST" in C:\laragon\www\Bishwo_Calculator\test_logo_favicon.php on line 46
+
+Call Stack:
+    0.2162     532544   1. {main}() C:\laragon\www\Bishwo_Calculator\test_logo_favicon.php:0
+
+
+Deprecated: htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Bishwo_Calculator\test_logo_favicon.php on line 46
+
+Call Stack:
+    0.2162     532544   1. {main}() C:\laragon\www\Bishwo_Calculator\test_logo_favicon.php:0
+    0.2309     661344   2. htmlspecialchars($string = NULL) C:\laragon\www\Bishwo_Calculator\test_logo_favicon.php:46
+
+            <tr><td><strong>HTTP Host</strong></td><td><code></code></td></tr>
+
+Warning: Undefined array key "REQUEST_URI" in C:\laragon\www\Bishwo_Calculator\test_logo_favicon.php on line 47
+
+Call Stack:
+    0.2162     532544   1. {main}() C:\laragon\www\Bishwo_Calculator\test_logo_favicon.php:0
+
+
+Deprecated: htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Bishwo_Calculator\test_logo_favicon.php on line 47
+
+Call Stack:
+    0.2162     532544   1. {main}() C:\laragon\www\Bishwo_Calculator\test_logo_favicon.php:0
+    0.2409     661352   2. htmlspecialchars($string = NULL) C:\laragon\www\Bishwo_Calculator\test_logo_favicon.php:47
+
+            <tr><td><strong>Request URI</strong></td><td><code></code></td></tr>
+        </table>
+        <h2>🎨 Site Meta Information</h2>
+        <table>
+            <tr><th>Key</th><th>Value</th></tr>
+            <tr><td><strong>Site Title</strong></td><td>EngiCal Pro</td></tr>
+            <tr><td><strong>Logo Text</strong></td><td>EngiCal Pro</td></tr>
+            <tr><td><strong>Header Style</strong></td><td>logo_text</td></tr>
+            <tr><td><strong>Logo (Raw)</strong></td><td><code>/assets/icons/icon-192.png</code></td></tr>
+            <tr><td><strong>Favicon (Raw)</strong></td><td><code>/assets/icons/favicon.ico</code></td></tr>
+        </table>
+        <h2>🔗 Generated URLs</h2>
+        <table>
+            <tr><th>Type</th><th>Generated URL</th></tr>
+            <tr><td><strong>Logo URL</strong></td><td><code>/assets/icons/icon-192.png</code></td></tr>
+            <tr><td><strong>Favicon URL</strong></td><td><code>/assets/icons/favicon.ico</code></td></tr>
+        </table>
+        <h2>📁 File System Check</h2>
+        <table>
+            <tr><th>File</th><th>Path</th><th>Exists</th><th>Size</th></tr>
+            <tr class='success'>
+                <td><strong>Logo</strong></td>
+                <td><code>C:\laragon\www\Bishwo_Calculator/public/assets/icons/icon-192.png</code></td>
+                <td>✅ Yes</td>
+                <td>197.13 KB</td>
+            </tr>
+            <tr class='success'>
+                <td><strong>Favicon</strong></td>
+                <td><code>C:\laragon\www\Bishwo_Calculator/public/assets/icons/favicon.ico</code></td>
+                <td>✅ Yes</td>
+                <td>438.44 KB</td>
+            </tr>
+        </table>
+        <h2>🎭 Visual Test</h2>
+        <div class='visual-test'>
+            <h3>Logo Display:</h3>
+            <img src='/assets/icons/icon-192.png' alt='Logo' class='logo-display' onerror='this.style.border="3px solid red"; this.alt="Failed to load logo"'>
+            <p>✅ Logo file exists and should display above</p>
+            <h3>Favicon Display:</h3>
+            <img src='/assets/icons/favicon.ico' alt='Favicon' class='favicon-display' onerror='this.style.border="3px solid red"; this.alt="Failed to load favicon"'>
+            <p>✅ Favicon file exists and should display above</p>
+            <p><em>Note: Check your browser tab for the favicon icon</em></p>
+        </div>
+        <h2>🔧 Logo Settings</h2>
+        <table>
+            <tr><th>Setting</th><th>Value</th></tr>
+            <tr><td><strong>Show Logo</strong></td><td>true</td></tr>
+            <tr><td><strong>Show Text</strong></td><td>true</td></tr>
+            <tr><td><strong>Text Position</strong></td><td>right</td></tr>
+            <tr><td><strong>Logo Height</strong></td><td>40px</td></tr>
+            <tr><td><strong>Text Size</strong></td><td>1.5rem</td></tr>
+            <tr><td><strong>Text Weight</strong></td><td>700</td></tr>
+            <tr><td><strong>Spacing</strong></td><td>12px</td></tr>
+            <tr><td><strong>Border Radius</strong></td><td>8px</td></tr>
+            <tr><td><strong>Shadow</strong></td><td>subtle</td></tr>
+            <tr><td><strong>Hover Effect</strong></td><td>scale</td></tr>
+        </table>
+        <h2>✅ Recommendations</h2>
+        <div class='info-box'>
+            <p><strong>✅ All checks passed!</strong></p>
+            <ul>
+                <li>Logo and favicon files exist</li>
+                <li>URLs are being generated correctly</li>
+                <li>Files should display properly on your website</li>
+            </ul>
+        </div>
+        <h2>📝 Additional Information</h2>
+        <div class='info-box'>
+            <ul>
+                <li><strong>Favicon Format:</strong> Should be .ico format (32x32 pixels recommended)</li>
+                <li><strong>Logo Format:</strong> PNG recommended (transparent background works best)</li>
+                <li><strong>Logo Size:</strong> Current setting: 40px</li>
+                <li><strong>Alternative:</strong> You can change logo/favicon paths in <code>app/db/site_meta.json</code></li>
+            </ul>
+        </div>
+        <hr style='margin: 30px 0;'>
+        <p style='text-align: center; color: #6b7280;'><em>Test completed at 2025-11-15 06:22:18</em></p>
+    </div>
+</body>
+</html>

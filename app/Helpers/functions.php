@@ -1,30 +1,33 @@
 <?php
-require_once __DIR__ . '/../Config/config.php';
+require_once __DIR__ . "/../Config/config.php";
 // Initialize secure session
-function init_secure_session() {
-    if (session_status() === PHP_SESSION_ACTIVE) return;
-    
+function init_secure_session()
+{
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        return;
+    }
+
     // Only set session name before starting
-    session_name('EngiCalSecureSess');
-    
+    session_name("EngiCalSecureSess");
+
     // Only set cookie params if we can (no output yet)
     if (!headers_sent()) {
         session_set_cookie_params([
-            'lifetime' => 0,
-            'path' => APP_BASE . '/',
-            'domain' => $_SERVER['HTTP_HOST'] ?? '',
-            'secure' => REQUIRE_HTTPS,
-            'httponly' => true,
-            'samesite' => 'Lax'
+            "lifetime" => 0,
+            "path" => APP_BASE . "/",
+            "domain" => $_SERVER["HTTP_HOST"] ?? "",
+            "secure" => REQUIRE_HTTPS,
+            "httponly" => true,
+            "samesite" => "Lax",
         ]);
     }
-    
+
     session_start();
-    
+
     // Mitigate session fixation
-    if (empty($_SESSION['init'])) {
+    if (empty($_SESSION["init"])) {
         session_regenerate_id(true);
-        $_SESSION['init'] = true;
+        $_SESSION["init"] = true;
     }
 }
 
@@ -39,101 +42,136 @@ function init_secure_session() {
 ////
 
 // CSRF helpers
-function csrf_token() {
-	if (!isset($_SESSION['_csrf_token'])) {
-		$_SESSION['_csrf_token'] = bin2hex(random_bytes(16));
-	}
-	return $_SESSION['_csrf_token'];
+function csrf_token()
+{
+    if (!isset($_SESSION["_csrf_token"])) {
+        $_SESSION["_csrf_token"] = bin2hex(random_bytes(16));
+    }
+    return $_SESSION["_csrf_token"];
 }
 
-function verify_csrf($token) {
-	return isset($_SESSION['_csrf_token']) && hash_equals($_SESSION['_csrf_token'], (string)$token);
+function verify_csrf($token)
+{
+    return isset($_SESSION["_csrf_token"]) &&
+        hash_equals($_SESSION["_csrf_token"], (string) $token);
 }
 
 // Admin session helper
-function require_admin_login() {
-	if (empty($_SESSION['admin_logged_in'])) {
-		header('Location: ' . (defined('APP_BASE') ? APP_BASE : '') . '/admin/login.php');
-		exit;
-	}
+function require_admin_login()
+{
+    if (empty($_SESSION["admin_logged_in"])) {
+        header(
+            "Location: " .
+                (defined("APP_BASE") ? APP_BASE : "") .
+                "/admin/login.php",
+        );
+        exit();
+    }
 }
 
 // Common calculation functions for the app. Keep formulas simple and deterministic.
 /**
  * Concrete volume (m³)
  */
-function concrete_volume(float $length, float $width, float $depth): float {
-	return $length * $width * $depth;
+function concrete_volume(float $length, float $width, float $depth): float
+{
+    return $length * $width * $depth;
 }
 /**
  * Earthwork volumes (cut, fill, net) given areas (m²) and length (m)
  * Returns associative array with keys 'cut', 'fill', 'net'
  */
-function earthwork_volumes(float $cutArea, float $fillArea, float $length): array {
-	$cut = $cutArea * $length;
-	$fill = $fillArea * $length;
-	return ['cut' => $cut, 'fill' => $fill, 'net' => $cut - $fill];
+function earthwork_volumes(
+    float $cutArea,
+    float $fillArea,
+    float $length,
+): array {
+    $cut = $cutArea * $length;
+    $fill = $fillArea * $length;
+    return ["cut" => $cut, "fill" => $fill, "net" => $cut - $fill];
 }
 
 /**
  * Beam load helper - returns moment (kN·m), section_modulus (m³), stress (kPa)
  */
-function beam_load(float $length, float $width_m, float $depth_m, float $load): array {
-	$moment = ($load * pow($length, 2)) / 8.0;
-	$section_modulus = ($width_m * pow($depth_m, 2)) / 6.0;
-	$stress = ($section_modulus > 0) ? ($moment / $section_modulus) : 0;
-	return ['moment' => $moment, 'section_modulus' => $section_modulus, 'stress' => $stress];
+function beam_load(
+    float $length,
+    float $width_m,
+    float $depth_m,
+    float $load,
+): array {
+    $moment = ($load * pow($length, 2)) / 8.0;
+    $section_modulus = ($width_m * pow($depth_m, 2)) / 6.0;
+    $stress = $section_modulus > 0 ? $moment / $section_modulus : 0;
+    return [
+        "moment" => $moment,
+        "section_modulus" => $section_modulus,
+        "stress" => $stress,
+    ];
 }
 
 /**
  * Unit conversion helper (simple set)
  */
-function convert_units(float $value, string $from, string $to): float {
-	$toMeter = ['meter' => 1.0, 'foot' => 0.3048, 'inch' => 0.0254, 'cm' => 0.01];
-	if (!isset($toMeter[$from]) || !isset($toMeter[$to])) return 0.0;
-	$valueInMeters = $value * $toMeter[$from];
-	return $valueInMeters / $toMeter[$to];
+function convert_units(float $value, string $from, string $to): float
+{
+    $toMeter = [
+        "meter" => 1.0,
+        "foot" => 0.3048,
+        "inch" => 0.0254,
+        "cm" => 0.01,
+    ];
+    if (!isset($toMeter[$from]) || !isset($toMeter[$to])) {
+        return 0.0;
+    }
+    $valueInMeters = $value * $toMeter[$from];
+    return $valueInMeters / $toMeter[$to];
 }
 
 // Simple helper: redirect back to app base
-function app_base_url($path=''){
-	$base = defined('APP_BASE') ? rtrim(APP_BASE, '/') : '';
-	return $base . ($path ? '/' . ltrim($path, '/') : '');
+function app_base_url($path = "")
+{
+    $base = defined("APP_BASE") ? rtrim(APP_BASE, "/") : "";
+    return $base . ($path ? "/" . ltrim($path, "/") : "");
 }
 
 /**
  * Load site metadata from JSON file (db/site_meta.json) and merge with sensible defaults.
  * Returns associative array with keys: title, description, keywords, logo, favicon, admin_name, admin_email
  */
-function get_site_meta(): array {
-	$defaults = [
-		'title' => 'AEC Engineering Calculator',
-		'description' => 'Professional engineering calculators for civil, electrical, HVAC, plumbing and fire protection.',
-		'keywords' => 'engineering, calculator, civil, electrical, HVAC, plumbing, fire protection, AEC',
-		'logo' => app_base_url('assets/icons/icon-192.png'),
-		'favicon' => app_base_url('assets/icons/icon-192.png'),
-		'admin_name' => defined('ADMIN_USER') ? ADMIN_USER : '',
-		'admin_email' => defined('MAIL_TO') ? MAIL_TO : 'admin@example.com',
-		'canonical' => null,
-	];
-
-	$metaFile = __DIR__ . '/../db/site_meta.json';
-	if (file_exists($metaFile)) {
-		$raw = file_get_contents($metaFile);
-		$data = json_decode($raw, true);
-		if (is_array($data)) {
-			return array_merge($defaults, $data);
-		}
-	}
-	return $defaults;
-}
-
-function get_site_settings(): array {
+function get_site_meta(): array
+{
     $defaults = [
-        'use_banner_image' => true
+        "title" => "AEC Engineering Calculator",
+        "description" =>
+            "Professional engineering calculators for civil, electrical, HVAC, plumbing and fire protection.",
+        "keywords" =>
+            "engineering, calculator, civil, electrical, HVAC, plumbing, fire protection, AEC",
+        "logo" => app_base_url("assets/icons/icon-192.png"),
+        "favicon" => app_base_url("assets/icons/icon-192.png"),
+        "admin_name" => defined("ADMIN_USER") ? ADMIN_USER : "",
+        "admin_email" => defined("MAIL_TO") ? MAIL_TO : "admin@example.com",
+        "canonical" => null,
     ];
 
-    $settingsFile = __DIR__ . '/../db/site_settings.json';
+    $metaFile = __DIR__ . "/../db/site_meta.json";
+    if (file_exists($metaFile)) {
+        $raw = file_get_contents($metaFile);
+        $data = json_decode($raw, true);
+        if (is_array($data)) {
+            return array_merge($defaults, $data);
+        }
+    }
+    return $defaults;
+}
+
+function get_site_settings(): array
+{
+    $defaults = [
+        "use_banner_image" => true,
+    ];
+
+    $settingsFile = __DIR__ . "/../db/site_settings.json";
     if (file_exists($settingsFile)) {
         $raw = file_get_contents($settingsFile);
         $data = json_decode($raw, true);
@@ -144,31 +182,168 @@ function get_site_settings(): array {
     return $defaults;
 }
 
-function save_site_settings(array $settings): bool {
-    $settingsFile = __DIR__ . '/../db/site_settings.json';
+function save_site_settings(array $settings): bool
+{
+    $settingsFile = __DIR__ . "/../db/site_settings.json";
     $json = json_encode($settings, JSON_PRETTY_PRINT);
     return file_put_contents($settingsFile, $json) !== false;
 }
 
-function generate_breadcrumb($items) {
+function generate_breadcrumb($items)
+{
     if (empty($items)) {
-        return '';
+        return "";
     }
 
     $html = '<nav aria-label="breadcrumb"><ol class="breadcrumb">';
     foreach ($items as $i => $item) {
-        if ($i === 0 && $item['name'] === 'Home') {
-            $html .= '<li class="breadcrumb-item"><a href="' . htmlspecialchars($item['url']) . '"><i class="fas fa-home"></i></a></li>';
+        if ($i === 0 && $item["name"] === "Home") {
+            $html .=
+                '<li class="breadcrumb-item"><a href="' .
+                htmlspecialchars($item["url"]) .
+                '"><i class="fas fa-home"></i></a></li>';
         } else {
             if ($i === count($items) - 1) {
-                $html .= '<li class="breadcrumb-item active" aria-current="page">' . htmlspecialchars($item['name']) . '</li>';
+                $html .=
+                    '<li class="breadcrumb-item active" aria-current="page">' .
+                    htmlspecialchars($item["name"]) .
+                    "</li>";
             } else {
-                $html .= '<li class="breadcrumb-item"><a href="' . htmlspecialchars($item['url']) . '">' . htmlspecialchars($item['name']) . '</a></li>';
+                $html .=
+                    '<li class="breadcrumb-item"><a href="' .
+                    htmlspecialchars($item["url"]) .
+                    '">' .
+                    htmlspecialchars($item["name"]) .
+                    "</a></li>";
             }
         }
     }
-    $html .= '</ol></nav>';
+    $html .= "</ol></nav>";
     return $html;
+}
+
+/**
+ * Generate asset URL with proper base path
+ */
+function asset_url(string $path = ""): string
+{
+    $base = defined("APP_BASE") ? rtrim(APP_BASE, "/") : "";
+    $path = ltrim($path, "/");
+    return $base . "/assets/" . $path;
+}
+
+/**
+ * Check if user is logged in
+ */
+function is_logged_in(): bool
+{
+    return isset($_SESSION["user_id"]) && !empty($_SESSION["user_id"]);
+}
+
+/**
+ * Get current logged-in user data
+ */
+function current_user(): ?array
+{
+    if (!is_logged_in()) {
+        return null;
+    }
+
+    // Return user data from session
+    return [
+        "id" => $_SESSION["user_id"] ?? null,
+        "username" => $_SESSION["username"] ?? null,
+        "email" => $_SESSION["email"] ?? null,
+        "role" => $_SESSION["role"] ?? "user",
+        "is_admin" => ($_SESSION["role"] ?? "") === "admin",
+    ];
+}
+
+/**
+ * Redirect to a URL
+ */
+function redirect(string $url, int $statusCode = 302): void
+{
+    // If URL doesn't start with http, assume it's a relative path
+    if (!preg_match("#^https?://#i", $url)) {
+        $url = app_base_url($url);
+    }
+
+    if (!headers_sent()) {
+        header("Location: {$url}", true, $statusCode);
+        exit();
+    }
+
+    // Fallback if headers already sent
+    echo "<script>window.location.href='" .
+        htmlspecialchars($url, ENT_QUOTES) .
+        "';</script>";
+    echo '<noscript><meta http-equiv="refresh" content="0;url=' .
+        htmlspecialchars($url, ENT_QUOTES) .
+        '"></noscript>';
+    exit();
+}
+
+/**
+ * Get old input value (for form repopulation after validation errors)
+ */
+function old(string $key, $default = "")
+{
+    return $_SESSION["_old_input"][$key] ?? $default;
+}
+
+/**
+ * Set a flash message
+ */
+function flash(string $key, $value): void
+{
+    if (!isset($_SESSION["_flash"])) {
+        $_SESSION["_flash"] = [];
+    }
+    $_SESSION["_flash"][$key] = $value;
+}
+
+/**
+ * Get and clear a flash message
+ */
+function get_flash(string $key, $default = null)
+{
+    $value = $_SESSION["_flash"][$key] ?? $default;
+
+    // Clear the flash message after retrieving
+    if (isset($_SESSION["_flash"][$key])) {
+        unset($_SESSION["_flash"][$key]);
+    }
+
+    return $value;
+}
+
+/**
+ * Clear all flash messages
+ */
+function clear_flash(): void
+{
+    if (isset($_SESSION["_flash"])) {
+        unset($_SESSION["_flash"]);
+    }
+}
+
+/**
+ * Store old input for form repopulation
+ */
+function store_old_input(array $data): void
+{
+    $_SESSION["_old_input"] = $data;
+}
+
+/**
+ * Clear old input data
+ */
+function clear_old_input(): void
+{
+    if (isset($_SESSION["_old_input"])) {
+        unset($_SESSION["_old_input"]);
+    }
 }
 
 ?>

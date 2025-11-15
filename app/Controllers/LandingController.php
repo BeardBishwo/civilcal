@@ -8,151 +8,81 @@ class LandingController extends Controller
 {
     public function civil()
     {
-        // Set the view path to the landing page
-        $viewPath = BASE_PATH . '/themes/default/views/landing/civil.php';
-        
-        // Check if the file exists
-        if (file_exists($viewPath)) {
-            include $viewPath;
-        } else {
-            // Fallback to 404 if file doesn't exist
-            http_response_code(404);
-            echo "Page not found";
-        }
+        // Render the landing page using the View system so layout is applied
+        return $this->view->render('landing/civil', [
+            'page_title' => 'Civil Engineering Toolkit',
+        ]);
     }
     
     public function electrical()
     {
-        // Set the view path to the landing page
-        $viewPath = BASE_PATH . '/themes/default/views/landing/electrical.php';
-        
-        // Check if the file exists
-        if (file_exists($viewPath)) {
-            include $viewPath;
-        } else {
-            // Fallback to 404 if file doesn't exist
-            http_response_code(404);
-            echo "Page not found";
-        }
+        // Render the landing page using the View system so layout is applied
+        return $this->view->render('landing/electrical', [
+            'page_title' => 'Electrical Engineering Toolkit',
+        ]);
     }
     
     public function plumbing()
     {
-        // Set the view path to the landing page
-        $viewPath = BASE_PATH . '/themes/default/views/landing/plumbing.php';
-        
-        // Check if the file exists
-        if (file_exists($viewPath)) {
-            include $viewPath;
-        } else {
-            // Fallback to 404 if file doesn't exist
-            http_response_code(404);
-            echo "Page not found";
-        }
+        // Render the landing page using the View system so layout is applied
+        return $this->view->render('landing/plumbing', [
+            'page_title' => 'Plumbing & HVAC Toolkit',
+        ]);
     }
     
     public function hvac()
     {
-        // Set the view path to the landing page
-        $viewPath = BASE_PATH . '/themes/default/views/landing/hvac.php';
-        
-        // Check if the file exists
-        if (file_exists($viewPath)) {
-            include $viewPath;
-        } else {
-            // Fallback to 404 if file doesn't exist
-            http_response_code(404);
-            echo "Page not found";
-        }
+        // Render the landing page using the View system so layout is applied
+        return $this->view->render('landing/hvac', [
+            'page_title' => 'HVAC Toolkit',
+        ]);
     }
     
     public function fire()
     {
-        // Set the view path to the landing page
-        $viewPath = BASE_PATH . '/themes/default/views/landing/fire.php';
-        
-        // Check if the file exists
-        if (file_exists($viewPath)) {
-            include $viewPath;
-        } else {
-            // Fallback to 404 if file doesn't exist
-            http_response_code(404);
-            echo "Page not found";
-        }
+        // Render the landing page using the View system so layout is applied
+        return $this->view->render('landing/fire', [
+            'page_title' => 'Fire Protection Toolkit',
+        ]);
     }
     
     public function site()
     {
-        // Set the view path to the landing page
-        $viewPath = BASE_PATH . '/themes/default/views/landing/site.php';
-        
-        // Check if the file exists
-        if (file_exists($viewPath)) {
-            include $viewPath;
-        } else {
-            // Fallback to 404 if file doesn't exist
-            http_response_code(404);
-            echo "Page not found";
-        }
+        // Render the landing page using the View system so layout is applied
+        return $this->view->render('landing/site', [
+            'page_title' => 'Site Engineering Toolkit',
+        ]);
     }
     
     public function structural()
     {
-        // Set the view path to the landing page
-        $viewPath = BASE_PATH . '/themes/default/views/landing/structural.php';
-        
-        // Check if the file exists
-        if (file_exists($viewPath)) {
-            include $viewPath;
-        } else {
-            // Fallback to 404 if file doesn't exist
-            http_response_code(404);
-            echo "Page not found";
-        }
+        // Render the landing page using the View system so layout is applied
+        return $this->view->render('landing/structural', [
+            'page_title' => 'Structural Engineering Toolkit',
+        ]);
     }
     
     public function estimation()
     {
-        // Set the view path to the landing page
-        $viewPath = BASE_PATH . '/themes/default/views/landing/estimation.php';
-        
-        // Check if the file exists
-        if (file_exists($viewPath)) {
-            include $viewPath;
-        } else {
-            // Fallback to 404 if file doesn't exist
-            http_response_code(404);
-            echo "Page not found";
-        }
+        // Render the landing page using the View system so layout is applied
+        return $this->view->render('landing/estimation', [
+            'page_title' => 'Estimation Toolkit',
+        ]);
     }
     
     public function management()
     {
-        // Set the view path to the landing page
-        $viewPath = BASE_PATH . '/themes/default/views/landing/management.php';
-        
-        // Check if the file exists
-        if (file_exists($viewPath)) {
-            include $viewPath;
-        } else {
-            // Fallback to 404 if file doesn't exist
-            http_response_code(404);
-            echo "Page not found";
-        }
+        // Render the landing page using the View system so layout is applied
+        return $this->view->render('landing/management', [
+            'page_title' => 'Project Management Toolkit',
+        ]);
     }
     
     public function mep()
     {
-        // Set the view path to the landing page
-        $viewPath = BASE_PATH . '/themes/default/views/landing/mep.php';
-        
-        // Check if the file exists
-        if (file_exists($viewPath)) {
-            include $viewPath;
-        } else {
-            // Fallback to 404 if file doesn't exist
-            http_response_code(404);
-            echo "Page not found";
-        }
+        // Render the landing page using the View system so layout is applied
+        return $this->view->render('landing/mep', [
+            'page_title' => 'MEP Engineering Toolkit',
+        ]);
     }
 }

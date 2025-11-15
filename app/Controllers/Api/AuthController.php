@@ -3,6 +3,7 @@
 namespace App\Controllers\Api;
 
 use App\Core\Controller;
+use App\Core\Database;
 use App\Models\User;
 use Exception;
 
@@ -64,6 +65,43 @@ class AuthController extends Controller
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['user'] = $user;
                 $_SESSION['is_admin'] = $user['is_admin'] ?? false;
+
+                // Also create a database-backed session and auth_token cookie
+                // so that session management tests and Auth::check() can rely
+                // on the same user_sessions infrastructure.
+                try {
+                    $db = Database::getInstance();
+                    $pdo = $db->getPdo();
+
+                    $sessionToken = bin2hex(random_bytes(32));
+                    $expiresAt = date('Y-m-d H:i:s', strtotime('+30 days'));
+
+                    $stmt = $pdo->prepare("\n                        INSERT INTO user_sessions (user_id, session_token, ip_address, user_agent, expires_at)\n                        VALUES (?, ?, ?, ?, ?)\n                    ");
+                    $stmt->execute([
+                        $user['id'],
+                        $sessionToken,
+                        $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
+                        $_SERVER['HTTP_USER_AGENT'] ?? '',
+                        $expiresAt,
+                    ]);
+
+                    // Regenerate PHP session ID for security, if active
+                    if (session_status() === PHP_SESSION_ACTIVE) {
+                        session_regenerate_id(true);
+                    }
+
+                    // Set auth_token cookie used by Auth::check()
+                    setcookie('auth_token', $sessionToken, [
+                        'expires' => time() + (30 * 24 * 60 * 60),
+                        'path' => '/',
+                        'secure' => isset($_SERVER['HTTPS']),
+                        'httponly' => true,
+                        'samesite' => 'Strict',
+                    ]);
+                } catch (Exception $e) {
+                    // Do not fail the login on persistence issues, but log them
+                    error_log('API Login session persistence error: ' . $e->getMessage());
+                }
 
                 // Handle "Remember Me" functionality
                 if ($rememberMe) {

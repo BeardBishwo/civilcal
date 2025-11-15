@@ -15,8 +15,14 @@ if (!isset($themeManager)) {
 function theme_asset($path) {
     global $themeManager;
     
+    // If themeManager is not available globally, create a new instance
     if (!$themeManager) {
-        return app_base_url($path);
+        try {
+            $themeManager = new \App\Services\ThemeManager();
+        } catch (Exception $e) {
+            // Fallback if ThemeManager fails
+            return app_base_url($path);
+        }
     }
     
     // Remove leading slash

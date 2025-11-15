@@ -399,6 +399,15 @@ $router->add('GET', '/estimation', 'LandingController@estimation');
 $router->add('GET', '/management', 'LandingController@management');
 $router->add('GET', '/mep', 'LandingController@mep');
 
+// Help & Documentation Routes
+$router->add('GET', '/help', 'HelpController@index');
+$router->add('GET', '/help/{category}', 'HelpController@category');
+$router->add('GET', '/help/{category}/{article}', 'HelpController@article');
+$router->add('GET', '/developers', 'DeveloperController@index');
+$router->add('GET', '/developers/api', 'DeveloperController@api');
+$router->add('GET', '/developers/documentation', 'DeveloperController@documentation');
+$router->add('GET', '/developers/guides', 'DeveloperController@guides');
+
 // Load module service providers
 \App\Modules\ModuleManager::load($router);
 

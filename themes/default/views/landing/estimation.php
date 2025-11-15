@@ -4,9 +4,9 @@ $breadcrumb = [
 	['name' => 'Home', 'url' => app_base_url('/')],
 	['name' => 'Estimation', 'url' => '#']
 ];
-require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
 ?>
 
+<?php if (!function_exists('load_theme_css')) { require_once __DIR__ . '/../partials/theme-helpers.php'; } ?>
 <?php load_theme_css('estimation.css'); ?>
 
 <div class="container">
@@ -235,8 +235,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 
-<?php
-require_once dirname(__DIR__, 4) . '/themes/default/views/partials/footer.php';
-?>
+<?php ?>
 
 

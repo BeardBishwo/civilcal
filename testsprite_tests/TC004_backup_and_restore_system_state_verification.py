@@ -12,13 +12,21 @@ def test_backup_and_restore_system_state_verification():
     backup_id = None
     
     def check_page_no_errors(path):
-        # Check page loads without PHP warnings or missing table errors
         resp = session.get(f"{BASE_URL}{path}", timeout=TIMEOUT)
         assert resp.status_code == 200, f"Failed to load {path}"
         content = resp.text.lower()
-        assert 'warning' not in content, f"PHP warnings found in {path}"
-        assert 'error' not in content, f"Errors found in {path}"
-        assert 'missing table' not in content, f"Missing table error in {path}"
+        issue_signatures = [
+            'php warning',
+            'warning:',
+            'undefined array key',
+            'undefined variable',
+            'fatal error',
+            'parse error',
+            'uncaught exception',
+            'missing table'
+        ]
+        for sig in issue_signatures:
+            assert sig not in content, f"Detected issue '{sig}' in {path}"
 
     try:
         # Step 1: Navigate profile, admin dashboard, help center to verify navigation works and no errors

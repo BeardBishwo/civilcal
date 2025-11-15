@@ -30,7 +30,7 @@ async def run_test():
         page = await context.new_page()
         
         # Navigate to your target URL and wait until the network request is committed
-        await page.goto("http://localhost:80/register", wait_until="commit", timeout=10000)
+        await page.goto("http://localhost:8000/Bishwo_Calculator", wait_until="commit", timeout=10000)
         
         # Wait for the main page to reach DOMContentLoaded state (optional for stability)
         try:
@@ -46,17 +46,29 @@ async def run_test():
                 pass
         
         # Interact with the page elements to simulate user flow
-        # -> Navigate to the admin login page using HTTPS and then proceed to /admin/themes after login.
-        await page.goto('https://localhost/admin/login', timeout=10000)
+        # -> Navigate to the administrator login page to start the login process.
+        await page.goto('http://localhost:8000/admin/login', timeout=10000)
         await asyncio.sleep(3)
+        
+
+        # -> Look for any visible links or navigation elements on the current or home page that might lead to admin login or theme management.
+        await page.goto('http://localhost:8000', timeout=10000)
+        await asyncio.sleep(3)
+        
+
+        # -> Click on the 'Login' link to proceed to the login page.
+        frame = context.pages[-1]
+        # Click on the 'Login' link to go to the login page
+        elem = frame.locator('xpath=html/body/header/div/div[3]/div/a').nth(0)
+        await page.wait_for_timeout(3000); await elem.click(timeout=5000)
         
 
         # --> Assertions to verify final state
         frame = context.pages[-1]
         try:
-            await expect(frame.locator('text=Theme upload completed successfully').first).to_be_visible(timeout=30000)
+            await expect(frame.locator('text=Theme upload successful').first).to_be_visible(timeout=1000)
         except AssertionError:
-            raise AssertionError("Test case failed: The theme upload validation did not pass as expected. Either the valid theme package upload was unsuccessful or the invalid theme package did not trigger the appropriate validation errors.")
+            raise AssertionError('Test case failed: The theme upload validation did not pass as expected, indicating the system did not properly handle the administrator theme upload and validation process.')
         await asyncio.sleep(5)
     
     finally:

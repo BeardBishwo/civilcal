@@ -1,132 +1,121 @@
 [
   {
     "id": "TC001",
-    "title": "User Calculator Navigation and Usage",
-    "description": "Verify that a user can successfully navigate through dynamic dropdown menus on the home page to select and open calculators for Civil, Electrical, and HVAC service modules with correct display and no errors.",
+    "title": "User Calculator Navigation and Access",
+    "description": "Verify that a user can navigate through the dynamic dropdown menu to select a service module and open the corresponding calculator without errors.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to the user home page."
+        "description": "Navigate to the home page."
       },
       {
         "type": "action",
-        "description": "Open the dynamic dropdown menu for calculator selection."
+        "description": "Locate the dynamic dropdown for service module selection."
       },
       {
         "type": "action",
-        "description": "Select a calculator under the Civil service module."
+        "description": "Select the 'Civil' service module from the dropdown."
       },
       {
         "type": "assertion",
-        "description": "Verify that the appropriate Civil calculator page loads without errors and all input fields are displayed correctly."
+        "description": "Verify that the Civil calculator page is displayed correctly."
       },
       {
         "type": "action",
-        "description": "Repeat selection of calculators for Electrical and HVAC modules."
-      },
-      {
-        "type": "assertion",
-        "description": "Verify each calculator page loads correctly, all relevant fields appear, and calculations perform as expected."
+        "description": "Repeat selection for 'Electrical' and verify its calculator opens properly."
       },
       {
         "type": "action",
-        "description": "Try selecting invalid or empty options in the dropdown if available."
+        "description": "Repeat selection for 'HVAC' and verify its calculator opens properly."
       },
       {
         "type": "assertion",
-        "description": "Verify the system handles selections gracefully without crashing or unexpected behavior."
+        "description": "Ensure no errors or UI glitches appear during navigation and calculator load."
       }
     ]
   },
   {
     "id": "TC002",
-    "title": "Theme Upload, Validation, Activation, and Dynamic CSS Application",
-    "description": "Test the full lifecycle in the theme management UI: upload a new theme, validate the upload, activate the theme, customize settings, and verify that dynamic CSS is applied on the front end.",
+    "title": "Theme Upload and Validation",
+    "description": "Test the ability for an administrator to upload a new theme, trigger validation checks, and handle invalid themes properly.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Log in as administrator and navigate to /admin/themes."
+        "description": "Login as an administrator and navigate to /admin/themes."
       },
       {
         "type": "action",
-        "description": "Upload a valid new theme ZIP file."
+        "description": "Attempt to upload a well-formed theme package."
       },
       {
         "type": "assertion",
-        "description": "Verify the system validates the theme manifest for required fields and structure."
+        "description": "Confirm that theme validation passes and the theme is added to the list."
       },
       {
         "type": "action",
-        "description": "Attempt upload of an invalid theme ZIP missing manifest or with incorrect structure."
+        "description": "Attempt to upload a malformed theme missing required files or invalid manifest."
       },
       {
         "type": "assertion",
-        "description": "Confirm the system rejects the upload and shows meaningful validation errors."
-      },
-      {
-        "type": "action",
-        "description": "Activate the successfully uploaded theme."
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the theme is activated and confirmed in the UI."
-      },
-      {
-        "type": "action",
-        "description": "Customize theme settings such as colors or fonts and save changes."
-      },
-      {
-        "type": "assertion",
-        "description": "Reload the home page and verify dynamic CSS from the active theme is applied correctly."
-      },
-      {
-        "type": "action",
-        "description": "Preview themes without activation to verify preview functionality."
-      },
-      {
-        "type": "assertion",
-        "description": "Ensure preview loads the temporary theme styling without affecting active theme."
+        "description": "Validate that the system rejects the theme with an appropriate error message."
       }
     ]
   },
   {
     "id": "TC003",
-    "title": "Plugin Upload, Manifest Validation, Activation Toggle, Deletion, and Refresh",
-    "description": "Verify plugin management including the ability to upload plugins with manifest validation, toggle activation states, delete plugins, and refresh plugin states without errors.",
+    "title": "Activate and Customize Theme with Dynamic CSS Application",
+    "description": "Verify that an administrator can activate a theme, customize its settings, and that the dynamic CSS is applied correctly on the front end.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Log in as administrator and navigate to plugin management section."
-      },
-      {
-        "type": "action",
-        "description": "Upload a valid plugin ZIP file containing a correct manifest."
+        "description": "Navigate to the themes management page and activate a valid theme."
       },
       {
         "type": "assertion",
-        "description": "Confirm manifest validation passes and the plugin appears in the list."
+        "description": "Confirm the theme is marked as active in the system."
       },
       {
         "type": "action",
-        "description": "Try uploading a plugin with malformed manifest or missing fields."
+        "description": "Apply customization settings for the active theme (e.g., colors, fonts)."
       },
       {
         "type": "assertion",
-        "description": "Confirm manifest validation fails and error messages are shown."
+        "description": "Verify that the front end reflects the customized styles via dynamic CSS without page reload errors."
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Plugin Upload, Validation, Activation Toggle, and Deletion",
+    "description": "Ensure that plugin management allows for correct upload, manifest validation, toggling activation state, and deletion without system errors.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Access plugin management interface as admin."
       },
       {
         "type": "action",
-        "description": "Toggle activation status of the uploaded plugin on and off."
+        "description": "Upload a valid plugin package."
       },
       {
         "type": "assertion",
-        "description": "Verify the system correctly updates plugin state with no errors or side effects."
+        "description": "Verify plugin manifest validation passes and plugin is listed."
+      },
+      {
+        "type": "action",
+        "description": "Toggle plugin activation on and verify status changes accordingly."
+      },
+      {
+        "type": "assertion",
+        "description": "Check no system errors occur upon activation toggle."
       },
       {
         "type": "action",
@@ -134,36 +123,36 @@
       },
       {
         "type": "assertion",
-        "description": "Verify the plugin is removed completely from the system and plugin list."
+        "description": "Confirm plugin is removed and system stability is maintained."
       },
       {
         "type": "action",
-        "description": "Use the plugin refresh function."
+        "description": "Upload a plugin with invalid manifest data."
       },
       {
         "type": "assertion",
-        "description": "Confirm the plugin list refreshes correctly reflecting current plugins and states."
+        "description": "Verify that the upload is rejected with clear validation error."
       }
     ]
   },
   {
-    "id": "TC004",
-    "title": "Backup Creation, Export, Restore, and Download Verification",
-    "description": "Test backup and restoration capabilities by creating backups, exporting them, restoring system state from backups, and downloading backup files successfully.",
+    "id": "TC005",
+    "title": "Backup Creation, Export, and Restore",
+    "description": "Test the backup system by creating backups, exporting backup files, restoring system state, and ensuring data integrity.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Log in as administrator and navigate to /admin/help for backup management."
+        "description": "Login as admin and visit /admin/help backup section."
       },
       {
         "type": "action",
-        "description": "Create a full system backup including database dump and theme/plugin assets."
+        "description": "Initiate a new full system backup."
       },
       {
         "type": "assertion",
-        "description": "Verify backup file is generated with expected contents (db.sql, themes, plugins)."
+        "description": "Confirm backup completes successfully including database dump and theme/plugin assets."
       },
       {
         "type": "action",
@@ -171,163 +160,156 @@
       },
       {
         "type": "assertion",
-        "description": "Confirm the backup file downloads completely and is not corrupted."
+        "description": "Verify downloaded file integrity and completeness."
       },
       {
         "type": "action",
-        "description": "Make changes to system state (e.g., activate different theme or plugin)."
-      },
-      {
-        "type": "action",
-        "description": "Restore the system from the previously created backup."
+        "description": "Modify system data, then perform a restore from the saved backup."
       },
       {
         "type": "assertion",
-        "description": "Verify the system state returns exactly to the backed-up configuration and data."
-      },
-      {
-        "type": "action",
-        "description": "Attempt restoration from an invalid or corrupted backup file."
-      },
-      {
-        "type": "assertion",
-        "description": "Confirm the system handles the error gracefully and refuses restoration."
-      }
-    ]
-  },
-  {
-    "id": "TC005",
-    "title": "Audit Log Viewing with Filtering and Download",
-    "description": "Validate audit log functionality including loading the audit logs page, applying various filter criteria to logs, and downloading selected log files correctly.",
-    "category": "functional",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Log in as administrator and go to /admin/audit-logs."
-      },
-      {
-        "type": "action",
-        "description": "Load the audit log viewer."
-      },
-      {
-        "type": "assertion",
-        "description": "Verify logs display correctly with structured format and pagination if applicable."
-      },
-      {
-        "type": "action",
-        "description": "Apply filters such as date range, user actions, and event types."
-      },
-      {
-        "type": "assertion",
-        "description": "Confirm the displayed logs match filter criteria accurately."
-      },
-      {
-        "type": "action",
-        "description": "Select logs and download the filtered log files."
-      },
-      {
-        "type": "assertion",
-        "description": "Verify files download fully and can be opened with expected log content."
+        "description": "Validate the system state returns exactly to the backup state without data loss."
       }
     ]
   },
   {
     "id": "TC006",
-    "title": "Admin POST Routes Protection with Rate Limiting and CSRF Tokens",
-    "description": "Test all administrative POST routes to ensure they enforce CSRF protection and rate limiting to prevent abuse and unauthorized access.",
-    "category": "security",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Identify key admin POST routes such as theme uploads, plugin uploads, backup creation, etc."
-      },
-      {
-        "type": "action",
-        "description": "Send POST requests to these endpoints without CSRF tokens."
-      },
-      {
-        "type": "assertion",
-        "description": "Verify requests are rejected with appropriate security errors."
-      },
-      {
-        "type": "action",
-        "description": "Send POST requests with valid CSRF tokens."
-      },
-      {
-        "type": "assertion",
-        "description": "Verify requests succeed as expected."
-      },
-      {
-        "type": "action",
-        "description": "Send repeated POST requests rapidly to trigger rate limiting."
-      },
-      {
-        "type": "assertion",
-        "description": "Confirm further requests are blocked with rate limit errors after threshold is exceeded."
-      }
-    ]
-  },
-  {
-    "id": "TC007",
-    "title": "Structured Logging of General and Audit Events",
-    "description": "Verify that both general system events and audit-specific records are logged in a structured format consistent with requirements to ensure traceability.",
+    "title": "Audit Log Filtering and Download",
+    "description": "Confirm that an administrator can apply advanced filters to audit logs and download the filtered entries without corruption or errors.",
     "category": "functional",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Perform general system actions such as user logins, calculator usage, and theme changes."
-      },
-      {
-        "type": "assertion",
-        "description": "Check general logs contain structured entries with accurate timestamps and event descriptions."
+        "description": "Navigate to /admin/audit-logs page."
       },
       {
         "type": "action",
-        "description": "Perform audit-relevant actions such as admin changes, plugin installations, and backup operations."
+        "description": "Apply filters by date range, user, and action type."
       },
       {
         "type": "assertion",
-        "description": "Verify audit logs capture these events with necessary detail for audit trails."
+        "description": "Verify the audit log list updates according to applied filters."
       },
       {
         "type": "action",
-        "description": "Review log file formats and consistency."
+        "description": "Download the filtered audit logs as a file."
       },
       {
         "type": "assertion",
-        "description": "Ensure logs adhere to the structured format specified."
+        "description": "Confirm the downloaded audit log file contains correct, uncorrupted data matching the filter criteria."
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Security: Rate Limiting and CSRF Protection on Admin POST Routes",
+    "description": "Verify that administrative POST endpoints enforce rate limiting and require valid CSRF tokens to prevent unauthorized or excessive access.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Attempt several rapid consecutive POST requests to an admin endpoint without valid CSRF tokens."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm requests without CSRF token are rejected with appropriate error."
+      },
+      {
+        "type": "action",
+        "description": "Submit POST requests with valid CSRF tokens exceeding the allowed rate limit."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that excess requests are throttled and proper rate limit response is returned."
+      },
+      {
+        "type": "action",
+        "description": "Submit POST requests within limits and with valid CSRF tokens."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure requests complete successfully without false negatives."
       }
     ]
   },
   {
     "id": "TC008",
-    "title": "API v1 Health Endpoint Reliability and Correct Response Format",
-    "description": "Validate that the API v1 health endpoint (/api/v1/health) consistently responds with HTTP 200 status and returns valid JSON confirming system availability.",
+    "title": "System Structured Logging and Audit Log Records",
+    "description": "Test that system events are logged with structured data and audit-specific records capture the necessary information for compliance.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Trigger system events including theme activation, plugin upload, and user calculator access."
+      },
+      {
+        "type": "assertion",
+        "description": "Inspect logs to verify structured format with timestamps, event types, and actor details."
+      },
+      {
+        "type": "action",
+        "description": "Perform an admin action requiring audit logging."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify audit logger records include all mandatory fields and event details."
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "API v1 Health Endpoint Response",
+    "description": "Validate the health check API at /api/v1/health returns a 200 HTTP status with correct JSON structure indicating system availability.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Send a GET request to /api/v1/health."
+        "description": "Send a GET request to /api/v1/health endpoint."
       },
       {
         "type": "assertion",
-        "description": "Verify the response status code is 200 OK."
+        "description": "Verify response code is 200 OK."
       },
       {
         "type": "assertion",
-        "description": "Confirm the response body is valid JSON containing expected health status details."
+        "description": "Confirm response content is JSON formatted and indicates system health status accurately."
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "API v1 Calculators and History Data Retrieval",
+    "description": "Test API endpoints that provide calculator data and usage history return correct data formats and handle invalid requests gracefully.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send GET request to /api/v1/calculators for available calculators."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify response contains a valid JSON list of calculators with expected fields."
       },
       {
         "type": "action",
-        "description": "Simulate system component failures (e.g., database down) if possible."
+        "description": "Send GET request to /api/v1/history with valid user parameters."
       },
       {
         "type": "assertion",
-        "description": "Confirm the health endpoint responds appropriately indicating degraded or unhealthy status."
+        "description": "Confirm the response returns a JSON-formatted history dataset matching the request parameters."
+      },
+      {
+        "type": "action",
+        "description": "Send GET request to /api/v1/history with invalid or missing parameters."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the API handles the error gracefully, returning appropriate status code and error message."
       }
     ]
   }

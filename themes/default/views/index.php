@@ -7,8 +7,7 @@ $meta = isset($meta) ? $meta : [
     'hero_subheading' => 'Professional Calculators for Modern Construction'
 ];
 
-// Include header with CSS
-require_once __DIR__ . '/partials/header.php';
+//
 ?>
 
 <!-- Floating Background Elements -->
@@ -20,7 +19,7 @@ require_once __DIR__ . '/partials/header.php';
 
 <div class="container">
     <!-- Hero Section -->
-    <?php 
+    <?php
     $hero_bg = $settings['hero_background'] ?? 'gradient';
     $hero_class = '';
     if ($hero_bg === 'image') {
@@ -102,7 +101,5 @@ $tm = new \App\Services\ThemeManager();
 <script src="<?php echo $tm->themeUrl('assets/js/tilt.js'); ?>"></script>
 
 <?php
-// Include footer
-require_once __DIR__ . '/partials/footer.php';
+//
 ?>
-

@@ -201,7 +201,7 @@
             <ul class="sidebar-menu">
                 <!-- Dashboard -->
                 <li>
-                    <a href="/admin/dashboard" class="<?= $currentPage == 'dashboard' ? 'active' : '' ?>">
+                    <a href="/admin/dashboard" class="<?= ($currentPage ?? '') == 'dashboard' ? 'active' : '' ?>">
                         <i class="bi bi-speedometer2"></i>
                         <span>Dashboard</span>
                     </a>
@@ -217,7 +217,7 @@
                 
                 <!-- Calculators -->
                 <li>
-                    <a href="/admin/calculators" class="<?= $currentPage == 'calculators' ? 'active' : '' ?>">
+                    <a href="/admin/calculators" class="<?= ($currentPage ?? '') == 'calculators' ? 'active' : '' ?>">
                         <i class="bi bi-calculator"></i>
                         <span>Calculators</span>
                     </a>
@@ -233,7 +233,7 @@
                 
                 <!-- Themes -->
                 <li>
-                    <a href="/admin/themes" class="<?= $currentPage == 'themes' ? 'active' : '' ?>">
+                    <a href="/admin/themes" class="<?= ($currentPage ?? '') == 'themes' ? 'active' : '' ?>">
                         <i class="bi bi-palette"></i>
                         <span>Themes</span>
                     </a>
@@ -249,7 +249,7 @@
                 
                 <!-- System Settings -->
                 <li>
-                    <a href="/admin/settings" class="<?= $currentPage == 'settings' ? 'active' : '' ?>">
+                    <a href="/admin/settings" class="<?= ($currentPage ?? '') == 'settings' ? 'active' : '' ?>">
                         <i class="bi bi-gear"></i>
                         <span>System Settings</span>
                     </a>
@@ -265,7 +265,7 @@
                 
                 <!-- Billing / Subscriptions -->
                 <li>
-                    <a href="/admin/subscriptions" class="<?= $currentPage == 'subscriptions' ? 'active' : '' ?>">
+                    <a href="/admin/subscriptions" class="<?= ($currentPage ?? '') == 'subscriptions' ? 'active' : '' ?>">
                         <i class="bi bi-credit-card"></i>
                         <span>Billing / Subscriptions</span>
                     </a>
@@ -273,7 +273,7 @@
                 
                 <!-- Help & Logs -->
                 <li>
-                    <a href="/admin/help" class="<?= $currentPage == 'help' ? 'active' : '' ?>">
+                    <a href="/admin/help" class="<?= ($currentPage ?? '') == 'help' ? 'active' : '' ?>">
                         <i class="bi bi-question-circle"></i>
                         <span>Help & Logs</span>
                     </a>

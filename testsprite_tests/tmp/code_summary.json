@@ -1,163 +1,47 @@
 {
   "tech_stack": [
     "php",
-    "html5",
-    "css3", 
-    "javascript",
-    "mysql",
-    "apache",
-    "composer",
-    "mvc_architecture",
-    "responsive_design",
-    "ajax",
-    "rest_api",
-    "session_management",
-    "bootstrap_css",
-    "fontawesome",
-    "chartjs"
+    "custom-mvc",
+    "bootstrap-5 (admin)",
+    "font-awesome",
+    "vanilla-js",
+    "filesystem-storage"
   ],
   "features": [
     {
-      "name": "landing_page",
-      "description": "Beautiful responsive landing page with animations and calculator categories",
-      "files": [
-        "themes/landing/index.php",
-        "themes/landing/assets/css/landing.css",
-        "themes/landing/assets/js/landing.js",
-        "public/css/landing.css",
-        "public/js/landing.js"
-      ]
+      "name": "Routing",
+      "description": "HTTP routing with middleware mapping and dispatch",
+      "files": ["app/Core/Router.php", "app/routes.php"]
     },
     {
-      "name": "user_authentication",
-      "description": "Complete authentication system with login, registration, password reset",
-      "files": [
-        "app/Controllers/Api/AuthController.php",
-        "app/Models/User.php",
-        "themes/auth/login.php",
-        "themes/auth/register.php",
-        "themes/auth/forgot-password.php"
-      ]
+      "name": "View Rendering",
+      "description": "Themed view rendering with layouts and partials",
+      "files": ["app/Core/View.php", "app/Views/layouts/main.php", "app/Views/layouts/admin.php"]
     },
     {
-      "name": "user_dashboard",
-      "description": "User dashboard with calculation history, favorites, and profile management",
-      "files": [
-        "app/Controllers/UserController.php",
-        "themes/user/dashboard.php",
-        "themes/user/profile.php",
-        "themes/user/calculations.php",
-        "themes/user/assets/css/dashboard.css"
-      ]
+      "name": "Theme System",
+      "description": "Active theme management, assets, config and helpers",
+      "files": ["app/Services/ThemeManager.php", "themes/default/theme.json", "themes/default/assets/css/theme.css", "themes/default/views/partials/header.php", "themes/default/views/partials/footer.php"]
     },
     {
-      "name": "engineering_calculators",
-      "description": "Comprehensive engineering calculation modules for different disciplines",
-      "files": [
-        "modules/civil/concrete/concrete-volume.php",
-        "modules/civil/steel/beam-weight.php",
-        "modules/electrical/load-calculation.php",
-        "modules/mechanical/pipe-sizing.php",
-        "modules/structural/beam-analysis.php",
-        "app/Controllers/CalculatorController.php"
-      ]
+      "name": "Landing Pages",
+      "description": "Category landing views for civil, electrical, hvac, plumbing, fire, site, structural, mep, management, estimation",
+      "files": ["themes/default/views/landing/civil.php", "themes/default/views/landing/electrical.php", "themes/default/views/landing/hvac.php", "themes/default/views/landing/plumbing.php", "themes/default/views/landing/fire.php", "themes/default/views/landing/site.php", "themes/default/views/landing/structural.php", "themes/default/views/landing/mep.php", "themes/default/views/landing/management.php", "themes/default/views/landing/estimation.php"]
     },
     {
-      "name": "admin_panel",
-      "description": "WordPress-like admin panel with modular architecture and beautiful UI",
-      "files": [
-        "app/Controllers/Admin/MainDashboardController.php",
-        "app/Controllers/Admin/DebugController.php",
-        "themes/admin/layouts/main.php",
-        "themes/admin/views/dashboard.php",
-        "themes/admin/views/modules.php",
-        "themes/admin/views/debug/dashboard.php",
-        "themes/admin/assets/css/admin.css",
-        "themes/admin/assets/js/admin.js"
-      ]
+      "name": "Admin Panel",
+      "description": "Admin layout and controllers for settings, themes, modules, users, analytics",
+      "files": ["app/Views/layouts/admin.php", "app/Controllers/Admin/SettingsController.php", "app/Controllers/Admin/ThemeController.php", "app/Controllers/Admin/PremiumThemeController.php", "app/Controllers/Admin/MainDashboardController.php", "app/Controllers/Admin/CalculatorController.php"]
     },
     {
-      "name": "module_system",
-      "description": "WordPress-like modular architecture for extensible functionality",
-      "files": [
-        "app/Core/AdminModule.php",
-        "app/Core/AdminModuleManager.php",
-        "app/Modules/Admin/DashboardModule.php",
-        "app/Modules/Admin/UserManagementModule.php",
-        "app/Modules/Analytics/AnalyticsModule.php"
-      ]
+      "name": "Content Management",
+      "description": "Simple CMS for pages with draft/publish and preview",
+      "files": ["app/Services/ContentService.php", "app/Controllers/Admin/ContentController.php", "app/Views/admin/content/index.php", "app/Views/admin/content/pages.php", "themes/default/views/pages/page.php"]
     },
     {
-      "name": "debug_system",
-      "description": "Comprehensive debugging tools with error logging and system monitoring",
-      "files": [
-        "app/Controllers/Admin/DebugController.php",
-        "themes/admin/views/debug/dashboard.php",
-        "themes/admin/views/debug/error-logs.php",
-        "test_system_verification.php",
-        "debug_demo.php"
-      ]
-    },
-    {
-      "name": "installer_system",
-      "description": "Beautiful installation wizard with auto-deletion functionality",
-      "files": [
-        "install/installer.php",
-        "install/steps/welcome.php",
-        "install/steps/database.php",
-        "install/steps/admin.php",
-        "install/steps/complete.php",
-        "install/database.sql",
-        "app/Services/InstallerService.php"
-      ]
-    },
-    {
-      "name": "geolocation_service",
-      "description": "Location detection and tracking for user analytics",
-      "files": [
-        "app/Services/GeoLocationService.php",
-        "app/Controllers/Api/LocationController.php"
-      ]
-    },
-    {
-      "name": "marketing_system",
-      "description": "User agreement tracking and marketing preferences management",
-      "files": [
-        "app/Controllers/Api/MarketingController.php",
-        "app/Models/User.php",
-        "test_agreements.php"
-      ]
-    },
-    {
-      "name": "api_system",
-      "description": "RESTful API endpoints for frontend integration and mobile apps",
-      "files": [
-        "app/Controllers/Api/AuthController.php",
-        "app/Controllers/Api/AdminController.php",
-        "app/Controllers/Api/MarketingController.php",
-        "app/Controllers/ApiController.php",
-        "app/routes.php"
-      ]
-    },
-    {
-      "name": "responsive_ui",
-      "description": "Mobile-first responsive design with modern animations and interactions",
-      "files": [
-        "themes/landing/assets/css/landing.css",
-        "themes/admin/assets/css/admin.css",
-        "themes/user/assets/css/dashboard.css",
-        "public/css/style.css"
-      ]
-    },
-    {
-      "name": "database_layer",
-      "description": "Database abstraction layer with migration support",
-      "files": [
-        "app/Core/Database.php",
-        "app/Models/User.php",
-        "database/migrations/",
-        "install/database.sql"
-      ]
+      "name": "Error Views",
+      "description": "Custom 404/500 pages and router integration",
+      "files": ["app/Views/errors/404.php", "app/Views/errors/500.php", "app/Core/Router.php"]
     }
   ]
 }

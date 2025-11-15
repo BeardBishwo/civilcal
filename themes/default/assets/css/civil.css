@@ -1,13 +1,11 @@
 /* assets/css/civil.css */
 
-
 /* Inherit theme colors instead of overriding */
 
 body {
     /* Remove fixed background - use theme.css instead */
     color: var(--light);
 }
-
 
 /* Only apply civil-specific styles without overriding body background */
 
@@ -169,15 +167,21 @@ body.sticky-nav .container {
 
 @keyframes blink-effect {
     0% {
-        box-shadow: 0 0 5px rgba(255, 255, 255, 0.2), 0 0 10px rgba(255, 255, 255, 0.2);
+        box-shadow:
+            0 0 5px rgba(255, 255, 255, 0.2),
+            0 0 10px rgba(255, 255, 255, 0.2);
         border: 2px solid rgba(255, 255, 255, 0.3);
     }
     50% {
-        box-shadow: 0 0 20px rgba(102, 126, 234, 0.8), 0 0 30px rgba(118, 75, 162, 0.8);
+        box-shadow:
+            0 0 20px rgba(102, 126, 234, 0.8),
+            0 0 30px rgba(118, 75, 162, 0.8);
         border: 2px solid rgba(102, 126, 234, 0.7);
     }
     100% {
-        box-shadow: 0 0 5px rgba(255, 255, 255, 0.2), 0 0 10px rgba(255, 255, 255, 0.2);
+        box-shadow:
+            0 0 5px rgba(255, 255, 255, 0.2),
+            0 0 10px rgba(255, 255, 255, 0.2);
         border: 2px solid rgba(255, 255, 255, 0.3);
     }
 }

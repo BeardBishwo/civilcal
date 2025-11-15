@@ -1,0 +1,188 @@
+═══════════════════════════════════════════════════════════════════════════════
+                        TESTS QUICK REFERENCE
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ ALL TEST FILES ORGANIZED IN tests/ DIRECTORY
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📂 DIRECTORY LOCATIONS
+─────────────────────────────────────────────────────────────────────────────
+
+Manual Tests:        tests/manual/
+Debug Files:         tests/debug/
+Diagnostics:         tests/diagnostics/
+API Tests:           tests/api/
+Theme Tests:         tests/theme/
+Other Tests:         tests/legacy/, tests/frontend/, tests/database/, etc.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 QUICK COMMANDS
+─────────────────────────────────────────────────────────────────────────────
+
+TEST CSS URL GENERATION
+  php tests/manual/test_css_url.php
+
+TEST THEME IMAGES
+  php tests/manual/test_theme_images.php
+
+TEST ROUTING
+  php tests/manual/test_routing.php
+
+CHECK DATABASE
+  php tests/diagnostics/check_db.php
+
+VERIFY PAGES
+  php tests/diagnostics/verify_pages.php
+
+COMPREHENSIVE VERIFICATION
+  php tests/diagnostics/comprehensive_verification.php
+
+GENERATE DEBUG REPORT
+  php tests/debug/generate_debug_report.php
+
+TEST LOGIN API
+  php tests/api/direct_login.php
+
+TEST USERNAME API
+  php tests/api/direct_check_username.php
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📋 FILES BY CATEGORY
+─────────────────────────────────────────────────────────────────────────────
+
+MANUAL TESTS (9 files)
+  • test_admin_dashboard.php
+  • test_admin_fix.php
+  • test_css_js_and_tests.php
+  • test_css_url.php
+  • test_fixes.php
+  • test_logo_favicon.php
+  • test_routing.php
+  • test_theme_images.php
+  • test_website_errors.php
+
+DEBUG FILES (7 files)
+  • auto_debug_demo.php
+  • debug_ide_runtime.php
+  • debug_pages.php
+  • debug_test.php
+  • generate_debug_report.php
+  • install_xdebug_auto.php
+  • setup_xdebug.php
+
+DIAGNOSTICS (5 files)
+  • check_db.php
+  • check_errors.php
+  • comprehensive_verification.php
+  • diagnose_css_loading.php
+  • verify_pages.php
+
+API TESTS (3 files)
+  • direct_check_username.php
+  • direct_forgot_password.php
+  • direct_login.php
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔍 WHAT EACH FILE DOES
+─────────────────────────────────────────────────────────────────────────────
+
+test_admin_dashboard.php
+  → Tests admin dashboard functionality
+
+test_admin_fix.php
+  → Tests admin-related fixes
+
+test_css_js_and_tests.php
+  → Tests CSS and JavaScript loading
+
+test_css_url.php
+  → Tests CSS URL generation and ThemeManager
+
+test_fixes.php
+  → Tests various bug fixes
+
+test_logo_favicon.php
+  → Tests logo and favicon loading
+
+test_routing.php
+  → Tests application routing
+
+test_theme_images.php
+  → Tests theme image loading and detection
+
+test_website_errors.php
+  → Tests website error handling
+
+auto_debug_demo.php
+  → Automatic debugging demonstration
+
+debug_ide_runtime.php
+  → IDE runtime debugging
+
+debug_pages.php
+  → Debug page rendering
+
+debug_test.php
+  → General debugging utilities
+
+generate_debug_report.php
+  → Generates comprehensive debug reports
+
+install_xdebug_auto.php
+  → Automatic XDebug installation
+
+setup_xdebug.php
+  → XDebug setup and configuration
+
+check_db.php
+  → Checks database connection and tables
+
+check_errors.php
+  → Checks for PHP errors and warnings
+
+comprehensive_verification.php
+  → Comprehensive system verification
+
+diagnose_css_loading.php
+  → Diagnoses CSS loading issues
+
+verify_pages.php
+  → Verifies page accessibility
+
+direct_check_username.php
+  → Tests username availability API
+
+direct_forgot_password.php
+  → Tests password reset API
+
+direct_login.php
+  → Tests login API
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✨ BENEFITS
+─────────────────────────────────────────────────────────────────────────────
+
+✓ Organized - All tests in one place
+✓ Categorized - Grouped by purpose
+✓ Clean Root - Root directory is cleaner
+✓ Easy to Find - Quick access to needed tests
+✓ Professional - Better project structure
+✓ Scalable - Easy to add more tests
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📝 NOTES
+─────────────────────────────────────────────────────────────────────────────
+
+• All files moved successfully (24 total)
+• No code changes made
+• Original functionality preserved
+• Use relative paths when running from tests/ directory
+• See ROOT_FILES_MOVED.md for detailed information
+
+═══════════════════════════════════════════════════════════════════════════════

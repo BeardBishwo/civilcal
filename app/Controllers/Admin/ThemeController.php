@@ -427,5 +427,94 @@ class ThemeController extends Controller
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
+
+    public function preview()
+    {
+        $theme = $this->getActiveThemeData();
+        $this->adminView('admin/themes/preview', ['currentPage'=>'themes','activeTheme'=>$theme,'title'=>'Theme Preview']);
+    }
+
+    public function previewById($id)
+    {
+        $this->redirect('/');
+    }
+
+    public function saveColors($id)
+    {
+        $payload = $_POST;
+        $settings = [
+            'colors' => [
+                'primary' => $payload['primary_color'] ?? null,
+                'secondary' => $payload['secondary_color'] ?? null,
+                'accent' => $payload['accent_color'] ?? null,
+                'background' => $payload['background_color'] ?? null,
+                'text' => $payload['text_color'] ?? null,
+                'text_secondary' => $payload['text_secondary_color'] ?? null,
+            ]
+        ];
+        $res = $this->themeManager->updateThemeSettings((int)$id, $settings);
+        $this->json($res);
+    }
+
+    public function saveTypography($id)
+    {
+        $payload = $_POST;
+        $settings = [
+            'typography' => [
+                'font_family' => $payload['font_family'] ?? null,
+                'heading_size' => $payload['heading_size'] ?? null,
+                'body_size' => $payload['body_size'] ?? null,
+                'line_height' => $payload['line_height'] ?? null,
+            ]
+        ];
+        $res = $this->themeManager->updateThemeSettings((int)$id, $settings);
+        $this->json($res);
+    }
+
+    public function saveFeatures($id)
+    {
+        $payload = $_POST;
+        $settings = [
+            'features' => [
+                'dark_mode' => isset($payload['dark_mode']),
+                'animations' => isset($payload['animations']),
+                'glassmorphism' => isset($payload['glassmorphism']),
+                '3d_effects' => isset($payload['3d_effects']),
+            ]
+        ];
+        $res = $this->themeManager->updateThemeSettings((int)$id, $settings);
+        $this->json($res);
+    }
+
+    public function saveLayout($id)
+    {
+        $payload = $_POST;
+        $settings = [
+            'layout' => [
+                'header_style' => $payload['header_style'] ?? null,
+                'footer_layout' => $payload['footer_layout'] ?? null,
+                'container_width' => $payload['container_width'] ?? null,
+            ]
+        ];
+        $res = $this->themeManager->updateThemeSettings((int)$id, $settings);
+        $this->json($res);
+    }
+
+    public function saveCustomCss($id)
+    {
+        $payload = $_POST;
+        $settings = [
+            'custom_css' => $payload['custom_css'] ?? ''
+        ];
+        $res = $this->themeManager->updateThemeSettings((int)$id, $settings);
+        $this->json($res);
+    }
+
+    public function resetCustomizations($id)
+    {
+        $settings = ['colors'=>[], 'typography'=>[], 'features'=>[], 'layout'=>[], 'custom_css'=>''];
+        $res = $this->themeManager->updateThemeSettings((int)$id, $settings);
+        $this->json($res);
+    }
 }
 ?>
