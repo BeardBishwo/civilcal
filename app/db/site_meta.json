@@ -2,7 +2,7 @@
   "title": "EngiCal Pro",
   "description": "Professional Engineering Calculators Suite - Advanced tools for Civil, Electrical, HVAC, Plumbing, and Fire Protection calculations",
   "keywords": "engineering, calculator, civil, electrical, HVAC, plumbing, fire protection, AEC, professional, calculations",
-  "logo": "/themes/default/assets/images/logo.png",
+  "logo": "/public/theme-assets.php?path=default/assets/images/logo.png",
   "logo_text": "EngiCal Pro",
   "header_style": "logo_text",
   "logo_style": "modern",
@@ -19,7 +19,7 @@
   },
   "logo_settings": {
     "show_logo": true,
-    "show_text": true,
+    "show_text": false,
     "text_position": "right",
     "logo_height": "40px",
     "text_size": "1.5rem",

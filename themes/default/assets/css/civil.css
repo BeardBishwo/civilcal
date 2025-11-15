@@ -55,11 +55,18 @@ body {
     transition: all 0.3s ease;
 }
 
-.sub-nav-btn:hover,
+.sub-nav-btn:hover {
+    border: 2px solid #FF69B4;
+    transform: none;
+    background-color: #FFC0CB;
+    color: #000;
+}
+
 .sub-nav-btn.active {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+    border: 2px solid #FF69B4;
+    transform: none;
+    background-color: #FFC0CB;
+    color: #000;
 }
 
 body.sticky-nav .sub-nav {
@@ -90,13 +97,24 @@ body.sticky-nav .container {
     border-radius: 20px;
     padding: 2rem;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1), inset 0 0 20px rgba(255, 255, 255, 0.05);
     transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
 }
 
 .category-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 0 20px rgba(255, 105, 180, 0.8), inset 0 0 30px rgba(255, 20, 147, 0.8);
+}
+
+.category-card.focused {
+    transform: translateY(-15px) scale(1.02);
+    opacity: 1;
+    filter: blur(0);
+}
+
+.category-card.blurred {
+    opacity: 0.3;
+    filter: blur(5px);
 }
 
 .category-header {
@@ -111,6 +129,7 @@ body.sticky-nav .container {
     font-size: 2rem;
     margin-right: 1rem;
     color: #feca57;
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1), inset 0 0 20px rgba(255, 255, 255, 0.05);
 }
 
 .category-title h3 {
@@ -139,10 +158,6 @@ body.sticky-nav .container {
 }
 
 .tool-item {
-    margin-bottom: 0.5rem;
-}
-
-.tool-item a {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -153,35 +168,22 @@ body.sticky-nav .container {
     text-decoration: none;
     transition: all 0.3s ease;
     border-left: 4px solid transparent;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
 }
 
-.tool-item a:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateX(10px);
-    border-left: 4px solid #f093fb;
+.tool-item:hover {
+    background: linear-gradient(45deg, #764ba2, #f093fb, #667eea);
+    transform: none;
+    box-shadow: none;
+    border: 2px solid #764ba2;
+    color: #000;
 }
 
-.category-card.highlight {
-    animation: blink-effect 1.5s ease-in-out;
-}
-
-@keyframes blink-effect {
-    0% {
-        box-shadow:
-            0 0 5px rgba(255, 255, 255, 0.2),
-            0 0 10px rgba(255, 255, 255, 0.2);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-    }
-    50% {
-        box-shadow:
-            0 0 20px rgba(102, 126, 234, 0.8),
-            0 0 30px rgba(118, 75, 162, 0.8);
-        border: 2px solid rgba(102, 126, 234, 0.7);
-    }
-    100% {
-        box-shadow:
-            0 0 5px rgba(255, 255, 255, 0.2),
-            0 0 10px rgba(255, 255, 255, 0.2);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-    }
+.tool-item:active {
+    background: linear-gradient(45deg, #764ba2, #f093fb, #667eea);
+    transform: none;
+    box-shadow: none;
+    border: 2px solid #764ba2;
+    color: #000;
 }

@@ -40,7 +40,7 @@ $title_safe = htmlspecialchars(
 $desc_safe = htmlspecialchars(
     $site_meta["description"] ?? "Professional Engineering Calculators Suite",
 );
-$logo = $site_meta["logo"] ?? app_base_url("assets/icons/icon-192.png");
+$logo = $site_meta["logo"] ?? app_base_url("public/theme-assets.php?path=default/assets/images/logo.png");
 $logo_text = $site_meta["logo_text"] ?? "EngiCal Pro";
 $header_style = $site_meta["header_style"] ?? "logo_text";
 $favicon = $site_meta["favicon"] ?? app_base_url("assets/images/favicon.png");
@@ -205,7 +205,7 @@ if (
     <style>
         /* Enhanced Header Styles */
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
             --glass-bg: rgba(255, 255, 255, 0.95);
             --glass-border: rgba(255, 255, 255, 0.2);
             --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -255,9 +255,10 @@ if (
             display: flex;
             align-items: center;
             justify-content: space-between;
-            /* Slightly reduced gap so header items fit better at non-default zoom levels */
-            gap: 1.25rem;
+            gap: 0.75rem;
             box-sizing: border-box;
+            min-width: 0;
+            flex-wrap: nowrap;
         }
 
         /* Ensure no body/html margins interfere */
@@ -315,7 +316,10 @@ if (
             }
 
             .header-middle {
-                display: none;
+                display: flex;
+                flex: 1 1 auto;
+                min-width: 0;
+                overflow: visible;
             }
         }
 
@@ -418,15 +422,12 @@ if (
         }
 
         .has-dropdown:hover .dropdown {
-            display: block;
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
         }
 
-        /* Support click-to-open for touch/mobile: .has-dropdown.open */
         .has-dropdown.open .dropdown {
-            display: block;
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
@@ -510,6 +511,34 @@ if (
             color: white;
         }
 
+        /* Responsive dropdown for mobile/tablet */
+        @media (max-width: 768px) {
+            .dropdown {
+                min-width: 180px;
+                left: auto;
+                right: 0;
+            }
+
+            .has-dropdown {
+                position: relative;
+            }
+
+            .has-dropdown a {
+                display: flex;
+                align-items: center;
+                gap: 0.35rem;
+            }
+
+            .has-dropdown a i.fa-layer-group {
+                font-size: 0.875rem;
+            }
+
+            .has-dropdown a .fa-chevron-down {
+                font-size: 0.75rem;
+                margin-left: 0.2rem;
+            }
+        }
+
         .search-container {
             position: relative;
             flex: 1 1 360px;
@@ -554,9 +583,8 @@ if (
             box-shadow: var(--shadow-lg);
             margin-top: 0.5rem;
             opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
+
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
 
         .search-input:focus + .search-suggestions,
@@ -566,16 +594,17 @@ if (
             transform: translateY(0);
         }
 
-        .header-right {
-            flex: 0 0 auto;
-            max-width: none;
+        .header-middle {
+            flex: 1 1 auto;
             display: flex;
             align-items: center;
-            gap: 0.25rem;
-            flex-shrink: 0;
-            flex-wrap: nowrap;
-            justify-content: flex-end;
-            white-space: nowrap;
+            justify-content: flex-start;
+            min-width: 0;
+            overflow: visible;
+            background: inherit;
+            max-width: calc(100% - 400px);
+            position: relative;
+            z-index: 1100;
         }
 
         .user-actions {
@@ -587,8 +616,9 @@ if (
             flex-wrap: nowrap;
             width: auto; /* don't force full width which can push content */
             justify-content: flex-end;
-            padding: 0 0.5rem; /* increased padding to prevent scrollbar overlap */
-            margin-right: 5px; /* extra margin to ensure login button is visible */
+            padding: 0 1rem; /* increased padding to prevent scrollbar overlap */
+            margin-right: 15px; /* extra margin to ensure login button is visible */
+            overflow: visible;
         }
 
         /* Move user-greeting inside user-actions */
@@ -748,7 +778,7 @@ if (
 
         /* Login button consistent spacing - no extra margins */
         .login-btn {
-            /* Remove conflicting margins to rely on gap from user-actions */
+            margin: 0;
         }
 
         @media (max-width: 480px) {
@@ -924,7 +954,10 @@ if (
             }
 
             .header-middle {
-                display: none;
+                display: flex;
+                flex: 1 1 auto;
+                min-width: 0;
+                overflow: visible;
             }
 
             .user-actions {
@@ -973,7 +1006,6 @@ if (
                     font-size: 0.65rem;
                 }
             }
-        }
 
         @media (max-width: 480px) {
             .header-content {
@@ -1111,9 +1143,9 @@ if (
 
         /* Ensure buttons remain visible in dark mode */
         body.dark-theme .btn-primary {
-            background: linear-gradient(135deg, #7c3aed 0%, #9f7aea 100%);
+            background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
             color: #fff;
-            box-shadow: 0 6px 18px rgba(124,58,237,0.25);
+            box-shadow: 0 6px 18px rgba(99,102,241,0.35);
             border: 1px solid rgba(255,255,255,0.06);
         }
 
@@ -1219,113 +1251,132 @@ if (
         }
 
         body:not(.dark-theme) .search-toggle-btn {
-            color: #4a5568;
-            border-color: rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #f7fafc, #f7fafc);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #2d3748;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.5rem 0.6rem;
+            margin-left: 0.25rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        body:not(.dark-theme) .search-toggle-btn:hover {
-            background: #f7fafc;
-            color: #667eea;
+        body:not(.dark-theme) .search-toggle-btn:hover{
+            background: linear-gradient(135deg, #f7fafc, #f7fafc);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
-    </style>
-    <style>
-    /* Enhanced Search Toggle Button - Visible in both light and dark themes */
-    .search-toggle-btn{
-        background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(124,58,237,0.1));
-        border: 1px solid rgba(102,126,234,0.2);
-        color: #667eea;
-        cursor: pointer;
-        font-size: 1rem;
-        padding: 0.5rem 0.6rem;
-        margin-left: 0.25rem;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
 
-    .search-toggle-btn:hover{
-        background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(124,58,237,0.2));
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(102,126,234,0.3);
-    }
+        .search-toggle-btn:hover{
+            background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(124,58,237,0.2));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+        }
 
-    body.dark-theme .search-toggle-btn{
-        background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15));
-        border: 1px solid rgba(139,92,246,0.3);
-        color: #a78bfa;
-    }
+        body.dark-theme .search-toggle-btn{
+            background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15));
+            border: 1px solid rgba(139,92,246,0.3);
+            color: #a78bfa;
+        }
 
-    body.dark-theme .search-toggle-btn:hover{
-        background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(59,130,246,0.25));
-        box-shadow: 0 4px 12px rgba(139,92,246,0.4);
-    }
+        body.dark-theme .search-toggle-btn:hover{
+            background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(59,130,246,0.25));
+            box-shadow: 0 4px 12px rgba(139,92,246,0.4);
+        }
 
-    /* Beautiful Glassmorphism Search Modal */
-    .search-modal{
-        display: none;
-        position: fixed;
-        z-index: 1200;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        background: linear-gradient(135deg,
-            rgba(102,126,234,0.1) 0%,
-            rgba(124,58,237,0.1) 50%,
-            rgba(16,185,129,0.1) 100%);
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-    }
+        /* Beautiful Glassmorphism Search Modal */
+        .search-modal{
+            display: none;
+            position: fixed;
+            z-index: 1200;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background: linear-gradient(135deg,
+                rgba(102,126,234,0.1) 0%,
+                rgba(124,58,237,0.1) 50%,
+                rgba(16,185,129,0.1) 100%);
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
 
-    .search-modal.active{ display: flex; }
+        .search-modal.active{ display: flex; }
 
-    .search-modal .modal-content{
-        background: linear-gradient(135deg,
-            rgba(255,255,255,0.25) 0%,
-            rgba(255,255,255,0.1) 100%);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255,255,255,0.18);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
-                    0 0 0 1px rgba(255,255,255,0.05) inset;
-        width: min(800px, 95%);
-        max-height: 85vh;
-        border-radius: 20px;
-        padding: 2rem;
-        position: relative;
-        overflow: hidden;
-        animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+        .search-modal .modal-content{
+            background: linear-gradient(135deg,
+                rgba(255,255,255,0.25) 0%,
+                rgba(255,255,255,0.1) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                        0 0 0 1px rgba(255,255,255,0.05) inset;
+            width: min(800px, 95%);
+            max-height: 85vh;
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    .search-modal .modal-content::before{
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(90deg,
-            transparent,
-            rgba(255,255,255,0.6),
-            transparent);
-    }
+        body.dark-theme .search-modal .modal-content{
+            background: linear-gradient(135deg,
+                rgba(15,23,42,0.4) 0%,
+                rgba(30,41,59,0.2) 100%);
+            border: 1px solid rgba(148,163,184,0.18);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6),
+                        0 0 0 1px rgba(148,163,184,0.05) inset;
+        }
 
-    body.dark-theme .search-modal .modal-content{
-        background: linear-gradient(135deg,
-            rgba(15,23,42,0.4) 0%,
-            rgba(30,41,59,0.2) 100%);
-        border: 1px solid rgba(148,163,184,0.18);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6),
-                    0 0 0 1px rgba(148,163,184,0.05) inset;
-    }
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
 
-    @keyframes modalSlideIn {
-        from {
+        .search-modal .modal-input{
+            width: 100%;
+            padding: 1.25rem 1.5rem;
+            font-size: 1.1rem;
+            border: 2px solid rgba(102,126,234,0.2);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated gradient border effect */
+        .search-modal .modal-input::before{
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c, #10b981, #3b82f6, #667eea);
+            background-size: 400% 400%;
+            border-radius: 14px;
+            z-index: -1;
+            animation: gradientBorder 3s ease infinite;
             opacity: 0;
+            transition: opacity 0.3s ease;
             transform: translateY(-20px) scale(0.95);
         }
         to {
@@ -1702,7 +1753,7 @@ if (
     body.dark-theme .help-btn {
         background: linear-gradient(135deg, rgba(96,165,250,0.15), rgba(59,130,246,0.1));
         border: 1px solid rgba(96,165,250,0.3);
-m        color: #93c5fd;
+        color: #93c5fd;
     }
 
     body.dark-theme .help-btn:hover {
@@ -1854,7 +1905,9 @@ m        color: #93c5fd;
                     <?php if (!empty($logo)): ?>
                         <img src="<?php echo htmlspecialchars($logo); ?>"
                              alt="<?php echo $title_safe; ?> Logo"
-                             class="<?php echo implode(" ", $imgClasses); ?>">
+                             class="<?php echo implode(" ", $imgClasses); ?>"
+                             onerror="this.style.display='none'; this.parentNode.querySelector('.logo-text').style.display='block';">
+                        <span class="logo-text" style="display: none;"><?php echo htmlspecialchars($logo_text); ?></span>
                     <?php else: ?>
                         <span><?php echo htmlspecialchars($logo_text); ?></span>
                     <?php endif; ?>
@@ -2186,8 +2239,8 @@ m        color: #93c5fd;
             input.select();
             startTypingEffect();
 
-            // Load popular calculators when modal opens
-            loadPopularCalculators();
+            // Removed automatic loading of popular calculators
+            results.innerHTML = '';
         }
 
         function loadPopularCalculators() {
@@ -2438,22 +2491,10 @@ m        color: #93c5fd;
                 console.log('Theme changed to:', isDark ? 'dark' : 'light');
             });
 
-            // Load saved theme - default to light theme now
-            const savedTheme = localStorage.getItem('theme');
-            const cookieTheme = document.cookie.split(';').find(row => row.startsWith('site_theme='))?.split('=')[1];
+            document.body.classList.add('dark-theme');
+            themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
 
-            // Check both localStorage and cookie, prioritize localStorage
-            const preferredTheme = savedTheme || cookieTheme || 'light';
-
-            if (preferredTheme === 'dark') {
-                document.body.classList.add('dark-theme');
-                themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                document.body.classList.remove('dark-theme');
-                themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
-            }
-
-            console.log('Initial theme loaded:', preferredTheme);
+            console.log('Initial theme loaded:', 'dark');
 
             // Enhanced search functionality
             let searchTimer = null;
@@ -2572,22 +2613,22 @@ m        color: #93c5fd;
                 `;
             }
 
-                // Allow immediate header update using server-returned user object (from login API)
-                window.applyHeaderUser = function(serverUser, isAdmin) {
-                    if (!serverUser) return;
-                    // serverUser may contain full_name, username or name/initial from header_status
-                    var name = serverUser.full_name || serverUser.name || serverUser.username || '';
-                    var initial = serverUser.initial || (name ? name.charAt(0).toUpperCase() : 'U');
-                    var role = serverUser.role || serverUser.user_role || serverUser.role_name || '';
-                    var userObj = { name: name, initial: initial, role: role };
-                    try {
-                        const ua = document.querySelector('.user-actions');
-                        if (!ua) return;
-                        ua.innerHTML = buildUserActionsHtml(userObj, !!isAdmin);
-                    } catch (e) {
-                        console.warn('applyHeaderUser failed', e);
-                    }
-                };
+            // Allow immediate header update using server-returned user object (from login API)
+            window.applyHeaderUser = function(serverUser, isAdmin) {
+                if (!serverUser) return;
+                // serverUser may contain full_name, username or name/initial from header_status
+                var name = serverUser.full_name || serverUser.name || serverUser.username || '';
+                var initial = serverUser.initial || (name ? name.charAt(0).toUpperCase() : 'U');
+                var role = serverUser.role || serverUser.user_role || serverUser.role_name || '';
+                var userObj = { name: name, initial: initial, role: role };
+                try {
+                    const ua = document.querySelector('.user-actions');
+                    if (!ua) return;
+                    ua.innerHTML = buildUserActionsHtml(userObj, !!isAdmin);
+                } catch (e) {
+                    console.warn('applyHeaderUser failed', e);
+                }
+            };
 
             function escapeHtml(str) {
                 if (!str) return '';

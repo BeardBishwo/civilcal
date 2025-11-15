@@ -105,7 +105,6 @@ body.light-theme html {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-bottom: 1rem;
-    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     animation: titlePulse 2s ease-in-out infinite;
 }
 
@@ -328,7 +327,6 @@ body.light-theme html {
     margin-bottom: 0.3rem;
     font-weight: 700;
     letter-spacing: 0.5px;
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
 }
 
 .category-header p {
@@ -376,7 +374,6 @@ body.light-theme html {
     position: relative;
     z-index: 1;
     letter-spacing: 0.5px;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
 .tool-item a span {
@@ -413,7 +410,6 @@ body.light-theme html {
 
 .tool-item:hover a {
     color: #ffffff;
-    text-shadow: 0 2px 8px rgba(0, 255, 255, 0.6);
 }
 
 .tool-item:hover a i {

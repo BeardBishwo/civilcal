@@ -25,7 +25,7 @@ $breadcrumb = [
 
     <div class="category-grid">
         <!-- Concrete Section -->
-        <div id="concrete" class="category-card category-section">
+        <div id="concrete" class="category-card">
             <div class="category-header">
                 <i class="fas fa-cube category-icon"></i>
                 <div class="category-title">
@@ -34,15 +34,15 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/concrete/concrete-volume.php'); ?>"><span>Concrete Volume</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/concrete/rebar-calculation.php'); ?>"><span>Rebar Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/concrete/concrete-mix.php'); ?>"><span>Concrete Mix Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/concrete/concrete-strength.php'); ?>"><span>Concrete Strength</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/civil/concrete/concrete-volume.php'); ?>" class="tool-item"><span>Concrete Volume</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/civil/concrete/rebar-calculation.php'); ?>" class="tool-item"><span>Rebar Calculation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/civil/concrete/concrete-mix.php'); ?>" class="tool-item"><span>Concrete Mix Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/civil/concrete/concrete-strength.php'); ?>" class="tool-item"><span>Concrete Strength</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Earthwork Section -->
-        <div id="earthwork" class="category-card category-section">
+        <div id="earthwork" class="category-card">
             <div class="category-header">
                 <i class="fas fa-mountain category-icon"></i>
                 <div class="category-title">
@@ -51,14 +51,14 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/earthwork/cut-and-fill-volume.php'); ?>"><span>Cut & Fill Volume</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/earthwork/slope-calculation.php'); ?>"><span>Slope Calculation</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/earthwork/excavation-volume.php'); ?>"><span>Excavation Volume</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/civil/earthwork/cut-and-fill-volume.php'); ?>" class="tool-item"><span>Cut & Fill Volume</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/civil/earthwork/slope-calculation.php'); ?>" class="tool-item"><span>Slope Calculation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/civil/earthwork/excavation-volume.php'); ?>" class="tool-item"><span>Excavation Volume</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Structural Section -->
-        <div id="structural" class="category-card category-section">
+        <div id="structural" class="category-card">
             <div class="category-header">
                 <i class="fas fa-building category-icon"></i>
                 <div class="category-title">
@@ -67,15 +67,15 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/structural/beam-load-capacity.php'); ?>"><span>Beam Load Capacity</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/structural/column-design.php'); ?>"><span>Column Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/structural/slab-design.php'); ?>"><span>Slab Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/structural/foundation-design.php'); ?>"><span>Foundation Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/civil/structural/beam-load-capacity.php'); ?>" class="tool-item"><span>Beam Load Capacity</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/civil/structural/column-design.php'); ?>" class="tool-item"><span>Column Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/civil/structural/slab-design.php'); ?>" class="tool-item"><span>Slab Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/civil/structural/foundation-design.php'); ?>" class="tool-item"><span>Foundation Design</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Brickwork Section -->
-        <div id="brickwork" class="category-card category-section">
+        <div id="brickwork" class="category-card">
             <div class="category-header">
                 <i class="fas fa-bricks category-icon"></i>
                 <div class="category-title">
@@ -84,9 +84,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/brickwork/brick-quantity.php'); ?>"><span>Brick Quantity</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/brickwork/mortar-ratio.php'); ?>"><span>Mortar Ratio</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/brickwork/plastering-estimator.php'); ?>"><span>Plastering Estimator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/civil/brickwork/brick-quantity.php'); ?>" class="tool-item"><span>Brick Quantity</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/civil/brickwork/mortar-ratio.php'); ?>" class="tool-item"><span>Mortar Ratio</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/civil/brickwork/plastering-estimator.php'); ?>" class="tool-item"><span>Plastering Estimator</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
     </div>
@@ -108,15 +108,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if(targetElement) {
                 window.scrollTo({
-                    top: targetElement.offsetTop - 100, // Adjust for fixed nav height
+                    top: targetElement.offsetTop - 150, // Adjust for fixed nav height
                     behavior: 'smooth'
                 });
-
-                // Add highlight effect
-                targetElement.classList.add('highlight');
-                setTimeout(() => {
-                    targetElement.classList.remove('highlight');
-                }, 2000); // Remove after 2 seconds
             }
         });
     });
@@ -143,8 +137,35 @@ document.addEventListener("DOMContentLoaded", function() {
             card.classList.toggle('active');
         });
     });
+
+    // Active state for sub-nav buttons with expand and blur effect
+    const subNavButtons = document.querySelectorAll('.sub-nav-btn');
+    subNavButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            subNavButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Get target card ID from href
+            const targetId = button.getAttribute('href').slice(1);
+            const targetCard = document.getElementById(targetId);
+            
+            // Apply focused and blur effects
+            categoryCards.forEach(card => {
+                card.classList.remove('focused', 'blurred');
+                if (card.id === targetId) {
+                    card.classList.add('focused');
+                } else {
+                    card.classList.add('blurred');
+                }
+            });
+            
+            // Remove all effects after 1 second
+            setTimeout(() => {
+                categoryCards.forEach(card => {
+                    card.classList.remove('focused', 'blurred');
+                });
+            }, 1000);
+        });
+    });
 });
 </script>
-
-<?php ?>
-
