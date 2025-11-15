@@ -26,7 +26,7 @@ $breadcrumb = [
 
     <div class="category-grid">
         <!-- Sprinkler Systems Section -->
-        <div id="sprinklers" class="category-card category-section">
+        <div id="sprinklers" class="category-card">
             <div class="category-header">
                 <i class="fas fa-spray-can category-icon"></i>
                 <div class="category-title">
@@ -35,14 +35,14 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/sprinklers/sprinkler-layout.php'); ?>"><span>Sprinkler Layout</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/sprinklers/discharge-calculations.php'); ?>"><span>Sprinkler Discharge</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/sprinklers/pipe-sizing.php'); ?>"><span>Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/fire/sprinklers/sprinkler-layout.php'); ?>" class="tool-item"><span>Sprinkler Layout</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/fire/sprinklers/discharge-calculations.php'); ?>" class="tool-item"><span>Sprinkler Discharge</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/fire/sprinklers/pipe-sizing.php'); ?>" class="tool-item"><span>Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Hydraulic Calculations Section -->
-        <div id="hydraulics" class="category-card category-section">
+        <div id="hydraulics" class="category-card">
             <div class="category-header">
                 <i class="fas fa-tint category-icon"></i>
                 <div class="category-title">
@@ -51,12 +51,12 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/hydraulics/hazen-williams.php'); ?>"><span>Hazen-Williams Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/fire/hydraulics/hazen-williams.php'); ?>" class="tool-item"><span>Hazen-Williams Calculator</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Standpipe Systems Section -->
-        <div id="standpipes" class="category-card category-section">
+        <div id="standpipes" class="category-card">
             <div class="category-header">
                 <i class="fas fa-building category-icon"></i>
                 <div class="category-title">
@@ -65,14 +65,14 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/standpipes/standpipe-classification.php'); ?>"><span>Standpipe Classification</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/standpipes/hose-demand.php'); ?>"><span>Hose Demand</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/standpipes/pressure-calculations.php'); ?>"><span>Pressure Calculations</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/fire/standpipes/standpipe-classification.php'); ?>" class="tool-item"><span>Standpipe Classification</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/fire/standpipes/hose-demand.php'); ?>" class="tool-item"><span>Hose Demand</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/fire/standpipes/pressure-calculations.php'); ?>" class="tool-item"><span>Pressure Calculations</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Hazard Classification Section -->
-        <div id="hazard" class="category-card category-section">
+        <div id="hazard" class="category-card">
             <div class="category-header">
                 <i class="fas fa-exclamation-triangle category-icon"></i>
                 <div class="category-title">
@@ -81,14 +81,14 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/hazard-classification/occupancy-assessment.php'); ?>"><span>Occupancy Assessment</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/hazard-classification/commodity-classification.php'); ?>"><span>Commodity Classification</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/hazard-classification/design-density.php'); ?>"><span>Design Density</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/fire/hazard-classification/occupancy-assessment.php'); ?>" class="tool-item"><span>Occupancy Assessment</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/fire/hazard-classification/commodity-classification.php'); ?>" class="tool-item"><span>Commodity Classification</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/fire/hazard-classification/design-density.php'); ?>" class="tool-item"><span>Design Density</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Fire Pumps Section -->
-        <div id="fire-pumps" class="category-card category-section">
+        <div id="fire-pumps" class="category-card">
             <div class="category-header">
                 <i class="fas fa-pump-medical category-icon"></i>
                 <div class="category-title">
@@ -97,9 +97,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/fire-pumps/pump-sizing.php'); ?>"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/fire-pumps/driver-power.php'); ?>"><span>Driver Power</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/fire-pumps/jockey-pump.php'); ?>"><span>Jockey Pump</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/fire/fire-pumps/pump-sizing.php'); ?>" class="tool-item"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/fire/fire-pumps/driver-power.php'); ?>" class="tool-item"><span>Driver Power</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/fire/fire-pumps/jockey-pump.php'); ?>" class="tool-item"><span>Jockey Pump</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
     </div>
@@ -121,15 +121,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if(targetElement) {
                 window.scrollTo({
-                    top: targetElement.offsetTop - 100, // Adjust for fixed nav height
+                    top: targetElement.offsetTop - 150, // Adjust for fixed nav height
                     behavior: 'smooth'
                 });
-
-                // Add highlight effect
-                targetElement.classList.add('highlight');
-                setTimeout(() => {
-                    targetElement.classList.remove('highlight');
-                }, 2000); // Remove after 2 seconds
             }
         });
     });
@@ -154,6 +148,36 @@ document.addEventListener("DOMContentLoaded", function() {
             if (e.target.closest('a')) return;
             
             card.classList.toggle('active');
+        });
+    });
+
+    // Active state for sub-nav buttons with expand and blur effect
+    const subNavButtons = document.querySelectorAll('.sub-nav-btn');
+    subNavButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            subNavButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Get target card ID from href
+            const targetId = button.getAttribute('href').slice(1);
+            const targetCard = document.getElementById(targetId);
+            
+            // Apply focused and blur effects
+            categoryCards.forEach(card => {
+                card.classList.remove('focused', 'blurred');
+                if (card.id === targetId) {
+                    card.classList.add('focused');
+                } else {
+                    card.classList.add('blurred');
+                }
+            });
+            
+            // Remove all effects after 1 second
+            setTimeout(() => {
+                categoryCards.forEach(card => {
+                    card.classList.remove('focused', 'blurred');
+                });
+            }, 1000);
         });
     });
 });

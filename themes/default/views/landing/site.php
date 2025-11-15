@@ -26,7 +26,7 @@ $breadcrumb = [
 
     <div class="category-grid">
         <!-- Field Surveying Section -->
-        <div id="surveying" class="category-card category-section">
+        <div id="surveying" class="category-card">
             <div class="category-header">
                 <i class="fas fa-ruler-combined category-icon"></i>
                 <div class="category-title">
@@ -35,15 +35,15 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/surveying/slope-staking.php'); ?>"><span>Slope Staking Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/surveying/batter-boards.php'); ?>"><span>Batter Board Setup</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/surveying/horizontal-curve-staking.php'); ?>"><span>Horizontal Curve Staking</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/surveying/grade-rod.php'); ?>"><span>Grade Rod Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/site/surveying/slope-staking.php'); ?>" class="tool-item"><span>Slope Staking Calculator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/surveying/batter-boards.php'); ?>" class="tool-item"><span>Batter Board Setup</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/surveying/horizontal-curve-staking.php'); ?>" class="tool-item"><span>Horizontal Curve Staking</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/surveying/grade-rod.php'); ?>" class="tool-item"><span>Grade Rod Calculator</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Earthwork & Grading Section -->
-        <div id="earthwork" class="category-card category-section">
+        <div id="earthwork" class="category-card">
             <div class="category-header">
                 <i class="fas fa-mountain category-icon"></i>
                 <div class="category-title">
@@ -52,15 +52,15 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/earthwork/swelling-shrinkage.php'); ?>"><span>Swelling & Shrinkage</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/earthwork/equipment-production.php'); ?>"><span>Equipment Production</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/earthwork/cut-fill-balancing.php'); ?>"><span>Cut/Fill Balancing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/earthwork/slope-paving.php'); ?>"><span>Slope Paving Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/site/earthwork/swelling-shrinkage.php'); ?>" class="tool-item"><span>Swelling & Shrinkage</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/earthwork/equipment-production.php'); ?>" class="tool-item"><span>Equipment Production</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/earthwork/cut-fill-balancing.php'); ?>" class="tool-item"><span>Cut/Fill Balancing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/earthwork/slope-paving.php'); ?>" class="tool-item"><span>Slope Paving Calculator</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Concrete Field Tools Section -->
-        <div id="concrete" class="category-card category-section">
+        <div id="concrete" class="category-card">
             <div class="category-header">
                 <i class="fas fa-cube category-icon"></i>
                 <div class="category-title">
@@ -69,15 +69,15 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/concrete-tools/temperature-control.php'); ?>"><span>Temperature Control</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/concrete-tools/yardage-adjustments.php'); ?>"><span>Yardage Adjustments</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/concrete-tools/placement-rate.php'); ?>"><span>Placement Rate Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/concrete-tools/testing-requirements.php'); ?>"><span>Testing Requirements</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/site/concrete-tools/temperature-control.php'); ?>" class="tool-item"><span>Temperature Control</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/concrete-tools/yardage-adjustments.php'); ?>" class="tool-item"><span>Yardage Adjustments</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/concrete-tools/placement-rate.php'); ?>" class="tool-item"><span>Placement Rate Calculator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/concrete-tools/testing-requirements.php'); ?>" class="tool-item"><span>Testing Requirements</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Site Safety Section -->
-        <div id="safety" class="category-card category-section">
+        <div id="safety" class="category-card">
             <div class="category-header">
                 <i class="fas fa-shield-alt category-icon"></i>
                 <div class="category-title">
@@ -86,15 +86,15 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/safety/fall-protection.php'); ?>"><span>Fall Protection Planning</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/safety/trench-safety.php'); ?>"><span>Trench Safety Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/safety/crane-setup.php'); ?>"><span>Crane Setup Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/safety/evacuation-planning.php'); ?>"><span>Evacuation Planning</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/site/safety/fall-protection.php'); ?>" class="tool-item"><span>Fall Protection Planning</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/safety/trench-safety.php'); ?>" class="tool-item"><span>Trench Safety Calculator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/safety/crane-setup.php'); ?>" class="tool-item"><span>Crane Setup Calculator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/safety/evacuation-planning.php'); ?>" class="tool-item"><span>Evacuation Planning</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Productivity Section -->
-        <div id="productivity" class="category-card category-section">
+        <div id="productivity" class="category-card">
             <div class="category-header">
                 <i class="fas fa-tachometer-alt category-icon"></i>
                 <div class="category-title">
@@ -103,10 +103,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/productivity/labor-productivity.php'); ?>"><span>Labor Productivity</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/productivity/equipment-utilization.php'); ?>"><span>Equipment Utilization</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/productivity/schedule-compression.php'); ?>"><span>Schedule Compression</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/site/productivity/cost-productivity.php'); ?>"><span>Cost Productivity Analysis</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/site/productivity/labor-productivity.php'); ?>" class="tool-item"><span>Labor Productivity</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/productivity/equipment-utilization.php'); ?>" class="tool-item"><span>Equipment Utilization</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/productivity/schedule-compression.php'); ?>" class="tool-item"><span>Schedule Compression</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/site/productivity/cost-productivity.php'); ?>" class="tool-item"><span>Cost Productivity Analysis</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
     </div>
@@ -128,15 +128,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if(targetElement) {
                 window.scrollTo({
-                    top: targetElement.offsetTop - 100, // Adjust for fixed nav height
+                    top: targetElement.offsetTop - 150, // Adjust for fixed nav height
                     behavior: 'smooth'
                 });
-
-                // Add highlight effect
-                targetElement.classList.add('highlight');
-                setTimeout(() => {
-                    targetElement.classList.remove('highlight');
-                }, 2000); // Remove after 2 seconds
             }
         });
     });
@@ -161,6 +155,36 @@ document.addEventListener("DOMContentLoaded", function() {
             if (e.target.closest('a')) return;
             
             card.classList.toggle('active');
+        });
+    });
+
+    // Active state for sub-nav buttons with expand and blur effect
+    const subNavButtons = document.querySelectorAll('.sub-nav-btn');
+    subNavButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            subNavButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Get target card ID from href
+            const targetId = button.getAttribute('href').slice(1);
+            const targetCard = document.getElementById(targetId);
+            
+            // Apply focused and blur effects
+            categoryCards.forEach(card => {
+                card.classList.remove('focused', 'blurred');
+                if (card.id === targetId) {
+                    card.classList.add('focused');
+                } else {
+                    card.classList.add('blurred');
+                }
+            });
+            
+            // Remove all effects after 1 second
+            setTimeout(() => {
+                categoryCards.forEach(card => {
+                    card.classList.remove('focused', 'blurred');
+                });
+            }, 1000);
         });
     });
 });

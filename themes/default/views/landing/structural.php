@@ -29,7 +29,7 @@ $breadcrumb = [
 
     <div class="category-grid">
         <!-- Beam Analysis -->
-        <div id="beam" class="category-card category-section">
+        <div id="beam" class="category-card">
             <div class="category-header">
                 <i class="fas fa-ruler-horizontal category-icon"></i>
                 <div class="category-title">
@@ -38,16 +38,16 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/beam-analysis/beam-design.php'); ?>"><span>Beam Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/beam-analysis/beam-load-combination.php'); ?>"><span>Load Combination</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/beam-analysis/cantilever-beam.php'); ?>"><span>Cantilever Beam</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/beam-analysis/continuous-beam.php'); ?>"><span>Continuous Beam</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/beam-analysis/simply-supported-beam.php'); ?>"><span>Simply Supported Beam</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/structural/beam-analysis/beam-design.php'); ?>" class="tool-item"><span>Beam Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/beam-analysis/beam-load-combination.php'); ?>" class="tool-item"><span>Load Combination</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/beam-analysis/cantilever-beam.php'); ?>" class="tool-item"><span>Cantilever Beam</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/beam-analysis/continuous-beam.php'); ?>" class="tool-item"><span>Continuous Beam</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/beam-analysis/simply-supported-beam.php'); ?>" class="tool-item"><span>Simply Supported Beam</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Column Design -->
-        <div id="column" class="category-card category-section">
+        <div id="column" class="category-card">
             <div class="category-header">
                 <i class="fas fa-columns category-icon"></i>
                 <div class="category-title">
@@ -56,16 +56,16 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/column-design/biaxial-column.php'); ?>"><span>Biaxial Column</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/column-design/column-footing-link.php'); ?>"><span>Column-Footing Link</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/column-design/long-column.php'); ?>"><span>Long Column</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/column-design/short-column.php'); ?>"><span>Short Column</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/column-design/steel-column-design.php'); ?>"><span>Steel Column Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/structural/column-design/biaxial-column.php'); ?>" class="tool-item"><span>Biaxial Column</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/column-design/column-footing-link.php'); ?>" class="tool-item"><span>Column-Footing Link</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/column-design/long-column.php'); ?>" class="tool-item"><span>Long Column</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/column-design/short-column.php'); ?>" class="tool-item"><span>Short Column</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/column-design/steel-column-design.php'); ?>" class="tool-item"><span>Steel Column Design</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Steel Structure -->
-        <div id="steel" class="category-card category-section">
+        <div id="steel" class="category-card">
             <div class="category-header">
                 <i class="fas fa-industry category-icon"></i>
                 <div class="category-title">
@@ -74,16 +74,16 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/steel-structure/connection-design.php'); ?>"><span>Connection Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/steel-structure/purlin-design.php'); ?>"><span>Purlin Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/steel-structure/steel-base-plate.php'); ?>"><span>Base Plate Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/steel-structure/steel-beam-design.php'); ?>"><span>Steel Beam Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/steel-structure/steel-truss-analysis.php'); ?>"><span>Truss Analysis</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/structural/steel-structure/connection-design.php'); ?>" class="tool-item"><span>Connection Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/steel-structure/purlin-design.php'); ?>" class="tool-item"><span>Purlin Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/steel-structure/steel-base-plate.php'); ?>" class="tool-item"><span>Base Plate Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/steel-structure/steel-beam-design.php'); ?>" class="tool-item"><span>Steel Beam Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/steel-structure/steel-truss-analysis.php'); ?>" class="tool-item"><span>Truss Analysis</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Foundation Design -->
-        <div id="foundation" class="category-card category-section">
+        <div id="foundation" class="category-card">
             <div class="category-header">
                 <i class="fas fa-university category-icon"></i>
                 <div class="category-title">
@@ -92,16 +92,16 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/foundation-design/combined-footing.php'); ?>"><span>Combined Footing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/foundation-design/foundation-pressure.php'); ?>"><span>Foundation Pressure</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/foundation-design/isolated-footing.php'); ?>"><span>Isolated Footing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/foundation-design/pile-foundation.php'); ?>"><span>Pile Foundation</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/foundation-design/raft-foundation.php'); ?>"><span>Raft Foundation</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/structural/foundation-design/combined-footing.php'); ?>" class="tool-item"><span>Combined Footing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/foundation-design/foundation-pressure.php'); ?>" class="tool-item"><span>Foundation Pressure</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/foundation-design/isolated-footing.php'); ?>" class="tool-item"><span>Isolated Footing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/foundation-design/pile-foundation.php'); ?>" class="tool-item"><span>Pile Foundation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/foundation-design/raft-foundation.php'); ?>" class="tool-item"><span>Raft Foundation</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Slab Design -->
-        <div id="slab" class="category-card category-section">
+        <div id="slab" class="category-card">
             <div class="category-header">
                 <i class="fas fa-square category-icon"></i>
                 <div class="category-title">
@@ -110,16 +110,16 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/slab-design/flat-slab.php'); ?>"><span>Flat Slab Design</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/slab-design/one-way-slab.php'); ?>"><span>One Way Slab</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/slab-design/two-way-slab.php'); ?>"><span>Two Way Slab</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/slab-design/waffle-slab.php'); ?>"><span>Waffle Slab</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/slab-design/slab-load-calculation.php'); ?>"><span>Slab Load Calculator</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/structural/slab-design/flat-slab.php'); ?>" class="tool-item"><span>Flat Slab Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/slab-design/one-way-slab.php'); ?>" class="tool-item"><span>One Way Slab</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/slab-design/two-way-slab.php'); ?>" class="tool-item"><span>Two Way Slab</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/slab-design/waffle-slab.php'); ?>" class="tool-item"><span>Waffle Slab</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/slab-design/slab-load-calculation.php'); ?>" class="tool-item"><span>Slab Load Calculator</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Load Analysis -->
-        <div id="loads" class="category-card category-section">
+        <div id="loads" class="category-card">
             <div class="category-header">
                 <i class="fas fa-weight-hanging category-icon"></i>
                 <div class="category-title">
@@ -128,16 +128,16 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/load-analysis/dead-load.php'); ?>"><span>Dead Load</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/load-analysis/live-load.php'); ?>"><span>Live Load</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/load-analysis/wind-load.php'); ?>"><span>Wind Load</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/load-analysis/seismic-load.php'); ?>"><span>Seismic Load</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/load-analysis/load-combination.php'); ?>"><span>Load Combinations</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/structural/load-analysis/dead-load.php'); ?>" class="tool-item"><span>Dead Load</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/load-analysis/live-load.php'); ?>" class="tool-item"><span>Live Load</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/load-analysis/wind-load.php'); ?>" class="tool-item"><span>Wind Load</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/load-analysis/seismic-load.php'); ?>" class="tool-item"><span>Seismic Load</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/load-analysis/load-combination.php'); ?>" class="tool-item"><span>Load Combinations</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Reinforcement -->
-        <div id="reinforce" class="category-card category-section">
+        <div id="reinforce" class="category-card">
             <div class="category-header">
                 <i class="fas fa-hashtag category-icon"></i>
                 <div class="category-title">
@@ -146,16 +146,16 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reinforcement/bar-bending-schedule.php'); ?>"><span>Bar Bending Schedule</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reinforcement/detailing-drawing.php'); ?>"><span>Detailing Drawing</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reinforcement/rebar-anchorage.php'); ?>"><span>Rebar Anchorage</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reinforcement/reinforcement-optimizer.php'); ?>"><span>Reinforcement Optimizer</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reinforcement/stirrup-design.php'); ?>"><span>Stirrup Design</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/structural/reinforcement/bar-bending-schedule.php'); ?>" class="tool-item"><span>Bar Bending Schedule</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/reinforcement/detailing-drawing.php'); ?>" class="tool-item"><span>Detailing Drawing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/reinforcement/rebar-anchorage.php'); ?>" class="tool-item"><span>Rebar Anchorage</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/reinforcement/reinforcement-optimizer.php'); ?>" class="tool-item"><span>Reinforcement Optimizer</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/reinforcement/stirrup-design.php'); ?>" class="tool-item"><span>Stirrup Design</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Reports -->
-        <div id="reports" class="category-card category-section">
+        <div id="reports" class="category-card">
             <div class="category-header">
                 <i class="fas fa-file-alt category-icon"></i>
                 <div class="category-title">
@@ -164,11 +164,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reports/beam-report.php'); ?>"><span>Beam Report</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reports/column-report.php'); ?>"><span>Column Report</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reports/foundation-report.php'); ?>"><span>Foundation Report</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reports/full-structure-summary.php'); ?>"><span>Full Structure Summary</span> <i class="fas fa-arrow-right"></i></a></li>
-                <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/reports/load-analysis-summary.php'); ?>"><span>Load Analysis Summary</span> <i class="fas fa-arrow-right"></i></a></li>
+                <a href="<?php echo app_base_url('modules/structural/reports/beam-report.php'); ?>" class="tool-item"><span>Beam Report</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/reports/column-report.php'); ?>" class="tool-item"><span>Column Report</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/reports/foundation-report.php'); ?>" class="tool-item"><span>Foundation Report</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/reports/full-structure-summary.php'); ?>" class="tool-item"><span>Full Structure Summary</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo app_base_url('modules/structural/reports/load-analysis-summary.php'); ?>" class="tool-item"><span>Load Analysis Summary</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
     </div>
@@ -190,15 +190,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if(targetElement) {
                 window.scrollTo({
-                    top: targetElement.offsetTop - 100, // Adjust for fixed nav height
+                    top: targetElement.offsetTop - 150, // Adjust for fixed nav height
                     behavior: 'smooth'
                 });
-
-                // Add highlight effect
-                targetElement.classList.add('highlight');
-                setTimeout(() => {
-                    targetElement.classList.remove('highlight');
-                }, 2000); // Remove after 2 seconds
             }
         });
     });
@@ -223,6 +217,36 @@ document.addEventListener("DOMContentLoaded", function() {
             if (e.target.closest('a')) return;
             
             card.classList.toggle('active');
+        });
+    });
+
+    // Active state for sub-nav buttons with expand and blur effect
+    const subNavButtons = document.querySelectorAll('.sub-nav-btn');
+    subNavButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            subNavButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Get target card ID from href
+            const targetId = button.getAttribute('href').slice(1);
+            const targetCard = document.getElementById(targetId);
+            
+            // Apply focused and blur effects
+            categoryCards.forEach(card => {
+                card.classList.remove('focused', 'blurred');
+                if (card.id === targetId) {
+                    card.classList.add('focused');
+                } else {
+                    card.classList.add('blurred');
+                }
+            });
+            
+            // Remove all effects after 1 second
+            setTimeout(() => {
+                categoryCards.forEach(card => {
+                    card.classList.remove('focused', 'blurred');
+                });
+            }, 1000);
         });
     });
 });

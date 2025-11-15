@@ -26,242 +26,176 @@ $breadcrumb = [
 
     <div class="category-grid">
         <!-- Dashboard Module -->
-        <div class="category-card" id="dashboard">
+        <div id="dashboard" class="category-card">
             <div class="category-header">
-                <div class="category-icon">
-                    <i class="fas fa-tachometer-alt"></i>
-                </div>
+                <i class="fas fa-tachometer-alt category-icon"></i>
                 <div class="category-title">
                     <h3>Project Dashboard</h3>
                     <p>Monitor and track project progress</p>
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/dashboard/project-overview.php') : 'modules/project-management/dashboard/project-overview.php'; ?>">
-                        Project Overview
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/dashboard/gantt-chart.php') : 'modules/project-management/dashboard/gantt-chart.php'; ?>">
-                        Gantt Chart
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/dashboard/milestone-tracker.php') : 'modules/project-management/dashboard/milestone-tracker.php'; ?>">
-                        Milestone Tracker
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/dashboard/project-overview.php') : 'modules/project-management/dashboard/project-overview.php'; ?>" class="tool-item"><span>Project Overview</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/dashboard/gantt-chart.php') : 'modules/project-management/dashboard/gantt-chart.php'; ?>" class="tool-item"><span>Gantt Chart</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/dashboard/milestone-tracker.php') : 'modules/project-management/dashboard/milestone-tracker.php'; ?>" class="tool-item"><span>Milestone Tracker</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Scheduling Module -->
-        <div class="category-card" id="scheduling">
+        <div id="scheduling" class="category-card">
             <div class="category-header">
-                <div class="category-icon">
-                    <i class="fas fa-calendar-alt"></i>
-                </div>
+                <i class="fas fa-calendar-alt category-icon"></i>
                 <div class="category-title">
                     <h3>Task & Scheduling</h3>
                     <p>Manage project timeline and tasks</p>
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/scheduling/create-task.php') : 'modules/project-management/scheduling/create-task.php'; ?>">
-                        Create Task
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/scheduling/assign-task.php') : 'modules/project-management/scheduling/assign-task.php'; ?>">
-                        Assign Task
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/scheduling/task-dependency.php') : 'modules/project-management/scheduling/task-dependency.php'; ?>">
-                        Task Dependencies
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/scheduling/create-task.php') : 'modules/project-management/scheduling/create-task.php'; ?>" class="tool-item"><span>Create Task</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/scheduling/assign-task.php') : 'modules/project-management/scheduling/assign-task.php'; ?>" class="tool-item"><span>Assign Task</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/scheduling/task-dependency.php') : 'modules/project-management/scheduling/task-dependency.php'; ?>" class="tool-item"><span>Task Dependencies</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Resources Module -->
-        <div class="category-card" id="resources">
+        <div id="resources" class="category-card">
             <div class="category-header">
-                <div class="category-icon">
-                    <i class="fas fa-users"></i>
-                </div>
+                <i class="fas fa-users category-icon"></i>
                 <div class="category-title">
                     <h3>Resource Management</h3>
                     <p>Manage workforce and equipment</p>
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/resources/manpower-planning.php') : 'modules/project-management/resources/manpower-planning.php'; ?>">
-                        Manpower Planning
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/resources/equipment-allocation.php') : 'modules/project-management/resources/equipment-allocation.php'; ?>">
-                        Equipment Allocation
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/resources/material-tracking.php') : 'modules/project-management/resources/material-tracking.php'; ?>">
-                        Material Tracking
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/resources/manpower-planning.php') : 'modules/project-management/resources/manpower-planning.php'; ?>" class="tool-item"><span>Manpower Planning</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/resources/equipment-allocation.php') : 'modules/project-management/resources/equipment-allocation.php'; ?>" class="tool-item"><span>Equipment Allocation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/resources/material-tracking.php') : 'modules/project-management/resources/material-tracking.php'; ?>" class="tool-item"><span>Material Tracking</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Financial Module -->
-        <div class="category-card" id="financial">
+        <div id="financial" class="category-card">
             <div class="category-header">
-                <div class="category-icon">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
+                <i class="fas fa-dollar-sign category-icon"></i>
                 <div class="category-title">
                     <h3>Financial Management</h3>
                     <p>Track costs and budgets</p>
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/financial/budget-tracking.php') : 'modules/project-management/financial/budget-tracking.php'; ?>">
-                        Budget Tracking
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/financial/cost-control.php') : 'modules/project-management/financial/cost-control.php'; ?>">
-                        Cost Control
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/financial/forecast-analysis.php') : 'modules/project-management/financial/forecast-analysis.php'; ?>">
-                        Forecast Analysis
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/financial/budget-tracking.php') : 'modules/project-management/financial/budget-tracking.php'; ?>" class="tool-item"><span>Budget Tracking</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/financial/cost-control.php') : 'modules/project-management/financial/cost-control.php'; ?>" class="tool-item"><span>Cost Control</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/financial/forecast-analysis.php') : 'modules/project-management/financial/forecast-analysis.php'; ?>" class="tool-item"><span>Forecast Analysis</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Quality Module -->
-        <div class="category-card" id="quality">
+        <div id="quality" class="category-card">
             <div class="category-header">
-                <div class="category-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
+                <i class="fas fa-check-circle category-icon"></i>
                 <div class="category-title">
                     <h3>Quality & Safety</h3>
                     <p>Manage quality control and safety</p>
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/quality/quality-checklist.php') : 'modules/project-management/quality/quality-checklist.php'; ?>">
-                        Quality Checklist
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/quality/safety-incidents.php') : 'modules/project-management/quality/safety-incidents.php'; ?>">
-                        Safety Incidents
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/quality/audit-reports.php') : 'modules/project-management/quality/audit-reports.php'; ?>">
-                        Audit Reports
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/quality/quality-checklist.php') : 'modules/project-management/quality/quality-checklist.php'; ?>" class="tool-item"><span>Quality Checklist</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/quality/safety-incidents.php') : 'modules/project-management/quality/safety-incidents.php'; ?>" class="tool-item"><span>Safety Incidents</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/quality/audit-reports.php') : 'modules/project-management/quality/audit-reports.php'; ?>" class="tool-item"><span>Audit Reports</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
         <!-- Documents Module -->
-        <div class="category-card" id="documents">
+        <div id="documents" class="category-card">
             <div class="category-header">
-                <div class="category-icon">
-                    <i class="fas fa-file-alt"></i>
-                </div>
+                <i class="fas fa-file-alt category-icon"></i>
                 <div class="category-title">
                     <h3>Document Control</h3>
                     <p>Manage project documentation</p>
                 </div>
             </div>
             <ul class="tool-list">
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/documents/document-repository.php') : 'modules/project-management/documents/document-repository.php'; ?>">
-                        Document Repository
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/documents/drawing-register.php') : 'modules/project-management/documents/drawing-register.php'; ?>">
-                        Drawing Register
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-                <li class="tool-item">
-                    <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/documents/submittal-tracking.php') : 'modules/project-management/documents/submittal-tracking.php'; ?>">
-                        Submittal Tracking
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/documents/document-repository.php') : 'modules/project-management/documents/document-repository.php'; ?>" class="tool-item"><span>Document Repository</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/documents/drawing-register.php') : 'modules/project-management/documents/drawing-register.php'; ?>" class="tool-item"><span>Drawing Register</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/documents/submittal-tracking.php') : 'modules/project-management/documents/submittal-tracking.php'; ?>" class="tool-item"><span>Submittal Tracking</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-
-    // Sticky navigation
+document.addEventListener("DOMContentLoaded", function() {
     const subNav = document.querySelector('.sub-nav');
-    const subNavTop = subNav.offsetTop;
+    const subNavOffsetTop = subNav.offsetTop;
+    const body = document.body;
 
-    function handleScroll() {
-        if (window.pageYOffset >= subNavTop) {
-            document.body.classList.add('sticky-nav');
-        } else {
-            document.body.classList.remove('sticky-nav');
-        }
-    }
-
-    window.addEventListener('scroll', handleScroll);
-
-    // Smooth scroll to sections
-    const navLinks = document.querySelectorAll('.sub-nav-btn');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+    // Smooth scrolling for sub-navigation links
+    document.querySelectorAll('.sub-nav-btn').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
             e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            const targetElement = document.getElementById(targetId);
             
-            navLinks.forEach(link => link.classList.remove('active'));
-            this.classList.add('active');
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
 
-            targetElement.scrollIntoView({
-                behavior: 'smooth'
+            if(targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 150, // Adjust for fixed nav height
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Sticky sub-navigation
+    window.addEventListener("scroll", function() {
+        if (window.pageYOffset >= subNavOffsetTop) {
+            body.classList.add("sticky-nav");
+        } else {
+            body.classList.remove("sticky-nav");
+        }
+    });
+
+    // Toggle tool lists
+    const categoryCards = document.querySelectorAll('.category-card');
+    categoryCards.forEach(card => {
+        // Expand all cards by default
+        card.classList.add('active');
+
+        card.addEventListener('click', (e) => {
+            // Prevent clicks on links from toggling the card
+            if (e.target.closest('a')) return;
+            
+            card.classList.toggle('active');
+        });
+    });
+
+    // Active state for sub-nav buttons with expand and blur effect
+    const subNavButtons = document.querySelectorAll('.sub-nav-btn');
+    subNavButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            subNavButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Get target card ID from href
+            const targetId = button.getAttribute('href').slice(1);
+            const targetCard = document.getElementById(targetId);
+            
+            // Apply focused and blur effects
+            categoryCards.forEach(card => {
+                card.classList.remove('focused', 'blurred');
+                if (card.id === targetId) {
+                    card.classList.add('focused');
+                } else {
+                    card.classList.add('blurred');
+                }
             });
             
-            // Highlight the target card
-            targetElement.classList.add('highlight');
+            // Remove all effects after 1 second
             setTimeout(() => {
-                targetElement.classList.remove('highlight');
-            }, 1500);
+                categoryCards.forEach(card => {
+                    card.classList.remove('focused', 'blurred');
+                });
+            }, 1000);
         });
     });
 });

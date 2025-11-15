@@ -10,11 +10,9 @@ $breadcrumb = [
     <?php load_theme_css('electrical.css'); ?>
 
 <div class="container">
-    <div class="hero d-flex justify-content-between align-items-center">
-        <div>
-            <h1>Electrical Engineering Toolkit</h1>
-            <p>Professional calculators and reference tools for electrical engineers and electricians.</p>
-        </div>
+    <div class="hero">
+        <h1>Electrical Engineering Toolkit</h1>
+        <p>Professional calculators and reference tools for electrical engineers and electricians.</p>
     </div>
 
     <!-- Sub-navigation for categories -->
@@ -113,8 +111,6 @@ $breadcrumb = [
         </div>
     </div>
 
-    <!-- Recent calculations will be inserted here by JS -->
-    <div id="recentElectricalCalculationsPlaceholder"></div>
 </div>
 
 <script>
@@ -127,18 +123,15 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll('.sub-nav-btn').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
+            
             const targetId = this.getAttribute('href');
             const targetElement = document.querySelector(targetId);
 
             if(targetElement) {
                 window.scrollTo({
-                    top: targetElement.offsetTop - 100,
+                    top: targetElement.offsetTop - 150, // Adjust for fixed nav height
                     behavior: 'smooth'
                 });
-
-                // Highlight effect
-                targetElement.classList.add('highlight');
-                setTimeout(() => targetElement.classList.remove('highlight'), 1800);
             }
         });
     });
@@ -152,38 +145,49 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Expand all category cards by default
-    document.querySelectorAll('.category-card').forEach(c => c.classList.add('active'));
+    // Toggle tool lists
+    const categoryCards = document.querySelectorAll('.category-card');
+    categoryCards.forEach(card => {
+        // Expand all cards by default
+        card.classList.add('active');
 
-    // Initialize recent calculations
-    renderRecentCalculations();
+        card.addEventListener('click', (e) => {
+            // Prevent clicks on links from toggling the card
+            if (e.target.closest('a')) return;
+            
+            card.classList.toggle('active');
+        });
+    });
+
+    // Active state for sub-nav buttons with expand and blur effect
+    const subNavButtons = document.querySelectorAll('.sub-nav-btn');
+    subNavButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            subNavButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Get target card ID from href
+            const targetId = button.getAttribute('href').slice(1);
+            const targetCard = document.getElementById(targetId);
+            
+            // Apply focused and blur effects
+            categoryCards.forEach(card => {
+                card.classList.remove('focused', 'blurred');
+                if (card.id === targetId) {
+                    card.classList.add('focused');
+                } else {
+                    card.classList.add('blurred');
+                }
+            });
+            
+            // Remove all effects after 1 second
+            setTimeout(() => {
+                categoryCards.forEach(card => {
+                    card.classList.remove('focused', 'blurred');
+                });
+            }, 1000);
+        });
+    });
 });
-
-function renderRecentCalculations() {
-    const recent = JSON.parse(localStorage.getItem('recentElectricalCalculations') || '[]');
-    const placeholder = document.getElementById('recentElectricalCalculationsPlaceholder');
-    if (!placeholder) return;
-
-    if (!recent || recent.length === 0) {
-        placeholder.innerHTML = '<div class="mt-4"><h4>Recent Calculations</h4><p class="text-muted">No recent calculations</p></div>';
-        return;
-    }
-
-    const items = recent.slice(0,10).map(calc => `
-        <div class="recent-item mb-2 p-2 border rounded">
-            <div class="small"><strong>${calc.type}</strong></div>
-            <div class="small text-muted">${calc.calculation}</div>
-            <div class="small text-muted">${calc.timestamp}</div>
-        </div>
-    `).join('');
-
-    placeholder.innerHTML = `<div class="mt-4"><h4>Recent Calculations</h4>${items}</div>`;
-}
 </script>
-
-<style>
-.recent-item { background: rgba(255,255,255,0.03); }
-</style>
-
-<?php ?>
 
