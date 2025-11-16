@@ -17,7 +17,7 @@ class ThemeController extends Controller
         $this->themeManager = new ThemeManager();
         
         // Check admin authentication
-        if (!$this->auth->check() || !$this->auth->isAdmin()) {
+        if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
             $this->redirect('/login');
         }
     }

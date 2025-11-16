@@ -1,190 +1,171 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Bishwo Calculator</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .admin-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-        }
-        .stat-card {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
-            transition: transform 0.2s;
-        }
-        .stat-card:hover {
-            transform: translateY(-2px);
-        }
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #667eea;
-        }
-        .quick-action {
-            background: white;
-            border: none;
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: left;
-            width: 100%;
-            margin-bottom: 0.5rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: all 0.2s;
-        }
-        .quick-action:hover {
-            background: #f8f9fa;
-            transform: translateX(5px);
-        }
-    </style>
-</head>
-<body>
-    <div class="admin-header">
-        <div class="container">
-            <h1><i class="fas fa-tachometer-alt me-3"></i>Admin Dashboard</h1>
-            <p class="mb-0">Welcome back! Here's an overview of your engineering calculator platform.</p>
-        </div>
+<?php
+ob_start();
+?>
+
+<!-- Page Header -->
+<div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(102, 126, 234, 0.2);">
+    <div>
+        <h1 style="font-size: 1.75rem; font-weight: 600; color: #f9fafb; margin: 0 0 0.5rem 0;">Admin Dashboard</h1>
+        <p style="color: #9ca3af; margin: 0; font-size: 0.875rem;">Welcome back! Here's an overview of your engineering calculator platform.</p>
     </div>
+</div>
 
-    <div class="container">
-        <div class="row">
-            <!-- Statistics Cards -->
-            <div class="col-md-3">
-                <div class="stat-card text-center">
-                    <i class="fas fa-users fa-2x text-primary mb-2"></i>
-                    <div class="stat-number">1,247</div>
-                    <div class="text-muted">Total Users</div>
-                    <small class="text-success"><i class="fas fa-arrow-up"></i> +12% this month</small>
-                </div>
-            </div>
-            
-            <div class="col-md-3">
-                <div class="stat-card text-center">
-                    <i class="fas fa-calculator fa-2x text-success mb-2"></i>
-                    <div class="stat-number">15,673</div>
-                    <div class="text-muted">Calculations</div>
-                    <small class="text-success"><i class="fas fa-arrow-up"></i> +8% this month</small>
-                </div>
-            </div>
-            
-            <div class="col-md-3">
-                <div class="stat-card text-center">
-                    <i class="fas fa-puzzle-piece fa-2x text-warning mb-2"></i>
-                    <div class="stat-number">12</div>
-                    <div class="text-muted">Active Modules</div>
-                    <small class="text-success"><i class="fas fa-check"></i> All operational</small>
-                </div>
-            </div>
-            
-            <div class="col-md-3">
-                <div class="stat-card text-center">
-                    <i class="fas fa-chart-line fa-2x text-info mb-2"></i>
-                    <div class="stat-number">98.5%</div>
-                    <div class="text-muted">System Health</div>
-                    <small class="text-success"><i class="fas fa-check-circle"></i> Excellent</small>
-                </div>
-            </div>
+<!-- Statistics Cards -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    
+    <!-- Total Users -->
+    <div class="stat-card" style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.5rem; text-align: center; transition: transform 0.2s ease;">
+        <div style="width: 50px; height: 50px; background: rgba(67, 97, 238, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto;">
+            <i class="fas fa-users" style="font-size: 1.5rem; color: #4cc9f0;"></i>
         </div>
+        <div style="font-size: 2rem; font-weight: 700; color: #4cc9f0; margin-bottom: 0.5rem;"><?php echo number_format($stats['total_users'] ?? 0); ?></div>
+        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">Total Users</div>
+        <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-arrow-up"></i> +12% this month</small>
+    </div>
+    
+    <!-- Calculations -->
+    <div class="stat-card" style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.5rem; text-align: center; transition: transform 0.2s ease;">
+        <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto;">
+            <i class="fas fa-calculator" style="font-size: 1.5rem; color: #34d399;"></i>
+        </div>
+        <div style="font-size: 2rem; font-weight: 700; color: #34d399; margin-bottom: 0.5rem;"><?php echo number_format($stats['total_calculations'] ?? 0); ?></div>
+        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">Calculations</div>
+        <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-arrow-up"></i> +8% this month</small>
+    </div>
+    
+    <!-- Active Modules -->
+    <div class="stat-card" style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.5rem; text-align: center; transition: transform 0.2s ease;">
+        <div style="width: 50px; height: 50px; background: rgba(245, 158, 11, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto;">
+            <i class="fas fa-cubes" style="font-size: 1.5rem; color: #fbbf24;"></i>
+        </div>
+        <div style="font-size: 2rem; font-weight: 700; color: #fbbf24; margin-bottom: 0.5rem;"><?php echo number_format($stats['active_modules'] ?? 0); ?></div>
+        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">Active Modules</div>
+        <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-check"></i> All operational</small>
+    </div>
+    
+    <!-- System Health -->
+    <div class="stat-card" style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.5rem; text-align: center; transition: transform 0.2s ease;">
+        <div style="width: 50px; height: 50px; background: rgba(6, 182, 212, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto;">
+            <i class="fas fa-heartbeat" style="font-size: 1.5rem; color: #22d3ee;"></i>
+        </div>
+        <div style="font-size: 2rem; font-weight: 700; color: #22d3ee; margin-bottom: 0.5rem;"><?php echo number_format($stats['system_health'] ?? 100, 1); ?>%</div>
+        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">System Health</div>
+        <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-check-circle"></i> Excellent</small>
+    </div>
+    
+</div>
 
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-chart-bar me-2"></i>System Overview</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4 text-center">
-                                <h3 class="text-primary">892</h3>
-                                <p class="text-muted">Active Users</p>
-                            </div>
-                            <div class="col-md-4 text-center">
-                                <h3 class="text-success">2,341</h3>
-                                <p class="text-muted">Monthly Calculations</p>
-                            </div>
-                            <div class="col-md-4 text-center">
-                                <h3 class="text-warning">67%</h3>
-                                <p class="text-muted">Storage Used</p>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-4">
-                            <h6>Recent Activity</h6>
-                            <ul class="list-unstyled">
-                                <li class="mb-2">
-                                    <i class="fas fa-user-plus text-primary me-2"></i>
-                                    New user registered - <small class="text-muted">2 hours ago</small>
-                                </li>
-                                <li class="mb-2">
-                                    <i class="fas fa-cog text-success me-2"></i>
-                                    System settings updated - <small class="text-muted">4 hours ago</small>
-                                </li>
-                                <li class="mb-2">
-                                    <i class="fas fa-database text-info me-2"></i>
-                                    Database backup completed - <small class="text-muted">1 day ago</small>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+<!-- Main Content Grid -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+    
+    <!-- System Overview -->
+    <div style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.75rem;">
+        <h5 style="font-size: 1.125rem; font-weight: 600; color: #f9fafb; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-chart-bar" style="color: #4cc9f0;"></i>
+            System Overview
+        </h5>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 2rem;">
+            <div style="text-align: center;">
+                <h3 style="font-size: 1.75rem; color: #4cc9f0; margin: 0 0 0.5rem 0;"><?php echo number_format($stats['active_users'] ?? 0); ?></h3>
+                <p style="color: #9ca3af; font-size: 0.875rem; margin: 0;">Active Users</p>
             </div>
-            
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
-                    </div>
-                    <div class="card-body">
-                        <a href="/bishwo_calculator/admin/settings" class="quick-action btn">
-                            <i class="fas fa-cog text-primary me-2"></i>
-                            <strong>Settings</strong><br>
-                            <small class="text-muted">Configure system settings</small>
-                        </a>
-                        
-                        <a href="/bishwo_calculator/admin/users" class="quick-action btn">
-                            <i class="fas fa-users text-success me-2"></i>
-                            <strong>Manage Users</strong><br>
-                            <small class="text-muted">User accounts and roles</small>
-                        </a>
-                        
-                        <a href="/bishwo_calculator/admin/setup/checklist" class="quick-action btn">
-                            <i class="fas fa-tasks text-warning me-2"></i>
-                            <strong>Setup Checklist</strong><br>
-                            <small class="text-muted">Complete site setup</small>
-                        </a>
-                        
-                        <a href="/bishwo_calculator/help" class="quick-action btn">
-                            <i class="fas fa-question-circle text-info me-2"></i>
-                            <strong>Help Center</strong><br>
-                            <small class="text-muted">Documentation and support</small>
-                        </a>
-                    </div>
-                </div>
+            <div style="text-align: center;">
+                <h3 style="font-size: 1.75rem; color: #34d399; margin: 0 0 0.5rem 0;"><?php echo number_format($stats['monthly_calculations'] ?? 0); ?></h3>
+                <p style="color: #9ca3af; font-size: 0.875rem; margin: 0;">Monthly Calculations</p>
+            </div>
+            <div style="text-align: center;">
+                <h3 style="font-size: 1.75rem; color: #fbbf24; margin: 0 0 0.5rem 0;"><?php echo number_format($stats['storage_used'] ?? 0); ?>%</h3>
+                <p style="color: #9ca3af; font-size: 0.875rem; margin: 0;">Storage Used</p>
             </div>
         </div>
         
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="alert alert-success">
-                    <h5><i class="fas fa-check-circle me-2"></i>System Status: Operational</h5>
-                    <p class="mb-0">All systems are running normally. Last checked: <?php echo date('Y-m-d H:i:s'); ?></p>
-                </div>
-            </div>
+        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(102, 126, 234, 0.2);">
+            <h6 style="font-size: 0.875rem; font-weight: 600; color: #f9fafb; margin: 0 0 1rem 0;">Recent Activity</h6>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                <li style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-user-plus" style="color: #4cc9f0;"></i>
+                    <span style="color: #e5e7eb; font-size: 0.875rem;">New user registered</span>
+                    <small style="color: #9ca3af; margin-left: auto; font-size: 0.75rem;">2 hours ago</small>
+                </li>
+                <li style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-cog" style="color: #34d399;"></i>
+                    <span style="color: #e5e7eb; font-size: 0.875rem;">System settings updated</span>
+                    <small style="color: #9ca3af; margin-left: auto; font-size: 0.75rem;">4 hours ago</small>
+                </li>
+                <li style="margin-bottom: 0; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-database" style="color: #22d3ee;"></i>
+                    <span style="color: #e5e7eb; font-size: 0.875rem;">Database backup completed</span>
+                    <small style="color: #9ca3af; margin-left: auto; font-size: 0.75rem;">1 day ago</small>
+                </li>
+            </ul>
         </div>
     </div>
+    
+    <!-- Quick Actions -->
+    <div style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.75rem;">
+        <h5 style="font-size: 1.125rem; font-weight: 600; color: #f9fafb; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-bolt" style="color: #fbbf24;"></i>
+            Quick Actions
+        </h5>
+        
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <a href="<?php echo app_base_url('/admin/settings'); ?>" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(67, 97, 238, 0.05); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 8px; text-decoration: none; transition: all 0.2s ease; color: inherit;">
+                <i class="fas fa-cog" style="color: #4cc9f0; font-size: 1.25rem; margin-top: 0.125rem;"></i>
+                <div>
+                    <strong style="color: #f9fafb; font-size: 0.875rem; display: block; margin-bottom: 0.25rem;">Settings</strong>
+                    <small style="color: #9ca3af; font-size: 0.75rem;">Configure system settings</small>
+                </div>
+            </a>
+            
+            <a href="<?php echo app_base_url('/admin/users'); ?>" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(67, 97, 238, 0.05); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 8px; text-decoration: none; transition: all 0.2s ease; color: inherit;">
+                <i class="fas fa-users" style="color: #34d399; font-size: 1.25rem; margin-top: 0.125rem;"></i>
+                <div>
+                    <strong style="color: #f9fafb; font-size: 0.875rem; display: block; margin-bottom: 0.25rem;">Manage Users</strong>
+                    <small style="color: #9ca3af; font-size: 0.75rem;">User accounts and roles</small>
+                </div>
+            </a>
+            
+            <a href="<?php echo app_base_url('/admin/modules'); ?>" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(67, 97, 238, 0.05); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 8px; text-decoration: none; transition: all 0.2s ease; color: inherit;">
+                <i class="fas fa-cubes" style="color: #fbbf24; font-size: 1.25rem; margin-top: 0.125rem;"></i>
+                <div>
+                    <strong style="color: #f9fafb; font-size: 0.875rem; display: block; margin-bottom: 0.25rem;">Modules</strong>
+                    <small style="color: #9ca3af; font-size: 0.75rem;">Manage active modules</small>
+                </div>
+            </a>
+            
+            <a href="<?php echo app_base_url('/help'); ?>" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(67, 97, 238, 0.05); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 8px; text-decoration: none; transition: all 0.2s ease; color: inherit;">
+                <i class="fas fa-question-circle" style="color: #22d3ee; font-size: 1.25rem; margin-top: 0.125rem;"></i>
+                <div>
+                    <strong style="color: #f9fafb; font-size: 0.875rem; display: block; margin-bottom: 0.25rem;">Help Center</strong>
+                    <small style="color: #9ca3af; font-size: 0.75rem;">Documentation and support</small>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<!-- System Status -->
+<div style="margin-top: 1.5rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 1.5rem;">
+    <h5 style="font-size: 1rem; font-weight: 600; color: #34d399; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-check-circle"></i>
+        System Status: Operational
+    </h5>
+    <p style="color: #9ca3af; font-size: 0.875rem; margin: 0;">All systems are running normally. Last checked: <?php echo date('Y-m-d H:i:s'); ?></p>
+</div>
+
+<style>
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+a[style*="background: rgba(67, 97, 238, 0.05)"]:hover {
+    background: rgba(67, 97, 238, 0.1) !important;
+    transform: translateX(5px);
+}
+</style>
+
+<?php
+$content = ob_get_clean();
+include __DIR__ . '/layout.php';
+?>

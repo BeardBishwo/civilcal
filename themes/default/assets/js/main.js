@@ -1,30 +1,19 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // --- Theme Toggle --- //
+    // --- Permanent Dark Theme (Navy Blue) --- //
+    // Set dark theme permanently - no light mode
+    document.body.classList.add('dark-theme');
+    document.body.setAttribute('data-theme', 'dark');
+    
+    // Disable theme toggle button
     const themeToggleBtn = document.getElementById('themeToggleBtn');
-    let currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-
-    function applyTheme(theme) {
-        document.body.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-        currentTheme = theme;
-        if (themeToggleBtn) {
-            const icon = themeToggleBtn.querySelector('i');
-            if (icon) {
-                icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-            }
-        }
-    }
-
     if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', () => {
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            applyTheme(newTheme);
-        });
+        themeToggleBtn.style.opacity = '0.3';
+        themeToggleBtn.style.cursor = 'not-allowed';
+        themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+        themeToggleBtn.title = 'Dark Mode (Always On)';
     }
 
-    // Apply initial theme
-    applyTheme(currentTheme);
-
+    console.log('Dark navy blue theme active (permanent)');
 
     // --- Mobile Nav Toggle --- //
     const hamburgerBtn = document.getElementById('hamburgerBtn');

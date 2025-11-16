@@ -9,6 +9,16 @@ use App\Core\Database;
 
 class PluginController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        
+        // Check admin authentication
+        if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
+            $this->redirect('/login');
+        }
+    }
+
     public function index()
     {
         // Load plugins from PluginManager

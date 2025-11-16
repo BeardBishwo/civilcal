@@ -2474,27 +2474,19 @@ if (
                     '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
             });
 
-            // Theme toggle
-            themeToggleBtn.addEventListener('click', function() {
-                const isDark = document.body.classList.toggle('dark-theme');
-                this.innerHTML = isDark ?
-                    '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-
-                // Save theme preference
-                localStorage.setItem('theme', isDark ? 'dark' : 'light');
-                // Also persist to a cookie so server-side can read it on next page load
-                const expires = new Date();
-                expires.setFullYear(expires.getFullYear() + 1);
-                document.cookie = `site_theme=${isDark ? 'dark' : 'light'}; path=/; expires=${expires.toUTCString()}; samesite=Lax`;
-
-                // Log theme change for debugging
-                console.log('Theme changed to:', isDark ? 'dark' : 'light');
-            });
-
+            // Set permanent dark theme (navy blue)
             document.body.classList.add('dark-theme');
-            themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+            document.body.setAttribute('data-theme', 'dark');
+            
+            // Remove theme toggle functionality - dark mode only
+            if (themeToggleBtn) {
+                themeToggleBtn.style.opacity = '0.3';
+                themeToggleBtn.style.cursor = 'not-allowed';
+                themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+                themeToggleBtn.title = 'Dark Mode (Always On)';
+            }
 
-            console.log('Initial theme loaded:', 'dark');
+            console.log('Dark navy blue theme loaded (permanent)');
 
             // Enhanced search functionality
             let searchTimer = null;

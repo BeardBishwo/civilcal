@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS `plugins` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
+  `type` varchar(100) DEFAULT 'calculator',
+  `description` text DEFAULT NULL,
+  `version` varchar(50) DEFAULT NULL,
+  `author` varchar(255) DEFAULT NULL,
+  `author_url` varchar(500) DEFAULT NULL,
+  `plugin_path` varchar(500) DEFAULT NULL,
+  `main_file` varchar(255) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 0,
+  `is_core` tinyint(1) DEFAULT 0,
+  `settings` json DEFAULT NULL,
+  `requirements` json DEFAULT NULL,
+  `installed_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`),
+  KEY `idx_active` (`is_active`),
+  KEY `idx_type` (`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

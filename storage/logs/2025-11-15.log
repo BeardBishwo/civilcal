@@ -4217,3 +4217,163 @@
 {"timestamp":"2025-11-15 13:55:48","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
 {"timestamp":"2025-11-15 13:55:48","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
 {"timestamp":"2025-11-15 13:55:48","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 14:18:44","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 14:18:44","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 14:18:44","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 14:18:44","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 14:18:52","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 14:18:52","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 14:18:52","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 14:18:52","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 14:18:53","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 14:18:53","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 14:18:53","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 14:18:53","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 14:18:54","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 14:18:54","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 14:18:54","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 14:18:54","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 14:18:58","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 14:18:58","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 14:18:58","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 14:18:58","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:48:27","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:48:27","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:48:27","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:48:27","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:48:27","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:48:27","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:48:27","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:48:27","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:48:28","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:48:28","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:48:28","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:48:28","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:48:56","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:48:56","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:48:56","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:48:56","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:48:57","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:48:57","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:48:57","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:48:57","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:48:58","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:48:58","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:48:58","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:48:58","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:55:56","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:55:56","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:55:56","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:55:56","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:55:57","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:55:57","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:55:57","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:55:57","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:16","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:16","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:16","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:16","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:16","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:16","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:16","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:16","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:19","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:19","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:19","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:19","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:20","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:20","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:20","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:20","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:21","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:21","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:21","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:21","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:22","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:22","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:22","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:22","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:22","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:22","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:22","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:22","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:23","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:23","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:23","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:23","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:23","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:23","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:23","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:23","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:24","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:24","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:24","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:24","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:27","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:27","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:27","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:27","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:27","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:27","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:27","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:28","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:35","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:35","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:35","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:35","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:36","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:36","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:36","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:36","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:37","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:37","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:37","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:37","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:38","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:38","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:38","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:38","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:40","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:40","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:40","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:40","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:41","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:41","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:41","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:41","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:45","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:45","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:45","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:45","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:46","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:46","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:46","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:46","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:56:55","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:56:55","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:56:55","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:56:55","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:57:05","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:57:05","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:57:05","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:57:05","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:57:06","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:57:06","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:57:06","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:57:06","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:57:11","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:57:11","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:57:11","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:57:11","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:57:11","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:57:11","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:57:11","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:57:11","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:57:20","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:57:20","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:57:20","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:57:20","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}
+{"timestamp":"2025-11-15 23:57:30","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-15 23:57:30","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-15 23:57:30","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-15 23:57:30","level":"info","message":"plugins_table_not_found","context":{"message":"Plugins table does not exist, skipping plugin boot"}}

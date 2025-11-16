@@ -11,13 +11,15 @@ class ModuleController extends Controller
         $categories = $this->getModuleCategories();
         
         // Prepare data for the view
-        $this->data['currentPage'] = 'modules';
-        $this->data['modules'] = $modules;
-        $this->data['categories'] = $categories;
-        $this->data['title'] = 'Modules Management - Admin Panel';
+        $data = [
+            'currentPage' => 'modules',
+            'modules' => $modules,
+            'categories' => $categories,
+            'title' => 'Modules Management - Admin Panel'
+        ];
         
         // Load the view
-        $this->loadView('admin/modules/index', $this->data);
+        $this->view('admin/modules/index', $data);
     }
 
     private function getAllModules()

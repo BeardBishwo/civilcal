@@ -24,25 +24,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Theme toggle
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', function() {
-            const isDark = document.body.classList.toggle('dark-theme');
-            this.innerHTML = isDark ? 
-                '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-            
-            // Save theme preference
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        });
-    }
+    // Set permanent dark theme (navy blue)
+    document.body.classList.add('dark-theme');
+    document.body.setAttribute('data-theme', 'dark');
 
-    // Load saved theme
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-theme');
-        if (themeToggleBtn) {
-            themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
-        }
+    // Disable theme toggle - dark mode only
+    if (themeToggleBtn) {
+        themeToggleBtn.style.opacity = '0.3';
+        themeToggleBtn.style.cursor = 'not-allowed';
+        themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+        themeToggleBtn.title = 'Dark Mode (Always On)';
     }
 
     // Enhanced search functionality

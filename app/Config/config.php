@@ -55,7 +55,7 @@ define('RATE_LIMIT_MAX_REQUESTS', [
 
 // Database configuration
 define('DB_HOST', getenv('DB_HOST') ?: '127.0.0.1');
-define('DB_NAME', getenv('DB_NAME') ?: 'aec_calculator');
+define('DB_NAME', getenv('DB_NAME') ?: 'bishwo_calculator');
 define('DB_USER', getenv('DB_USER') ?: 'root');
 define('DB_PASS', getenv('DB_PASS') ?: '');
 

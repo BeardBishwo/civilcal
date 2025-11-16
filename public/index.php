@@ -12,6 +12,60 @@ require_once dirname(__DIR__) . '/app/bootstrap.php';
 
 // Serve theme assets when application is hosted from /public
 $requestedPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+
+// Serve static assets from /assets/ directory
+$assetPrefixes = ['/assets/'];
+if (defined('APP_BASE') && APP_BASE) {
+    $normalizedBase = '/' . ltrim(APP_BASE, '/');
+    $assetPrefixes[] = rtrim($normalizedBase, '/') . '/assets/';
+}
+
+$matchedAssetPrefixLen = null;
+foreach ($assetPrefixes as $prefix) {
+    $len = strlen($prefix);
+    if ($len && strncasecmp($requestedPath, $prefix, $len) === 0) {
+        $matchedAssetPrefixLen = $len;
+        break;
+    }
+}
+
+if ($matchedAssetPrefixLen !== null) {
+    $assetsRoot = realpath(__DIR__ . '/assets');
+    $relativePath = substr($requestedPath, $matchedAssetPrefixLen);
+    $targetPath = $assetsRoot ? realpath($assetsRoot . DIRECTORY_SEPARATOR . $relativePath) : false;
+
+    if ($assetsRoot && $targetPath && str_starts_with($targetPath, $assetsRoot) && is_file($targetPath)) {
+        // Determine MIME type with fallback to extension-based detection
+        $extension = strtolower(pathinfo($targetPath, PATHINFO_EXTENSION));
+        $mimeTypes = [
+            'css' => 'text/css',
+            'js' => 'application/javascript',
+            'json' => 'application/json',
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'svg' => 'image/svg+xml',
+            'woff' => 'font/woff',
+            'woff2' => 'font/woff2',
+            'ttf' => 'font/ttf',
+            'otf' => 'font/otf',
+            'ico' => 'image/x-icon'
+        ];
+        
+        $mimeType = $mimeTypes[$extension] ?? (mime_content_type($targetPath) ?: 'application/octet-stream');
+        
+        header('Content-Type: ' . $mimeType);
+        header('Content-Length: ' . filesize($targetPath));
+        readfile($targetPath);
+        exit;
+    }
+
+    http_response_code(404);
+    exit;
+}
+
+// Serve theme assets
 $themePrefixes = ['/themes/'];
 if (defined('APP_BASE') && APP_BASE) {
     $normalizedBase = '/' . ltrim(APP_BASE, '/');
@@ -33,7 +87,26 @@ if ($matchedPrefixLen !== null) {
     $targetPath = $themesRoot ? realpath($themesRoot . DIRECTORY_SEPARATOR . $relativePath) : false;
 
     if ($themesRoot && $targetPath && str_starts_with($targetPath, $themesRoot) && is_file($targetPath)) {
-        $mimeType = mime_content_type($targetPath) ?: 'application/octet-stream';
+        // Determine MIME type with fallback to extension-based detection
+        $extension = strtolower(pathinfo($targetPath, PATHINFO_EXTENSION));
+        $mimeTypes = [
+            'css' => 'text/css',
+            'js' => 'application/javascript',
+            'json' => 'application/json',
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'svg' => 'image/svg+xml',
+            'woff' => 'font/woff',
+            'woff2' => 'font/woff2',
+            'ttf' => 'font/ttf',
+            'otf' => 'font/otf',
+            'ico' => 'image/x-icon'
+        ];
+        
+        $mimeType = $mimeTypes[$extension] ?? (mime_content_type($targetPath) ?: 'application/octet-stream');
+        
         header('Content-Type: ' . $mimeType);
         header('Content-Length: ' . filesize($targetPath));
         readfile($targetPath);

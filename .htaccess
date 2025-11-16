@@ -32,7 +32,7 @@ RedirectMatch 403 ^/(app|config|database|storage|vendor|tests)/.*$
     RewriteCond %{REQUEST_URI} public
     RewriteRule ^(.*)public/?(.*)$ /$1$2 [R=301,L]
     
-    # Serve static files directly
+    # Serve static files directly with proper MIME types
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule .* - [L]
     

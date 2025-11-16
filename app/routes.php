@@ -79,6 +79,22 @@ $router->add('POST', '/api/marketing/update-preferences', 'Api\MarketingControll
 $router->add('GET', '/admin', 'Admin\MainDashboardController@index', ['auth', 'admin']);
 $router->add('GET', '/admin/dashboard', 'Admin\MainDashboardController@index', ['auth', 'admin']);
 
+// Users Management
+$router->add('GET', '/admin/users', 'Admin\UserManagementController@index', ['auth', 'admin']);
+
+// Calculations
+$router->add('GET', '/admin/calculations', 'Admin\CalculationsController@index', ['auth', 'admin']);
+
+// Modules Management  
+$router->add('GET', '/admin/modules', 'Admin\ModuleController@index', ['auth', 'admin']);
+
+// System Routes
+$router->add('GET', '/admin/logs', 'Admin\LogsController@index', ['auth', 'admin']);
+$router->add('GET', '/admin/logs/download/{filename}', 'Admin\LogsController@download', ['auth', 'admin']);
+$router->add('GET', '/admin/logs/view/{filename}', 'Admin\LogsController@viewLog', ['auth', 'admin']);
+$router->add('GET', '/admin/backup', 'Admin\BackupController@index', ['auth', 'admin']);
+$router->add('GET', '/admin/system-status', 'Admin\SystemStatusController@index', ['auth', 'admin']);
+
 // Module Management
 $router->add('GET', '/admin/modules', 'Admin\MainDashboardController@modules', ['auth', 'admin']);
 $router->add('POST', '/admin/modules/activate', 'Admin\MainDashboardController@activateModule', ['auth', 'admin']);

@@ -262,17 +262,82 @@ class MainDashboardController extends Controller
      * Get dashboard statistics
      */
     private function getDashboardStats()
-    {
-        return [
-            'total_users' => 1247,
-            'active_users' => 892,
-            'total_calculations' => 15673,
-            'monthly_calculations' => 2341,
-            'active_modules' => 12,
-            'system_health' => 98.5,
-            'storage_used' => 67,
-            'api_requests' => 8934
-        ];
+    {        
+        try {
+            // Get total users count
+            $userStmt = $this->db->query("SELECT COUNT(*) as count FROM users");
+            $totalUsers = $userStmt->fetch(\PDO::FETCH_ASSOC)['count'] ?? 0;
+            
+            // Get active users (last 30 days)
+            $activeStmt = $this->db->query("
+                SELECT COUNT(DISTINCT user_id) as count 
+                FROM calculation_history 
+                WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+            ");
+            $activeUsers = $activeStmt->fetch(\PDO::FETCH_ASSOC)['count'] ?? 0;
+            
+            // Get total calculations
+            $calcStmt = $this->db->query("SELECT COUNT(*) as count FROM calculation_history");
+            $totalCalculations = $calcStmt->fetch(\PDO::FETCH_ASSOC)['count'] ?? 0;
+            
+            // Get monthly calculations
+            $monthlyStmt = $this->db->query("
+                SELECT COUNT(*) as count 
+                FROM calculation_history 
+                WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+            ");
+            $monthlyCalculations = $monthlyStmt->fetch(\PDO::FETCH_ASSOC)['count'] ?? 0;
+            
+            // Count active modules (directories in modules folder)
+            $modulesPath = BASE_PATH . '/modules';
+            $activeModules = 0;
+            if (is_dir($modulesPath)) {
+                $modules = scandir($modulesPath);
+                foreach ($modules as $module) {
+                    if ($module !== '.' && $module !== '..' && is_dir($modulesPath . '/' . $module)) {
+                        $activeModules++;
+                    }
+                }
+            }
+            
+            // Calculate system health based on various metrics
+            $systemHealth = 95.0; // Default good health
+            
+            // Check disk space
+            $total = disk_total_space(BASE_PATH);
+            $free = disk_free_space(BASE_PATH);
+            $storageUsed = $total > 0 ? round((($total - $free) / $total) * 100, 1) : 0;
+            
+            if ($storageUsed > 90) {
+                $systemHealth -= 10;
+            } elseif ($storageUsed > 80) {
+                $systemHealth -= 5;
+            }
+            
+            return [
+                'total_users' => $totalUsers,
+                'active_users' => $activeUsers,
+                'total_calculations' => $totalCalculations,
+                'monthly_calculations' => $monthlyCalculations,
+                'active_modules' => $activeModules,
+                'system_health' => $systemHealth,
+                'storage_used' => $storageUsed,
+                'api_requests' => 0 // Can be tracked later if needed
+            ];
+        } catch (\Exception $e) {
+            // Return default values if database query fails
+            error_log('Dashboard stats error: ' . $e->getMessage());
+            return [
+                'total_users' => 0,
+                'active_users' => 0,
+                'total_calculations' => 0,
+                'monthly_calculations' => 0,
+                'active_modules' => 0,
+                'system_health' => 100,
+                'storage_used' => 0,
+                'api_requests' => 0
+            ];
+        }
     }
 
     /**
