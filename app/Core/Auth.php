@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Core;
 
 use App\Models\User;
@@ -12,6 +13,11 @@ class Auth
         if ($user && password_verify($password, $user->password)) {
             if (!$user->is_active) {
                 return ['success' => false, 'message' => 'Account is deactivated'];
+            }
+            
+            // Start session if needed
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
             }
             
             // Create session
@@ -50,11 +56,13 @@ class Auth
             ");
             $stmt->execute([$user->id]);
             
-            // Regenerate session ID for security
-            if (session_status() === PHP_SESSION_ACTIVE) {
-                session_regenerate_id(true);
-            }
-            // Set session cookie
+            // Set session variables for backward compatibility
+            $_SESSION['user_id'] = $user->id;
+            $_SESSION['username'] = $user->username;
+            $_SESSION['user'] = (array) $user;
+            $_SESSION['is_admin'] = ($user->role === 'admin');
+            
+            // Set cookie
             setcookie('auth_token', $sessionToken, [
                 'expires' => time() + (30 * 24 * 60 * 60),
                 'path' => '/',
@@ -87,6 +95,16 @@ class Auth
     
     public static function logout()
     {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        // Clear session variables
+        unset($_SESSION['user_id']);
+        unset($_SESSION['username']);
+        unset($_SESSION['user']);
+        unset($_SESSION['is_admin']);
+        
         if (isset($_COOKIE['auth_token'])) {
             $token = $_COOKIE['auth_token'];
             
@@ -105,17 +123,36 @@ class Auth
             ]);
         }
         
+        // Destroy session
         session_destroy();
     }
     
     public static function check()
     {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        // Check session-based authentication first
+        if (!empty($_SESSION['user_id'])) {
+            $user = User::findByUsername($_SESSION['username'] ?? '');
+            if ($user) {
+                // Update last activity
+                $db = Database::getInstance();
+                $stmt = $db->prepare("UPDATE user_sessions SET last_activity = NOW() WHERE user_id = ?");
+                $stmt->execute([$user->id]);
+                
+                return (object) $user;
+            }
+        }
+        
+        // Fallback: Check cookie-based authentication
         if (isset($_COOKIE['auth_token'])) {
             $token = $_COOKIE['auth_token'];
             
             $db = Database::getInstance();
             $stmt = $db->prepare("
-                SELECT us.*, u.* 
+                SELECT u.* 
                 FROM user_sessions us 
                 JOIN users u ON us.user_id = u.id 
                 WHERE us.session_token = ? AND us.expires_at > NOW() AND u.is_active = 1
@@ -125,12 +162,15 @@ class Auth
             
             if ($session) {
                 // Update last activity
-                $stmt = $db->prepare("
-                    UPDATE user_sessions SET last_activity = NOW() WHERE session_token = ?
-                ");
+                $stmt = $db->prepare("UPDATE user_sessions SET last_activity = NOW() WHERE session_token = ?");
                 $stmt->execute([$token]);
                 
-                // Return a simple user object with properties
+                // Sync session variables
+                $_SESSION['user_id'] = $session['id'];
+                $_SESSION['username'] = $session['username'];
+                $_SESSION['user'] = $session;
+                $_SESSION['is_admin'] = ($session['role'] === 'admin');
+                
                 return (object) $session;
             }
         }
@@ -146,7 +186,15 @@ class Auth
     public static function isAdmin()
     {
         $user = self::check();
-        return $user && $user->role === 'admin';
+        if (!$user) return false;
+        
+        // Check multiple possible admin indicators
+        $isAdmin = 
+            (isset($user->role) && $user->role === 'admin') ||
+            (isset($user->is_admin) && $user->is_admin) ||
+            (isset($_SESSION['is_admin']) && $_SESSION['is_admin']);
+            
+        return $isAdmin;
     }
     
     private static function getClientIp()

@@ -38,7 +38,7 @@ class SettingsController extends Controller
             'general_settings' => $this->getGeneralSettings()
         ];
 
-        $this->view('admin/settings/index', $data);
+        $this->view('admin/settings/general', $data);
     }
 
     /**

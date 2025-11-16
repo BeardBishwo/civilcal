@@ -10,9 +10,12 @@ echo "Starting database migrations...\n\n";
 try {
     // List of all migration files in order
     $migrations = [
+        
         '001_create_users_table.php',
-        '002_create_subscriptions_table.php', 
-        '003_create_calculations_table.php',
+        '001_plugin_theme_system.php',
+        '002_create_subscriptions_table.php',
+        '002_theme_editor_tables.php',
+        '003_create_subscriptions_table.php',
         '004_create_calculation_history.php',
         '009_create_export_templates.php',
         '010_add_profile_fields_to_users.php',
@@ -22,12 +25,15 @@ try {
         '014_create_email_threads_table.php',
         '015_create_email_responses_table.php',
         '016_create_email_templates_table.php',
-        '017_create_admin_tables.php',
-        '018_create_complete_system_tables.php'
+        '018_create_complete_system_tables.php',
+
+
     ];
 
     $completed = 0;
     $failed = 0;
+
+    $pdo = \App\Core\Database::getInstance()->getPdo();
 
     foreach ($migrations as $migrationFile) {
         $migrationPath = __DIR__ . '/migrations/' . $migrationFile;
@@ -48,7 +54,12 @@ try {
                     $migration = new $className();
                     
                     if (method_exists($migration, 'up')) {
-                        $migration->up();
+                        $reflection = new ReflectionMethod($migration, 'up');
+                        if ($reflection->getNumberOfParameters() >= 1) {
+                            $migration->up($pdo);
+                        } else {
+                            $migration->up();
+                        }
                         echo "✅ Completed: $migrationFile\n\n";
                         $completed++;
                     } else {

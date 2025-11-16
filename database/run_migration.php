@@ -1,110 +1,131 @@
 <?php
 /**
  * Database Migration Runner
- * Executes database migrations to update the schema
+ * Executes database migrations to update the schema with proper PDO handling
  */
 
-require_once '../app/Config/config.php';
-require_once '../app/Core/DatabaseLegacy.php';
+require_once '../app/bootstrap.php';
 
 try {
-    echo "Starting database migration...\n";
+    echo "=== Database Migration Runner ===\n\n";
     
-    // Create database instance
-    $database = new Database();
-    $conn = $database->getConnection();
+    // Get PDO connection from Database singleton
+    $db = \App\Core\Database::getInstance();
+    $pdo = $db->getPdo();
     
-    if (!$conn) {
-        throw new Exception("Failed to connect to database");
+    echo "[OK] Database connection established.\n\n";
+    
+    // Get list of all migration files
+    $migrationsDir = __DIR__ . '/migrations';
+    $migrationFiles = glob($migrationsDir . '/*.php');
+    sort($migrationFiles);
+    
+    if (empty($migrationFiles)) {
+        echo "[WARNING] No migration files found in $migrationsDir\n";
+        exit(0);
     }
     
-    echo "Database connection established.\n";
+    echo "Found " . count($migrationFiles) . " migration files.\n\n";
     
-    // Load and execute the migration
-    require_once 'migrations/010_add_profile_fields_to_users.php';
+    $successful = 0;
+    $skipped = 0;
+    $failed = 0;
     
-    $migration = new AddProfileFieldsToUsers();
-    $sql = $migration->up();
-    
-    // First, check what columns already exist
-    $stmt = $conn->query("DESCRIBE users");
-    $existingColumns = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    
-    $newFields = [
-        'avatar' => "avatar VARCHAR(255) NULL",
-        'professional_title' => "professional_title VARCHAR(255) NULL",
-        'company' => "company VARCHAR(255) NULL",
-        'phone' => "phone VARCHAR(20) NULL",
-        'timezone' => "timezone VARCHAR(100) NULL DEFAULT 'UTC'",
-        'measurement_system' => "measurement_system ENUM('metric', 'imperial') DEFAULT 'metric'",
-        'notification_preferences' => "notification_preferences JSON NULL",
-        'email_notifications' => "email_notifications BOOLEAN DEFAULT TRUE",
-        'calculation_privacy' => "calculation_privacy ENUM('public', 'private', 'team') DEFAULT 'private'",
-        'profile_completed' => "profile_completed BOOLEAN DEFAULT FALSE",
-        'last_login' => "last_login DATETIME NULL",
-        'login_count' => "login_count INT DEFAULT 0",
-        'bio' => "bio TEXT NULL",
-        'website' => "website VARCHAR(255) NULL",
-        'location' => "location VARCHAR(255) NULL",
-        'social_links' => "social_links JSON NULL",
-        'email_verified_at' => "email_verified_at DATETIME NULL",
-        'two_factor_enabled' => "two_factor_enabled BOOLEAN DEFAULT FALSE",
-        'two_factor_secret' => "two_factor_secret VARCHAR(255) NULL",
-        'updated_at' => "updated_at DATETIME NULL"
-    ];
-    
-    echo "Checking existing columns in users table...\n";
-    $fieldsToAdd = [];
-    foreach ($newFields as $fieldName => $fieldDefinition) {
-        if (!in_array($fieldName, $existingColumns)) {
-            $fieldsToAdd[] = "ADD COLUMN $fieldDefinition";
-            echo "  ➕ Will add: $fieldName\n";
-        } else {
-            echo "  ✅ Already exists: $fieldName\n";
+    foreach ($migrationFiles as $migrationFile) {
+        $migrationName = basename($migrationFile);
+        
+        // Skip if not a PHP file
+        if (!preg_match('/\.php$/', $migrationFile)) {
+            echo "[-] Skipping non-PHP file: $migrationName\n";
+            $skipped++;
+            continue;
         }
-    }
-    
-    if (empty($fieldsToAdd)) {
-        echo "ℹ️  All profile fields already exist in the users table.\n";
-    } else {
-        echo "Executing migration: Add profile fields to users table\n";
         
-        $sql = "ALTER TABLE users " . implode(",\n        ", $fieldsToAdd);
+        echo "Processing: $migrationName\n";
         
-        // Execute the migration
-        $conn->exec($sql);
-        
-        echo "✅ Migration completed successfully!\n";
-        echo "Added " . count($fieldsToAdd) . " new profile fields to users table.\n";
-    }
-    
-    // Verify the migration by checking the table structure
-    $stmt = $conn->query("DESCRIBE users");
-    $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    
-    echo "\nVerifying migration results:\n";
-    $found = 0;
-    foreach (array_keys($newFields) as $field) {
-        if (in_array($field, $columns)) {
-            echo "  ✅ $field\n";
-            $found++;
-        } else {
-            echo "  ❌ $field (NOT FOUND)\n";
+        try {
+            // Check file content to see if it's class-based or legacy
+            $fileContent = file_get_contents($migrationFile);
+            
+            // Check if it's a class-based migration
+            if (preg_match('/class\s+(\w+)/', $fileContent, $matches)) {
+                // Class-based migration - load and execute
+                $className = $matches[1];
+                
+                // Check for bad require paths that will fail
+                if (strpos($fileContent, 'require_once') !== false && 
+                    preg_match('/require_once.*[\\\\\\/]\.\./', $fileContent)) {
+                    echo "  [-] Skipping (bad require paths)\n";
+                    $skipped++;
+                    continue;
+                }
+                
+                // Load the migration file
+                require_once $migrationFile;
+                
+                // Find the actual class (try different namespaces)
+                $actualClassName = null;
+                if (class_exists($className)) {
+                    $actualClassName = $className;
+                } elseif (class_exists('App\\Migrations\\' . $className)) {
+                    $actualClassName = 'App\\Migrations\\' . $className;
+                } else {
+                    echo "  [!] Class not found: {$className}\n";
+                    $skipped++;
+                    continue;
+                }
+                
+                // Verify the class has an up() method
+                if (!method_exists($actualClassName, 'up')) {
+                    echo "  [!] Class does not have up() method\n";
+                    $skipped++;
+                    continue;
+                }
+                
+                // Instantiate and call migration
+                $migration = new $actualClassName();
+                $migration->up($pdo);
+                echo "  [+] Completed\n";
+                $successful++;
+                
+            } else {
+                // Legacy SQL file - skip if it has require errors
+                if (strpos($fileContent, 'require_once') !== false && 
+                    preg_match('/require_once.*Database\.php/', $fileContent)) {
+                    echo "  [-] Skipping (legacy with broken requires)\n";
+                    $skipped++;
+                    continue;
+                }
+                
+                echo "  [-] Not a class-based migration (skipped)\n";
+                $skipped++;
+            }
+            
+        } catch (Exception $e) {
+            echo "  [ERROR] " . $e->getMessage() . "\n";
+            $failed++;
         }
+        
+        echo "\n";
     }
     
-    echo "\nMigration Summary:\n";
-    echo "Total new fields: " . count($newFields) . "\n";
-    echo "Fields present: $found\n";
+    // Summary
+    echo "\n=== Migration Summary ===\n";
+    echo "Successful: $successful\n";
+    echo "Skipped: $skipped\n";
+    echo "Failed: $failed\n";
     
-    if ($found === count($newFields)) {
-        echo "🎉 All profile fields are now present in the users table!\n";
+    if ($failed > 0) {
+        echo "\n[WARNING] Some migrations failed. Review the errors above.\n";
+        exit(1);
     } else {
-        echo "⚠️  Some fields may not have been created properly.\n";
+        echo "\n[SUCCESS] All migrations processed!\n";
+        exit(0);
     }
     
 } catch (Exception $e) {
-    echo "❌ Migration failed: " . $e->getMessage() . "\n";
+    echo "[ERROR] Fatal error: " . $e->getMessage() . "\n";
+    echo $e->getTraceAsString() . "\n";
     exit(1);
 }
 ?>

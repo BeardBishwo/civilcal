@@ -1,11 +1,15 @@
 <?php
 
 class CreateCompleteSystemTables {
-    public function up() {
-        $db = \App\Core\Database::getInstance();
+    public function up($pdo = null) {
+        // If no PDO provided, try to get it from Database singleton
+        if ($pdo === null) {
+            $db = \App\Core\Database::getInstance();
+            $pdo = $db->getPdo();
+        }
         
         // Users table (if not exists)
-        $db->exec("
+        $pdo->exec("
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(100) UNIQUE NOT NULL,
@@ -28,23 +32,47 @@ class CreateCompleteSystemTables {
             )
         ");
         
-        // Settings table
-        $db->exec("
-            CREATE TABLE IF NOT EXISTS settings (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                setting_key VARCHAR(255) UNIQUE NOT NULL,
-                setting_value TEXT,
-                setting_type ENUM('string', 'boolean', 'integer', 'json') DEFAULT 'string',
-                setting_group VARCHAR(100) DEFAULT 'general',
-                description TEXT,
-                is_public BOOLEAN DEFAULT FALSE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            )
-        ");
+        // Settings table - check if setting_group column exists before adding it
+        try {
+            // Check if settings table exists and has setting_group column
+            $result = $pdo->query("DESCRIBE settings")->fetchAll(PDO::FETCH_ASSOC);
+            $hasSettingGroup = false;
+            foreach ($result as $col) {
+                if ($col['Field'] === 'setting_group') {
+                    $hasSettingGroup = true;
+                    break;
+                }
+            }
+            
+            // If settings table exists but missing columns, add them
+            if (!$hasSettingGroup) {
+                $pdo->exec("ALTER TABLE settings ADD COLUMN setting_group VARCHAR(100) DEFAULT 'general' AFTER setting_type");
+            }
+            if (!in_array('description', array_column($result, 'Field'))) {
+                $pdo->exec("ALTER TABLE settings ADD COLUMN description TEXT AFTER setting_group");
+            }
+            if (!in_array('is_public', array_column($result, 'Field'))) {
+                $pdo->exec("ALTER TABLE settings ADD COLUMN is_public BOOLEAN DEFAULT FALSE AFTER description");
+            }
+        } catch (Exception $e) {
+            // Settings table doesn't exist, create it
+            $pdo->exec("
+                CREATE TABLE IF NOT EXISTS settings (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    setting_key VARCHAR(255) UNIQUE NOT NULL,
+                    setting_value TEXT,
+                    setting_type ENUM('string', 'boolean', 'integer', 'json') DEFAULT 'string',
+                    setting_group VARCHAR(100) DEFAULT 'general',
+                    description TEXT,
+                    is_public BOOLEAN DEFAULT FALSE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                )
+            ");
+        }
         
         // User sessions table
-        $db->exec("
+        $pdo->exec("
             CREATE TABLE IF NOT EXISTS user_sessions (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT NOT NULL,
@@ -58,7 +86,7 @@ class CreateCompleteSystemTables {
         ");
         
         // Login history table
-        $db->exec("
+        $pdo->exec("
             CREATE TABLE IF NOT EXISTS login_history (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT NOT NULL,
@@ -72,7 +100,7 @@ class CreateCompleteSystemTables {
         ");
         
         // System logs table
-        $db->exec("
+        $pdo->exec("
             CREATE TABLE IF NOT EXISTS system_logs (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 level ENUM('INFO', 'WARNING', 'ERROR', 'DEBUG') DEFAULT 'INFO',
@@ -88,14 +116,14 @@ class CreateCompleteSystemTables {
         ");
         
         // Insert default admin user
-        $this->insertDefaultData($db);
+        $this->insertDefaultData($pdo);
     }
     
-    private function insertDefaultData($db) {
+    private function insertDefaultData($pdo) {
         // Insert default admin user (password: admin123)
         $hashedPassword = password_hash('admin123', PASSWORD_DEFAULT);
         
-        $stmt = $db->prepare("
+        $stmt = $pdo->prepare("
             INSERT IGNORE INTO users 
             (username, email, password, role, first_name, last_name, is_active, email_verified) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -130,7 +158,7 @@ class CreateCompleteSystemTables {
             ['maintenance_mode', '0', 'boolean', 'system', 'Maintenance mode']
         ];
         
-        $stmt = $db->prepare("
+        $stmt = $pdo->prepare("
             INSERT IGNORE INTO settings 
             (setting_key, setting_value, setting_type, setting_group, description) 
             VALUES (?, ?, ?, ?, ?)
@@ -141,12 +169,15 @@ class CreateCompleteSystemTables {
         }
     }
     
-    public function down() {
-        $db = \App\Core\Database::getInstance();
+    public function down($pdo = null) {
+        if ($pdo === null) {
+            $db = \App\Core\Database::getInstance();
+            $pdo = $db->getPdo();
+        }
         $tables = ['users', 'settings', 'user_sessions', 'login_history', 'system_logs'];
         
         foreach ($tables as $table) {
-            $db->exec("DROP TABLE IF EXISTS $table");
+            $pdo->exec("DROP TABLE IF EXISTS $table");
         }
     }
 }
