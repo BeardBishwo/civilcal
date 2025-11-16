@@ -89,10 +89,10 @@ ob_start();
     <?php else: ?>
         <?php foreach ($themes as $theme): ?>
             <div class="theme-item" 
-                 style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; overflow: hidden; <?php echo $theme['status'] === 'active' ? 'border-color: #34d399;' : ''; ?> <?php echo $theme['status'] === 'deleted' ? 'opacity: 0.75;' : ''; ?>">
+                 style="background: #FFFFFF; border: 1px solid #E5E9F1; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.04); <?php echo $theme['status'] === 'active' ? 'border-color: #34d399;' : ''; ?> <?php echo $theme['status'] === 'deleted' ? 'opacity: 0.75;' : ''; ?>">
                 <!-- Theme Preview -->
                 <div style="position: relative;">
-                    <div style="height: 180px; background: #0a0e27; display: flex; align-items: center; justify-content: center;">
+                    <div style="height: 180px; background: #f7f9fc; display: flex; align-items: center; justify-content: center;">
                         <?php $preview = $theme['screenshot_path'] ?? ($theme['preview_image'] ?? null); ?>
                         <?php if ($preview): ?>
                             <img src="<?php echo htmlspecialchars($preview); ?>" alt="Theme Preview" style="width: 100%; height: 100%; object-fit: cover;">
@@ -125,16 +125,16 @@ ob_start();
                 </div>
 
                 <div style="padding: 1.5rem;">
-                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #f9fafb; margin: 0 0 0.5rem 0;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0 0 0.5rem 0;">
                         <?php echo htmlspecialchars($theme['display_name'] ?? $theme['name']); ?>
                     </h3>
-                    <p style="color: #9ca3af; font-size: 0.875rem; margin: 0 0 1rem 0;">
+                    <p style="color: #64748b; font-size: 0.875rem; margin: 0 0 1rem 0;">
                         <?php echo htmlspecialchars($theme['description'] ?? 'No description available'); ?>
                     </p>
                     
                     <!-- Theme Meta -->
                     <div style="margin-bottom: 1.5rem;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.875rem; color: #9ca3af;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.875rem; color: #64748b;">
                             <div>
                                 <strong>Version:</strong><br>
                                 <?php echo htmlspecialchars($theme['version']); ?>
@@ -147,7 +147,7 @@ ob_start();
                     </div>
                 </div>
 
-                <div style="background: rgba(10, 14, 39, 0.5); padding: 1.5rem; border-top: 1px solid rgba(102, 126, 234, 0.1);">
+                <div style="background: #f7f9fc; padding: 1.5rem; border-top: 1px solid #E5E9F1;">
                     <!-- Action Buttons -->
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
                         <?php if ($theme['status'] !== 'active'): ?>
@@ -182,36 +182,36 @@ ob_start();
 
 <!-- Upload Theme Modal -->
 <div class="modal" id="uploadThemeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 10000; align-items: center; justify-content: center;">
-    <div style="background: #0a0e27; border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; width: 90%; max-width: 600px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid rgba(102, 126, 234, 0.1);">
-            <h3 style="font-size: 1.25rem; font-weight: 600; color: #f9fafb; margin: 0;">
+    <div style="background: #FFFFFF; border: 1px solid #E5E9F1; border-radius: 12px; width: 90%; max-width: 600px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid #E5E9F1;">
+            <h3 style="font-size: 1.25rem; font-weight: 600; color: #1e293b; margin: 0;">
                 <i class="fas fa-cloud-upload-alt" style="margin-right: 0.5rem;"></i>Upload New Theme
             </h3>
             <button data-bs-dismiss="modal" style="background: transparent; border: none; color: #9ca3af; cursor: pointer; font-size: 1.5rem;">×</button>
         </div>
         <form id="uploadThemeForm" enctype="multipart/form-data" style="padding: 1.5rem;">
-            <div id="uploadArea" style="border: 2px dashed rgba(102, 126, 234, 0.2); border-radius: 8px; padding: 2rem; text-align: center; margin-bottom: 1.5rem; cursor: pointer;">
+            <div id="uploadArea" style="border: 2px dashed #E5E9F1; border-radius: 8px; padding: 2rem; text-align: center; margin-bottom: 1.5rem; cursor: pointer; transition: all 0.2s;">
                 <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #9ca3af; margin-bottom: 1rem;"></i>
-                <p style="color: #9ca3af; margin: 0 0 1rem 0;">Drag & drop your theme ZIP file here, or click to browse</p>
+                <p style="color: #64748b; margin: 0 0 1rem 0;">Drag & drop your theme ZIP file here, or click to browse</p>
                 <input type="file" id="themeZipFile" name="theme_zip" accept=".zip" required style="display: none;">
-                <button type="button" id="browseFileBtn" style="background: transparent; color: #4cc9f0; border: 1px solid rgba(102, 126, 234, 0.2); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">Browse Files</button>
+                <button type="button" id="browseFileBtn" style="background: transparent; color: #4361ee; border: 1px solid #E5E9F1; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">Browse Files</button>
                 <div style="margin-top: 1rem;">
                     <small style="color: #9ca3af;">Maximum file size: 10MB</small>
                 </div>
             </div>
             
             <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px; padding: 1rem;">
-                <h4 style="font-size: 1rem; font-weight: 600; color: #f9fafb; margin: 0 0 1rem 0;">
+                <h4 style="font-size: 1rem; font-weight: 600; color: #1e293b; margin: 0 0 1rem 0;">
                     <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>Theme Requirements
                 </h4>
-                <ul style="color: #9ca3af; margin: 0; padding-left: 1.5rem; font-size: 0.875rem;">
+                <ul style="color: #64748b; margin: 0; padding-left: 1.5rem; font-size: 0.875rem;">
                     <li style="margin-bottom: 0.5rem;">ZIP file must contain a valid theme configuration</li>
                     <li>Recommended theme size: Under 10MB</li>
                 </ul>
             </div>
         </form>
-        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; padding: 1.5rem; border-top: 1px solid rgba(102, 126, 234, 0.1);">
-            <button data-bs-dismiss="modal" style="background: transparent; color: #9ca3af; border: 1px solid rgba(102, 126, 234, 0.2); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">Cancel</button>
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; padding: 1.5rem; border-top: 1px solid #E5E9F1;">
+            <button data-bs-dismiss="modal" style="background: transparent; color: #64748b; border: 1px solid #E5E9F1; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">Cancel</button>
             <button id="uploadSubmitBtn" disabled style="background: #4361ee; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
                 <i class="fas fa-upload"></i>
                 <span>Upload Theme</span>
@@ -221,15 +221,39 @@ ob_start();
 </div>
 
 <script>
-// Simple JavaScript for theme actions
+// Enhanced JavaScript for theme actions with AJAX functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Get CSRF token if available
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
     // Activate theme
     document.querySelectorAll('.activate-theme').forEach(button => {
         button.addEventListener('click', function() {
             const themeId = this.dataset.themeId;
             if (confirm('Are you sure you want to activate this theme?')) {
-                // In a real implementation, this would make an AJAX call
-                alert('Theme activation would happen here. Theme ID: ' + themeId);
+                // Make AJAX call to activate theme
+                fetch('/admin/themes/activate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        ...(csrfToken && {'X-CSRF-Token': csrfToken})
+                    },
+                    body: 'theme_id=' + encodeURIComponent(themeId)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Theme activated successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while activating the theme.');
+                });
             }
         });
     });
@@ -239,8 +263,29 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const themeId = this.dataset.themeId;
             if (confirm('Are you sure you want to delete this theme?')) {
-                // In a real implementation, this would make an AJAX call
-                alert('Theme deletion would happen here. Theme ID: ' + themeId);
+                // Make AJAX call to delete theme
+                fetch('/admin/themes/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        ...(csrfToken && {'X-CSRF-Token': csrfToken})
+                    },
+                    body: 'theme_id=' + encodeURIComponent(themeId)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Theme deleted successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the theme.');
+                });
             }
         });
     });
@@ -250,8 +295,29 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const themeId = this.dataset.themeId;
             if (confirm('Are you sure you want to restore this theme?')) {
-                // In a real implementation, this would make an AJAX call
-                alert('Theme restoration would happen here. Theme ID: ' + themeId);
+                // Make AJAX call to restore theme
+                fetch('/admin/themes/restore', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        ...(csrfToken && {'X-CSRF-Token': csrfToken})
+                    },
+                    body: 'theme_id=' + encodeURIComponent(themeId)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Theme restored successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while restoring the theme.');
+                });
             }
         });
     });
@@ -261,6 +327,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('themeZipFile');
     const browseBtn = document.getElementById('browseFileBtn');
     const submitBtn = document.getElementById('uploadSubmitBtn');
+    const uploadForm = document.getElementById('uploadThemeForm');
     
     browseBtn.addEventListener('click', () => fileInput.click());
     
@@ -277,13 +344,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     uploadArea.addEventListener('dragleave', function() {
-        this.style.borderColor = 'rgba(102, 126, 234, 0.2)';
+        this.style.borderColor = '#E5E9F1';
         this.style.backgroundColor = 'transparent';
     });
     
     uploadArea.addEventListener('drop', function(e) {
         e.preventDefault();
-        this.style.borderColor = 'rgba(102, 126, 234, 0.2)';
+        this.style.borderColor = '#E5E9F1';
         this.style.backgroundColor = 'transparent';
         
         const files = e.dataTransfer.files;
@@ -291,6 +358,51 @@ document.addEventListener('DOMContentLoaded', function() {
             fileInput.files = files;
             submitBtn.disabled = false;
         }
+    });
+    
+    // Handle form submission
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!fileInput.files.length) {
+            alert('Please select a theme file to upload.');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('theme_zip', fileInput.files[0]);
+        
+        // Show uploading state
+        submitBtn.disabled = true;
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        
+        // Make AJAX call to upload theme
+        fetch('/admin/themes/upload', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                ...(csrfToken && {'X-CSRF-Token': csrfToken})
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Theme uploaded successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while uploading the theme.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        });
     });
     
     // Modal functionality
@@ -318,6 +430,16 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.addEventListener('click', function(e) {
             if (e.target === this) {
                 this.style.display = 'none';
+            }
+        });
+    });
+    
+    // Customize theme button
+    document.querySelectorAll('#customizeThemeBtn').forEach(button => {
+        button.addEventListener('click', function() {
+            const themeId = this.dataset.themeId;
+            if (themeId) {
+                window.location.href = '/admin/themes/' + encodeURIComponent(themeId) + '/customize';
             }
         });
     });

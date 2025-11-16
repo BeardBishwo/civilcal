@@ -1,42 +1,18 @@
 <?php
-// Environment settings
-define('ENVIRONMENT', getenv('APP_ENV') ?: 'development'); // 'development', 'staging', 'production'
-
-// Enhanced approach: determine APP_BASE dynamically from request context
-// Works with both .test domains and subdirectory installations
-function get_app_base() {
-    // For .test domains (document root), use empty base
-    if (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], '.test') !== false) {
-        return '';
+// Environment detection
+if (!defined('ENVIRONMENT')) {
+    if (isset($_SERVER['APP_ENV'])) {
+        define('ENVIRONMENT', $_SERVER['APP_ENV']);
+    } elseif (getenv('APP_ENV')) {
+        define('ENVIRONMENT', getenv('APP_ENV'));
+    } else {
+        define('ENVIRONMENT', 'development');
     }
-    
-    // For subdirectory installations, detect from SCRIPT_NAME
-    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-    $baseDir = dirname($scriptName);
-    
-    // Remove /public from path if present (for clean URLs)
-    if (substr($baseDir, -7) === '/public') {
-        $baseDir = substr($baseDir, 0, -7);
-    }
-    
-    // Normalize path
-    if ($baseDir === '/' || $baseDir === '\\' || $baseDir === '.') {
-        return '';
-    }
-    
-    return $baseDir;
 }
 
-define('APP_BASE', get_app_base());
-
-// Generate dynamic APP_URL based on current request
-function get_app_url() {
-    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $base = defined('APP_BASE') ? APP_BASE : '';
-    return $protocol . '://' . $host . $base;
-}
-
+// App configuration
+define('APP_NAME', getenv('APP_NAME') ?: 'Bishwo Calculator');
+define('APP_BASE', getenv('APP_BASE') ?: '/Bishwo_Calculator');
 define('APP_URL', getenv('APP_URL') ?: get_app_url());
 
 // Security settings
@@ -68,6 +44,7 @@ define('MAIL_ENABLED', getenv('MAIL_ENABLED') ?: false);
 define('MAIL_FROM', getenv('MAIL_FROM') ?: 'noreply@example.com');
 define('MAIL_FROM_NAME', getenv('MAIL_FROM_NAME') ?: 'AEC Calculator');
 define('MAIL_REPLY_TO', getenv('MAIL_REPLY_TO') ?: 'support@example.com');
+define('MAIL_TO', getenv('MAIL_TO') ?: 'admin@example.com');
 
 // SMTP settings (required for reliable email delivery)
 define('MAIL_SMTP_HOST', getenv('MAIL_SMTP_HOST') ?: 'smtp.example.com');
@@ -106,6 +83,13 @@ if (!headers_sent()) {
     if (ENVIRONMENT === 'production') {
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
     }
+}
+
+// Helper function to get app URL
+function get_app_url() {
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    return $protocol . '://' . $host . APP_BASE;
 }
 
 ?>

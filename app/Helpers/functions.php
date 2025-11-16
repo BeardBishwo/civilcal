@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . "/../Config/config.php";
+
 // Initialize secure session
 function init_secure_session()
 {
@@ -344,6 +345,26 @@ function clear_old_input(): void
     if (isset($_SESSION["_old_input"])) {
         unset($_SESSION["_old_input"]);
     }
+}
+
+/**
+ * Sanitize text field for security
+ */
+function sanitize_text_field($value)
+{
+    if (is_array($value)) {
+        return array_map('sanitize_text_field', $value);
+    }
+    
+    if (is_string($value)) {
+        // Remove HTML tags and encode special characters
+        $value = strip_tags($value);
+        $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+        // Trim whitespace
+        $value = trim($value);
+    }
+    
+    return $value;
 }
 
 ?>
