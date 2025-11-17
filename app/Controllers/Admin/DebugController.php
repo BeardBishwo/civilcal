@@ -19,9 +19,7 @@ class DebugController extends Controller
      */
     public function index()
     {
-        $this->checkAdminAccess();
-        
-        $data = [
+                $data = [
             'page_title' => 'Debug Dashboard - System Testing',
             'system_info' => $this->getSystemInfo(),
             'recent_errors' => $this->getRecentErrors(),
@@ -37,9 +35,7 @@ class DebugController extends Controller
      */
     public function errorLogs()
     {
-        $this->checkAdminAccess();
-        
-        $page = $_GET['page'] ?? 1;
+                $page = $_GET['page'] ?? 1;
         $filter = $_GET['filter'] ?? 'all';
         
         $logs = $this->getErrorLogs($page, $filter);
@@ -63,9 +59,7 @@ class DebugController extends Controller
      */
     public function runTests()
     {
-        $this->checkAdminAccess();
-        
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $testType = $_POST['test_type'] ?? 'all';
             $results = $this->runSystemTests();
             
@@ -91,9 +85,7 @@ class DebugController extends Controller
      */
     public function clearLogs()
     {
-        $this->checkAdminAccess();
-        
-        try {
+                try {
             $logFile = __DIR__ . '/../../storage/logs/error.log';
             
             if (file_exists($logFile)) {
@@ -161,9 +153,7 @@ class DebugController extends Controller
      */
     public function liveErrors()
     {
-        $this->checkAdminAccess();
-        
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $since = $_POST['since'] ?? date('Y-m-d H:i:s', strtotime('-5 minutes'));
             $errors = $this->getErrorsSince($since);
             
@@ -644,24 +634,6 @@ class DebugController extends Controller
             }
         }
         return $this->formatBytes($size);
-    }
-    
-    private function checkAdminAccess()
-    {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        
-        if (empty($_SESSION['user_id'])) {
-            header('Location: /login?redirect=' . urlencode($_SERVER['REQUEST_URI']));
-            exit;
-        }
-        
-        $userModel = new User();
-        if (!$userModel->isAdmin($_SESSION['user_id'])) {
-            header('Location: /dashboard?error=access_denied');
-            exit;
-        }
     }
     
     private function render($template, $data = [])

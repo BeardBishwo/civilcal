@@ -1,3 +1,7 @@
+<?php
+// Ensure $currentPage is always defined to prevent warnings
+$currentPage = $currentPage ?? basename($_SERVER['REQUEST_URI'] ?? 'dashboard');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -209,7 +213,7 @@
                 
                 <!-- Users Management -->
                 <li>
-                    <a href="/admin/users" class="<?= $currentPage == 'users' ? 'active' : '' ?>">
+                    <a href="/admin/users" class="<?= ($currentPage ?? '') == 'users' ? 'active' : '' ?>">
                         <i class="bi bi-people"></i>
                         <span>Users Management</span>
                     </a>
@@ -225,7 +229,7 @@
                 
                 <!-- Modules & Categories -->
                 <li>
-                    <a href="/admin/modules" class="<?= $currentPage == 'modules' ? 'active' : '' ?>">
+                    <a href="/admin/modules" class="<?= ($currentPage ?? '') == 'modules' ? 'active' : '' ?>">
                         <i class="bi bi-grid-3x3-gap"></i>
                         <span>Modules & Categories</span>
                     </a>
@@ -241,7 +245,7 @@
                 
                 <!-- Plugins -->
                 <li>
-                    <a href="/admin/plugins" class="<?= $currentPage == 'plugins' ? 'active' : '' ?>">
+                    <a href="/admin/plugins" class="<?= ($currentPage ?? '') == 'plugins' ? 'active' : '' ?>">
                         <i class="bi bi-puzzle"></i>
                         <span>Plugins</span>
                     </a>
@@ -257,7 +261,7 @@
                 
                 <!-- Email & Notifications -->
                 <li>
-                    <a href="/admin/email" class="<?= $currentPage == 'email' ? 'active' : '' ?>">
+                    <a href="/admin/email" class="<?= ($currentPage ?? '') == 'email' ? 'active' : '' ?>">
                         <i class="bi bi-envelope"></i>
                         <span>Email & Notifications</span>
                     </a>

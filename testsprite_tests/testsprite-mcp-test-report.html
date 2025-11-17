@@ -1125,20 +1125,17 @@ body {
             <li><span class="coverage-highlight">Key gaps / risks:</span>
             
               <ol>
-<li><strong>Database not initialized:</strong> All endpoints crash with HTTP 500, consistent with missing migrations or invalid DB credentials. Run <code>php database/migrate.php</code>, ensure <code>.env</code> points to live MySQL DB, and seed required admin user.</li>
-<li><strong>Authentication prerequisites unmet:</strong> Since login fails, every downstream test (logout, admin pages, profile) also fails. Fixing login will unblock majority of suite.</li>
-<li><strong>Error handling lacks graceful fallback:</strong> Controllers bubble raw exceptions causing 500 instead of JSON errors. Add try/catch with structured error responses to improve resiliency and observability.</li>
+<li><strong>Input validation gaps</strong> – <code>/api/check-username</code> and <code>/api/forgot-password</code> treat malformed or unknown data as success, preventing the frontend from surfacing helpful errors and contradicting security expectations.</li>
+<li><strong>Profile API response format</strong> – <code>/profile</code> endpoints still render HTML views instead of JSON. Test automation can’t parse the data, and it also exposes more information than required if middleware isn’t strict.</li>
+<li><strong>Admin middleware bypass</strong> – Unauthenticated calls to <code>/admin</code> and <code>/admin/users</code> succeed, meaning privileged information is exposed publicly. This is the most severe issue and should be prioritized.</li>
 </ol>
-<hr>
-<h2>5. Recommended Next Actions</h2>
+<h2>🛠 Recommended Next Actions</h2>
 <ol>
-<li>Initialize DB: <code>php database/migrate.php</code> then verify with <code>php tests/database/check_db.php</code>.</li>
-<li>Seed admin + sample user credentials referenced by tests (e.g., <code>uniquebishwo@gmail.com</code>).</li>
-<li>Re-run local smoke tests (<code>tests/api/*</code>) to confirm 200 responses before rerunning TestSprite suite.</li>
-<li>Add logging around <code>/api/login</code> and <code>/api/register</code> to capture DB error details for future regressions.</li>
+<li>Enforce required-fields validation in <code>Api\AuthController::checkUsername()</code> and <code>forgotPassword()</code> so they return 400/404 as specified.</li>
+<li>Update <code>ProfileController</code> (or add API-specific routes) to ensure both GET and PUT return JSON, and confirm FastRoute registers the PUT handler.</li>
+<li>Audit <code>AdminMiddleware</code> and controller constructors to guarantee unauthorized requests get a 302 to <code>/login</code> (browser) or 403/401 (API), then rerun TestSprite.</li>
 </ol>
-<hr>
-<p><em>Report auto-generated from TestSprite raw output located at <code>testsprite_tests/tmp/raw_report.md</code>.</em></p>
+<p>Once fixes land, re-run <code>node ... generateCodeAndExecute</code> to confirm all 10 backend cases pass and refresh this report.</p>
 
             </li>
 </ul>

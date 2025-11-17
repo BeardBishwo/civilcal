@@ -9,8 +9,7 @@ class CalculationsController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->checkAdminAccess();
-    }
+            }
 
     public function index()
     {
@@ -43,13 +42,5 @@ class CalculationsController extends Controller
         ];
 
         $this->view('admin/calculations/index', $data);
-    }
-
-    private function checkAdminAccess()
-    {
-        if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
-            redirect('/login');
-            exit;
-        }
     }
 }

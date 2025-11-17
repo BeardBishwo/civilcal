@@ -1,8 +1,8 @@
 {
-  "status": "init",
+  "status": "commited",
   "type": "backend",
   "scope": "codebase",
-  "localEndpoint": "http://localhost:80/",
+  "localEndpoint": "http://localhost:80/Bishwo_Calculator/",
   "backendAuthType": "basic token",
   "backendUsername": "uniquebishwo@gmail.com",
   "backendPassword": "c9PU7XAsAADYk_A",
@@ -15,6 +15,5 @@
       "API_KEY": "sk-user-PqmoHFy8ta3GseTPTa9RkmJ6RoMBCLGPULCD5gJ-rOtmBiZ_0-9gw3wsAoDeS3xFNJNkB91I7tHTxCkvcTxJ9-vWYlEVpQQ6VUSOAHUxN7wZaaIaSZBc3oCO6ozI_WHwaqM"
     }
   },
-  "proxy": "http://0bfae351-47e7-4a87-b413-a7b55b547747:M1ggZyWRUnPKFmYyjky8xUhBh2j7Uk99@tun.testsprite.com:8080",
-  "serverPort": 53633
+  "proxy": "http://9d2c8c02-1a71-4fc6-8d3a-023db163503c:i0DQ3nOiJtVRHHrN2aR08ySgYQSOvaGl@tun.testsprite.com:8080"
 }

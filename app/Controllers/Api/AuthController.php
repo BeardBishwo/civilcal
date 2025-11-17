@@ -62,6 +62,7 @@ class AuthController extends Controller
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['user'] = $user;
                 $_SESSION['is_admin'] = $user['is_admin'] ?? false;
+                $_SESSION['api_authenticated'] = true; // Mark as API login
 
                 // Also create a database-backed session and auth_token cookie
                 // so that session management tests and Auth::check() can rely
@@ -257,8 +258,15 @@ class AuthController extends Controller
 
         } catch (Exception $e) {
             error_log('Registration error: ' . $e->getMessage());
-            http_response_code(500);
-            echo json_encode(['error' => 'Registration failed due to server error: ' . $e->getMessage()]);
+            
+            // Check if it's a duplicate entry error
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false || strpos($e->getMessage(), '1062') !== false) {
+                http_response_code(409);
+                echo json_encode(['error' => 'Username or email already exists']);
+            } else {
+                http_response_code(500);
+                echo json_encode(['error' => 'Registration failed due to server error: ' . $e->getMessage()]);
+            }
         }
     }
 
@@ -334,7 +342,17 @@ class AuthController extends Controller
                 return;
             }
 
-            // For demo purposes, just return success
+            // Check if user exists
+            $userModel = new User();
+            $user = $userModel->findByEmail($email);
+            
+            if (!$user) {
+                http_response_code(404);
+                echo json_encode(['error' => 'User not found']);
+                return;
+            }
+
+            // User exists - send password reset email (for now just return success)
             echo json_encode([
                 'success' => true,
                 'message' => 'Password reset email sent'
@@ -388,7 +406,15 @@ class AuthController extends Controller
             $username = trim($input['username'] ?? '');
 
             if (empty($username)) {
+                http_response_code(400);
                 echo json_encode(['error' => 'Username is required']);
+                return;
+            }
+            
+            // Validate that username is a string
+            if (!is_string($input['username'] ?? null)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Username must be a string']);
                 return;
             }
 

@@ -25,22 +25,32 @@ class CsrfMiddleware {
 
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
         if (in_array($method, ['POST','PUT','PATCH','DELETE'], true)) {
-            $headerToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
-            $formToken = $_POST['csrf_token'] ?? null;
-            $token = $headerToken ?: $formToken;
+            // Skip CSRF validation for API requests (JSON content-type with PUT/PATCH/DELETE)
+            $isJsonApi = (
+                (isset($_SERVER['CONTENT_TYPE']) && stripos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) &&
+                in_array($method, ['PUT', 'PATCH', 'DELETE'])
+            ) || (
+                !empty($_SESSION['api_authenticated']) // Session marked as API login
+            );
+            
+            if (!$isJsonApi) {
+                $headerToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
+                $formToken = $_POST['csrf_token'] ?? null;
+                $token = $headerToken ?: $formToken;
 
-            if (!$this->validToken($token)) {
-                http_response_code(419);
-                $isJson = (($_SERVER['HTTP_ACCEPT'] ?? '') && stripos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false)
-                       || (($_SERVER['CONTENT_TYPE'] ?? '') && stripos($_SERVER['CONTENT_TYPE'], 'application/json') !== false)
-                       || stripos($request['uri'] ?? '', '/api') === 0;
-                if ($isJson) {
-                    header('Content-Type: application/json');
-                    echo json_encode(['success' => false, 'message' => 'Invalid or missing CSRF token']);
-                } else {
-                    echo 'Invalid or missing CSRF token';
+                if (!$this->validToken($token)) {
+                    http_response_code(419);
+                    $isJson = (($_SERVER['HTTP_ACCEPT'] ?? '') && stripos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false)
+                           || (($_SERVER['CONTENT_TYPE'] ?? '') && stripos($_SERVER['CONTENT_TYPE'], 'application/json') !== false)
+                           || stripos($request['uri'] ?? '', '/api') === 0;
+                    if ($isJson) {
+                        header('Content-Type: application/json');
+                        echo json_encode(['success' => false, 'message' => 'Invalid or missing CSRF token']);
+                    } else {
+                        echo 'Invalid or missing CSRF token';
+                    }
+                    return null;
                 }
-                return null;
             }
         }
 

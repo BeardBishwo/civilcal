@@ -1,91 +1,65 @@
-# TestSprite AI Testing Report (Backend)
+# TestSprite Backend Test Report
 
-## 1. Document Metadata
-
+## 📋 Document Metadata
 - **Project:** Bishwo_Calculator
 - **Date:** 2025-11-17
-- **Environment:** Local Laragon (port 80) proxied via TestSprite tunnel
-- **Prepared by:** Cascade via TestSprite MCP
+- **Test Suite:** TestSprite backend plan (`testsprite_backend_test_plan.json`)
+- **Environment:** Local Laragon PHP server on http://localhost:80/Bishwo_Calculator
 
----
+## ✅ Requirement Validation Summary
 
-## 2. Requirement Validation Summary
+### Requirement R1 – Authentication endpoints must enforce correct flows
+Covers login, logout, username availability, and forgot-password behavior.
 
-### Requirement A — Authentication API Stability (TC001–TC003)
-
-| Test ID | Description | Result | Findings |
+| Test ID | Description | Result | Notes |
 | --- | --- | --- | --- |
-| TC001 | User login functionality | ❌ Failed | `/api/login` returned HTTP 500 for valid credentials. Response body indicates unhandled exception before auth can complete. Likely DB seed/migrations missing required users or env misconfig (e.g., `.env` DB creds). |
-| TC002 | User registration process | ❌ Failed | `/api/register` responded 500 instead of 201. Input payload satisified API contract, so failure likely due to DB layer (missing `users` table columns such as `terms_agree` / `engineer_roles`) or validation exception not caught. |
-| TC003 | User logout operation | ❌ Failed | Test could not even reach logout because prerequisite login failed with 500. Indicates login must succeed before downstream auth flows can be verified. |
+| TC001 | Authenticate using username/email + password | ✅ Pass | 200 OK returned and session cookies issued. |
+| TC002 | Destroy active session and auth token on logout | ✅ Pass | Logout redirected correctly with cleared cookies. |
+| TC003 | Username availability should reject malformed payloads | ❌ Fail | Missing `username` returned 200 instead of 400; endpoint is not validating required input (@testsprite_tests/tmp/raw_report.md#31-44). |
+| TC004 | Forgot-password should 404 for unknown emails | ❌ Fail | Endpoint returned 200 for unregistered email; should signal "user not found" to protect UX/security (@testsprite_tests/tmp/raw_report.md#46-59). |
 
-**Requirement verdict:** Not met. All auth endpoints crash. Root cause appears to be missing DB migrations/seed data or misconfigured `.env`, causing PDO exceptions that bubble up as 500s.
+**Takeaway:** Input validation and error paths for `/api/check-username` and `/api/forgot-password` still need to be aligned with spec.
 
----
+### Requirement R2 – Registration & Profile APIs must protect data and return JSON
 
-### Requirement B — Admin Access Control (TC004–TC006)
-
-| Test ID | Description | Result | Findings |
+| Test ID | Description | Result | Notes |
 | --- | --- | --- | --- |
-| TC004 | Admin dashboard access control | ❌ Failed | GET `/admin` returned 500 even with admin creds. Since login already fails, middleware never receives authenticated session, leading to fatal error (likely undefined session/auth object). |
-| TC005 | Admin settings section retrieval | ❌ Failed | GET `/admin/settings/general` returned 500. Same upstream login failure, compounded by possible missing view/template dependencies. |
-| TC006 | User management listing access | ❌ Failed | `/admin/users` returned 500. Again blocked by global auth failure. |
+| TC005 | Register a new user with valid data | ✅ Pass | Unique user creation succeeded and response payload was returned. |
+| TC006 | Retrieve profile for authenticated user | ❌ Fail | Authenticated GET `/profile` responded non-JSON (likely HTML). Middleware may not detect API mode or controller returns view instead of JSON (@testsprite_tests/tmp/raw_report.md#69-107). |
+| TC007 | Update profile information | ❌ Fail | PUT `/profile` responded 404, suggesting route mis-match or HTTP verb not allowed (@testsprite_tests/tmp/raw_report.md#109-122). |
 
-**Requirement verdict:** Not met. Need to stabilize authentication layer first, then verify admin middleware + templates. Confirm that required tables (`user_sessions`, `settings`, etc.) exist.
+**Takeaway:** Profile controller needs consistent JSON responses and routing for both GET and PUT variations.
 
----
+### Requirement R3 – Admin routes must enforce access control & status codes
 
-### Requirement C — Calculator Engine Availability (TC007–TC008)
-
-| Test ID | Description | Result | Findings |
+| Test ID | Description | Result | Notes |
 | --- | --- | --- | --- |
-| TC007 | List available calculators | ❌ Failed | `/calculators` responded 500. Stack trace implies global exception handler triggered before controller response—likely because middleware expects logged-in user (session missing) or modules reference nonexistent database records. |
-| TC008 | Execute calculator function | ❌ Failed | `/calculator/electrical/load` returned 500. Without authenticated context and seeded module definitions, execution path throws (e.g., missing module class file include or DB row). |
+| TC008 | Admin dashboard access control | ❌ Fail | Unauthenticated request received 200 instead of redirect/401, so `AdminMiddleware` may not short-circuit correctly (@testsprite_tests/tmp/raw_report.md#124-137). |
+| TC009 | Admin settings section rendering | ✅ Pass | Settings section returned expected HTML when authenticated. |
+| TC010 | Admin users listing protections | ❌ Fail | `/admin/users` returned 200 for unauthorized access; should be 401/403 (@testsprite_tests/tmp/raw_report.md#147-158). |
 
-**Requirement verdict:** Not met. Need to ensure calculator modules autoloaded and any prerequisite tables/config (e.g., `calculator_modules`) are migrated.
+**Takeaway:** Some admin endpoints bypass middleware or session detection; ensure every admin controller verifies `Auth::check()` before rendering.
 
----
-
-### Requirement D — User Profile Management (TC009–TC010)
-
-| Test ID | Description | Result | Findings |
-| --- | --- | --- | --- |
-| TC009 | Get user profile data | ❌ Failed | `/profile` GET returned 500 because login prerequisite failed, so middleware likely throws when `$_SESSION['user_id']` absent. |
-| TC010 | Update user profile information | ❌ Failed | `/profile` PUT returned 500. Same upstream issue plus possible CSRF/token requirement not satisfied by API test. |
-
-**Requirement verdict:** Not met. Need successful session establishment and CSRF handling for API clients.
-
----
-
-## 3. Coverage & Metrics
+## 📊 Coverage & Metrics
+- **Total tests:** 10
+- **Passed:** 4
+- **Failed:** 6
+- **Pass rate:** 40%
 
 | Requirement | Total Tests | ✅ Passed | ❌ Failed |
 | --- | --- | --- | --- |
-| Requirement A — Authentication API Stability | 3 | 0 | 3 |
-| Requirement B — Admin Access Control | 3 | 0 | 3 |
-| Requirement C — Calculator Engine Availability | 2 | 0 | 2 |
-| Requirement D — User Profile Management | 2 | 0 | 2 |
+| R1 Authentication | 4 | 2 | 2 |
+| R2 Registration & Profile | 3 | 1 | 2 |
+| R3 Admin Access Control | 3 | 1 | 2 |
 
-- **Overall Pass Rate:** 0% (0 / 10 passing)
-- **Blocking Severity:** Critical — no backend endpoint returned success.
+## ⚠️ Key Gaps / Risks
+1. **Input validation gaps** – `/api/check-username` and `/api/forgot-password` treat malformed or unknown data as success, preventing the frontend from surfacing helpful errors and contradicting security expectations.
+2. **Profile API response format** – `/profile` endpoints still render HTML views instead of JSON. Test automation can’t parse the data, and it also exposes more information than required if middleware isn’t strict.
+3. **Admin middleware bypass** – Unauthenticated calls to `/admin` and `/admin/users` succeed, meaning privileged information is exposed publicly. This is the most severe issue and should be prioritized.
 
----
+## 🛠 Recommended Next Actions
+1. Enforce required-fields validation in `Api\AuthController::checkUsername()` and `forgotPassword()` so they return 400/404 as specified.
+2. Update `ProfileController` (or add API-specific routes) to ensure both GET and PUT return JSON, and confirm FastRoute registers the PUT handler.
+3. Audit `AdminMiddleware` and controller constructors to guarantee unauthorized requests get a 302 to `/login` (browser) or 403/401 (API), then rerun TestSprite.
 
-## 4. Key Gaps / Risks
-
-1. **Database not initialized:** All endpoints crash with HTTP 500, consistent with missing migrations or invalid DB credentials. Run `php database/migrate.php`, ensure `.env` points to live MySQL DB, and seed required admin user.
-2. **Authentication prerequisites unmet:** Since login fails, every downstream test (logout, admin pages, profile) also fails. Fixing login will unblock majority of suite.
-3. **Error handling lacks graceful fallback:** Controllers bubble raw exceptions causing 500 instead of JSON errors. Add try/catch with structured error responses to improve resiliency and observability.
-
----
-
-## 5. Recommended Next Actions
-
-1. Initialize DB: `php database/migrate.php` then verify with `php tests/database/check_db.php`.
-2. Seed admin + sample user credentials referenced by tests (e.g., `uniquebishwo@gmail.com`).
-3. Re-run local smoke tests (`tests/api/*`) to confirm 200 responses before rerunning TestSprite suite.
-4. Add logging around `/api/login` and `/api/register` to capture DB error details for future regressions.
-
----
-
-*Report auto-generated from TestSprite raw output located at `testsprite_tests/tmp/raw_report.md`.*
+Once fixes land, re-run `node ... generateCodeAndExecute` to confirm all 10 backend cases pass and refresh this report.

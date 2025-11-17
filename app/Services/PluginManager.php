@@ -653,9 +653,12 @@ class PluginManager
                         ]);
                     }
                 } else {
-                    Logger::warning("plugin_entry_undefined", [
-                        "slug" => $plugin["slug"],
-                    ]);
+                    // Only log this in debug mode to reduce log noise
+                    if (defined('APP_DEBUG') && APP_DEBUG) {
+                        Logger::warning("plugin_entry_undefined", [
+                            "slug" => $plugin["slug"],
+                        ]);
+                    }
                 }
             }
         } catch (\Throwable $e) {

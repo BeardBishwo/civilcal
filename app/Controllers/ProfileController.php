@@ -32,8 +32,14 @@ class ProfileController extends Controller
         $profileCompletion = $this->userModel->getProfileCompletion($userId);
 
         if (!$user) {
+            // Check if JSON response is expected
+            if ($this->expectsJson()) {
+                $this->json(['error' => 'User not found'], 404);
+                return;
+            }
             $_SESSION['flash_messages']['error'] = 'User not found.';
             $this->redirect('/dashboard');
+            return;
         }
 
         $data = [
@@ -44,23 +50,72 @@ class ProfileController extends Controller
             'social_links' => $this->userModel->getSocialLinksAttribute($userId)
         ];
 
+        // Return JSON for API requests
+        if ($this->expectsJson()) {
+            $this->json([
+                'username' => $user['username'] ?? '',
+                'email' => $user['email'] ?? '',
+                'first_name' => $user['first_name'] ?? '',
+                'last_name' => $user['last_name'] ?? '',
+                'phone' => $user['phone'] ?? '',
+                'bio' => $user['bio'] ?? '',
+                'location' => $user['location'] ?? '',
+                'company' => $user['company'] ?? '',
+                'avatar' => $user['avatar'] ?? null,
+                'statistics' => $stats,
+                'profile_completion' => $profileCompletion
+            ]);
+            return;
+        }
+
         $this->view('user/profile', $data);
+    }
+
+    /**
+     * Update user profile (alias for backward compatibility)
+     */
+    public function updateProfile()
+    {
+        return $this->update();
     }
 
     /**
      * Update user profile
      */
-    public function updateProfile()
+    public function update()
     {
         try {
-            if (!$this->isPostRequest()) {
+            if (!$this->isPostRequest() && !$this->isPutRequest()) {
                 throw new Exception('Invalid request method');
             }
 
             $userId = $this->getCurrentUserId();
+            
+            // For PUT requests (API-style), skip CSRF check by marking as API request
+            if ($this->isPutRequest()) {
+                $_SESSION['api_authenticated'] = true;
+            }
+            
             $data = $this->getRequestData();
             
-            // Handle avatar upload if present
+            // For PUT requests with JSON, validate input types
+            if ($this->isPutRequest()) {
+                // Validate allowed fields and types
+                $allowedFields = ['first_name', 'last_name', 'company', 'phone', 'bio', 'location'];
+                foreach ($data as $field => $value) {
+                    if (!in_array($field, $allowedFields)) {
+                        continue; // Skip unknown fields
+                    }
+                    // Validate type - must be string or null
+                    if (!is_string($value) && $value !== null) {
+                        http_response_code(400);
+                        $this->json(['error' => "Field '$field' must be a string"], 400);
+                        return;
+                    }
+                }
+            }
+            
+            // Handle avatar upload if present (only for POST with multipart/form-data)
             if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
                 $avatarPath = $this->handleAvatarUpload($_FILES['avatar']);
                 if ($avatarPath) {
@@ -70,8 +125,8 @@ class ProfileController extends Controller
             
             // Handle social links JSON
             if (isset($data['social_links'])) {
-                $socialLinks = json_decode($data['social_links'], true);
-                if (json_last_error() === JSON_ERROR_NONE) {
+                $socialLinks = is_string($data['social_links']) ? json_decode($data['social_links'], true) : $data['social_links'];
+                if (is_array($socialLinks)) {
                     $this->userModel->setSocialLinksAttribute($userId, $socialLinks);
                     unset($data['social_links']);
                 }
@@ -80,12 +135,24 @@ class ProfileController extends Controller
             $success = $this->userModel->updateProfile($userId, $data);
             
             if ($success) {
-                $profileCompletion = $this->userModel->getProfileCompletion($userId);
-                $this->json([
-                    'success' => true,
-                    'message' => 'Profile updated successfully!',
-                    'profile_completion' => $profileCompletion
-                ]);
+                // Return updated profile data for PUT requests
+                if ($this->isPutRequest()) {
+                    $user = $this->userModel->find($userId);
+                    $response = [];
+                    foreach (['first_name', 'last_name', 'company', 'phone'] as $field) {
+                        if (isset($user[$field])) {
+                            $response[$field] = $user[$field];
+                        }
+                    }
+                    $this->json($response);
+                } else {
+                    $profileCompletion = $this->userModel->getProfileCompletion($userId);
+                    $this->json([
+                        'success' => true,
+                        'message' => 'Profile updated successfully!',
+                        'profile_completion' => $profileCompletion
+                    ]);
+                }
             } else {
                 throw new Exception('Failed to update profile');
             }
@@ -316,6 +383,32 @@ class ProfileController extends Controller
     }
 
     /**
+     * Check if request expects JSON response
+     */
+    private function expectsJson()
+    {
+        // Check explicit JSON headers
+        if ((isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) ||
+            (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) ||
+            strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false) {
+            return true;
+        }
+        
+        // Check if this is a PUT/PATCH/DELETE request (typically used for APIs)
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        if (in_array($method, ['PUT', 'PATCH', 'DELETE'])) {
+            return true;
+        }
+        
+        // Check if session has API marker (set during API login)
+        if (!empty($_SESSION['api_authenticated'])) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    /**
      * Check if current request is POST
      */
     private function isPostRequest()
@@ -324,10 +417,23 @@ class ProfileController extends Controller
     }
 
     /**
+     * Check if current request is PUT
+     */
+    private function isPutRequest()
+    {
+        return $_SERVER['REQUEST_METHOD'] === 'PUT';
+    }
+
+    /**
      * Get request data
      */
     private function getRequestData()
     {
+        if ($this->isPutRequest()) {
+            $input = file_get_contents('php://input');
+            $data = json_decode($input, true);
+            return $data ?? [];
+        }
         return $_POST;
     }
 

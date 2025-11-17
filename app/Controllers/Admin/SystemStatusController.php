@@ -9,8 +9,7 @@ class SystemStatusController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->checkAdminAccess();
-    }
+            }
 
     public function index()
     {
@@ -123,13 +122,5 @@ class SystemStatusController extends Controller
             'status' => empty($missing) ? 'ok' : 'error',
             'message' => empty($missing) ? 'All required extensions loaded' : 'Missing: ' . implode(', ', $missing)
         ];
-    }
-
-    private function checkAdminAccess()
-    {
-        if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
-            redirect('/login');
-            exit;
-        }
     }
 }

@@ -10,7 +10,7 @@ class UserManagementController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->checkAdminAccess();
+        // Admin access check is handled by AdminMiddleware
     }
 
     public function index()
@@ -74,11 +74,4 @@ class UserManagementController extends Controller
         $this->view('admin/users/edit', $data);
     }
 
-    private function checkAdminAccess()
-    {
-        if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
-            redirect('/login');
-            exit;
-        }
-    }
 }

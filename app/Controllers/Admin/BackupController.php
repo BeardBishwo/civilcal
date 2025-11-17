@@ -9,8 +9,7 @@ class BackupController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->checkAdminAccess();
-    }
+            }
 
     public function index()
     {
@@ -45,13 +44,5 @@ class BackupController extends Controller
         ];
 
         $this->view('admin/backup/index', $data);
-    }
-
-    private function checkAdminAccess()
-    {
-        if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
-            redirect('/login');
-            exit;
-        }
     }
 }

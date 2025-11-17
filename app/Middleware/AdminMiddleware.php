@@ -16,8 +16,25 @@ class AdminMiddleware
         $isAuthenticated = false;
         $isAdmin = false;
         
-        // Check session-based authentication first
-        if (!empty($_SESSION['user_id']) || !empty($_SESSION['user'])) {
+        // Check HTTP Basic Auth (for API tests)
+        if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+            $userModel = new \App\Models\User();
+            $user = $userModel->findByUsername($_SERVER['PHP_AUTH_USER']);
+            
+            if ($user && password_verify($_SERVER['PHP_AUTH_PW'], $user->password)) {
+                $isAuthenticated = true;
+                $isAdmin = ($user->is_admin ?? false) || ($user->role ?? '') === 'admin' || ($user->role ?? '') === 'super_admin';
+                
+                // Set session for this request
+                $_SESSION['user_id'] = $user->id;
+                $_SESSION['username'] = $user->username;
+                $_SESSION['user'] = (array) $user;
+                $_SESSION['is_admin'] = $isAdmin;
+            }
+        }
+        
+        // Check session-based authentication
+        if (!$isAuthenticated && (!empty($_SESSION['user_id']) || !empty($_SESSION['user']))) {
             $isAuthenticated = true;
             // Check admin status from session
             $isAdmin = !empty($_SESSION['is_admin']) || 
@@ -40,13 +57,42 @@ class AdminMiddleware
         }
         
         if (!$isAuthenticated) {
-            // Redirect to login if not authenticated
-            header("Location: /login");
+            // Admin routes should always return 401 for unauthenticated access
+            // This is appropriate for admin management endpoints
+            http_response_code(401);
+            
+            // Check if request prefers JSON response
+            $prefersJson = (
+                isset($_SERVER['PHP_AUTH_USER']) || // Basic auth was attempted
+                (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) ||
+                (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false)
+            );
+            
+            if ($prefersJson) {
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'Authentication required', 'debug' => 'AdminMiddleware_v2']);
+            } else {
+                // Return simple HTML for browser requests
+                echo '<!DOCTYPE html><html><head><title>401 Unauthorized</title></head><body><h1>401 Unauthorized</h1><p>Authentication required to access admin panel.</p><p><a href="/login">Login</a></p><p style="color:gray;font-size:10px;">AdminMiddleware_v2</p></body></html>';
+            }
             exit;
         }
         
         // Check if user is admin
         if (!$isAdmin) {
+            // Check if this is an API request
+            $isApiRequest = (
+                strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false ||
+                (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false)
+            );
+            
+            if ($isApiRequest) {
+                http_response_code(403);
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'Forbidden', 'message' => 'Admin privileges required']);
+                exit;
+            }
+            
             http_response_code(403);
             echo '
             <!DOCTYPE html>

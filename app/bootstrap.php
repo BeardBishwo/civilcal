@@ -8,6 +8,36 @@ define("APP_PATH", BASE_PATH . "/app");
 define("CONFIG_PATH", BASE_PATH . "/config");
 define("STORAGE_PATH", BASE_PATH . "/storage");
 
+// Load environment variables from .env file
+if (file_exists(BASE_PATH . '/.env')) {
+    $lines = file(BASE_PATH . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        // Skip comments
+        if (strpos(trim($line), '#') === 0) {
+            continue;
+        }
+        
+        // Parse KEY=VALUE
+        if (strpos($line, '=') !== false) {
+            list($key, $value) = explode('=', $line, 2);
+            $key = trim($key);
+            $value = trim($value);
+            
+            // Remove quotes if present
+            if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
+                (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
+                $value = substr($value, 1, -1);
+            }
+            
+            // Set environment variable
+            if (!isset($_ENV[$key])) {
+                $_ENV[$key] = $value;
+                putenv("$key=$value");
+            }
+        }
+    }
+}
+
 // Autoloader for App classes
 spl_autoload_register(function ($class) {
     $prefix = "App\\";

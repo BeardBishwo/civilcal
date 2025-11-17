@@ -1,52 +1,52 @@
 [
   {
     "id": "TC001",
-    "title": "user login functionality",
-    "description": "Test the /api/login endpoint to verify successful user login with valid credentials and proper handling of invalid credentials."
+    "title": "authenticate using username or email plus password",
+    "description": "Test the /api/login endpoint to verify successful authentication with valid username/email and password, including optional remember_me functionality. Validate error responses for missing credentials and invalid login attempts."
   },
   {
     "id": "TC002",
-    "title": "user registration process",
-    "description": "Test the /api/register endpoint to ensure new users can register with valid data and receive appropriate errors for invalid input."
+    "title": "destroy active session and auth token on logout",
+    "description": "Test the /api/logout endpoint to ensure it properly destroys the active user session and authentication token. Verify correct response for authenticated users and error response for unauthenticated access."
   },
   {
     "id": "TC003",
-    "title": "user logout operation",
-    "description": "Test the /api/logout endpoint to confirm that authenticated users can successfully log out and receive confirmation."
+    "title": "check username availability for registration",
+    "description": "Test the /api/check-username endpoint to confirm it correctly checks username availability and provides suggestions. Validate handling of invalid input and proper success response."
   },
   {
     "id": "TC004",
-    "title": "admin dashboard access control",
-    "description": "Test the /admin endpoint to verify that only authorized admin users can access the admin dashboard and unauthorized users are denied."
+    "title": "trigger password reset email dispatch",
+    "description": "Test the /api/forgot-password endpoint to verify that a password reset email is queued when a valid registered email is provided. Confirm appropriate error response when the account is not found."
   },
   {
     "id": "TC005",
-    "title": "admin settings section retrieval",
-    "description": "Test the /admin/settings/{section} endpoint to ensure correct retrieval of various settings sections, proper handling of invalid sections, and access control."
+    "title": "register a new user with valid data",
+    "description": "Test the /api/register endpoint to ensure new users can be registered with valid username, email, password, and optional profile details. Validate error handling for validation failures and duplicate username or email."
   },
   {
     "id": "TC006",
-    "title": "user management listing access",
-    "description": "Test the /admin/users endpoint to verify that authorized admins can view the user management listing and unauthorized access is prevented."
+    "title": "retrieve profile for authenticated user",
+    "description": "Test the /profile GET endpoint to confirm it returns the profile information for the current authenticated session user. Verify unauthorized access is properly rejected."
   },
   {
     "id": "TC007",
-    "title": "list available calculators",
-    "description": "Test the /calculators endpoint to confirm it returns the complete and accurate list of available engineering calculators."
+    "title": "update profile information and preferences",
+    "description": "Test the /profile PUT endpoint to verify that authenticated users can update their profile information including first name, last name, company, and phone. Validate input validation and unauthorized access handling."
   },
   {
     "id": "TC008",
-    "title": "execute calculator function",
-    "description": "Test the /calculator/{module}/{function} endpoint to verify correct execution of calculations with valid input, and proper error response when calculator or function is not found."
+    "title": "render admin dashboard overview for authorized users",
+    "description": "Test the /admin GET endpoint to ensure the admin dashboard overview is rendered correctly for authenticated admin users. Verify redirection for unauthenticated users and forbidden access for non-admins."
   },
   {
     "id": "TC009",
-    "title": "get user profile data",
-    "description": "Test the /profile GET endpoint to ensure authenticated users can retrieve their profile data and unauthenticated requests are denied."
+    "title": "return requested admin settings section ui",
+    "description": "Test the /admin/settings/{section} GET endpoint to confirm it returns the correct settings section UI for valid sections (general, users, security, email, advanced). Validate 404 response for invalid sections."
   },
   {
     "id": "TC010",
-    "title": "update user profile information",
-    "description": "Test the /profile PUT endpoint to verify users can update their profile information with valid data and receive errors for invalid input."
+    "title": "list and manage registered users in admin panel",
+    "description": "Test the /admin/users GET endpoint to verify it returns the user management table for authorized admin users and returns forbidden error for unauthorized access."
   }
 ]

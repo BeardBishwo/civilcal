@@ -20,9 +20,7 @@ class MainDashboardController extends Controller
      */
     public function index()
     {
-        $this->checkAdminAccess();
-        
-        $data = [
+                $data = [
             'page_title' => 'Admin Dashboard - Bishwo Calculator',
             'widgets' => $this->getWidgets(),
             'menuItems' => $this->getMenuItems(),
@@ -39,9 +37,7 @@ class MainDashboardController extends Controller
      */
     public function modules()
     {
-        $this->checkAdminAccess();
-        
-        $data = [
+                $data = [
             'page_title' => 'Module Management',
             'allModules' => $this->getAllModules(),
             'activeModules' => $this->getActiveModules(),
@@ -56,9 +52,7 @@ class MainDashboardController extends Controller
      */
     public function activateModule()
     {
-        $this->checkAdminAccess();
-        
-        try {
+                try {
             $moduleName = $_POST['module'] ?? '';
             
             if (empty($moduleName)) {
@@ -82,9 +76,7 @@ class MainDashboardController extends Controller
      */
     public function deactivateModule()
     {
-        $this->checkAdminAccess();
-        
-        try {
+                try {
             $moduleName = $_POST['module'] ?? '';
             
             if (empty($moduleName)) {
@@ -108,9 +100,7 @@ class MainDashboardController extends Controller
      */
     public function moduleSettings($moduleName)
     {
-        $this->checkAdminAccess();
-        
-        $activeModules = $this->moduleManager->getActiveModules();
+                $activeModules = $this->moduleManager->getActiveModules();
         
         if (!isset($activeModules[$moduleName])) {
             $this->redirect('/admin/modules?error=module_not_found');
@@ -137,9 +127,7 @@ class MainDashboardController extends Controller
      */
     public function updateModuleSettings()
     {
-        $this->checkAdminAccess();
-        
-        try {
+                try {
             $moduleName = $_POST['module'] ?? '';
             $settings = $_POST['settings'] ?? [];
             
@@ -164,9 +152,7 @@ class MainDashboardController extends Controller
      */
     public function menuCustomization()
     {
-        $this->checkAdminAccess();
-        
-        $data = [
+                $data = [
             'page_title' => 'Menu Customization',
             'menuItems' => $this->moduleManager->getMenuItems(),
             'availableModules' => $this->moduleManager->getActiveModules()
@@ -180,9 +166,7 @@ class MainDashboardController extends Controller
      */
     public function widgetManagement()
     {
-        $this->checkAdminAccess();
-        
-        $data = [
+                $data = [
             'page_title' => 'Widget Management',
             'widgets' => $this->moduleManager->getWidgets(),
             'availableWidgets' => $this->getAvailableWidgets(),
@@ -197,9 +181,7 @@ class MainDashboardController extends Controller
      */
     public function systemStatus()
     {
-        $this->checkAdminAccess();
-        
-        $data = [
+                $data = [
             'page_title' => 'System Status',
             'systemInfo' => $this->getSystemInfo(),
             'moduleStatus' => $this->getModuleStatus(),
@@ -207,28 +189,6 @@ class MainDashboardController extends Controller
         ];
         
         $this->render('admin/system-status', $data);
-    }
-    
-    /**
-     * Check if user has admin access
-     */
-    private function checkAdminAccess()
-    {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        
-        if (empty($_SESSION['user_id'])) {
-            $this->redirect('/login?redirect=' . urlencode($_SERVER['REQUEST_URI']));
-            return;
-        }
-        
-        // Check if user is admin
-        $userModel = new \App\Models\User();
-        if (!$userModel->isAdmin($_SESSION['user_id'])) {
-            $this->redirect('/dashboard?error=access_denied');
-            return;
-        }
     }
     
     /**

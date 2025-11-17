@@ -46,6 +46,7 @@ $router->add('POST', '/api/traditional-units/all-conversions/protected', 'ApiCon
 
 // User Routes
 $router->add('GET', '/profile', 'ProfileController@index', ['auth']);
+$router->add('PUT', '/profile', 'ProfileController@update', ['auth']);
 $router->add('POST', '/profile/update', 'ProfileController@update', ['auth']);
 $router->add('POST', '/profile/change-password', 'ProfileController@changePassword', ['auth']);
 $router->add('GET', '/history', 'ProfileController@history', ['auth']);
@@ -68,12 +69,17 @@ $router->add('GET', '/api/logout', 'Api\AuthController@logout');
 $router->add('GET', '/api/check-remember', 'Api\AuthController@checkRememberToken');
 $router->add('GET', '/api/user-status', 'Api\AuthController@userStatus');
 $router->add('GET', '/api/check-username', 'Api\AuthController@checkUsername');
+$router->add('POST', '/api/check-username', 'Api\AuthController@checkUsername');
 $router->add('POST', '/api/resend-verification', 'Api\AuthController@resendVerification');
 $router->add('GET', '/api/location', 'Api\LocationController@getLocation');
 $router->add('GET', '/api/location/status', 'Api\LocationController@getStatus');
 $router->add('GET', '/api/marketing/stats', 'Api\MarketingController@getStats', ['auth', 'admin']);
 $router->add('GET', '/api/marketing/opt-in-users', 'Api\MarketingController@getOptInUsers', ['auth', 'admin']);
 $router->add('POST', '/api/marketing/update-preferences', 'Api\MarketingController@updatePreferences', ['auth']);
+
+// Profile API Routes (JSON responses, no CSRF for API routes)
+$router->add('GET', '/api/profile', 'Api\ProfileController@index', ['auth']);
+$router->add('PUT', '/api/profile', 'Api\ProfileController@update', ['auth']);
 
 // Admin Dashboard Routes (WordPress-like admin system)
 $router->add('GET', '/admin', 'Admin\MainDashboardController@index', ['auth', 'admin']);

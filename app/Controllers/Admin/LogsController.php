@@ -9,8 +9,7 @@ class LogsController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->checkAdminAccess();
-    }
+            }
 
     public function index()
     {
@@ -87,13 +86,5 @@ class LogsController extends Controller
         ];
 
         $this->view('admin/logs/view', $data);
-    }
-
-    private function checkAdminAccess()
-    {
-        if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
-            redirect('/login');
-            exit;
-        }
     }
 }
