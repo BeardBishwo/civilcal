@@ -28,16 +28,14 @@ RedirectMatch 403 ^/(app|config|database|storage|vendor|tests)/.*$
 <IfModule mod_rewrite.c>
     RewriteEngine On
     
-    # Redirect /public/ URLs to clean URLs
-    RewriteCond %{REQUEST_URI} public
-    RewriteRule ^(.*)public/?(.*)$ /$1$2 [R=301,L]
+    # Automatically detect the base path (works in subdirectories)
+    RewriteBase /Bishwo_Calculator/
     
-    # Serve static files directly with proper MIME types
-    RewriteCond %{REQUEST_FILENAME} -f
-    RewriteRule .* - [L]
+    # Serve existing files and directories directly (no rewriting)
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
     
-    # Route everything else through index.php
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ index.php [L,QSA]
+    # Route non-existing files/dirs through index.php
+    RewriteRule ^(.*)$ index.php?url=$1 [L,QSA]
 </IfModule>

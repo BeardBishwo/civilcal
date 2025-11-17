@@ -1,5 +1,8 @@
 <?php
-require_once '../app/bootstrap.php';
+require_once __DIR__ . '/../app/bootstrap.php';
+
+// Change directory to project root to ensure proper path resolution
+chdir(__DIR__ . '/..');
 
 try {
     $db = \App\Core\Database::getInstance();

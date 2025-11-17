@@ -14,10 +14,7 @@ class Controller {
         require_once __DIR__ . '/../Config/db.php';
         require_once __DIR__ . '/../Helpers/functions.php';
         
-        // Initialize session if not already started
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        // Session is already started in bootstrap.php - no need to start again
         
         // Initialize database connection using global function
         $this->db = get_db();

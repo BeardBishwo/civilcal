@@ -62,14 +62,21 @@ class Auth
             $_SESSION['user'] = (array) $user;
             $_SESSION['is_admin'] = ($user->role === 'admin');
             
-            // Set cookie
-            setcookie('auth_token', $sessionToken, [
+            // Set cookie when running in web server context and headers not yet sent.
+            // For CLI/testing, populate $_COOKIE for subsequent checks instead.
+            $cookieOptions = [
                 'expires' => time() + (30 * 24 * 60 * 60),
                 'path' => '/',
                 'secure' => isset($_SERVER['HTTPS']),
                 'httponly' => true,
                 'samesite' => 'Strict'
-            ]);
+            ];
+
+            if (php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg') {
+                $_COOKIE['auth_token'] = $sessionToken;
+            } elseif (!headers_sent()) {
+                setcookie('auth_token', $sessionToken, $cookieOptions);
+            }
             
             return ['success' => true, 'user' => $user];
         }
@@ -113,14 +120,20 @@ class Auth
             $stmt = $db->prepare("DELETE FROM user_sessions WHERE session_token = ?");
             $stmt->execute([$token]);
             
-            // Clear cookie
-            setcookie('auth_token', '', [
+            // Clear cookie when possible; clear $_COOKIE for CLI/testing.
+            $cookieOptions = [
                 'expires' => time() - 3600,
                 'path' => '/',
                 'secure' => isset($_SERVER['HTTPS']),
                 'httponly' => true,
                 'samesite' => 'Strict'
-            ]);
+            ];
+
+            if (php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg') {
+                unset($_COOKIE['auth_token']);
+            } elseif (!headers_sent()) {
+                setcookie('auth_token', '', $cookieOptions);
+            }
         }
         
         // Destroy session

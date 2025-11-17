@@ -56,10 +56,7 @@ class AuthController extends Controller
             if ($user && password_verify($password, $user->password)) {
                 // Convert object to array
                 $user = (array) $user;
-                // Start session and set user data
-                if (session_status() == PHP_SESSION_NONE) {
-                    session_start();
-                }
+                // Session is already started in bootstrap.php
                 
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
@@ -186,36 +183,51 @@ class AuthController extends Controller
             $username = $input['username'] ?? '';
             $email = $input['email'] ?? '';
             $password = $input['password'] ?? '';
+            
+            // Support both formats: full_name OR (first_name + last_name)
             $fullName = $input['full_name'] ?? '';
-            $phoneNumber = $input['phone_number'] ?? '';
+            $firstName = $input['first_name'] ?? '';
+            $lastName = $input['last_name'] ?? '';
+            
+            // If full_name provided, parse it
+            if (!empty($fullName) && (empty($firstName) || empty($lastName))) {
+                $nameParts = explode(' ', trim($fullName), 2);
+                $firstName = $nameParts[0] ?? '';
+                $lastName = $nameParts[1] ?? '';
+            }
+            
+            $phoneNumber = $input['phone_number'] ?? $input['phone'] ?? '';
             $engineerRoles = $input['engineer_roles'] ?? [];
             $termsAgree = $input['terms_agree'] ?? false;
             $marketingAgree = $input['marketing_agree'] ?? false;
 
-            if (empty($username) || empty($email) || empty($password) || empty($fullName)) {
+            // Validate required fields
+            if (empty($username) || empty($email) || empty($password)) {
                 http_response_code(400);
-                echo json_encode(['error' => 'All required fields must be filled: username, email, password, and full name']);
+                echo json_encode(['error' => 'Username, email, and password are required']);
                 return;
             }
 
-            // Validate that at least one engineering specialty is selected
-            if (empty($engineerRoles) || !is_array($engineerRoles) || count($engineerRoles) == 0) {
+            // Validate name (either full_name or first_name must be provided)
+            if (empty($firstName)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'First name is required']);
+                return;
+            }
+
+            // Validate that at least one engineering specialty is selected (only if provided)
+            if (!empty($engineerRoles) && (!is_array($engineerRoles) || count($engineerRoles) == 0)) {
                 http_response_code(400);
                 echo json_encode(['error' => 'Please select at least one engineering specialty']);
                 return;
             }
 
-            // Validate terms agreement (required)
-            if (!$termsAgree) {
+            // Validate terms agreement (only if provided)
+            if (isset($input['terms_agree']) && !$termsAgree) {
                 http_response_code(400);
                 echo json_encode(['error' => 'You must agree to the Terms of Service and Privacy Policy to register']);
                 return;
             }
-
-            // Parse full name into first and last name
-            $nameParts = explode(' ', trim($fullName), 2);
-            $firstName = $nameParts[0] ?? '';
-            $lastName = $nameParts[1] ?? '';
 
             // Create user with agreement preferences
             $userModel = new User();
@@ -226,25 +238,27 @@ class AuthController extends Controller
                 'first_name' => $firstName,
                 'last_name' => $lastName,
                 'phone' => $phoneNumber,
-                'terms_agree' => $termsAgree,
-                'marketing_agree' => $marketingAgree
+                'terms_agreed' => $termsAgree ? 1 : 0,
+                'marketing_emails' => $marketingAgree ? 1 : 0
             ]);
 
             if ($result) {
+                http_response_code(200);
                 echo json_encode([
                     'success' => true,
                     'message' => 'Registration successful',
-                    'user_id' => $result
+                    'user_id' => $result,
+                    'username' => $username
                 ]);
             } else {
                 http_response_code(400);
-                echo json_encode(['error' => 'Registration failed']);
+                echo json_encode(['error' => 'Registration failed - username or email may already exist']);
             }
 
         } catch (Exception $e) {
             error_log('Registration error: ' . $e->getMessage());
             http_response_code(500);
-            echo json_encode(['error' => 'Registration failed due to server error']);
+            echo json_encode(['error' => 'Registration failed due to server error: ' . $e->getMessage()]);
         }
     }
 
@@ -256,13 +270,40 @@ class AuthController extends Controller
         header('Content-Type: application/json');
         
         try {
-            if (session_status() == PHP_SESSION_NONE) {
-                session_start();
+            // Session is already started in bootstrap.php
+            
+            // Get user_id before destroying session to delete DB session
+            $userId = $_SESSION['user_id'] ?? null;
+            
+            // Delete database session if exists
+            if ($userId) {
+                try {
+                    $db = Database::getInstance();
+                    $pdo = $db->getPdo();
+                    
+                    // Delete user sessions from database
+                    $stmt = $pdo->prepare("DELETE FROM user_sessions WHERE user_id = ?");
+                    $stmt->execute([$userId]);
+                } catch (Exception $e) {
+                    error_log('Error deleting user session: ' . $e->getMessage());
+                }
+            }
+            
+            // Clear auth_token cookie
+            if (isset($_COOKIE['auth_token'])) {
+                setcookie('auth_token', '', [
+                    'expires' => time() - 3600,
+                    'path' => '/',
+                    'secure' => isset($_SERVER['HTTPS']),
+                    'httponly' => true,
+                    'samesite' => 'Strict'
+                ]);
             }
             
             // Clear remember me cookie if it exists
             $this->clearRememberToken();
             
+            // Destroy session
             session_destroy();
             
             echo json_encode([
@@ -314,9 +355,7 @@ class AuthController extends Controller
         header('Content-Type: application/json');
         
         try {
-            if (session_status() == PHP_SESSION_NONE) {
-                session_start();
-            }
+            // Session is already started in bootstrap.php
             
             if (isset($_SESSION['user_id'])) {
                 echo json_encode([

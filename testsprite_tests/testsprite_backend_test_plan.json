@@ -1,0 +1,52 @@
+[
+  {
+    "id": "TC001",
+    "title": "user login functionality",
+    "description": "Test the /api/login endpoint to verify successful user login with valid credentials and proper handling of invalid credentials."
+  },
+  {
+    "id": "TC002",
+    "title": "user registration process",
+    "description": "Test the /api/register endpoint to ensure new users can register with valid data and receive appropriate errors for invalid input."
+  },
+  {
+    "id": "TC003",
+    "title": "user logout operation",
+    "description": "Test the /api/logout endpoint to confirm that authenticated users can successfully log out and receive confirmation."
+  },
+  {
+    "id": "TC004",
+    "title": "admin dashboard access control",
+    "description": "Test the /admin endpoint to verify that only authorized admin users can access the admin dashboard and unauthorized users are denied."
+  },
+  {
+    "id": "TC005",
+    "title": "admin settings section retrieval",
+    "description": "Test the /admin/settings/{section} endpoint to ensure correct retrieval of various settings sections, proper handling of invalid sections, and access control."
+  },
+  {
+    "id": "TC006",
+    "title": "user management listing access",
+    "description": "Test the /admin/users endpoint to verify that authorized admins can view the user management listing and unauthorized access is prevented."
+  },
+  {
+    "id": "TC007",
+    "title": "list available calculators",
+    "description": "Test the /calculators endpoint to confirm it returns the complete and accurate list of available engineering calculators."
+  },
+  {
+    "id": "TC008",
+    "title": "execute calculator function",
+    "description": "Test the /calculator/{module}/{function} endpoint to verify correct execution of calculations with valid input, and proper error response when calculator or function is not found."
+  },
+  {
+    "id": "TC009",
+    "title": "get user profile data",
+    "description": "Test the /profile GET endpoint to ensure authenticated users can retrieve their profile data and unauthenticated requests are denied."
+  },
+  {
+    "id": "TC010",
+    "title": "update user profile information",
+    "description": "Test the /profile PUT endpoint to verify users can update their profile information with valid data and receive errors for invalid input."
+  }
+]
