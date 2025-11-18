@@ -77,6 +77,37 @@ $pageTitle = $page_title ?? 'User Profile';
             box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
         }
         
+        .btn-primary {
+            background: linear-gradient(135deg, #4361ee 0%, #4cc9f0 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(67, 97, 238, 0.5);
+            background: linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-primary i {
+            font-size: 1rem;
+        }
+        
         /* Card Style - Clean White */
         .card {
             background: rgba(255, 255, 255, 0.03);

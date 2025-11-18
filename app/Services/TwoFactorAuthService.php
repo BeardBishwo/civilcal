@@ -180,7 +180,7 @@ class TwoFactorAuthService
             return false;
         }
         
-        $recoveryCodes = json_decode($user['two_factor_recovery_codes'], true);
+        $recoveryCodes = json_decode($user['two_factor_recovery_codes'] ?? '[]', true);
         
         if (!is_array($recoveryCodes)) {
             return false;
@@ -422,7 +422,7 @@ class TwoFactorAuthService
             return null;
         }
         
-        $recoveryCodes = json_decode($user['two_factor_recovery_codes'], true);
+        $recoveryCodes = json_decode($user['two_factor_recovery_codes'] ?? '[]', true);
         
         return [
             'enabled' => (bool) $user['two_factor_enabled'],
