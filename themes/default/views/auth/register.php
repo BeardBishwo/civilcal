@@ -79,23 +79,23 @@ $csrf_token = Security::generateCsrfToken();
                         <div class="strength-text" id="strengthText">Password strength</div>
                         <div class="password-requirements" id="passwordRequirements">
                             <div class="requirement" data-requirement="length">
-                                <span class="requirement-icon">○</span>
+                                <span class="requirement-icon"><i class="fas fa-circle"></i></span>
                                 <span class="requirement-text">At least 8 characters</span>
                             </div>
                             <div class="requirement" data-requirement="uppercase">
-                                <span class="requirement-icon">○</span>
+                                <span class="requirement-icon"><i class="fas fa-circle"></i></span>
                                 <span class="requirement-text">One uppercase letter</span>
                             </div>
                             <div class="requirement" data-requirement="lowercase">
-                                <span class="requirement-icon">○</span>
+                                <span class="requirement-icon"><i class="fas fa-circle"></i></span>
                                 <span class="requirement-text">One lowercase letter</span>
                             </div>
                             <div class="requirement" data-requirement="number">
-                                <span class="requirement-icon">○</span>
+                                <span class="requirement-icon"><i class="fas fa-circle"></i></span>
                                 <span class="requirement-text">One number</span>
                             </div>
                             <div class="requirement" data-requirement="special">
-                                <span class="requirement-icon">○</span>
+                                <span class="requirement-icon"><i class="fas fa-circle"></i></span>
                                 <span class="requirement-text">One special character</span>
                             </div>
                         </div>
@@ -145,19 +145,42 @@ $csrf_token = Security::generateCsrfToken();
                     <!-- Professional Details -->
                     <div class="form-row">
                         <div class="form-group half-width">
-                            <label for="full_name">Full Name *</label>
-                            <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Your full name" required>
-                            <div class="field-message">Enter your complete legal name</div>
+                            <label for="first_name">First Name *</label>
+                            <input type="text" id="first_name" name="first_name" class="form-control" placeholder="John" required>
+                            <div class="field-message">Your given name</div>
                         </div>
                         
                         <div class="form-group half-width">
-                            <label for="phone_number">Phone Number</label>
-                            <input type="tel" id="phone_number" name="phone_number" class="form-control" placeholder="+1 (555) 123-4567">
-                            <div class="field-message">Optional field - Include country code for international numbers</div>
+                            <label for="last_name">Last Name *</label>
+                            <input type="text" id="last_name" name="last_name" class="form-control" placeholder="Smith" required>
+                            <div class="field-message">Your family name</div>
                         </div>
                     </div>
                     
                     <div class="form-row">
+                        <div class="form-group half-width">
+                            <label for="phone_number">Phone Number</label>
+                            <input type="tel" id="phone_number" name="phone_number" class="form-control" placeholder="+1 (555) 123-4567">
+                            <div class="field-message">Optional - Include country code for international numbers</div>
+                        </div>
+                        
+                        <div class="form-group half-width">
+                            <label for="company">Company/Organization</label>
+                            <input type="text" id="company" name="company" class="form-control" placeholder="Your company name">
+                            <div class="field-message">Optional field</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group half-width">
+                            <label for="preferred_units">Preferred Units</label>
+                            <select id="preferred_units" name="preferred_units" class="form-control">
+                                <option value="metric">Metric (SI)</option>
+                                <option value="imperial">Imperial (US)</option>
+                            </select>
+                            <div class="field-message">Choose your preferred measurement system</div>
+                        </div>
+                        
                         <div class="form-group half-width">
                             <label for="role">Professional Role</label>
                             <select id="role" name="role" class="form-control">
@@ -170,21 +193,6 @@ $csrf_token = Security::generateCsrfToken();
                                 <option value="student">Student</option>
                                 <option value="educator">Educator</option>
                                 <option value="other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group half-width">
-                            <label for="company">Company/Organization</label>
-                            <input type="text" id="company" name="company" class="form-control" placeholder="Your company name">
-                        </div>
-                        
-                        <div class="form-group half-width">
-                            <label for="preferred_units">Preferred Units</label>
-                            <select id="preferred_units" name="preferred_units" class="form-control">
-                                <option value="metric">Metric (SI)</option>
-                                <option value="imperial">Imperial (US)</option>
                             </select>
                         </div>
                     </div>
@@ -299,7 +307,7 @@ $csrf_token = Security::generateCsrfToken();
 
         <!-- Login Link -->
         <div class="auth-footer">
-            <p>Already have an account? <a href="login.php" class="auth-link">Sign In</a></p>
+            <p>Already have an account? <a href="<?php echo app_base_url('/login'); ?>" class="auth-link">Sign In</a></p>
         </div>
     </div>
 </div>
@@ -307,13 +315,14 @@ $csrf_token = Security::generateCsrfToken();
 <!-- CSS Styles -->
 <style>
 .auth-container {
-    min-height: 100vh;
+    min-height: calc(100vh - 200px);
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 32px;
+    padding: 32px 32px 60px 32px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-top: 20px;
 }
 
 .auth-card {
@@ -1006,33 +1015,33 @@ select.form-control {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 2px solid #d1d5db;
-    font-size: 0.7rem;
-    font-weight: bold;
+    width: 20px;
+    height: 20px;
+    font-size: 0.75rem;
     color: #d1d5db;
-    background-color: transparent;
     transition: all 0.3s ease;
     flex-shrink: 0;
 }
 
-.requirement.met .requirement-icon {
-    background-color: #10b981;
-    border-color: #10b981;
-    color: white;
-    transform: scale(1.1);
-    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+.requirement-icon i {
+    transition: all 0.3s ease;
 }
 
-.requirement.met .requirement-icon::before {
-    content: "✓";
-    font-weight: 900;
+.requirement:not(.met) .requirement-icon i {
+    color: #d1d5db;
+    font-size: 0.65rem;
 }
 
-.requirement:not(.met) .requirement-icon::before {
-    content: "";
+.requirement.met .requirement-icon i {
+    color: #10b981;
+    font-size: 0.9rem;
+    animation: checkPop 0.3s ease;
+}
+
+@keyframes checkPop {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
 }
 
 /* Form alignment fixes */
@@ -1302,8 +1311,8 @@ select.form-control {
 <script>
 // Expose PHP specialties to JS so we can build a fallback control if checkboxes are missing
 const SPECIALTIES = <?php echo json_encode($specialties); ?>;
-// Use direct endpoint to bypass routing issues
-const CHECK_USERNAME_URL = '<?php echo app_base_url('direct_check_username.php'); ?>';
+// Use API endpoint for username checking
+const CHECK_USERNAME_URL = '<?php echo app_base_url('/api/check-username'); ?>';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize form elements
@@ -1594,10 +1603,17 @@ function checkPasswordStrength(password) {
     // Update requirement indicators
     requirements.forEach(req => {
         const type = req.dataset.requirement;
+        const icon = req.querySelector('.requirement-icon i');
         if (checks[type]) {
             req.classList.add('met');
+            if (icon) {
+                icon.className = 'fas fa-check-circle';
+            }
         } else {
             req.classList.remove('met');
+            if (icon) {
+                icon.className = 'fas fa-circle';
+            }
         }
     });
     
