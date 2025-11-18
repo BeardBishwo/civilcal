@@ -3,7 +3,7 @@
         'name' => 'aec-calculator/framework',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '30c85991c9a13721c598683e0cd15a2365b0357d',
+        'reference' => '116fae5c7e827b2f17d37b11f7812c8aadfce3c3',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'aec-calculator/framework' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '30c85991c9a13721c598683e0cd15a2365b0357d',
+            'reference' => '116fae5c7e827b2f17d37b11f7812c8aadfce3c3',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

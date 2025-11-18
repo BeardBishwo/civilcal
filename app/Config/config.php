@@ -1,4 +1,9 @@
 <?php
+/**
+ * Bishwo Calculator - Application Configuration
+ * Core settings for the application
+ */
+
 // Environment detection
 if (!defined('ENVIRONMENT')) {
     if (isset($_SERVER['APP_ENV'])) {
@@ -11,52 +16,23 @@ if (!defined('ENVIRONMENT')) {
 }
 
 // App configuration
-define('APP_NAME', getenv('APP_NAME') ?: 'Bishwo Calculator');
-define('APP_BASE', getenv('APP_BASE') ?: '/Bishwo_Calculator');
-define('APP_URL', getenv('APP_URL') ?: get_app_url());
+define('APP_NAME', 'Bishwo Calculator');
+define('APP_BASE', '/Bishwo_Calculator');
+define('APP_URL', 'http://localhost/Bishwo_Calculator');
 
 // Security settings
-define('REQUIRE_HTTPS', ENVIRONMENT === 'production');
+define('REQUIRE_HTTPS', false);
 define('CSRF_EXPIRY', 7200); // 2 hours
-define('RATE_LIMIT_WINDOW', 3600); // 1 hour
-define('RATE_LIMIT_MAX_REQUESTS', [
-    'login' => 10,       // Max login attempts per hour
-    'register' => 5,     // Max registration attempts per hour
-    'reset' => 3,        // Max password reset requests per hour
-    'contact' => 10,     // Max contact form submissions per hour
-    'api' => 1000        // Max API requests per hour per token
-]);
-
-// Session is now configured and started in bootstrap.php
 
 // Database configuration
-define('DB_HOST', getenv('DB_HOST') ?: '127.0.0.1');
-define('DB_NAME', getenv('DB_NAME') ?: 'bishwo_calculator');
-define('DB_USER', getenv('DB_USER') ?: 'root');
-define('DB_PASS', getenv('DB_PASS') ?: '');
+define('DB_HOST', '127.0.0.1');
+define('DB_NAME', 'bishwo_calculator');
+define('DB_USER', 'root');
+define('DB_PASS', '');
 
 // Admin settings
-define('ADMIN_USER', getenv('ADMIN_USER') ?: 'admin');
-define('ADMIN_PASS', getenv('ADMIN_PASS') ?: 'password');
-
-// Mail configuration
-define('MAIL_ENABLED', getenv('MAIL_ENABLED') ?: false);
-define('MAIL_FROM', getenv('MAIL_FROM') ?: 'noreply@example.com');
-define('MAIL_FROM_NAME', getenv('MAIL_FROM_NAME') ?: 'AEC Calculator');
-define('MAIL_REPLY_TO', getenv('MAIL_REPLY_TO') ?: 'support@example.com');
-define('MAIL_TO', getenv('MAIL_TO') ?: 'admin@example.com');
-
-// SMTP settings (required for reliable email delivery)
-define('MAIL_SMTP_HOST', getenv('MAIL_SMTP_HOST') ?: 'smtp.example.com');
-define('MAIL_SMTP_PORT', getenv('MAIL_SMTP_PORT') ?: 587);
-define('MAIL_SMTP_USER', getenv('MAIL_SMTP_USER') ?: 'smtp-user');
-define('MAIL_SMTP_PASS', getenv('MAIL_SMTP_PASS') ?: 'smtp-pass');
-define('MAIL_SMTP_SECURE', getenv('MAIL_SMTP_SECURE') ?: 'tls'); // tls or ssl
-
-// PayPal settings
-define('PAYPAL_CLIENT_ID', getenv('PAYPAL_CLIENT_ID') ?: '');
-define('PAYPAL_SECRET', getenv('PAYPAL_SECRET') ?: '');
-define('PAYPAL_MODE', getenv('PAYPAL_MODE') ?: 'sandbox'); // 'sandbox' or 'live'
+define('ADMIN_USER', 'admin');
+define('ADMIN_PASS', 'password');
 
 // Error reporting
 if (ENVIRONMENT === 'development') {
@@ -67,29 +43,10 @@ if (ENVIRONMENT === 'development') {
     ini_set('display_errors', '0');
 }
 
-// Anti-abuse and rate limiting
-define('FAILED_LOGIN_DELAY', 2); // Seconds to wait after failed login
-define('MAX_FAILED_LOGINS', 5); // After this many failures, require password reset
-
-// Tenant settings
-define('MAX_USERS_PER_TENANT', 50);
-define('STORAGE_LIMIT_PER_TENANT', 1024 * 1024 * 100); // 100MB per tenant
-
-// Set secure headers
-if (!headers_sent()) {
-    header('X-Frame-Options: SAMEORIGIN');
-    header('X-Content-Type-Options: nosniff');
-    header('X-XSS-Protection: 1; mode=block');
-    if (ENVIRONMENT === 'production') {
-        header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
-    }
-}
-
 // Helper function to get app URL
 function get_app_url() {
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     return $protocol . '://' . $host . APP_BASE;
 }
-
 ?>

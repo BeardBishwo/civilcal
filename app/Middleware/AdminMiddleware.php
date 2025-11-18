@@ -41,7 +41,7 @@ class AdminMiddleware
         
         if (!$isAuthenticated) {
             // Redirect to login if not authenticated
-            header("Location: /login");
+            header("Location: " . app_base_url("/login"));
             exit;
         }
         

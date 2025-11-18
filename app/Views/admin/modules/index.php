@@ -24,7 +24,7 @@ ob_start();
 <!-- Modules Grid -->
 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
     <?php foreach ($modules as $module): ?>
-        <div style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.5rem;">
+        <div class="module-card" style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.5rem; transition: all 0.2s ease;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h3 style="font-size: 1.125rem; font-weight: 600; color: #4cc9f0; margin: 0;"><?php echo htmlspecialchars($module['name']); ?></h3>
                 <span style="background: #4361ee; color: white; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem;">v<?php echo $module['version']; ?></span>
@@ -113,6 +113,84 @@ ob_start();
         </form>
     </div>
 </div>
+
+<style>
+/* Module Card Enhancements */
+.module-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.module-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(67, 97, 238, 0.3);
+}
+
+/* Button Hover Effects */
+button {
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Table Hover */
+table tbody tr {
+    transition: background 0.2s ease;
+}
+
+table tbody tr:hover {
+    background: rgba(67, 97, 238, 0.05);
+}
+
+/* Input Focus */
+input:focus {
+    outline: none;
+    border-color: #4361ee !important;
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    div[style*="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))"] {
+        grid-template-columns: 1fr !important;
+    }
+    
+    div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+    
+    div[style*="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+    
+    .page-header > div[style*="display: flex"] {
+        flex-direction: column !important;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    button {
+        width: 100% !important;
+    }
+    
+    table {
+        font-size: 0.75rem !important;
+    }
+}
+</style>
 
 <?php
 $content = ob_get_clean();

@@ -85,8 +85,12 @@ $router->add('GET', '/admin/users', 'Admin\UserManagementController@index', ['au
 // Calculations
 $router->add('GET', '/admin/calculations', 'Admin\CalculationsController@index', ['auth', 'admin']);
 
-// Modules Management  
+// Modules Management - Using Beautiful Theme UI
 $router->add('GET', '/admin/modules', 'Admin\ModuleController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/modules/activate', 'Admin\ModuleController@activate', ['auth', 'admin']);
+$router->add('POST', '/admin/modules/deactivate', 'Admin\ModuleController@deactivate', ['auth', 'admin']);
+$router->add('GET', '/admin/modules/{module}/settings', 'Admin\ModuleController@settings', ['auth', 'admin']);
+$router->add('POST', '/admin/modules/settings/update', 'Admin\ModuleController@updateSettings', ['auth', 'admin']);
 
 // System Routes
 $router->add('GET', '/admin/logs', 'Admin\LogsController@index', ['auth', 'admin']);
@@ -94,13 +98,6 @@ $router->add('GET', '/admin/logs/download/{filename}', 'Admin\LogsController@dow
 $router->add('GET', '/admin/logs/view/{filename}', 'Admin\LogsController@viewLog', ['auth', 'admin']);
 $router->add('GET', '/admin/backup', 'Admin\BackupController@index', ['auth', 'admin']);
 $router->add('GET', '/admin/system-status', 'Admin\SystemStatusController@index', ['auth', 'admin']);
-
-// Module Management
-$router->add('GET', '/admin/modules', 'Admin\MainDashboardController@modules', ['auth', 'admin']);
-$router->add('POST', '/admin/modules/activate', 'Admin\MainDashboardController@activateModule', ['auth', 'admin']);
-$router->add('POST', '/admin/modules/deactivate', 'Admin\MainDashboardController@deactivateModule', ['auth', 'admin']);
-$router->add('GET', '/admin/modules/{module}/settings', 'Admin\MainDashboardController@moduleSettings', ['auth', 'admin']);
-$router->add('POST', '/admin/modules/settings/update', 'Admin\MainDashboardController@updateModuleSettings', ['auth', 'admin']);
 
 // Logo & Branding Settings
 $router->add('GET', '/admin/logo-settings', 'Admin\LogoController@index', ['auth', 'admin']);
@@ -226,9 +223,6 @@ $router->add('POST', '/admin/settings/save', 'Admin\SettingsController@saveSetti
 // Calculators Management Routes
 $router->add('GET', '/admin/calculators', 'Admin\CalculatorController@index', ['auth', 'admin']);
 $router->add('POST', '/admin/calculators/add', 'Admin\CalculatorController@addCalculator', ['auth', 'admin']);
-
-// Modules Management Routes
-$router->add('GET', '/admin/modules', 'Admin\ModuleController@index', ['auth', 'admin']);
 
 // Widget Management Routes
 $router->add('GET', '/admin/widgets', 'WidgetController@index', ['auth', 'admin']);
@@ -363,6 +357,10 @@ $router->add('POST', '/admin/help/export-plugins', 'Admin\HelpController@exportP
 $router->add('POST', '/admin/help/restore', 'Admin\HelpController@restore', ['auth', 'admin', 'ratelimit']);
 $router->add('GET', '/admin/help/download-backup', 'Admin\HelpController@downloadBackup', ['auth', 'admin']);
 $router->add('POST', '/admin/help/export-logs', 'Admin\HelpController@exportLogs', ['auth', 'admin', 'ratelimit']);
+
+// Activity Logs
+$router->add('GET', '/admin/activity', 'Admin\ActivityController@index', ['auth', 'admin']);
+$router->add('GET', '/admin/activity/export', 'Admin\ActivityController@export', ['auth', 'admin']);
 
 // Audit Logs Viewer
 $router->add('GET', '/admin/audit-logs', 'Admin\AuditLogController@index', ['auth', 'admin']);

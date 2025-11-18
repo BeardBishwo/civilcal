@@ -13,7 +13,7 @@ class HistoryController {
         // Check if user is logged in
         $auth = new Auth();
         if (!$auth->check()) {
-            return header('Location: /login');
+            return header('Location: ' . app_base_url('/login'));
         }
 
         $user = $auth->user();
@@ -54,7 +54,7 @@ class HistoryController {
     public function delete($id) {
         $auth = new Auth();
         if (!$auth->check()) {
-            return header('Location: /login');
+            return header('Location: ' . app_base_url('/login'));
         }
 
         $user = $auth->user();
@@ -66,7 +66,7 @@ class HistoryController {
             Session::setFlash('error', 'Calculation not found or access denied.');
         }
 
-        return header('Location: /history');
+        return header('Location: ' . app_base_url('/history'));
     }
 
     public function toggleFavorite($id) {
@@ -91,14 +91,14 @@ class HistoryController {
     public function search() {
         $auth = new Auth();
         if (!$auth->check()) {
-            return header('Location: /login');
+            return header('Location: ' . app_base_url('/login'));
         }
 
         $user = $auth->user();
         $searchTerm = $_GET['q'] ?? '';
 
         if (empty($searchTerm)) {
-            return header('Location: /history');
+            return header('Location: ' . app_base_url('/history'));
         }
 
         $history = CalculationHistory::searchHistory($user->id, $searchTerm);
@@ -110,7 +110,7 @@ class HistoryController {
     public function view($id) {
         $auth = new Auth();
         if (!$auth->check()) {
-            return header('Location: /login');
+            return header('Location: ' . app_base_url('/login'));
         }
 
         $user = $auth->user();
@@ -119,7 +119,7 @@ class HistoryController {
 
         if (!$calculation) {
             Session::setFlash('error', 'Calculation not found.');
-            return header('Location: /history');
+            return header('Location: ' . app_base_url('/history'));
         }
 
         // Include the view for individual calculation
@@ -162,7 +162,7 @@ class HistoryController {
     public function byType($calculatorType) {
         $auth = new Auth();
         if (!$auth->check()) {
-            return header('Location: /login');
+            return header('Location: ' . app_base_url('/login'));
         }
 
         $user = $auth->user();
@@ -176,7 +176,7 @@ class HistoryController {
     public function export() {
         $auth = new Auth();
         if (!$auth->check()) {
-            return header('Location: /login');
+            return header('Location: ' . app_base_url('/login'));
         }
 
         $user = $auth->user();
@@ -194,7 +194,7 @@ class HistoryController {
                 break;
             default:
                 Session::setFlash('error', 'Invalid export format.');
-                return header('Location: /history');
+                return header('Location: ' . app_base_url('/history'));
         }
     }
 
@@ -239,7 +239,7 @@ class HistoryController {
     public function clearAll() {
         $auth = new Auth();
         if (!$auth->check()) {
-            return header('Location: /login');
+            return header('Location: ' . app_base_url('/login'));
         }
 
         $user = $auth->user();
@@ -249,7 +249,7 @@ class HistoryController {
         // $historyModel->clearUserHistory($user->id);
         
         Session::setFlash('success', 'History cleared successfully.');
-        return header('Location: /history');
+        return header('Location: ' . app_base_url('/history'));
     }
 
     public function bulkDelete() {

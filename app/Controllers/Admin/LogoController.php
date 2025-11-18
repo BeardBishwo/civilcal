@@ -10,7 +10,7 @@ class LogoController extends Controller
     {
         // Check admin authentication
         if (empty($_SESSION['is_admin'])) {
-            header('Location: /login');
+            header('Location: ' . app_base_url('/login'));
             exit;
         }
         
@@ -94,7 +94,7 @@ class LogoController extends Controller
                 } else {
                     // Redirect back with success message
                     $_SESSION['logo_success'] = 'Logo settings updated successfully!';
-                    header('Location: /admin/logo-settings');
+                    header('Location: ' . app_base_url('/admin/logo-settings'));
                 }
             } else {
                 throw new \Exception('Failed to save logo settings');
@@ -109,7 +109,7 @@ class LogoController extends Controller
                 echo json_encode(['error' => 'Failed to update logo settings: ' . $e->getMessage()]);
             } else {
                 $_SESSION['logo_error'] = 'Failed to update logo settings: ' . $e->getMessage();
-                header('Location: /admin/logo-settings');
+                header('Location: ' . app_base_url('/admin/logo-settings'));
             }
         }
         

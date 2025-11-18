@@ -8,7 +8,7 @@ $isAdmin = $isLoggedIn && $auth->isAdmin();
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="/">
+        <a class="navbar-brand fw-bold" href="<?php echo app_base_url('/'); ?>">
             <i class="fas fa-calculator me-2"></i>Bishwo Calculator
         </a>
         
@@ -20,17 +20,17 @@ $isAdmin = $isLoggedIn && $auth->isAdmin();
             <?php if ($isLoggedIn): ?>
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">
+                        <a class="nav-link" href="<?php echo app_base_url('/'); ?>">
                             <i class="fas fa-tachometer-alt me-1"></i>Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/calculators">
+                        <a class="nav-link" href="<?php echo app_base_url('/calculators'); ?>">
                             <i class="fas fa-calculator me-1"></i>Calculators
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/history">
+                        <a class="nav-link" href="<?php echo app_base_url('/history'); ?>">
                             <i class="fas fa-history me-1"></i>History
                         </a>
                     </li>
@@ -40,20 +40,20 @@ $isAdmin = $isLoggedIn && $auth->isAdmin();
                                 <i class="fas fa-cog me-1"></i>Admin
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/admin">
+                                <li><a class="dropdown-item" href="<?php echo app_base_url('/admin'); ?>">
                                     <i class="fas fa-tachometer-alt me-2"></i>Dashboard
                                 </a></li>
-                                <li><a class="dropdown-item" href="/admin/users">
+                                <li><a class="dropdown-item" href="<?php echo app_base_url('/admin/users'); ?>">
                                     <i class="fas fa-users me-2"></i>Users
                                 </a></li>
-                                <li><a class="dropdown-item" href="/admin/settings">
+                                <li><a class="dropdown-item" href="<?php echo app_base_url('/admin/settings'); ?>">
                                     <i class="fas fa-cog me-2"></i>Settings
                                 </a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/admin/plugins">
+                                <li><a class="dropdown-item" href="<?php echo app_base_url('/admin/plugins'); ?>">
                                     <i class="fas fa-plug me-2"></i>Plugins
                                 </a></li>
-                                <li><a class="dropdown-item" href="/admin/themes">
+                                <li><a class="dropdown-item" href="<?php echo app_base_url('/admin/themes'); ?>">
                                     <i class="fas fa-palette me-2"></i>Themes
                                 </a></li>
                             </ul>
@@ -68,12 +68,12 @@ $isAdmin = $isLoggedIn && $auth->isAdmin();
                             <?= htmlspecialchars($currentUser['first_name'] ?? $currentUser['email'] ?? 'User') ?>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/profile">
+                            <li><a class="dropdown-item" href="<?php echo app_base_url('/profile'); ?>">
                                 <i class="fas fa-user me-2"></i>Profile
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <form method="POST" action="/logout" class="d-inline">
+                                <form method="POST" action="<?php echo app_base_url('/logout'); ?>" class="d-inline">
                                     <button type="submit" class="dropdown-item">
                                         <i class="fas fa-sign-out-alt me-2"></i>Logout
                                     </button>
@@ -85,7 +85,7 @@ $isAdmin = $isLoggedIn && $auth->isAdmin();
             <?php else: ?>
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
+                        <a class="nav-link" href="<?php echo app_base_url('/'); ?>">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#features">Features</a>
@@ -97,10 +97,10 @@ $isAdmin = $isLoggedIn && $auth->isAdmin();
                 
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="/login">Login</a>
+                        <a class="nav-link" href="<?php echo app_base_url('/login'); ?>">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/register">Register</a>
+                        <a class="nav-link" href="<?php echo app_base_url('/register'); ?>">Register</a>
                     </li>
                 </ul>
             <?php endif; ?>

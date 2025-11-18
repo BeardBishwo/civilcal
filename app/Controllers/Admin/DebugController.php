@@ -653,13 +653,13 @@ class DebugController extends Controller
         }
         
         if (empty($_SESSION['user_id'])) {
-            header('Location: /login?redirect=' . urlencode($_SERVER['REQUEST_URI']));
+            header('Location: ' . app_base_url('/login?redirect=' . urlencode($_SERVER['REQUEST_URI'])));
             exit;
         }
         
         $userModel = new User();
         if (!$userModel->isAdmin($_SESSION['user_id'])) {
-            header('Location: /dashboard?error=access_denied');
+            header('Location: ' . app_base_url('/dashboard?error=access_denied'));
             exit;
         }
     }

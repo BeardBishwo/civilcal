@@ -24,7 +24,7 @@ $content = '
                     <span>12.5%</span>
                 </div>
             </div>
-            <div class="stat-value" id="total-users">1,247</div>
+            <div class="stat-value" id="total-users">' . ($stats['total_users'] ?? 0) . '</div>
             <div class="stat-label">Total Users</div>
         </div>
         
@@ -39,7 +39,7 @@ $content = '
                     <span>8.2%</span>
                 </div>
             </div>
-            <div class="stat-value" id="active-users">1,186</div>
+            <div class="stat-value" id="active-users">' . ($stats['active_users'] ?? 0) . '</div>
             <div class="stat-label">Active Users</div>
         </div>
         
@@ -54,8 +54,8 @@ $content = '
                     <span>15.3%</span>
                 </div>
             </div>
-            <div class="stat-value" id="calculator-usage">3,428</div>
-            <div class="stat-label">Calculations Today</div>
+            <div class="stat-value" id="calculator-usage">' . ($stats['monthly_calculations'] ?? 0) . '</div>
+            <div class="stat-label">Calculations This Month</div>
         </div>
         
         <!-- Active Modules -->
@@ -65,7 +65,7 @@ $content = '
                     <i class="fas fa-puzzle-piece"></i>
                 </div>
             </div>
-            <div class="stat-value" id="active-modules">12</div>
+            <div class="stat-value" id="active-modules">' . ($stats['active_modules'] ?? 0) . '</div>
             <div class="stat-label">Active Modules</div>
         </div>
     </div>
@@ -421,6 +421,9 @@ $content = '
 $breadcrumbs = [
     ['title' => 'Dashboard']
 ];
+
+$page_title = $page_title ?? 'Dashboard - Admin Panel';
+$currentPage = $currentPage ?? 'dashboard';
 
 // Include the layout
 include __DIR__ . '/../layouts/main.php';

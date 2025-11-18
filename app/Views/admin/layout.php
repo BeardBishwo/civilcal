@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title ?? 'Admin Panel'; ?> - Bishwo Calculator</title>
     
+    <!-- Base URL for JavaScript -->
+    <script>
+        window.APP_BASE_URL = <?php echo json_encode(app_base_url('/')); ?>;
+    </script>
+    <script src="<?php echo asset_url('js/app-utils.js'); ?>"></script>
+    
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     

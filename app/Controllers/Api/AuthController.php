@@ -148,7 +148,7 @@ class AuthController extends Controller
                         'role' => $user['role'] ?? 'user',
                         'is_admin' => $user['is_admin'] ?? false
                     ],
-                    'redirect_url' => ($user['is_admin'] ?? false) ? '/admin/dashboard' : '/'
+                    'redirect_url' => ($user['is_admin'] ?? false) ? app_base_url('/admin/dashboard') : app_base_url('/')
                 ]);
             } else {
                 http_response_code(401);
