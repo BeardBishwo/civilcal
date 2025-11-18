@@ -10,6 +10,9 @@ define("APP_PATH", BASE_PATH . "/app");
 define("CONFIG_PATH", BASE_PATH . "/config");
 define("STORAGE_PATH", BASE_PATH . "/storage");
 
+// Load Composer autoloader (for vendor packages like Google2FA)
+require_once BASE_PATH . '/vendor/autoload.php';
+
 // Autoloader for App classes
 spl_autoload_register(function ($class) {
     $prefix = "App\\";

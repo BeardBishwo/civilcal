@@ -46,19 +46,32 @@ $router->add('POST', '/api/traditional-units/all-conversions/protected', 'ApiCon
 
 // User Routes
 $router->add('GET', '/profile', 'ProfileController@index', ['auth']);
-$router->add('POST', '/profile/update', 'ProfileController@update', ['auth']);
-$router->add('POST', '/profile/change-password', 'ProfileController@changePassword', ['auth']);
-$router->add('GET', '/history', 'ProfileController@history', ['auth']);
-$router->add('POST', '/history/delete/{id}', 'ProfileController@deleteCalculation', ['auth']);
-
-// Extended Profile Management Routes (from original routes.php)
 $router->add('GET', '/user/profile', 'ProfileController@index', ['auth']);
 $router->add('POST', '/profile/update', 'ProfileController@updateProfile', ['auth']);
+$router->add('POST', '/user/profile/update', 'ProfileController@updateProfile', ['auth']);
 $router->add('POST', '/profile/notifications', 'ProfileController@updateNotifications', ['auth']);
 $router->add('POST', '/profile/privacy', 'ProfileController@updatePrivacy', ['auth']);
 $router->add('POST', '/profile/password', 'ProfileController@changePassword', ['auth']);
+$router->add('POST', '/profile/change-password', 'ProfileController@changePassword', ['auth']);
 $router->add('POST', '/profile/delete', 'ProfileController@deleteAccount', ['auth']);
 $router->add('GET', '/profile/avatar/{filename}', 'ProfileController@serveAvatar', ['auth']);
+$router->add('GET', '/history', 'ProfileController@history', ['auth']);
+$router->add('POST', '/history/delete/{id}', 'ProfileController@deleteCalculation', ['auth']);
+
+// Two-Factor Authentication Routes
+$router->add('GET', '/2fa/setup', 'TwoFactorController@setup', ['auth']);
+$router->add('POST', '/2fa/enable', 'TwoFactorController@enable', ['auth']);
+$router->add('POST', '/2fa/disable', 'TwoFactorController@disable', ['auth']);
+$router->add('GET', '/2fa/verify', 'TwoFactorController@showVerify');
+$router->add('POST', '/2fa/verify', 'TwoFactorController@verify');
+$router->add('POST', '/2fa/recovery-codes/regenerate', 'TwoFactorController@regenerateRecoveryCodes', ['auth']);
+$router->add('GET', '/2fa/trusted-devices', 'TwoFactorController@getTrustedDevices', ['auth']);
+$router->add('POST', '/2fa/trusted-devices/revoke', 'TwoFactorController@revokeTrustedDevice', ['auth']);
+
+// Data Export Routes (GDPR)
+$router->add('POST', '/data-export/request', 'DataExportController@requestExport', ['auth']);
+$router->add('GET', '/data-export/requests', 'DataExportController@getRequests', ['auth']);
+$router->add('GET', '/data-export/download/{id}', 'DataExportController@download', ['auth']);
 
 // Authentication API Routes (for frontend AJAX)
 $router->add('POST', '/api/login', 'Api\AuthController@login');

@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'aec-calculator/framework',
-        'pretty_version' => 'dev-main',
-        'version' => 'dev-main',
-        'reference' => '116fae5c7e827b2f17d37b11f7812c8aadfce3c3',
+        'pretty_version' => '1.0.0+no-version-set',
+        'version' => '1.0.0.0',
+        'reference' => null,
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -20,9 +20,9 @@
             'dev_requirement' => false,
         ),
         'aec-calculator/framework' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => '116fae5c7e827b2f17d37b11f7812c8aadfce3c3',
+            'pretty_version' => '1.0.0+no-version-set',
+            'version' => '1.0.0.0',
+            'reference' => null,
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -371,9 +371,9 @@
             'dev_requirement' => false,
         ),
         'pragmarx/google2fa' => array(
-            'pretty_version' => 'v8.0.3',
-            'version' => '8.0.3.0',
-            'reference' => '6f8d87ebd5afbf7790bde1ffc7579c7c705e0fad',
+            'pretty_version' => 'v9.0.0',
+            'version' => '9.0.0.0',
+            'reference' => 'e6bc62dd6ae83acc475f57912e27466019a1f2cf',
             'type' => 'library',
             'install_path' => __DIR__ . '/../pragmarx/google2fa',
             'aliases' => array(),

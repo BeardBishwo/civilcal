@@ -425,7 +425,19 @@ $pageTitle = $page_title ?? 'User Profile';
 </head>
 
 <body data-theme="dark">
-    <?php include 'themes/default/views/partials/header.php'; ?>
+    <?php 
+    // Save the $user variable before including header (header overwrites it with session data)
+    $profileUser = $user;
+    
+    $headerPath = __DIR__ . '/../../../themes/default/views/partials/header.php';
+    if (file_exists($headerPath)) {
+        include $headerPath;
+    }
+    
+    // Restore the profile user data (with all database fields)
+    $user = $profileUser;
+    unset($profileUser);
+    ?>
     
     <div class="profile-container">
         <!-- Page Header -->
@@ -656,19 +668,114 @@ $pageTitle = $page_title ?? 'User Profile';
             
             <!-- Tab 5: Security -->
             <div class="tab-content" id="tab-security">
+                <!-- Two-Factor Authentication -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <h5 style="margin-bottom: 1rem; color: #f9fafb;">
+                        <i class="fas fa-shield-alt" style="margin-right: 0.5rem; color: #4cc9f0;"></i>
+                        Two-Factor Authentication (2FA)
+                    </h5>
+                    
+                    <?php if ($two_factor_status && $two_factor_status['enabled']): ?>
+                        <div class="alert" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #4ade80; margin-bottom: 1rem;">
+                            <i class="fas fa-check-circle"></i> 2FA is currently <strong>enabled</strong>
+                            <?php if ($two_factor_status['confirmed_at']): ?>
+                                <br><small>Activated on <?php echo date('M j, Y', strtotime($two_factor_status['confirmed_at'])); ?></small>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <p style="color: #9ca3af; margin-bottom: 1rem;">
+                            Recovery codes remaining: <strong><?php echo $two_factor_status['recovery_codes_remaining']; ?></strong>
+                        </p>
+                        
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button type="button" class="btn-outline" onclick="regenerateRecoveryCodes()">
+                                <i class="fas fa-sync-alt"></i> Regenerate Recovery Codes
+                            </button>
+                            <button type="button" class="btn-outline" style="border-color: #ef4444; color: #ef4444;" onclick="disable2FA()">
+                                <i class="fas fa-times-circle"></i> Disable 2FA
+                            </button>
+                        </div>
+                    <?php else: ?>
+                        <div class="alert" style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.3); color: #fbbf24; margin-bottom: 1rem;">
+                            <i class="fas fa-exclamation-triangle"></i> 2FA is currently <strong>disabled</strong>
+                        </div>
+                        
+                        <p style="color: #9ca3af; margin-bottom: 1rem;">
+                            Add an extra layer of security to your account with two-factor authentication using Google Authenticator or similar apps.
+                        </p>
+                        
+                        <button type="button" class="btn-primary" onclick="window.location.href='<?php echo app_base_url('/2fa/setup'); ?>'">
+                            <i class="fas fa-lock"></i> Enable 2FA
+                        </button>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- Data Export (GDPR) -->
                 <div class="card">
-                    <h5 style="margin-bottom: 1.5rem; color: #f9fafb;"><i class="fas fa-key" style="margin-right: 0.5rem; color: #4cc9f0;"></i>Security Settings</h5>
-                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                        <button type="button" class="btn-outline" onclick="alert('Change Password modal would open here')">
-                            <i class="fas fa-key"></i> Change Password
-                        </button>
-                        <button type="button" class="btn-outline" onclick="alert('Notification Settings modal would open here')">
-                            <i class="fas fa-bell"></i> Notification Settings
-                        </button>
-                        <button type="button" class="btn-outline" onclick="alert('Privacy Settings modal would open here')">
-                            <i class="fas fa-shield-alt"></i> Privacy Settings
-                        </button>
-                    </div>
+                    <h5 style="margin-bottom: 1rem; color: #f9fafb;">
+                        <i class="fas fa-download" style="margin-right: 0.5rem; color: #4cc9f0;"></i>
+                        Data Export (GDPR)
+                    </h5>
+                    
+                    <p style="color: #9ca3af; margin-bottom: 1rem;">
+                        Request a copy of all your personal data stored in our system. You'll receive a downloadable ZIP file containing your profile, calculations, and activity history.
+                    </p>
+                    
+                    <button type="button" class="btn-primary" onclick="requestDataExport()" style="margin-bottom: 1.5rem;">
+                        <i class="fas fa-file-archive"></i> Request Data Export
+                    </button>
+                    
+                    <?php if (!empty($export_requests)): ?>
+                        <h6 style="color: #f9fafb; margin-bottom: 0.75rem;">Recent Export Requests</h6>
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; color: #e5e7eb; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                        <th style="padding: 0.5rem; text-align: left;">Status</th>
+                                        <th style="padding: 0.5rem; text-align: left;">Requested</th>
+                                        <th style="padding: 0.5rem; text-align: left;">Expires</th>
+                                        <th style="padding: 0.5rem; text-align: left;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach (array_slice($export_requests, 0, 5) as $request): ?>
+                                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                            <td style="padding: 0.5rem;">
+                                                <?php 
+                                                $statusColors = [
+                                                    'pending' => '#fbbf24',
+                                                    'processing' => '#3b82f6',
+                                                    'completed' => '#22c55e',
+                                                    'failed' => '#ef4444'
+                                                ];
+                                                $color = $statusColors[$request['status']] ?? '#9ca3af';
+                                                ?>
+                                                <span style="color: <?php echo $color; ?>;">
+                                                    ● <?php echo ucfirst($request['status']); ?>
+                                                </span>
+                                            </td>
+                                            <td style="padding: 0.5rem; color: #9ca3af;">
+                                                <?php echo date('M j, Y', strtotime($request['requested_at'])); ?>
+                                            </td>
+                                            <td style="padding: 0.5rem; color: #9ca3af;">
+                                                <?php echo $request['expires_at'] ? date('M j, Y', strtotime($request['expires_at'])) : '-'; ?>
+                                            </td>
+                                            <td style="padding: 0.5rem;">
+                                                <?php if ($request['status'] === 'completed'): ?>
+                                                    <a href="<?php echo app_base_url('/data-export/download/' . $request['id']); ?>" 
+                                                       style="color: #4cc9f0; text-decoration: none;">
+                                                        <i class="fas fa-download"></i> Download
+                                                    </a>
+                                                <?php else: ?>
+                                                    -
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
             
@@ -740,9 +847,11 @@ $pageTitle = $page_title ?? 'User Profile';
             formData.append('social_links', JSON.stringify(socialLinks));
             
             try {
-                const response = await fetch('/user/profile/update', {
+                const baseUrl = window.location.origin + '/Bishwo_Calculator';
+                const response = await fetch(baseUrl + '/user/profile/update', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    credentials: 'include'
                 });
                 
                 const data = await response.json();
@@ -761,9 +870,98 @@ $pageTitle = $page_title ?? 'User Profile';
                 btn.disabled = false;
             }
         });
+        
+        // Two-Factor Authentication Functions
+        async function disable2FA() {
+            const password = prompt('Enter your password to disable 2FA:');
+            if (!password) return;
+            
+            try {
+                const baseUrl = window.location.origin + '/Bishwo_Calculator';
+                const response = await fetch(baseUrl + '/2fa/disable', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: new URLSearchParams({password}),
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✓ 2FA disabled successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to disable 2FA'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error: Failed to disable 2FA');
+            }
+        }
+        
+        async function regenerateRecoveryCodes() {
+            if (!confirm('This will invalidate all existing recovery codes. Continue?')) return;
+            
+            const password = prompt('Enter your password to regenerate recovery codes:');
+            if (!password) return;
+            
+            try {
+                const baseUrl = window.location.origin + '/Bishwo_Calculator';
+                const response = await fetch(baseUrl + '/2fa/recovery-codes/regenerate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: new URLSearchParams({password}),
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show recovery codes
+                    const codes = data.recovery_codes.join('\n');
+                    alert('New Recovery Codes:\n\n' + codes + '\n\nPlease save these codes in a secure location!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to regenerate codes'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error: Failed to regenerate codes');
+            }
+        }
+        
+        // Data Export Functions
+        async function requestDataExport() {
+            if (!confirm('Request a complete export of your personal data? This may take a few minutes to process.')) return;
+            
+            try {
+                const baseUrl = window.location.origin + '/Bishwo_Calculator';
+                const response = await fetch(baseUrl + '/data-export/request', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✓ ' + data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to request export'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error: Failed to request export');
+            }
+        }
     </script>
     
-    <?php include 'themes/default/views/partials/footer.php'; ?>
+    <?php 
+    $footerPath = __DIR__ . '/../../../themes/default/views/partials/footer.php';
+    if (file_exists($footerPath)) {
+        include $footerPath;
+    }
+    ?>
 </body>
 </html>
 

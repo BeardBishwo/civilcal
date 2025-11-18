@@ -43,5 +43,28 @@ class Controller {
             echo "<p>Expected path: " . htmlspecialchars($viewPath) . "</p>";
         }
     }
+    
+    /**
+     * Send JSON response
+     * 
+     * @param array $data The data to send as JSON
+     * @param int $statusCode HTTP status code (default 200)
+     */
+    protected function json($data, $statusCode = 200) {
+        http_response_code($statusCode);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit;
+    }
+    
+    /**
+     * Redirect to a URL
+     * 
+     * @param string $url The URL to redirect to
+     */
+    protected function redirect($url) {
+        header('Location: ' . $url);
+        exit;
+    }
 }
 ?>

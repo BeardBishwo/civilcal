@@ -36,12 +36,34 @@ class ProfileController extends Controller
             $this->redirect('/dashboard');
         }
 
+        // Get 2FA status (with error handling)
+        $twoFactorStatus = null;
+        try {
+            $twoFactorService = new \App\Services\TwoFactorAuthService();
+            $twoFactorStatus = $twoFactorService->getStatus($userId);
+        } catch (\Exception $e) {
+            error_log('2FA Status Error: ' . $e->getMessage());
+            $twoFactorStatus = ['enabled' => false, 'confirmed_at' => null, 'recovery_codes_remaining' => 0];
+        }
+        
+        // Get export requests (with error handling)
+        $exportRequests = [];
+        try {
+            $exportService = new \App\Services\DataExportService();
+            $exportRequests = $exportService->getExportRequests($userId);
+        } catch (\Exception $e) {
+            error_log('Export Requests Error: ' . $e->getMessage());
+            $exportRequests = [];
+        }
+
         $data = [
             'user' => $user,
             'statistics' => $stats,
             'profile_completion' => $profileCompletion,
             'notification_preferences' => $this->userModel->getNotificationPreferencesAttribute($userId),
-            'social_links' => $this->userModel->getSocialLinksAttribute($userId)
+            'social_links' => $this->userModel->getSocialLinksAttribute($userId),
+            'two_factor_status' => $twoFactorStatus,
+            'export_requests' => $exportRequests
         ];
 
         $this->view('user/profile', $data);
