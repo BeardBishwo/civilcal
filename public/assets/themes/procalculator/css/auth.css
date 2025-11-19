@@ -341,3 +341,105 @@
 
 /* Errors */
 .pc-error-message { color: var(--auth-error); font-size: 0.85rem; margin-top: 0.25rem; display: none; }
+
+/* Light mode enhancements for authentication pages */
+body:not(.dark-mode) .auth-container,
+html:not(.dark-mode) .auth-container,
+body:not(.dark-mode) .pc-login-container,
+html:not(.dark-mode) .pc-login-container,
+body:not(.dark-mode) .pc-register-container,
+html:not(.dark-mode) .pc-register-container {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%);
+}
+
+body:not(.dark-mode) .auth-card,
+html:not(.dark-mode) .auth-card,
+body:not(.dark-mode) .pc-login-card,
+html:not(.dark-mode) .pc-login-card,
+body:not(.dark-mode) .pc-register-card,
+html:not(.dark-mode) .pc-register-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+body:not(.dark-mode) .auth-title,
+html:not(.dark-mode) .auth-title,
+body:not(.dark-mode) .pc-login-title,
+html:not(.dark-mode) .pc-login-title,
+body:not(.dark-mode) .pc-register-title,
+html:not(.dark-mode) .pc-register-title {
+    color: #1e293b;
+}
+
+body:not(.dark-mode) .auth-subtitle,
+html:not(.dark-mode) .auth-subtitle,
+body:not(.dark-mode) .pc-login-subtitle,
+html:not(.dark-mode) .pc-login-subtitle,
+body:not(.dark-mode) .pc-register-subtitle,
+html:not(.dark-mode) .pc-register-subtitle {
+    color: #64748b;
+}
+
+body:not(.dark-mode) .form-label,
+html:not(.dark-mode) .form-label,
+body:not(.dark-mode) .pc-label,
+html:not(.dark-mode) .pc-label {
+    color: #1e293b;
+}
+
+body:not(.dark-mode) .form-input,
+html:not(.dark-mode) .form-input,
+body:not(.dark-mode) .pc-input,
+html:not(.dark-mode) .pc-input {
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(0, 0, 0, 0.12);
+    color: #1e293b;
+}
+
+body:not(.dark-mode) .form-input:focus,
+html:not(.dark-mode) .form-input:focus,
+body:not(.dark-mode) .pc-input:focus,
+html:not(.dark-mode) .pc-input:focus {
+    background: rgba(255, 255, 255, 1);
+    border-color: var(--auth-primary);
+    box-shadow: 0 0 0 4px rgba(63, 114, 175, 0.12);
+}
+
+body:not(.dark-mode) .form-input::placeholder,
+html:not(.dark-mode) .form-input::placeholder,
+body:not(.dark-mode) .pc-input::placeholder,
+html:not(.dark-mode) .pc-input::placeholder {
+    color: #94a3b8;
+}
+
+body:not(.dark-mode) .auth-btn-secondary,
+html:not(.dark-mode) .auth-btn-secondary {
+    background: rgba(248, 250, 252, 0.9);
+    color: #1e293b;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+body:not(.dark-mode) .auth-btn-secondary:hover,
+html:not(.dark-mode) .auth-btn-secondary:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+body:not(.dark-mode) .auth-links,
+html:not(.dark-mode) .auth-links {
+    color: #64748b;
+}
+
+body:not(.dark-mode) .pc-password-toggle,
+html:not(.dark-mode) .pc-password-toggle {
+    background: rgba(248, 250, 252, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    color: #475569;
+}
+
+body:not(.dark-mode) .pc-password-toggle:hover,
+html:not(.dark-mode) .pc-password-toggle:hover {
+    background: rgba(255, 255, 255, 1);
+    color: var(--auth-primary);
+}

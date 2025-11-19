@@ -546,6 +546,163 @@
     margin: 0;
 }
 
+/* Light mode enhancements for dashboard */
+body:not(.dark-mode) .dashboard,
+html:not(.dark-mode) .dashboard {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%);
+}
+
+body:not(.dark-mode) .dashboard-sidebar,
+html:not(.dark-mode) .dashboard-sidebar {
+    background: rgba(255, 255, 255, 0.95);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body:not(.dark-mode) .sidebar-menu-item,
+html:not(.dark-mode) .sidebar-menu-item {
+    color: #475569;
+}
+
+body:not(.dark-mode) .sidebar-menu-item:hover,
+html:not(.dark-mode) .sidebar-menu-item:hover,
+body:not(.dark-mode) .sidebar-menu-item.active,
+html:not(.dark-mode) .sidebar-menu-item.active {
+    background: rgba(99, 102, 241, 0.08);
+    color: #1e293b;
+}
+
+body:not(.dark-mode) .menu-label,
+html:not(.dark-mode) .menu-label {
+    color: #64748b;
+}
+
+body:not(.dark-mode) .sidebar-footer,
+html:not(.dark-mode) .sidebar-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body:not(.dark-mode) .user-info,
+html:not(.dark-mode) .user-info {
+    background: rgba(248, 250, 252, 0.8);
+}
+
+body:not(.dark-mode) .user-details h4,
+html:not(.dark-mode) .user-details h4 {
+    color: #1e293b;
+}
+
+body:not(.dark-mode) .user-details p,
+html:not(.dark-mode) .user-details p {
+    color: #64748b;
+}
+
+body:not(.dark-mode) .dashboard-header,
+html:not(.dark-mode) .dashboard-header {
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body:not(.dark-mode) .header-title,
+html:not(.dark-mode) .header-title {
+    color: #1e293b;
+}
+
+body:not(.dark-mode) .header-search-input,
+html:not(.dark-mode) .header-search-input {
+    background: rgba(248, 250, 252, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    color: #1e293b;
+}
+
+body:not(.dark-mode) .header-search-input::placeholder,
+html:not(.dark-mode) .header-search-input::placeholder {
+    color: #94a3b8;
+}
+
+body:not(.dark-mode) .header-search-icon,
+html:not(.dark-mode) .header-search-icon {
+    color: #64748b;
+}
+
+body:not(.dark-mode) .notification-btn,
+html:not(.dark-mode) .notification-btn {
+    background: rgba(248, 250, 252, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #475569;
+}
+
+body:not(.dark-mode) .notification-btn:hover,
+html:not(.dark-mode) .notification-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    color: #1e293b;
+}
+
+body:not(.dark-mode) .dashboard-card,
+html:not(.dark-mode) .dashboard-card {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+body:not(.dark-mode) .dashboard-card:hover,
+html:not(.dark-mode) .dashboard-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+body:not(.dark-mode) .stats-value,
+html:not(.dark-mode) .stats-value {
+    color: #1e293b;
+}
+
+body:not(.dark-mode) .stats-label,
+html:not(.dark-mode) .stats-label,
+body:not(.dark-mode) .stats-change,
+html:not(.dark-mode) .stats-change {
+    color: #64748b;
+}
+
+body:not(.dark-mode) .chart-empty,
+html:not(.dark-mode) .chart-empty {
+    color: #64748b;
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+body:not(.dark-mode) .activity-item,
+html:not(.dark-mode) .activity-item {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body:not(.dark-mode) .activity-time,
+html:not(.dark-mode) .activity-time,
+body:not(.dark-mode) .activity-description,
+html:not(.dark-mode) .activity-description {
+    color: #64748b;
+}
+
+body:not(.dark-mode) .activity-title,
+html:not(.dark-mode) .activity-title {
+    color: #1e293b;
+}
+
+body:not(.dark-mode) .quick-action,
+html:not(.dark-mode) .quick-action {
+    background: rgba(248, 250, 252, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #475569;
+}
+
+body:not(.dark-mode) .quick-action:hover,
+html:not(.dark-mode) .quick-action:hover {
+    background: rgba(255, 255, 255, 1);
+    color: #1e293b;
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+body:not(.dark-mode) .quick-action-text p,
+html:not(.dark-mode) .quick-action-text p {
+    color: #64748b;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .dashboard {

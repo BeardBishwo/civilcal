@@ -50,15 +50,49 @@ body.index-page {
     animation: gradientShift 15s ease infinite;
 }
 
-/* Light mode - keep dark background */
-body.light-theme,
-body.light-theme.index-page {
-    background: linear-gradient(135deg, #0a0e27, #1a1a4d, #0f0f2e) !important;
-    color: #ffffff !important;
+/* Light mode - proper light background */
+body:not(.dark-theme),
+body:not(.dark-theme).index-page {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%) !important;
+    color: #1e293b !important;
 }
 
-body.light-theme html {
-    background: linear-gradient(135deg, #0a0e27, #1a1a4d, #0f0f2e) !important;
+body:not(.dark-theme) html {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%) !important;
+}
+
+body:not(.dark-theme) .hero {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+}
+
+body:not(.dark-theme) .hero h1,
+body:not(.dark-theme) .hero h2,
+body:not(.dark-theme) .hero p {
+    color: #1e293b !important;
+}
+
+body:not(.dark-theme) .category-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+body:not(.dark-theme) .category-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+body:not(.dark-theme) .category-card h3 {
+    color: #1e293b !important;
+}
+
+body:not(.dark-theme) .category-card p {
+    color: #475569 !important;
+}
+
+body:not(.dark-theme) .category-icon {
+    color: #667eea !important;
 }
 
 .container {
@@ -390,7 +424,9 @@ body.light-theme html {
     margin: 0;
 }
 
-.tool-item {
+/* Dark theme tool items (default for homepage) */
+body.dark-theme .tool-item,
+body:not(.light-mode) .tool-item {
     padding: 1.2rem 1rem;
     margin: 0.8rem 0;
     background: rgba(30, 30, 60, 0.6);
@@ -400,9 +436,11 @@ body.light-theme html {
     border: 1.5px solid rgba(102, 126, 234, 0.5);
     position: relative;
     overflow: hidden;
+    transition: all 0.3s ease;
 }
 
-.tool-item a {
+body.dark-theme .tool-item a,
+body:not(.light-mode) .tool-item a {
     color: #ffffff;
     text-decoration: none;
     display: flex;
@@ -415,11 +453,13 @@ body.light-theme html {
     letter-spacing: 0.5px;
 }
 
-.tool-item a span {
+body.dark-theme .tool-item a span,
+body:not(.light-mode) .tool-item a span {
     flex: 1;
 }
 
-.tool-item a i {
+body.dark-theme .tool-item a i,
+body:not(.light-mode) .tool-item a i {
     margin-left: 0.8rem;
     font-size: 1rem;
     opacity: 0.9;
@@ -427,7 +467,62 @@ body.light-theme html {
     color: #ffd700;
 }
 
-.tool-item a::before {
+body.dark-theme .tool-item a::before,
+body:not(.light-mode) .tool-item a::before {
+    display: none;
+}
+
+/* Light mode tool items */
+body:not(.dark-theme) .tool-item {
+    padding: 1.2rem 1rem;
+    margin: 0.8rem 0;
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 1.5px solid rgba(99, 102, 241, 0.3) !important;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+body:not(.dark-theme) .tool-item:hover {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-color: rgba(99, 102, 241, 0.6) !important;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+    transform: translateY(-2px);
+}
+
+body:not(.dark-theme) .tool-item a {
+    color: #1e293b !important;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1.1rem;
+    font-weight: 800;
+    position: relative;
+    z-index: 1;
+    letter-spacing: 0.5px;
+}
+
+body:not(.dark-theme) .tool-item a:hover {
+    color: #6366f1 !important;
+}
+
+body:not(.dark-theme) .tool-item a span {
+    flex: 1;
+}
+
+body:not(.dark-theme) .tool-item a i {
+    margin-left: 0.8rem;
+    font-size: 1rem;
+    opacity: 0.9;
+    transition: all 0.3s ease;
+    color: #f59e0b !important;
+}
+
+body:not(.dark-theme) .tool-item a::before {
     display: none;
 }
 

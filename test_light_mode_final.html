@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Light Mode Test - Final Verification</title>
+    
+    <!-- Load all CSS files -->
+    <link rel="stylesheet" href="themes/default/assets/css/header.css">
+    <link rel="stylesheet" href="themes/default/assets/css/theme.css">
+    <link rel="stylesheet" href="themes/default/assets/css/home.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        .test-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .toggle-btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .status {
+            margin-top: 0.5rem;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .test-section {
+            margin-bottom: 3rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Test Controls -->
+    <div class="test-controls">
+        <button class="toggle-btn" onclick="toggleTheme()">
+            Toggle Light/Dark
+        </button>
+        <div class="status" id="status">Mode: Light</div>
+    </div>
+
+    <!-- Header Test -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo">ProCalculator</div>
+            <nav class="main-nav">
+                <a href="#" class="active">Home</a>
+                <a href="#">Calculators</a>
+                <a href="#">Dashboard</a>
+                <a href="#">About</a>
+            </nav>
+            <div class="header-actions">
+                <input type="text" class="search-input" placeholder="Search...">
+                <button class="theme-toggle-btn">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 style="text-align: center; margin: 2rem 0;">Light Mode Verification Test</h1>
+
+        <!-- Cards Test -->
+        <div class="test-section">
+            <h2 class="section-title">Card Components</h2>
+            
+            <div class="card" style="padding: 1.5rem; margin-bottom: 1rem;">
+                <div class="card-header" style="padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <h3 class="card-title">Sample Card Title</h3>
+                </div>
+                <div class="card-body">
+                    <p>This is the card body. In light mode, this text should be dark gray on a white background with visible borders.</p>
+                </div>
+                <div class="card-footer" style="padding-top: 1rem; margin-top: 1rem; display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">Primary</button>
+                    <button class="btn btn-secondary" style="padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Secondary</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Test -->
+        <div class="test-section">
+            <h2 class="section-title">Form Elements</h2>
+            
+            <div class="card" style="padding: 1.5rem;">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Text Input</label>
+                    <input type="text" class="form-control" placeholder="Enter text here..." style="width: 100%; padding: 0.75rem; border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Select Dropdown</label>
+                    <select class="form-control" style="width: 100%; padding: 0.75rem; border-radius: 4px;">
+                        <option>Option 1</option>
+                        <option>Option 2</option>
+                        <option>Option 3</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Textarea</label>
+                    <textarea class="form-control" rows="3" placeholder="Enter description..." style="width: 100%; padding: 0.75rem; border-radius: 4px;"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Test -->
+        <div class="test-section">
+            <h2 class="section-title">Table Component</h2>
+            
+            <table class="table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="padding: 1rem; text-align: left;">Column 1</th>
+                        <th style="padding: 1rem; text-align: left;">Column 2</th>
+                        <th style="padding: 1rem; text-align: left;">Column 3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 1rem;">Data 1</td>
+                        <td style="padding: 1rem;">Data 2</td>
+                        <td style="padding: 1rem;">Data 3</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 1rem;">Data 4</td>
+                        <td style="padding: 1rem;">Data 5</td>
+                        <td style="padding: 1rem;">Data 6</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 1rem;">Data 7</td>
+                        <td style="padding: 1rem;">Data 8</td>
+                        <td style="padding: 1rem;">Data 9</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Results -->
+        <div class="test-section">
+            <h2 class="section-title">Verification Checklist</h2>
+            
+            <div class="card" style="padding: 1.5rem;">
+                <h3>Light Mode (Current):</h3>
+                <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 1.8;">
+                    <li>Header should be WHITE with DARK text</li>
+                    <li>Cards should be WHITE with visible borders</li>
+                    <li>Text should be DARK and readable</li>
+                    <li>Form inputs should be WHITE with DARK text</li>
+                    <li>Table should have visible borders and DARK text</li>
+                    <li>Background should be LIGHT gradient</li>
+                </ul>
+                
+                <h3 style="margin-top: 2rem;">Dark Mode (After Toggle):</h3>
+                <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 1.8;">
+                    <li>Header should be DARK with LIGHT text</li>
+                    <li>Cards should be DARK with visible borders</li>
+                    <li>Text should be LIGHT and readable</li>
+                    <li>Form inputs should be DARK with LIGHT text</li>
+                    <li>Background should be DARK gradient</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const html = document.documentElement;
+            const status = document.getElementById('status');
+            
+            body.classList.toggle('dark-theme');
+            html.classList.toggle('dark-theme');
+            
+            if (body.classList.contains('dark-theme')) {
+                status.textContent = 'Mode: Dark';
+                status.style.color = '#fff';
+            } else {
+                status.textContent = 'Mode: Light';
+                status.style.color = '#000';
+            }
+        }
+        
+        // Start in light mode (no dark-theme class)
+        document.body.classList.remove('dark-theme');
+        document.documentElement.classList.remove('dark-theme');
+    </script>
+</body>
+</html>

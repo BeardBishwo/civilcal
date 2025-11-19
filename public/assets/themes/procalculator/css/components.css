@@ -81,6 +81,41 @@
     align-items: center;
 }
 
+/* Light mode enhancements for cards */
+body:not(.dark-mode) .card,
+html:not(.dark-mode) .card {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+body:not(.dark-mode) .card-header,
+html:not(.dark-mode) .card-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+body:not(.dark-mode) .card-footer,
+html:not(.dark-mode) .card-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+body:not(.dark-mode) .card-title,
+html:not(.dark-mode) .card-title {
+    color: #1e293b;
+}
+
+body:not(.dark-mode) .card-subtitle,
+html:not(.dark-mode) .card-subtitle,
+body:not(.dark-mode) .card-body,
+html:not(.dark-mode) .card-body {
+    color: #475569;
+}
+
+body:not(.dark-mode) .card:hover,
+html:not(.dark-mode) .card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
 
 /* Buttons */
 
@@ -630,6 +665,148 @@
     border-bottom-right-radius: var(--radius-md);
 }
 
+
+/* Light mode enhancements for buttons */
+body:not(.dark-mode) .btn-secondary,
+html:not(.dark-mode) .btn-secondary {
+    background: rgba(255, 255, 255, 0.9);
+    color: #1e293b;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+body:not(.dark-mode) .btn-secondary:hover:not(:disabled),
+html:not(.dark-mode) .btn-secondary:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Light mode enhancements for inputs */
+body:not(.dark-mode) .input,
+html:not(.dark-mode) .input,
+body:not(.dark-mode) .select,
+html:not(.dark-mode) .select,
+body:not(.dark-mode) .textarea,
+html:not(.dark-mode) .textarea {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    color: #1e293b;
+}
+
+body:not(.dark-mode) .input:focus,
+html:not(.dark-mode) .input:focus,
+body:not(.dark-mode) .select:focus,
+html:not(.dark-mode) .select:focus,
+body:not(.dark-mode) .textarea:focus,
+html:not(.dark-mode) .textarea:focus {
+    background: rgba(255, 255, 255, 1);
+    border-color: var(--component-primary);
+    box-shadow: 0 0 0 3px rgba(63, 114, 175, 0.15);
+}
+
+body:not(.dark-mode) .input::placeholder,
+html:not(.dark-mode) .input::placeholder,
+body:not(.dark-mode) .textarea::placeholder,
+html:not(.dark-mode) .textarea::placeholder {
+    color: #94a3b8;
+}
+
+/* Light mode enhancements for tables */
+body:not(.dark-mode) .table,
+html:not(.dark-mode) .table {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body:not(.dark-mode) .table th,
+html:not(.dark-mode) .table th {
+    background: rgba(248, 250, 252, 0.9);
+    color: #1e293b;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+body:not(.dark-mode) .table td,
+html:not(.dark-mode) .table td {
+    color: #475569;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body:not(.dark-mode) .table tr:hover,
+html:not(.dark-mode) .table tr:hover {
+    background: rgba(248, 250, 252, 0.6);
+}
+
+/* Light mode enhancements for modals */
+body:not(.dark-mode) .modal-content,
+html:not(.dark-mode) .modal-content {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+}
+
+body:not(.dark-mode) .modal-header,
+html:not(.dark-mode) .modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body:not(.dark-mode) .modal-title,
+html:not(.dark-mode) .modal-title {
+    color: #1e293b;
+}
+
+body:not(.dark-mode) .modal-body,
+html:not(.dark-mode) .modal-body {
+    color: #475569;
+}
+
+body:not(.dark-mode) .modal-footer,
+html:not(.dark-mode) .modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Light mode enhancements for dropdowns */
+body:not(.dark-mode) .dropdown-toggle,
+html:not(.dark-mode) .dropdown-toggle {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    color: #1e293b;
+}
+
+body:not(.dark-mode) .dropdown-toggle:hover,
+html:not(.dark-mode) .dropdown-toggle:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+body:not(.dark-mode) .dropdown-menu,
+html:not(.dark-mode) .dropdown-menu {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+body:not(.dark-mode) .dropdown-item,
+html:not(.dark-mode) .dropdown-item {
+    color: #475569;
+}
+
+body:not(.dark-mode) .dropdown-item:hover,
+html:not(.dark-mode) .dropdown-item:hover {
+    background: rgba(99, 102, 241, 0.08);
+    color: #1e293b;
+}
+
+/* Light mode enhancements for progress bars */
+body:not(.dark-mode) .progress,
+html:not(.dark-mode) .progress {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+/* Light mode enhancements for tooltips */
+body:not(.dark-mode) .tooltip-text,
+html:not(.dark-mode) .tooltip-text {
+    background: #1e293b;
+    color: #ffffff;
+}
 
 /* Mobile Responsive */
 
