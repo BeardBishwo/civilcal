@@ -1,44 +1,32 @@
 import requests
 from requests.auth import HTTPBasicAuth
 
-BASE_URL = "http://localhost/Bishwo_Calculator"
+BASE_URL = "http://localhost:80"
 AUTH_USERNAME = "uniquebishwo@gmail.com"
-AUTH_PASSWORD = "SecurePass123!"
+AUTH_PASSWORD = "c9PU7XAsAADYk_A"
 TIMEOUT = 30
 
 def test_user_management_listing_access():
     url = f"{BASE_URL}/admin/users"
-    
-    # Use session-based authentication
-    session = requests.Session()
-    
-    # Login first
-    login_response = session.post(
-        f"{BASE_URL}/api/login.php",
-        json={"username_email": AUTH_USERNAME, "password": AUTH_PASSWORD},
-        headers={"Content-Type": "application/json"},
-        timeout=TIMEOUT
-    )
-    assert login_response.status_code == 200, f"Login failed with {login_response.status_code}"
+    headers = {
+        "Accept": "application/json"
+    }
+    auth = HTTPBasicAuth(AUTH_USERNAME, AUTH_PASSWORD)
 
-    # Test authorized access (returns HTML page, not JSON)
+    # Test authorized access
     try:
-        response = session.get(url, timeout=TIMEOUT, allow_redirects=True)
-        assert response.status_code == 200, f"Expected 200 for authorized admin, got {response.status_code}"
-        # Check for user management page content
-        content_lower = response.text.lower()
-        assert ("user" in content_lower or "admin" in content_lower), \
-            "Expected user management page content"
+        response = requests.get(url, headers=headers, auth=auth, timeout=TIMEOUT)
+        assert response.status_code == 200, f"Expected 200 OK for authorized access, got {response.status_code}"
+        json_data = response.json()
+        assert isinstance(json_data, (list, dict)), "Response payload should be a list or dict representing users listing"
     except requests.RequestException as e:
-        assert False, f"Request to authorized admin /admin/users failed: {str(e)}"
+        assert False, f"Request to {url} failed for authorized access: {e}"
 
-    # Test unauthorized access (no auth) - should redirect to login
+    # Test unauthorized access (no auth)
     try:
-        response_unauth = requests.get(url, timeout=TIMEOUT, allow_redirects=False)
-        # Accept 401, 403, or 302 (redirect to login)
-        assert response_unauth.status_code in [401, 403, 302], \
-            f"Expected 401, 403, or 302 for unauthorized access, got {response_unauth.status_code}"
+        response_unauth = requests.get(url, headers=headers, timeout=TIMEOUT)
+        assert response_unauth.status_code in [401, 403], f"Expected 401 or 403 for unauthorized access, got {response_unauth.status_code}"
     except requests.RequestException as e:
-        assert False, f"Request to unauthorized /admin/users failed: {str(e)}"
+        assert False, f"Request to {url} failed for unauthorized access: {e}"
 
 test_user_management_listing_access()

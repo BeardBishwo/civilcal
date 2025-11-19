@@ -1,63 +1,46 @@
 import requests
 import uuid
 
-BASE_URL = "http://localhost/Bishwo_Calculator"
-TIMEOUT = 30
+BASE_URL = "http://localhost:80"
+REGISTER_ENDPOINT = f"{BASE_URL}/api/register"
+HEADERS = {
+    "Content-Type": "application/json",
+    "Authorization": "Basic dW5pcXVlYmlzaHdvQGdtYWlsLmNvbTplOVBVN1hBc0FBRFlrX0E="
+}  # base64 for 'uniquebishwo@gmail.com:c9PU7XAsAADYk_A'
 
 def test_user_registration_process():
-    headers = {
-        "Content-Type": "application/json"
-    }
+    timeout = 30
 
-    # Generate unique user data for valid registration
-    unique_suffix = str(uuid.uuid4()).replace("-", "")[:8]
-    valid_user = {
-        "username": f"testuser_{unique_suffix}",
-        "email": f"testuser_{unique_suffix}@example.com",
-        "password": "ValidPassw0rd!",
+    # Generate unique email to avoid conflict
+    unique_email = f"testuser_{uuid.uuid4().hex[:8]}@example.com"
+    valid_payload = {
+        "username": "testuser",
+        "email": unique_email,
+        "password": "ValidPass123!",
         "first_name": "Test",
         "last_name": "User"
     }
 
-    # Testing successful registration
+    # Test successful registration
+    response = requests.post(REGISTER_ENDPOINT, json=valid_payload, headers=HEADERS, timeout=timeout)
+    assert response.status_code == 201, f"Expected 201, got {response.status_code}"
     try:
-        response = requests.post(
-            f"{BASE_URL}/api/register.php",
-            json=valid_user,
-            headers=headers,
-            timeout=TIMEOUT
-        )
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         json_resp = response.json()
-        assert isinstance(json_resp, dict), "Response is not a JSON object"
-        # Check for at least 'username' or 'id' in the response
-        assert 'username' in json_resp or 'id' in json_resp, "Response missing expected keys"
+    except Exception:
+        json_resp = None
+    assert json_resp is not None, "Response is not valid JSON"
 
-    finally:
-        # Clean up: No user deletion API
-        pass
-
-    # Testing registration failure cases
-    invalid_cases = [
-        ({"username_email": "no_username@example.com", "password": "pass"}, 400),
-        ({"username": "user1", "username_email": "invalid-email", "password": "pass"}, 400),
-        ({"username": "user2", "username_email": "user2@example.com", "password": "123"}, 400),
-        ({"username": "user3", "username_email": "user3@example.com"}, 400),
-        ({"username": "", "username_email": "user4@example.com", "password": "password123"}, 400),
+    # Test invalid inputs with expected 400 response
+    invalid_payloads = [
+        {},  # empty
+        {"username": "", "email": "", "password": "", "first_name": "", "last_name": ""},  # all empty strings
+        {"username": "a"*256, "email": "invalidemail", "password": "short", "first_name": "T"*300, "last_name": "U"*300},  # overly long and malformed email and password
+        {"username": "user", "email": "missingat.com", "password": "ValidPass123!", "first_name": "Test", "last_name": "User"},  # invalid email format
+        {"username": "user", "email": unique_email, "password": "", "first_name": "Test", "last_name": "User"},  # missing password
     ]
 
-    for payload, expected_status in invalid_cases:
-        try:
-            resp = requests.post(
-                f"{BASE_URL}/api/register.php",
-                json=payload,
-                headers=headers,
-                timeout=TIMEOUT
-            )
-            assert resp.status_code == expected_status, (
-                f"Expected {expected_status} for payload {payload}, got {resp.status_code}"
-            )
-        except requests.RequestException as e:
-            assert False, f"RequestException occurred: {e}"
+    for payload in invalid_payloads:
+        resp = requests.post(REGISTER_ENDPOINT, json=payload, headers=HEADERS, timeout=timeout)
+        assert resp.status_code == 400, f"Expected 400 for payload {payload}, got {resp.status_code}"
 
 test_user_registration_process()

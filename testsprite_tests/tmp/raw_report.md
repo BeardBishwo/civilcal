@@ -5,7 +5,7 @@
 
 ## 1️⃣ Document Metadata
 - **Project Name:** Bishwo_Calculator
-- **Date:** 2025-11-17
+- **Date:** 2025-11-18
 - **Prepared by:** TestSprite AI Team
 
 ---
@@ -18,11 +18,11 @@
 - **Test Error:** Traceback (most recent call last):
   File "/var/task/handler.py", line 258, in run_with_retry
     exec(code, exec_env)
-  File "<string>", line 48, in <module>
-  File "<string>", line 26, in test_user_login_functionality
+  File "<string>", line 39, in <module>
+  File "<string>", line 29, in test_user_login_functionality
 AssertionError: Expected 200, got 500
 
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/57a9732d-f941-41fe-812e-5498ec9764ba/e7338bb6-cde2-435a-92c1-2b1e0e04430e
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7000806-f16f-44b9-b8d5-701b7bb2b50e/e9a73325-c46e-4dac-a2c9-dfe613983451
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -33,11 +33,11 @@ AssertionError: Expected 200, got 500
 - **Test Error:** Traceback (most recent call last):
   File "/var/task/handler.py", line 258, in run_with_retry
     exec(code, exec_env)
-  File "<string>", line 63, in <module>
-  File "<string>", line 30, in test_user_registration_process
+  File "<string>", line 46, in <module>
+  File "<string>", line 26, in test_user_registration_process
 AssertionError: Expected 201, got 500
 
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/57a9732d-f941-41fe-812e-5498ec9764ba/97239c49-3b8a-41a3-a14e-35c3c921da4c
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7000806-f16f-44b9-b8d5-701b7bb2b50e/156a3c1c-8e42-475b-bc21-3ce2b634e586
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -48,11 +48,11 @@ AssertionError: Expected 201, got 500
 - **Test Error:** Traceback (most recent call last):
   File "/var/task/handler.py", line 258, in run_with_retry
     exec(code, exec_env)
-  File "<string>", line 56, in <module>
-  File "<string>", line 17, in test_user_logout_operation
+  File "<string>", line 32, in <module>
+  File "<string>", line 23, in test_user_logout_operation
 AssertionError: Login failed with status code 500
 
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/57a9732d-f941-41fe-812e-5498ec9764ba/9d591908-cdcc-4bd0-8739-1f61f8e2dd71
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7000806-f16f-44b9-b8d5-701b7bb2b50e/948f2f5c-0717-4c57-bfdc-3c099e32fdd2
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -63,11 +63,11 @@ AssertionError: Login failed with status code 500
 - **Test Error:** Traceback (most recent call last):
   File "/var/task/handler.py", line 258, in run_with_retry
     exec(code, exec_env)
-  File "<string>", line 37, in <module>
+  File "<string>", line 40, in <module>
   File "<string>", line 19, in test_admin_dashboard_access_control
-AssertionError: Expected 200 for authorized admin, got 500
+AssertionError: Expected 200 for authorized access, got 500
 
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/57a9732d-f941-41fe-812e-5498ec9764ba/d384f297-ee5b-45c0-8593-6a28c1823eca
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7000806-f16f-44b9-b8d5-701b7bb2b50e/8c4068ae-6083-4909-a5f8-96fa1c49dc7f
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -78,11 +78,25 @@ AssertionError: Expected 200 for authorized admin, got 500
 - **Test Error:** Traceback (most recent call last):
   File "/var/task/handler.py", line 258, in run_with_retry
     exec(code, exec_env)
-  File "<string>", line 48, in <module>
+  File "<string>", line 63, in <module>
   File "<string>", line 27, in test_admin_settings_section_retrieval
-AssertionError: Expected 200 OK for section 'general', got 500
+AssertionError: Expected 200 OK for valid section 'general', got 500. Response: <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>500 Internal Server Error</title>
+</head><body>
+<h1>Internal Server Error</h1>
+<p>The server encountered an internal error or
+misconfiguration and was unable to complete
+your request.</p>
+<p>Please contact the server administrator at 
+ admin@example.com to inform them of the time this error occurred,
+ and the actions you performed just before this error.</p>
+<p>More information about this error may be available
+in the server error log.</p>
+</body></html>
 
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/57a9732d-f941-41fe-812e-5498ec9764ba/6dae4f18-0238-4456-8d15-2279fa9f6b54
+
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7000806-f16f-44b9-b8d5-701b7bb2b50e/8dd4731e-b488-4d85-b8bf-a1a6ceb00349
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -95,9 +109,9 @@ AssertionError: Expected 200 OK for section 'general', got 500
     exec(code, exec_env)
   File "<string>", line 32, in <module>
   File "<string>", line 19, in test_user_management_listing_access
-AssertionError: Expected 200 for authorized admin, got 500
+AssertionError: Expected 200 OK for authorized access, got 500
 
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/57a9732d-f941-41fe-812e-5498ec9764ba/05533e80-7254-4b2f-a125-e7eaec71c512
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7000806-f16f-44b9-b8d5-701b7bb2b50e/ed33578b-e198-430e-b098-2e17467e60fe
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -106,13 +120,21 @@ AssertionError: Expected 200 for authorized admin, got 500
 - **Test Name:** list available calculators
 - **Test Code:** [TC007_list_available_calculators.py](./TC007_list_available_calculators.py)
 - **Test Error:** Traceback (most recent call last):
+  File "<string>", line 16, in test_list_available_calculators
+  File "/var/task/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:80/calculators
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
   File "/var/task/handler.py", line 258, in run_with_retry
     exec(code, exec_env)
-  File "<string>", line 22, in <module>
-  File "<string>", line 11, in test_list_available_calculators
-AssertionError: Expected 200 OK but got 500
+  File "<string>", line 46, in <module>
+  File "<string>", line 18, in test_list_available_calculators
+AssertionError: Request failed: 500 Server Error: Internal Server Error for url: http://localhost:80/calculators
 
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/57a9732d-f941-41fe-812e-5498ec9764ba/62b9a3e9-1cc3-4936-afab-7506b1d3a70d
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7000806-f16f-44b9-b8d5-701b7bb2b50e/a5f36575-6dc0-4851-9049-708c0b959991
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -123,11 +145,11 @@ AssertionError: Expected 200 OK but got 500
 - **Test Error:** Traceback (most recent call last):
   File "/var/task/handler.py", line 258, in run_with_retry
     exec(code, exec_env)
-  File "<string>", line 55, in <module>
-  File "<string>", line 26, in test_execute_calculator_function
-AssertionError: Expected 200 OK for valid calculation, got 500
+  File "<string>", line 56, in <module>
+  File "<string>", line 31, in test_execute_calculator_function
+AssertionError: Expected status 200 but got 500
 
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/57a9732d-f941-41fe-812e-5498ec9764ba/a7c80e9b-ffdd-4f06-b992-734a823cfbb2
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7000806-f16f-44b9-b8d5-701b7bb2b50e/34eaff00-074c-4e43-8c9d-09af7aae6e0b
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -138,11 +160,11 @@ AssertionError: Expected 200 OK for valid calculation, got 500
 - **Test Error:** Traceback (most recent call last):
   File "/var/task/handler.py", line 258, in run_with_retry
     exec(code, exec_env)
-  File "<string>", line 36, in <module>
-  File "<string>", line 17, in test_get_user_profile_data
-AssertionError: Expected 200 OK for authenticated request but got 500
+  File "<string>", line 46, in <module>
+  File "<string>", line 23, in test_get_user_profile_data
+AssertionError: Expected 200 OK for authenticated request, got 500
 
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/57a9732d-f941-41fe-812e-5498ec9764ba/5895fdb9-8ed6-481d-aa1c-feb456c2030d
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7000806-f16f-44b9-b8d5-701b7bb2b50e/adbbbc48-4efa-4a96-a245-74210dd4cfc8
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -153,11 +175,11 @@ AssertionError: Expected 200 OK for authenticated request but got 500
 - **Test Error:** Traceback (most recent call last):
   File "/var/task/handler.py", line 258, in run_with_retry
     exec(code, exec_env)
-  File "<string>", line 55, in <module>
-  File "<string>", line 36, in test_update_user_profile_information
+  File "<string>", line 49, in <module>
+  File "<string>", line 32, in test_update_user_profile_information
 AssertionError: Expected 200 OK for valid update, got 500
 
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/57a9732d-f941-41fe-812e-5498ec9764ba/8eeda329-db99-49c7-bd80-76685e6ebcab
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7000806-f16f-44b9-b8d5-701b7bb2b50e/aee17b40-f29e-4c7b-9a30-373d7c9e9b4a
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---

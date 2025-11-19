@@ -1,23 +1,11 @@
 import requests
+from requests.auth import HTTPBasicAuth
 
-BASE_URL = "http://localhost/Bishwo_Calculator"
-AUTH_USERNAME = "uniquebishwo@gmail.com"
-AUTH_PASSWORD = "SecurePass123!"
+BASE_URL = "http://localhost:80"
+AUTH = HTTPBasicAuth("uniquebishwo@gmail.com", "c9PU7XAsAADYk_A")
 TIMEOUT = 30
 
 def test_admin_settings_section_retrieval():
-    # Use session-based authentication (not HTTP Basic Auth)
-    session = requests.Session()
-    
-    # Login first
-    login_response = session.post(
-        f"{BASE_URL}/api/login.php",
-        json={"username_email": AUTH_USERNAME, "password": AUTH_PASSWORD},
-        headers={"Content-Type": "application/json"},
-        timeout=TIMEOUT
-    )
-    assert login_response.status_code == 200, f"Login failed with {login_response.status_code}"
-
     valid_sections = [
         "general",
         "users",
@@ -27,33 +15,49 @@ def test_admin_settings_section_retrieval():
         "performance",
         "advanced"
     ]
-    # Test valid sections (these return HTML, not JSON)
-    # Note: Some sections may return "Access denied" if permissions are more restricted
+    headers = {"Accept": "application/json"}
+
+    # Test valid sections - expect 200
     for section in valid_sections:
         url = f"{BASE_URL}/admin/settings/{section}"
-        response = session.get(url, timeout=TIMEOUT, allow_redirects=True)
-        assert response.status_code == 200, f"Expected 200 OK for section '{section}', got {response.status_code}"
-        # Verify it's an admin page (either settings content or access control message)
-        content_lower = response.text.lower()
-        # Accept either valid settings page OR access denied message (which is still a valid response)
-        assert ("settings" in content_lower or "setting" in content_lower or 
-                "admin" in content_lower or section in content_lower or
-                "access denied" in content_lower or "access" in content_lower), \
-            f"Expected valid settings or access control page for section '{section}'"
+        try:
+            response = requests.get(url, auth=AUTH, headers=headers, timeout=TIMEOUT)
+        except requests.RequestException as e:
+            assert False, f"Request to valid section '{section}' failed with exception: {e}"
+        assert response.status_code == 200, (
+            f"Expected 200 OK for valid section '{section}', got {response.status_code}. "
+            f"Response: {response.text}"
+        )
+        # Optionally check content structure if known, here we just check JSON response
+        try:
+            data = response.json()
+        except Exception as e:
+            assert False, f"Response for section '{section}' is not valid JSON: {e}"
+        assert isinstance(data, dict), f"Expected JSON object for section '{section}', got {type(data)}"
 
-    # Test invalid section (should return 404 or redirect)
-    invalid_section = "nonexistentsection"
+    # Test invalid section - expect 404
+    invalid_section = "invalidSection12345"
     url_invalid = f"{BASE_URL}/admin/settings/{invalid_section}"
-    response_invalid = session.get(url_invalid, timeout=TIMEOUT, allow_redirects=False)
-    # Accept 404 or 302 (redirect to valid page)
-    assert response_invalid.status_code in [404, 302], \
-        f"Expected 404 or 302 for invalid section, got {response_invalid.status_code}"
+    try:
+        response_invalid = requests.get(url_invalid, auth=AUTH, headers=headers, timeout=TIMEOUT)
+    except requests.RequestException as e:
+        assert False, f"Request to invalid section failed with exception: {e}"
+    assert response_invalid.status_code == 404, (
+        f"Expected 404 Not Found for invalid section, got {response_invalid.status_code}. "
+        f"Response: {response_invalid.text}"
+    )
 
-    # Test access denied with no authentication (should redirect to login)
-    url_any_section = f"{BASE_URL}/admin/settings/general"
-    response_no_auth = requests.get(url_any_section, timeout=TIMEOUT, allow_redirects=False)
-    # Could be 401, 403, or 302 (redirect to login)
-    assert response_no_auth.status_code in (401, 403, 302), \
-        f"Expected 401, 403, or 302 without auth, got {response_no_auth.status_code}"
+    # Test access control by omitting auth - expect 403 or 401
+    for section in valid_sections:
+        url = f"{BASE_URL}/admin/settings/{section}"
+        try:
+            response_no_auth = requests.get(url, headers=headers, timeout=TIMEOUT)
+        except requests.RequestException as e:
+            assert False, f"Request without auth failed with exception: {e}"
+        # The system might respond 403 or 401 depending on API design for unauthorized
+        assert response_no_auth.status_code in (401, 403), (
+            f"Expected 401 or 403 for unauthenticated access to section '{section}', "
+            f"got {response_no_auth.status_code}. Response: {response_no_auth.text}"
+        )
 
 test_admin_settings_section_retrieval()

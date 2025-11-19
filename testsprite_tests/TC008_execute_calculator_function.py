@@ -1,68 +1,56 @@
 import requests
 from requests.auth import HTTPBasicAuth
 
-BASE_URL = "http://localhost/Bishwo_Calculator"
-AUTH_USERNAME = "uniquebishwo@gmail.com"
-AUTH_PASSWORD = "SecurePass123!"
+BASE_URL = "http://localhost:80"
+USERNAME = "uniquebishwo@gmail.com"
+PASSWORD = "c9PU7XAsAADYk_A"
 TIMEOUT = 30
 
 def test_execute_calculator_function():
-    # Use session-based authentication
-    session = requests.Session()
-    
-    # Login first
-    login_response = session.post(
-        f"{BASE_URL}/api/login.php",
-        json={"username_email": AUTH_USERNAME, "password": AUTH_PASSWORD},
-        headers={"Content-Type": "application/json"},
-        timeout=TIMEOUT
-    )
-    assert login_response.status_code == 200, f"Login failed with {login_response.status_code}"
-    
+    auth = HTTPBasicAuth(USERNAME, PASSWORD)
     headers = {"Content-Type": "application/json"}
 
-    # Test valid calculation - use API calculate endpoint with correct format
+    # Define a valid calculator module, function, and valid input_values
+    valid_module = "electrical"
+    valid_function = "voltage-drop"
     valid_payload = {
-        "category": "civil",
-        "tool": "concrete-calculator",
-        "data": {
-            "length": 10,
-            "width": 5,
-            "height": 2
+        "input_values": {
+            "current": 10,
+            "length": 50,
+            "resistance": 0.02
         }
     }
-    url_valid = f"{BASE_URL}/api/calculate"
+
+    # Test valid calculation execution
+    url_valid = f"{BASE_URL}/calculator/{valid_module}/{valid_function}"
     try:
-        response_valid = session.post(url_valid, json=valid_payload, headers=headers, timeout=TIMEOUT)
+        response_valid = requests.post(url_valid, json=valid_payload, auth=auth, headers=headers, timeout=TIMEOUT)
     except requests.RequestException as e:
-        assert False, f"Request failed for valid calculation: {e}"
+        assert False, f"Request to valid calculator function failed: {e}"
 
-    # Accept 200 (success) or 500 (calculator implementation issue) - just verify API is accessible
-    assert response_valid.status_code in [200, 500], \
-        f"Expected 200 or 500 for calculation request, got {response_valid.status_code}"
-    
-    # If we got 200, verify the response structure
-    if response_valid.status_code == 200:
-        try:
-            result = response_valid.json()
-            # Just check for valid JSON response
-            assert isinstance(result, dict), "Response should be a JSON object"
-        except ValueError:
-            pass  # If it's not JSON, that's okay for this test
+    assert response_valid.status_code == 200, f"Expected status 200 but got {response_valid.status_code}"
+    json_valid = response_valid.json()
+    assert "result" in json_valid or "output" in json_valid, "Valid calculation response should contain 'result' or 'output' key"
 
-    # Test calculator not found
-    invalid_payload = {
-        "category": "nonexistent",
-        "tool": "invalid-tool",
-        "data": {"a": 1}
-    }
+    # Test calculator module not found (use an invalid calculator module)
+    invalid_module = "invalid_module_xyz"
+    url_invalid_module = f"{BASE_URL}/calculator/{invalid_module}/{valid_function}"
     try:
-        response_invalid_module = session.post(url_valid, json=invalid_payload, headers=headers, timeout=TIMEOUT)
+        response_invalid_module = requests.post(url_invalid_module, json=valid_payload, auth=auth, headers=headers, timeout=TIMEOUT)
     except requests.RequestException as e:
-        assert False, f"Request failed for invalid calculator module: {e}"
+        assert False, f"Request to invalid calculator module failed: {e}"
 
-    # Accept 400, 404, or 500 for invalid calculator
-    assert response_invalid_module.status_code in [400, 404, 500], \
-        f"Expected 400, 404, or 500 for invalid calculator, got {response_invalid_module.status_code}"
+    assert response_invalid_module.status_code == 404, f"Expected status 404 for invalid calculator module but got {response_invalid_module.status_code}"
+
+    # Test calculator function not found (use an invalid function)
+    invalid_function = "invalid_function_abc"
+    url_invalid_function = f"{BASE_URL}/calculator/{valid_module}/{invalid_function}"
+    try:
+        response_invalid_function = requests.post(url_invalid_function, json=valid_payload, auth=auth, headers=headers, timeout=TIMEOUT)
+    except requests.RequestException as e:
+        assert False, f"Request to invalid calculator function failed: {e}"
+
+    assert response_invalid_function.status_code == 404, f"Expected status 404 for invalid calculator function but got {response_invalid_function.status_code}"
+
 
 test_execute_calculator_function()

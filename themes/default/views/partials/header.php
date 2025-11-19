@@ -227,9 +227,14 @@ if (
 
         /* Light theme header */
         body:not(.dark-theme) .site-header {
-            background: rgba(255, 255, 255, 0.95);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            color: #1a202c;
+            background: rgba(255, 255, 255, 0.98);
+            border-bottom: 1px solid #e2e8f0;
+            color: #0f172a;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        body:not(.dark-theme) .site-header .logo-text {
+            color: #0f172a !important;
         }
 
         /* Dark theme header */
@@ -277,8 +282,35 @@ if (
 
         /* Light theme (default) */
         body:not(.dark-theme) {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%) !important;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 50%, #e1e8ed 100%) !important;
             color: #1a202c;
+        }
+        
+        body:not(.dark-theme) h1,
+        body:not(.dark-theme) h2,
+        body:not(.dark-theme) h3,
+        body:not(.dark-theme) h4,
+        body:not(.dark-theme) h5,
+        body:not(.dark-theme) h6 {
+            color: #0f172a !important;
+        }
+        
+        body:not(.dark-theme) p,
+        body:not(.dark-theme) span,
+        body:not(.dark-theme) .text-primary {
+            color: #334155 !important;
+        }
+        
+        body:not(.dark-theme) a {
+            color: #3b82f6 !important;
+        }
+        
+        body:not(.dark-theme) .card,
+        body:not(.dark-theme) .section {
+            background: #ffffff !important;
+            color: #1e293b !important;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         /* Dark theme */
@@ -680,42 +712,79 @@ if (
         }
 
         .theme-toggle-btn {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
-            border: 1.5px solid rgba(102, 126, 234, 0.3);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+            border: 2px solid rgba(99, 102, 241, 0.4);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            color: #667eea;
-            font-size: 1.1rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #6366f1;
+            font-size: 1.2rem;
             font-weight: 600;
             position: relative;
             flex-shrink: 0;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+        
+        /* Animated gradient background */
+        .theme-toggle-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(99, 102, 241, 0.3),
+                transparent
+            );
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+        
+        .theme-toggle-btn:hover::before {
+            opacity: 1;
+            animation: shimmerEffect 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes shimmerEffect {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
 
+        /* Tooltip styling */
         .theme-toggle-btn::after {
             content: attr(data-label);
             position: absolute;
-            bottom: -25px;
+            bottom: -35px;
             left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
+            transform: translateX(-50%) translateY(5px);
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
             color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
         }
 
         .theme-toggle-btn:hover::after {
             opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
 
         /* Small search icon button for opening modal */
@@ -741,22 +810,43 @@ if (
         }
 
         .theme-toggle-btn:hover {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
             color: white;
-            border-color: #667eea;
-            transform: scale(1.15);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            border-color: #8b5cf6;
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 
+                0 8px 24px rgba(99, 102, 241, 0.5),
+                0 0 40px rgba(168, 85, 247, 0.4);
+        }
+        
+        .theme-toggle-btn:active {
+            transform: scale(0.95) rotate(0deg);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+        
+        .theme-toggle-btn i {
+            position: relative;
+            z-index: 1;
+            transition: transform 0.4s ease;
+        }
+        
+        .theme-toggle-btn:hover i {
+            transform: rotate(20deg) scale(1.1);
         }
 
         body.dark-theme .theme-toggle-btn {
-            color: #f093fb;
-            border-color: rgba(240, 147, 251, 0.3);
+            color: #a855f7;
+            border-color: rgba(168, 85, 247, 0.4);
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15));
         }
 
         body.dark-theme .theme-toggle-btn:hover {
-            background: linear-gradient(135deg, #f093fb, #f5576c);
+            background: linear-gradient(135deg, #a855f7, #ec4899);
             color: white;
-            border-color: #f093fb;
+            border-color: #a855f7;
+            box-shadow: 
+                0 8px 24px rgba(168, 85, 247, 0.5),
+                0 0 40px rgba(236, 72, 153, 0.4);
         }
 
         /* Header-specific button sizing to keep the header compact */
@@ -1188,49 +1278,83 @@ if (
 
         /* Comprehensive light theme styles */
         body:not(.dark-theme) .main-nav a {
-            color: #2d3748;
+            color: #1e293b !important;
+            font-weight: 500;
         }
 
         body:not(.dark-theme) .main-nav a:hover {
-            background: #f7fafc;
-            color: #667eea;
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6 !important;
         }
 
         body:not(.dark-theme) .dropdown {
-            background: rgba(255, 255, 255, 0.98);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            color: #1a202c;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
         body:not(.dark-theme) .dropdown a {
-            color: #4a5568;
+            color: #1e293b !important;
+            font-weight: 500;
         }
 
         body:not(.dark-theme) .dropdown a:hover {
-            background: #f7fafc;
-            color: #667eea;
+            background: #f1f5f9;
+            color: #3b82f6 !important;
+        }
+        
+        body:not(.dark-theme) .dropdown .grid-item {
+            border-color: #e2e8f0;
+        }
+        
+        body:not(.dark-theme) .dropdown .grid-item:hover {
+            border-color: #3b82f6;
         }
 
         body:not(.dark-theme) .user-actions .btn-text {
-            color: #2d3748;
+            color: #1e293b !important;
+            font-weight: 600;
+        }
+        
+        body:not(.dark-theme) .btn-primary,
+        body:not(.dark-theme) button {
+            color: #ffffff !important;
+        }
+        
+        body:not(.dark-theme) input,
+        body:not(.dark-theme) textarea,
+        body:not(.dark-theme) select {
+            color: #1e293b !important;
+            background: #ffffff !important;
+            border-color: #cbd5e1 !important;
+        }
+        
+        body:not(.dark-theme) input::placeholder,
+        body:not(.dark-theme) textarea::placeholder {
+            color: #94a3b8 !important;
         }
 
         body:not(.dark-theme) .search-suggestions a,
         body:not(.dark-theme) .search-suggestions div {
-            color: #2d3748;
+            color: #1e293b !important;
         }
 
         body:not(.dark-theme) .search-input {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            color: #1a202c;
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #1e293b !important;
+        }
+        
+        body:not(.dark-theme) .search-input::placeholder {
+            color: #94a3b8 !important;
         }
 
         body:not(.dark-theme) .search-suggestions {
-            background: rgba(255, 255, 255, 0.98);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            color: #1a202c;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         body:not(.dark-theme) .user-greeting {
@@ -1240,14 +1364,28 @@ if (
         }
 
         body:not(.dark-theme) .theme-toggle-btn {
-            color: #4a5568;
-            border-color: rgba(0, 0, 0, 0.1);
+            color: #f59e0b;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.15));
+            border-color: rgba(245, 158, 11, 0.4);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+        
+        body:not(.dark-theme) .theme-toggle-btn::before {
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(245, 158, 11, 0.3),
+                transparent
+            );
         }
 
         body:not(.dark-theme) .theme-toggle-btn:hover {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #f59e0b, #fbbf24, #fb923c);
             color: white;
-            border-color: #667eea;
+            border-color: #f59e0b;
+            box-shadow: 
+                0 8px 24px rgba(245, 158, 11, 0.5),
+                0 0 40px rgba(251, 191, 36, 0.4);
         }
 
         body:not(.dark-theme) .search-toggle-btn {
@@ -2474,19 +2612,112 @@ if (
                     '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
             });
 
-            // Set permanent dark theme (navy blue)
-            document.body.classList.add('dark-theme');
-            document.body.setAttribute('data-theme', 'dark');
-            
-            // Remove theme toggle functionality - dark mode only
+            // Theme Toggle Functionality - Day/Night Mode
             if (themeToggleBtn) {
-                themeToggleBtn.style.opacity = '0.3';
-                themeToggleBtn.style.cursor = 'not-allowed';
-                themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
-                themeToggleBtn.title = 'Dark Mode (Always On)';
+                // Check for saved theme preference or default to dark
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                
+                // Apply saved theme
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                    document.body.setAttribute('data-theme', 'dark');
+                    themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+                    themeToggleBtn.setAttribute('data-label', 'Dark Mode');
+                } else {
+                    document.body.classList.remove('dark-theme');
+                    document.body.setAttribute('data-theme', 'light');
+                    themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+                    themeToggleBtn.setAttribute('data-label', 'Light Mode');
+                }
+                
+                // Toggle theme on button click
+                themeToggleBtn.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    const isDark = document.body.classList.contains('dark-theme');
+                    
+                    // Toggle theme
+                    if (isDark) {
+                        // Switch to light mode
+                        document.body.classList.remove('dark-theme');
+                        document.body.setAttribute('data-theme', 'light');
+                        icon.className = 'fas fa-sun';
+                        this.setAttribute('data-label', 'Light Mode');
+                        localStorage.setItem('theme', 'light');
+                        
+                        // Animate icon change
+                        icon.style.transform = 'rotate(180deg) scale(1.2)';
+                        setTimeout(() => {
+                            icon.style.transform = '';
+                        }, 400);
+                        
+                        showThemeNotification('☀️ Light Mode Enabled');
+                    } else {
+                        // Switch to dark mode
+                        document.body.classList.add('dark-theme');
+                        document.body.setAttribute('data-theme', 'dark');
+                        icon.className = 'fas fa-moon';
+                        this.setAttribute('data-label', 'Dark Mode');
+                        localStorage.setItem('theme', 'dark');
+                        
+                        // Animate icon change
+                        icon.style.transform = 'rotate(-180deg) scale(1.2)';
+                        setTimeout(() => {
+                            icon.style.transform = '';
+                        }, 400);
+                        
+                        showThemeNotification('🌙 Dark Mode Enabled');
+                    }
+                });
+            }
+            
+            // Show theme change notification
+            function showThemeNotification(message) {
+                // Remove existing notification if any
+                const existing = document.querySelector('.theme-notification');
+                if (existing) {
+                    existing.remove();
+                }
+                
+                // Create notification
+                const notification = document.createElement('div');
+                notification.className = 'theme-notification';
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 80px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                    color: white;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    font-size: 0.9rem;
+                    font-weight: 500;
+                    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+                    z-index: 10000;
+                    opacity: 0;
+                    transform: translateY(-10px);
+                    transition: all 0.3s ease;
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Animate in
+                setTimeout(() => {
+                    notification.style.opacity = '1';
+                    notification.style.transform = 'translateY(0)';
+                }, 10);
+                
+                // Animate out and remove
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 2000);
             }
 
-            console.log('Dark navy blue theme loaded (permanent)');
+            console.log('Theme toggle enabled - Day/Night mode ready');
 
             // Enhanced search functionality
             let searchTimer = null;
