@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Core\Controller;
@@ -9,17 +10,18 @@ use App\Calculators\CalculatorFactory;
 class CalculatorController extends Controller
 {
     private $calculationService;
-    
+
     public function __construct()
     {
+        parent::__construct();
         $this->calculationService = new CalculationService();
     }
-    
+
     public function index()
     {
         $categories = $this->getCalculatorCategories();
         $featuredCalculators = $this->getFeaturedCalculators();
-        
+
         $this->view->render('home/index', [
             'categories' => $categories,
             'featuredCalculators' => $featuredCalculators,
@@ -29,11 +31,16 @@ class CalculatorController extends Controller
             'viewHelper' => $this->view
         ]);
     }
-    
+
+    public function dashboard()
+    {
+        $this->view->render('dashboard');
+    }
+
     public function category($category)
     {
         $all = CalculatorFactory::getAvailableCalculators();
-        $list = array_values(array_filter($all, function($c) use ($category){
+        $list = array_values(array_filter($all, function ($c) use ($category) {
             return isset($c['category']) && strtolower($c['category']) === strtolower($category);
         }));
 
@@ -43,22 +50,24 @@ class CalculatorController extends Controller
             return;
         }
 
-        $title = ucwords(str_replace(['-','_'], ' ', $category)) . ' Calculators';
+        $title = ucwords(str_replace(['-', '_'], ' ', $category)) . ' Calculators';
         $this->view->render('calculators/category', [
             'title' => $title,
             'category' => $category,
             'calculators' => $list,
         ]);
     }
-    
+
     public function tool($category, $tool)
     {
         $all = CalculatorFactory::getAvailableCalculators();
         $match = null;
         foreach ($all as $c) {
             if ((isset($c['category']) && strtolower($c['category']) === strtolower($category))
-                && (isset($c['slug']) && strtolower($c['slug']) === strtolower($tool))) {
-                $match = $c; break;
+                && (isset($c['slug']) && strtolower($c['slug']) === strtolower($tool))
+            ) {
+                $match = $c;
+                break;
             }
         }
 
@@ -68,7 +77,7 @@ class CalculatorController extends Controller
             return;
         }
 
-        $title = ($match['name'] ?? ucwords(str_replace(['-','_'], ' ', $tool)));
+        $title = ($match['name'] ?? ucwords(str_replace(['-', '_'], ' ', $tool)));
         $this->view->render('calculators/tool', [
             'title' => $title,
             'category' => $category,
@@ -76,23 +85,23 @@ class CalculatorController extends Controller
             'calculator' => $match,
         ]);
     }
-    
+
     public function calculate($category, $tool)
     {
         $user = Auth::user();
         $userId = $user ? $user->id : null;
-        
+
         $result = $this->calculationService->performCalculation(
-            $category, 
-            $tool, 
-            $_POST, 
+            $category,
+            $tool,
+            $_POST,
             $userId
         );
-        
+
         header('Content-Type: application/json');
         echo json_encode($result);
     }
-    
+
     /**
      * Execute calculator calculation (API endpoint)
      * Supports HTTP Basic Auth for testing
@@ -100,7 +109,7 @@ class CalculatorController extends Controller
     public function execute($module, $function)
     {
         header('Content-Type: application/json');
-        
+
         try {
             // Support HTTP Basic Auth for API testing
             $userId = null;
@@ -117,7 +126,7 @@ class CalculatorController extends Controller
                 $user = Auth::user();
                 $userId = $user ? $user->id : null;
             }
-            
+
             // Get input from JSON body
             $input = json_decode(file_get_contents('php://input'), true);
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -125,38 +134,39 @@ class CalculatorController extends Controller
                 echo json_encode(['error' => 'Invalid JSON input']);
                 return;
             }
-            
+
             $inputValues = $input['input_values'] ?? [];
-            
+
             // Validate input
             if (empty($inputValues)) {
                 http_response_code(400);
                 echo json_encode(['error' => 'Missing input_values']);
                 return;
             }
-            
+
             // Try to create the calculator to check if it exists
             $testCalculator = \App\Calculators\CalculatorFactory::create($module, $function);
-            
+
             if (!$testCalculator) {
                 // If calculator class doesn't exist, check in available calculators list
                 $all = \App\Calculators\CalculatorFactory::getAvailableCalculators();
                 $found = false;
                 foreach ($all as $calc) {
                     if ((isset($calc['category']) && strtolower($calc['category']) === strtolower($module))
-                        && (isset($calc['slug']) && strtolower($calc['slug']) === strtolower($function))) {
+                        && (isset($calc['slug']) && strtolower($calc['slug']) === strtolower($function))
+                    ) {
                         $found = true;
                         break;
                     }
                 }
-                
+
                 if (!$found) {
                     http_response_code(404);
                     echo json_encode(['error' => 'Calculator not found']);
                     return;
                 }
             }
-            
+
             // Perform calculation
             $result = $this->calculationService->performCalculation(
                 $module,
@@ -164,7 +174,7 @@ class CalculatorController extends Controller
                 $inputValues,
                 $userId
             );
-            
+
             // Return result
             if (isset($result['success']) && $result['success']) {
                 http_response_code(200);
@@ -173,7 +183,6 @@ class CalculatorController extends Controller
                 http_response_code(400);
                 echo json_encode($result);
             }
-            
         } catch (\Exception $e) {
             http_response_code(500);
             echo json_encode([
@@ -182,11 +191,11 @@ class CalculatorController extends Controller
             ]);
         }
     }
-    
+
     public function apiCalculate()
     {
         $input = json_decode(file_get_contents('php://input'), true);
-        
+
         if (!isset($input['category']) || !isset($input['tool']) || !isset($input['data'])) {
             http_response_code(400);
             echo json_encode([
@@ -195,21 +204,21 @@ class CalculatorController extends Controller
             ]);
             return;
         }
-        
+
         $user = Auth::user();
         $userId = $user ? $user->id : null;
-        
+
         $result = $this->calculationService->performCalculation(
             $input['category'],
             $input['tool'],
             $input['data'],
             $userId
         );
-        
+
         header('Content-Type: application/json');
         echo json_encode($result);
     }
-    
+
     private function getCalculatorCategories()
     {
         return [
@@ -257,7 +266,7 @@ class CalculatorController extends Controller
             ]
         ];
     }
-    
+
     private function getFeaturedCalculators()
     {
         return [
@@ -287,7 +296,7 @@ class CalculatorController extends Controller
             ]
         ];
     }
-    
+
     private function getCalculatorsByCategory($category)
     {
         $allCalculators = [
@@ -338,29 +347,29 @@ class CalculatorController extends Controller
                 ]
             ]
         ];
-        
+
         return $allCalculators[$category] ?? [];
     }
-    
+
     private function getCategoryInfo($category)
     {
         $categories = $this->getCalculatorCategories();
         return $categories[$category] ?? null;
     }
-    
+
     private function getCalculatorInfo($category, $tool)
     {
         $calculators = $this->getCalculatorsByCategory($category);
-        
+
         foreach ($calculators as $calc) {
             if ($calc['slug'] === $tool) {
                 return $calc;
             }
         }
-        
+
         return null;
     }
-    
+
     private function notFound()
     {
         http_response_code(404);

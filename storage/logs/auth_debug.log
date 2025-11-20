@@ -1,0 +1,48 @@
+[2025-11-20 13:21:47] Auth::login called. Identity: uniquebishwo@gmail.com
+[2025-11-20 13:21:47] Session ID: c3bs69hebb8o59ve232c2rv6hm
+[2025-11-20 13:21:47] CSRF Check - Posted: 
+[2025-11-20 13:21:47] CSRF Check - Session: NOT_SET
+[2025-11-20 13:21:47] Auth::login failed: CSRF mismatch or expired. Valid: No, NotExpired: Yes
+[2025-11-20 13:25:03] Auth::login called. Identity: uniquebishwo@gmail.com
+[2025-11-20 13:25:03] Session ID: d2b2sfrpf9fs8hda9es7hiedqj
+[2025-11-20 13:25:03] CSRF Check - Posted: 4eb3d74b63aa35fa029a4063cbaad42b1e64586f55067241dd06e4a484bd4d3a
+[2025-11-20 13:25:03] CSRF Check - Session: 4eb3d74b63aa35fa029a4063cbaad42b1e64586f55067241dd06e4a484bd4d3a
+[2025-11-20 14:18:25] Auth::login called. Identity: uniquebishwo@gmail.com
+[2025-11-20 14:18:25] Session ID: d2b2sfrpf9fs8hda9es7hiedqj
+[2025-11-20 14:18:25] CSRF Check - Posted: 4eb3d74b63aa35fa029a4063cbaad42b1e64586f55067241dd06e4a484bd4d3a
+[2025-11-20 14:18:25] CSRF Check - Session: 4eb3d74b63aa35fa029a4063cbaad42b1e64586f55067241dd06e4a484bd4d3a
+[2025-11-20 14:20:29] Auth::login called. Identity: uniquebishwo@gmail.com
+[2025-11-20 14:20:29] Session ID: d2b2sfrpf9fs8hda9es7hiedqj
+[2025-11-20 14:20:29] CSRF Check - Posted: 4eb3d74b63aa35fa029a4063cbaad42b1e64586f55067241dd06e4a484bd4d3a
+[2025-11-20 14:20:29] CSRF Check - Session: 4eb3d74b63aa35fa029a4063cbaad42b1e64586f55067241dd06e4a484bd4d3a
+[2025-11-20 14:20:29] Auth::login called for identity: uniquebishwo@gmail.com
+[2025-11-20 14:20:29] Auth::login: User found (ID: )
+[2025-11-20 14:20:29] Auth::login failed: Password mismatch
+[2025-11-20 14:22:27] Auth::login called. Identity: uniquebishwo@gmail.com
+[2025-11-20 14:22:27] Session ID: d2b2sfrpf9fs8hda9es7hiedqj
+[2025-11-20 14:22:27] CSRF Check - Posted: 4eb3d74b63aa35fa029a4063cbaad42b1e64586f55067241dd06e4a484bd4d3a
+[2025-11-20 14:22:27] CSRF Check - Session: 4eb3d74b63aa35fa029a4063cbaad42b1e64586f55067241dd06e4a484bd4d3a
+[2025-11-20 14:22:27] Auth::login called for identity: uniquebishwo@gmail.com
+[2025-11-20 14:22:27] Auth::login: User found (ID: 3)
+[2025-11-20 14:22:27] Auth::login: Password verified. Setting session.
+[2025-11-20 14:26:22] Auth::login called. Identity: uniquebishwo@gmail.com
+[2025-11-20 14:26:22] Session ID: lere51ig5264fqb2d8qsoe1rro
+[2025-11-20 14:26:22] CSRF Check - Posted: 24d78b147464067f8354f257cea64dfb25c31de6c1d6f61783ac8d1e16d0a380
+[2025-11-20 14:26:22] CSRF Check - Session: 24d78b147464067f8354f257cea64dfb25c31de6c1d6f61783ac8d1e16d0a380
+[2025-11-20 14:26:22] Auth::login called for identity: uniquebishwo@gmail.com
+[2025-11-20 14:26:22] Auth::login: User found (ID: 3)
+[2025-11-20 14:26:23] Auth::login: Password verified. Setting session.
+[2025-11-20 14:26:53] Auth::login called. Identity: uniquebishwo@gmail.com
+[2025-11-20 14:26:53] Session ID: 97sdfdqniq05suhf53ps3brqv6
+[2025-11-20 14:26:53] CSRF Check - Posted: 24737179ca31e8531714333ef08db2786cad990505797432b062a3bd98d6e65f
+[2025-11-20 14:26:53] CSRF Check - Session: 24737179ca31e8531714333ef08db2786cad990505797432b062a3bd98d6e65f
+[2025-11-20 14:26:53] Auth::login called for identity: uniquebishwo@gmail.com
+[2025-11-20 14:26:53] Auth::login: User found (ID: 3)
+[2025-11-20 14:26:53] Auth::login: Password verified. Setting session.
+[2025-11-20 14:28:34] Auth::login called. Identity: uniquebishwo@gmail.com
+[2025-11-20 14:28:34] Session ID: ar9bsk8tb3oh0603g6141dn3h9
+[2025-11-20 14:28:34] CSRF Check - Posted: 2e99d622d027259c8b31c26802bca2bdc2a7021187330201049fc25ba3c7b734
+[2025-11-20 14:28:34] CSRF Check - Session: 2e99d622d027259c8b31c26802bca2bdc2a7021187330201049fc25ba3c7b734
+[2025-11-20 14:28:34] Auth::login called for identity: uniquebishwo@gmail.com
+[2025-11-20 14:28:34] Auth::login: User found (ID: 3)
+[2025-11-20 14:28:34] Auth::login: Password verified. Setting session.

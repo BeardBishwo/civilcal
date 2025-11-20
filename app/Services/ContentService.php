@@ -12,7 +12,7 @@ use PDO;
 class ContentService
 {
     private static $cache = [];
-    
+
     /**
      * Get page by slug
      */
@@ -21,7 +21,7 @@ class ContentService
         if (isset(self::$cache['page_' . $slug])) {
             return self::$cache['page_' . $slug];
         }
-        
+
         $db = Database::getInstance();
         $stmt = $db->prepare("
             SELECT p.*, u.username as author_username 
@@ -31,21 +31,21 @@ class ContentService
         ");
         $stmt->execute([$slug]);
         $page = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if ($page) {
             self::$cache['page_' . $slug] = $page;
         }
-        
+
         return $page;
     }
-    
+
     /**
      * Get all pages
      */
     public static function getAllPages($status = null)
     {
         $db = Database::getInstance();
-        
+
         if ($status) {
             $stmt = $db->prepare("
                 SELECT p.*, u.username as author_username 
@@ -64,25 +64,33 @@ class ContentService
             ");
             $stmt->execute();
         }
-        
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
+    /**
+     * Alias for getAllPages() for backward compatibility
+     */
+    public static function allPages($status = null)
+    {
+        return self::getAllPages($status);
+    }
+
     /**
      * Create new page
      */
     public static function createPage($data)
     {
         $db = Database::getInstance();
-        
+
         $stmt = $db->prepare("
             INSERT INTO pages 
             (slug, title, content, excerpt, meta_title, meta_description, meta_keywords, status, template, author_id, published_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
-        
+
         $publishedAt = ($data['status'] ?? 'draft') === 'published' ? date('Y-m-d H:i:s') : null;
-        
+
         return $stmt->execute([
             $data['slug'],
             $data['title'],
@@ -97,38 +105,38 @@ class ContentService
             $publishedAt
         ]);
     }
-    
+
     /**
      * Update page
      */
     public static function updatePage($id, $data)
     {
         $db = Database::getInstance();
-        
+
         $fields = [];
         $values = [];
-        
+
         $allowedFields = ['slug', 'title', 'content', 'excerpt', 'meta_title', 'meta_description', 'meta_keywords', 'status', 'template'];
-        
+
         foreach ($allowedFields as $field) {
             if (isset($data[$field])) {
                 $fields[] = "$field = ?";
                 $values[] = $data[$field];
             }
         }
-        
+
         if (empty($fields)) {
             return false;
         }
-        
+
         $values[] = $id;
-        
+
         $sql = "UPDATE pages SET " . implode(', ', $fields) . " WHERE id = ?";
         $stmt = $db->prepare($sql);
-        
+
         return $stmt->execute($values);
     }
-    
+
     /**
      * Delete page
      */
@@ -138,7 +146,7 @@ class ContentService
         $stmt = $db->prepare("DELETE FROM pages WHERE id = ?");
         return $stmt->execute([$id]);
     }
-    
+
     /**
      * Get menu by location
      */
@@ -147,7 +155,7 @@ class ContentService
         if (isset(self::$cache['menu_' . $location])) {
             return self::$cache['menu_' . $location];
         }
-        
+
         $db = Database::getInstance();
         $stmt = $db->prepare("
             SELECT * FROM menus 
@@ -157,15 +165,15 @@ class ContentService
         ");
         $stmt->execute([$location]);
         $menu = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if ($menu && isset($menu['items'])) {
             $menu['items'] = json_decode($menu['items'], true);
             self::$cache['menu_' . $location] = $menu;
         }
-        
+
         return $menu;
     }
-    
+
     /**
      * Get all menus
      */
@@ -175,33 +183,33 @@ class ContentService
         $stmt = $db->prepare("SELECT * FROM menus ORDER BY display_order ASC");
         $stmt->execute();
         $menus = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         foreach ($menus as &$menu) {
             if (isset($menu['items'])) {
                 $menu['items'] = json_decode($menu['items'], true);
             }
         }
-        
+
         return $menus;
     }
-    
+
     /**
      * Save menu
      */
     public static function saveMenu($id, $data)
     {
         $db = Database::getInstance();
-        
+
         if (is_array($data['items'])) {
             $data['items'] = json_encode($data['items']);
         }
-        
+
         $stmt = $db->prepare("
             UPDATE menus 
             SET name = ?, items = ?, is_active = ?, display_order = ?
             WHERE id = ?
         ");
-        
+
         return $stmt->execute([
             $data['name'],
             $data['items'],
@@ -210,7 +218,7 @@ class ContentService
             $id
         ]);
     }
-    
+
     /**
      * Clear cache
      */

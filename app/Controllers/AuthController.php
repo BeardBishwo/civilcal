@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Auth Controller
  * Handles authentication pages
@@ -13,12 +14,35 @@ use App\Services\AuditLogger;
 
 class AuthController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->view = new \App\Core\View();
+        error_log("AuthController initialized");
+    }
+
     /**
      * Show login page
      */
     public function showLogin()
     {
+        error_log("DEBUG: showLogin called");
+        // Ensure view is initialized
+        if (!isset($this->view) || is_null($this->view)) {
+            error_log("DEBUG: view was null, initializing");
+            $this->view = new \App\Core\View();
+        }
+
+        error_log("DEBUG: view type is " . gettype($this->view));
+
         // Generate CSRF token if not exists
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            $_SESSION['csrf_expiry'] = time() + 3600;
+        }
 
         $this->view->render("auth/login", [
             "viewHelper" => $this->view,
@@ -31,32 +55,37 @@ class AuthController extends Controller
     public function login()
     {
         header("Content-Type: application/json");
+        $logFile = __DIR__ . '/../../storage/logs/auth_debug.log';
 
         try {
             if (session_status() === PHP_SESSION_NONE) {
                 session_start();
             }
+
+            $identity = $_POST["email"] ?? ($_POST["username_email"] ?? ($_POST["username"] ?? ""));
+            file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "Auth::login called. Identity: " . $identity . "\n", FILE_APPEND);
+            file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "Session ID: " . session_id() . "\n", FILE_APPEND);
+
             $token = $_POST["csrf_token"] ?? "";
-            $valid =
-                !empty($_SESSION["csrf_token"]) &&
-                hash_equals($_SESSION["csrf_token"], $token);
-            $notExpired =
-                empty($_SESSION["csrf_expiry"]) ||
-                time() <= $_SESSION["csrf_expiry"];
+            $sessionToken = $_SESSION["csrf_token"] ?? "NOT_SET";
+
+            file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "CSRF Check - Posted: " . $token . "\n", FILE_APPEND);
+            file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "CSRF Check - Session: " . $sessionToken . "\n", FILE_APPEND);
+
+            $valid = !empty($_SESSION["csrf_token"]) && hash_equals($_SESSION["csrf_token"], $token);
+
+            $notExpired = empty($_SESSION["csrf_expiry"]) || time() <= $_SESSION["csrf_expiry"];
+
             if (!$valid || !$notExpired) {
+                file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "Auth::login failed: CSRF mismatch or expired. Valid: " . ($valid ? 'Yes' : 'No') . ", NotExpired: " . ($notExpired ? 'Yes' : 'No') . "\n", FILE_APPEND);
                 echo json_encode([
                     "success" => false,
                     "message" => "Invalid or expired session",
                 ]);
                 return;
             }
-
-            $identity =
-                $_POST["email"] ??
-                ($_POST["username_email"] ?? ($_POST["username"] ?? ""));
             $password = $_POST["password"] ?? "";
-            $remember =
-                isset($_POST["remember"]) || isset($_POST["remember_me"]);
+            $remember = isset($_POST["remember"]) || isset($_POST["remember_me"]);
 
             // Validate input
             if (empty($identity) || empty($password)) {
@@ -102,7 +131,7 @@ class AuthController extends Controller
             AuditLogger::error("login_exception", [
                 "message" => $e->getMessage(),
             ]);
-            error_log("Login error: " . $e->getMessage());
+            file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "Login error: " . $e->getMessage() . "\n", FILE_APPEND);
             echo json_encode([
                 "success" => false,
                 "message" => "An error occurred. Please try again.",
@@ -163,8 +192,7 @@ class AuthController extends Controller
                 $parts = preg_split("/\s+/", $fullName);
                 $firstName = $firstName ?: $parts[0] ?? "";
                 $lastName =
-                    $lastName ?:
-                    (count($parts) > 1
+                    $lastName ?: (count($parts) > 1
                         ? implode(" ", array_slice($parts, 1))
                         : "");
             }
@@ -246,7 +274,7 @@ class AuthController extends Controller
                     echo json_encode([
                         "success" => false,
                         "message" =>
-                            "Registration succeeded but auto-login failed",
+                        "Registration succeeded but auto-login failed",
                     ]);
                     return;
                 }
@@ -357,7 +385,7 @@ class AuthController extends Controller
             echo json_encode([
                 "success" => true,
                 "message" =>
-                    "If an account exists with this email, a password reset link has been sent.",
+                "If an account exists with this email, a password reset link has been sent.",
             ]);
         } catch (\Exception $e) {
             error_log("Forgot password error: " . $e->getMessage());

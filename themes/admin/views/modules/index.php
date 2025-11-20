@@ -95,7 +95,7 @@ if (!empty($allModules)) {
         $actionText = $isActive ? 'Deactivate' : 'Activate';
         $actionClass = $isActive ? 'danger' : 'success';
         $actionIcon = $isActive ? 'fa-pause' : 'fa-play';
-        
+
         $content .= '
         <div class="module-card ' . $statusClass . '" data-module="' . htmlspecialchars($moduleName) . '" data-status="' . $statusClass . '">
             <div class="module-header">
@@ -530,5 +530,4 @@ $breadcrumbs = [
 ];
 
 // Include the layout
-include __DIR__ . '/../layouts/main.php';
-?>
+include __DIR__ . '/../../layouts/main.php';

@@ -32,11 +32,11 @@ class DebugController extends Controller
             'test_results' => $this->runSystemTests(),
             'breadcrumbs' => [['title' => 'Debug Dashboard']]
         ];
-        
+
         // Use standard view rendering which uses the theme system
         $this->view->render('admin/debug/dashboard', $data);
     }
-    
+
     /**
      * Error logs viewer
      */
@@ -44,9 +44,9 @@ class DebugController extends Controller
     {
         $page = $_GET['page'] ?? 1;
         $filter = $_GET['filter'] ?? 'all';
-        
+
         $logs = $this->getErrorLogs($page, $filter);
-        
+
         $data = [
             'page_title' => 'Error Logs',
             'logs' => $logs,
@@ -57,10 +57,10 @@ class DebugController extends Controller
                 ['title' => 'Error Logs']
             ]
         ];
-        
+
         $this->view->render('admin/debug/error-logs', $data);
     }
-    
+
     /**
      * System tests runner
      */
@@ -76,7 +76,7 @@ class DebugController extends Controller
 
             $testType = $_POST['test_type'] ?? 'all';
             // Use cached test results if available (5‑second TTL)
-            $results = $this->getCached('system_tests', function() use ($testType) {
+            $results = $this->getCached('system_tests', function () use ($testType) {
                 return $this->runSystemTests();
             }, 5);
 
@@ -95,7 +95,7 @@ class DebugController extends Controller
 
         $this->view->render('admin/debug/tests', $data);
     }
-    
+
     /**
      * Clear error logs
      */
@@ -104,31 +104,31 @@ class DebugController extends Controller
         try {
             $logDir = __DIR__ . '/../../storage/logs';
             $cleared = 0;
-            
+
             // Clear today's log file
             $todayLog = $logDir . '/' . date('Y-m-d') . '.log';
             if (file_exists($todayLog)) {
                 file_put_contents($todayLog, '');
                 $cleared++;
             }
-            
+
             // Optionally clear older log files (last 7 days)
             for ($i = 1; $i < 7; $i++) {
                 $date = date('Y-m-d', strtotime("-{$i} days"));
                 $logFile = $logDir . '/' . $date . '.log';
-                
+
                 if (file_exists($logFile)) {
                     unlink($logFile);
                     $cleared++;
                 }
             }
-            
+
             $this->json(['success' => true, 'message' => "Cleared {$cleared} log file(s)"]);
         } catch (Exception $e) {
             $this->json(['success' => false, 'error' => $e->getMessage()]);
         }
     }
-    
+
     /**
      * Live error monitoring
      */
@@ -137,11 +137,11 @@ class DebugController extends Controller
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $since = $_POST['since'] ?? date('Y-m-d H:i:s', strtotime('-5 minutes'));
             $errors = $this->getErrorsSince($since);
-            
+
             $this->json(['success' => true, 'errors' => $errors]);
             return;
         }
-        
+
         $data = [
             'page_title' => 'Live Error Monitor',
             'breadcrumbs' => [
@@ -149,21 +149,21 @@ class DebugController extends Controller
                 ['title' => 'Live Monitor']
             ]
         ];
-        
+
         $this->view->render('admin/debug/live-monitor', $data);
     }
 
     /**
      * Helper to output JSON
      */
-    public function json($data, $statusCode = 200)
+    protected function json($data, $statusCode = 200)
     {
         http_response_code($statusCode);
         header('Content-Type: application/json');
         echo json_encode($data);
         exit;
     }
-    
+
     /**
      * Get available test categories
      */
@@ -179,7 +179,7 @@ class DebugController extends Controller
             'all' => 'All Tests'
         ];
     }
-    
+
     /**
      * Get errors since a specific timestamp
      */
@@ -188,31 +188,31 @@ class DebugController extends Controller
         $logDir = __DIR__ . '/../../storage/logs';
         $sinceTime = strtotime($since);
         $errors = [];
-        
+
         // Read from daily log files (current and previous day)
         $dates = [
             date('Y-m-d'),
             date('Y-m-d', strtotime('-1 day'))
         ];
-        
+
         foreach ($dates as $date) {
             $logFile = $logDir . '/' . $date . '.log';
-            
+
             if (!file_exists($logFile)) {
                 continue;
             }
-            
+
             $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            
+
             foreach ($lines as $line) {
                 $entry = @json_decode($line, true);
-                
+
                 if (!$entry || !isset($entry['timestamp'])) {
                     continue;
                 }
-                
+
                 $logTime = strtotime($entry['timestamp']);
-                
+
                 if ($logTime >= $sinceTime) {
                     $errors[] = [
                         'timestamp' => $entry['timestamp'],
@@ -223,26 +223,26 @@ class DebugController extends Controller
                 }
             }
         }
-        
+
         // Also check PHP error log for critical errors
         $phpErrorLog = $logDir . '/php_error.log';
         if (file_exists($phpErrorLog)) {
             $phpLines = file($phpErrorLog, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             $recentPhpErrors = array_slice(array_reverse($phpLines), 0, 20);
-            
+
             foreach ($recentPhpErrors as $line) {
                 // Parse PHP error log format: [20-Nov-2025 08:16:02 UTC]
                 if (preg_match('/^\[([^\]]+)\]\s+(.+)$/', $line, $matches)) {
                     $timestamp = $matches[1];
                     $message = $matches[2];
-                    
+
                     // Skip Xdebug timeout messages unless they're the only errors
                     if (strpos($message, 'Xdebug: [Step Debug] Time-out') !== false) {
                         continue;
                     }
-                    
+
                     $logTime = strtotime($timestamp);
-                    
+
                     if ($logTime >= $sinceTime) {
                         $errors[] = [
                             'timestamp' => date('Y-m-d H:i:s', $logTime),
@@ -254,22 +254,22 @@ class DebugController extends Controller
                 }
             }
         }
-        
+
         // Sort by timestamp descending
-        usort($errors, function($a, $b) {
+        usort($errors, function ($a, $b) {
             return strtotime($b['timestamp']) - strtotime($a['timestamp']);
         });
-        
+
         return $errors;
     }
-    
+
     /**
      * Get comprehensive system information
      */
     private function getSystemInfo()
     {
         // ---- Caching (5‑second TTL) ----
-        return $this->getCached('system_info', function() {
+        return $this->getCached('system_info', function () {
             return [
                 'php' => [
                     'version' => PHP_VERSION,
@@ -294,7 +294,7 @@ class DebugController extends Controller
             ];
         }, 5);
     }
-    
+
     /**
      * Get database connection info
      */
@@ -303,7 +303,7 @@ class DebugController extends Controller
         try {
             $db = \App\Core\Database::getInstance();
             $pdo = $db->getPdo();
-            
+
             return [
                 'status' => 'Connected',
                 'version' => $pdo->query('SELECT VERSION()')->fetchColumn(),
@@ -318,7 +318,7 @@ class DebugController extends Controller
             ];
         }
     }
-    
+
     /**
      * Get database tables info
      */
@@ -327,29 +327,29 @@ class DebugController extends Controller
         try {
             $db = \App\Core\Database::getInstance();
             $pdo = $db->getPdo();
-            
+
             $stmt = $pdo->query('SHOW TABLES');
             $tables = [];
-            
+
             while ($table = $stmt->fetchColumn()) {
                 $countStmt = $pdo->query("SELECT COUNT(*) FROM `{$table}`");
                 $count = $countStmt->fetchColumn();
                 $tables[$table] = $count;
             }
-            
+
             return $tables;
         } catch (Exception $e) {
             return ['error' => $e->getMessage()];
         }
     }
-    
+
     /**
      * Get file system information
      */
     private function getFileSystemInfo()
     {
         $storage = __DIR__ . '/../../storage';
-        
+
         return [
             'storage_writable' => is_writable($storage),
             'storage_size' => $this->getDirectorySize($storage),
@@ -360,7 +360,7 @@ class DebugController extends Controller
             'disk_total_space' => $this->formatBytes(disk_total_space('.'))
         ];
     }
-    
+
     /**
      * Get module information
      */
@@ -370,12 +370,12 @@ class DebugController extends Controller
             $moduleManager = AdminModuleManager::getInstance();
             $allModules = $moduleManager->getAllModules();
             $activeModules = $moduleManager->getActiveModules();
-            
+
             return [
                 'total' => count($allModules),
                 'active' => count($activeModules),
                 'inactive' => count($allModules) - count($activeModules),
-                'modules' => array_map(function($module) use ($activeModules, $allModules) {
+                'modules' => array_map(function ($module) use ($activeModules, $allModules) {
                     $moduleName = array_search($module, $allModules);
                     return [
                         'name' => $module['name'],
@@ -388,7 +388,7 @@ class DebugController extends Controller
             return ['error' => $e->getMessage()];
         }
     }
-    
+
     /**
      * Run comprehensive system tests
      */
@@ -404,24 +404,24 @@ class DebugController extends Controller
             'Installer Service' => $this->testInstallerService(),
             'Admin Panel' => $this->testAdminPanel()
         ];
-        
+
         return $tests;
     }
-    
+
     /**
      * Test PHP version and extensions
      */
     private function testPhpVersion()
     {
         $result = ['status' => 'pass', 'messages' => []];
-        
+
         if (version_compare(PHP_VERSION, '7.4.0', '<')) {
             $result['status'] = 'fail';
             $result['messages'][] = 'PHP 7.4+ required, found ' . PHP_VERSION;
         } else {
             $result['messages'][] = 'PHP version: ' . PHP_VERSION;
         }
-        
+
         $required = ['pdo', 'pdo_mysql', 'mbstring', 'curl', 'openssl'];
         foreach ($required as $ext) {
             if (!extension_loaded($ext)) {
@@ -429,10 +429,10 @@ class DebugController extends Controller
                 $result['messages'][] = "Missing extension: {$ext}";
             }
         }
-        
+
         return $result;
     }
-    
+
     /**
      * Test database connection
      */
@@ -442,7 +442,7 @@ class DebugController extends Controller
             $db = \App\Core\Database::getInstance();
             $pdo = $db->getPdo();
             $pdo->query('SELECT 1');
-            
+
             return [
                 'status' => 'pass',
                 'messages' => ['Database connection successful']
@@ -454,21 +454,21 @@ class DebugController extends Controller
             ];
         }
     }
-    
+
     /**
      * Test file permissions
      */
     private function testFilePermissions()
     {
         $result = ['status' => 'pass', 'messages' => []];
-        
+
         $paths = [
             '../storage' => 'Storage directory',
             '../storage/logs' => 'Logs directory',
             '../storage/cache' => 'Cache directory',
             '../config' => 'Config directory'
         ];
-        
+
         foreach ($paths as $path => $name) {
             if (!is_writable($path)) {
                 $result['status'] = 'fail';
@@ -477,10 +477,10 @@ class DebugController extends Controller
                 $result['messages'][] = "{$name} writable";
             }
         }
-        
+
         return $result;
     }
-    
+
     /**
      * Test module system
      */
@@ -489,7 +489,7 @@ class DebugController extends Controller
         try {
             $moduleManager = AdminModuleManager::getInstance();
             $modules = $moduleManager->getAllModules();
-            
+
             return [
                 'status' => 'pass',
                 'messages' => [
@@ -504,7 +504,7 @@ class DebugController extends Controller
             ];
         }
     }
-    
+
     /**
      * Test user authentication
      */
@@ -512,10 +512,10 @@ class DebugController extends Controller
     {
         try {
             $userModel = new User();
-            $adminUsers = count(array_filter($userModel->getAll(), function($user) {
+            $adminUsers = count(array_filter($userModel->getAll(), function ($user) {
                 return in_array($user['role'], ['admin', 'super_admin']);
             }));
-            
+
             return [
                 'status' => 'pass',
                 'messages' => [
@@ -530,7 +530,7 @@ class DebugController extends Controller
             ];
         }
     }
-    
+
     /**
      * Test GeoLocation service
      */
@@ -539,7 +539,7 @@ class DebugController extends Controller
         try {
             $geoService = new GeoLocationService();
             $status = $geoService->getStatus();
-            
+
             return [
                 'status' => 'pass',
                 'messages' => ['GeoLocation service initialized']
@@ -551,7 +551,7 @@ class DebugController extends Controller
             ];
         }
     }
-    
+
     /**
      * Test installer service
      */
@@ -560,7 +560,7 @@ class DebugController extends Controller
         try {
             $canDelete = InstallerService::shouldAutoDelete();
             $isProcessed = InstallerService::isInstallerProcessed();
-            
+
             return [
                 'status' => 'pass',
                 'messages' => [
@@ -576,7 +576,7 @@ class DebugController extends Controller
             ];
         }
     }
-    
+
     /**
      * Test admin panel access
      */
@@ -589,30 +589,30 @@ class DebugController extends Controller
             $templatePath = $rootPath . '/themes/admin/layouts/main.php';
             $cssPath = $rootPath . '/themes/admin/assets/css/admin.css';
             $jsPath = $rootPath . '/themes/admin/assets/js/admin.js';
-            
+
             $result = ['status' => 'pass', 'messages' => []];
-            
+
             if (!file_exists($templatePath)) {
                 $result['status'] = 'fail';
                 $result['messages'][] = 'Admin layout missing';
             } else {
                 $result['messages'][] = 'Admin layout found';
             }
-            
+
             if (!file_exists($cssPath)) {
                 $result['status'] = 'warning';
                 $result['messages'][] = 'Admin CSS missing';
             } else {
                 $result['messages'][] = 'Admin CSS found';
             }
-            
+
             if (!file_exists($jsPath)) {
                 $result['status'] = 'warning';
                 $result['messages'][] = 'Admin JS missing';
             } else {
                 $result['messages'][] = 'Admin JS found';
             }
-            
+
             return $result;
         } catch (Exception $e) {
             return [
@@ -621,7 +621,7 @@ class DebugController extends Controller
             ];
         }
     }
-    
+
     /**
      * Get recent error logs
      */
@@ -629,20 +629,20 @@ class DebugController extends Controller
     {
         $logDir = __DIR__ . '/../../storage/logs';
         $errors = [];
-        
+
         // Read from today's log file
         $logFile = $logDir . '/' . date('Y-m-d') . '.log';
-        
+
         if (file_exists($logFile)) {
             $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            
+
             foreach (array_reverse($lines) as $line) {
                 if (count($errors) >= $limit) {
                     break;
                 }
-                
+
                 $entry = @json_decode($line, true);
-                
+
                 if ($entry && isset($entry['timestamp'])) {
                     $errors[] = [
                         'timestamp' => $entry['timestamp'],
@@ -653,21 +653,21 @@ class DebugController extends Controller
                 }
             }
         }
-        
+
         // If we need more, get from yesterday's log
         if (count($errors) < $limit) {
             $yesterdayLog = $logDir . '/' . date('Y-m-d', strtotime('-1 day')) . '.log';
-            
+
             if (file_exists($yesterdayLog)) {
                 $lines = file($yesterdayLog, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-                
+
                 foreach (array_reverse($lines) as $line) {
                     if (count($errors) >= $limit) {
                         break;
                     }
-                    
+
                     $entry = @json_decode($line, true);
-                    
+
                     if ($entry && isset($entry['timestamp'])) {
                         $errors[] = [
                             'timestamp' => $entry['timestamp'],
@@ -679,10 +679,10 @@ class DebugController extends Controller
                 }
             }
         }
-        
+
         return $errors;
     }
-    
+
     /**
      * Get error logs with pagination
      */
@@ -691,27 +691,27 @@ class DebugController extends Controller
         $logDir = __DIR__ . '/../../storage/logs';
         $perPage = 50;
         $logs = [];
-        
+
         // Read from multiple days (last 7 days)
         for ($i = 0; $i < 7; $i++) {
             $date = date('Y-m-d', strtotime("-{$i} days"));
             $logFile = $logDir . '/' . $date . '.log';
-            
+
             if (!file_exists($logFile)) {
                 continue;
             }
-            
+
             $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            
+
             foreach ($lines as $line) {
                 $entry = @json_decode($line, true);
-                
+
                 if (!$entry || !isset($entry['timestamp'])) {
                     continue;
                 }
-                
+
                 $level = $entry['level'] ?? 'info';
-                
+
                 if ($filter === 'all' || $filter === $level) {
                     $logs[] = [
                         'timestamp' => $entry['timestamp'],
@@ -722,54 +722,54 @@ class DebugController extends Controller
                 }
             }
         }
-        
+
         // Sort by timestamp descending
-        usort($logs, function($a, $b) {
+        usort($logs, function ($a, $b) {
             return strtotime($b['timestamp']) - strtotime($a['timestamp']);
         });
-        
+
         $total = count($logs);
         $pages = ceil($total / $perPage);
         $offset = ($page - 1) * $perPage;
         $logs = array_slice($logs, $offset, $perPage);
-        
+
         return [
             'logs' => $logs,
             'total' => $total,
             'pages' => $pages
         ];
     }
-    
+
     /**
      * Get log level from message
      */
     private function getLogLevel($message)
     {
         $message = strtolower($message);
-        
+
         if (strpos($message, 'fatal') !== false) return 'fatal';
         if (strpos($message, 'error') !== false) return 'error';
         if (strpos($message, 'warning') !== false) return 'warning';
         if (strpos($message, 'notice') !== false) return 'notice';
         if (strpos($message, 'info') !== false) return 'info';
-        
+
         return 'debug';
     }
-    
+
     /**
      * Helper methods
      */
     private function formatBytes($bytes, $precision = 2)
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
+
         return round($bytes, $precision) . ' ' . $units[$i];
     }
-    
+
     private function getDirectorySize($directory)
     {
         $size = 0;
@@ -795,7 +795,7 @@ class DebugController extends Controller
     private function getCached(string $key, callable $callback, int $ttl = 60)
     {
         $cacheDir = __DIR__ . '/../../storage/cache';
-        
+
         // Ensure cache directory exists
         if (!file_exists($cacheDir)) {
             @mkdir($cacheDir, 0777, true);
@@ -824,18 +824,18 @@ class DebugController extends Controller
 
         return $data;
     }
-    
+
     private function checkAdminAccess()
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        
+
         if (empty($_SESSION['user_id'])) {
             header('Location: ' . app_base_url('/login?redirect=' . urlencode($_SERVER['REQUEST_URI'])));
             exit;
         }
-        
+
         $userModel = new User();
         if (!$userModel->isAdmin($_SESSION['user_id'])) {
             header('Location: ' . app_base_url('/dashboard?error=access_denied'));
@@ -843,4 +843,3 @@ class DebugController extends Controller
         }
     }
 }
-?>
