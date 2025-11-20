@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.disabled = true;
             btnIcon.className = 'fas fa-spinner fa-spin';
             
-            fetch('/admin/debug/run-tests', {
+            fetch('/Bishwo_Calculator/admin/debug/run-tests', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.disabled = true;
         icon.className = 'fas fa-spinner fa-spin';
         
-        fetch('/admin/debug/run-tests', {
+        fetch('/Bishwo_Calculator/admin/debug/run-tests', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

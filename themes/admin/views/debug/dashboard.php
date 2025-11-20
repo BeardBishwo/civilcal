@@ -18,11 +18,11 @@ $content = '
                 <i class="fas fa-play"></i>
                 Run All Tests
             </button>
-            <a href="/admin/debug/error-logs" class="btn btn-secondary">
+            <a href="/Bishwo_Calculator/admin/debug/error-logs" class="btn btn-secondary">
                 <i class="fas fa-file-alt"></i>
                 View Error Logs
             </a>
-            <a href="/admin/debug/live-errors" class="btn btn-info">
+            <a href="/Bishwo_Calculator/admin/debug/live-errors" class="btn btn-info">
                 <i class="fas fa-broadcast-tower"></i>
                 Live Monitor
             </a>
@@ -53,7 +53,7 @@ if (!empty($test_results)) {
     foreach ($test_results as $testName => $result) {
         $statusClass = '';
         $statusIcon = '';
-        
+
         switch ($result['status']) {
             case 'pass':
                 $statusClass = 'success';
@@ -68,7 +68,7 @@ if (!empty($test_results)) {
                 $statusIcon = 'fa-times-circle';
                 break;
         }
-        
+
         $content .= '
                 <div class="test-item">
                     <div class="test-header">
@@ -78,7 +78,7 @@ if (!empty($test_results)) {
                             ' . strtoupper($result['status']) . '
                         </span>
                     </div>';
-        
+
         if (!empty($result['messages'])) {
             $content .= '<div class="test-messages">';
             foreach ($result['messages'] as $message) {
@@ -86,7 +86,7 @@ if (!empty($test_results)) {
             }
             $content .= '</div>';
         }
-        
+
         $content .= '</div>';
     }
 } else {
@@ -162,7 +162,7 @@ if (isset($system_info['database']['version'])) {
                         <span class="info-label">Charset:</span>
                         <span class="info-value">' . htmlspecialchars($system_info['database']['charset']) . '</span>
                     </div>';
-    
+
     if (isset($system_info['database']['tables']) && is_array($system_info['database']['tables'])) {
         $content .= '
                     <div class="info-item">
@@ -186,7 +186,7 @@ $content .= '
                 <i class="fas fa-exclamation-triangle"></i>
                 Recent Errors
             </h3>
-            <a href="/admin/debug/error-logs" class="btn btn-sm btn-primary">View All</a>
+            <a href="/Bishwo_Calculator/admin/debug/error-logs" class="btn btn-sm btn-primary">View All</a>
         </div>
         <div class="card-content">
             <div class="error-list">';
@@ -205,7 +205,7 @@ if (!empty($recent_errors)) {
             default:
                 $levelClass = 'info';
         }
-        
+
         $content .= '
                 <div class="error-item">
                     <div class="error-time">' . htmlspecialchars($error['timestamp']) . '</div>
@@ -233,7 +233,7 @@ async function runAllTests() {
     button.innerHTML = \'<i class="fas fa-spinner fa-spin"></i> Running Tests...\';
     
     try {
-        const response = await fetch("/admin/debug/run-tests", {
+        const response = await fetch("/Bishwo_Calculator/admin/debug/run-tests", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -314,7 +314,7 @@ async function clearErrorLogs() {
     }
     
     try {
-        const response = await fetch("/admin/debug/clear-logs", {
+        const response = await fetch("/Bishwo_Calculator/admin/debug/clear-logs", {
             method: "POST"
         });
         
@@ -517,4 +517,3 @@ $breadcrumbs = [
 
 // Include the layout
 include __DIR__ . '/../../layouts/main.php';
-?>
