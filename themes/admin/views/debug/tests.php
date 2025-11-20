@@ -26,10 +26,10 @@
                                 <tr id="test-row-<?= $key ?>">
                                     <td><?= htmlspecialchars($label) ?></td>
                                     <td>
-                                        <span class="text-muted">Waiting to run...</span>
+                                        <span class="text-muted test-description">Click "Run" to test this component</span>
                                         <div class="test-messages mt-1 small"></div>
                                     </td>
-                                    <td><span class="badge badge-secondary">Pending</span></td>
+                                    <td><span class="badge badge-secondary">Not Run</span></td>
                                     <td>
                                         <button class="btn btn-sm btn-info run-test-btn" data-test="<?= $key ?>">
                                             <i class="fas fa-play"></i> Run
@@ -48,6 +48,47 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const csrfToken = '<?= $_SESSION['csrf_token'] ?? '' ?>';
+
+    const testCategoryMap = {
+        'PHP Version': 'system',
+        'Admin Panel': 'system',
+        'Database Connection': 'database',
+        'Module System': 'modules',
+        'User Authentication': 'auth',
+        'GeoLocation Service': 'services',
+        'Installer Service': 'services',
+        'File Permissions': 'files'
+    };
+
+    const statusPriority = { pass: 1, warning: 2, fail: 3 };
+
+    function aggregateResults(results) {
+        const aggregated = {};
+
+        Object.entries(results).forEach(([name, result]) => {
+            const key = testCategoryMap[name];
+            if (!key) {
+                return;
+            }
+
+            if (!aggregated[key]) {
+                aggregated[key] = {
+                    status: result.status,
+                    messages: []
+                };
+            } else if (statusPriority[result.status] > statusPriority[aggregated[key].status]) {
+                aggregated[key].status = result.status;
+            }
+
+            if (Array.isArray(result.messages) && result.messages.length) {
+                result.messages.forEach(message => {
+                    aggregated[key].messages.push(`${name}: ${message}`);
+                });
+            }
+        });
+
+        return aggregated;
+    }
     
     // Helper to update test row UI
     function updateTestRow(testType, status, messages) {
@@ -56,6 +97,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const badge = row.querySelector('.badge');
         const msgContainer = row.querySelector('.test-messages');
+        const description = row.querySelector('.test-description');
+        
+        // Hide the initial description
+        if (description) {
+            description.style.display = 'none';
+        }
         
         // Update badge
         badge.className = 'badge';
@@ -87,6 +134,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    function refreshTableFromResults(rawResults) {
+        const aggregated = aggregateResults(rawResults);
+        Object.entries(aggregated).forEach(([key, data]) => {
+            updateTestRow(key, data.status, data.messages);
+        });
+    }
+
     // Run single test
     document.querySelectorAll('.run-test-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -107,39 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // The backend returns results keyed by test name (e.g. "PHP Version"), 
-                    // but we need to map back to our keys (e.g. "system").
-                    // Since the controller runs all tests anyway when 'all' is passed, 
-                    // or specific ones, let's handle the response structure.
-                    // Actually, the controller's runSystemTests returns an array keyed by descriptive names.
-                    // We might need to adjust the controller or the JS to match keys.
-                    // For now, let's assume the controller returns the full results array.
-                    
-                    // Let's map descriptive names back to keys for UI update
-                    const nameToKey = {
-                        'PHP Version': 'system',
-                        'Database Connection': 'database',
-                        'File Permissions': 'files',
-                        'Module System': 'modules',
-                        'User Authentication': 'auth',
-                        'GeoLocation Service': 'services', // Approximate mapping
-                        'Installer Service': 'services',   // Approximate mapping
-                        'Admin Panel': 'system'            // Approximate mapping
-                    };
-                    
-                    // Since the controller returns ALL results even for single test request (based on current implementation),
-                    // we can update all rows.
-                    Object.entries(data.results).forEach(([name, result]) => {
-                        // Find key by matching label in our table
-                        // This is a bit hacky, better to have consistent keys.
-                        // Let's try to match by text content of first cell
-                        document.querySelectorAll('tbody tr').forEach(tr => {
-                            if (tr.cells[0].textContent.trim() === name) {
-                                const key = tr.id.replace('test-row-', '');
-                                updateTestRow(key, result.status, result.messages);
-                            }
-                        });
-                    });
+                    refreshTableFromResults(data.results);
                 } else {
                     alert('Error running test: ' + (data.error || 'Unknown error'));
                 }
@@ -173,14 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                Object.entries(data.results).forEach(([name, result]) => {
-                     document.querySelectorAll('tbody tr').forEach(tr => {
-                        if (tr.cells[0].textContent.trim() === name) {
-                            const key = tr.id.replace('test-row-', '');
-                            updateTestRow(key, result.status, result.messages);
-                        }
-                    });
-                });
+                refreshTableFromResults(data.results);
             } else {
                 alert('Error running tests: ' + (data.error || 'Unknown error'));
             }

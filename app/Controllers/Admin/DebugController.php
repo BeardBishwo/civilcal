@@ -102,13 +102,28 @@ class DebugController extends Controller
     public function clearLogs()
     {
         try {
-            $logFile = __DIR__ . '/../../storage/logs/error.log';
+            $logDir = __DIR__ . '/../../storage/logs';
+            $cleared = 0;
             
-            if (file_exists($logFile)) {
-                file_put_contents($logFile, '');
+            // Clear today's log file
+            $todayLog = $logDir . '/' . date('Y-m-d') . '.log';
+            if (file_exists($todayLog)) {
+                file_put_contents($todayLog, '');
+                $cleared++;
             }
             
-            $this->json(['success' => true, 'message' => 'Error logs cleared']);
+            // Optionally clear older log files (last 7 days)
+            for ($i = 1; $i < 7; $i++) {
+                $date = date('Y-m-d', strtotime("-{$i} days"));
+                $logFile = $logDir . '/' . $date . '.log';
+                
+                if (file_exists($logFile)) {
+                    unlink($logFile);
+                    $cleared++;
+                }
+            }
+            
+            $this->json(['success' => true, 'message' => "Cleared {$cleared} log file(s)"]);
         } catch (Exception $e) {
             $this->json(['success' => false, 'error' => $e->getMessage()]);
         }
@@ -141,7 +156,7 @@ class DebugController extends Controller
     /**
      * Helper to output JSON
      */
-    protected function json($data, $statusCode = 200)
+    public function json($data, $statusCode = 200)
     {
         http_response_code($statusCode);
         header('Content-Type: application/json');
@@ -170,31 +185,82 @@ class DebugController extends Controller
      */
     private function getErrorsSince($since)
     {
-        $logFile = __DIR__ . '/../../storage/logs/error.log';
-        
-        if (!file_exists($logFile)) {
-            return [];
-        }
-        
+        $logDir = __DIR__ . '/../../storage/logs';
         $sinceTime = strtotime($since);
-        $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         $errors = [];
         
-        foreach (array_reverse($lines) as $line) {
-            if (preg_match('/^\[([^\]]+)\]\s+(.+)$/', $line, $matches)) {
-                $logTime = strtotime($matches[1]);
+        // Read from daily log files (current and previous day)
+        $dates = [
+            date('Y-m-d'),
+            date('Y-m-d', strtotime('-1 day'))
+        ];
+        
+        foreach ($dates as $date) {
+            $logFile = $logDir . '/' . $date . '.log';
+            
+            if (!file_exists($logFile)) {
+                continue;
+            }
+            
+            $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            
+            foreach ($lines as $line) {
+                $entry = @json_decode($line, true);
+                
+                if (!$entry || !isset($entry['timestamp'])) {
+                    continue;
+                }
+                
+                $logTime = strtotime($entry['timestamp']);
                 
                 if ($logTime >= $sinceTime) {
                     $errors[] = [
-                        'timestamp' => $matches[1],
-                        'message' => $matches[2],
-                        'level' => $this->getLogLevel($matches[2])
+                        'timestamp' => $entry['timestamp'],
+                        'message' => $entry['message'] ?? '',
+                        'level' => $entry['level'] ?? 'info',
+                        'context' => $entry['context'] ?? []
                     ];
                 }
             }
         }
         
-        return array_reverse($errors);
+        // Also check PHP error log for critical errors
+        $phpErrorLog = $logDir . '/php_error.log';
+        if (file_exists($phpErrorLog)) {
+            $phpLines = file($phpErrorLog, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            $recentPhpErrors = array_slice(array_reverse($phpLines), 0, 20);
+            
+            foreach ($recentPhpErrors as $line) {
+                // Parse PHP error log format: [20-Nov-2025 08:16:02 UTC]
+                if (preg_match('/^\[([^\]]+)\]\s+(.+)$/', $line, $matches)) {
+                    $timestamp = $matches[1];
+                    $message = $matches[2];
+                    
+                    // Skip Xdebug timeout messages unless they're the only errors
+                    if (strpos($message, 'Xdebug: [Step Debug] Time-out') !== false) {
+                        continue;
+                    }
+                    
+                    $logTime = strtotime($timestamp);
+                    
+                    if ($logTime >= $sinceTime) {
+                        $errors[] = [
+                            'timestamp' => date('Y-m-d H:i:s', $logTime),
+                            'message' => $message,
+                            'level' => 'error',
+                            'context' => ['source' => 'php_error_log']
+                        ];
+                    }
+                }
+            }
+        }
+        
+        // Sort by timestamp descending
+        usort($errors, function($a, $b) {
+            return strtotime($b['timestamp']) - strtotime($a['timestamp']);
+        });
+        
+        return $errors;
     }
     
     /**
@@ -517,29 +583,34 @@ class DebugController extends Controller
     private function testAdminPanel()
     {
         try {
-            $templatePath = __DIR__ . '/../../themes/admin/layouts/main.php';
-            $cssPath = __DIR__ . '/../../themes/admin/assets/css/admin.css';
-            $jsPath = __DIR__ . '/../../themes/admin/assets/js/admin.js';
+            // Use absolute paths from project root
+            // From app/Controllers/Admin we need to go up 3 levels to reach project root
+            $rootPath = dirname(__DIR__, 3);
+            $templatePath = $rootPath . '/themes/admin/layouts/main.php';
+            $cssPath = $rootPath . '/themes/admin/assets/css/admin.css';
+            $jsPath = $rootPath . '/themes/admin/assets/js/admin.js';
             
             $result = ['status' => 'pass', 'messages' => []];
             
             if (!file_exists($templatePath)) {
                 $result['status'] = 'fail';
                 $result['messages'][] = 'Admin layout missing';
+            } else {
+                $result['messages'][] = 'Admin layout found';
             }
             
             if (!file_exists($cssPath)) {
                 $result['status'] = 'warning';
                 $result['messages'][] = 'Admin CSS missing';
+            } else {
+                $result['messages'][] = 'Admin CSS found';
             }
             
             if (!file_exists($jsPath)) {
                 $result['status'] = 'warning';
                 $result['messages'][] = 'Admin JS missing';
-            }
-            
-            if (empty($result['messages'])) {
-                $result['messages'][] = 'Admin panel files present';
+            } else {
+                $result['messages'][] = 'Admin JS found';
             }
             
             return $result;
@@ -556,22 +627,56 @@ class DebugController extends Controller
      */
     private function getRecentErrors($limit = 50)
     {
-        $logFile = __DIR__ . '/../../storage/logs/error.log';
-        
-        if (!file_exists($logFile)) {
-            return [];
-        }
-        
-        $lines = array_reverse(file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES));
+        $logDir = __DIR__ . '/../../storage/logs';
         $errors = [];
         
-        foreach (array_slice($lines, 0, $limit) as $line) {
-            if (preg_match('/^\[([^\]]+)\]\s+(.+)$/', $line, $matches)) {
-                $errors[] = [
-                    'timestamp' => $matches[1],
-                    'message' => $matches[2],
-                    'level' => $this->getLogLevel($matches[2])
-                ];
+        // Read from today's log file
+        $logFile = $logDir . '/' . date('Y-m-d') . '.log';
+        
+        if (file_exists($logFile)) {
+            $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            
+            foreach (array_reverse($lines) as $line) {
+                if (count($errors) >= $limit) {
+                    break;
+                }
+                
+                $entry = @json_decode($line, true);
+                
+                if ($entry && isset($entry['timestamp'])) {
+                    $errors[] = [
+                        'timestamp' => $entry['timestamp'],
+                        'message' => $entry['message'] ?? '',
+                        'level' => $entry['level'] ?? 'info',
+                        'context' => $entry['context'] ?? []
+                    ];
+                }
+            }
+        }
+        
+        // If we need more, get from yesterday's log
+        if (count($errors) < $limit) {
+            $yesterdayLog = $logDir . '/' . date('Y-m-d', strtotime('-1 day')) . '.log';
+            
+            if (file_exists($yesterdayLog)) {
+                $lines = file($yesterdayLog, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                
+                foreach (array_reverse($lines) as $line) {
+                    if (count($errors) >= $limit) {
+                        break;
+                    }
+                    
+                    $entry = @json_decode($line, true);
+                    
+                    if ($entry && isset($entry['timestamp'])) {
+                        $errors[] = [
+                            'timestamp' => $entry['timestamp'],
+                            'message' => $entry['message'] ?? '',
+                            'level' => $entry['level'] ?? 'info',
+                            'context' => $entry['context'] ?? []
+                        ];
+                    }
+                }
             }
         }
         
@@ -583,29 +688,45 @@ class DebugController extends Controller
      */
     private function getErrorLogs($page = 1, $filter = 'all')
     {
-        $logFile = __DIR__ . '/../../storage/logs/error.log';
+        $logDir = __DIR__ . '/../../storage/logs';
         $perPage = 50;
-        
-        if (!file_exists($logFile)) {
-            return ['logs' => [], 'total' => 0, 'pages' => 0];
-        }
-        
-        $lines = array_reverse(file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES));
         $logs = [];
         
-        foreach ($lines as $line) {
-            if (preg_match('/^\[([^\]]+)\]\s+(.+)$/', $line, $matches)) {
-                $level = $this->getLogLevel($matches[2]);
+        // Read from multiple days (last 7 days)
+        for ($i = 0; $i < 7; $i++) {
+            $date = date('Y-m-d', strtotime("-{$i} days"));
+            $logFile = $logDir . '/' . $date . '.log';
+            
+            if (!file_exists($logFile)) {
+                continue;
+            }
+            
+            $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            
+            foreach ($lines as $line) {
+                $entry = @json_decode($line, true);
+                
+                if (!$entry || !isset($entry['timestamp'])) {
+                    continue;
+                }
+                
+                $level = $entry['level'] ?? 'info';
                 
                 if ($filter === 'all' || $filter === $level) {
                     $logs[] = [
-                        'timestamp' => $matches[1],
-                        'message' => $matches[2],
-                        'level' => $level
+                        'timestamp' => $entry['timestamp'],
+                        'message' => $entry['message'] ?? '',
+                        'level' => $level,
+                        'context' => $entry['context'] ?? []
                     ];
                 }
             }
         }
+        
+        // Sort by timestamp descending
+        usort($logs, function($a, $b) {
+            return strtotime($b['timestamp']) - strtotime($a['timestamp']);
+        });
         
         $total = count($logs);
         $pages = ceil($total / $perPage);

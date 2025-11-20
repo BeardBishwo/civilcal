@@ -88,8 +88,12 @@ ob_start();
         </div>
     <?php else: ?>
         <?php foreach ($themes as $theme): ?>
+            <?php
+                $status = $theme['status'] ?? ($theme['is_active'] ?? false ? 'active' : 'inactive');
+                $isActive = ($status === 'active');
+            ?>
             <div class="theme-item" 
-                 style="background: #FFFFFF; border: 1px solid #E5E9F1; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.04); <?php echo $theme['status'] === 'active' ? 'border-color: #34d399;' : ''; ?> <?php echo $theme['status'] === 'deleted' ? 'opacity: 0.75;' : ''; ?>">
+                 style="background: #FFFFFF; border: 1px solid #E5E9F1; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.04); <?php echo $isActive ? 'border-color: #34d399;' : ''; ?> <?php echo $status === 'deleted' ? 'opacity: 0.75;' : ''; ?>">
                 <!-- Theme Preview -->
                 <div style="position: relative;">
                     <div style="height: 180px; background: #f7f9fc; display: flex; align-items: center; justify-content: center;">
@@ -105,9 +109,9 @@ ob_start();
                     </div>
                     <!-- Status Badge -->
                     <div style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <?php if ($theme['status'] === 'active'): ?>
+                        <?php if ($isActive): ?>
                             <span style="background: #34d399; color: white; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem;">Active</span>
-                        <?php elseif ($theme['status'] === 'deleted'): ?>
+                        <?php elseif ($status === 'deleted'): ?>
                             <span style="background: #ef4444; color: white; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem;">Deleted</span>
                         <?php else: ?>
                             <span style="background: #9ca3af; color: white; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem;">Inactive</span>
@@ -150,7 +154,7 @@ ob_start();
                 <div style="background: #f7f9fc; padding: 1.5rem; border-top: 1px solid #E5E9F1;">
                     <!-- Action Buttons -->
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
-                        <?php if ($theme['status'] !== 'active'): ?>
+                        <?php if (!$isActive): ?>
                             <button class="activate-theme" data-theme-id="<?php echo $theme['id']; ?>" style="background: #34d399; color: white; border: none; padding: 0.5rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.25rem; font-size: 0.875rem;">
                                 <i class="fas fa-play-circle"></i>
                                 <span>Activate</span>
@@ -162,7 +166,7 @@ ob_start();
                             </button>
                         <?php endif; ?>
 
-                        <?php if ($theme['status'] !== 'deleted'): ?>
+                        <?php if ($status !== 'deleted'): ?>
                             <button class="delete-theme" data-theme-id="<?php echo $theme['id']; ?>" style="background: #ef4444; color: white; border: none; padding: 0.5rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.25rem; font-size: 0.875rem;">
                                 <i class="fas fa-trash"></i>
                                 <span>Delete</span>

@@ -149,8 +149,11 @@ if (!empty($logs['logs'])) {
                             </td>
                             <td class="log-timestamp">' . htmlspecialchars($log['timestamp']) . '</td>
                             <td class="log-message">
-                                <div class="message-preview">' . htmlspecialchars(substr($log['message'], 0, 100)) . '</div>
-                                <div class="message-full" style="display: none;">' . htmlspecialchars($log['message']) . '</div>
+                                <div class="message-preview">' . htmlspecialchars(substr($log['message'], 0, 100)) . (strlen($log['message']) > 100 ? '...' : '') . '</div>
+                                <div class="message-full" style="display: none;">
+                                    <strong>Message:</strong><br>' . htmlspecialchars($log['message']) . '
+                                    ' . (!empty($log['context']) ? '<br><br><strong>Context:</strong><br><pre style="background: #f5f5f5; padding: 8px; border-radius: 4px; font-size: 12px; max-height: 200px; overflow-y: auto;">' . htmlspecialchars(json_encode($log['context'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) . '</pre>' : '') . '
+                                </div>
                             </td>
                             <td class="log-actions">
                                 <button onclick="toggleMessage(' . $index . ')" class="btn btn-sm btn-secondary" title="Toggle Full Message">

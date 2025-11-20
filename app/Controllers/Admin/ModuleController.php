@@ -124,7 +124,8 @@ class ModuleController extends Controller
                         'description' => $this->getModuleDescription($dir),
                         'status' => 'active', // TODO: Get from settings
                         'calculators_count' => $calcCount,
-                        'version' => '1.0.0'
+                        'version' => '1.0.0',
+                        'category' => $this->getCategoryFromName($dir)
                     ];
                 }
             }
