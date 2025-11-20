@@ -1,31 +1,31 @@
 import requests
 
-BASE_URL = "http://localhost:80"
-LOGIN_URL = f"{BASE_URL}/api/login"
-LOGOUT_URL = f"{BASE_URL}/api/logout"
-TIMEOUT = 30
-
-USERNAME = "uniquebishwo@gmail.com"
-PASSWORD = "c9PU7XAsAADYk_A"
+base_url = "http://localhost:80"
+username = "uniquebishwo@gmail.com"
+password = "c9PU7XAsAADYk_A"
 
 def test_user_logout_operation():
     session = requests.Session()
     try:
-        # Login to get authenticated session (token/cookies)
+        # Login to get authenticated session or token if needed
+        login_url = f"{base_url}/api/login"
         login_payload = {
-            "email": USERNAME,
-            "password": PASSWORD
+            "email": username,
+            "password": password
         }
-        login_headers = {
-            "Content-Type": "application/json"
-        }
-        login_response = session.post(LOGIN_URL, json=login_payload, headers=login_headers, timeout=TIMEOUT)
-        assert login_response.status_code == 200, f"Login failed with status code {login_response.status_code}"
-        
-        # Attempt logout with authenticated session
-        logout_response = session.get(LOGOUT_URL, timeout=TIMEOUT)
-        assert logout_response.status_code == 200, f"Logout failed with status code {logout_response.status_code}"
-        assert "Logout successful" in logout_response.text or logout_response.text != "", "Logout response confirmation missing"
+        login_resp = session.post(login_url, json=login_payload, timeout=30)
+        assert login_resp.status_code == 200, f"Login failed with status {login_resp.status_code}"
+
+        # Perform logout operation
+        logout_url = f"{base_url}/api/logout"
+        logout_resp = session.get(logout_url, timeout=30)
+        assert logout_resp.status_code == 200, f"Logout failed with status {logout_resp.status_code}"
+
+        try:
+            data = logout_resp.json()
+            assert "success" in data or "message" in data or "logout" in str(data).lower()
+        except Exception:
+            assert logout_resp.text.strip() != "", "Logout response empty"
     finally:
         session.close()
 

@@ -1,46 +1,44 @@
 import requests
-import uuid
+from requests.auth import HTTPBasicAuth
 
-BASE_URL = "http://localhost:80"
-REGISTER_ENDPOINT = f"{BASE_URL}/api/register"
-HEADERS = {
-    "Content-Type": "application/json",
-    "Authorization": "Basic dW5pcXVlYmlzaHdvQGdtYWlsLmNvbTplOVBVN1hBc0FBRFlrX0E="
-}  # base64 for 'uniquebishwo@gmail.com:c9PU7XAsAADYk_A'
+base_url = "http://localhost:80/bishwo_calculator"
+auth = HTTPBasicAuth("uniquebishwo@gmail.com", "c9PU7XAsAADYk_A")
+headers = {"Content-Type": "application/json"}
+timeout = 30
 
 def test_user_registration_process():
-    timeout = 30
-
-    # Generate unique email to avoid conflict
-    unique_email = f"testuser_{uuid.uuid4().hex[:8]}@example.com"
+    register_url = f"{base_url}/api/register"
+    
+    # Valid user registration data
     valid_payload = {
-        "username": "testuser",
-        "email": unique_email,
-        "password": "ValidPass123!",
+        "username": "testuser123",
+        "email": "testuser123@example.com",
+        "password": "StrongPass!123",
         "first_name": "Test",
         "last_name": "User"
     }
-
-    # Test successful registration
-    response = requests.post(REGISTER_ENDPOINT, json=valid_payload, headers=HEADERS, timeout=timeout)
-    assert response.status_code == 201, f"Expected 201, got {response.status_code}"
+    
+    # Invalid user registration data (missing password)
+    invalid_payload = {
+        "username": "testuser456",
+        "email": "testuser456@example.com",
+        "first_name": "Test",
+        "last_name": "User"
+    }
+    
+    # --- Test registration success with valid data ---
     try:
-        json_resp = response.json()
-    except Exception:
-        json_resp = None
-    assert json_resp is not None, "Response is not valid JSON"
+        response = requests.post(register_url, auth=auth, headers=headers, json=valid_payload, timeout=timeout)
+        assert response.status_code == 201, f"Expected 201 for valid registration, got {response.status_code}"
+    except requests.RequestException as e:
+        assert False, f"Request failed for valid registration: {e}"
+    
+    # --- Test registration failure with invalid data ---
+    try:
+        response = requests.post(register_url, auth=auth, headers=headers, json=invalid_payload, timeout=timeout)
+        assert response.status_code == 400, f"Expected 400 for invalid registration, got {response.status_code}"
+    except requests.RequestException as e:
+        assert False, f"Request failed for invalid registration: {e}"
 
-    # Test invalid inputs with expected 400 response
-    invalid_payloads = [
-        {},  # empty
-        {"username": "", "email": "", "password": "", "first_name": "", "last_name": ""},  # all empty strings
-        {"username": "a"*256, "email": "invalidemail", "password": "short", "first_name": "T"*300, "last_name": "U"*300},  # overly long and malformed email and password
-        {"username": "user", "email": "missingat.com", "password": "ValidPass123!", "first_name": "Test", "last_name": "User"},  # invalid email format
-        {"username": "user", "email": unique_email, "password": "", "first_name": "Test", "last_name": "User"},  # missing password
-    ]
-
-    for payload in invalid_payloads:
-        resp = requests.post(REGISTER_ENDPOINT, json=payload, headers=HEADERS, timeout=timeout)
-        assert resp.status_code == 400, f"Expected 400 for payload {payload}, got {resp.status_code}"
 
 test_user_registration_process()

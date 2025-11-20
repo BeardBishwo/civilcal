@@ -11,15 +11,13 @@ class DashboardController extends Controller
     public function __construct() {
         parent::__construct();
         
-        // Check if user is admin
-        if (!$this->auth->check() || !$this->auth->isAdmin()) {
-            $this->redirect('/login');
-        }
+        // Authentication and authorization are now handled by middleware
+        // This constructor can be empty or handle other initialization
     }
     
     public function index()
     {
-        $currentUser = $this->auth->user();
+        $currentUser = $_SESSION['user'] ?? null;
         
         // Get dashboard statistics
         $stats = [
@@ -30,7 +28,7 @@ class DashboardController extends Controller
         ];
 
         // Render the dashboard view with admin layout
-        $this->adminView('admin/dashboard', [
+        $this->view->render('admin/dashboard', [
             'currentUser' => $currentUser,
             'currentPage' => 'dashboard',
             'stats' => $stats,
@@ -186,6 +184,63 @@ class DashboardController extends Controller
             'labels' => ['Civil', 'Electrical', 'Structural', 'HVAC', 'Plumbing'],
             'data' => [1250, 980, 756, 543, 432]
         ];
+    }
+    
+    /**
+     * Get dashboard data (API endpoint)
+     */
+    public function getDashboardData()
+    {
+        header('Content-Type: application/json');
+        
+        try {
+            // Check admin authentication - support both session and HTTP Basic Auth
+            $isAdmin = false;
+            
+            // Check HTTP Basic Auth first (for API testing)
+            if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+                $user = \App\Models\User::findByUsername($_SERVER['PHP_AUTH_USER']);
+                if ($user) {
+                    $userArray = is_array($user) ? $user : (array) $user;
+                    if (password_verify($_SERVER['PHP_AUTH_PW'], $userArray['password'])) {
+                        // Check if user is admin
+                        $isAdmin = ($userArray['is_admin'] ?? false) || ($userArray['role'] ?? '') === 'admin';
+                    }
+                }
+            } else {
+                // Fall back to session auth
+                if ($this->auth->check() && $this->auth->isAdmin()) {
+                    $isAdmin = true;
+                }
+            }
+            
+            if (!$isAdmin) {
+                http_response_code(401);
+                echo json_encode(['error' => 'Unauthorized']);
+                return;
+            }
+            
+            $stats = [
+                'total_users' => $this->getTotalUsers(),
+                'active_modules' => $this->getActiveModules(),
+                'total_calculators' => $this->getTotalCalculators(),
+                'api_requests' => $this->getApiRequests(),
+                'recent_activity' => $this->getRecentActivity(),
+                'system_status' => $this->getSystemStatus(),
+                'user_growth' => $this->getUserGrowthData(),
+                'calculator_usage' => $this->getCalculatorUsageData()
+            ];
+            
+            http_response_code(200);
+            echo json_encode($stats);
+            
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'error' => 'Failed to get dashboard data',
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }
 ?>

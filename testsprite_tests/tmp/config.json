@@ -1,20 +1,19 @@
 {
-  "status": "init",
+  "status": "commited",
   "type": "backend",
   "scope": "codebase",
-  "localEndpoint": "http://localhost:80/bishwo_calculator/",
+  "localEndpoint": "http://localhost/bishwo_calculator/",
   "backendAuthType": "basic token",
   "backendUsername": "uniquebishwo@gmail.com",
   "backendPassword": "c9PU7XAsAADYk_A",
   "executionArgs": {
     "projectName": "Bishwo_Calculator",
-    "projectPath": "c:/laragon/www/Bishwo_Calculator",
+    "projectPath": "c:\\laragon\\www\\Bishwo_Calculator",
     "testIds": [],
     "additionalInstruction": "",
     "envs": {
-      "API_KEY": "sk-user-PqmoHFy8ta3GseTPTa9RkmJ6RoMBCLGPULCD5gJ-rOtmBiZ_0-9gw3wsAoDeS3xFNJNkB91I7tHTxCkvcTxJ9-vWYlEVpQQ6VUSOAHUxN7wZaaIaSZBc3oCO6ozI_WHwaqM"
+      "API_KEY": "sk-user-YCUSPr4_luCVfXqUL3LD4cByblmhInnTO2E5bf6tpCMEeYM8qcyqniEMMtDMZY5X-IymyjZwBcteQ9U7xCGYgZRq-cXNqAbIwXxYXESbPy6hg5eK87e1V9mvtsWjQFO8YIQ"
     }
   },
-  "proxy": "http://f18c9ee7-24ce-4a1c-abe9-54509b372880:GJHGjMLMFqb6QVvlAgk7FZbgjorkBOPO@tun.testsprite.com:8080",
-  "serverPort": 53633
+  "proxy": "http://8a8e020c-370a-41bc-b00d-b5d6eff23fc9:CyRBJo1COEcaV9iDIAg77djIoGBMZnjM@tun.testsprite.com:8080"
 }

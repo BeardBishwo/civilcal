@@ -10,15 +10,28 @@ class Auth
         }
         
         if (!empty($_SESSION['user_id'])) {
+            // Get role from session, or from user array if available
+            $role = $_SESSION['role'] ?? ($_SESSION['user']['role'] ?? 'user');
+            $isAdmin = $_SESSION['is_admin'] ?? ($_SESSION['user']['is_admin'] ?? false);
+            
             return (object) [
                 'id' => $_SESSION['user_id'],
                 'username' => $_SESSION['username'] ?? '',
-                'role' => $_SESSION['role'] ?? 'user',
-                'is_admin' => $_SESSION['is_admin'] ?? false
+                'role' => $role,
+                'is_admin' => $isAdmin
             ];
         }
         
         return false;
+    }
+    
+    /**
+     * Get the currently authenticated user
+     * Alias for check() method
+     */
+    public static function user()
+    {
+        return self::check();
     }
     
     public static function isAdmin()
@@ -26,7 +39,8 @@ class Auth
         $user = self::check();
         if (!$user) return false;
         
-        return ($user->role === 'admin');
+        // Check both is_admin flag and role
+        return ($user->is_admin == 1) || ($user->role === 'admin') || ($user->role === 'super_admin');
     }
     
     /**

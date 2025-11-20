@@ -1,75 +1,71 @@
 {
   "meta": {
-    "project": "EngiCal Pro - AEC Engineering Calculator Suite",
-    "date": "2025-11-14",
-    "prepared_by": "Product Management Team"
+    "project": "EngiCal Pro",
+    "date": "2025-11-19",
+    "prepared_by": "Automated PRD Generator"
   },
-  "product_overview": "EngiCal Pro is a premium, modular, and enterprise-grade web-based calculation platform designed specifically for Architecture, Engineering, and Construction (AEC) professionals. It offers over 250 specialized engineering calculators across 10+ disciplines, delivered with advanced user management, a powerful calculation engine, flexible theming, and extensive API support to enable professional-grade computation and project management.",
+  "product_overview": "EngiCal Pro is a premium, modular, enterprise-grade web-based calculation platform designed for Architecture, Engineering, and Construction (AEC) professionals. It delivers over 250 specialized engineering calculators across 10 engineering disciplines through a modern, scalable SaaS architecture, featuring comprehensive user management, payment integration, and advanced performance monitoring.",
   "core_goals": [
-    "Provide comprehensive engineering calculation coverage across multiple AEC disciplines with over 250 calculators.",
-    "Deliver a modular and scalable platform enabling easy addition of new calculator modules, themes, and plugins.",
-    "Ensure enterprise-grade multi-tenant architecture with role-based access control and audit logging.",
-    "Offer a professional, intuitive, and responsive user interface with dark mode and mobile-first design.",
-    "Support seamless integration with payment gateways and subscription management for sustainable monetization.",
-    "Enable users to save, organize, share, and export calculation data with project-based management and customizable reports.",
-    "Expose a complete RESTful API with documentation for developer integration and extensibility.",
-    "Maintain high security and compliance standards including GDPR, secure authentication, and data encryption."
+    "Provide a modular and extensible suite of 250+ professional engineering calculators covering diverse AEC disciplines.",
+    "Deliver enterprise-grade features including multi-tenant architecture, role-based access control (RBAC), audit logging, and secure authentication.",
+    "Ensure high performance and scalability with optimized database connectivity, caching layers, and real-time system monitoring.",
+    "Offer a seamless user experience with responsive, accessible UI, multi-theme support, and comprehensive export/reporting capabilities.",
+    "Enable third-party integrations through a robust API-first design including payment gateways and developer portal."
   ],
   "key_features": [
-    "Comprehensive Calculator Suite: Over 250 calculators across civil, electrical, HVAC, plumbing, fire protection, structural engineering, site development, and project management.",
-    "User Management System: Email/password and social login, two-factor authentication, role-based access control, and profile management including image uploads.",
-    "Multi-Tenant Architecture: Tenant isolation, custom branding, user and resource limits per tenant, and automated provisioning.",
-    "Payment & Subscription: Supports PayPal, Stripe, Mollie with recurring billing, multiple plans, and refund management.",
-    "Calculation History & Project Management: Unlimited saves (for premium users), organization by projects, version tracking, and sharing possibilities.",
-    "Export & Reporting: Export capabilities to PDF, Excel, CSV with professional, customizable report templates.",
-    "API & Developer Tools: Fully documented REST API with token-based authentication, rate limiting, webhook support, and developer portal.",
-    "Theme & Customization: Multi-theme support with dark/light modes, white-label branding, and customizable UI elements.",
-    "Plugin System: Extensible plugin framework for adding new calculators, payment gateways, export formats, themes, and authentication methods.",
-    "Security & Compliance: Bcrypt password hashing, CSRF and XSS protection, session security, and GDPR compliance."
+    "Comprehensive Calculator Suite with 250+ calculators across civil, electrical, HVAC, plumbing, fire protection, MEP coordination, estimation, structural, site development, and project management domains.",
+    "Robust User Management with email/password login, social OAuth, two-factor authentication, session management, and detailed user profiles.",
+    "Multi-tenant Architecture with tenant isolation, resource quotas, custom branding, and automated provisioning.",
+    "Payment & Subscription System supporting PayPal, Stripe, Mollie; recurring billing; invoice management; and webhook notifications.",
+    "Export & Reporting Module supporting PDF, Excel, CSV exports with customizable templates and batch capabilities.",
+    "API & Developer Tools including RESTful API with token authentication, rate limiting, webhook support, and interactive documentation.",
+    "Theme & Customization System featuring multi-theme support, dark/light mode, white-label capabilities, and CSS variable theming.",
+    "Plugin System enabling modular extensions for calculators, payment gateways, exports, and themes with admin management.",
+    "Image Management handling optimized uploads and storage for logos, favicons, banners, and profile photos.",
+    "Security Features covering bcrypt password hashing, CSRF protection, SQL injection prevention, XSS protection, rate limiting, and GDPR compliance.",
+    "Advanced Performance Optimization with connection pooling, caching layers, query optimization, real-time monitoring, and performance dashboards."
   ],
   "user_flow_summary": [
-    "Guest users can browse and try limited calculators without signing up, view pricing and product information.",
-    "Users register or login with email/password or social login, optionally enable two-factor authentication.",
-    "Users select and use engineering calculators by choosing a module and inputting data for calculations.",
-    "Premium users save calculations, organize them under projects, export results, and share with collaborators.",
-    "Admins access the comprehensive dashboard for user and subscription management, system monitoring, settings, and logs.",
-    "Developers interact via the public REST API, managing API keys and monitoring usage through the developer portal.",
-    "Users customize the platform experience through theme selection, profile updates, and notification preferences.",
-    "Payment processing flows for subscriptions and plan changes are handled with integrated gateway APIs, including payment history and invoices."
+    "Guest users can browse calculators with limited access and view pricing/plans without authentication.",
+    "Registered users can authenticate via email/password or social login, manage profiles, save calculations, and organize projects.",
+    "Premium users access unlimited calculators, save and export calculations, customize templates, and API access with priority support.",
+    "Admins have access to the admin panel for user management, system analytics, settings configuration, plugin management, and audit logs.",
+    "Users can perform calculations through web UI or API endpoints with input validation, and receive results with export options.",
+    "Payment and subscription flows enable users to select plans, process payments securely, and manage subscriptions.",
+    "On system administration, admin users monitor system health and performance via dashboards with interactive control and alerts."
   ],
   "validation_criteria": [
-    "All 250+ calculators perform accurate computations validated against engineering standards.",
-    "User authentication, registration, and session management operate securely and reliably with 2FA and role-based access controls.",
-    "Multi-tenant isolation prevents data leakage between tenants with custom branding and resource limits enforced.",
-    "Payment and subscription processes complete successful transactions including recurring billing and refund handling.",
-    "Exported reports generate correctly in PDF, Excel, and CSV formats including custom branding elements.",
-    "API endpoints respond correctly with proper authentication, rate limiting, errors, and documentation consistency.",
-    "Admin panel features are accessible to authorized roles only, with secured management of users, settings, and analytics.",
-    "Themes and plugins can be activated, customized, and managed without impacting system stability.",
-    "Performance metrics meet defined targets for page load time (<3s), API response (<500ms), and calculation time (<2s).",
-    "Security protections including CSRF, XSS, SQL injection prevention, and GDPR compliance are verified through testing and audits."
+    "All core calculator modules execute accurate calculations with input validation and return expected results.",
+    "User authentication and session management enforce secure access and handle all edge cases including password reset and two-factor authentication.",
+    "Admin panel and API endpoints perform CRUD operations securely respecting role permissions and error handling.",
+    "Performance monitoring metrics report real-time system stats with less than 1% error rate and detect bottlenecks correctly.",
+    "API requests enforce rate limiting and return proper responses for authentication, validation, and error conditions.",
+    "Export functionality generates PDF, Excel, and CSV files matching templates and containing correct data.",
+    "Security mechanisms prevent common vulnerabilities including SQL injection, CSRF, XSS, and password attacks.",
+    "Database connectivity is robust with connection pooling and retry logic handling failures gracefully.",
+    "UI and dashboards render responsively across devices with consistent appearance and performance.",
+    "All automated tests pass (10/10) including integration, security, performance, and functional tests."
   ],
   "code_summary": {
     "tech_stack": [
       "PHP 7.4+",
       "Custom MVC Framework",
-      "MySQL/MariaDB Database",
       "FastRoute Router",
-      "Composer Dependency Manager",
-      "Session-based Authentication",
-      "Custom Template Engine",
-      "RESTful API Architecture"
+      "Composer",
+      "MySQL / MariaDB",
+      "Twig-like Custom View Layer",
+      "Session + Cookie Auth",
+      "REST-style JSON APIs"
     ],
     "features": [
       {
         "name": "Authentication API",
-        "description": "Handles user authentication including login, logout, registration with session management",
+        "description": "Login, registration, logout, username availability, remember-me, and password reset endpoints for first-party clients.",
         "files": [
-          "app/Controllers/AuthController.php",
           "app/Controllers/Api/AuthController.php",
+          "app/Controllers/AuthController.php",
           "app/Core/Auth.php",
-          "app/Middleware/AuthMiddleware.php",
-          "app/Middleware/AdminMiddleware.php"
+          "app/Middleware/AuthMiddleware.php"
         ],
         "api_doc": {
           "openapi": "3.0.0",
@@ -80,38 +76,7 @@
           "paths": {
             "/api/login": {
               "post": {
-                "summary": "User login",
-                "requestBody": {
-                  "required": true,
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "email": {
-                            "type": "string"
-                          },
-                          "password": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "responses": {
-                  "200": {
-                    "description": "Login successful"
-                  },
-                  "401": {
-                    "description": "Invalid credentials"
-                  }
-                }
-              }
-            },
-            "/api/register": {
-              "post": {
-                "summary": "User registration",
+                "summary": "Authenticate with username/email + password",
                 "requestBody": {
                   "required": true,
                   "content": {
@@ -127,12 +92,6 @@
                           },
                           "password": {
                             "type": "string"
-                          },
-                          "first_name": {
-                            "type": "string"
-                          },
-                          "last_name": {
-                            "type": "string"
                           }
                         }
                       }
@@ -140,21 +99,107 @@
                   }
                 },
                 "responses": {
-                  "201": {
-                    "description": "Registration successful"
+                  "200": {
+                    "description": "Login success with session + auth token"
                   },
                   "400": {
-                    "description": "Invalid data"
+                    "description": "Missing credentials"
+                  },
+                  "401": {
+                    "description": "Invalid credentials"
+                  }
+                }
+              }
+            },
+            "/api/register": {
+              "post": {
+                "summary": "Create a user with name, email, password, roles, agreements",
+                "requestBody": {
+                  "required": true,
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "username": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string",
+                            "format": "email"
+                          },
+                          "password": {
+                            "type": "string"
+                          },
+                          "full_name": {
+                            "type": "string"
+                          },
+                          "engineer_roles": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "required": [
+                          "username",
+                          "email",
+                          "password",
+                          "full_name",
+                          "engineer_roles"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "200": {
+                    "description": "Registration success"
+                  },
+                  "400": {
+                    "description": "Validation failure"
+                  },
+                  "500": {
+                    "description": "Server error"
                   }
                 }
               }
             },
             "/api/logout": {
               "get": {
-                "summary": "User logout",
+                "summary": "Destroy current session",
                 "responses": {
                   "200": {
-                    "description": "Logout successful"
+                    "description": "Logout success"
+                  },
+                  "401": {
+                    "description": "Not authenticated"
+                  }
+                }
+              }
+            },
+            "/api/check-username": {
+              "post": {
+                "summary": "Check username availability and suggestions",
+                "responses": {
+                  "200": {
+                    "description": "Availability result"
+                  },
+                  "400": {
+                    "description": "Bad request"
+                  }
+                }
+              }
+            },
+            "/api/forgot-password": {
+              "post": {
+                "summary": "Initiate password reset",
+                "responses": {
+                  "200": {
+                    "description": "Reset email enqueued"
+                  },
+                  "400": {
+                    "description": "Missing email"
                   }
                 }
               }
@@ -164,7 +209,7 @@
       },
       {
         "name": "Admin Panel System",
-        "description": "Comprehensive admin panel with user management, settings, themes, plugins, and system administration",
+        "description": "Server-rendered admin dashboard providing system stats, configuration, plugin/theme management, and logs.",
         "files": [
           "app/Controllers/Admin/MainDashboardController.php",
           "app/Controllers/Admin/SettingsController.php",
@@ -172,8 +217,7 @@
           "app/Controllers/Admin/ThemeController.php",
           "app/Controllers/Admin/PluginController.php",
           "app/Controllers/Admin/SystemStatusController.php",
-          "app/Controllers/Admin/LogsController.php",
-          "app/Controllers/Admin/ErrorLogController.php"
+          "app/Middleware/AdminMiddleware.php"
         ],
         "api_doc": {
           "openapi": "3.0.0",
@@ -184,20 +228,23 @@
           "paths": {
             "/admin": {
               "get": {
-                "summary": "Admin dashboard",
+                "summary": "Render dashboard",
                 "responses": {
                   "200": {
-                    "description": "Admin dashboard view"
+                    "description": "Dashboard view"
+                  },
+                  "302": {
+                    "description": "Redirect when unauthenticated"
                   },
                   "403": {
-                    "description": "Access denied"
+                    "description": "Forbidden for non-admin"
                   }
                 }
               }
             },
             "/admin/settings/{section}": {
               "get": {
-                "summary": "Admin settings section",
+                "summary": "Render specific settings section",
                 "parameters": [
                   {
                     "name": "section",
@@ -219,26 +266,26 @@
                 ],
                 "responses": {
                   "200": {
-                    "description": "Settings section view"
+                    "description": "Section rendered"
                   },
                   "403": {
-                    "description": "Access denied"
+                    "description": "Forbidden"
                   },
                   "404": {
-                    "description": "Section not found"
+                    "description": "Unknown section"
                   }
                 }
               }
             },
             "/admin/users": {
               "get": {
-                "summary": "User management listing",
+                "summary": "User list view",
                 "responses": {
                   "200": {
-                    "description": "Users listing view"
+                    "description": "HTML table of users"
                   },
                   "403": {
-                    "description": "Access denied"
+                    "description": "Forbidden"
                   }
                 }
               }
@@ -247,15 +294,13 @@
         }
       },
       {
-        "name": "Calculator Engine",
-        "description": "Engineering calculation system with support for multiple disciplines (electrical, mechanical, plumbing, structural)",
+        "name": "Calculator Engine API",
+        "description": "Modular calculation engine with endpoints for listing calculators and executing discipline-specific calculations.",
         "files": [
           "app/Controllers/CalculatorController.php",
           "modules/electrical/",
-          "modules/mep/",
-          "modules/plumbing/",
-          "modules/structural/",
-          "modules/project-management/",
+          "modules/civil/",
+          "modules/fire/",
           "app/Core/CalculatorEngine.php"
         ],
         "api_doc": {
@@ -267,17 +312,17 @@
           "paths": {
             "/calculators": {
               "get": {
-                "summary": "List available calculators",
+                "summary": "List calculators grouped by module",
                 "responses": {
                   "200": {
-                    "description": "List of calculators"
+                    "description": "JSON list of calculators"
                   }
                 }
               }
             },
             "/calculator/{module}/{function}": {
               "post": {
-                "summary": "Execute calculation",
+                "summary": "Execute a calculation routine",
                 "parameters": [
                   {
                     "name": "module",
@@ -304,7 +349,10 @@
                         "type": "object",
                         "properties": {
                           "input_values": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": "number"
+                            }
                           }
                         }
                       }
@@ -313,10 +361,13 @@
                 },
                 "responses": {
                   "200": {
-                    "description": "Calculation result"
+                    "description": "Result payload"
+                  },
+                  "400": {
+                    "description": "Validation error"
                   },
                   "404": {
-                    "description": "Calculator not found"
+                    "description": "Unknown calculator"
                   }
                 }
               }
@@ -325,10 +376,9 @@
         }
       },
       {
-        "name": "User Profile Management",
-        "description": "User profile management including profile editing, image uploads, and settings",
+        "name": "User Profile Service",
+        "description": "Authenticated profile reads + updates including avatar upload endpoints.",
         "files": [
-          "app/Controllers/UserController.php",
           "app/Controllers/ProfileController.php",
           "app/Controllers/ProfileImageController.php",
           "app/Models/User.php"
@@ -342,18 +392,18 @@
           "paths": {
             "/profile": {
               "get": {
-                "summary": "Get user profile",
+                "summary": "Fetch profile for the logged-in user",
                 "responses": {
                   "200": {
-                    "description": "User profile data"
+                    "description": "Profile JSON"
                   },
                   "401": {
-                    "description": "Not authenticated"
+                    "description": "Requires authentication"
                   }
                 }
               },
               "put": {
-                "summary": "Update user profile",
+                "summary": "Update profile fields",
                 "requestBody": {
                   "required": true,
                   "content": {
@@ -383,7 +433,10 @@
                     "description": "Profile updated"
                   },
                   "400": {
-                    "description": "Invalid data"
+                    "description": "Validation error"
+                  },
+                  "401": {
+                    "description": "Unauthorized"
                   }
                 }
               }
@@ -392,8 +445,8 @@
         }
       },
       {
-        "name": "Theme Management System",
-        "description": "Theme system allowing users to select, customize and manage website themes",
+        "name": "Theme Management",
+        "description": "Admin endpoints for listing, previewing, and activating frontend themes plus customization states.",
         "files": [
           "app/Controllers/Admin/ThemeController.php",
           "app/Controllers/Admin/ThemeCustomizeController.php",
@@ -409,33 +462,33 @@
           "paths": {
             "/admin/themes": {
               "get": {
-                "summary": "List available themes",
+                "summary": "List themes and metadata",
                 "responses": {
                   "200": {
-                    "description": "Theme listing"
+                    "description": "Theme list"
                   },
                   "403": {
-                    "description": "Access denied"
+                    "description": "Forbidden"
                   }
                 }
               }
             },
-            "/admin/themes/{id}/activate": {
+            "/admin/themes/{theme}/activate": {
               "post": {
                 "summary": "Activate theme",
                 "parameters": [
                   {
-                    "name": "id",
+                    "name": "theme",
                     "in": "path",
                     "required": true,
                     "schema": {
-                      "type": "integer"
+                      "type": "string"
                     }
                   }
                 ],
                 "responses": {
                   "200": {
-                    "description": "Theme activated"
+                    "description": "Activation success"
                   },
                   "404": {
                     "description": "Theme not found"
@@ -448,16 +501,16 @@
       },
       {
         "name": "Plugin System",
-        "description": "Extensible plugin system for adding new functionality",
+        "description": "Admin APIs for listing plugins, toggling activation, and managing plugin metadata.",
         "files": [
           "app/Controllers/Admin/PluginController.php",
-          "plugins/",
-          "app/Services/PluginManager.php"
+          "app/Services/PluginManager.php",
+          "plugins/"
         ],
         "api_doc": {
           "openapi": "3.0.0",
           "info": {
-            "title": "Plugin Management API",
+            "title": "Plugin API",
             "version": "1.0.0"
           },
           "paths": {
@@ -466,17 +519,17 @@
                 "summary": "List installed plugins",
                 "responses": {
                   "200": {
-                    "description": "Plugin listing"
+                    "description": "Plugin list"
                   },
                   "403": {
-                    "description": "Access denied"
+                    "description": "Forbidden"
                   }
                 }
               }
             },
             "/admin/plugins/toggle": {
               "post": {
-                "summary": "Enable/disable plugin",
+                "summary": "Activate or deactivate a plugin",
                 "requestBody": {
                   "required": true,
                   "content": {
@@ -494,14 +547,21 @@
                               "deactivate"
                             ]
                           }
-                        }
+                        },
+                        "required": [
+                          "plugin",
+                          "action"
+                        ]
                       }
                     }
                   }
                 },
                 "responses": {
                   "200": {
-                    "description": "Plugin status updated"
+                    "description": "State updated"
+                  },
+                  "400": {
+                    "description": "Invalid payload"
                   }
                 }
               }
@@ -510,8 +570,8 @@
         }
       },
       {
-        "name": "Payment & Subscription System",
-        "description": "Subscription management with payment processing capabilities",
+        "name": "Payment & Subscription",
+        "description": "Subscription plan listing and payment processing endpoints for premium tiers.",
         "files": [
           "app/Controllers/PaymentController.php",
           "app/Controllers/Admin/SubscriptionController.php"
@@ -525,7 +585,7 @@
           "paths": {
             "/payment": {
               "post": {
-                "summary": "Process payment",
+                "summary": "Process a payment intent",
                 "requestBody": {
                   "required": true,
                   "content": {
@@ -542,7 +602,12 @@
                           "payment_method": {
                             "type": "string"
                           }
-                        }
+                        },
+                        "required": [
+                          "amount",
+                          "currency",
+                          "payment_method"
+                        ]
                       }
                     }
                   }
@@ -552,20 +617,20 @@
                     "description": "Payment processed"
                   },
                   "400": {
-                    "description": "Invalid payment data"
+                    "description": "Validation error"
                   }
                 }
               }
             },
             "/admin/subscriptions": {
               "get": {
-                "summary": "List subscriptions",
+                "summary": "List subscription plans and status",
                 "responses": {
                   "200": {
-                    "description": "Subscription listing"
+                    "description": "Subscription data"
                   },
                   "403": {
-                    "description": "Access denied"
+                    "description": "Forbidden"
                   }
                 }
               }
@@ -575,7 +640,7 @@
       },
       {
         "name": "API Administration",
-        "description": "RESTful API endpoints for admin operations and system health monitoring",
+        "description": "JSON endpoints exposing dashboard metrics and health checks for monitoring.",
         "files": [
           "app/Controllers/Api/AdminController.php",
           "app/Controllers/Api/V1/HealthController.php"
@@ -589,26 +654,26 @@
           "paths": {
             "/api/admin/dashboard/stats": {
               "get": {
-                "summary": "Get dashboard statistics",
+                "summary": "Retrieve aggregated metrics",
                 "responses": {
                   "200": {
-                    "description": "Dashboard statistics"
+                    "description": "Stats payload"
                   },
                   "403": {
-                    "description": "Access denied"
+                    "description": "Forbidden"
                   }
                 }
               }
             },
             "/api/admin/system/health": {
               "get": {
-                "summary": "System health check",
+                "summary": "System health probe",
                 "responses": {
                   "200": {
-                    "description": "System health status"
+                    "description": "Healthy"
                   },
                   "500": {
-                    "description": "System issues detected"
+                    "description": "Service degraded"
                   }
                 }
               }
@@ -617,8 +682,8 @@
         }
       },
       {
-        "name": "Export/Import System",
-        "description": "Data export and import capabilities for calculations and user data",
+        "name": "Export / Import",
+        "description": "Endpoints for exporting calculation results and importing structured data.",
         "files": [
           "app/Controllers/ExportController.php",
           "app/Services/DataExporter.php"
@@ -626,13 +691,13 @@
         "api_doc": {
           "openapi": "3.0.0",
           "info": {
-            "title": "Export/Import API",
+            "title": "Export API",
             "version": "1.0.0"
           },
           "paths": {
             "/export": {
               "post": {
-                "summary": "Export calculation data",
+                "summary": "Generate an export in PDF/CSV/XLSX",
                 "requestBody": {
                   "required": true,
                   "content": {
@@ -651,17 +716,21 @@
                           "data_type": {
                             "type": "string"
                           }
-                        }
+                        },
+                        "required": [
+                          "format",
+                          "data_type"
+                        ]
                       }
                     }
                   }
                 },
                 "responses": {
                   "200": {
-                    "description": "Export generated"
+                    "description": "Export ready"
                   },
                   "400": {
-                    "description": "Invalid export parameters"
+                    "description": "Invalid parameters"
                   }
                 }
               }

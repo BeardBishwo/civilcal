@@ -42,9 +42,16 @@ class CalculationService
                 $this->saveToHistory($userId, $calculatorType, $calculatorSlug, $inputData, $result);
             }
             
+            // Extract numeric result if it's in a nested structure
+            $numericResult = $result;
+            if (is_array($result) && isset($result['result'])) {
+                $numericResult = $result['result'];
+            }
+            
             return [
                 'success' => true,
-                'data' => $result,
+                'result' => $numericResult,  // Direct numeric value for API compatibility
+                'data' => $result,           // Full result data for backward compatibility
                 'timestamp' => date('Y-m-d H:i:s')
             ];
             
@@ -58,19 +65,41 @@ class CalculationService
     
     public function saveToHistory($userId, $calculatorType, $calculatorSlug, $inputs, $results)
     {
-        $stmt = $this->db->prepare("
-            INSERT INTO calculation_history 
-            (user_id, calculator_type, calculator_slug, input_data, result_data, created_at) 
-            VALUES (?, ?, ?, ?, ?, NOW())
-        ");
-        
-        return $stmt->execute([
-            $userId,
-            $calculatorType,
-            $calculatorSlug,
-            json_encode($inputs),
-            json_encode($results)
-        ]);
+        try {
+            $stmt = $this->db->prepare("
+                INSERT INTO calculation_history 
+                (user_id, calculator_type, calculator_slug, input_data, result_data, created_at) 
+                VALUES (?, ?, ?, ?, ?, NOW())
+            ");
+            
+            return $stmt->execute([
+                $userId,
+                $calculatorType,
+                $calculatorSlug,
+                json_encode($inputs),
+                json_encode($results)
+            ]);
+        } catch (\Exception $e) {
+            // If table doesn't have calculator_slug, try without it
+            try {
+                $stmt = $this->db->prepare("
+                    INSERT INTO calculation_history 
+                    (user_id, calculator_type, input_data, result_data, created_at) 
+                    VALUES (?, ?, ?, ?, NOW())
+                ");
+                
+                return $stmt->execute([
+                    $userId,
+                    $calculatorType,
+                    json_encode($inputs),
+                    json_encode($results)
+                ]);
+            } catch (\Exception $e2) {
+                // Log but don't fail the calculation
+                error_log("Failed to save calculation history: " . $e2->getMessage());
+                return false;
+            }
+        }
     }
     
     public function getUserHistory($userId, $limit = 50, $offset = 0)

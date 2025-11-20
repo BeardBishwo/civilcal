@@ -1,40 +1,65 @@
 import requests
 from requests.auth import HTTPBasicAuth
 
-BASE_URL = "http://localhost:80"
-USERNAME = "uniquebishwo@gmail.com"
-PASSWORD = "c9PU7XAsAADYk_A"
+BASE_URL = "http://localhost:80/bishwo_calculator/"
+AUTH_USERNAME = "uniquebishwo@gmail.com"
+AUTH_PASSWORD = "c9PU7XAsAADYk_A"
 TIMEOUT = 30
 
 def test_admin_dashboard_access_control():
-    auth = HTTPBasicAuth(USERNAME, PASSWORD)
-    admin_url = f"{BASE_URL}/admin"
+    headers = {
+        "Accept": "application/json"
+    }
 
-    # Test authorized access
+    # Authorized admin user access test
     try:
-        response = requests.get(admin_url, auth=auth, timeout=TIMEOUT)
+        response_auth = requests.get(
+            BASE_URL + "admin",
+            auth=HTTPBasicAuth(AUTH_USERNAME, AUTH_PASSWORD),
+            headers=headers,
+            timeout=TIMEOUT
+        )
     except requests.RequestException as e:
-        assert False, f"Request to admin dashboard failed: {e}"
-    else:
-        assert response.status_code == 200, f"Expected 200 for authorized access, got {response.status_code}"
-        # Optionally check content to confirm it's the admin dashboard view
-        assert "dashboard" in response.text.lower() or "admin" in response.text.lower()
+        assert False, f"Request to admin endpoint with authorized user failed: {e}"
 
-    # Test unauthorized access with invalid credentials
-    invalid_auth = HTTPBasicAuth("invaliduser@example.com", "wrongpassword")
-    try:
-        response = requests.get(admin_url, auth=invalid_auth, timeout=TIMEOUT)
-    except requests.RequestException as e:
-        assert False, f"Request to admin dashboard with invalid auth failed: {e}"
-    else:
-        assert response.status_code in (401, 403), f"Expected 401 or 403 for unauthorized access, got {response.status_code}"
+    assert response_auth.status_code == 200, (
+        f"Authorized admin user should have access, got status code {response_auth.status_code}"
+    )
+    # Optionally verify response content type or keys if response JSON expected
+    if response_auth.headers.get("Content-Type", "").startswith("application/json"):
+        try:
+            json_data = response_auth.json()
+            assert isinstance(json_data, dict), "Expected JSON object in response"
+        except ValueError:
+            assert False, "Response is not valid JSON"
 
-    # Test unauthorized access with no credentials
+    # Unauthorized user access test (no auth)
     try:
-        response = requests.get(admin_url, timeout=TIMEOUT)
+        response_unauth = requests.get(
+            BASE_URL + "admin",
+            headers=headers,
+            timeout=TIMEOUT
+        )
     except requests.RequestException as e:
-        assert False, f"Request to admin dashboard without auth failed: {e}"
-    else:
-        assert response.status_code in (401, 403), f"Expected 401 or 403 for no auth access, got {response.status_code}"
+        assert False, f"Request to admin endpoint without auth failed: {e}"
+
+    assert response_unauth.status_code == 403, (
+        f"Unauthorized user should receive 403 Forbidden, got status code {response_unauth.status_code}"
+    )
+
+    # Unauthorized user access test (wrong auth)
+    try:
+        response_wrong_auth = requests.get(
+            BASE_URL + "admin",
+            auth=HTTPBasicAuth("wronguser@example.com", "wrongpassword"),
+            headers=headers,
+            timeout=TIMEOUT
+        )
+    except requests.RequestException as e:
+        assert False, f"Request to admin endpoint with wrong auth failed: {e}"
+
+    assert response_wrong_auth.status_code == 403, (
+        f"User with wrong credentials should receive 403 Forbidden, got status code {response_wrong_auth.status_code}"
+    )
 
 test_admin_dashboard_access_control()

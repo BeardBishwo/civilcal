@@ -10,31 +10,53 @@ class CalculatorFactory
         $calculatorClass = "App\\Calculators\\" . ucfirst($calculatorType) . "Calculator";
         
         if (class_exists($calculatorClass)) {
-            return new $calculatorClass();
+            $calculator = new $calculatorClass();
+            if ($calculatorSlug && method_exists($calculator, 'setCalculatorSlug')) {
+                $calculator->setCalculatorSlug($calculatorSlug);
+            }
+            return $calculator;
         }
         
         // Try to load from modules
         if ($calculatorSlug) {
             $moduleCalculator = self::loadFromModule($calculatorType, $calculatorSlug);
             if ($moduleCalculator) {
+                if (method_exists($moduleCalculator, 'setCalculatorSlug')) {
+                    $moduleCalculator->setCalculatorSlug($calculatorSlug);
+                }
                 return $moduleCalculator;
             }
         }
         
-        // Fallback to base calculator
-        return new BaseCalculator();
+        // No calculator found
+        return null;
     }
     
     private static function loadFromModule($category, $calculatorSlug)
     {
-        $modulePath = __DIR__ . "/../../modules/{$category}/{$calculatorSlug}.php";
+        // Try multiple path patterns for module calculators
+        $patterns = [
+            __DIR__ . "/../../modules/{$category}/*/{$calculatorSlug}.php",
+            __DIR__ . "/../../modules/{$category}/{$calculatorSlug}.php",
+        ];
         
-        if (file_exists($modulePath)) {
-            require_once $modulePath;
-            
-            $className = ucfirst($calculatorSlug) . 'Calculator';
-            if (class_exists($className)) {
-                return new $className();
+        foreach ($patterns as $pattern) {
+            $files = glob($pattern);
+            if (!empty($files)) {
+                $modulePath = $files[0];
+                require_once $modulePath;
+                
+                // Try full namespace
+                $className = "App\\Calculators\\" . ucfirst(str_replace(['-', '_'], '', $calculatorSlug)) . 'Calculator';
+                if (class_exists($className)) {
+                    return new $className();
+                }
+                
+                // Try without namespace
+                $className = ucfirst(str_replace(['-', '_'], '', $calculatorSlug)) . 'Calculator';
+                if (class_exists($className)) {
+                    return new $className();
+                }
             }
         }
         

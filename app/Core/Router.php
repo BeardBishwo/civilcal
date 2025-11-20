@@ -113,15 +113,52 @@ class Router {
                         $ref = new \ReflectionMethod($middleware, 'handle');
                         if ($ref->getNumberOfParameters() >= 2) {
                             $pipeline[] = $middleware;
+                        } else {
+                            // Legacy middleware with no parameters - execute immediately
+                            if ($middleware->handle() === false) {
+                                return;
+                            }
                         }
                     } catch (\ReflectionException $e) {
                         // Fallback to legacy behavior
                         if ($middleware->handle() === false) {
-                    return;
-                }
+                            return;
+                        }
                     }
                 }
             }
+        }
+        
+        // Execute pipeline middleware
+        $next = function($request) use ($route, $params) {
+            list($controllerClass, $method) = explode('@', $route['controller']);
+            
+            if (strpos($controllerClass, '\\') === false) {
+                $controllerClass = "App\\Controllers\\{$controllerClass}";
+            } else {
+                $controllerClass = "App\\Controllers\\{$controllerClass}";
+            }
+            
+            if (class_exists($controllerClass)) {
+                $controller = new $controllerClass();
+                return call_user_func_array([$controller, $method], $params);
+            }
+            
+            http_response_code(500);
+            echo "Controller not found: {$controllerClass}";
+            return null;
+        };
+        
+        // Run through pipeline in reverse order
+        foreach (array_reverse($pipeline) as $middleware) {
+            $next = function($request) use ($middleware, $next) {
+                return $middleware->handle($request, $next);
+            };
+        }
+        
+        // Execute the pipeline
+        if (!empty($pipeline)) {
+            return $next($request);
         }
         
         list($controllerClass, $method) = explode('@', $route['controller']);

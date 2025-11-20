@@ -330,6 +330,170 @@ class ProfileController extends Controller
     }
 
     /**
+     * Get profile data (API endpoint)
+     */
+    public function getProfile()
+    {
+        try {
+            // Support both session and HTTP Basic Auth
+            $userId = null;
+            
+            if (isset($_SESSION['user_id'])) {
+                $userId = $_SESSION['user_id'];
+            } elseif (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+                // Authenticate using HTTP Basic Auth
+                $user = User::findByUsername($_SERVER['PHP_AUTH_USER']);
+                if ($user) {
+                    // Convert to array if it's an object
+                    $userArray = is_array($user) ? $user : (array) $user;
+                    if (password_verify($_SERVER['PHP_AUTH_PW'], $userArray['password'])) {
+                        $userId = $userArray['id'];
+                    }
+                }
+            }
+            
+            if (!$userId) {
+                http_response_code(401);
+                $this->json(['error' => 'Unauthorized'], 401);
+                return;
+            }
+            
+            $user = $this->userModel->find($userId);
+            
+            if (!$user) {
+                http_response_code(404);
+                $this->json(['error' => 'User not found'], 404);
+                return;
+            }
+            
+            // Remove sensitive data
+            unset($user['password']);
+            
+            // Add additional profile data
+            $user['statistics'] = $this->userModel->getStatistics($userId);
+            $user['profile_completion'] = $this->userModel->getProfileCompletion($userId);
+            
+            http_response_code(200);
+            $this->json($user);
+            
+        } catch (Exception $e) {
+            http_response_code(500);
+            $this->json(['error' => 'Server error: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update profile via API (supports PUT and POST)
+     */
+    public function updateProfileApi()
+    {
+        try {
+            // Check authentication - support both session and HTTP Basic Auth
+            $userId = null;
+            
+            if (isset($_SESSION['user_id'])) {
+                $userId = $_SESSION['user_id'];
+            } elseif (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+                // Authenticate using HTTP Basic Auth
+                $user = User::findByUsername($_SERVER['PHP_AUTH_USER']);
+                if ($user) {
+                    // Convert to array if it's an object
+                    $userArray = is_array($user) ? $user : (array) $user;
+                    if (password_verify($_SERVER['PHP_AUTH_PW'], $userArray['password'])) {
+                        $userId = $userArray['id'];
+                    }
+                }
+            }
+            
+            if (!$userId) {
+                http_response_code(401);
+                $this->json(['error' => 'Unauthorized'], 401);
+                return;
+            }
+            
+            // Get input from PUT/POST
+            $input = file_get_contents('php://input');
+            $data = json_decode($input, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                http_response_code(400);
+                $this->json(['error' => 'Invalid JSON'], 400);
+                return;
+            }
+            
+            // Validate data
+            if (empty($data)) {
+                http_response_code(400);
+                $this->json(['error' => 'No data provided'], 400);
+                return;
+            }
+            
+            // Filter allowed fields
+            $allowedFields = ['first_name', 'last_name', 'company', 'phone', 'bio'];
+            $updateData = [];
+            
+            foreach ($allowedFields as $field) {
+                if (isset($data[$field])) {
+                    // Validate data types
+                    if (!is_string($data[$field]) && !is_null($data[$field])) {
+                        http_response_code(400);
+                        $this->json(['error' => "Invalid type for field '$field'"], 400);
+                        return;
+                    }
+                    
+                    if (is_string($data[$field])) {
+                        $value = trim($data[$field]);
+                        
+                        // Check max length
+                        if (strlen($value) > 255) {
+                            http_response_code(400);
+                            $this->json(['error' => "Field '$field' exceeds maximum length"], 400);
+                            return;
+                        }
+                        
+                        $updateData[$field] = $value;
+                    } else {
+                        $updateData[$field] = null;
+                    }
+                }
+            }
+            
+            if (empty($updateData)) {
+                http_response_code(400);
+                $this->json(['error' => 'No valid data provided for update'], 400);
+                return;
+            }
+            
+            // Update profile
+            $success = $this->userModel->updateProfile($userId, $updateData);
+            
+            if ($success) {
+                // Get updated user data
+                $user = $this->userModel->find($userId);
+                unset($user['password']);
+                
+                // Return the updated fields
+                $response = [];
+                foreach ($allowedFields as $field) {
+                    if (isset($user[$field])) {
+                        $response[$field] = $user[$field];
+                    }
+                }
+                
+                http_response_code(200);
+                $this->json($response);
+            } else {
+                http_response_code(500);
+                $this->json(['error' => 'Failed to update profile'], 500);
+            }
+            
+        } catch (Exception $e) {
+            http_response_code(500);
+            $this->json(['error' => 'Server error: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
      * Get current user ID
      */
     protected function getCurrentUserId()

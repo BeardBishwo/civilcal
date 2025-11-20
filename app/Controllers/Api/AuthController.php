@@ -38,17 +38,35 @@ class AuthController extends Controller
                 return;
             }
             
-            $username = $input['username_email'] ?? $input['username'] ?? $_POST['username_email'] ?? $_POST['username'] ?? '';
+            // Support multiple field names: username, email, username_email
+            // Check in order of priority
+            $username = '';
+            if (isset($input['username_email'])) {
+                $username = $input['username_email'];
+            } elseif (isset($input['email'])) {
+                $username = $input['email'];
+            } elseif (isset($input['username'])) {
+                $username = $input['username'];
+            } elseif (isset($_POST['username_email'])) {
+                $username = $_POST['username_email'];
+            } elseif (isset($_POST['email'])) {
+                $username = $_POST['email'];
+            } elseif (isset($_POST['username'])) {
+                $username = $_POST['username'];
+            }
+            
             $password = $input['password'] ?? $_POST['password'] ?? '';
             $rememberMe = $input['remember_me'] ?? $_POST['remember_me'] ?? false;
             
             error_log('API Login attempt for username: ' . $username);
 
             if (empty($username) || empty($password)) {
+                error_log('API Login error: Missing credentials - username: ' . ($username ?: 'empty') . ', password: ' . ($password ? 'provided' : 'empty'));
                 http_response_code(400);
                 echo json_encode(['error' => 'Username and password are required']);
                 return;
             }
+
 
             // Find user by username or email
             $user = User::findByUsername($username);
@@ -257,8 +275,15 @@ class AuthController extends Controller
 
         } catch (Exception $e) {
             error_log('Registration error: ' . $e->getMessage());
-            http_response_code(500);
-            echo json_encode(['error' => 'Registration failed due to server error: ' . $e->getMessage()]);
+            
+            // Check if this is a duplicate entry error
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false || strpos($e->getMessage(), '1062') !== false) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Username or email already exists']);
+            } else {
+                http_response_code(500);
+                echo json_encode(['error' => 'Registration failed due to server error: ' . $e->getMessage()]);
+            }
         }
     }
 
@@ -270,6 +295,36 @@ class AuthController extends Controller
         header('Content-Type: application/json');
         
         try {
+            // Check if user is authenticated via session or auth_token cookie
+            $isAuthenticated = false;
+            
+            // Check session first
+            if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
+                $isAuthenticated = true;
+            }
+            
+            // Check auth_token cookie as backup
+            if (!$isAuthenticated && isset($_COOKIE['auth_token'])) {
+                try {
+                    $db = Database::getInstance();
+                    $pdo = $db->getPdo();
+                    $stmt = $pdo->prepare("SELECT user_id FROM user_sessions WHERE session_token = ? AND expires_at > NOW()");
+                    $stmt->execute([$_COOKIE['auth_token']]);
+                    if ($stmt->fetch()) {
+                        $isAuthenticated = true;
+                    }
+                } catch (Exception $e) {
+                    error_log('Error checking auth token: ' . $e->getMessage());
+                }
+            }
+            
+            // If not authenticated, return 401
+            if (!$isAuthenticated) {
+                http_response_code(401);
+                echo json_encode(['error' => 'Unauthorized - not logged in']);
+                return;
+            }
+            
             // Session is already started in bootstrap.php
             
             // Get user_id before destroying session to delete DB session
@@ -384,10 +439,25 @@ class AuthController extends Controller
         header('Content-Type: application/json');
 
         try {
-            $input = json_decode(file_get_contents('php://input'), true);
-            $username = trim($input['username'] ?? '');
+            // Support both GET and POST methods
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $usernameRaw = $_GET['username'] ?? '';
+            } else {
+                $input = json_decode(file_get_contents('php://input'), true);
+                $usernameRaw = $input['username'] ?? '';
+            }
+            
+            // Validate username is a string before trimming
+            if (!is_string($usernameRaw)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Username must be a string']);
+                return;
+            }
+            
+            $username = trim($usernameRaw);
 
             if (empty($username)) {
+                http_response_code(400);
                 echo json_encode(['error' => 'Username is required']);
                 return;
             }

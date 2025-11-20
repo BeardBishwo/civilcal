@@ -1,5 +1,12 @@
 RewriteEngine On
 
+# Pass Authorization header to PHP (for HTTP Basic Auth)
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Extract PHP_AUTH_USER and PHP_AUTH_PW from Authorization header
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
 # Serve static files directly (don't route to index.php)
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]

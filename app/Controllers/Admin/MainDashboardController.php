@@ -211,24 +211,19 @@ class MainDashboardController extends Controller
     
     /**
      * Check if user has admin access
+     * Note: AdminMiddleware already handles authentication with HTTP Basic Auth support
+     * This method is kept for backward compatibility but can be simplified
      */
     private function checkAdminAccess()
     {
+        // AdminMiddleware already validated admin access
+        // Just ensure session is started for view access
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
         
-        if (empty($_SESSION['user_id'])) {
-            $this->redirect('/login?redirect=' . urlencode($_SERVER['REQUEST_URI']));
-            return;
-        }
-        
-        // Check if user is admin
-        $userModel = new \App\Models\User();
-        if (!$userModel->isAdmin($_SESSION['user_id'])) {
-            $this->redirect('/dashboard?error=access_denied');
-            return;
-        }
+        // If we got here, user is already authenticated and is admin (via middleware)
+        // No need to redirect
     }
     
     /**

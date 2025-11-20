@@ -93,6 +93,96 @@ class CalculatorController extends Controller
         echo json_encode($result);
     }
     
+    /**
+     * Execute calculator calculation (API endpoint)
+     * Supports HTTP Basic Auth for testing
+     */
+    public function execute($module, $function)
+    {
+        header('Content-Type: application/json');
+        
+        try {
+            // Support HTTP Basic Auth for API testing
+            $userId = null;
+            if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+                $user = \App\Models\User::findByUsername($_SERVER['PHP_AUTH_USER']);
+                if ($user) {
+                    $userArray = is_array($user) ? $user : (array) $user;
+                    if (password_verify($_SERVER['PHP_AUTH_PW'], $userArray['password'])) {
+                        $userId = $userArray['id'];
+                    }
+                }
+            } else {
+                // Fall back to session auth
+                $user = Auth::user();
+                $userId = $user ? $user->id : null;
+            }
+            
+            // Get input from JSON body
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Invalid JSON input']);
+                return;
+            }
+            
+            $inputValues = $input['input_values'] ?? [];
+            
+            // Validate input
+            if (empty($inputValues)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Missing input_values']);
+                return;
+            }
+            
+            // Try to create the calculator to check if it exists
+            $testCalculator = \App\Calculators\CalculatorFactory::create($module, $function);
+            
+            if (!$testCalculator) {
+                // If calculator class doesn't exist, check in available calculators list
+                $all = \App\Calculators\CalculatorFactory::getAvailableCalculators();
+                $found = false;
+                foreach ($all as $calc) {
+                    if ((isset($calc['category']) && strtolower($calc['category']) === strtolower($module))
+                        && (isset($calc['slug']) && strtolower($calc['slug']) === strtolower($function))) {
+                        $found = true;
+                        break;
+                    }
+                }
+                
+                if (!$found) {
+                    http_response_code(404);
+                    echo json_encode(['error' => 'Calculator not found']);
+                    return;
+                }
+            }
+            
+            // Perform calculation
+            $result = $this->calculationService->performCalculation(
+                $module,
+                $function,
+                $inputValues,
+                $userId
+            );
+            
+            // Return result
+            if (isset($result['success']) && $result['success']) {
+                http_response_code(200);
+                echo json_encode($result);
+            } else {
+                http_response_code(400);
+                echo json_encode($result);
+            }
+            
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'error' => 'Calculation failed',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+    
     public function apiCalculate()
     {
         $input = json_decode(file_get_contents('php://input'), true);

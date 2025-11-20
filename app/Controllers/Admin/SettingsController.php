@@ -8,9 +8,122 @@ use App\Services\GDPRService;
 
 class SettingsController extends Controller
 {
+    public function __construct() {
+        parent::__construct();
+    }
+    
+    public function general()
+    {
+        $this->requireAdminWithBasicAuth();
+        
+        return $this->view('admin/settings/general', [
+            'title' => 'General Settings'
+        ]);
+    }
+    
+    public function users()
+    {
+        $this->requireAdminWithBasicAuth();
+        
+        return $this->view('admin/settings/users', [
+            'title' => 'User Settings'
+        ]);
+    }
+    
+    public function security()
+    {
+        $this->requireAdminWithBasicAuth();
+        
+        return $this->view('admin/settings/security', [
+            'title' => 'Security Settings'
+        ]);
+    }
+    
+    public function email()
+    {
+        $this->requireAdminWithBasicAuth();
+        
+        return $this->view('admin/settings/email', [
+            'title' => 'Email Settings'
+        ]);
+    }
+    
+    public function api()
+    {
+        $this->requireAdminWithBasicAuth();
+        
+        return $this->view('admin/settings/api', [
+            'title' => 'API Settings'
+        ]);
+    }
+    
+    public function performance()
+    {
+        $this->requireAdminWithBasicAuth();
+        
+        return $this->view('admin/settings/performance', [
+            'title' => 'Performance Settings'
+        ]);
+    }
+    
+    public function advanced()
+    {
+        $this->requireAdminWithBasicAuth();
+        
+        return $this->view('admin/settings/advanced', [
+            'title' => 'Advanced Settings'
+        ]);
+    }
+    
+    private function requireAdminWithBasicAuth()
+    {
+        $isAuthenticated = false;
+        $isAdmin = false;
+        
+        // Check HTTP Basic Auth FIRST (for API testing)
+        if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+            // Authenticate using HTTP Basic Auth
+            $userModel = new \App\Models\User();
+            $user = $userModel->findByUsername($_SERVER['PHP_AUTH_USER']);
+            if ($user) {
+                $userArray = is_array($user) ? $user : (array) $user;
+                if (password_verify($_SERVER['PHP_AUTH_PW'], $userArray['password'])) {
+                    $isAuthenticated = true;
+                    $role = $userArray['role'] ?? 'user';
+                    $isAdminRole = $userArray['is_admin'] ?? 0;
+                    $isAdmin = ($isAdminRole == 1) || in_array($role, ['admin', 'super_admin']);
+                    
+                    // Set session for subsequent requests
+                    $_SESSION['user_id'] = $userArray['id'];
+                    $_SESSION['username'] = $userArray['username'];
+                    $_SESSION['user'] = $userArray;
+                    $_SESSION['is_admin'] = $isAdmin;
+                }
+            }
+        }
+        
+        // Fallback to session-based auth
+        if (!$isAuthenticated && $this->auth->check()) {
+            $isAuthenticated = true;
+            $isAdmin = $this->auth->isAdmin();
+        }
+        
+        if (!$isAuthenticated) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Unauthorized']);
+            exit;
+        }
+        
+        if (!$isAdmin) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Forbidden - Admin access required']);
+            exit;
+        }
+    }
+    
     public function index()
     {
-        $this->requireAdmin();
+        $this->requireAdminWithBasicAuth();
         
         // Get settings grouped by category
         $groups = ['general', 'appearance', 'email', 'security', 'privacy', 'performance', 'system', 'api'];
@@ -29,7 +142,7 @@ class SettingsController extends Controller
     
     public function save()
     {
-        $this->requireAdmin();
+        $this->requireAdminWithBasicAuth();
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return $this->json(['success' => false, 'message' => 'Invalid request']);
@@ -82,7 +195,7 @@ class SettingsController extends Controller
     
     public function reset()
     {
-        $this->requireAdmin();
+        $this->requireAdminWithBasicAuth();
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return $this->json(['success' => false, 'message' => 'Invalid request']);
@@ -138,7 +251,7 @@ class SettingsController extends Controller
     
     public function export()
     {
-        $this->requireAdmin();
+        $this->requireAdminWithBasicAuth();
         
         $settings = SettingsService::getAll();
         
@@ -151,7 +264,7 @@ class SettingsController extends Controller
     
     public function import()
     {
-        $this->requireAdmin();
+        $this->requireAdminWithBasicAuth();
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return $this->redirect('/admin/settings');
@@ -216,5 +329,63 @@ class SettingsController extends Controller
         ];
         
         return in_array($key, $checkboxFields);
+    }
+    
+    /**
+     * Get settings data (API endpoint)
+     */
+    public function getSettings()
+    {
+        header('Content-Type: application/json');
+        
+        try {
+            // Check admin authentication - support both session and HTTP Basic Auth
+            $isAdmin = false;
+            
+            // Check HTTP Basic Auth first (for API testing)
+            if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+                $user = \App\Models\User::findByUsername($_SERVER['PHP_AUTH_USER']);
+                if ($user) {
+                    $userArray = is_array($user) ? $user : (array) $user;
+                    if (password_verify($_SERVER['PHP_AUTH_PW'], $userArray['password'])) {
+                        // Check if user is admin
+                        $isAdmin = ($userArray['is_admin'] ?? false) || ($userArray['role'] ?? '') === 'admin';
+                    }
+                }
+            } else {
+                // Fall back to session auth
+                if ($this->auth->check() && $this->auth->isAdmin()) {
+                    $isAdmin = true;
+                }
+            }
+            
+            if (!$isAdmin) {
+                http_response_code(401);
+                echo json_encode(['error' => 'Unauthorized']);
+                return;
+            }
+            
+            // Get settings grouped by category
+            $groups = ['general', 'appearance', 'email', 'security', 'privacy', 'performance', 'system', 'api'];
+            $settingsByGroup = [];
+            
+            foreach ($groups as $group) {
+                $settingsByGroup[$group] = \App\Services\SettingsService::getByGroup($group);
+            }
+            
+            http_response_code(200);
+            echo json_encode([
+                'success' => true,
+                'settings' => $settingsByGroup,
+                'groups' => $groups
+            ]);
+            
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'error' => 'Failed to get settings',
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }

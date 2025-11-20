@@ -13,7 +13,7 @@ $router->add('GET', '/about', 'HomeController@about');
 $router->add('GET', '/contact', 'HomeController@contact');
 $router->add('POST', '/contact', 'HomeController@contact');
 
-// Authentication Routes
+// Authentication Routes (Web)
 $router->add('GET', '/login', 'AuthController@showLogin', ['guest']);
 $router->add('POST', '/login', 'AuthController@login', ['guest']);
 $router->add('GET', '/register', 'AuthController@showRegister', ['guest']);
@@ -23,11 +23,22 @@ $router->add('POST', '/forgot-password', 'AuthController@forgotPassword', ['gues
 $router->add('GET', '/logout', 'AuthController@logout'); // No middleware - can be accessed anytime
 $router->add('POST', '/logout', 'AuthController@logout'); // No middleware - can be accessed anytime
 
+// Authentication API Routes
+$router->add('POST', '/api/login', 'Api\\AuthController@login');
+$router->add('POST', '/api/register', 'Api\\AuthController@register');
+$router->add('POST', '/api/logout', 'Api\\AuthController@logout');
+$router->add('GET', '/api/logout', 'Api\\AuthController@logout');
+$router->add('POST', '/api/forgot-password', 'Api\\AuthController@forgotPassword');
+$router->add('GET', '/api/check-username', 'Api\\AuthController@checkUsername');
+$router->add('POST', '/api/check-username', 'Api\\AuthController@checkUsername');
+
 // Calculator Routes (Public)
 $router->add('GET', '/calculators', 'CalculatorController@index');
 $router->add('GET', '/calculator/{category}', 'CalculatorController@category');
 $router->add('GET', '/calculator/{category}/{tool}', 'CalculatorController@tool');
 $router->add('POST', '/calculator/{category}/{tool}/calculate', 'CalculatorController@calculate');
+// Add route for calculator execution (matches test expectations)
+$router->add('POST', '/calculator/{module}/{function}', 'CalculatorController@execute');
 
 // Calculator Routes (Protected)
 $router->add('GET', '/dashboard', 'CalculatorController@dashboard', ['auth']);
@@ -68,29 +79,9 @@ $router->add('POST', '/2fa/recovery-codes/regenerate', 'TwoFactorController@rege
 $router->add('GET', '/2fa/trusted-devices', 'TwoFactorController@getTrustedDevices', ['auth']);
 $router->add('POST', '/2fa/trusted-devices/revoke', 'TwoFactorController@revokeTrustedDevice', ['auth']);
 
-// Data Export Routes (GDPR)
-$router->add('POST', '/data-export/request', 'DataExportController@requestExport', ['auth']);
-$router->add('GET', '/data-export/requests', 'DataExportController@getRequests', ['auth']);
-$router->add('GET', '/data-export/download/{id}', 'DataExportController@download', ['auth']);
-
-// Authentication API Routes (for frontend AJAX)
-$router->add('POST', '/api/login', 'Api\AuthController@login');
-$router->add('POST', '/api/register', 'Api\AuthController@register');
-$router->add('POST', '/api/forgot-password', 'Api\AuthController@forgotPassword');
-$router->add('GET', '/api/logout', 'Api\AuthController@logout');
-$router->add('GET', '/api/check-remember', 'Api\AuthController@checkRememberToken');
-$router->add('GET', '/api/user-status', 'Api\AuthController@userStatus');
-$router->add('GET', '/api/check-username', 'Api\AuthController@checkUsername');
-$router->add('POST', '/api/resend-verification', 'Api\AuthController@resendVerification');
-$router->add('GET', '/api/location', 'Api\LocationController@getLocation');
-$router->add('GET', '/api/location/status', 'Api\LocationController@getStatus');
-$router->add('GET', '/api/marketing/stats', 'Api\MarketingController@getStats', ['auth', 'admin']);
-$router->add('GET', '/api/marketing/opt-in-users', 'Api\MarketingController@getOptInUsers', ['auth', 'admin']);
-$router->add('POST', '/api/marketing/update-preferences', 'Api\MarketingController@updatePreferences', ['auth']);
-
-// Admin Dashboard Routes (WordPress-like admin system)
-$router->add('GET', '/admin', 'Admin\MainDashboardController@index', ['auth', 'admin']);
-$router->add('GET', '/admin/dashboard', 'Admin\MainDashboardController@index', ['auth', 'admin']);
+// Admin Dashboard (main)
+$router->add('GET', '/admin', 'Admin\DashboardController@index', ['auth', 'admin']);
+$router->add('GET', '/admin/dashboard', 'Admin\DashboardController@index', ['auth', 'admin']);
 
 // Users Management
 $router->add('GET', '/admin/users', 'Admin\UserManagementController@index', ['auth', 'admin']);
@@ -220,6 +211,18 @@ $router->add('GET', '/api/calculator/{category}/{tool}', 'ApiController@getCalcu
 $router->add('GET', '/api/calculations', 'ApiController@getUserCalculations', ['auth']);
 $router->add('GET', '/api/calculations/{id}', 'ApiController@getCalculation', ['auth']);
 
+// Profile API Routes
+$router->add('GET', '/api/profile', 'Api\\ProfileController@getProfile', ['auth']);
+$router->add('PUT', '/api/profile', 'Api\\ProfileController@updateProfile', ['auth']);
+$router->add('POST', '/api/profile', 'Api\\ProfileController@updateProfile', ['auth']);
+$router->add('PUT', '/profile', 'Api\\ProfileController@updateProfile', ['auth']);
+$router->add('POST', '/profile', 'Api\\ProfileController@updateProfile', ['auth']);
+
+// Payment API Routes
+$router->add('POST', '/payment', 'PaymentController@processPayment');
+$router->add('GET', '/api/payment/methods', 'PaymentController@getPaymentMethods', ['auth']);
+$router->add('POST', '/api/payment/process', 'PaymentController@processPayment', ['auth']);
+
 // API v1 Routes (versioned, API-key or session auth handled in controller)
 $router->add('POST', '/api/v1/calculate', 'ApiController@calculate');
 $router->add('GET', '/api/v1/calculators', 'ApiController@getCalculators');
@@ -232,6 +235,10 @@ $router->add('GET', '/api/v1/health', 'Api\\V1\\HealthController@health');
 // Additional Admin Routes (using existing controllers)
 $router->add('GET', '/admin/users', 'Admin\UserController@index', ['auth', 'admin']);
 $router->add('POST', '/admin/settings/save', 'Admin\SettingsController@saveSettings', ['auth', 'admin']);
+
+// Admin API Routes
+$router->add('GET', '/api/admin/dashboard', 'Admin\DashboardController@getDashboardData', ['auth', 'admin']);
+$router->add('GET', '/api/admin/settings', 'Admin\SettingsController@getSettings', ['auth', 'admin']);
 
 // Calculators Management Routes
 $router->add('GET', '/admin/calculators', 'Admin\CalculatorController@index', ['auth', 'admin']);

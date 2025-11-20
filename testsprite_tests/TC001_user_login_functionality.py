@@ -1,39 +1,38 @@
 import requests
 
-BASE_URL = "http://localhost:80"
-LOGIN_ENDPOINT = "/api/login"
-
-AUTH_USERNAME = "uniquebishwo@gmail.com"
-AUTH_PASSWORD = "c9PU7XAsAADYk_A"
+BASE_URL = "http://localhost:80/bishwo_calculator"
+EMAIL = "uniquebishwo@gmail.com"
+PASSWORD = "c9PU7XAsAADYk_A"
 TIMEOUT = 30
 
+
 def test_user_login_functionality():
-    url = BASE_URL + LOGIN_ENDPOINT
+    login_url = f"{BASE_URL}/api/login"
     headers = {"Content-Type": "application/json"}
 
-    # Valid credentials payload
+    # Test successful login with valid credentials
     valid_payload = {
-        "email": AUTH_USERNAME,
-        "password": AUTH_PASSWORD
+        "email": EMAIL,
+        "password": PASSWORD
     }
-
-    # Invalid credentials payload
-    invalid_payload = {
-        "email": AUTH_USERNAME,
-        "password": "wrong_password_123"
-    }
-
     try:
-        # Test successful login with valid credentials
-        response = requests.post(url, json=valid_payload, headers=headers, timeout=TIMEOUT)
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+        response = requests.post(login_url, json=valid_payload, headers=headers, timeout=TIMEOUT)
+    except requests.RequestException as e:
+        assert False, f"Request failed during valid login test: {e}"
 
-        # Test login failure with invalid credentials
-        response_invalid = requests.post(url, json=invalid_payload, headers=headers, timeout=TIMEOUT)
-        assert response_invalid.status_code == 401, f"Expected 401, got {response_invalid.status_code}"
+    assert response.status_code == 200, f"Expected 200 for valid login but got {response.status_code}"
 
-    except requests.exceptions.RequestException as e:
-        assert False, f"Request failed: {e}"
+    # Test login failure with invalid credentials
+    invalid_payload = {
+        "email": EMAIL,
+        "password": "invalidpassword123"
+    }
+    try:
+        response_invalid = requests.post(login_url, json=invalid_payload, headers=headers, timeout=TIMEOUT)
+    except requests.RequestException as e:
+        assert False, f"Request failed during invalid login test: {e}"
+
+    assert response_invalid.status_code == 401, f"Expected 401 for invalid login but got {response_invalid.status_code}"
 
 
 test_user_login_functionality()
