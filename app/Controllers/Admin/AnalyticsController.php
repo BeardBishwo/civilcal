@@ -23,7 +23,7 @@ class AnalyticsController extends Controller
             'charts' => $this->getChartData()
         ];
 
-        $this->view('admin/analytics/overview', $data);
+        $this->view->render('admin/analytics/overview', $data);
     }
 
     /**
@@ -37,7 +37,7 @@ class AnalyticsController extends Controller
             'growth_data' => $this->getUserGrowthData()
         ];
 
-        $this->view('admin/analytics/users', $data);
+        $this->view->render('admin/analytics/users', $data);
     }
 
     /**
@@ -51,7 +51,7 @@ class AnalyticsController extends Controller
             'usage_data' => $this->getCalculatorUsageData()
         ];
 
-        $this->view('admin/analytics/calculators', $data);
+        $this->view->render('admin/analytics/calculators', $data);
     }
 
     /**
@@ -64,7 +64,7 @@ class AnalyticsController extends Controller
             'performance_metrics' => $this->getPerformanceMetrics()
         ];
 
-        $this->view('admin/analytics/performance', $data);
+        $this->view->render('admin/analytics/performance', $data);
     }
 
     /**
@@ -77,7 +77,7 @@ class AnalyticsController extends Controller
             'available_reports' => $this->getAvailableReports()
         ];
 
-        $this->view('admin/analytics/reports', $data);
+        $this->view->render('admin/analytics/reports', $data);
     }
 
     /**

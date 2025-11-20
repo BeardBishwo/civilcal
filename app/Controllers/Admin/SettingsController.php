@@ -16,7 +16,7 @@ class SettingsController extends Controller
     {
         $this->requireAdminWithBasicAuth();
         
-        return $this->view('admin/settings/general', [
+        $this->view->render('admin/settings/general', [
             'title' => 'General Settings'
         ]);
     }
@@ -25,7 +25,7 @@ class SettingsController extends Controller
     {
         $this->requireAdminWithBasicAuth();
         
-        return $this->view('admin/settings/users', [
+        $this->view->render('admin/settings/users', [
             'title' => 'User Settings'
         ]);
     }
@@ -34,7 +34,7 @@ class SettingsController extends Controller
     {
         $this->requireAdminWithBasicAuth();
         
-        return $this->view('admin/settings/security', [
+        $this->view->render('admin/settings/security', [
             'title' => 'Security Settings'
         ]);
     }
@@ -43,7 +43,7 @@ class SettingsController extends Controller
     {
         $this->requireAdminWithBasicAuth();
         
-        return $this->view('admin/settings/email', [
+        $this->view->render('admin/settings/email', [
             'title' => 'Email Settings'
         ]);
     }
@@ -52,7 +52,7 @@ class SettingsController extends Controller
     {
         $this->requireAdminWithBasicAuth();
         
-        return $this->view('admin/settings/api', [
+        $this->view->render('admin/settings/api', [
             'title' => 'API Settings'
         ]);
     }
@@ -61,7 +61,7 @@ class SettingsController extends Controller
     {
         $this->requireAdminWithBasicAuth();
         
-        return $this->view('admin/settings/performance', [
+        $this->view->render('admin/settings/performance', [
             'title' => 'Performance Settings'
         ]);
     }
@@ -70,7 +70,7 @@ class SettingsController extends Controller
     {
         $this->requireAdminWithBasicAuth();
         
-        return $this->view('admin/settings/advanced', [
+        $this->view->render('admin/settings/advanced', [
             'title' => 'Advanced Settings'
         ]);
     }
@@ -133,7 +133,7 @@ class SettingsController extends Controller
             $settingsByGroup[$group] = SettingsService::getByGroup($group);
         }
         
-        return $this->view('admin/settings/index', [
+        $this->view->render('admin/settings/index', [
             'title' => 'Settings Management',
             'settingsByGroup' => $settingsByGroup,
             'groups' => $groups

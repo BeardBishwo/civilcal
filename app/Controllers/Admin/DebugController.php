@@ -10,26 +10,31 @@ use App\Services\InstallerService;
 use Exception;
 
 /**
- * Debug Controller - System testing and error log viewing
+ * Debug Controller - System Testing & Monitoring
  */
 class DebugController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->checkAdminAccess();
+    }
+
     /**
      * Debug dashboard - system overview
      */
     public function index()
     {
-        $this->checkAdminAccess();
-        
         $data = [
-            'page_title' => 'Debug Dashboard - System Testing',
+            'page_title' => 'Debug Dashboard',
             'system_info' => $this->getSystemInfo(),
             'recent_errors' => $this->getRecentErrors(),
             'test_results' => $this->runSystemTests(),
             'breadcrumbs' => [['title' => 'Debug Dashboard']]
         ];
         
-        $this->render('debug/dashboard', $data);
+        // Use standard view rendering which uses the theme system
+        $this->view->render('admin/debug/dashboard', $data);
     }
     
     /**
@@ -37,15 +42,13 @@ class DebugController extends Controller
      */
     public function errorLogs()
     {
-        $this->checkAdminAccess();
-        
         $page = $_GET['page'] ?? 1;
         $filter = $_GET['filter'] ?? 'all';
         
         $logs = $this->getErrorLogs($page, $filter);
         
         $data = [
-            'page_title' => 'Error Logs - System Debug',
+            'page_title' => 'Error Logs',
             'logs' => $logs,
             'current_page' => $page,
             'filter' => $filter,
@@ -55,7 +58,7 @@ class DebugController extends Controller
             ]
         ];
         
-        $this->render('debug/error-logs', $data);
+        $this->view->render('admin/debug/error-logs', $data);
     }
     
     /**
@@ -63,27 +66,34 @@ class DebugController extends Controller
      */
     public function runTests()
     {
-        $this->checkAdminAccess();
-        
+        // Handle AJAX requests
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // CSRF Check
+            if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+                $this->json(['success' => false, 'error' => 'Invalid CSRF token']);
+                return;
+            }
+
             $testType = $_POST['test_type'] ?? 'all';
-            $results = $this->runSystemTests();
-            
-            header('Content-Type: application/json');
-            echo json_encode(['success' => true, 'results' => $results]);
+            // Use cached test results if available (5‑second TTL)
+            $results = $this->getCached('system_tests', function() use ($testType) {
+                return $this->runSystemTests();
+            }, 5);
+
+            $this->json(['success' => true, 'results' => $results]);
             return;
         }
-        
+
         $data = [
-            'page_title' => 'System Tests - Debug Tools',
+            'page_title' => 'System Tests',
             'available_tests' => $this->getAvailableTests(),
             'breadcrumbs' => [
                 ['title' => 'Debug', 'url' => '/admin/debug'],
                 ['title' => 'System Tests']
             ]
         ];
-        
-        $this->render('debug/tests', $data);
+
+        $this->view->render('admin/debug/tests', $data);
     }
     
     /**
@@ -91,8 +101,6 @@ class DebugController extends Controller
      */
     public function clearLogs()
     {
-        $this->checkAdminAccess();
-        
         try {
             $logFile = __DIR__ . '/../../storage/logs/error.log';
             
@@ -100,12 +108,45 @@ class DebugController extends Controller
                 file_put_contents($logFile, '');
             }
             
-            header('Content-Type: application/json');
-            echo json_encode(['success' => true, 'message' => 'Error logs cleared']);
+            $this->json(['success' => true, 'message' => 'Error logs cleared']);
         } catch (Exception $e) {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            $this->json(['success' => false, 'error' => $e->getMessage()]);
         }
+    }
+    
+    /**
+     * Live error monitoring
+     */
+    public function liveErrors()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $since = $_POST['since'] ?? date('Y-m-d H:i:s', strtotime('-5 minutes'));
+            $errors = $this->getErrorsSince($since);
+            
+            $this->json(['success' => true, 'errors' => $errors]);
+            return;
+        }
+        
+        $data = [
+            'page_title' => 'Live Error Monitor',
+            'breadcrumbs' => [
+                ['title' => 'Debug', 'url' => '/admin/debug'],
+                ['title' => 'Live Monitor']
+            ]
+        ];
+        
+        $this->view->render('admin/debug/live-monitor', $data);
+    }
+
+    /**
+     * Helper to output JSON
+     */
+    protected function json($data, $statusCode = 200)
+    {
+        http_response_code($statusCode);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit;
     }
     
     /**
@@ -157,59 +198,35 @@ class DebugController extends Controller
     }
     
     /**
-     * Live error monitoring
-     */
-    public function liveErrors()
-    {
-        $this->checkAdminAccess();
-        
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $since = $_POST['since'] ?? date('Y-m-d H:i:s', strtotime('-5 minutes'));
-            $errors = $this->getErrorsSince($since);
-            
-            header('Content-Type: application/json');
-            echo json_encode(['success' => true, 'errors' => $errors]);
-            return;
-        }
-        
-        $data = [
-            'page_title' => 'Live Error Monitor',
-            'breadcrumbs' => [
-                ['title' => 'Debug', 'url' => '/admin/debug'],
-                ['title' => 'Live Monitor']
-            ]
-        ];
-        
-        $this->render('debug/live-monitor', $data);
-    }
-    
-    /**
      * Get comprehensive system information
      */
     private function getSystemInfo()
     {
-        return [
-            'php' => [
-                'version' => PHP_VERSION,
-                'memory_limit' => ini_get('memory_limit'),
-                'memory_usage' => $this->formatBytes(memory_get_usage(true)),
-                'memory_peak' => $this->formatBytes(memory_get_peak_usage(true)),
-                'execution_time' => ini_get('max_execution_time'),
-                'error_reporting' => error_reporting(),
-                'display_errors' => ini_get('display_errors'),
-                'log_errors' => ini_get('log_errors'),
-                'error_log_file' => ini_get('error_log')
-            ],
-            'server' => [
-                'software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
-                'document_root' => $_SERVER['DOCUMENT_ROOT'] ?? 'Unknown',
-                'script_name' => $_SERVER['SCRIPT_NAME'] ?? 'Unknown',
-                'request_time' => date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME'] ?? time())
-            ],
-            'database' => $this->getDatabaseInfo(),
-            'files' => $this->getFileSystemInfo(),
-            'modules' => $this->getModuleInfo()
-        ];
+        // ---- Caching (5‑second TTL) ----
+        return $this->getCached('system_info', function() {
+            return [
+                'php' => [
+                    'version' => PHP_VERSION,
+                    'memory_limit' => ini_get('memory_limit'),
+                    'memory_usage' => $this->formatBytes(memory_get_usage(true)),
+                    'memory_peak' => $this->formatBytes(memory_get_peak_usage(true)),
+                    'execution_time' => ini_get('max_execution_time'),
+                    'error_reporting' => error_reporting(),
+                    'display_errors' => ini_get('display_errors'),
+                    'log_errors' => ini_get('log_errors'),
+                    'error_log_file' => ini_get('error_log')
+                ],
+                'server' => [
+                    'software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
+                    'document_root' => $_SERVER['DOCUMENT_ROOT'] ?? 'Unknown',
+                    'script_name' => $_SERVER['SCRIPT_NAME'] ?? 'Unknown',
+                    'request_time' => date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME'] ?? time())
+                ],
+                'database' => $this->getDatabaseInfo(),
+                'files' => $this->getFileSystemInfo(),
+                'modules' => $this->getModuleInfo()
+            ];
+        }, 5);
     }
     
     /**
@@ -645,6 +662,47 @@ class DebugController extends Controller
         }
         return $this->formatBytes($size);
     }
+
+    /**
+     * Caches data for a given key with a specified TTL.
+     *
+     * @param string $key The cache key.
+     * @param callable $callback The function to execute if data is not in cache.
+     * @param int $ttl Time to live in seconds.
+     * @return mixed The cached data or the result of the callback.
+     */
+    private function getCached(string $key, callable $callback, int $ttl = 60)
+    {
+        $cacheDir = __DIR__ . '/../../storage/cache';
+        
+        // Ensure cache directory exists
+        if (!file_exists($cacheDir)) {
+            @mkdir($cacheDir, 0777, true);
+        }
+
+        $cacheFile = $cacheDir . '/' . md5($key) . '.cache';
+
+        // Try to read from cache
+        if (file_exists($cacheFile) && (filemtime($cacheFile) + $ttl) > time()) {
+            $content = @file_get_contents($cacheFile);
+            if ($content !== false) {
+                $data = @unserialize($content);
+                if ($data !== false) {
+                    return $data;
+                }
+            }
+        }
+
+        // Execute callback to get fresh data
+        $data = $callback();
+
+        // Try to write to cache, but don't crash if it fails
+        if (is_writable($cacheDir)) {
+            @file_put_contents($cacheFile, serialize($data));
+        }
+
+        return $data;
+    }
     
     private function checkAdminAccess()
     {
@@ -662,16 +720,6 @@ class DebugController extends Controller
             header('Location: ' . app_base_url('/dashboard?error=access_denied'));
             exit;
         }
-    }
-    
-    private function render($template, $data = [])
-    {
-        extract($data);
-        $currentUser = (new User())->find($_SESSION['user_id']);
-        
-        ob_start();
-        include __DIR__ . "/../../themes/admin/views/{$template}.php";
-        echo ob_get_clean();
     }
 }
 ?>

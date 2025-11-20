@@ -24,7 +24,7 @@ class SystemStatusController extends Controller
             'system_health' => $this->getSystemHealth()
         ];
 
-        $this->view('admin/system/status', $data);
+        $this->view->render('admin/system/status', $data);
     }
 
     private function getDatabaseVersion()

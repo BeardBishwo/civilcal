@@ -35,13 +35,13 @@ class UserManagementController extends Controller
             ]
         ];
 
-        $this->view('admin/users/index', $data);
+        $this->view->render('admin/users/index', $data);
     }
 
     public function create()
     {
         $data = ['page_title' => 'Create User'];
-        $this->view('admin/users/create', $data);
+        $this->view->render('admin/users/create', $data);
     }
 
     public function store()
@@ -71,7 +71,7 @@ class UserManagementController extends Controller
             'user' => $user
         ];
 
-        $this->view('admin/users/edit', $data);
+        $this->view->render('admin/users/edit', $data);
     }
 
     public function roles()
@@ -96,7 +96,7 @@ class UserManagementController extends Controller
             'role_stats' => $roleStats
         ];
 
-        $this->view('admin/users/roles', $data);
+        $this->view->render('admin/users/roles', $data);
     }
 
     public function permissions()
@@ -113,7 +113,7 @@ class UserManagementController extends Controller
             'permissions' => $permissions
         ];
 
-        $this->view('admin/users/permissions', $data);
+        $this->view->render('admin/users/permissions', $data);
     }
 
     public function bulk()
@@ -132,7 +132,7 @@ class UserManagementController extends Controller
             ]
         ];
 
-        $this->view('admin/users/bulk', $data);
+        $this->view->render('admin/users/bulk', $data);
     }
 
     private function checkAdminAccess()

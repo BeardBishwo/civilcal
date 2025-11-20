@@ -29,7 +29,7 @@ class ModuleController extends Controller
         ];
         
         // Load the view
-        $this->view('admin/modules/index', $data);
+        $this->view->render('admin/modules/index', $data);
     }
 
     public function activate()
@@ -82,7 +82,7 @@ class ModuleController extends Controller
             'title' => "Module Settings: {$moduleName}"
         ];
         
-        $this->view('admin/modules/settings', $data);
+        $this->view->render('admin/modules/settings', $data);
     }
 
     public function updateSettings()

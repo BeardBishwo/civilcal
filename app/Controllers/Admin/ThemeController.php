@@ -84,10 +84,10 @@ class ThemeController extends Controller
             ];
             
             // Load the admin view
-            $this->adminView('admin/themes/index', $data);
+            $this->view->render('admin/themes/index', $data);
         } catch (Exception $e) {
             error_log("Theme Index Error: " . $e->getMessage());
-            $this->adminView('admin/themes/index', [
+            $this->view->render('admin/themes/index', [
                 'error' => 'Failed to load themes: ' . $e->getMessage(),
                 'title' => 'Themes Management - Admin Panel'
             ]);
@@ -354,10 +354,10 @@ class ThemeController extends Controller
                 'title' => 'Theme Backups - Admin Panel'
             ];
             
-            $this->adminView('admin/themes/backups', $data);
+            $this->view->render('admin/themes/backups', $data);
         } catch (Exception $e) {
             error_log("Theme Backups Error: " . $e->getMessage());
-            $this->adminView('admin/themes/backups', [
+            $this->view->render('admin/themes/backups', [
                 'error' => 'Failed to load backups: ' . $e->getMessage(),
                 'title' => 'Theme Backups - Admin Panel'
             ]);
@@ -431,7 +431,7 @@ class ThemeController extends Controller
     public function preview()
     {
         $theme = $this->getActiveThemeData();
-        $this->adminView('admin/themes/preview', ['currentPage'=>'themes','activeTheme'=>$theme,'title'=>'Theme Preview']);
+        $this->view->render('admin/themes/preview', ['currentPage'=>'themes','activeTheme'=>$theme,'title'=>'Theme Preview']);
     }
 
     public function previewById($id)

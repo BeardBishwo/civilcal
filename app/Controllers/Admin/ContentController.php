@@ -3,6 +3,7 @@ namespace App\Controllers\Admin;
 
 use App\Core\Controller;
 use App\Services\ContentService;
+use App\Services\MenuService;
 
 class ContentController extends Controller {
     private $svc;
@@ -15,18 +16,18 @@ class ContentController extends Controller {
 
     public function index() {
         $pages = $this->svc->allPages();
-        $this->adminView('admin/content/index', ['currentPage'=>'content','pages'=>$pages,'title'=>'Content Management']);
+        $this->view->render('admin/content/index', ['currentPage'=>'content','pages'=>$pages,'title'=>'Content Management']);
     }
 
     public function pages() { $this->index(); }
 
     public function edit($slug) {
         $page = $this->svc->getPage($slug);
-        $this->adminView('admin/content/pages', ['currentPage'=>'content','page'=>$page,'mode'=>'edit','title'=>'Edit Page']);
+        $this->view->render('admin/content/pages', ['currentPage'=>'content','page'=>$page,'mode'=>'edit','title'=>'Edit Page']);
     }
 
     public function create() {
-        $this->adminView('admin/content/pages', ['currentPage'=>'content','page'=>null,'mode'=>'create','title'=>'Create Page']);
+        $this->view->render('admin/content/pages', ['currentPage'=>'content','page'=>null,'mode'=>'create','title'=>'Create Page']);
     }
 
     public function save() {
@@ -54,18 +55,17 @@ class ContentController extends Controller {
     }
 
     public function menus() {
-        $ms = new \App\Services\MenuService();
+        $ms = new MenuService();
         $items = $ms->get('primary');
-        $this->adminView('admin/content/menus', ['currentPage'=>'content','items'=>$items,'title'=>'Menus']);
+        $this->view->render('admin/content/menus', ['currentPage'=>'content','items'=>$items,'title'=>'Menus']);
     }
 
     public function saveMenus() {
         $payload = $_POST['items'] ?? '[]';
         $items = json_decode($payload, true);
         if (!is_array($items)) { $items = []; }
-        $ms = new \App\Services\MenuService();
+        $ms = new MenuService();
         $ms->set('primary', $items);
         $this->redirect('/admin/content/menus');
     }
 }
-?>

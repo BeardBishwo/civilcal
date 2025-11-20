@@ -22,43 +22,43 @@ ob_start();
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
     
     <!-- Total Users -->
-    <div class="stat-card" style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.5rem; text-align: center;">
+    <div class="stat-card" style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.5rem; text-align: center; transition: transform 0.2s ease;">
         <div style="width: 50px; height: 50px; background: rgba(67, 97, 238, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto;">
             <i class="fas fa-users" style="font-size: 1.5rem; color: #4cc9f0;"></i>
         </div>
         <div style="font-size: 2rem; font-weight: 700; color: #4cc9f0; margin-bottom: 0.5rem;"><?php echo number_format($stats['total_users'] ?? 0); ?></div>
-        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">Total Users</div>
-        <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-arrow-up"></i> +12% this month</small>
+        <div style="color: #9ca3af; font-size: 0.875rem;">Total Users</div>
+        <?php /* TODO: Calculate real growth percentage from database */ ?>
+        <?php /* <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-arrow-up"></i> +12% this month</small> */ ?>
     </div>
     
     <!-- Active Users -->
-    <div class="stat-card" style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.5rem; text-align: center;">
+    <div class="stat-card" style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.5rem; text-align: center; transition: transform 0.2s ease;">
         <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto;">
             <i class="fas fa-user-check" style="font-size: 1.5rem; color: #34d399;"></i>
         </div>
         <div style="font-size: 2rem; font-weight: 700; color: #34d399; margin-bottom: 0.5rem;"><?php echo number_format($stats['active_users'] ?? 0); ?></div>
-        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">Active Users (30d)</div>
-        <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-arrow-up"></i> +8% this month</small>
+        <div style="color: #9ca3af; font-size: 0.875rem;">Active Users (30d)</div>
+        <?php /* TODO: Calculate real growth percentage from database */ ?>
+        <?php /* <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-arrow-up"></i> +8% this month</small> */ ?>
     </div>
     
     <!-- Total Calculations -->
-    <div class="stat-card" style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.5rem; text-align: center;">
+    <div class="stat-card" style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.5rem; text-align: center; transition: transform 0.2s ease;">
         <div style="width: 50px; height: 50px; background: rgba(245, 158, 11, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto;">
             <i class="fas fa-calculator" style="font-size: 1.5rem; color: #fbbf24;"></i>
         </div>
         <div style="font-size: 2rem; font-weight: 700; color: #fbbf24; margin-bottom: 0.5rem;"><?php echo number_format($stats['total_calculations'] ?? 0); ?></div>
-        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">Total Calculations</div>
-        <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-check"></i> All time</small>
+        <div style="color: #9ca3af; font-size: 0.875rem;">Total Calculations</div>
     </div>
     
     <!-- Monthly Calculations -->
-    <div class="stat-card" style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.5rem; text-align: center;">
+    <div class="stat-card" style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 1.5rem; text-align: center; transition: transform 0.2s ease;">
         <div style="width: 50px; height: 50px; background: rgba(6, 182, 212, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto;">
             <i class="fas fa-chart-line" style="font-size: 1.5rem; color: #22d3ee;"></i>
         </div>
         <div style="font-size: 2rem; font-weight: 700; color: #22d3ee; margin-bottom: 0.5rem;"><?php echo number_format($stats['monthly_calculations'] ?? 0); ?></div>
-        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">Monthly Calculations</div>
-        <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-check-circle"></i> Last 30 days</small>
+        <div style="color: #9ca3af; font-size: 0.875rem;">Monthly Calculations</div>
     </div>
     
 </div>
