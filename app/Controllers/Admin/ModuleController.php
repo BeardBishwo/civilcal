@@ -3,12 +3,16 @@
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
+use App\Services\ModuleService;
 
 class ModuleController extends Controller
 {
+    private $moduleService;
+
     public function __construct()
     {
         parent::__construct();
+        $this->moduleService = new ModuleService();
 
         // Check if user is admin
         if (!$this->auth->check() || !$this->auth->isAdmin()) {
@@ -18,14 +22,21 @@ class ModuleController extends Controller
 
     public function index()
     {
-        $modules = $this->getAllModules();
+        $modules = $this->moduleService->getAllModules();
         $categories = $this->getModuleCategories();
+        $stats = $this->moduleService->getModuleStats();
+
+        // If service didn't return modules, fall back to file-based approach
+        if (empty($modules)) {
+            $modules = $this->getAllModulesFromFileSystem();
+        }
 
         // Prepare data for the view
         $data = [
             'currentPage' => 'modules',
             'modules' => $modules,
             'categories' => $categories,
+            'stats' => $stats,
             'title' => 'Modules Management - Admin Panel'
         ];
 
@@ -42,12 +53,9 @@ class ModuleController extends Controller
             return;
         }
 
-        // TODO: Implement actual activation logic
-        // For now, return success
-        echo json_encode([
-            'success' => true,
-            'message' => "Module '{$moduleName}' activated successfully"
-        ]);
+        // Get module by name and activate it
+        $result = $this->moduleService->activateModule($moduleName);
+        echo json_encode($result);
     }
 
     public function deactivate()
@@ -59,12 +67,9 @@ class ModuleController extends Controller
             return;
         }
 
-        // TODO: Implement actual deactivation logic
-        // For now, return success
-        echo json_encode([
-            'success' => true,
-            'message' => "Module '{$moduleName}' deactivated successfully"
-        ]);
+        // Get module by name and deactivate it
+        $result = $this->moduleService->deactivateModule($moduleName);
+        echo json_encode($result);
     }
 
     public function settings($params)
@@ -76,10 +81,15 @@ class ModuleController extends Controller
             return;
         }
 
-        // TODO: Load module settings
+        $module = $this->moduleService->getModuleByName($moduleName);
+        if (!$module) {
+            $this->redirect('/admin/modules');
+            return;
+        }
+
         $data = [
             'currentPage' => 'modules',
-            'moduleName' => $moduleName,
+            'module' => $module,
             'title' => "Module Settings: {$moduleName}"
         ];
 
@@ -95,14 +105,16 @@ class ModuleController extends Controller
             return;
         }
 
-        // TODO: Implement settings update logic
-        echo json_encode([
-            'success' => true,
-            'message' => "Settings for '{$moduleName}' updated successfully"
-        ]);
+        $settingsData = $_POST['settings'] ?? [];
+        $result = $this->moduleService->updateModuleConfig($moduleName, $settingsData);
+
+        echo json_encode($result);
     }
 
-    private function getAllModules()
+    /**
+     * Get modules from the file system as fallback
+     */
+    private function getAllModulesFromFileSystem()
     {
         // Get real modules from modules directory
         $modulesPath = dirname(dirname(dirname(__DIR__))) . '/modules/';

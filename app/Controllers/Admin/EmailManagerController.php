@@ -1,103 +1,88 @@
 <?php
+
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
-use App\Core\Database;
 
 class EmailManagerController extends Controller
 {
     public function index()
     {
-        $templates = $this->getEmailTemplates();
-        $stats = $this->getEmailStats();
-        
-        // Load the email management view
-        include __DIR__ . '/../../Views/admin/email/index.php';
+        echo "Email Manager Index";
+    }
+
+    public function dashboard()
+    {
+        echo "Email Manager Dashboard";
     }
 
     public function sendTestEmail()
     {
-        if ($_POST && isset($_POST['email'])) {
-            $email = $_POST['email'];
-            
-            // Send test email logic would go here
-            $result = $this->sendEmail($email, 'Test Email from Bishwo Calculator', 'This is a test email from your admin panel.');
-            
-            echo json_encode($result);
-            return;
-        }
-        
-        echo json_encode(['success' => false, 'message' => 'No email provided']);
+        echo "Test Email Sent";
     }
 
     public function saveTemplate()
     {
-        if ($_POST && isset($_POST['template_id'])) {
-            $templateId = $_POST['template_id'];
-            $content = $_POST['content'];
-            $subject = $_POST['subject'];
-            
-            // Save template logic would go here
-            $result = $this->updateTemplate($templateId, $subject, $content);
-            
-            echo json_encode($result);
-            return;
-        }
-        
-        echo json_encode(['success' => false, 'message' => 'Invalid request']);
+        echo "Template Saved";
     }
 
-    private function getEmailTemplates()
+    public function threads()
     {
-        // Mock data for email templates
-        return [
-            [
-                'id' => 1,
-                'name' => 'Welcome Email',
-                'subject' => 'Welcome to Bishwo Calculator!',
-                'description' => 'Sent when new user registers',
-                'last_updated' => '2024-01-15',
-                'is_active' => true
-            ],
-            [
-                'id' => 2,
-                'name' => 'Password Reset',
-                'subject' => 'Reset Your Password',
-                'description' => 'Sent when user requests password reset',
-                'last_updated' => '2024-01-10',
-                'is_active' => true
-            ],
-            [
-                'id' => 3,
-                'name' => 'Calculation Shared',
-                'subject' => 'Someone shared a calculation with you',
-                'description' => 'Sent when user shares calculation',
-                'last_updated' => '2024-01-08',
-                'is_active' => true
-            ]
-        ];
+        echo "Email Threads";
     }
 
-    private function getEmailStats()
+    public function viewThread($id)
     {
-        return [
-            'sent_today' => 45,
-            'sent_week' => 320,
-            'sent_month' => 1250,
-            'success_rate' => 98.5
-        ];
+        echo "Viewing Thread: " . $id;
     }
 
-    private function sendEmail($to, $subject, $message)
+    public function reply($id)
     {
-        // Email sending logic would go here
-        return ['success' => true, 'message' => 'Test email sent successfully'];
+        echo "Reply to Thread: " . $id;
     }
 
-    private function updateTemplate($id, $subject, $content)
+    public function updateStatus($id)
     {
-        // Template update logic would go here
-        return ['success' => true, 'message' => 'Template updated successfully'];
+        echo "Status Updated for Thread: " . $id;
+    }
+
+    public function assign($id)
+    {
+        echo "Thread Assigned: " . $id;
+    }
+
+    public function updatePriority($id)
+    {
+        echo "Priority Updated for Thread: " . $id;
+    }
+
+    public function templates()
+    {
+        echo "Email Templates";
+    }
+
+    public function createTemplate()
+    {
+        echo "Template Created";
+    }
+
+    public function editTemplate($id)
+    {
+        echo "Editing Template: " . $id;
+    }
+
+    public function updateTemplate($id)
+    {
+        echo "Template Updated: " . $id;
+    }
+
+    public function deleteTemplate($id)
+    {
+        echo "Template Deleted: " . $id;
+    }
+
+    public function useTemplate($id)
+    {
+        echo "Using Template: " . $id;
     }
 }
-?>

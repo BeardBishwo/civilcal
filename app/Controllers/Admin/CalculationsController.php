@@ -3,38 +3,39 @@
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
+use App\Models\Calculation;
 
 class CalculationsController extends Controller
 {
+    private $calculationModel;
+
     public function __construct()
     {
         parent::__construct();
         $this->checkAdminAccess();
+        $this->calculationModel = new Calculation();
     }
 
     public function index()
     {
-        // Get all calculations from database
-        $stmt = $this->db->query("
-            SELECT c.*, u.username, u.email 
-            FROM calculation_history c 
-            LEFT JOIN users u ON c.user_id = u.id 
-            ORDER BY c.created_at DESC 
-            LIMIT 100
-        ");
-        $calculations = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        // Get recent calculations using model
+        $calculationsResult = $this->calculationModel->getAll([], 1, 100);
+        $calculations = $calculationsResult['calculations'];
 
-        // Get statistics
-        $statsStmt = $this->db->query("
-            SELECT 
-                COUNT(*) as total,
-                COUNT(DISTINCT user_id) as unique_users,
-                COUNT(DISTINCT calculator_type) as calculator_types,
-                COUNT(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 END) as week_count,
-                COUNT(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 END) as month_count
-            FROM calculation_history
-        ");
-        $stats = $statsStmt->fetch(\PDO::FETCH_ASSOC);
+        // Enhance calculations data with user info
+        foreach ($calculations as &$calc) {
+            if ($calc['user_id']) {
+                $user = $this->getUserInfo($calc['user_id']);
+                $calc['username'] = $user['username'] ?? null;
+                $calc['email'] = $user['email'] ?? null;
+            } else {
+                $calc['username'] = 'Guest';
+                $calc['email'] = 'guest@example.com';
+            }
+        }
+
+        // Get statistics using model
+        $stats = $this->getCalculationStats();
 
         $data = [
             'page_title' => 'Calculations Management',
@@ -43,6 +44,29 @@ class CalculationsController extends Controller
         ];
 
         $this->view('admin/calculations/index', $data);
+    }
+
+    /**
+     * Get calculation statistics using model method
+     */
+    private function getCalculationStats()
+    {
+        // Get statistics using the model method
+        return $this->calculationModel->getCalculationStats();
+    }
+
+    /**
+     * Get user info by ID
+     */
+    private function getUserInfo($userId)
+    {
+        try {
+            $userStmt = $this->db->prepare("SELECT username, email FROM users WHERE id = ?");
+            $userStmt->execute([$userId]);
+            return $userStmt->fetch(\PDO::FETCH_ASSOC) ?: [];
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 
     private function checkAdminAccess()

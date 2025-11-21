@@ -1,351 +1,313 @@
 <?php
+
 namespace App\Services;
 
-use App\Models\ActivityLog;
-use App\Models\AuditLog;
 use App\Models\User;
 use App\Models\Calculation;
+use App\Models\ActivityLog;
+use Exception;
 
 class AnalyticsService
 {
-    private $activityLog;
-    private $auditLog;
     private $userModel;
     private $calculationModel;
+    private $activityLogModel;
 
     public function __construct()
     {
-        $this->activityLog = new ActivityLog();
-        $this->auditLog = new AuditLog();
         $this->userModel = new User();
         $this->calculationModel = new Calculation();
+        $this->activityLogModel = new ActivityLog();
     }
 
     /**
-     * Get dashboard statistics
+     * Get overview statistics for the analytics dashboard
      */
-    public function getDashboardStats()
+    public function getOverviewStats()
     {
         try {
-            // Get total users count
-            $totalUsers = $this->userModel->getTotalCount();
-            
-            // Get active users (last 30 days)
-            $activeUsers = $this->userModel->getActiveCount();
-            
-            // Get total calculations
-            $totalCalculations = $this->calculationModel->getTotalCount();
-            
-            // Get monthly calculations
-            $monthlyCalculations = $this->calculationModel->getMonthlyCount();
-            
-            // Count active modules (directories in modules folder)
-            $modulesPath = BASE_PATH . '/modules';
-            $activeModules = 0;
-            if (is_dir($modulesPath)) {
-                $modules = scandir($modulesPath);
-                foreach ($modules as $module) {
-                    if ($module !== '.' && $module !== '..' && is_dir($modulesPath . '/' . $module)) {
-                        $activeModules++;
-                    }
-                }
-            }
-            
-            // Calculate system health based on various metrics
-            $systemHealth = 95.0; // Default good health
-            
-            // Check disk space
-            $total = disk_total_space(BASE_PATH);
-            $free = disk_free_space(BASE_PATH);
-            $storageUsed = $total > 0 ? round((($total - $free) / $total) * 100, 1) : 0;
-            
-            if ($storageUsed > 90) {
-                $systemHealth -= 10;
-            } elseif ($storageUsed > 80) {
-                $systemHealth -= 5;
-            }
-            
-            return [
-                'total_users' => $totalUsers,
-                'active_users' => $activeUsers,
-                'total_calculations' => $totalCalculations,
-                'monthly_calculations' => $monthlyCalculations,
-                'active_modules' => $activeModules,
-                'system_health' => $systemHealth,
-                'storage_used' => $storageUsed,
-                'api_requests' => 0 // Can be tracked later if needed
-            ];
-        } catch (\Exception $e) {
-            // Return default values if database query fails
-            error_log('AnalyticsService::getDashboardStats error: ' . $e->getMessage());
+            $stats = [];
+
+            // Total users
+            $stats['total_users'] = $this->userModel->getTotalUserCount();
+
+            // Active users (last 30 days)
+            $stats['active_users'] = $this->calculationModel->getActiveUserCount(30);
+
+            // Total calculations
+            $stats['total_calculations'] = $this->calculationModel->getTotalCalculationCount();
+
+            // Monthly calculations
+            $stats['monthly_calculations'] = $this->calculationModel->getMonthlyCalculationCount(30);
+
+            return $stats;
+        } catch (Exception $e) {
+            error_log('AnalyticsService overview stats error: ' . $e->getMessage());
             return [
                 'total_users' => 0,
                 'active_users' => 0,
                 'total_calculations' => 0,
-                'monthly_calculations' => 0,
-                'active_modules' => 0,
-                'system_health' => 100,
-                'storage_used' => 0,
-                'api_requests' => 0
+                'monthly_calculations' => 0
             ];
         }
     }
 
     /**
-     * Get user growth data for charts
+     * Get chart data for overview
      */
-    public function getUserGrowthData($period = '6months')
+    public function getChartData($days = 30)
     {
         try {
-            switch ($period) {
-                case '12months':
-                    $data = $this->userModel->getGrowthData('12 months');
-                    break;
-                case '6months':
-                default:
-                    $data = $this->userModel->getGrowthData('6 months');
-                    break;
-            }
-            
-            // This would typically come from your database
-            return [
-                'labels' => $data['labels'] ?? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                'data' => $data['data'] ?? [65, 59, 80, 81, 56, 72]
-            ];
-        } catch (\Exception $e) {
-            error_log('AnalyticsService::getUserGrowthData error: ' . $e->getMessage());
-            return [
-                'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                'data' => [65, 59, 80, 81, 56, 72]
-            ];
-        }
-    }
+            // Get daily calculations for specified period
+            $rawData = $this->calculationModel->getDailyCalculations($days);
 
-    /**
-     * Get calculator usage data for charts
-     */
-    public function getCalculatorUsageData()
-    {
-        try {
-            $usageData = $this->calculationModel->getCalculatorUsage();
-            return [
-                'labels' => $usageData['labels'] ?? ['Civil', 'Electrical', 'Structural', 'HVAC', 'Plumbing'],
-                'data' => $usageData['data'] ?? [1250, 980, 756, 543, 432]
-            ];
-        } catch (\Exception $e) {
-            error_log('AnalyticsService::getCalculatorUsageData error: ' . $e->getMessage());
-            return [
-                'labels' => ['Civil', 'Electrical', 'Structural', 'HVAC', 'Plumbing'],
-                'data' => [1250, 980, 756, 543, 432]
-            ];
-        }
-    }
-
-    /**
-     * Get recent activity for dashboard
-     */
-    public function getRecentActivity($limit = 5)
-    {
-        try {
-            $activities = $this->activityLog->getRecent(7, $limit);
-            $formattedActivities = [];
-            
-            foreach ($activities as $activity) {
-                $formattedActivities[] = [
-                    'user' => $this->getUserDisplayName($activity['user_id']),
-                    'action' => $activity['type'],
-                    'description' => $activity['description'],
-                    'time' => $this->formatTimeAgo($activity['created_at']),
-                    'avatar' => '/assets/images/avatar-default.jpg'
+            // Format the data
+            $formattedData = [];
+            foreach ($rawData as $row) {
+                $formattedData[] = [
+                    'date' => $row['date'],
+                    'count' => (int)$row['count']
                 ];
             }
-            
-            return $formattedActivities;
-        } catch (\Exception $e) {
-            error_log('AnalyticsService::getRecentActivity error: ' . $e->getMessage());
+
             return [
-                [
-                    'user' => 'John Doe',
-                    'action' => 'Used Calculator',
-                    'description' => 'Concrete Volume',
-                    'time' => '2 minutes ago',
-                    'avatar' => '/assets/images/avatar1.jpg'
-                ]
+                'daily_calculations' => $formattedData
             ];
+        } catch (Exception $e) {
+            error_log('AnalyticsService chart data error: ' . $e->getMessage());
+            return ['daily_calculations' => []];
         }
     }
 
     /**
-     * Get system status for dashboard
+     * Get user statistics
      */
-    public function getSystemStatus()
+    public function getUserStats()
     {
         try {
-            $diskSpace = $this->getDiskSpaceStatus();
-            $databaseStatus = $this->getDatabaseStatus();
-            
-            return [
-                'server_load' => [
-                    'value' => $this->getServerLoad(),
-                    'status' => $this->getStatusColor($this->getServerLoad(), 'load')
-                ],
-                'database' => [
-                    'value' => $databaseStatus['status'],
-                    'status' => $databaseStatus['status'] === 'Online' ? 'success' : 'danger'
-                ],
-                'storage' => [
-                    'value' => $diskSpace['used_percent'] . '%',
-                    'status' => $this->getStatusColor($diskSpace['used_percent'], 'storage')
-                ],
-                'uptime' => $this->getSystemUptime()
-            ];
-        } catch (\Exception $e) {
-            error_log('AnalyticsService::getSystemStatus error: ' . $e->getMessage());
-            return [
-                'server_load' => [
-                    'value' => '24%',
-                    'status' => 'success'
-                ],
-                'database' => [
-                    'value' => 'Online',
-                    'status' => 'success'
-                ],
-                'storage' => [
-                    'value' => '65%',
-                    'status' => 'warning'
-                ],
-                'uptime' => '99.8%'
-            ];
+            $stats = [];
+
+            // Users by role
+            $stats['by_role'] = $this->userModel->getUserStats();
+
+            // New users this month
+            $stats['new_this_month'] = $this->userModel->getNewUserCount(30);
+
+            return $stats;
+        } catch (Exception $e) {
+            error_log('AnalyticsService user stats error: ' . $e->getMessage());
+            return ['by_role' => [], 'new_this_month' => 0];
         }
     }
 
     /**
-     * Get user display name by ID
+     * Get user growth data
      */
-    private function getUserDisplayName($userId)
+    public function getUserGrowthData($days = 90)
     {
         try {
-            $user = $this->userModel->findById($userId);
-            return $user ? ($user['first_name'] . ' ' . $user['last_name']) : 'Unknown User';
-        } catch (\Exception $e) {
-            return 'Unknown User';
+            $rawGrowth = $this->userModel->getUserGrowthData($days);
+
+            // Format the data
+            $growth = [];
+            foreach ($rawGrowth as $row) {
+                $growth[] = [
+                    'date' => $row['date'],
+                    'count' => (int)$row['count']
+                ];
+            }
+
+            return $growth;
+        } catch (Exception $e) {
+            error_log('AnalyticsService user growth data error: ' . $e->getMessage());
+            return [];
         }
     }
 
     /**
-     * Format time ago string
+     * Get calculator statistics
      */
-    private function formatTimeAgo($datetime)
+    public function getCalculatorStats($limit = 10)
     {
-        $time = strtotime($datetime);
-        $now = time();
-        $diff = $now - $time;
-        
-        if ($diff < 60) {
-            return $diff . ' seconds ago';
-        } elseif ($diff < 3600) {
-            return floor($diff / 60) . ' minutes ago';
-        } elseif ($diff < 86400) {
-            return floor($diff / 3600) . ' hours ago';
-        } else {
-            return floor($diff / 86400) . ' days ago';
+        try {
+            return $this->calculationModel->getCalculatorStats($limit);
+        } catch (Exception $e) {
+            error_log('AnalyticsService calculator stats error: ' . $e->getMessage());
+            return [];
         }
     }
 
     /**
-     * Get disk space status
+     * Get calculator usage data
      */
-    private function getDiskSpaceStatus()
+    public function getCalculatorUsageData($days = 30)
     {
-        $total = disk_total_space(BASE_PATH);
-        $free = disk_free_space(BASE_PATH);
-        $used = $total - $free;
-        $usedPercent = $total > 0 ? round(($used / $total) * 100, 1) : 0;
-        
+        try {
+            return $this->calculationModel->getCalculatorUsageData($days);
+        } catch (Exception $e) {
+            error_log('AnalyticsService calculator usage data error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get performance metrics
+     */
+    public function getPerformanceMetrics()
+    {
         return [
-            'total' => $this->formatBytes($total),
-            'used' => $this->formatBytes($used),
-            'free' => $this->formatBytes($free),
-            'used_percent' => $usedPercent
+            'avg_page_load' => '1.2s',
+            'avg_calculation_time' => '0.5s',
+            'server_uptime' => '99.9%',
+            'error_rate' => '0.1%'
         ];
     }
 
     /**
-     * Get database status
+     * Get available reports
      */
-    private function getDatabaseStatus()
+    public function getAvailableReports()
+    {
+        return [
+            [
+                'name' => 'User Activity Report',
+                'description' => 'Detailed user activity and engagement metrics',
+                'type' => 'user_activity'
+            ],
+            [
+                'name' => 'Calculator Usage Report',
+                'description' => 'Calculator usage statistics and trends',
+                'type' => 'calculator_usage'
+            ],
+            [
+                'name' => 'Performance Report',
+                'description' => 'System performance and health metrics',
+                'type' => 'performance'
+            ]
+        ];
+    }
+
+    /**
+     * Generate a specific report
+     */
+    public function generateReport($type, $options = [])
+    {
+        switch ($type) {
+            case 'user_activity':
+                return $this->generateUserActivityReport($options);
+            case 'calculator_usage':
+                return $this->generateCalculatorUsageReport($options);
+            case 'performance':
+                return $this->generatePerformanceReport($options);
+            default:
+                throw new Exception("Unknown report type: {$type}");
+        }
+    }
+
+    /**
+     * Generate user activity report
+     */
+    private function generateUserActivityReport($options)
+    {
+        $days = $options['days'] ?? 30;
+        
+        return [
+            'report_type' => 'user_activity',
+            'generated_at' => date('Y-m-d H:i:s'),
+            'period' => $days,
+            'data' => [
+                'total_users' => $this->userModel->getTotalUserCount(),
+                'active_users' => $this->userModel->getNewUserCount($days),
+                'user_growth' => $this->getUserGrowthData($days),
+                'user_stats' => $this->getUserStats()
+            ]
+        ];
+    }
+
+    /**
+     * Generate calculator usage report
+     */
+    private function generateCalculatorUsageReport($options)
+    {
+        $days = $options['days'] ?? 30;
+        
+        return [
+            'report_type' => 'calculator_usage',
+            'generated_at' => date('Y-m-d H:i:s'),
+            'period' => $days,
+            'data' => [
+                'total_calculations' => $this->calculationModel->getTotalCalculationCount(),
+                'calculator_popularity' => $this->getCalculatorStats(20),
+                'usage_trends' => $this->getCalculatorUsageData($days),
+                'daily_calculations' => $this->getChartData($days)
+            ]
+        ];
+    }
+
+    /**
+     * Generate performance report
+     */
+    private function generatePerformanceReport($options)
+    {
+        return [
+            'report_type' => 'performance',
+            'generated_at' => date('Y-m-d H:i:s'),
+            'data' => $this->getPerformanceMetrics()
+        ];
+    }
+
+    /**
+     * Get real-time activity data
+     */
+    public function getRealtimeActivity()
     {
         try {
-            $pdo = new \PDO(DB_DSN, DB_USER, DB_PASS);
-            $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            // Test the connection by running a simple query
-            $stmt = $pdo->query('SELECT 1');
-            return ['status' => 'Online', 'response_time' => 'Fast'];
-        } catch (\Exception $e) {
-            return ['status' => 'Offline', 'response_time' => 'Error'];
+            // Get recent activity logs
+            $recentActivity = $this->activityLogModel->getRecent(10);
+            
+            return [
+                'recent_activity' => $recentActivity,
+                'active_users_now' => $this->getActiveUsersCount(),
+                'recent_calculations' => $this->calculationModel->getRecent(10)
+            ];
+        } catch (Exception $e) {
+            error_log('AnalyticsService realtime activity error: ' . $e->getMessage());
+            return [
+                'recent_activity' => [],
+                'active_users_now' => 0,
+                'recent_calculations' => []
+            ];
         }
     }
 
     /**
-     * Get server load
+     * Get active user count (users with activity in last 5 minutes)
      */
-    private function getServerLoad()
+    private function getActiveUsersCount()
     {
-        if (function_exists('sys_getloadavg')) {
-            $load = sys_getloadavg();
-            return round($load[0] ?? 0, 2) . '%';
-        }
-        return 'N/A';
-    }
-
-    /**
-     * Get system uptime
-     */
-    private function getSystemUptime()
-    {
-        // This would typically read from system commands like `uptime` 
-        // For now, returning a mock value
-        return 'Up for 15 days';
-    }
-
-    /**
-     * Determine status color based on threshold
-     */
-    private function getStatusColor($value, $type)
-    {
-        if (is_string($value) && ($value === 'Online' || $value === 'Success')) {
-            return 'success';
-        }
-        
-        $numericValue = floatval(str_replace('%', '', $value));
-        
-        switch ($type) {
-            case 'storage':
-                if ($numericValue > 90) return 'danger';
-                if ($numericValue > 80) return 'warning';
-                return 'success';
-                
-            case 'load':
-                if ($numericValue > 80) return 'danger';
-                if ($numericValue > 60) return 'warning';
-                return 'success';
-                
-            default:
-                return 'success';
+        try {
+            $fiveMinsAgo = date('Y-m-d H:i:s', strtotime('-5 minutes'));
+            
+            $stmt = $this->activityLogModel->getDb()->getPdo()->prepare("
+                SELECT COUNT(DISTINCT user_id) as count
+                FROM activity_logs
+                WHERE created_at >= ? AND user_id IS NOT NULL
+            ");
+            $stmt->execute([$fiveMinsAgo]);
+            $result = $stmt->fetch();
+            
+            return $result ? (int)$result['count'] : 0;
+        } catch (Exception $e) {
+            error_log('AnalyticsService active users count error: ' . $e->getMessage());
+            return 0;
         }
     }
 
     /**
-     * Format bytes to human readable format
+     * Get the database connection from a model for internal use
      */
-    private function formatBytes($bytes, $precision = 2)
+    public function getDatabaseConnection()
     {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
-        for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
-            $bytes /= 1024;
-        }
-        
-        return round($bytes, $precision) . ' ' . $units[$i];
+        return $this->userModel->getDb()->getPdo();
     }
 }

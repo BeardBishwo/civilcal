@@ -1,366 +1,442 @@
 <?php
+
 namespace App\Services;
 
-/**
- * Email service for sending transactional and notification emails
- * Provides a clean interface for email operations
- */
-class EmailService {
-    private array $config;
-    private $logger;
-    
-    public function __construct($logger = null) {
-        $this->logger = $logger;
-        $this->loadConfiguration();
+use App\Models\EmailTemplate;
+use App\Models\EmailThread;
+use Exception;
+
+class EmailService
+{
+    private $emailTemplateModel;
+    private $emailThreadModel;
+
+    public function __construct()
+    {
+        $this->emailTemplateModel = new EmailTemplate();
+        $this->emailThreadModel = new EmailThread();
     }
-    
+
     /**
-     * Load email configuration
+     * Send an email using a template
      */
-    private function loadConfiguration(): void {
-        // Try to load from configuration file
-        $configFile = BASE_PATH . '/config/mail.php';
-        
-        if (file_exists($configFile)) {
-            $config = include $configFile;
-            if (is_array($config)) {
-                $this->config = $config;
-            } else {
-                // Fallback if config file doesn't return an array
-                $this->config = $this->getDefaultConfig();
-            }
-        } else {
-            // Fallback to default configuration
-            $this->config = $this->getDefaultConfig();
-        }
-    }
-    
-    /**
-     * Get default email configuration
-     */
-    private function getDefaultConfig(): array {
-        return [
-            'driver' => getenv('MAIL_DRIVER') ?: 'smtp',
-            'host' => getenv('MAIL_HOST') ?: 'localhost',
-            'port' => getenv('MAIL_PORT') ?: 587,
-            'username' => getenv('MAIL_USERNAME') ?: '',
-            'password' => getenv('MAIL_PASSWORD') ?: '',
-            'encryption' => getenv('MAIL_ENCRYPTION') ?: 'tls',
-            'from' => [
-                'address' => getenv('MAIL_FROM_ADDRESS') ?: 'noreply@example.com',
-                'name' => getenv('MAIL_FROM_NAME') ?: 'Bishwo Calculator'
-            ]
-        ];
-    }
-    
-    /**
-     * Send a simple email
-     */
-    public function send(string $to, string $subject, string $body, array $options = []): bool {
+    public function sendEmailUsingTemplate($templateId, $recipient, $variables = [])
+    {
         try {
-            $headers = $this->buildHeaders($to, $subject, $options);
-            $message = $this->buildMessage($body, $options);
+            // Get the template
+            $template = $this->emailTemplateModel->find($templateId);
             
-            $result = mail($to, $subject, $message, $headers);
-            
-            if ($result) {
-                $this->logEmail('sent', $to, $subject);
-                return true;
-            } else {
-                $this->logEmail('failed', $to, $subject, 'Mail function returned false');
-                return false;
+            if (!$template) {
+                throw new Exception("Email template not found: {$templateId}");
             }
+
+            // Process the template with variables
+            $processedContent = $this->emailTemplateModel->processTemplate($templateId, $variables);
             
-        } catch (\Exception $e) {
-            $this->logEmail('error', $to, $subject, $e->getMessage());
-            return false;
-        }
-    }
-    
-    /**
-     * Send HTML email
-     */
-    public function sendHtml(string $to, string $subject, string $htmlBody, array $options = []): bool {
-        $options['html'] = true;
-        return $this->send($to, $subject, $htmlBody, $options);
-    }
-    
-    /**
-     * Send email with template
-     */
-    public function sendTemplate(string $to, string $template, array $data = [], array $options = []): bool {
-        $templatePath = BASE_PATH . "/app/Views/email/{$template}.php";
-        
-        if (!file_exists($templatePath)) {
-            $this->logEmail('error', $to, 'Template not found', "Template: {$template}");
-            return false;
-        }
-        
-        // Extract template variables
-        extract($data);
-        
-        // Capture template output
-        ob_start();
-        include $templatePath;
-        $body = ob_get_clean();
-        
-        return $this->send($to, $options['subject'] ?? 'Notification', $body, $options);
-    }
-    
-    /**
-     * Build email headers
-     */
-    private function buildHeaders(string $to, string $subject, array $options): string {
-        $headers = [];
-        
-        // From header
-        $from = $options['from'] ?? $this->config['from'];
-        $headers[] = "From: {$from['name']} <{$from['address']}>";
-        $headers[] = "Reply-To: {$from['name']} <{$from['address']}>";
-        
-        // MIME headers for HTML emails
-        if ($options['html'] ?? false) {
-            $headers[] = 'MIME-Version: 1.0';
-            $headers[] = 'Content-Type: text/html; charset=UTF-8';
-        } else {
-            $headers[] = 'Content-Type: text/plain; charset=UTF-8';
-        }
-        
-        // CC and BCC
-        if (isset($options['cc'])) {
-            $headers[] = "Cc: {$options['cc']}";
-        }
-        
-        if (isset($options['bcc'])) {
-            $headers[] = "Bcc: {$options['bcc']}";
-        }
-        
-        return implode("\r\n", $headers);
-    }
-    
-    /**
-     * Build email message body
-     */
-    private function buildMessage(string $body, array $options): string {
-        // Add signature if specified
-        if (isset($options['signature']) && $options['signature']) {
-            $signature = $this->getSignature();
-            $body .= "\r\n\r\n" . $signature;
-        }
-        
-        // Process newlines for email
-        $body = str_replace("\r\n", "\r\n", $body);
-        $body = str_replace("\n", "\r\n", $body);
-        
-        return $body;
-    }
-    
-    /**
-     * Get email signature
-     */
-    private function getSignature(): string {
-        return "-- \r\n" . 
-               $this->config['from']['name'] . "\r\n" .
-               "Bishwo Calculator Team\r\n" .
-               "https://example.com";
-    }
-    
-    /**
-     * Log email activity
-     */
-    private function logEmail(string $action, string $to, string $subject, string $error = ''): void {
-        if ($this->logger) {
-            $logData = [
-                'action' => $action,
-                'to' => $to,
-                'subject' => $subject,
-                'timestamp' => date('Y-m-d H:i:s')
-            ];
-            
-            if ($error) {
-                $logData['error'] = $error;
-                $this->logger->error("Email {$action}: {$error}", $logData);
-            } else {
-                $this->logger->info("Email {$action}", $logData);
+            if ($processedContent === false) {
+                throw new Exception("Failed to process template: {$templateId}");
             }
-        }
-    }
-    
-    /**
-     * Send welcome email to new user
-     */
-    public function sendWelcomeEmail(string $to, string $userName): bool {
-        $subject = 'Welcome to Bishwo Calculator!';
-        
-        $htmlBody = "
-        <html>
-        <head>
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #007bff; color: white; padding: 20px; text-align: center; }
-                .content { padding: 20px; background: #f8f9fa; }
-                .footer { padding: 15px; background: #6c757d; color: white; text-align: center; }
-                .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
-            </style>
-        </head>
-        <body>
-            <div class='container'>
-                <div class='header'>
-                    <h1>Welcome to Bishwo Calculator!</h1>
-                </div>
-                <div class='content'>
-                    <h2>Hello {$userName},</h2>
-                    <p>Thank you for joining Bishwo Calculator! We're excited to have you on board.</p>
-                    <p>Our platform provides over 250 specialized engineering calculators across 10+ disciplines, designed specifically for Architecture, Engineering, and Construction professionals.</p>
-                    <p><a href='https://example.com/login' class='btn'>Get Started</a></p>
-                    <p>If you have any questions, feel free to reply to this email.</p>
-                </div>
-                <div class='footer'>
-                    <p>&copy; " . date('Y') . " Bishwo Calculator. All rights reserved.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        ";
-        
-        return $this->sendHtml($to, $subject, $htmlBody);
-    }
-    
-    /**
-     * Send password reset email
-     */
-    public function sendPasswordResetEmail(string $to, string $userName, string $resetToken): bool {
-        $subject = 'Password Reset Request';
-        
-        $resetUrl = "https://example.com/reset-password?token={$resetToken}";
-        
-        $htmlBody = "
-        <html>
-        <head>
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #ffc107; color: #333; padding: 20px; text-align: center; }
-                .content { padding: 20px; background: #f8f9fa; }
-                .footer { padding: 15px; background: #6c757d; color: white; text-align: center; }
-                .btn { display: inline-block; padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; }
-            </style>
-        </head>
-        <body>
-            <div class='container'>
-                <div class='header'>
-                    <h1>Password Reset</h1>
-                </div>
-                <div class='content'>
-                    <h2>Hello {$userName},</h2>
-                    <p>We received a request to reset your password. If you made this request, click the button below to reset your password:</p>
-                    <p><a href='{$resetUrl}' class='btn'>Reset Password</a></p>
-                    <p>If you didn't request this reset, you can safely ignore this email.</p>
-                    <p>This reset link will expire in 1 hour for security reasons.</p>
-                </div>
-                <div class='footer'>
-                    <p>&copy; " . date('Y') . " Bishwo Calculator. All rights reserved.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        ";
-        
-        return $this->sendHtml($to, $subject, $htmlBody);
-    }
-    
-    /**
-     * Send calculation result email
-     */
-    public function sendCalculationResultEmail(string $to, string $userName, string $calculationType, array $results): bool {
-        $subject = "Your {$calculationType} Calculation Results";
-        
-        $htmlBody = "
-        <html>
-        <head>
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #28a745; color: white; padding: 20px; text-align: center; }
-                .content { padding: 20px; background: #f8f9fa; }
-                .results { background: white; padding: 15px; border-radius: 5px; margin: 15px 0; }
-                .footer { padding: 15px; background: #6c757d; color: white; text-align: center; }
-                table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-                th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-                th { background-color: #f2f2f2; }
-            </style>
-        </head>
-        <body>
-            <div class='container'>
-                <div class='header'>
-                    <h1>Calculation Results</h1>
-                </div>
-                <div class='content'>
-                    <h2>Hello {$userName},</h2>
-                    <p>Your {$calculationType} calculation has been completed successfully!</p>
-                    <div class='results'>
-                        <h3>Results:</h3>
-                        <table>
-        ";
-        
-        foreach ($results as $key => $value) {
-            $htmlBody .= "<tr><th>" . htmlspecialchars($key) . "</th><td>" . htmlspecialchars($value) . "</td></tr>";
-        }
-        
-        $htmlBody .="                    </table>
-                    </div>
-                    <p>Thank you for using Bishwo Calculator!</p>
-                </div>
-                <div class='footer'>
-                    <p>&copy; " . date('Y') . " Bishwo Calculator. All rights reserved.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        ";
-        
-        return $this->sendHtml($to, $subject, $htmlBody);
-    }
-    
-    /**
-     * Test email configuration
-     */
-    public function testConnection(): array {
-        try {
-            // Test basic mail function
-            $testEmail = $this->config['from']['address'];
-            $testSubject = 'Test Email';
-            $testBody = 'This is a test email to verify the email configuration.';
-            
-            $result = mail($testEmail, $testSubject, $testBody);
-            
+
+            // Send the email
+            $result = $this->sendEmail(
+                $recipient,
+                $processedContent['subject'],
+                $processedContent['content']
+            );
+
             return [
-                'success' => $result,
-                'message' => $result ? 'Email configuration is working' : 'Email configuration failed',
-                'config' => [
-                    'driver' => $this->config['driver'],
-                    'from_email' => $this->config['from']['address']
-                ]
+                'success' => true,
+                'message' => 'Email sent successfully',
+                'result' => $result
             ];
-            
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Email configuration error: ' . $e->getMessage(),
-                'config' => $this->config
+                'message' => 'Email sending failed: ' . $e->getMessage()
             ];
         }
     }
-    
+
+    /**
+     * Send a direct email
+     */
+    public function sendEmail($to, $subject, $body, $from = null, $replyTo = null)
+    {
+        try {
+            // Validate required parameters
+            if (empty($to) || empty($subject) || empty($body)) {
+                throw new Exception("Missing required email parameters");
+            }
+
+            // Validate email address
+            if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("Invalid recipient email: {$to}");
+            }
+
+            // Prepare headers
+            $headers = [];
+            
+            if ($from) {
+                if (filter_var($from, FILTER_VALIDATE_EMAIL)) {
+                    $headers[] = "From: {$from}";
+                } else {
+                    throw new Exception("Invalid sender email: {$from}");
+                }
+            } else {
+                // Use default sender
+                $defaultFrom = $_ENV['MAIL_FROM'] ?? (defined('MAIL_FROM') ? MAIL_FROM : 'noreply@' . $_SERVER['HTTP_HOST']);
+                $headers[] = "From: {$defaultFrom}";
+            }
+
+            $headers[] = "Reply-To: " . ($replyTo ?? $to);
+            $headers[] = "MIME-Version: 1.0";
+            $headers[] = "Content-Type: text/html; charset=UTF-8";
+            $headers[] = "X-Mailer: PHP/" . phpversion();
+
+            // Send the email
+            $mailSent = mail($to, $subject, $body, implode("\r\n", $headers));
+
+            if ($mailSent) {
+                return [
+                    'success' => true,
+                    'message' => 'Email sent successfully'
+                ];
+            } else {
+                throw new Exception("Mail function failed to send email");
+            }
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Email sending failed: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Create a new email thread
+     */
+    public function createEmailThread($data)
+    {
+        try {
+            // Validate required data
+            $requiredFields = ['from_email', 'from_name', 'subject', 'message'];
+            foreach ($requiredFields as $field) {
+                if (empty($data[$field])) {
+                    throw new Exception("Missing required field: {$field}");
+                }
+            }
+
+            // Validate email address
+            if (!filter_var($data['from_email'], FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("Invalid email address: {$data['from_email']}");
+            }
+
+            // Create the thread using the model
+            $result = $this->emailThreadModel->create($data);
+
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Email thread created successfully'
+                ];
+            } else {
+                throw new Exception("Failed to create email thread");
+            }
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Email thread creation failed: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Add response to an email thread
+     */
+    public function addResponseToThread($threadId, $userId, $message, $isInternalNote = false)
+    {
+        try {
+            $result = $this->emailThreadModel->addResponseToThread($threadId, $userId, $message, $isInternalNote);
+
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Response added to thread successfully'
+                ];
+            } else {
+                throw new Exception("Failed to add response to thread: {$threadId}");
+            }
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Adding response to thread failed: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Get all email threads with optional filters
+     */
+    public function getEmailThreads($filters = [], $page = 1, $perPage = 20)
+    {
+        try {
+            return $this->emailThreadModel->getThreadsWithFilters($filters, $page, $perPage);
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Failed to retrieve email threads: ' . $e->getMessage(),
+                'data' => []
+            ];
+        }
+    }
+
+    /**
+     * Get email thread by ID
+     */
+    public function getEmailThreadById($id)
+    {
+        try {
+            return $this->emailThreadModel->getThreadById($id);
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Failed to retrieve email thread: ' . $e->getMessage(),
+                'data' => null
+            ];
+        }
+    }
+
+    /**
+     * Update email thread status
+     */
+    public function updateEmailThread($id, $data)
+    {
+        try {
+            $result = $this->emailThreadModel->update($id, $data);
+
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Email thread updated successfully'
+                ];
+            } else {
+                throw new Exception("Failed to update email thread: {$id}");
+            }
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Email thread update failed: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Get email template by ID
+     */
+    public function getEmailTemplate($id)
+    {
+        try {
+            return $this->emailTemplateModel->find($id);
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Failed to retrieve email template: ' . $e->getMessage(),
+                'data' => null
+            ];
+        }
+    }
+
+    /**
+     * Get email template by name
+     */
+    public function getEmailTemplateByName($name)
+    {
+        try {
+            return $this->emailTemplateModel->findByName($name);
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Failed to retrieve email template: ' . $e->getMessage(),
+                'data' => null
+            ];
+        }
+    }
+
+    /**
+     * Create a new email template
+     */
+    public function createEmailTemplate($data)
+    {
+        try {
+            // Validate required fields
+            $validation = $this->emailTemplateModel->validate($data);
+            if (!$validation['valid']) {
+                return [
+                    'success' => false,
+                    'message' => 'Validation failed: ' . implode(', ', $validation['errors']),
+                    'errors' => $validation['errors']
+                ];
+            }
+
+            // Create the template
+            $result = $this->emailTemplateModel->create($validation['data']);
+
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Email template created successfully',
+                    'template_id' => $result
+                ];
+            } else {
+                throw new Exception("Failed to create email template");
+            }
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Email template creation failed: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Update an existing email template
+     */
+    public function updateEmailTemplate($id, $data)
+    {
+        try {
+            // Validate data
+            $validation = $this->emailTemplateModel->validate($data);
+            if (!$validation['valid']) {
+                return [
+                    'success' => false,
+                    'message' => 'Validation failed: ' . implode(', ', $validation['errors']),
+                    'errors' => $validation['errors']
+                ];
+            }
+
+            // Update the template
+            $result = $this->emailTemplateModel->update($id, $validation['data']);
+
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Email template updated successfully'
+                ];
+            } else {
+                throw new Exception("Failed to update email template: {$id}");
+            }
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Email template update failed: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Get all email templates with optional filters
+     */
+    public function getAllEmailTemplates($filters = [], $page = 1, $perPage = 20)
+    {
+        try {
+            return $this->emailTemplateModel->getAll($filters, $page, $perPage);
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Failed to retrieve email templates: ' . $e->getMessage(),
+                'data' => []
+            ];
+        }
+    }
+
+    /**
+     * Send bulk emails
+     */
+    public function sendBulkEmails($recipients, $subject, $body, $templateId = null, $variables = [])
+    {
+        try {
+            $results = [
+                'sent' => 0,
+                'failed' => 0,
+                'results' => []
+            ];
+
+            foreach ($recipients as $index => $recipient) {
+                $emailSubject = $subject;
+                $emailBody = $body;
+                
+                // If template is provided, process it with variables for this recipient
+                if ($templateId) {
+                    $recipientVariables = isset($variables[$index]) ? $variables[$index] : [];
+                    $processed = $this->emailTemplateModel->processTemplate($templateId, $recipientVariables);
+                    
+                    if ($processed !== false) {
+                        $emailSubject = $processed['subject'];
+                        $emailBody = $processed['content'];
+                    }
+                }
+
+                $result = $this->sendEmail($recipient, $emailSubject, $emailBody);
+                $results['results'][] = [
+                    'recipient' => $recipient,
+                    'result' => $result
+                ];
+
+                if ($result['success']) {
+                    $results['sent']++;
+                } else {
+                    $results['failed']++;
+                }
+            }
+
+            $results['success'] = true;
+            $results['message'] = "Bulk email operation completed. Sent: {$results['sent']}, Failed: {$results['failed']}";
+
+            return $results;
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Bulk email operation failed: ' . $e->getMessage(),
+                'sent' => 0,
+                'failed' => 0,
+                'results' => []
+            ];
+        }
+    }
+
     /**
      * Get email statistics
      */
-    public function getStats(): array {
-        return [
-            'driver' => $this->config['driver'],
-            'from_email' => $this->config['from']['address'],
-            'from_name' => $this->config['from']['name']
-        ];
+    public function getEmailStats()
+    {
+        try {
+            $templateStats = $this->emailTemplateModel->getStats();
+            $threadCount = $this->emailThreadModel->getTotalThreadCount();
+            
+            return [
+                'success' => true,
+                'stats' => [
+                    'total_templates' => $templateStats['total_templates'] ?? 0,
+                    'active_templates' => $templateStats['active_templates'] ?? 0,
+                    'inactive_templates' => $templateStats['inactive_templates'] ?? 0,
+                    'total_threads' => $threadCount,
+                    'templates_by_type' => $this->emailTemplateModel->getTemplateTypes()
+                ]
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Failed to retrieve email stats: ' . $e->getMessage(),
+                'stats' => []
+            ];
+        }
+    }
+
+    /**
+     * Validate email address
+     */
+    public function validateEmail($email)
+    {
+        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
     }
 }

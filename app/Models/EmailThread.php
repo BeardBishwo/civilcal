@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use App\Core\Database;
+use Exception;
 
 class EmailThread {
     private $db;
-    
+
     public function __construct() {
         $this->db = Database::getInstance();
     }

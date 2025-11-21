@@ -544,4 +544,66 @@ class User
             'total_pages' => ceil($total / $perPage)
         ];
     }
+
+    /**
+     * Get user statistics for analytics
+     */
+    public function getUserStats()
+    {
+        $stmt = $this->db->getPdo()->query("
+            SELECT role, COUNT(*) as count
+            FROM users
+            GROUP BY role
+        ");
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Get new user count for a specific period
+     */
+    public function getNewUserCount($days = 30)
+    {
+        $stmt = $this->db->getPdo()->prepare("
+            SELECT COUNT(*) as count
+            FROM users
+            WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+        ");
+        $stmt->execute([$days]);
+        $result = $stmt->fetch();
+        return $result ? $result['count'] : 0;
+    }
+
+    /**
+     * Get user growth data
+     */
+    public function getUserGrowthData($days = 90)
+    {
+        $stmt = $this->db->getPdo()->prepare("
+            SELECT DATE(created_at) as date, COUNT(*) as count
+            FROM users
+            WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+            GROUP BY DATE(created_at)
+            ORDER BY date ASC
+        ");
+        $stmt->execute([$days]);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Get total user count
+     */
+    public function getTotalUserCount()
+    {
+        $stmt = $this->db->getPdo()->query("SELECT COUNT(*) as count FROM users");
+        $result = $stmt->fetch();
+        return $result ? $result['count'] : 0;
+    }
+
+    /**
+     * Get database connection
+     */
+    public function getDb()
+    {
+        return $this->db;
+    }
 }

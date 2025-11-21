@@ -1,238 +1,109 @@
 <?php
+
 namespace App\Services;
+
+use Exception;
 
 class BackupService
 {
     private $backupDir;
-    private $databaseConfig;
+    private $maxBackupSize;
 
     public function __construct()
     {
         $this->backupDir = BASE_PATH . '/storage/backups';
-        $this->databaseConfig = [
-            'host' => defined('DB_HOST') ? DB_HOST : 'localhost',
-            'dbname' => defined('DB_NAME') ? DB_NAME : '',
-            'username' => defined('DB_USER') ? DB_USER : '',
-            'password' => defined('DB_PASS') ? DB_PASS : '',
-        ];
-        
-        // Create backup directory if it doesn't exist
-        if (!is_dir($this->backupDir)) {
-            mkdir($this->backupDir, 0755, true);
-        }
+        $this->maxBackupSize = 500 * 1024 * 1024; // 500MB in bytes
+        $this->ensureBackupDirectory();
     }
 
     /**
-     * Create a full backup of the application
+     * Create a new backup
      */
-    public function createBackup($includeDatabase = true, $includeFiles = true, $customName = null)
+    public function createBackup($includeDatabase = true, $includeFiles = true, $backupName = null)
     {
         try {
-            $backupName = $customName ?: 'backup_' . date('Y-m-d_H-i-s');
-            $backupPath = $this->backupDir . '/' . $backupName . '.zip';
-            
+            // Generate backup name if not provided
+            if (!$backupName) {
+                $backupName = 'backup_' . date('Y-m-d_H-i-s') . '.zip';
+            } else {
+                $backupName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $backupName) . '_' . date('Y-m-d_H-i-s') . '.zip';
+            }
+
+            $backupPath = $this->backupDir . '/' . $backupName;
+
+            // Create a new zip archive
             $zip = new \ZipArchive();
             $zipOpen = $zip->open($backupPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-            
+
             if ($zipOpen !== true) {
-                throw new \Exception('Could not create backup file: ' . $backupPath);
+                throw new Exception("Cannot create backup file at: {$backupPath}");
             }
-            
+
             // Add database dump if requested
             if ($includeDatabase) {
-                $dbDump = $this->createDatabaseDump();
-                $zip->addFromString('database.sql', $dbDump);
+                $dbDumpPath = $this->createDatabaseDump();
+                $zip->addFile($dbDumpPath, 'database_dump.sql');
+                
+                // Clean up the temporary dump file
+                unlink($dbDumpPath);
             }
-            
-            // Add application files if requested
+
+            // Add files if requested
             if ($includeFiles) {
-                $this->addDirectoryToZip($zip, BASE_PATH, 'app');
+                $this->addDirectoryToZip($zip, BASE_PATH, 'files');
             }
-            
+
             $zip->close();
-            
+
+            // Check backup size
+            $backupSize = filesize($backupPath);
+            if ($backupSize > $this->maxBackupSize) {
+                unlink($backupPath); // Delete oversized backup
+                throw new Exception("Backup exceeds maximum allowed size of " . ($this->maxBackupSize / (1024*1024)) . "MB");
+            }
+
             return [
                 'success' => true,
-                'path' => $backupPath,
-                'size' => filesize($backupPath),
-                'message' => 'Backup created successfully'
+                'message' => 'Backup created successfully',
+                'backup_name' => $backupName,
+                'size' => $backupSize,
+                'path' => $backupPath
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Backup failed: ' . $e->getMessage()
+                'message' => 'Backup creation failed: ' . $e->getMessage()
             ];
         }
     }
 
     /**
-     * Create a database dump
-     */
-    private function createDatabaseDump()
-    {
-        try {
-            $dsn = "mysql:host={$this->databaseConfig['host']};dbname={$this->databaseConfig['dbname']};charset=utf8mb4";
-            $pdo = new \PDO($dsn, $this->databaseConfig['username'], $this->databaseConfig['password']);
-            $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            
-            // Get all table names
-            $tables = [];
-            $result = $pdo->query("SHOW TABLES");
-            while ($row = $result->fetch(\PDO::FETCH_NUM)) {
-                $tables[] = $row[0];
-            }
-            
-            $sqlDump = "-- Database Backup\n-- Generated: " . date('Y-m-d H:i:s') . "\n\n";
-            
-            foreach ($tables as $table) {
-                // Get table structure
-                $createTable = $pdo->query("SHOW CREATE TABLE `{$table}`")->fetch(\PDO::FETCH_NUM);
-                $sqlDump .= "\n" . $createTable[1] . ";\n\n";
-                
-                // Get table data
-                $result = $pdo->query("SELECT * FROM `{$table}`");
-                while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-                    $sqlDump .= "INSERT INTO `{$table}` VALUES (";
-                    $values = [];
-                    foreach ($row as $value) {
-                        if ($value === null) {
-                            $values[] = 'NULL';
-                        } else {
-                            $values[] = $pdo->quote($value);
-                        }
-                    }
-                    $sqlDump .= implode(', ', $values) . ");\n";
-                }
-            }
-            
-            return $sqlDump;
-        } catch (\Exception $e) {
-            error_log('BackupService::createDatabaseDump error: ' . $e->getMessage());
-            throw new \Exception('Database dump failed: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Add a directory to zip archive
-     */
-    private function addDirectoryToZip($zip, $dir, $zipPath = '')
-    {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS)
-        );
-        
-        foreach ($iterator as $file) {
-            if ($file->isFile()) {
-                $filePath = $file->getRealPath();
-                $relativePath = $zipPath . '/' . substr($filePath, strlen(BASE_PATH) + 1);
-                
-                // Skip backup directory to avoid including backups in backups
-                if (strpos($relativePath, '/storage/backups/') === false) {
-                    $zip->addFile($filePath, $relativePath);
-                }
-            }
-        }
-    }
-
-    /**
-     * Restore a backup from file
-     */
-    public function restoreBackup($backupFile)
-    {
-        try {
-            if (!file_exists($backupFile)) {
-                throw new \Exception('Backup file does not exist: ' . $backupFile);
-            }
-            
-            $zip = new \ZipArchive();
-            $zipOpen = $zip->open($backupFile);
-            
-            if ($zipOpen !== true) {
-                throw new \Exception('Could not open backup file: ' . $backupFile);
-            }
-            
-            // Extract to a temporary directory
-            $tempDir = $this->backupDir . '/temp_restore_' . time();
-            mkdir($tempDir, 0755, true);
-            
-            $zip->extractTo($tempDir);
-            $zip->close();
-            
-            // Look for database dump
-            $dbDumpFile = $tempDir . '/database.sql';
-            if (file_exists($dbDumpFile)) {
-                $this->restoreDatabase($dbDumpFile);
-            }
-            
-            // For now, we'll just return success
-            // In a real implementation, you would restore the files as well
-            $this->removeDirectory($tempDir);
-            
-            return [
-                'success' => true,
-                'message' => 'Backup restored successfully'
-            ];
-        } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'message' => 'Restore failed: ' . $e->getMessage()
-            ];
-        }
-    }
-
-    /**
-     * Restore database from SQL file
-     */
-    private function restoreDatabase($sqlFile)
-    {
-        try {
-            $dsn = "mysql:host={$this->databaseConfig['host']};dbname={$this->databaseConfig['dbname']};charset=utf8mb4";
-            $pdo = new \PDO($dsn, $this->databaseConfig['username'], $this->databaseConfig['password']);
-            $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            
-            $sql = file_get_contents($sqlFile);
-            $statements = explode(";\n", $sql);
-            
-            foreach ($statements as $statement) {
-                $statement = trim($statement);
-                if (!empty($statement)) {
-                    $pdo->exec($statement);
-                }
-            }
-        } catch (\Exception $e) {
-            error_log('BackupService::restoreDatabase error: ' . $e->getMessage());
-            throw new \Exception('Database restore failed: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Get list of available backups
+     * Get list of all backups
      */
     public function getBackupList()
     {
         $backups = [];
-        
-        if (is_dir($this->backupDir)) {
-            $files = scandir($this->backupDir);
-            foreach ($files as $file) {
-                if (pathinfo($file, PATHINFO_EXTENSION) === 'zip') {
-                    $filePath = $this->backupDir . '/' . $file;
-                    $backups[] = [
-                        'name' => $file,
-                        'path' => $filePath,
-                        'size' => filesize($filePath),
-                        'date' => date('Y-m-d H:i:s', filemtime($filePath)),
-                        'formatted_size' => $this->formatBytes(filesize($filePath))
-                    ];
-                }
-            }
+        $files = glob($this->backupDir . '/*.zip');
+
+        foreach ($files as $file) {
+            $fileName = basename($file);
+            $fileSize = filesize($file);
+            $fileTime = filemtime($file);
+
+            $backups[] = [
+                'name' => $fileName,
+                'size' => $fileSize,
+                'size_formatted' => $this->formatBytes($fileSize),
+                'date' => date('Y-m-d H:i:s', $fileTime),
+                'timestamp' => $fileTime
+            ];
         }
-        
+
         // Sort by date (newest first)
-        usort($backups, function($a, $b) {
-            return strtotime($b['date']) - strtotime($a['date']);
+        usort($backups, function ($a, $b) {
+            return $b['timestamp'] - $a['timestamp'];
         });
-        
+
         return $backups;
     }
 
@@ -243,72 +114,406 @@ class BackupService
     {
         try {
             $backupPath = $this->backupDir . '/' . $backupName;
-            
-            if (file_exists($backupPath)) {
-                unlink($backupPath);
+
+            if (!file_exists($backupPath)) {
+                throw new Exception("Backup file does not exist: {$backupName}");
+            }
+
+            if (unlink($backupPath)) {
                 return [
                     'success' => true,
                     'message' => 'Backup deleted successfully'
                 ];
             } else {
-                return [
-                    'success' => false,
-                    'message' => 'Backup file does not exist'
-                ];
+                throw new Exception("Failed to delete backup file: {$backupName}");
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Delete failed: ' . $e->getMessage()
+                'message' => 'Backup deletion failed: ' . $e->getMessage()
             ];
         }
     }
 
     /**
-     * Schedule automatic backups
+     * Restore from a backup file
+     */
+    public function restoreBackup($backupPath)
+    {
+        try {
+            if (!file_exists($backupPath)) {
+                throw new Exception("Backup file does not exist: {$backupPath}");
+            }
+
+            $zip = new \ZipArchive();
+            $zipOpen = $zip->open($backupPath);
+
+            if ($zipOpen !== true) {
+                throw new Exception("Cannot open backup file: {$backupPath}");
+            }
+
+            // Create temporary directory for extraction
+            $tempDir = $this->backupDir . '/temp_restore_' . uniqid();
+            if (!mkdir($tempDir, 0755, true)) {
+                throw new Exception("Cannot create temporary directory for restore");
+            }
+
+            // Extract the backup
+            $zip->extractTo($tempDir);
+            $zip->close();
+
+            // Process different backup components
+            $hasDatabase = file_exists($tempDir . '/database_dump.sql');
+            $hasFiles = is_dir($tempDir . '/files');
+
+            $results = [];
+
+            // Restore database if available
+            if ($hasDatabase) {
+                $results['database'] = $this->restoreDatabase($tempDir . '/database_dump.sql');
+            }
+
+            // Restore files if available
+            if ($hasFiles) {
+                $results['files'] = $this->restoreFiles($tempDir . '/files');
+            }
+
+            // Clean up temporary directory
+            $this->deleteDirectory($tempDir);
+
+            return [
+                'success' => true,
+                'message' => 'Restore completed successfully',
+                'details' => $results
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Restore failed: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Schedule automated backups
      */
     public function scheduleBackup($schedule = 'daily', $retention = 7)
     {
-        // In a real implementation, this would set up cron jobs or scheduled tasks
-        // For now, we'll just return a success message
+        try {
+            // In a real implementation, this would integrate with a cron job or task scheduler
+            // For now, we'll just return a message indicating the schedule
+            
+            $validSchedules = ['hourly', 'daily', 'weekly', 'monthly'];
+            if (!in_array($schedule, $validSchedules)) {
+                throw new Exception("Invalid schedule: {$schedule}. Valid options: " . implode(', ', $validSchedules));
+            }
+
+            // Validate retention
+            if (!is_numeric($retention) || $retention < 1) {
+                throw new Exception("Retention must be a positive number, got: {$retention}");
+            }
+
+            return [
+                'success' => true,
+                'message' => "Backup scheduled: {$schedule}, retention: {$retention} backups",
+                'schedule' => $schedule,
+                'retention' => $retention
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Scheduling failed: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Get backup statistics
+     */
+    public function getBackupStats()
+    {
+        $backups = $this->getBackupList();
+        $totalSize = 0;
+        
+        foreach ($backups as $backup) {
+            $totalSize += $backup['size'];
+        }
+
         return [
-            'success' => true,
-            'message' => 'Backup scheduled: ' . $schedule . ' with ' . $retention . ' days retention'
+            'total_backups' => count($backups),
+            'total_size' => $totalSize,
+            'total_size_formatted' => $this->formatBytes($totalSize),
+            'latest_backup' => $backups[0] ?? null
         ];
     }
 
     /**
-     * Format bytes to human readable format
+     * Create a database dump
      */
-    private function formatBytes($bytes, $precision = 2)
+    private function createDatabaseDump()
     {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
-        for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
-            $bytes /= 1024;
+        try {
+            // Get database configuration
+            $dbHost = $_ENV['DB_HOST'] ?? (defined('DB_HOST') ? DB_HOST : 'localhost');
+            $dbUser = $_ENV['DB_USER'] ?? (defined('DB_USER') ? DB_USER : 'root');
+            $dbPass = $_ENV['DB_PASSWORD'] ?? (defined('DB_PASSWORD') ? DB_PASSWORD : '');
+            $dbName = $_ENV['DB_NAME'] ?? (defined('DB_NAME') ? DB_NAME : 'engical');
+            
+            // Create temporary file
+            $tempFile = $this->backupDir . '/temp_dump_' . uniqid() . '.sql';
+            
+            // Use mysqldump if available, otherwise use PHP method
+            if (function_exists('exec')) {
+                $command = "mysqldump --host={$dbHost} --user={$dbUser} --password={$dbPass} {$dbName}";
+                $output = [];
+                $returnCode = 0;
+                exec($command, $output, $returnCode);
+                
+                if ($returnCode === 0) {
+                    $dumpContent = implode("\n", $output);
+                    file_put_contents($tempFile, $dumpContent);
+                    return $tempFile;
+                }
+            }
+            
+            // Fallback to PHP method if mysqldump is not available
+            return $this->createDatabaseDumpWithPHP();
+        } catch (Exception $e) {
+            throw new Exception("Failed to create database dump: " . $e->getMessage());
         }
-        
-        return round($bytes, $precision) . ' ' . $units[$i];
     }
 
     /**
-     * Remove directory recursively
+     * Create database dump using PHP (fallback method)
      */
-    private function removeDirectory($dir)
+    private function createDatabaseDumpWithPHP()
     {
-        if (is_dir($dir)) {
-            $objects = scandir($dir);
-            foreach ($objects as $object) {
-                if ($object !== '.' && $object !== '..') {
-                    $path = $dir . '/' . $object;
-                    if (is_dir($path)) {
-                        $this->removeDirectory($path);
-                    } else {
-                        unlink($path);
+        try {
+            // Create temporary file
+            $tempFile = $this->backupDir . '/temp_dump_' . uniqid() . '.sql';
+            $handle = fopen($tempFile, 'w');
+
+            // Get database connection - assuming we can access it through a global function
+            $pdo = $this->getDbConnection();
+
+            // Get all table names
+            $stmt = $pdo->query("SHOW TABLES");
+            $tables = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+
+            foreach ($tables as $table) {
+                // Get table structure
+                $createTableStmt = $pdo->query("SHOW CREATE TABLE `{$table}`");
+                $createTable = $createTableStmt->fetch();
+                $tableStructure = $createTable['Create Table'];
+
+                // Write table structure
+                fwrite($handle, "DROP TABLE IF EXISTS `{$table}`;\n");
+                fwrite($handle, $tableStructure . ";\n\n");
+
+                // Get table data
+                $dataStmt = $pdo->query("SELECT * FROM `{$table}`");
+                while ($row = $dataStmt->fetch(\PDO::FETCH_ASSOC)) {
+                    $values = [];
+                    foreach ($row as $value) {
+                        $values[] = $value === null ? 'NULL' : $pdo->quote($value);
                     }
+                    fwrite($handle, "INSERT INTO `{$table}` VALUES (" . implode(',', $values) . ");\n");
+                }
+                fwrite($handle, "\n");
+            }
+
+            fclose($handle);
+
+            return $tempFile;
+        } catch (Exception $e) {
+            throw new Exception("Failed to create database dump with PHP: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Restore database from SQL file
+     */
+    private function restoreDatabase($sqlFilePath)
+    {
+        try {
+            $sql = file_get_contents($sqlFilePath);
+            if ($sql === false) {
+                throw new Exception("Cannot read SQL file: {$sqlFilePath}");
+            }
+
+            $pdo = $this->getDbConnection();
+            
+            // Split SQL into statements (simple approach - may need more sophisticated parsing for complex SQL)
+            $statements = preg_split('/;(?=\s*(?:\/\*.*?\*\/\s*)?(?:--.*\s*)?$)/', $sql);
+            
+            $executed = 0;
+            foreach ($statements as $statement) {
+                $statement = trim($statement);
+                if (!empty($statement)) {
+                    $pdo->exec($statement);
+                    $executed++;
                 }
             }
-            rmdir($dir);
+
+            return [
+                'success' => true,
+                'message' => "Database restored successfully",
+                'statements_executed' => $executed
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => "Database restore failed: " . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Restore files from backup
+     */
+    private function restoreFiles($sourceDir)
+    {
+        try {
+            // This is a simplified implementation
+            // In a real system, you would implement specific file restoration logic
+            // based on your application's needs and what files are being backed up
+            
+            // For now, we'll just copy files with some basic validation
+            $result = $this->copyDirectory($sourceDir, BASE_PATH . '/restored');
+            
+            return [
+                'success' => $result,
+                'message' => $result ? 'Files restored successfully' : 'File restore failed'
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => "File restore failed: " . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Add directory to zip archive
+     */
+    private function addDirectoryToZip($zip, $dir, $zipDirName = '', $excludePatterns = ['*/storage/backups/*', '*/cache/*'])
+    {
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $file) {
+            // Skip if matches exclude patterns
+            $relativePath = substr($file->getPathname(), strlen(BASE_PATH) + 1);
+            
+            $shouldExclude = false;
+            foreach ($excludePatterns as $pattern) {
+                if (fnmatch($pattern, $relativePath)) {
+                    $shouldExclude = true;
+                    break;
+                }
+            }
+            
+            if ($shouldExclude) {
+                continue;
+            }
+
+            // Add file to zip with relative path
+            $zipPath = $zipDirName . '/' . substr($file->getPathname(), strlen(BASE_PATH) + 1);
+            $zip->addFile($file->getPathname(), $zipPath);
+        }
+    }
+
+    /**
+     * Copy directory recursively
+     */
+    private function copyDirectory($src, $dst)
+    {
+        $dir = opendir($src);
+        @mkdir($dst);
+        while (($file = readdir($dir)) !== false) {
+            if ($file != '.' && $file != '..') {
+                if (is_dir($src . '/' . $file)) {
+                    $this->copyDirectory($src . '/' . $file, $dst . '/' . $file);
+                } else {
+                    copy($src . '/' . $file, $dst . '/' . $file);
+                }
+            }
+        }
+        closedir($dir);
+        return true;
+    }
+
+    /**
+     * Delete directory recursively
+     */
+    private function deleteDirectory($dir)
+    {
+        if (!file_exists($dir)) {
+            return true;
+        }
+
+        if (!is_dir($dir)) {
+            return unlink($dir);
+        }
+
+        foreach (scandir($dir) as $item) {
+            if ($item == '.' || $item == '..') {
+                continue;
+            }
+
+            if (!$this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) {
+                return false;
+            }
+        }
+
+        return rmdir($dir);
+    }
+
+    /**
+     * Format bytes to human-readable format
+     */
+    private function formatBytes($size, $precision = 2)
+    {
+        $units = array('B', 'KB', 'MB', 'GB', 'TB');
+
+        for ($i = 0; $size > 1024 && $i < count($units) - 1; $i++) {
+            $size /= 1024;
+        }
+
+        return round($size, $precision) . ' ' . $units[$i];
+    }
+
+    /**
+     * Get database connection
+     * This would need to be adapted to your specific application's database connection method
+     */
+    private function getDbConnection()
+    {
+        // This is a placeholder - you'll need to adapt this to your application's database connection
+        // For example, if you have a Database class like in your MVC structure:
+        // $db = Database::getInstance();
+        // return $db->getPdo();
+        
+        // For now, assuming a global PDO connection or creating a new one
+        // This is a simplified implementation - you would replace this with your actual database connection logic
+        return new \PDO(
+            "mysql:host=" . ($_ENV['DB_HOST'] ?? (defined('DB_HOST') ? DB_HOST : 'localhost')) . 
+            ";dbname=" . ($_ENV['DB_NAME'] ?? (defined('DB_NAME') ? DB_NAME : 'engical')),
+            $_ENV['DB_USER'] ?? (defined('DB_USER') ? DB_USER : 'root'),
+            $_ENV['DB_PASSWORD'] ?? (defined('DB_PASSWORD') ? DB_PASSWORD : '')
+        );
+    }
+
+    /**
+     * Ensure backup directory exists
+     */
+    private function ensureBackupDirectory()
+    {
+        if (!is_dir($this->backupDir)) {
+            if (!mkdir($this->backupDir, 0755, true)) {
+                throw new Exception("Cannot create backup directory: {$this->backupDir}");
+            }
         }
     }
 }
