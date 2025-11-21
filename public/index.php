@@ -8,7 +8,8 @@
 define('BISHWO_CALCULATOR', true);
 
 // Load application bootstrap FIRST (defines BASE_PATH)
-require_once dirname(__DIR__) . '/app/bootstrap.php';
+$bootstrapPath = dirname(__DIR__) . '/app/bootstrap.php';
+require_once $bootstrapPath;
 
 // Start session (if not already started by bootstrap)
 if (session_status() === PHP_SESSION_NONE) {

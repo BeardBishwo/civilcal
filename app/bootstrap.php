@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Bishwo Calculator - Application Bootstrap
  * Initializes core application components and configuration
@@ -23,7 +24,7 @@ spl_autoload_register(function ($class) {
 
     $relative_class = substr($class, $len);
     $file = APP_PATH . "/" . str_replace("\\", "/", $relative_class) . ".php";
-    
+
     if (file_exists($file)) {
         require $file;
     }
@@ -70,7 +71,7 @@ set_error_handler(function ($errno, $errstr, $errfile, $errline) {
 
 set_exception_handler(function ($e) {
     \App\Services\Logger::exception($e);
-    
+
     if (APP_DEBUG) {
         http_response_code(500);
         echo "Exception: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, "UTF-8");
@@ -87,4 +88,3 @@ register_shutdown_function(function () {
         ]);
     }
 });
-?>

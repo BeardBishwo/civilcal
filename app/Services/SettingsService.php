@@ -73,13 +73,7 @@ class SettingsService
 
         $result = [];
         foreach ($settings as $setting) {
-            $result[$setting['setting_key']] = [
-                'value' => self::castValue($setting['setting_value'], $setting['setting_type']),
-                'type' => $setting['setting_type'],
-                'group' => $setting['setting_group'],
-                'description' => $setting['description'],
-                'is_public' => (bool)$setting['is_public']
-            ];
+            $result[$setting['setting_key']] = self::castValue($setting['setting_value'], $setting['setting_type']);
         }
 
         return $result;

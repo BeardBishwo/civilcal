@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Bishwo Calculator - Admin Panel' ?></title>
     <meta name="csrf-token" content="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
-    
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -21,34 +22,34 @@
             --sidebar-width: 250px;
             --header-height: 60px;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
         }
-        
+
         /* Header Styles */
         .admin-header {
             background: linear-gradient(135deg, var(--primary-color), #1a2530);
             height: var(--header-height);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 1000;
         }
-        
+
         .logo {
             font-weight: 700;
             font-size: 1.5rem;
             color: white;
         }
-        
+
         .search-box {
             max-width: 400px;
         }
-        
+
         /* Sidebar Styles */
         .admin-sidebar {
             width: var(--sidebar-width);
@@ -58,24 +59,24 @@
             top: var(--header-height);
             left: 0;
             overflow-y: auto;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
         }
-        
+
         .sidebar-collapsed .admin-sidebar {
             width: 60px;
         }
-        
+
         .sidebar-menu {
             list-style: none;
             padding: 0;
             margin: 0;
         }
-        
+
         .sidebar-menu li {
             border-bottom: 1px solid #f0f0f0;
         }
-        
+
         .sidebar-menu a {
             display: flex;
             align-items: center;
@@ -84,26 +85,26 @@
             text-decoration: none;
             transition: all 0.3s ease;
         }
-        
+
         .sidebar-menu a:hover {
             background-color: #f8f9fa;
             color: var(--secondary-color);
         }
-        
+
         .sidebar-menu a.active {
             background-color: var(--secondary-color);
             color: white;
         }
-        
+
         .sidebar-menu .bi {
             width: 20px;
             margin-right: 10px;
         }
-        
+
         .sidebar-collapsed .sidebar-menu span {
             display: none;
         }
-        
+
         /* Main Content */
         .admin-content {
             margin-left: var(--sidebar-width);
@@ -111,38 +112,38 @@
             padding: 20px;
             transition: all 0.3s ease;
         }
-        
+
         .sidebar-collapsed .admin-content {
             margin-left: 60px;
         }
-        
+
         /* Card Styles */
         .stat-card {
             border: none;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
         }
-        
+
         .stat-card:hover {
             transform: translateY(-5px);
         }
-        
+
         .stat-card .card-body {
             padding: 20px;
         }
-        
+
         .stat-number {
             font-size: 2rem;
             font-weight: 700;
             margin-bottom: 0;
         }
-        
+
         .stat-label {
             color: #6c757d;
             font-size: 0.9rem;
         }
-        
+
         /* Quick Actions */
         .quick-actions .btn {
             margin: 5px;
@@ -150,6 +151,7 @@
         }
     </style>
 </head>
+
 <body class="<?= $_COOKIE['sidebar_collapsed'] ?? '' ?>">
     <!-- Header -->
     <header class="admin-header">
@@ -163,7 +165,7 @@
                         <div class="logo">Bishwo Calculator</div>
                     </div>
                 </div>
-                
+
                 <div class="col-md-6">
                     <div class="search-box mx-auto">
                         <div class="input-group">
@@ -174,7 +176,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-md-3">
                     <div class="d-flex justify-content-end align-items-center">
                         <div class="dropdown">
@@ -185,7 +187,9 @@
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="/profile"><i class="bi bi-person me-2"></i>Profile</a></li>
                                 <li><a class="dropdown-item" href="/settings"><i class="bi bi-gear me-2"></i>Settings</a></li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <li><a class="dropdown-item" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
                             </ul>
                         </div>
@@ -206,7 +210,7 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-                
+
                 <!-- Users Management -->
                 <li>
                     <a href="/admin/users" class="<?= $currentPage == 'users' ? 'active' : '' ?>">
@@ -214,7 +218,7 @@
                         <span>Users Management</span>
                     </a>
                 </li>
-                
+
                 <!-- Calculators -->
                 <li>
                     <a href="/admin/calculators" class="<?= ($currentPage ?? '') == 'calculators' ? 'active' : '' ?>">
@@ -222,7 +226,7 @@
                         <span>Calculators</span>
                     </a>
                 </li>
-                
+
                 <!-- Modules & Categories -->
                 <li>
                     <a href="/admin/modules" class="<?= $currentPage == 'modules' ? 'active' : '' ?>">
@@ -230,7 +234,7 @@
                         <span>Modules & Categories</span>
                     </a>
                 </li>
-                
+
                 <!-- Themes -->
                 <li>
                     <a href="/admin/themes" class="<?= ($currentPage ?? '') == 'themes' ? 'active' : '' ?>">
@@ -238,7 +242,7 @@
                         <span>Themes</span>
                     </a>
                 </li>
-                
+
                 <!-- Plugins -->
                 <li>
                     <a href="/admin/plugins" class="<?= $currentPage == 'plugins' ? 'active' : '' ?>">
@@ -246,23 +250,23 @@
                         <span>Plugins</span>
                     </a>
                 </li>
-                
+
                 <!-- System Settings -->
                 <li>
-                    <a href="/admin/settings" class="<?= ($currentPage ?? '') == 'settings' ? 'active' : '' ?>">
+                    <a href="/admin/settings/general" class="<?= ($currentPage ?? '') == 'settings' ? 'active' : '' ?>">
                         <i class="bi bi-gear"></i>
                         <span>System Settings</span>
                     </a>
                 </li>
-                
+
                 <!-- Email & Notifications -->
                 <li>
-                    <a href="/admin/email" class="<?= $currentPage == 'email' ? 'active' : '' ?>">
+                    <a href="/admin/settings/email" class="<?= $currentPage == 'email' ? 'active' : '' ?>">
                         <i class="bi bi-envelope"></i>
                         <span>Email & Notifications</span>
                     </a>
                 </li>
-                
+
                 <!-- Billing / Subscriptions -->
                 <li>
                     <a href="/admin/subscriptions" class="<?= ($currentPage ?? '') == 'subscriptions' ? 'active' : '' ?>">
@@ -270,7 +274,7 @@
                         <span>Billing / Subscriptions</span>
                     </a>
                 </li>
-                
+
                 <!-- Help & Logs -->
                 <li>
                     <a href="/admin/help" class="<?= ($currentPage ?? '') == 'help' ? 'active' : '' ?>">
@@ -293,7 +297,7 @@
         // Sidebar Toggle
         document.getElementById('sidebarToggle').addEventListener('click', function() {
             document.body.classList.toggle('sidebar-collapsed');
-            
+
             // Save preference in cookie
             const isCollapsed = document.body.classList.contains('sidebar-collapsed');
             document.cookie = `sidebar_collapsed=${isCollapsed ? 'sidebar-collapsed' : ''}; path=/; max-age=31536000`;
@@ -326,7 +330,7 @@
                     }
                 });
             }
-            
+
             // Calculator Usage Chart
             const usageCtx = document.getElementById('calculatorUsageChart');
             if (usageCtx) {
@@ -356,4 +360,5 @@
         document.addEventListener('DOMContentLoaded', initCharts);
     </script>
 </body>
+
 </html>

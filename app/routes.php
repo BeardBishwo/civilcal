@@ -187,42 +187,42 @@ $router->add(
 );
 
 // Admin Dashboard Routes (WordPress-like admin system)
-$router->add("GET", "/admin", "Admin\MainDashboardController@index", [
+$router->add("GET", "/admin", "Admin\DashboardController@index", [
     "auth",
     "admin",
 ]);
-$router->add("GET", "/admin/dashboard", "Admin\MainDashboardController@index", [
+$router->add("GET", "/admin/dashboard", "Admin\DashboardController@index", [
     "auth",
     "admin",
 ]);
 
 // Module Management
-$router->add("GET", "/admin/modules", "Admin\MainDashboardController@modules", [
+$router->add("GET", "/admin/modules", "Admin\DashboardController@modules", [
     "auth",
     "admin",
 ]);
 $router->add(
     "POST",
     "/admin/modules/activate",
-    "Admin\MainDashboardController@activateModule",
+    "Admin\DashboardController@activateModule",
     ["auth", "admin"],
 );
 $router->add(
     "POST",
     "/admin/modules/deactivate",
-    "Admin\MainDashboardController@deactivateModule",
+    "Admin\DashboardController@deactivateModule",
     ["auth", "admin"],
 );
 $router->add(
     "GET",
     "/admin/modules/{module}/settings",
-    "Admin\MainDashboardController@moduleSettings",
+    "Admin\DashboardController@moduleSettings",
     ["auth", "admin"],
 );
 $router->add(
     "POST",
     "/admin/modules/settings/update",
-    "Admin\MainDashboardController@updateModuleSettings",
+    "Admin\DashboardController@updateModuleSettings",
     ["auth", "admin"],
 );
 
@@ -326,19 +326,19 @@ $router->add("GET", "/developers/playground", "DeveloperController@playground");
 $router->add(
     "GET",
     "/admin/menu-customization",
-    "Admin\MainDashboardController@menuCustomization",
+    "Admin\DashboardController@menuCustomization",
     ["auth", "admin"],
 );
 $router->add(
     "GET",
     "/admin/widget-management",
-    "Admin\MainDashboardController@widgetManagement",
+    "Admin\DashboardController@widgetManagement",
     ["auth", "admin"],
 );
 $router->add(
     "GET",
     "/admin/system-status",
-    "Admin\MainDashboardController@systemStatus",
+    "Admin\DashboardController@systemStatus",
     ["auth", "admin"],
 );
 
@@ -499,6 +499,12 @@ $router->add("GET", "/admin/settings/email", "Admin\SettingsController@email", [
     "auth",
     "admin",
 ]);
+$router->add(
+    "POST",
+    "/admin/email/send-test",
+    "Admin\SettingsController@sendTestEmail",
+    ["auth", "admin"],
+);
 $router->add(
     "GET",
     "/admin/settings/security",
@@ -1486,11 +1492,11 @@ $router->add("GET", "/mep", "LandingController@mep");
 
 // Boot active plugins
 try {
-    new \App\Services\PluginManager()->bootAll();
+    $pluginManager = new \App\Services\PluginManager();
+    $pluginManager->bootAll();
 } catch (\Throwable $e) {
     \App\Services\Logger::exception($e, ["when" => "boot_plugins_from_routes"]);
 }
 
 // Page routes
 $router->add('GET', '/page/{slug}', 'PageController@show');
-

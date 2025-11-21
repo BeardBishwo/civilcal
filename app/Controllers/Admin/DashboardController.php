@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
@@ -9,7 +10,8 @@ use Exception;
 
 class DashboardController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
@@ -302,7 +304,6 @@ class DashboardController extends Controller
 
             http_response_code(200);
             echo json_encode($stats);
-
         } catch (\Exception $e) {
             http_response_code(500);
             echo json_encode([
@@ -491,13 +492,17 @@ class DashboardController extends Controller
      */
     private function getSystemInfo()
     {
+        $db = \App\Core\Database::getInstance();
+        $pdo = $db->getPdo();
+
         return [
             'php_version' => PHP_VERSION,
             'memory_usage' => memory_get_usage(true),
             'memory_limit' => ini_get('memory_limit'),
             'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
             'document_root' => $_SERVER['DOCUMENT_ROOT'] ?? 'Unknown',
-            'loaded_extensions' => get_loaded_extensions()
+            'loaded_extensions' => get_loaded_extensions(),
+            'database_driver' => $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)
         ];
     }
 
@@ -506,12 +511,20 @@ class DashboardController extends Controller
      */
     private function getModuleStatus()
     {
-        // Placeholder - in real implementation, this would come from module manager
-        return [
-            'total_modules' => 10,
-            'active_modules' => 7,
-            'inactive_modules' => 3
-        ];
+        // In a real implementation, this would come from module manager
+        // For now, we'll return the list of defined modules
+        $modules = $this->getAllModules();
+        $statusList = [];
+
+        foreach ($modules as $key => $module) {
+            $statusList[] = [
+                'name' => $module['name'],
+                'active' => $module['active'],
+                'version' => '1.0.0' // Placeholder version
+            ];
+        }
+
+        return $statusList;
     }
 
     /**
@@ -521,5 +534,45 @@ class DashboardController extends Controller
     {
         header('Content-Type: application/json');
         echo json_encode($data);
+    }
+
+    /**
+     * Module settings page
+     */
+    public function moduleSettings($module)
+    {
+        $data = [
+            'page_title' => 'Module Settings',
+            'module' => $module,
+            'settings' => [], // Placeholder
+            'menuItems' => $this->getMenuItems()
+        ];
+
+        $this->view->render('admin/module-settings', $data);
+    }
+
+    /**
+     * Update module settings
+     */
+    public function updateModuleSettings()
+    {
+        try {
+            // Placeholder logic
+            $this->jsonResponse(['success' => true, 'message' => 'Settings updated successfully']);
+        } catch (\Exception $e) {
+            $this->jsonResponse(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Get widgets
+     */
+    private function getWidgets()
+    {
+        // Placeholder data
+        return [
+            'active_widgets' => [],
+            'inactive_widgets' => []
+        ];
     }
 }

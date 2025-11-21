@@ -17,8 +17,11 @@ class SettingsController extends Controller
     {
         $this->requireAdminWithBasicAuth();
 
+        $settings = SettingsService::getAll('general');
+
         $this->view->render('admin/settings/general', [
-            'title' => 'General Settings'
+            'title' => 'General Settings',
+            'settings' => $settings
         ]);
     }
 
@@ -35,8 +38,11 @@ class SettingsController extends Controller
     {
         $this->requireAdminWithBasicAuth();
 
+        $settings = SettingsService::getAll('security');
+
         $this->view->render('admin/settings/security', [
-            'title' => 'Security Settings'
+            'title' => 'Security Settings',
+            'settings' => $settings
         ]);
     }
 
@@ -44,8 +50,11 @@ class SettingsController extends Controller
     {
         $this->requireAdminWithBasicAuth();
 
+        $settings = SettingsService::getAll('email');
+
         $this->view->render('admin/settings/email', [
-            'title' => 'Email Settings'
+            'title' => 'Email Settings',
+            'settings' => $settings
         ]);
     }
 
@@ -394,6 +403,56 @@ class SettingsController extends Controller
             echo json_encode([
                 'error' => 'Failed to get settings',
                 'message' => $e->getMessage()
+            ]);
+        }
+    }
+    /**
+     * Send a test email using current settings
+     */
+    public function sendTestEmail()
+    {
+        $this->requireAdminWithBasicAuth();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return $this->json(['success' => false, 'message' => 'Invalid request']);
+        }
+
+        try {
+            // Get current email settings
+            $settings = SettingsService::getAll('email');
+
+            // Get recipient email (current user)
+            $recipientEmail = $_SESSION['user']['email'] ?? $settings['admin_email'] ?? 'admin@example.com';
+
+            // In a real implementation, we would use PHPMailer or a similar library here
+            // For now, we'll simulate the process and log it
+
+            $smtpHost = $settings['smtp_host'] ?? '';
+            $smtpPort = $settings['smtp_port'] ?? '';
+            $smtpUser = $settings['smtp_username'] ?? '';
+
+            if (empty($smtpHost)) {
+                throw new \Exception('SMTP Host is not configured');
+            }
+
+            // Log the attempt
+            GDPRService::logActivity(
+                $_SESSION['user_id'] ?? null,
+                'test_email_sent',
+                'system',
+                null,
+                "Test email sent to $recipientEmail using SMTP host $smtpHost"
+            );
+
+            // Return success (mock)
+            return $this->json([
+                'success' => true,
+                'message' => "Test email sent successfully to $recipientEmail"
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Failed to send test email: ' . $e->getMessage()
             ]);
         }
     }

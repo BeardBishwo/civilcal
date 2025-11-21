@@ -1,102 +1,55 @@
 <?php
-/**
- * General Settings Page - MVC Partial View
- * This is now a proper partial view that integrates with the admin layout
- */
 
-// Get current settings from controller data
-$general_settings = $general_settings ?? [];
-$current_section = $current_section ?? 'general';
-$page_title = $page_title ?? 'General Settings - Admin Panel';
-$settings_sections = $settings_sections ?? [];
+/**
+ * General Settings Page
+ */
 ?>
 
-<!-- Page Header -->
-<div class="page-header">
-    <div>
-        <h1 class="page-title"><?php echo htmlspecialchars($page_title); ?></h1>
-        <p class="page-subtitle">Configure your site settings and preferences</p>
+<div class="container-fluid p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">General Settings</h1>
     </div>
-</div>
 
-<!-- Settings Navigation -->
-<div class="settings-nav">
-    <?php foreach ($settings_sections as $section): ?>
-        <a href="<?php echo htmlspecialchars($section['url']); ?>"
-           class="<?php echo ($current_section === $section['id']) ? 'active' : ''; ?>">
-            <i class="<?php echo htmlspecialchars($section['icon']); ?>"></i>
-            <?php echo htmlspecialchars($section['name']); ?>
-        </a>
-    <?php endforeach; ?>
-</div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Site Configuration</h6>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/settings/save" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
 
-<!-- Settings Form -->
-<form id="settingsForm" method="POST" action="<?php echo app_base_url('/admin/settings/update'); ?>">
-    <input type="hidden" name="section" value="<?php echo htmlspecialchars($current_section); ?>">
-
-    <!-- Settings Content -->
-    <div class="settings-content">
-        <?php foreach ($general_settings as $groupKey => $group): ?>
-            <div class="settings-card">
-                <h3><?php echo htmlspecialchars($group['title'] ?? $groupKey); ?></h3>
-                <p class="card-description"><?php echo htmlspecialchars($group['description'] ?? ''); ?></p>
-
-                <?php if (isset($group['fields']) && is_array($group['fields'])): ?>
-                    <?php foreach ($group['fields'] as $fieldKey => $field): ?>
-                        <div class="form-group">
-                            <label class="form-label<?php echo ($field['required'] ?? false) ? ' required' : ''; ?>">
-                                <?php echo htmlspecialchars($field['label'] ?? $fieldKey); ?>
-                            </label>
-
-                            <?php if (($field['type'] ?? 'text') === 'textarea'): ?>
-                                <textarea name="settings[<?php echo htmlspecialchars($fieldKey); ?>]"
-                                          class="form-input form-textarea"
-                                          <?php echo ($field['required'] ?? false) ? 'required' : ''; ?>><?php echo htmlspecialchars($field['value'] ?? ''); ?></textarea>
-                            <?php elseif (($field['type'] ?? 'text') === 'select'): ?>
-                                <select name="settings[<?php echo htmlspecialchars($fieldKey); ?>]"
-                                        class="form-input form-select"
-                                        <?php echo ($field['required'] ?? false) ? 'required' : ''; ?>>
-                                    <?php foreach ($field['options'] ?? [] as $optKey => $optLabel): ?>
-                                        <option value="<?php echo htmlspecialchars($optKey); ?>"
-                                                <?php echo ($field['value'] ?? '') == $optKey ? 'selected' : ''; ?>>
-                                            <?php echo htmlspecialchars($optLabel); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            <?php elseif (($field['type'] ?? 'text') === 'checkbox'): ?>
-                                <label class="form-checkbox-container">
-                                    <input type="checkbox"
-                                           name="settings[<?php echo htmlspecialchars($fieldKey); ?>]"
-                                           value="1"
-                                           class="form-checkbox"
-                                           <?php echo ($field['value'] ?? false) ? 'checked' : ''; ?>>
-                                    <span><?php echo htmlspecialchars($field['description'] ?? 'Enable'); ?></span>
-                                </label>
-                            <?php else: ?>
-                                <input type="<?php echo htmlspecialchars($field['type'] ?? 'text'); ?>"
-                                       name="settings[<?php echo htmlspecialchars($fieldKey); ?>]"
-                                       value="<?php echo htmlspecialchars($field['value'] ?? ''); ?>"
-                                       class="form-input"
-                                       <?php echo ($field['required'] ?? false) ? 'required' : ''; ?>>
-                            <?php endif; ?>
-
-                            <?php if (isset($field['description']) && ($field['type'] ?? 'text') !== 'checkbox'): ?>
-                                <small class="form-description"><?php echo htmlspecialchars($field['description']); ?></small>
-                            <?php endif; ?>
+                        <div class="mb-3">
+                            <label for="site_name" class="form-label">Site Name</label>
+                            <input type="text" class="form-control" id="site_name" name="site_name" value="<?= htmlspecialchars($settings['site_name'] ?? 'Bishwo Calculator') ?>">
+                            <div class="form-text">The name of your website as it appears in the browser title and emails.</div>
                         </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-        <?php endforeach; ?>
 
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i> Save Settings
-            </button>
-            <button type="button" onclick="document.getElementById('settingsForm').reset();" class="btn btn-secondary">
-                <i class="fas fa-undo"></i> Reset
-            </button>
+                        <div class="mb-3">
+                            <label for="site_description" class="form-label">Site Description</label>
+                            <textarea class="form-control" id="site_description" name="site_description" rows="3"><?= htmlspecialchars($settings['site_description'] ?? '') ?></textarea>
+                            <div class="form-text">A brief description of your website for SEO purposes.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="admin_email" class="form-label">Admin Email</label>
+                            <input type="email" class="form-control" id="admin_email" name="admin_email" value="<?= htmlspecialchars($settings['admin_email'] ?? '') ?>">
+                            <div class="form-text">The email address for system notifications and admin contact.</div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="maintenance_mode" name="maintenance_mode" value="1" <?= ($settings['maintenance_mode'] ?? '0') == '1' ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="maintenance_mode">Maintenance Mode</label>
+                            <div class="form-text">Enable to show a maintenance page to visitors (admins can still access the site).</div>
+                        </div>
+
+                        <hr>
+
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-</form>
+</div>
