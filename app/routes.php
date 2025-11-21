@@ -138,9 +138,11 @@ $router->add('GET', '/developers/sdk/{language}', 'DeveloperController@sdk');
 $router->add('GET', '/developers/playground', 'DeveloperController@playground');
 
 // Advanced Admin Features
-$router->add('GET', '/admin/menu-customization', 'Admin\MainDashboardController@menuCustomization', ['auth', 'admin']);
-$router->add('GET', '/admin/widget-management', 'Admin\MainDashboardController@widgetManagement', ['auth', 'admin']);
-$router->add('GET', '/admin/system-status', 'Admin\MainDashboardController@systemStatus', ['auth', 'admin']);
+$router->add('GET', '/admin/menu-customization', 'Admin\DashboardController@menuCustomization', ['auth', 'admin']);
+$router->add('GET', '/admin/widget-management', 'Admin\DashboardController@widgetManagement', ['auth', 'admin']);
+$router->add('GET', '/admin/modules', 'Admin\DashboardController@modules', ['auth', 'admin']);
+$router->add('POST', '/admin/modules/activate', 'Admin\DashboardController@activateModule', ['auth', 'admin']);
+$router->add('POST', '/admin/modules/deactivate', 'Admin\DashboardController@deactivateModule', ['auth', 'admin']);
 
 // User Management Module Routes
 $router->add('GET', '/admin/users', 'Admin\UserManagementController@index', ['auth', 'admin']);
@@ -412,6 +414,14 @@ $router->add('GET', '/admin/email-manager/template/{id}', 'Admin\EmailManagerCon
 $router->add('PUT', '/admin/email-manager/template/{id}', 'Admin\EmailManagerController@updateTemplate', ['auth', 'admin']);
 $router->add('DELETE', '/admin/email-manager/template/{id}', 'Admin\EmailManagerController@deleteTemplate', ['auth', 'admin']);
 $router->add('POST', '/admin/email-manager/templates/{id}/use', 'Admin\EmailManagerController@useTemplate', ['auth', 'admin']);
+
+// Notification Center Routes
+$router->add('GET', '/admin/notifications', 'Admin\NotificationController@index', ['auth', 'admin']);
+$router->add('GET', '/api/admin/notifications', 'Admin\NotificationController@getNotifications', ['auth', 'admin']);
+$router->add('POST', '/api/admin/notifications', 'Admin\NotificationController@create', ['auth', 'admin']);
+$router->add('POST', '/admin/notifications/mark-read/{id}', 'Admin\NotificationController@markAsRead', ['auth', 'admin']);
+$router->add('POST', '/admin/notifications/mark-all-read', 'Admin\NotificationController@markAllAsRead', ['auth', 'admin']);
+$router->add('DELETE', '/admin/notifications/delete/{id}', 'Admin\NotificationController@delete', ['auth', 'admin']);
 
 // Error Monitoring & Logging Routes
 $router->add('GET', '/admin/error-logs', 'Admin\ErrorLogController@index', ['auth', 'admin']);

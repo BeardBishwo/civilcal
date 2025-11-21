@@ -72,10 +72,10 @@ $content = '
     
     <!-- Dashboard Grid -->
     <div class="dashboard-grid">
-        
+
         <!-- Left Column - Charts & Analytics -->
         <div class="dashboard-left">
-            
+
             <!-- User Growth Chart -->
             <div class="card">
                 <div class="card-header">
@@ -94,8 +94,8 @@ $content = '
                     <canvas id="userGrowthChart" width="400" height="200"></canvas>
                 </div>
             </div>
-            
-            <!-- Recent Activity -->
+
+            <!-- Recent Activity Widget -->
             <div class="card" style="margin-top: 24px;">
                 <div class="card-header">
                     <h3 class="card-title">
@@ -115,7 +115,7 @@ $content = '
                                 <div class="activity-meta">john.doe@example.com • 5 minutes ago</div>
                             </div>
                         </div>
-                        
+
                         <div class="activity-item">
                             <div class="activity-avatar">
                                 <i class="fas fa-calculator"></i>
@@ -125,7 +125,7 @@ $content = '
                                 <div class="activity-meta">Anonymous user • 12 minutes ago</div>
                             </div>
                         </div>
-                        
+
                         <div class="activity-item">
                             <div class="activity-avatar">
                                 <i class="fas fa-cog"></i>
@@ -135,7 +135,7 @@ $content = '
                                 <div class="activity-meta">admin@example.com • 1 hour ago</div>
                             </div>
                         </div>
-                        
+
                         <div class="activity-item">
                             <div class="activity-avatar">
                                 <i class="fas fa-puzzle-piece"></i>
@@ -148,14 +148,122 @@ $content = '
                     </div>
                 </div>
             </div>
-            
+
         </div>
-        
-        <!-- Right Column - Widgets & Info -->
+
+        <!-- Right Column - Dashboard Widgets -->
         <div class="dashboard-right">
-            
-            <!-- Quick Actions -->
+
+            <!-- Error Monitoring Widget -->
             <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Error Monitoring
+                    </h3>
+                    <a href="/admin/error-logs" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-content">
+                    <div class="error-stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Errors Today</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">4</div>
+                            <div class="stat-label">Critical</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Warnings</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill error" style="width: 12%;"></div>
+                            </div>
+                            <div class="progress-label">Errors: 12/1000 requests</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue/Subscription Widget -->
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-dollar-sign"></i>
+                        Revenue & Subscriptions
+                    </h3>
+                    <a href="/admin/subscriptions" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-content">
+                    <div class="revenue-stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">$2,450</div>
+                            <div class="stat-label">Monthly Revenue</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">47</div>
+                            <div class="stat-label">Active Subscriptions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">New This Month</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <canvas id="revenueChart" width="300" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Usage Stats Widget -->
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Calculator Usage Stats
+                    </h3>
+                    <a href="/admin/analytics/calculators" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-content">
+                    <div class="calculator-usage-list">
+                        <div class="usage-item">
+                            <div class="usage-label">Concrete Volume</div>
+                            <div class="usage-value">1,250</div>
+                            <div class="usage-bar">
+                                <div class="usage-fill" style="width: 90%;"></div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-label">Electrical Load</div>
+                            <div class="usage-value">980</div>
+                            <div class="usage-bar">
+                                <div class="usage-fill" style="width: 75%;"></div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-label">Beam Design</div>
+                            <div class="usage-value">756</div>
+                            <div class="usage-bar">
+                                <div class="usage-fill" style="width: 60%;"></div>
+                            </div>
+                        </div>
+                        <div class="usage-item">
+                            <div class="usage-label">Pipe Sizing</div>
+                            <div class="usage-value">542</div>
+                            <div class="usage-bar">
+                                <div class="usage-fill" style="width: 40%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card" style="margin-top: 24px;">
                 <div class="card-header">
                     <h3 class="card-title">
                         <i class="fas fa-bolt"></i>
@@ -170,21 +278,21 @@ $content = '
                             </div>
                             <div class="action-label">Add User</div>
                         </a>
-                        
+
                         <a href="/admin/content/pages" class="quick-action-item">
                             <div class="action-icon">
                                 <i class="fas fa-plus"></i>
                             </div>
                             <div class="action-label">New Page</div>
                         </a>
-                        
+
                         <button onclick="createBackup()" class="quick-action-item">
                             <div class="action-icon">
                                 <i class="fas fa-download"></i>
                             </div>
                             <div class="action-label">Backup</div>
                         </button>
-                        
+
                         <button onclick="checkSystemHealth()" class="quick-action-item">
                             <div class="action-icon">
                                 <i class="fas fa-heartbeat"></i>
@@ -194,74 +302,9 @@ $content = '
                     </div>
                 </div>
             </div>
-            
-            <!-- Calculator Usage Breakdown -->
-            <div class="card" style="margin-top: 24px;">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-pie"></i>
-                        Calculator Usage
-                    </h3>
-                </div>
-                <div class="card-content">
-                    <canvas id="calculatorUsageChart" width="300" height="300"></canvas>
-                </div>
-            </div>
-            
-            <!-- System Status -->
-            <div class="card" style="margin-top: 24px;">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-server"></i>
-                        System Status
-                    </h3>
-                </div>
-                <div class="card-content">
-                    <div class="system-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">PHP Version</div>
-                            <div class="metric-value">' . PHP_VERSION . '</div>
-                            <div class="metric-status status-success">
-                                <i class="fas fa-check"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="metric-item">
-                            <div class="metric-label">Memory Usage</div>
-                            <div class="metric-value">' . round(memory_get_usage(true) / 1024 / 1024) . ' MB</div>
-                            <div class="metric-status status-success">
-                                <i class="fas fa-check"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="metric-item">
-                            <div class="metric-label">Database</div>
-                            <div class="metric-value">Connected</div>
-                            <div class="metric-status status-success">
-                                <i class="fas fa-check"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="metric-item">
-                            <div class="metric-label">Storage</div>
-                            <div class="metric-value">78% Used</div>
-                            <div class="metric-status status-warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 16px;">
-                        <a href="/admin/system-status" class="btn btn-primary btn-sm" style="width: 100%;">
-                            <i class="fas fa-external-link-alt"></i>
-                            View Detailed Status
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
+
         </div>
-        
+
     </div>
     
 </div>
@@ -409,9 +452,118 @@ $content = '
     gap: 8px;
 }
 
+/* Error Monitoring Widget Styles */
+.error-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--admin-danger);
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--admin-gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.progress-bar-container {
+    width: 100%;
+}
+
+.progress-bar {
+    height: 8px;
+    background: var(--admin-gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--admin-danger);
+}
+
+.progress-label {
+    font-size: 12px;
+    color: var(--admin-gray-600);
+    text-align: right;
+}
+
+/* Revenue/Subscription Widget Styles */
+.revenue-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+/* Calculator Usage Stats Widget Styles */
+.calculator-usage-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.usage-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.usage-label {
+    flex: 1;
+    font-size: 14px;
+    color: var(--admin-gray-700);
+}
+
+.usage-value {
+    font-weight: 600;
+    color: var(--admin-gray-800);
+    min-width: 50px;
+    text-align: right;
+}
+
+.usage-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--admin-gray-200);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.usage-fill {
+    height: 100%;
+    background: var(--admin-primary);
+    border-radius: 3px;
+}
+
 @media (max-width: 768px) {
     .quick-actions-grid {
         grid-template-columns: 1fr;
+    }
+
+    .error-stats-grid,
+    .revenue-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .usage-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .usage-value {
+        align-self: flex-end;
     }
 }
 </style>
@@ -425,6 +577,127 @@ $breadcrumbs = [
 $page_title = $page_title ?? 'Dashboard - Admin Panel';
 $currentPage = $currentPage ?? 'dashboard';
 
+// Add JavaScript for dashboard widgets
+$scripts = [
+    app_base_url('themes/admin/assets/js/admin.js')
+];
+
 // Include the layout
 include __DIR__ . '/../layouts/main.php';
 ?>
+
+<script>
+// Initialize charts when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize revenue chart
+    if (document.getElementById('revenueChart')) {
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [500, 750, 1200, 2450],
+                    borderColor: 'var(--admin-success)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        display: false
+                    },
+                    y: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    // Initialize user growth chart (if it exists)
+    if (document.getElementById('userGrowthChart')) {
+        const userCtx = document.getElementById('userGrowthChart').getContext('2d');
+        new Chart(userCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Users',
+                    data: [120, 190, 300, 500, 750, 1234],
+                    borderColor: 'var(--admin-primary)',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Initialize calculator usage chart (if it exists)
+    if (document.getElementById('calculatorUsageChart')) {
+        const calcCtx = document.getElementById('calculatorUsageChart').getContext('2d');
+        new Chart(calcCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Concrete', 'Electrical', 'Structural', 'HVAC', 'Other'],
+                datasets: [{
+                    data: [35, 25, 20, 15, 5],
+                    backgroundColor: [
+                        'var(--admin-primary)',
+                        'var(--admin-warning)',
+                        'var(--admin-danger)',
+                        'var(--admin-info)',
+                        'var(--admin-gray-400)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    }
+});
+
+// Function for backup (if called from quick actions)
+function createBackup() {
+    alert('Backup functionality will be implemented here');
+}
+
+// Function for system health check (if called from quick actions)
+function checkSystemHealth() {
+    alert('System health check will be performed here');
+}
+</script>

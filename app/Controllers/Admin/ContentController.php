@@ -1,110 +1,163 @@
 <?php
-
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
-use App\Services\ContentService;
-use App\Services\MenuService;
+use App\Core\Auth;
 
 class ContentController extends Controller
 {
-    private $svc;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->svc = new ContentService();
-        if (!$this->auth->check() || !$this->auth->isAdmin()) {
-            $this->redirect('/login');
-        }
-    }
-
     public function index()
     {
-        $pages = ContentService::getAllPages();
-        $this->view->render('admin/content/index', ['currentPage' => 'content', 'pages' => $pages, 'title' => 'Content Management']);
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
+
+        $data = [
+            'user' => $user,
+            'page_title' => 'Content Management - Admin Panel',
+            'currentPage' => 'content'
+        ];
+
+        $this->view->render('admin/content/index', $data);
     }
 
     public function pages()
     {
-        $this->index();
-    }
-
-    public function edit($slug)
-    {
-        $page = $this->svc->getPage($slug);
-        $this->view->render('admin/content/pages', ['currentPage' => 'content', 'page' => $page, 'mode' => 'edit', 'title' => 'Edit Page']);
-    }
-
-    public function create()
-    {
-        $this->view->render('admin/content/pages', ['currentPage' => 'content', 'page' => null, 'mode' => 'create', 'title' => 'Create Page']);
-    }
-
-    public function save()
-    {
-        $title = $_POST['title'] ?? '';
-        $slug = $_POST['slug'] ?? '';
-        $body = $_POST['body'] ?? '';
-        $status = $_POST['status'] ?? 'draft';
-        if ($slug === '') {
-            $slug = strtolower(preg_replace('/[^a-z0-9-]+/', '-', $title));
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
         }
 
+        // Get all pages from the database
+        $pages = $this->getPages();
+        
         $data = [
-            'title' => $title,
-            'slug' => $slug,
-            'content' => $body, // ContentService expects 'content', not 'body'
-            'status' => $status,
-            'updated_at' => date('Y-m-d H:i:s')
+            'user' => $user,
+            'pages' => $pages,
+            'page_title' => 'Manage Pages - Admin Panel',
+            'currentPage' => 'content'
         ];
 
-        $existing = $this->svc->getPage($slug);
-        if ($existing) {
-            $this->svc->updatePage($existing['id'], $data);
-        } else {
-            $this->svc->createPage($data);
-        }
-
-        $this->redirect('/admin/content');
-    }
-
-    public function publish()
-    {
-        $slug = $_POST['slug'] ?? '';
-        $page = $this->svc->getPage($slug);
-        if ($page) {
-            $this->svc->updatePage($page['id'], ['status' => 'published']);
-        }
-        $this->redirect('/admin/content');
-    }
-
-    public function preview($slug)
-    {
-        $page = $this->svc->getPage($slug);
-        if (!$page) {
-            $this->redirect('/admin/content');
-            return;
-        }
-        $this->view->render('pages/page', ['page' => $page, 'title' => $page['title']]);
+        $this->view->render('admin/content/pages', $data);
     }
 
     public function menus()
     {
-        $ms = new MenuService();
-        $items = $ms->get('primary');
-        $this->view->render('admin/content/menus', ['currentPage' => 'content', 'items' => $items, 'title' => 'Menus']);
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
+
+        // Get all menus from the database
+        $menus = $this->getMenus();
+        
+        $data = [
+            'user' => $user,
+            'menus' => $menus,
+            'page_title' => 'Manage Menus - Admin Panel',
+            'currentPage' => 'content'
+        ];
+
+        $this->view->render('admin/content/menus', $data);
     }
 
-    public function saveMenus()
+    public function media()
     {
-        $payload = $_POST['items'] ?? '[]';
-        $items = json_decode($payload, true);
-        if (!is_array($items)) {
-            $items = [];
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
         }
-        $ms = new MenuService();
-        $ms->set('primary', $items);
-        $this->redirect('/admin/content/menus');
+
+        // Get all media files
+        $media = $this->getMedia();
+        
+        $data = [
+            'user' => $user,
+            'media' => $media,
+            'page_title' => 'Media Library - Admin Panel',
+            'currentPage' => 'content'
+        ];
+
+        $this->view->render('admin/content/media', $data);
+    }
+
+    private function getPages()
+    {
+        // Placeholder - in real implementation, this would query the database
+        return [
+            [
+                'id' => 1,
+                'title' => 'Home',
+                'slug' => 'home',
+                'status' => 'published',
+                'created_at' => '2024-10-15',
+                'author' => 'Admin'
+            ],
+            [
+                'id' => 2,
+                'title' => 'About',
+                'slug' => 'about',
+                'status' => 'published',
+                'created_at' => '2024-10-16',
+                'author' => 'Admin'
+            ],
+            [
+                'id' => 3,
+                'title' => 'Contact',
+                'slug' => 'contact',
+                'status' => 'draft',
+                'created_at' => '2024-10-17',
+                'author' => 'Admin'
+            ]
+        ];
+    }
+
+    private function getMenus()
+    {
+        // Placeholder - in real implementation, this would query the database
+        return [
+            [
+                'id' => 1,
+                'name' => 'Main Menu',
+                'location' => 'header',
+                'items_count' => 5,
+                'modified_at' => '2024-10-15'
+            ],
+            [
+                'id' => 2,
+                'name' => 'Footer Menu',
+                'location' => 'footer',
+                'items_count' => 3,
+                'modified_at' => '2024-10-14'
+            ]
+        ];
+    }
+
+    private function getMedia()
+    {
+        // Placeholder - in real implementation, this would scan the media directory
+        return [
+            [
+                'id' => 1,
+                'filename' => 'logo.png',
+                'url' => '/storage/media/logo.png',
+                'type' => 'image/png',
+                'size' => '24.5 KB',
+                'uploaded_at' => '2024-10-15'
+            ],
+            [
+                'id' => 2,
+                'filename' => 'hero-image.jpg',
+                'url' => '/storage/media/hero-image.jpg',
+                'type' => 'image/jpeg',
+                'size' => '128.7 KB',
+                'uploaded_at' => '2024-10-16'
+            ]
+        ];
     }
 }
