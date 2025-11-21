@@ -129,6 +129,96 @@
                         </ul>
                     </li>
                     
+                    <!-- Calculations -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/calculations') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('admin/calculations'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-calculator"></i>
+                            <span class="nav-text">Calculations</span>
+                        </a>
+                    </li>
+
+                    <!-- Calculators -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/calculators') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('admin/calculators'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-tools"></i>
+                            <span class="nav-text">Calculators</span>
+                        </a>
+                    </li>
+
+                    <!-- Widgets -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/widgets') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('admin/widgets'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-th-large"></i>
+                            <span class="nav-text">Widgets</span>
+                            <i class="nav-arrow fas fa-chevron-right"></i>
+                        </a>
+                        <ul class="nav-submenu">
+                            <li><a href="<?php echo app_base_url('admin/widgets'); ?>">All Widgets</a></li>
+                            <li><a href="<?php echo app_base_url('admin/widgets/create'); ?>">Add Widget</a></li>
+                            <li><a href="<?php echo app_base_url('admin/widgets/settings'); ?>">Settings</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Activity Logs -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/activity') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('admin/activity'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-clipboard-list"></i>
+                            <span class="nav-text">Activity Logs</span>
+                        </a>
+                    </li>
+
+                    <!-- Audit Logs -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/audit-logs') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('admin/audit-logs'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-history"></i>
+                            <span class="nav-text">Audit Logs</span>
+                        </a>
+                    </li>
+
+                    <!-- Email Manager -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/email-manager') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('admin/email-manager'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-envelope"></i>
+                            <span class="nav-text">Email Manager</span>
+                            <i class="nav-arrow fas fa-chevron-right"></i>
+                        </a>
+                        <ul class="nav-submenu">
+                            <li><a href="<?php echo app_base_url('admin/email-manager'); ?>">Dashboard</a></li>
+                            <li><a href="<?php echo app_base_url('admin/email-manager/threads'); ?>">Threads</a></li>
+                            <li><a href="<?php echo app_base_url('admin/email-manager/templates'); ?>">Templates</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Subscriptions -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/subscriptions') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('admin/subscriptions'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-credit-card"></i>
+                            <span class="nav-text">Subscriptions</span>
+                        </a>
+                    </li>
+
+                    <!-- Premium Themes -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/premium-themes') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('admin/premium-themes'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-gem"></i>
+                            <span class="nav-text">Premium Themes</span>
+                            <i class="nav-arrow fas fa-chevron-right"></i>
+                        </a>
+                        <ul class="nav-submenu">
+                            <li><a href="<?php echo app_base_url('admin/premium-themes'); ?>">All Premium</a></li>
+                            <li><a href="<?php echo app_base_url('admin/premium-themes/marketplace'); ?>">Marketplace</a></li>
+                            <li><a href="<?php echo app_base_url('admin/premium-themes/create'); ?>">Create New</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- System -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/system') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('admin/system-status'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-server"></i>
+                            <span class="nav-text">System</span>
+                        </a>
+                    </li>
+
                     <!-- Debug & Testing -->
                     <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/debug') !== false ? 'active' : ''; ?>">
                         <a href="<?php echo app_base_url('admin/debug'); ?>" class="nav-link">
@@ -142,6 +232,22 @@
                             <li><a href="<?php echo app_base_url('admin/debug/tests'); ?>">System Tests</a></li>
                             <li><a href="<?php echo app_base_url('admin/debug/live-errors'); ?>">Live Monitor</a></li>
                         </ul>
+                    </li>
+
+                    <!-- Backup -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/backup') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('admin/backup'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-database"></i>
+                            <span class="nav-text">Backup</span>
+                        </a>
+                    </li>
+
+                    <!-- Plugins -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/plugins') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('admin/plugins'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-plug"></i>
+                            <span class="nav-text">Plugins</span>
+                        </a>
                     </li>
                 </ul>
                 

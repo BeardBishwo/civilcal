@@ -6,50 +6,53 @@ ob_start();
 <div class="admin-card">
     <div class="admin-card-header">
         <div>
-            <h1>Analytics Overview</h1>
-            <p style="color: #9ca3af; font-size: 0.875rem; margin: 0;">Comprehensive system analytics and metrics overview</p>
+            <h1>Analytics Dashboard</h1>
+            <p style="color: #9ca3af; font-size: 0.875rem; margin: 0;">Track usage patterns and system performance metrics</p>
         </div>
     </div>
 </div>
 
-<!-- Analytics Overview Statistics -->
+<!-- Analytics Overview -->
 <div class="admin-grid">
     <div class="admin-card" style="text-align: center; padding: 1.5rem;">
-        <i class="fas fa-chart-line" style="font-size: 1.5rem; color: #4cc9f0; margin-bottom: 1rem;"></i>
-        <h3 style="font-size: 1rem; color: #f9fafb; margin-bottom: 0.5rem;">Total Page Views</h3>
-        <div style="font-size: 2rem; font-weight: 700; color: #4cc9f0; margin-bottom: 0.5rem;"><?php echo number_format($stats['total_page_views'] ?? 0); ?></div>
-        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">All Time</div>
+        <i class="fas fa-users" style="font-size: 1.5rem; color: #4cc9f0; margin-bottom: 1rem;"></i>
+        <h3 style="font-size: 1rem; color: #f9fafb; margin-bottom: 0.5rem;">Total Users</h3>
+        <div style="font-size: 2rem; font-weight: 700; color: #4cc9f0; margin-bottom: 0.5rem;"><?php echo number_format($stats['total_users'] ?? 0); ?></div>
+        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">Active Users</div>
         <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-arrow-up"></i> +15% this month</small>
     </div>
 
     <div class="admin-card" style="text-align: center; padding: 1.5rem;">
-        <i class="fas fa-users" style="font-size: 1.5rem; color: #34d399; margin-bottom: 1rem;"></i>
-        <h3 style="font-size: 1rem; color: #f9fafb; margin-bottom: 0.5rem;">Unique Visitors</h3>
-        <div style="font-size: 2rem; font-weight: 700; color: #34d399; margin-bottom: 0.5rem;"><?php echo number_format($stats['unique_visitors'] ?? 0); ?></div>
-        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">This Month</div>
-        <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-bolt"></i> High Traffic</small>
+        <i class="fas fa-calculator" style="font-size: 1.5rem; color: #34d399; margin-bottom: 1rem;"></i>
+        <h3 style="font-size: 1rem; color: #f9fafb; margin-bottom: 0.5rem;">Calculations</h3>
+        <div style="font-size: 2rem; font-weight: 700; color: #34d399; margin-bottom: 0.5rem;"><?php echo number_format($stats['total_calculations'] ?? 0); ?></div>
+        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">All Time</div>
+        <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-bolt"></i> High usage</small>
     </div>
 
     <div class="admin-card" style="text-align: center; padding: 1.5rem;">
-        <i class="fas fa-calculator" style="font-size: 1.5rem; color: #fbbf24; margin-bottom: 1rem;"></i>
-        <h3 style="font-size: 1rem; color: #f9fafb; margin-bottom: 0.5rem;">Total Calculations</h3>
-        <div style="font-size: 2rem; font-weight: 700; color: #fbbf24; margin-bottom: 0.5rem;"><?php echo number_format($stats['total_calculations'] ?? 0); ?></div>
-        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">Processed</div>
-        <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-check-circle"></i> Active Usage</small>
+        <i class="fas fa-chart-line" style="font-size: 1.5rem; color: #fbbf24; margin-bottom: 1rem;"></i>
+        <h3 style="font-size: 1rem; color: #f9fafb; margin-bottom: 0.5rem;">Avg. Session</h3>
+        <div style="font-size: 2rem; font-weight: 700; color: #fbbf24; margin-bottom: 0.5rem;"><?php echo $stats['avg_session_duration'] ?? '0m'; ?></div>
+        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">Duration</div>
+        <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-clock"></i> Engaging experience</small>
     </div>
     
     <div class="admin-card" style="text-align: center; padding: 1.5rem;">
-        <i class="fas fa-clock" style="font-size: 1.5rem; color: #22d3ee; margin-bottom: 1rem;"></i>
-        <h3 style="font-size: 1rem; color: #f9fafb; margin-bottom: 0.5rem;">Avg. Session</h3>
-        <div style="font-size: 2rem; font-weight: 700; color: #22d3ee; margin-bottom: 0.5rem;"><?php echo $stats['avg_session_duration'] ?? '0m'; ?></div>
-        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">Duration</div>
-        <small style="color: #10b981; font-size: 0.75rem;"><i class="fas fa-chart-line"></i> Growing</small>
+        <i class="fas fa-bolt" style="font-size: 1.5rem; color: #22d3ee; margin-bottom: 1rem;"></i>
+        <h3 style="font-size: 1rem; color: #f9fafb; margin-bottom: 0.5rem;">System Load</h3>
+        <div style="font-size: 2rem; font-weight: 700; color: #22d3ee; margin-bottom: 0.5rem;"><?php echo $stats['system_load'] ?? '0%'; ?></div>
+        <div style="color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem;">Current</div>
+        <small style="color: <?php echo ($stats['system_load'] ?? 0) > 80 ? '#f87171' : '#10b981'; ?>; font-size: 0.75rem;">
+            <i class="fas <?php echo ($stats['system_load'] ?? 0) > 80 ? 'fa-exclamation-triangle' : 'fa-check-circle'; ?>"></i>
+            <?php echo ($stats['system_load'] ?? 0) > 80 ? 'High Load' : 'Optimal'; ?>
+        </small>
     </div>
 </div>
 
 <!-- Charts Section -->
 <div class="admin-card">
-    <h2 class="admin-card-title">Analytics Charts</h2>
+    <h2 class="admin-card-title">Usage Analytics</h2>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
         <div style="height: 300px; background: rgba(15, 23, 42, 0.5); border-radius: 8px; padding: 1rem; display: flex; align-items: center; justify-content: center;">
             <p style="color: #9ca3af; text-align: center;">User Activity Chart<br>(Placeholder for chart)</p>
