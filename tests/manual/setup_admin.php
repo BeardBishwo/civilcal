@@ -1,46 +1,68 @@
-<?php
-require_once 'app/bootstrap.php';
 
-try {
-    $db = \App\Core\Database::getInstance();
-    
-    echo "=== Checking users table ===\n";
-    $result = $db->query("SELECT * FROM users");
-    $users = $result->fetchAll(\PDO::FETCH_ASSOC);
-    
-    if (empty($users)) {
-        echo "[WARNING] No users exist in database!\n";
-        echo "Creating default admin user...\n";
-        
-        $hashedPassword = password_hash('admin123', PASSWORD_DEFAULT);
-        $stmt = $db->prepare("
-            INSERT INTO users (username, email, password, role, first_name, last_name, is_active, email_verified)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-        $stmt->execute([
-            'admin',
-            'admin@bishwocalculator.com',
-            $hashedPassword,
-            'admin',
-            'System',
-            'Administrator',
-            true,
-            true
-        ]);
-        
-        echo "[SUCCESS] Admin user created!\n";
-        $userId = $db->lastInsertId();
-        echo "User ID: $userId\n";
-        echo "Username: admin\n";
-        echo "Password: admin123\n";
-    } else {
-        echo "Found " . count($users) . " users:\n";
-        foreach ($users as $user) {
-            echo "- ID: {$user['id']}, Username: {$user['username']}, Email: {$user['email']}, Role: {$user['role']}\n";
-        }
-    }
-    
-} catch (Exception $e) {
-    echo "[ERROR] " . $e->getMessage() . "\n";
+<?php
+/**
+ * Admin User Setup Script
+ * Creates an admin user for testing the admin panel
+ */
+
+// Define application constant
+define('BISHWO_CALCULATOR', true);
+
+// Load application bootstrap
+require_once dirname(dirname(dirname(__DIR__))) . '/app/bootstrap.php';
+
+// Load database configuration
+require_once dirname(dirname(dirname(__DIR__))) . '/app/Config/db.php';
+
+// Get database connection
+$pdo = get_db();
+
+if (!$pdo) {
+    die("Database connection failed. Please check your database configuration.");
 }
-?>
+
+echo "=== Admin User Setup ===\n";
+
+// Check if users table exists
+try {
+    $stmt = $pdo->query("SHOW TABLES LIKE 'users'");
+    $tableExists = $stmt->rowCount() > 0;
+    
+    if (!$tableExists) {
+        echo "❌ Users table does not exist. Please run the installation first.\n";
+        exit(1);
+    }
+} catch (Exception $e) {
+    echo "❌ Error checking users table: " . $e->getMessage() . "\n";
+    exit(1);
+}
+
+// Check if admin user already exists
+try {
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = 'admin' OR email = 'admin@bishwocalculator.com'");
+    $stmt->execute();
+    $existingAdmin = $stmt->fetch();
+    
+    if ($existingAdmin) {
+        echo "✅ Admin user already exists (ID: {$existingAdmin['id']})\n";
+        
+        // Update the existing admin user to ensure it has admin privileges
+        $updateStmt = $pdo->prepare("UPDATE users SET role = 'admin', is_admin = 1 WHERE id = ?");
+        $updateStmt->execute([$existingAdmin['id']]);
+        echo "✅ Updated existing user with admin privileges\n";
+        exit(0);
+    }
+} catch (Exception $e) {
+    echo "❌ Error checking for existing admin: " . $e->getMessage() . "\n";
+    exit(1);
+}
+
+// Create admin user
+try {
+    $hashedPassword = password_hash('admin123', PASSWORD_DEFAULT);
+    $currentTime = date('Y-m-d H:i:s');
+    
+    $stmt = $pdo->prepare("
+        INSERT INTO users (
+            username, email, password, first_name, last_name, role, is_admin,
+           
