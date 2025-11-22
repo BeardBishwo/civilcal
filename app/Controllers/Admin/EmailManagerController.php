@@ -3,17 +3,42 @@
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
+use App\Models\EmailThread;
+use App\Models\EmailTemplate;
+use App\Services\EmailService;
+use App\Models\User;
 
 class EmailManagerController extends Controller
 {
+    private $emailThread;
+    private $emailTemplate;
+    private $emailService;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->emailThread = new EmailThread();
+        $this->emailTemplate = new EmailTemplate();
+        $this->emailService = new EmailService();
+    }
+
     public function index()
     {
-        echo "Email Manager Index";
+        return $this->dashboard();
     }
 
     public function dashboard()
     {
-        echo "Email Manager Dashboard";
+        $stats = $this->emailThread->getStatistics();
+        $recentThreads = $this->emailThread->getRecentThreads(5);
+        $templateStats = $this->emailTemplate->getStats();
+
+        return $this->view('admin/email-manager/dashboard', [
+            'stats' => $stats,
+            'recentThreads' => $recentThreads,
+            'templateStats' => $templateStats,
+            'pageTitle' => 'Email Manager Dashboard'
+        ]);
     }
 
     public function sendTestEmail()
@@ -28,61 +53,450 @@ class EmailManagerController extends Controller
 
     public function threads()
     {
-        echo "Email Threads";
+        $filters = [];
+
+        // Get filter parameters from request
+        if (isset($_GET['status']) && $_GET['status'] !== 'all') {
+            $filters['status'] = $_GET['status'];
+        }
+
+        if (isset($_GET['category']) && $_GET['category'] !== 'all') {
+            $filters['category'] = $_GET['category'];
+        }
+
+        if (isset($_GET['priority']) && $_GET['priority'] !== 'all') {
+            $filters['priority'] = $_GET['priority'];
+        }
+
+        if (isset($_GET['search']) && !empty($_GET['search'])) {
+            $filters['search'] = $_GET['search'];
+        }
+
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+
+        $threads = $this->emailThread->getThreadsWithFilters($filters, $page, $limit);
+        $totalCount = $this->emailThread->getThreadCountWithFilters($filters);
+
+        // Return JSON for AJAX requests
+        if ($this->isAjaxRequest()) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'threads' => $threads,
+                'total' => $totalCount,
+                'page' => $page,
+                'limit' => $limit,
+                'total_pages' => ceil($totalCount / $limit)
+            ]);
+            exit;
+        }
+
+        // Return view for regular requests
+        return $this->view('admin/email-manager/threads', [
+            'threads' => $threads,
+            'total' => $totalCount,
+            'page' => $page,
+            'limit' => $limit,
+            'total_pages' => ceil($totalCount / $limit),
+            'filters' => $filters,
+            'pageTitle' => 'Email Threads'
+        ]);
+    }
+
+    private function isAjaxRequest()
+    {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+               strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
     public function viewThread($id)
     {
-        echo "Viewing Thread: " . $id;
+        $thread = $this->emailThread->getThreadById($id);
+
+        if (!$thread) {
+            return $this->view('admin/email-manager/error', [
+                'message' => 'Thread not found',
+                'pageTitle' => 'Error'
+            ]);
+        }
+
+        $availableAssignees = $this->emailThread->getAvailableAssignees();
+        $templates = $this->emailTemplate->getActiveTemplates();
+
+        return $this->view('admin/email-manager/thread-detail', [
+            'thread' => $thread,
+            'availableAssignees' => $availableAssignees,
+            'templates' => $templates,
+            'pageTitle' => 'Thread: ' . $thread['subject']
+        ]);
     }
 
     public function reply($id)
     {
-        echo "Reply to Thread: " . $id;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return $this->jsonResponse(['error' => 'Method not allowed'], 405);
+        }
+
+        $thread = $this->emailThread->getThreadById($id);
+        if (!$thread) {
+            return $this->jsonResponse(['error' => 'Thread not found'], 404);
+        }
+
+        $message = $_POST['message'] ?? '';
+        $isInternal = isset($_POST['is_internal']) && $_POST['is_internal'] === '1';
+        $userId = $_SESSION['user']['id'] ?? null;
+
+        if (empty($message)) {
+            return $this->jsonResponse(['error' => 'Message is required'], 400);
+        }
+
+        $success = $this->emailThread->addResponseToThread($id, $userId, $message, $isInternal);
+
+        if ($success) {
+            return $this->jsonResponse([
+                'success' => true,
+                'message' => 'Reply added successfully'
+            ]);
+        } else {
+            return $this->jsonResponse(['error' => 'Failed to add reply'], 500);
+        }
+    }
+
+    private function jsonResponse($data, $statusCode = 200)
+    {
+        http_response_code($statusCode);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit;
     }
 
     public function updateStatus($id)
     {
-        echo "Status Updated for Thread: " . $id;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return $this->jsonResponse(['error' => 'Method not allowed'], 405);
+        }
+
+        $thread = $this->emailThread->getThreadById($id);
+        if (!$thread) {
+            return $this->jsonResponse(['error' => 'Thread not found'], 404);
+        }
+
+        $status = $_POST['status'] ?? '';
+        $validStatuses = ['new', 'in_progress', 'resolved', 'closed'];
+
+        if (!in_array($status, $validStatuses)) {
+            return $this->jsonResponse(['error' => 'Invalid status'], 400);
+        }
+
+        $success = $this->emailThread->updateThread($id, ['status' => $status]);
+
+        if ($success) {
+            return $this->jsonResponse([
+                'success' => true,
+                'message' => 'Status updated successfully'
+            ]);
+        } else {
+            return $this->jsonResponse(['error' => 'Failed to update status'], 500);
+        }
     }
 
     public function assign($id)
     {
-        echo "Thread Assigned: " . $id;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return $this->jsonResponse(['error' => 'Method not allowed'], 405);
+        }
+
+        $thread = $this->emailThread->getThreadById($id);
+        if (!$thread) {
+            return $this->jsonResponse(['error' => 'Thread not found'], 404);
+        }
+
+        $assignedTo = $_POST['assigned_to'] ?? null;
+
+        // Validate that the assignee exists
+        if ($assignedTo !== null) {
+            $userModel = new User();
+            $assignee = $userModel->find($assignedTo);
+            if (!$assignee) {
+                return $this->jsonResponse(['error' => 'Assignee not found'], 400);
+            }
+        }
+
+        $success = $this->emailThread->updateThread($id, ['assigned_to' => $assignedTo]);
+
+        if ($success) {
+            return $this->jsonResponse([
+                'success' => true,
+                'message' => 'Thread assigned successfully'
+            ]);
+        } else {
+            return $this->jsonResponse(['error' => 'Failed to assign thread'], 500);
+        }
     }
 
     public function updatePriority($id)
     {
-        echo "Priority Updated for Thread: " . $id;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return $this->jsonResponse(['error' => 'Method not allowed'], 405);
+        }
+
+        $thread = $this->emailThread->getThreadById($id);
+        if (!$thread) {
+            return $this->jsonResponse(['error' => 'Thread not found'], 404);
+        }
+
+        $priority = $_POST['priority'] ?? '';
+        $validPriorities = ['low', 'medium', 'high', 'urgent'];
+
+        if (!in_array($priority, $validPriorities)) {
+            return $this->jsonResponse(['error' => 'Invalid priority'], 400);
+        }
+
+        $success = $this->emailThread->updateThread($id, ['priority' => $priority]);
+
+        if ($success) {
+            return $this->jsonResponse([
+                'success' => true,
+                'message' => 'Priority updated successfully'
+            ]);
+        } else {
+            return $this->jsonResponse(['error' => 'Failed to update priority'], 500);
+        }
     }
 
     public function templates()
     {
-        echo "Email Templates";
+        $filters = [];
+
+        if (isset($_GET['category']) && $_GET['category'] !== 'all') {
+            $filters['category'] = $_GET['category'];
+        }
+
+        if (isset($_GET['is_active'])) {
+            $filters['is_active'] = (bool)$_GET['is_active'];
+        }
+
+        if (isset($_GET['search']) && !empty($_GET['search'])) {
+            $filters['search'] = $_GET['search'];
+        }
+
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $perPage = 20;
+
+        $templatesData = $this->emailTemplate->getAll($filters, $page, $perPage);
+
+        // Return JSON for AJAX requests
+        if ($this->isAjaxRequest()) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'templates' => $templatesData['templates'],
+                'total' => $templatesData['total'],
+                'page' => $page,
+                'per_page' => $perPage,
+                'total_pages' => $templatesData['total_pages']
+            ]);
+            exit;
+        }
+
+        // Return view for regular requests
+        return $this->view('admin/email-manager/templates', [
+            'templates' => $templatesData['templates'],
+            'total' => $templatesData['total'],
+            'page' => $page,
+            'per_page' => $perPage,
+            'total_pages' => $templatesData['total_pages'],
+            'filters' => $filters,
+            'templateTypes' => $this->emailTemplate->getTemplateTypes(),
+            'pageTitle' => 'Email Templates'
+        ]);
     }
 
     public function createTemplate()
     {
-        echo "Template Created";
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'name' => $_POST['name'] ?? '',
+                'subject' => $_POST['subject'] ?? '',
+                'content' => $_POST['content'] ?? '',
+                'category' => $_POST['category'] ?? 'general',
+                'description' => $_POST['description'] ?? '',
+                'is_active' => isset($_POST['is_active']),
+                'created_by' => $_SESSION['user']['id'] ?? null,
+                'variables' => $_POST['variables'] ?? []
+            ];
+
+            $validation = $this->emailTemplate->validate($data);
+
+            if (!$validation['valid']) {
+                return $this->jsonResponse([
+                    'success' => false,
+                    'errors' => $validation['errors']
+                ], 400);
+            }
+
+            $templateId = $this->emailTemplate->create($data);
+
+            if ($templateId) {
+                return $this->jsonResponse([
+                    'success' => true,
+                    'message' => 'Template created successfully',
+                    'template_id' => $templateId
+                ]);
+            } else {
+                return $this->jsonResponse([
+                    'success' => false,
+                    'error' => 'Failed to create template'
+                ], 500);
+            }
+        }
+
+        // Return form for GET requests
+        return $this->view('admin/email-manager/template-form', [
+            'template' => null,
+            'templateTypes' => $this->emailTemplate->getTemplateTypes(),
+            'pageTitle' => 'Create Email Template'
+        ]);
     }
 
     public function editTemplate($id)
     {
-        echo "Editing Template: " . $id;
+        $template = $this->emailTemplate->getTemplateById($id);
+
+        if (!$template) {
+            return $this->view('admin/email-manager/error', [
+                'message' => 'Template not found',
+                'pageTitle' => 'Error'
+            ]);
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'name' => $_POST['name'] ?? '',
+                'subject' => $_POST['subject'] ?? '',
+                'content' => $_POST['content'] ?? '',
+                'category' => $_POST['category'] ?? 'general',
+                'description' => $_POST['description'] ?? '',
+                'is_active' => isset($_POST['is_active']),
+                'variables' => $_POST['variables'] ?? []
+            ];
+
+            $validation = $this->emailTemplate->validate($data);
+
+            if (!$validation['valid']) {
+                return $this->jsonResponse([
+                    'success' => false,
+                    'errors' => $validation['errors']
+                ], 400);
+            }
+
+            $success = $this->emailTemplate->update($id, $data);
+
+            if ($success) {
+                return $this->jsonResponse([
+                    'success' => true,
+                    'message' => 'Template updated successfully'
+                ]);
+            } else {
+                return $this->jsonResponse([
+                    'success' => false,
+                    'error' => 'Failed to update template'
+                ], 500);
+            }
+        }
+
+        // Return form for GET requests
+        return $this->view('admin/email-manager/template-form', [
+            'template' => $template,
+            'templateTypes' => $this->emailTemplate->getTemplateTypes(),
+            'pageTitle' => 'Edit Email Template'
+        ]);
     }
 
     public function updateTemplate($id)
     {
-        echo "Template Updated: " . $id;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return $this->jsonResponse(['error' => 'Method not allowed'], 405);
+        }
+
+        $template = $this->emailTemplate->getTemplateById($id);
+        if (!$template) {
+            return $this->jsonResponse(['error' => 'Template not found'], 404);
+        }
+
+        $data = [
+            'name' => $_POST['name'] ?? '',
+            'subject' => $_POST['subject'] ?? '',
+            'content' => $_POST['content'] ?? '',
+            'category' => $_POST['category'] ?? 'general',
+            'description' => $_POST['description'] ?? '',
+            'is_active' => isset($_POST['is_active']),
+            'variables' => $_POST['variables'] ?? []
+        ];
+
+        $validation = $this->emailTemplate->validate($data);
+
+        if (!$validation['valid']) {
+            return $this->jsonResponse([
+                'success' => false,
+                'errors' => $validation['errors']
+            ], 400);
+        }
+
+        $success = $this->emailTemplate->update($id, $data);
+
+        if ($success) {
+            return $this->jsonResponse([
+                'success' => true,
+                'message' => 'Template updated successfully'
+            ]);
+        } else {
+            return $this->jsonResponse([
+                'success' => false,
+                'error' => 'Failed to update template'
+            ], 500);
+        }
     }
 
     public function deleteTemplate($id)
     {
-        echo "Template Deleted: " . $id;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return $this->jsonResponse(['error' => 'Method not allowed'], 405);
+        }
+
+        $template = $this->emailTemplate->getTemplateById($id);
+        if (!$template) {
+            return $this->jsonResponse(['error' => 'Template not found'], 404);
+        }
+
+        $success = $this->emailTemplate->delete($id);
+
+        if ($success) {
+            return $this->jsonResponse([
+                'success' => true,
+                'message' => 'Template deleted successfully'
+            ]);
+        } else {
+            return $this->jsonResponse([
+                'success' => false,
+                'error' => 'Failed to delete template'
+            ], 500);
+        }
     }
 
     public function useTemplate($id)
     {
-        echo "Using Template: " . $id;
+        $template = $this->emailTemplate->getTemplateById($id);
+
+        if (!$template) {
+            return $this->jsonResponse(['error' => 'Template not found'], 404);
+        }
+
+        // Return template data for use in forms
+        return $this->jsonResponse([
+            'success' => true,
+            'template' => $template
+        ]);
     }
 }

@@ -46,3 +46,20 @@
 [2025-11-20 14:28:34] Auth::login called for identity: uniquebishwo@gmail.com
 [2025-11-20 14:28:34] Auth::login: User found (ID: 3)
 [2025-11-20 14:28:34] Auth::login: Password verified. Setting session.
+[2025-11-21 12:34:29] Auth::login called. Identity: admin@engicalpro.com
+[2025-11-21 12:34:29] Session ID: jl1s0780hi2rhshnjbpoqkh5sn
+[2025-11-21 12:34:29] CSRF Check - Posted: 5b1801e25e588441fdea7128385287b9ea73df64846311b786a6ff81697c9faa
+[2025-11-21 12:34:29] CSRF Check - Session: NOT_SET
+[2025-11-21 12:34:29] Auth::login failed: CSRF mismatch or expired. Valid: No, NotExpired: Yes
+[2025-11-21 12:47:50] Auth::login called. Identity: admin@engicalpro.com
+[2025-11-21 12:47:50] Session ID: hs7vjiub6sbruqcomer0t5lhkj
+[2025-11-21 12:47:50] CSRF Check - Posted: f4b139e69e8e794ed9e267ebe28f8b61c0e34f25da2c57934b14f9ef8a06e558
+[2025-11-21 12:47:50] CSRF Check - Session: NOT_SET
+[2025-11-21 12:47:50] Auth::login failed: CSRF mismatch or expired. Valid: No, NotExpired: Yes
+[2025-11-21 12:48:41] Auth::login called. Identity: admin@engicalpro.com
+[2025-11-21 12:48:41] Session ID: hs7vjiub6sbruqcomer0t5lhkj
+[2025-11-21 12:48:41] CSRF Check - Posted: 04142fa1f531a5ded5ee5965fbfd01de29bbe88b9a690f5b6decf30cbf0fe68b
+[2025-11-21 12:48:41] CSRF Check - Session: 04142fa1f531a5ded5ee5965fbfd01de29bbe88b9a690f5b6decf30cbf0fe68b
+[2025-11-21 12:48:41] Auth::login called for identity: admin@engicalpro.com
+[2025-11-21 12:48:41] Auth::login: User found (ID: 2)
+[2025-11-21 12:48:41] Auth::login: Password verified. Setting session.
