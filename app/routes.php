@@ -1332,19 +1332,19 @@ $router->add(
 $router->add(
     "POST",
     "/admin/themes/:id/save-custom_css",
-    "Admin\ThemeCustomizeController@saveCustomCSS",
+    "Admin\\ThemeCustomizeController@saveCustomCSS",
     ["auth", "admin"],
 );
 $router->add(
     "GET",
     "/admin/themes/:id/preview",
-    "Admin\ThemeCustomizeController@preview",
+    "Admin\\ThemeCustomizeController@preview",
     ["auth", "admin"],
 );
 $router->add(
     "POST",
     "/admin/themes/:id/reset",
-    "Admin\ThemeCustomizeController@reset",
+    "Admin\\ThemeCustomizeController@reset",
     ["auth", "admin"],
 );
 
@@ -1352,43 +1352,68 @@ $router->add(
 $router->add(
     "GET",
     "/admin/email-manager",
-    "Admin\EmailManagerController@dashboard",
+    "Admin\\EmailManagerController@dashboard",
+    ["auth", "admin"],
+);
+$router->add(
+    "GET",
+    "/admin/email-manager/stats",
+    "Admin\\EmailManagerController@stats",
     ["auth", "admin"],
 );
 $router->add(
     "GET",
     "/admin/email-manager/threads",
-    "Admin\EmailManagerController@threads",
+    "Admin\\EmailManagerController@threads",
     ["auth", "admin"],
 );
 $router->add(
     "GET",
     "/admin/email-manager/thread/{id}",
-    "Admin\EmailManagerController@viewThread",
+    "Admin\\EmailManagerController@viewThread",
     ["auth", "admin"],
 );
 $router->add(
     "POST",
     "/admin/email-manager/thread/{id}/reply",
-    "Admin\EmailManagerController@reply",
+    "Admin\\EmailManagerController@reply",
     ["auth", "admin"],
 );
 $router->add(
     "POST",
     "/admin/email-manager/thread/{id}/status",
-    "Admin\EmailManagerController@updateStatus",
+    "Admin\\EmailManagerController@updateStatus",
     ["auth", "admin"],
 );
 $router->add(
     "POST",
     "/admin/email-manager/thread/{id}/assign",
-    "Admin\EmailManagerController@assign",
+    "Admin\\EmailManagerController@assign",
     ["auth", "admin"],
 );
 $router->add(
     "POST",
     "/admin/email-manager/thread/{id}/priority",
-    "Admin\EmailManagerController@updatePriority",
+    "Admin\\EmailManagerController@updatePriority",
+    ["auth", "admin"],
+);
+
+$router->add(
+    "GET",
+    "/admin/email-manager/settings",
+    "Admin\\EmailManagerController@settings",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/email-manager/settings",
+    "Admin\\EmailManagerController@updateSettings",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/email-manager/test-email",
+    "Admin\\EmailManagerController@testEmail",
     ["auth", "admin"],
 );
 
@@ -1396,25 +1421,25 @@ $router->add(
 $router->add(
     "GET",
     "/admin/email-manager/templates",
-    "Admin\EmailManagerController@templates",
+    "Admin\\EmailManagerController@templates",
     ["auth", "admin"],
 );
 $router->add(
     "POST",
     "/admin/email-manager/templates",
-    "Admin\EmailManagerController@createTemplate",
+    "Admin\\EmailManagerController@createTemplate",
     ["auth", "admin"],
 );
 $router->add(
     "GET",
     "/admin/email-manager/template/{id}",
-    "Admin\EmailManagerController@editTemplate",
+    "Admin\\EmailManagerController@editTemplate",
     ["auth", "admin"],
 );
 $router->add(
     "PUT",
     "/admin/email-manager/template/{id}",
-    "Admin\EmailManagerController@updateTemplate",
+    "Admin\\EmailManagerController@updateTemplate",
     ["auth", "admin"],
 );
 $router->add(
@@ -1423,10 +1448,91 @@ $router->add(
     "Admin\EmailManagerController@deleteTemplate",
     ["auth", "admin"],
 );
+// Email Manager Admin Routes
+$router->add(
+    "GET",
+    "/admin/email-manager",
+    "Admin\\EmailManagerController@dashboard",
+    ["auth", "admin"],
+);
+$router->add(
+    "GET",
+    "/admin/email-manager/stats",
+    "Admin\\EmailManagerController@stats",
+    ["auth", "admin"],
+);
+$router->add(
+    "GET",
+    "/admin/email-manager/threads",
+    "Admin\\EmailManagerController@threads",
+    ["auth", "admin"],
+);
+$router->add(
+    "GET",
+    "/admin/email-manager/thread/{id}",
+    "Admin\\EmailManagerController@viewThread",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/email-manager/thread/{id}/reply",
+    "Admin\\EmailManagerController@reply",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/email-manager/thread/{id}/status",
+    "Admin\\EmailManagerController@updateStatus",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/email-manager/thread/{id}/assign",
+    "Admin\\EmailManagerController@assign",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/email-manager/thread/{id}/priority",
+    "Admin\\EmailManagerController@updatePriority",
+    ["auth", "admin"],
+);
+
+// Email Templates Admin Routes
+$router->add(
+    "GET",
+    "/admin/email-manager/templates",
+    "Admin\\EmailManagerController@templates",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/email-manager/templates",
+    "Admin\\EmailManagerController@createTemplate",
+    ["auth", "admin"],
+);
+$router->add(
+    "GET",
+    "/admin/email-manager/template/{id}",
+    "Admin\\EmailManagerController@editTemplate",
+    ["auth", "admin"],
+);
+$router->add(
+    "PUT",
+    "/admin/email-manager/template/{id}",
+    "Admin\\EmailManagerController@updateTemplate",
+    ["auth", "admin"],
+);
+$router->add(
+    "DELETE",
+    "/admin/email-manager/template/{id}",
+    "Admin\\EmailManagerController@deleteTemplate",
+    ["auth", "admin"],
+);
 $router->add(
     "POST",
     "/admin/email-manager/templates/{id}/use",
-    "Admin\EmailManagerController@useTemplate",
+    "Admin\\EmailManagerController@useTemplate",
     ["auth", "admin"],
 );
 

@@ -1,29 +1,34 @@
 <?php
+
 /**
  * Enhanced Email System for EngiCal Pro
  * Supports both PHPMailer and PHP mail() with admin-configurable settings
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
+use App\Core\Database;
 
-class EmailManager {
+class EmailManager
+{
     private $settings;
     private $mailer;
     private $usePHPMailer = true;
-    
-    public function __construct() {
+
+    public function __construct()
+    {
         $this->loadSettings();
         $this->initializeMailer();
     }
-    
+
     /**
      * Load email settings from configuration or database
      */
-    private function loadSettings() {
+    private function loadSettings()
+    {
         // Default settings
         $this->settings = [
             'use_phpmailer' => true,
@@ -36,14 +41,14 @@ class EmailManager {
             'from_name' => 'EngiCal Pro',
             'reply_to' => 'support@engicalpro.com'
         ];
-        
+
         // Load from database if available
         try {
-            $db = new Database();
-            $stmt = $db->executeQuery("SELECT setting_name, setting_value FROM site_settings WHERE setting_name LIKE 'email_%'");
+            $db = Database::getInstance();
+            $stmt = $db->query("SELECT setting_key, setting_value FROM site_settings WHERE setting_key LIKE 'email_%'");
             if ($stmt) {
                 while ($row = $stmt->fetch()) {
-                    $key = str_replace('email_', '', $row['setting_name']);
+                    $key = str_replace('email_', '', $row['setting_key']);
                     $this->settings[$key] = $row['setting_value'];
                 }
             }
@@ -51,100 +56,104 @@ class EmailManager {
             // Use defaults if database loading fails
             error_log('Email settings loading failed: ' . $e->getMessage());
         }
-        
+
         // Check if PHPMailer should be used
-        $this->usePHPMailer = $this->settings['use_phpmailer'] && !empty($this->settings['smtp_host']);
+        $this->usePHPMailer = ($this->settings['use_phpmailer'] ?? true) && !empty($this->settings['smtp_host']);
     }
-    
+
     /**
      * Initialize PHPMailer or prepare for PHP mail()
      */
-    private function initializeMailer() {
+    private function initializeMailer()
+    {
         if (!$this->usePHPMailer) {
             return;
         }
-        
+
         try {
             $this->mailer = new PHPMailer(true);
-            
+
             // Server settings
             $this->mailer->isSMTP();
             $this->mailer->Host = $this->settings['smtp_host'];
             $this->mailer->Port = (int)$this->settings['smtp_port'];
-            
+
             if (!empty($this->settings['smtp_username'])) {
                 $this->mailer->SMTPAuth = true;
                 $this->mailer->Username = $this->settings['smtp_username'];
                 $this->mailer->Password = $this->settings['smtp_password'];
             }
-            
+
             $this->mailer->SMTPSecure = $this->settings['smtp_encryption'];
             $this->mailer->SMTPDebug = 0; // Set to 2 for debugging
-            
+
             // Default sender
             $this->mailer->setFrom($this->settings['from_email'], $this->settings['from_name']);
             $this->mailer->addReplyTo($this->settings['reply_to'], $this->settings['from_name']);
-            
         } catch (Exception $e) {
             error_log('PHPMailer initialization failed: ' . $e->getMessage());
             $this->usePHPMailer = false;
         }
     }
-    
+
     /**
      * Send email verification message
      */
-    public function sendVerificationEmail($email, $fullName, $verificationToken) {
+    public function sendVerificationEmail($email, $fullName, $verificationToken)
+    {
         $verificationLink = app_base_url("verify.php?token={$verificationToken}");
-        
+
         $subject = "Verify Your Email - EngiCal Pro";
-        
+
         $body = $this->getTemplate('email_verification', [
             'full_name' => $fullName,
             'verification_link' => $verificationLink,
             'site_name' => 'EngiCal Pro'
         ]);
-        
+
         return $this->sendEmail($email, $subject, $body);
     }
-    
+
     /**
      * Send password reset email
      */
-    public function sendPasswordResetEmail($email, $fullName, $resetToken) {
+    public function sendPasswordResetEmail($email, $fullName, $resetToken)
+    {
         $resetLink = app_base_url("reset.php?token={$resetToken}");
-        
+
         $subject = "Password Reset - EngiCal Pro";
-        
+
         $body = $this->getTemplate('password_reset', [
             'full_name' => $fullName,
             'reset_link' => $resetLink,
             'site_name' => 'EngiCal Pro'
         ]);
-        
+
         return $this->sendEmail($email, $subject, $body);
     }
-    
+
     /**
      * Send welcome email
      */
-    public function sendWelcomeEmail($email, $fullName, $username) {
+    public function sendWelcomeEmail($email, $fullName, $username)
+    {
         $subject = "Welcome to EngiCal Pro!";
-        
+
         $body = $this->getTemplate('welcome', [
             'full_name' => $fullName,
             'username' => $username,
             'site_name' => 'EngiCal Pro',
             'login_url' => app_base_url('login.php')
         ]);
-        
+
         return $this->sendEmail($email, $subject, $body);
     }
-    
+
     /**
      * Send generic email
      */
-    public function sendEmail($to, $subject, $body, $isHtml = true) {
+    public function sendEmail($to, $subject, $body, $isHtml = true)
+    {
         try {
             if ($this->usePHPMailer && $this->mailer) {
                 return $this->sendViaPHPMailer($to, $subject, $body, $isHtml);
@@ -156,70 +165,72 @@ class EmailManager {
             return false;
         }
     }
-    
+
     /**
      * Send email using PHPMailer
      */
-    private function sendViaPHPMailer($to, $subject, $body, $isHtml = true) {
+    private function sendViaPHPMailer($to, $subject, $body, $isHtml = true)
+    {
         try {
             $this->mailer->clearAddresses();
             $this->mailer->clearAttachments();
-            
+
             $this->mailer->addAddress($to);
             $this->mailer->Subject = $subject;
             $this->mailer->Body = $body;
             $this->mailer->isHTML($isHtml);
-            
+
             if (!$isHtml) {
                 $this->mailer->AltBody = strip_tags($body);
             }
-            
+
             $result = $this->mailer->send();
-            
+
             if ($result) {
                 error_log("Email sent successfully to: {$to}");
             }
-            
+
             return $result;
-            
         } catch (Exception $e) {
             error_log("PHPMailer sending failed: " . $e->getMessage());
             return false;
         }
     }
-    
+
     /**
      * Send email using PHP mail() function
      */
-    private function sendViaPHPMail($to, $subject, $body, $isHtml = true) {
+    private function sendViaPHPMail($to, $subject, $body, $isHtml = true)
+    {
         $headers = [
             'From: ' . $this->settings['from_name'] . ' <' . $this->settings['from_email'] . '>',
             'Reply-To: ' . $this->settings['reply_to'],
             'X-Mailer: PHP/' . phpversion(),
             'MIME-Version: 1.0'
         ];
-        
+
         if ($isHtml) {
             $headers[] = 'Content-Type: text/html; charset=UTF-8';
         } else {
             $headers[] = 'Content-Type: text/plain; charset=UTF-8';
         }
-        
+
         $result = mail($to, $subject, $body, implode("\r\n", $headers));
-        
+
         if ($result) {
             error_log("Email sent successfully via PHP mail() to: {$to}");
         } else {
             error_log("PHP mail() sending failed for: {$to}");
         }
-        
+
         return $result;
     }
-    
+
     /**
      * Get email template
      */
-    private function getTemplate($templateName, $variables = []) {
+    private function getTemplate($templateName, $variables = [])
+    {
         $templates = [
             'email_verification' => '
                 <!DOCTYPE html>
@@ -355,33 +366,33 @@ class EmailManager {
                 </html>
             '
         ];
-        
+
         $template = $templates[$templateName] ?? '';
-        
+
         // Replace variables in template
         foreach ($variables as $key => $value) {
             $template = str_replace('{{' . $key . '}}', htmlspecialchars($value), $template);
         }
-        
+
         return $template;
     }
-    
+
     /**
      * Test email configuration
      */
-    public function testEmailSettings($testEmail) {
+    public function testEmailSettings($testEmail)
+    {
         try {
             $testResult = $this->sendEmail(
                 $testEmail,
                 'EngiCal Pro - Email Test',
                 '<p>This is a test email to verify your email configuration is working correctly.</p><p>If you received this email, your settings are configured properly!</p>'
             );
-            
+
             return [
                 'success' => $testResult,
                 'message' => $testResult ? 'Test email sent successfully!' : 'Failed to send test email'
             ];
-            
         } catch (Exception $e) {
             return [
                 'success' => false,
@@ -389,51 +400,52 @@ class EmailManager {
             ];
         }
     }
-    
+
     /**
      * Get current email settings
      */
-    public function getSettings() {
+    public function getSettings()
+    {
         return $this->settings;
     }
-    
+
     /**
      * Update email settings
      */
-    public function updateSettings($newSettings) {
+    public function updateSettings($newSettings)
+    {
         try {
-            $db = new Database();
-            
+            $db = Database::getInstance();
+
             foreach ($newSettings as $key => $value) {
-                $settingName = 'email_' . $key;
-                
+                $settingKey = 'email_' . $key;
+
                 // Check if setting exists
-                $stmt = $db->executeQuery(
-                    "SELECT id FROM site_settings WHERE setting_name = ?",
-                    [$settingName]
+                $stmt = $db->query(
+                    "SELECT id FROM site_settings WHERE setting_key = ?",
+                    [$settingKey]
                 );
-                
+
                 if ($stmt && $stmt->fetch()) {
                     // Update existing setting
-                    $db->executeQuery(
-                        "UPDATE site_settings SET setting_value = ?, updated_at = NOW() WHERE setting_name = ?",
-                        [$value, $settingName]
+                    $db->query(
+                        "UPDATE site_settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?",
+                        [$value, $settingKey]
                     );
                 } else {
                     // Insert new setting
-                    $db->executeQuery(
-                        "INSERT INTO site_settings (setting_name, setting_value, created_at, updated_at) VALUES (?, ?, NOW(), NOW())",
-                        [$settingName, $value]
+                    $db->query(
+                        "INSERT INTO site_settings (setting_key, setting_value, setting_group, created_at, updated_at) VALUES (?, ?, 'email', NOW(), NOW())",
+                        [$settingKey, $value]
                     );
                 }
             }
-            
+
             // Reload settings
             $this->loadSettings();
             $this->initializeMailer();
-            
+
             return true;
-            
         } catch (Exception $e) {
             error_log('Failed to update email settings: ' . $e->getMessage());
             return false;

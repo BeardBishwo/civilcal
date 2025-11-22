@@ -45,6 +45,37 @@ class Controller {
     }
     
     /**
+     * Render a view wrapped in a layout
+     * 
+     * @param string $layoutName The layout file (e.g., 'admin/layout')
+     * @param array $data Data to pass to both view and layout
+     */
+    protected function layout($layoutName, $data = []) {
+        // Start output buffering to capture the view content
+        ob_start();
+        
+        // If there's a specific view to render, do it now
+        // The calling file (view) will output its content, which we'll capture
+        
+        // Get the buffered content (this will be set by the calling view file)
+        $content = ob_get_clean();
+        
+        // Extract data for layout use
+        extract($data);
+        
+        // Build layout path
+        $layoutPath = __DIR__ . '/../Views/' . str_replace('.', '/', $layoutName) . '.php';
+        
+        if (file_exists($layoutPath)) {
+            include $layoutPath;
+        } else {
+            echo "<h1>Layout Error</h1>";
+            echo "<p>Layout file not found: " . htmlspecialchars($layoutName) . "</p>";
+            echo "<p>Expected path: " . htmlspecialchars($layoutPath) . "</p>";
+        }
+    }
+    
+    /**
      * Send JSON response
      * 
      * @param array $data The data to send as JSON

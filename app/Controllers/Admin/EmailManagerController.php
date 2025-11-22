@@ -8,6 +8,8 @@ use App\Models\EmailTemplate;
 use App\Services\EmailService;
 use App\Models\User;
 
+require_once __DIR__ . '/../../Services/EmailManager.php';
+
 class EmailManagerController extends Controller
 {
     private $emailThread;
@@ -49,6 +51,29 @@ class EmailManagerController extends Controller
     public function saveTemplate()
     {
         echo "Template Saved";
+    }
+
+    public function stats()
+    {
+        // Get email statistics
+        $stats = $this->emailThread->getStatistics();
+
+        // Calculate additional metrics
+        $highPriority = $this->emailThread->getThreadCountByPriority('high');
+        $urgent = $this->emailThread->getThreadCountByPriority('urgent');
+
+        $data = [
+            'total_threads' => $stats['total'] ?? 0,
+            'unread_threads' => $stats['new_count'] ?? 0,
+            'resolved_threads' => $stats['resolved_count'] ?? 0,
+            'high_priority' => ($highPriority + $urgent),
+            'in_progress' => $stats['in_progress_count'] ?? 0
+        ];
+
+        // Return JSON for AJAX
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit;
     }
 
     public function threads()
@@ -107,7 +132,7 @@ class EmailManagerController extends Controller
     private function isAjaxRequest()
     {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-               strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
     public function viewThread($id)
@@ -498,5 +523,75 @@ class EmailManagerController extends Controller
             'success' => true,
             'template' => $template
         ]);
+    }
+    public function settings()
+    {
+        require_once __DIR__ . '/../../app/Services/EmailManager.php';
+        $emailManager = new \EmailManager();
+        $settings = $emailManager->getSettings();
+
+        return $this->view('admin/email-manager/settings', [
+            'settings' => $settings,
+            'pageTitle' => 'Email Settings'
+        ]);
+    }
+
+    public function updateSettings()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return $this->jsonResponse(['error' => 'Method not allowed'], 405);
+        }
+
+        require_once __DIR__ . '/../../app/Services/EmailManager.php';
+        $emailManager = new \EmailManager();
+        $newSettings = [
+            'from_name' => $_POST['email_from_name'] ?? '',
+            'from_address' => $_POST['email_from_address'] ?? '',
+            'smtp_host' => $_POST['email_smtp_host'] ?? '',
+            'smtp_port' => $_POST['email_smtp_port'] ?? '',
+            'smtp_username' => $_POST['email_smtp_user'] ?? '',
+            'smtp_password' => $_POST['email_smtp_pass'] ?? '',
+            'smtp_encryption' => $_POST['email_smtp_secure'] ?? 'tls'
+        ];
+
+        // Map from_address to from_email for consistency
+        $newSettings['from_email'] = $newSettings['from_address'];
+        unset($newSettings['from_address']);
+
+        try {
+            if ($emailManager->updateSettings($newSettings)) {
+                $_SESSION['success'] = 'Settings updated successfully';
+            } else {
+                $_SESSION['error'] = 'Failed to update settings';
+            }
+        } catch (\Exception $e) {
+            error_log("Email settings update error: " . $e->getMessage());
+            $_SESSION['error'] = 'Error: ' . $e->getMessage();
+        }
+
+        header('Location: /admin/email-manager/settings');
+        exit;
+        exit;
+    }
+
+    public function testEmail()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return $this->jsonResponse(['error' => 'Method not allowed'], 405);
+        }
+
+        $email = $_POST['test_email'] ?? '';
+        if (empty($email)) {
+            return $this->jsonResponse(['error' => 'Email address required'], 400);
+        }
+
+        $emailManager = new \EmailManager();
+
+        // Note: This tests currently SAVED settings. 
+        // Ideally we would test with the submitted form data, but that requires more complex logic.
+
+        $result = $emailManager->testEmailSettings($email);
+
+        return $this->jsonResponse($result);
     }
 }
