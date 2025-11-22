@@ -1,9 +1,0 @@
-{"ts":"2025-11-20T04:53:49+00:00","level":"INFO","action":"logout","details":{"ip":"::1","ua":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36","user_id":4}}
-{"ts":"2025-11-20T12:42:48+00:00","level":"INFO","action":"logout","details":{"ip":"::1","ua":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36","user_id":6}}
-{"ts":"2025-11-20T13:25:03+00:00","level":"WARNING","action":"login_failed","details":{"ip":"::1","ua":"curl/8.16.0","identity":"uniquebishwo@gmail.com"}}
-{"ts":"2025-11-20T14:18:26+00:00","level":"WARNING","action":"login_failed","details":{"ip":"::1","ua":"curl/8.16.0","identity":"uniquebishwo@gmail.com"}}
-{"ts":"2025-11-20T14:20:29+00:00","level":"WARNING","action":"login_failed","details":{"ip":"::1","ua":"curl/8.16.0","identity":"uniquebishwo@gmail.com"}}
-{"ts":"2025-11-20T14:22:27+00:00","level":"INFO","action":"login_success","details":{"ip":"::1","ua":"curl/8.16.0","user_id":3,"username_or_email":"uniquebishwo@gmail.com"}}
-{"ts":"2025-11-20T14:26:23+00:00","level":"INFO","action":"login_success","details":{"ip":"::1","user_id":3,"username_or_email":"uniquebishwo@gmail.com"}}
-{"ts":"2025-11-20T14:26:53+00:00","level":"INFO","action":"login_success","details":{"ip":"::1","user_id":3,"username_or_email":"uniquebishwo@gmail.com"}}
-{"ts":"2025-11-20T14:28:34+00:00","level":"INFO","action":"login_success","details":{"ip":"::1","user_id":3,"username_or_email":"uniquebishwo@gmail.com"}}
