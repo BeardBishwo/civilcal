@@ -13,36 +13,36 @@ const AdminApp = {
         this.initAjaxForms();
         this.loadDashboardData();
     },
-    
+
     // Sidebar Management
     initSidebar() {
         // Sidebar toggle
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
         const sidebar = document.getElementById('admin-sidebar');
-        
+
         if (sidebarToggle) {
             sidebarToggle.addEventListener('click', () => {
                 sidebar.classList.toggle('collapsed');
             });
         }
-        
+
         if (mobileSidebarToggle) {
             mobileSidebarToggle.addEventListener('click', () => {
                 sidebar.classList.toggle('show');
             });
         }
-        
+
         // Submenu handling
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 const parent = link.closest('.nav-item');
                 const submenu = parent.querySelector('.nav-submenu');
-                
+
                 if (submenu) {
                     e.preventDefault();
                     parent.classList.toggle('active');
-                    
+
                     // Close other submenus
                     document.querySelectorAll('.nav-item').forEach(item => {
                         if (item !== parent && !item.querySelector('.nav-submenu a[href="' + window.location.pathname + '"]')) {
@@ -52,32 +52,32 @@ const AdminApp = {
                 }
             });
         });
-        
+
         // Auto-open active submenu
         const activeSubmenuLink = document.querySelector('.nav-submenu a[href="' + window.location.pathname + '"]');
         if (activeSubmenuLink) {
             activeSubmenuLink.closest('.nav-item').classList.add('active');
         }
     },
-    
+
     // User Menu Management
     initUserMenu() {
         const userAvatar = document.querySelector('.user-avatar');
         const userDropdown = document.getElementById('user-dropdown');
-        
+
         if (userAvatar && userDropdown) {
             userAvatar.addEventListener('click', (e) => {
                 e.stopPropagation();
                 userDropdown.classList.toggle('show');
             });
-            
+
             // Close dropdown when clicking outside
             document.addEventListener('click', () => {
                 userDropdown.classList.remove('show');
             });
         }
     },
-    
+
     // Notification System
     initNotifications() {
         // Auto-hide alerts after 5 seconds
@@ -88,7 +88,7 @@ const AdminApp = {
             }, 5000);
         });
     },
-    
+
     // Charts Initialization
     initCharts() {
         // User Growth Chart
@@ -131,7 +131,7 @@ const AdminApp = {
                 }
             });
         }
-        
+
         // Calculator Usage Pie Chart
         const calculatorUsageCanvas = document.getElementById('calculatorUsageChart');
         if (calculatorUsageCanvas) {
@@ -165,29 +165,29 @@ const AdminApp = {
             });
         }
     },
-    
+
     // AJAX Form Handling
     initAjaxForms() {
         document.querySelectorAll('.ajax-form').forEach(form => {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
+
                 const submitBtn = form.querySelector('[type="submit"]');
                 const originalText = submitBtn.textContent;
-                
+
                 // Show loading
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-                
+
                 try {
                     const formData = new FormData(form);
                     const response = await fetch(form.action, {
                         method: form.method,
                         body: formData
                     });
-                    
+
                     const result = await response.json();
-                    
+
                     if (result.success) {
                         this.showNotification(result.message || 'Operation completed successfully!', 'success');
                         if (result.redirect) {
@@ -205,21 +205,31 @@ const AdminApp = {
             });
         });
     },
-    
+
     // Load Dashboard Data
     async loadDashboardData() {
+        // Only attempt to load dashboard data if we're on the dashboard page
+        const isDashboardPage = window.location.pathname.includes('/admin/dashboard') || window.location.pathname.includes('/admin');
+        if (!isDashboardPage) return;
+
         try {
             const response = await fetch('/api/admin/dashboard/stats');
+            if (!response.ok) {
+                // API endpoint doesn't exist yet, silently fail
+                console.log('Dashboard stats API not available yet');
+                return;
+            }
             const data = await response.json();
-            
+
             if (data.success) {
                 this.updateDashboardStats(data.stats);
             }
         } catch (error) {
-            console.error('Failed to load dashboard data:', error);
+            // Silently fail - dashboard stats are not critical
+            console.log('Dashboard stats not available:', error.message);
         }
     },
-    
+
     // Update Dashboard Statistics
     updateDashboardStats(stats) {
         // Update user stats
@@ -228,20 +238,20 @@ const AdminApp = {
             this.updateStatCard('active-users', stats.users.active);
             this.updateStatCard('new-users-today', stats.users.new_today);
         }
-        
+
         // Update system stats
         if (stats.system) {
             this.updateStatCard('memory-usage', stats.system.memory_usage);
             this.updateStatCard('storage-used', stats.system.storage_used);
         }
-        
+
         // Update modules stats
         if (stats.modules) {
             this.updateStatCard('active-modules', stats.modules.active);
             this.updateStatCard('total-modules', stats.modules.total);
         }
     },
-    
+
     // Update Individual Stat Card
     updateStatCard(cardId, value) {
         const card = document.getElementById(cardId);
@@ -253,33 +263,33 @@ const AdminApp = {
             }
         }
     },
-    
+
     // Animate Number Values
     animateValue(element, start, end, duration) {
         const startTime = performance.now();
         const startValue = parseInt(start);
         const endValue = parseInt(end);
-        
+
         const updateValue = (currentTime) => {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            
+
             const currentValue = Math.floor(startValue + (endValue - startValue) * progress);
             element.textContent = currentValue.toLocaleString();
-            
+
             if (progress < 1) {
                 requestAnimationFrame(updateValue);
             }
         };
-        
+
         requestAnimationFrame(updateValue);
     },
-    
+
     // Show Notification Toast
     showNotification(message, type = 'info') {
         const toast = document.getElementById('notification-toast');
         if (!toast) return;
-        
+
         toast.className = `notification-toast ${type}`;
         toast.innerHTML = `
             <div style="display: flex; align-items: center; gap: 12px;">
@@ -291,14 +301,14 @@ const AdminApp = {
                 </button>
             </div>
         `;
-        
+
         toast.classList.add('show');
-        
+
         setTimeout(() => {
             toast.classList.remove('show');
         }, 5000);
     },
-    
+
     // Get Notification Icon
     getNotificationIcon(type) {
         const icons = {
@@ -315,7 +325,7 @@ const AdminApp = {
 const ModuleManager = {
     async toggleModule(moduleName, action) {
         AdminApp.showLoading(true);
-        
+
         try {
             const response = await fetch('/api/admin/modules/toggle', {
                 method: 'POST',
@@ -327,9 +337,9 @@ const ModuleManager = {
                     action: action
                 })
             });
-            
+
             const result = await response.json();
-            
+
             if (result.success) {
                 AdminApp.showNotification(result.message, 'success');
                 setTimeout(() => window.location.reload(), 1500);
@@ -347,14 +357,14 @@ const ModuleManager = {
 // Backup Functions
 async function createBackup() {
     AdminApp.showLoading(true, 'Creating backup...');
-    
+
     try {
         const response = await fetch('/api/admin/backup/create', {
             method: 'POST'
         });
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
             AdminApp.showNotification(`Backup created: ${result.backup_name} (${result.file_size})`, 'success');
         } else {
@@ -370,11 +380,11 @@ async function createBackup() {
 // System Health Check
 async function checkSystemHealth() {
     AdminApp.showLoading(true, 'Checking system health...');
-    
+
     try {
         const response = await fetch('/api/admin/system/health');
         const result = await response.json();
-        
+
         if (result.success) {
             displayHealthResults(result.health);
         } else {
@@ -417,7 +427,7 @@ function displayHealthResults(health) {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
 }
 
@@ -433,10 +443,10 @@ function getHealthIcon(status) {
 }
 
 // Loading Overlay Management
-AdminApp.showLoading = function(show, message = 'Loading...') {
+AdminApp.showLoading = function (show, message = 'Loading...') {
     const overlay = document.getElementById('loading-overlay');
     const spinner = overlay?.querySelector('.loading-spinner span');
-    
+
     if (show) {
         if (spinner) spinner.textContent = message;
         overlay?.style.setProperty('display', 'flex');
@@ -461,7 +471,7 @@ function initDataTables() {
                 filterTable(table, e.target.value);
             });
         }
-        
+
         // Add sorting
         table.querySelectorAll('th[data-sortable]').forEach(th => {
             th.style.cursor = 'pointer';
@@ -474,7 +484,7 @@ function initDataTables() {
 
 function filterTable(table, query) {
     const rows = table.querySelectorAll('tbody tr');
-    
+
     rows.forEach(row => {
         const text = row.textContent.toLowerCase();
         row.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
@@ -484,11 +494,11 @@ function filterTable(table, query) {
 function sortTable(table, columnIndex, type) {
     const tbody = table.querySelector('tbody');
     const rows = Array.from(tbody.querySelectorAll('tr'));
-    
+
     rows.sort((a, b) => {
         const aVal = a.cells[columnIndex].textContent.trim();
         const bVal = b.cells[columnIndex].textContent.trim();
-        
+
         if (type === 'number') {
             return parseFloat(aVal) - parseFloat(bVal);
         } else if (type === 'date') {
@@ -497,7 +507,7 @@ function sortTable(table, columnIndex, type) {
             return aVal.localeCompare(bVal);
         }
     });
-    
+
     rows.forEach(row => tbody.appendChild(row));
 }
 
@@ -507,10 +517,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initDataTables();
 });
 
-// Global error handler
+// Global error handler - only log to console, don't show notifications
 window.addEventListener('error', (e) => {
     console.error('Admin Error:', e.error);
-    AdminApp.showNotification('An unexpected error occurred', 'error');
+    // Don't show notification for every error - too aggressive
+    // AdminApp.showNotification('An unexpected error occurred', 'error');
 });
 
 // Export for global use

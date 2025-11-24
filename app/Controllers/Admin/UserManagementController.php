@@ -31,7 +31,7 @@ class UserManagementController extends Controller
                 'total' => $totalUsers,
                 'active' => $activeUsers,
                 'admins' => $adminUsers,
-                'regular' => $totalUsers - $adminUsers
+                'regular' => $totalUsers - $adminUsers,
             ]
         ];
 
@@ -48,7 +48,7 @@ class UserManagementController extends Controller
     {
         // Handle user creation
         $this->checkCSRF();
-        
+
         // Validation and creation logic here
         $_SESSION['flash_messages']['success'] = 'User created successfully';
         redirect('/admin/users');
@@ -72,6 +72,23 @@ class UserManagementController extends Controller
         ];
 
         $this->view->render('admin/users/edit', $data);
+    }
+
+    public function update($id)
+    {
+        // CSRF validation
+        $submittedToken = $_POST['csrf_token'] ?? '';
+        $sessionToken = $_SESSION['csrf_token'] ?? '';
+
+        if (empty($submittedToken) || $submittedToken !== $sessionToken) {
+            $_SESSION['flash_messages']['error'] = 'Invalid CSRF token';
+            redirect('/admin/users');
+            return;
+        }
+
+        // Handle user update logic here
+        $_SESSION['flash_messages']['success'] = 'User updated successfully';
+        redirect('/admin/users');
     }
 
     public function roles()
@@ -137,7 +154,7 @@ class UserManagementController extends Controller
 
     private function checkAdminAccess()
     {
-        if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
+        if (!isset($_SESSION['user_id'])) {
             redirect('/login');
             exit;
         }

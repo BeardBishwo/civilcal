@@ -1,0 +1,267 @@
+{
+  "meta": {
+    "project": "Bishwo Calculator Backend Testing",
+    "date": "2025-11-19",
+    "prepared_by": "Backend Testing Team"
+  },
+  "product_overview": "This document details the comprehensive backend testing requirements for the Bishwo Calculator platform. It covers REST APIs, service layers, database integrity, security, integration, and performance testing to ensure a robust and secure backend system. The testing is designed to validate all core backend functionalities, security aspects, and performance criteria for the custom PHP MVC based system.",
+  "core_goals": [
+    "Achieve 100% REST API endpoint coverage to ensure all backend functionality works as intended.",
+    "Validate service layer business logic correctness and robustness for all 34 services.",
+    "Ensure data persistence and integrity with rigorous database CRUD and migration testing.",
+    "Confirm security measures against authentication bypass, authorization violations, and common vulnerabilities like SQL injection and CSRF.",
+    "Verify integration points with payment gateways, email services, and external APIs for reliability.",
+    "Meet performance benchmarks with API response times under 500ms and stable behavior under load."
+  ],
+  "key_features": [
+    "Authentication API testing including login, registration, logout, and session management.",
+    "Profile API validation for authenticated user data fetch and update operations.",
+    "Admin Dashboard API testing enforcing admin-only access and correct statistics delivery.",
+    "Comprehensive test cases covering all critical REST endpoints, business logic validations, and input handling.",
+    "Extensive security testing for authentication, authorization, input validation, CSRF, and rate limiting.",
+    "Performance testing including response time benchmarks and load test scenarios.",
+    "Service and database testing with transaction and migration validation.",
+    "Integration tests covering end-to-end user flows including auth, calculator, payment, and admin actions."
+  ],
+  "user_flow_summary": [
+    "User registration with email verification followed by login and profile management.",
+    "Authenticated user performing calculator operations, saving history, exporting results, and sharing calculations.",
+    "Admin users accessing dashboard, managing users, updating settings, themes, and plugins.",
+    "Payment flow from plan selection through successful subscription activation and notification.",
+    "GDPR related flows such as data export request and account deletion with cascade effects.",
+    "Two-factor authentication setup and verification processes for enhanced security."
+  ],
+  "validation_criteria": [
+    "All API endpoints return correct HTTP status codes and validate request and response payloads accurately.",
+    "Service layer methods correctly perform calculations, validations, and state changes as expected.",
+    "Database operations maintain data consistency with constraints, transactional atomicity, and proper migrations.",
+    "Security tests block unauthorized access, prevent injection attacks, enforce CSRF tokens, and uphold session security.",
+    "Integration tests confirm seamless interactions across components, including third-party services.",
+    "Performance tests demonstrate API response times under 500ms and system stability under concurrent load.",
+    "Test coverage metrics exceed 90% code coverage and 95% service method coverage with zero critical bugs.",
+    "Pass rate for automated tests minimum 98%, with all critical paths and security features fully verified."
+  ],
+  "code_summary": {
+    "tech_stack": [
+      "PHP 7.4+",
+      "Custom MVC framework",
+      "MySQL/MariaDB",
+      "Composer packages (FastRoute, PHPMailer, Guzzle, etc.)"
+    ],
+    "features": [
+      {
+        "name": "Authentication API",
+        "description": "Provides JSON-based login, registration, and logout endpoints with session + token handling for both users and admins.",
+        "files": [
+          "api/login.php",
+          "app/Controllers/Api/AuthController.php"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "Authentication API",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/api/login.php": {
+              "post": {
+                "summary": "Authenticate a user",
+                "requestBody": {
+                  "required": true,
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "username_email": {
+                            "type": "string"
+                          },
+                          "password": {
+                            "type": "string"
+                          },
+                          "remember_me": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "username_email",
+                          "password"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "200": {
+                    "description": "Successful login returns user data and redirect."
+                  },
+                  "400": {
+                    "description": "Missing credentials or bad input."
+                  },
+                  "401": {
+                    "description": "Invalid credentials."
+                  }
+                }
+              }
+            },
+            "/api/logout.php": {
+              "post": {
+                "summary": "Destroy the current authenticated session",
+                "responses": {
+                  "200": {
+                    "description": "Logout successful."
+                  },
+                  "401": {
+                    "description": "No active session."
+                  }
+                }
+              }
+            },
+            "/api/register.php": {
+              "post": {
+                "summary": "Register a new user account",
+                "requestBody": {
+                  "required": true,
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "username": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string",
+                            "format": "email"
+                          },
+                          "password": {
+                            "type": "string"
+                          },
+                          "first_name": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "username",
+                          "email",
+                          "password",
+                          "first_name"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "200": {
+                    "description": "Registration successful."
+                  },
+                  "400": {
+                    "description": "Validation failure."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Profile API",
+        "description": "Session-aware profile endpoint that lets authenticated users fetch and update their profile fields (first name, last name, company, phone).",
+        "files": [
+          "api/profile.php",
+          "app/Models/User.php"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "Profile API",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/api/profile.php": {
+              "get": {
+                "summary": "Retrieve the authenticated user's profile",
+                "responses": {
+                  "200": {
+                    "description": "Profile data returned."
+                  },
+                  "401": {
+                    "description": "Unauthorized."
+                  }
+                }
+              },
+              "put": {
+                "summary": "Update profile fields",
+                "requestBody": {
+                  "required": true,
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "first_name": {
+                            "type": "string"
+                          },
+                          "last_name": {
+                            "type": "string"
+                          },
+                          "company": {
+                            "type": "string"
+                          },
+                          "phone": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "200": {
+                    "description": "Updated fields returned."
+                  },
+                  "400": {
+                    "description": "Validation failure."
+                  },
+                  "401": {
+                    "description": "Unauthorized."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Admin Dashboard API",
+        "description": "Admin-only dashboard data endpoint that exposes statistics, activity feeds, and system metrics for the admin panel UI.",
+        "files": [
+          "app/Controllers/Admin/DashboardController.php",
+          "resources/views/admin/dashboard.php"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "Admin Dashboard API",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/admin/dashboard/data": {
+              "get": {
+                "summary": "Return dashboard statistics for authenticated admins",
+                "responses": {
+                  "200": {
+                    "description": "Dashboard metrics returned."
+                  },
+                  "401": {
+                    "description": "Unauthorized or non-admin user."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

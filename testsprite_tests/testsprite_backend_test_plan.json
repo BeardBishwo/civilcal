@@ -1,0 +1,123 @@
+{
+  "id": "bishwo-admin-panel-test-suite",
+  "title": "Bishwo Calculator Admin Panel Test Suite",
+  "description": "Comprehensive testing of admin dashboard, settings, user management, and authentication endpoints",
+  "testPlan": [
+    {
+      "id": "TC_ADMIN_001",
+      "name": "Admin Dashboard Access",
+      "description": "Verify admin can access dashboard with correct stats",
+      "endpoint": "/admin/dashboard",
+      "method": "GET",
+      "auth": "session",
+      "expectedStatus": 200,
+      "expectedResponse": {
+        "contains": ["total_users", "active_users", "total_calculations"]
+      }
+    },
+    {
+      "id": "TC_ADMIN_002",
+      "name": "Admin Settings Access",
+      "description": "Verify admin can access settings page",
+      "endpoint": "/admin/settings",
+      "method": "GET",
+      "auth": "session",
+      "expectedStatus": 200
+    },
+    {
+      "id": "TC_ADMIN_003",
+      "name": "User Management List",
+      "description": "Verify admin can list all users",
+      "endpoint": "/admin/users",
+      "method": "GET",
+      "auth": "session",
+      "expectedStatus": 200,
+      "expectedResponse": {
+        "contains": ["users"]
+      }
+    },
+    {
+      "id": "TC_ADMIN_004",
+      "name": "Admin Dashboard Data API",
+      "description": "Verify dashboard data API returns metrics",
+      "endpoint": "/admin/dashboard/data",
+      "method": "GET",
+      "auth": "session",
+      "expectedStatus": 200,
+      "expectedResponse": {
+        "contains": ["total_users", "active_users", "system_health"]
+      }
+    },
+    {
+      "id": "TC_ADMIN_005",
+      "name": "Unauthorized Admin Access",
+      "description": "Verify non-admin cannot access admin dashboard",
+      "endpoint": "/admin/dashboard",
+      "method": "GET",
+      "auth": "session",
+      "userRole": "user",
+      "expectedStatus": 403
+    },
+    {
+      "id": "TC_AUTH_001",
+      "name": "User Login",
+      "description": "Verify user can login successfully",
+      "endpoint": "/api/login.php",
+      "method": "POST",
+      "payload": {
+        "username_email": "uniquebishwo@gmail.com",
+        "password": "c9PU7XAsAADYk_A"
+      },
+      "expectedStatus": 200,
+      "expectedResponse": {
+        "contains": ["success", "user"]
+      }
+    },
+    {
+      "id": "TC_AUTH_002",
+      "name": "User Logout",
+      "description": "Verify user can logout successfully",
+      "endpoint": "/api/logout.php",
+      "method": "POST",
+      "auth": "session",
+      "expectedStatus": 200,
+      "expectedResponse": {
+        "contains": ["success"]
+      }
+    },
+    {
+      "id": "TC_PROFILE_001",
+      "name": "Get User Profile",
+      "description": "Verify authenticated user can retrieve profile",
+      "endpoint": "/api/profile.php",
+      "method": "GET",
+      "auth": "session",
+      "expectedStatus": 200,
+      "expectedResponse": {
+        "contains": ["id", "username", "email"]
+      }
+    },
+    {
+      "id": "TC_PROFILE_002",
+      "name": "Update User Profile",
+      "description": "Verify user can update profile fields",
+      "endpoint": "/api/profile.php",
+      "method": "PUT",
+      "auth": "session",
+      "payload": {
+        "first_name": "Test",
+        "last_name": "User"
+      },
+      "expectedStatus": 200
+    },
+    {
+      "id": "TC_PROFILE_003",
+      "name": "Unauthorized Profile Access",
+      "description": "Verify unauthenticated user cannot access profile",
+      "endpoint": "/api/profile.php",
+      "method": "GET",
+      "auth": "none",
+      "expectedStatus": 401
+    }
+  ]
+}

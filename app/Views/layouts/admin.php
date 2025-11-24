@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'Bishwo Calculator - Admin Panel' ?></title>
-    <meta name="csrf-token" content="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+    <title><?php echo $title ?? 'Bishwo Calculator - Admin Panel'; ?></title>
+    <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -152,7 +152,7 @@
     </style>
 </head>
 
-<body class="<?= $_COOKIE['sidebar_collapsed'] ?? '' ?>">
+<body class="<?php echo $_COOKIE['sidebar_collapsed'] ?? ''; ?>">
     <!-- Header -->
     <header class="admin-header">
         <div class="container-fluid h-100">
@@ -183,98 +183,24 @@
                 </div>
             </div>
         </div>
+        </div>
+        </div>
     </header>
 
     <!-- Sidebar -->
     <aside class="admin-sidebar">
-        <nav>
-            <ul class="sidebar-menu">
-                <!-- Dashboard -->
-                <li>
-                    <a href="<?= app_base_url('/admin/dashboard') ?>" class="<?= ($currentPage ?? '') == 'dashboard' ? 'active' : '' ?>">
-                        <i class="bi bi-speedometer2"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-
-                <!-- Users Management -->
-                <li>
-                    <a href="<?= app_base_url('/admin/users') ?>" class="<?= $currentPage == 'users' ? 'active' : '' ?>">
-                        <i class="bi bi-people"></i>
-                        <span>Users Management</span>
-                    </a>
-                </li>
-
-                <!-- Calculators -->
-                <li>
-                    <a href="<?= app_base_url('/admin/calculators') ?>" class="<?= ($currentPage ?? '') == 'calculators' ? 'active' : '' ?>">
-                        <i class="bi bi-calculator"></i>
-                        <span>Calculators</span>
-                    </a>
-                </li>
-
-                <!-- Modules & Categories -->
-                <li>
-                    <a href="<?= app_base_url('/admin/modules') ?>" class="<?= $currentPage == 'modules' ? 'active' : '' ?>">
-                        <i class="bi bi-grid-3x3-gap"></i>
-                        <span>Modules & Categories</span>
-                    </a>
-                </li>
-
-                <!-- Themes -->
-                <li>
-                    <a href="<?= app_base_url('/admin/themes') ?>" class="<?= ($currentPage ?? '') == 'themes' ? 'active' : '' ?>">
-                        <i class="bi bi-palette"></i>
-                        <span>Themes</span>
-                    </a>
-                </li>
-
-                <!-- Plugins -->
-                <li>
-                    <a href="<?= app_base_url('/admin/plugins') ?>" class="<?= $currentPage == 'plugins' ? 'active' : '' ?>">
-                        <i class="bi bi-puzzle"></i>
-                        <span>Plugins</span>
-                    </a>
-                </li>
-
-                <!-- System Settings -->
-                <li>
-                    <a href="<?= app_base_url('/admin/settings/general') ?>" class="<?= ($currentPage ?? '') == 'settings' ? 'active' : '' ?>">
-                        <i class="bi bi-gear"></i>
-                        <span>System Settings</span>
-                    </a>
-                </li>
-
-                <!-- Email & Notifications -->
-                <li>
-                    <a href="<?= app_base_url('/admin/settings/email') ?>" class="<?= $currentPage == 'email' ? 'active' : '' ?>">
-                        <i class="bi bi-envelope"></i>
-                        <span>Email & Notifications</span>
-                    </a>
-                </li>
-
-                <!-- Billing / Subscriptions -->
-                <li>
-                    <a href="<?= app_base_url('/admin/subscriptions') ?>" class="<?= ($currentPage ?? '') == 'subscriptions' ? 'active' : '' ?>">
-                        <i class="bi bi-credit-card"></i>
-                        <span>Billing / Subscriptions</span>
-                    </a>
-                </li>
-
-                <!-- Help & Logs -->
-                <li>
-                    <a href="<?= app_base_url('/admin/help') ?>" class="<?= ($currentPage ?? '') == 'help' ? 'active' : '' ?>">
-                        <i class="bi bi-question-circle"></i>
-                        <span>Help & Logs</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <ul class="sidebar-menu">
+            <li><a href="<?= app_base_url('/admin/dashboard') ?>"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a></li>
+            <li><a href="<?= app_base_url('/admin/users') ?>"><i class="bi bi-people"></i><span>Users</span></a></li>
+            <li><a href="<?= app_base_url('/admin/modules') ?>"><i class="bi bi-grid-3x3-gap"></i><span>Modules</span></a></li>
+            <li><a href="<?= app_base_url('/admin/analytics') ?>"><i class="bi bi-graph-up"></i><span>Analytics</span></a></li>
+            <li><a href="<?= app_base_url('/admin/settings') ?>"><i class="bi bi-gear"></i><span>Settings</span></a></li>
+        </ul>
     </aside>
 
     <!-- Main Content -->
     <main class="admin-content">
-        <?= $content ?>
+        <?php echo $content; ?>
     </main>
 
     <!-- Bootstrap & Custom JS -->

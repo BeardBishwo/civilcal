@@ -1,0 +1,19 @@
+{
+  "status": "commited",
+  "type": "backend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:80/bishwo_calculator",
+  "backendAuthType": "basic token",
+  "backendUsername": "uniquebishwo@gmail.com",
+  "backendPassword": "c9PU7XAsAADYk_A",
+  "executionArgs": {
+    "projectName": "Bishwo_Calculator",
+    "projectPath": "c:\\laragon\\www\\Bishwo_Calculator",
+    "testIds": [],
+    "additionalInstruction": "Run TestSprite backend admin panel verification covering dashboard, settings, user management, and all linked functions. Report conflicts or errors with stack traces if found.",
+    "envs": {
+      "API_KEY": "sk-user-iJG4vmvfaiz6SIFzWW-OynOmSk7ONJXWBU678xUNcqR2GMCke06gASm9cTaVACR8lAy39S-1i0CipQ8EkeFcGOosl2ystvMN7OW-7_vWOGsIen2fZnnoKablQDMxeqeZVNY"
+    }
+  },
+  "proxy": "http://b102ed20-cb85-4a18-ae8d-7c4bd7c1e047:Rlo1DBA3cwfMH4J8HWkf7tazKhQsH6Uz@tun.testsprite.com:8080"
+}

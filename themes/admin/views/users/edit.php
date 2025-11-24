@@ -192,6 +192,65 @@ $user = $user ?? [];
                     <div style="background: var(--admin-gray-50); padding: 16px; border-radius: 8px; border-left: 4px solid var(--admin-danger);">
                         <h5 style="margin: 0 0 8px 0; color: var(--admin-danger);">Delete User Account</h5>
                         <p style="margin: 0 0 16px 0; color: var(--admin-gray-600); font-size: 14px;">
+                            Permanently delete this user account and all associated data. This action cannot be undone.
+                        </p>
+                        <button type="button" class="btn btn-danger" onclick="deleteUser(<?php echo $user['id']; ?>)">
+                            <i class="fas fa-trash"></i> Delete User Account
+                        </button>
+                    </div>
+                </div>
+                <?php endif; ?>
+
+<style>
+/* Additional user form styles */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 500;
+    color: var(--admin-gray-700);
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--admin-gray-300);
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 2px rgba(var(--admin-primary-rgb), 0.1);
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-danger {
+    background: var(--admin-danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc3545;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
     font-size: 12px;
     font-weight: 500;
     text-transform: uppercase;

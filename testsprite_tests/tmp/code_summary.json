@@ -1,0 +1,164 @@
+{
+  "tech_stack": [
+    "PHP 7.4+",
+    "Custom MVC framework",
+    "MySQL/MariaDB",
+    "Composer packages (FastRoute, PHPMailer, Guzzle, etc.)"
+  ],
+  "features": [
+    {
+      "name": "Authentication API",
+      "description": "Provides JSON-based login, registration, and logout endpoints with session + token handling for both users and admins.",
+      "files": [
+        "api/login.php",
+        "app/Controllers/Api/AuthController.php"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Authentication API",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/api/login.php": {
+            "post": {
+              "summary": "Authenticate a user",
+              "requestBody": {
+                "required": true,
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "username_email": {"type": "string"},
+                        "password": {"type": "string"},
+                        "remember_me": {"type": "boolean"}
+                      },
+                      "required": ["username_email", "password"]
+                    }
+                  }
+                }
+              },
+              "responses": {
+                "200": {"description": "Successful login returns user data and redirect."},
+                "400": {"description": "Missing credentials or bad input."},
+                "401": {"description": "Invalid credentials."}
+              }
+            }
+          },
+          "/api/logout.php": {
+            "post": {
+              "summary": "Destroy the current authenticated session",
+              "responses": {
+                "200": {"description": "Logout successful."},
+                "401": {"description": "No active session."}
+              }
+            }
+          },
+          "/api/register.php": {
+            "post": {
+              "summary": "Register a new user account",
+              "requestBody": {
+                "required": true,
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "username": {"type": "string"},
+                        "email": {"type": "string", "format": "email"},
+                        "password": {"type": "string"},
+                        "first_name": {"type": "string"}
+                      },
+                      "required": ["username", "email", "password", "first_name"]
+                    }
+                  }
+                }
+              },
+              "responses": {
+                "200": {"description": "Registration successful."},
+                "400": {"description": "Validation failure."}
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Profile API",
+      "description": "Session-aware profile endpoint that lets authenticated users fetch and update their profile fields (first name, last name, company, phone).",
+      "files": [
+        "api/profile.php",
+        "app/Models/User.php"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Profile API",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/api/profile.php": {
+            "get": {
+              "summary": "Retrieve the authenticated user's profile",
+              "responses": {
+                "200": {"description": "Profile data returned."},
+                "401": {"description": "Unauthorized."}
+              }
+            },
+            "put": {
+              "summary": "Update profile fields",
+              "requestBody": {
+                "required": true,
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "first_name": {"type": "string"},
+                        "last_name": {"type": "string"},
+                        "company": {"type": "string"},
+                        "phone": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              },
+              "responses": {
+                "200": {"description": "Updated fields returned."},
+                "400": {"description": "Validation failure."},
+                "401": {"description": "Unauthorized."}
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Admin Dashboard API",
+      "description": "Admin-only dashboard data endpoint that exposes statistics, activity feeds, and system metrics for the admin panel UI.",
+      "files": [
+        "app/Controllers/Admin/DashboardController.php",
+        "resources/views/admin/dashboard.php"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Admin Dashboard API",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/admin/dashboard/data": {
+            "get": {
+              "summary": "Return dashboard statistics for authenticated admins",
+              "responses": {
+                "200": {"description": "Dashboard metrics returned."},
+                "401": {"description": "Unauthorized or non-admin user."}
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

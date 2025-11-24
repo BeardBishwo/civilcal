@@ -120,53 +120,6 @@ $csrf_token = $_SESSION['csrf_token'];
         </div>
     </div>
 
-    <!-- Quick Login Demo Section -->
-    <div class="demo-section">
-        <div class="demo-card">
-            <h3><i class="fas fa-rocket"></i> Quick Demo Access</h3>
-            <p>Try the enhanced authentication system with these demo accounts:</p>
-
-            <div class="demo-accounts">
-                <div class="demo-account">
-                    <strong>Engineer Demo:</strong>
-                    <div class="demo-credentials">
-                        <code>engineer@engicalpro.com</code>
-                        <code>Engineer123!</code>
-                        <button class="btn btn-sm demo-login" data-email="engineer@engicalpro.com" data-password="Engineer123!">
-                            <i class="fas fa-bolt"></i> Quick Login
-                        </button>
-                    </div>
-                </div>
-
-                <div class="demo-account">
-                    <strong>Admin Demo:</strong>
-                    <div class="demo-credentials">
-                        <code>admin@engicalpro.com</code>
-                        <code>password</code>
-                        <button class="btn btn-sm demo-login" data-email="admin@engicalpro.com" data-password="password">
-                            <i class="fas fa-bolt"></i> Quick Login
-                        </button>
-                    </div>
-                </div>
-
-                <div class="demo-account">
-                    <strong>Your Personal Account:</strong>
-                    <div class="demo-credentials">
-                        <code>uniquebishwo@gmail.com</code>
-                        <code>c9PU7XAsAADYk_A</code>
-                        <button class="btn btn-sm demo-login" data-email="uniquebishwo@gmail.com" data-password="c9PU7XAsAADYk_A">
-                            <i class="fas fa-user-crown"></i> Personal Login
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <p class="demo-note">
-                <small><i class="fas fa-info-circle"></i> These are demo credentials for testing purposes only.</small>
-            </p>
-        </div>
-    </div>
-
     <!-- CSS Styles -->
     <style>
         .auth-container {
