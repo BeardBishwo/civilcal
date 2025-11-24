@@ -22,7 +22,7 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
     <!-- Sidebar Menu -->
     <nav class="sidebar-menu">
         <ul>
-            <li class="<?php echo strpos($currentPath, '/admin/dashboard') !== false || $currentPath === '/admin' ? 'active' : ''; ?>">
+            <li class="<?php echo strpos($currentPath, '/admin/dashboard') !== false || $currentPath === app_base_url('/admin') ? 'active' : ''; ?>">
                 <a href="<?php echo app_base_url('/admin/dashboard'); ?>">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
@@ -59,64 +59,49 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
                 </a>
                 <ul class="submenu">
                     <li><a href="<?php echo app_base_url('/admin/analytics/overview'); ?>"><i class="fas fa-circle"></i> Overview</a></li>
-                    <li><a href="<?php echo app_base_url('/admin/analytics/overview'); ?>"><i class="fas fa-circle"></i> Overview</a></li>
-                    <li><a href="<?php echo app_base_url('/admin/analytics/users'); ?>"><i class="fas fa-circle"></i> Users</a></li>
                     <li><a href="<?php echo app_base_url('/admin/analytics/users'); ?>"><i class="fas fa-circle"></i> Users</a></li>
                     <li><a href="<?php echo app_base_url('/admin/analytics/calculators'); ?>"><i class="fas fa-circle"></i> Calculators</a></li>
-                    <li><a href="<?php echo app_base_url('/admin/analytics/calculators'); ?>"><i class="fas fa-circle"></i> Performance</a></li>
                     <li><a href="<?php echo app_base_url('/admin/analytics/performance'); ?>"><i class="fas fa-circle"></i> Performance</a></li>
                     <li><a href="<?php echo app_base_url('/admin/analytics/reports'); ?>"><i class="fas fa-circle"></i> Reports</a></li>
                 </ul>
             </li>
 
             <li class="<?php echo strpos($currentPath, '/admin/content') !== false ? 'active' : ''; ?>">
-                <a href="<?php echo app_base_url('/admin/analytics/reports'); ?>"><i class="fas fa-circle"></i> Reports</a>
-            </li>
+                <a href="<?php echo app_base_url('/admin/content'); ?>">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Content</span>
+                </a>
             </li>
 
             <li class="<?php echo strpos($currentPath, '/admin/activity') !== false ? 'active' : ''; ?>">
-                <a href="<?php echo app_base_url('/admin/content'); ?>">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Content Management</span>
+                <a href="<?php echo app_base_url('/admin/activity'); ?>">
+                    <i class="fas fa-history"></i>
+                    <span>Activity</span>
                 </a>
             </li>
 
             <li class="<?php echo strpos($currentPath, '/admin/audit-logs') !== false ? 'active' : ''; ?>">
-                <a href="<?php echo app_base_url('/admin/content'); ?>">
-                    <i class="fas fa-history"></i>
-                    <span>Activity Logs</span>
-                </a>
-            </li>
-
-            <li class="<?php echo strpos($currentPath, '/admin/email-manager') !== false ? 'active' : ''; ?>">
                 <a href="<?php echo app_base_url('/admin/audit-logs'); ?>">
                     <i class="fas fa-search"></i>
                     <span>Audit Logs</span>
                 </a>
             </li>
 
-            <li class="<?php echo strpos($currentPath, '/admin/email') !== false ? 'active' : ''; ?>">
-                <a href="<?php echo app_base_url('/admin/email'); ?>">
+            <li class="<?php echo strpos($currentPath, '/admin/email-manager') !== false || strpos($currentPath, '/admin/email') !== false ? 'active' : ''; ?>">
+                <a href="<?php echo app_base_url('/admin/email-manager'); ?>">
                     <i class="fas fa-envelope"></i>
                     <span>Email Manager</span>
                 </a>
             </li>
 
             <li class="<?php echo strpos($currentPath, '/admin/subscriptions') !== false ? 'active' : ''; ?>">
-                <a href="<?php echo app_base_url('/admin/email'); ?>">
-                    <i class="fas fa-at"></i>
-                    <span>Email</span>
-                </a>
-            </li>
-
-            <li class="<?php echo strpos($currentPath, '/admin/widgets') !== false ? 'active' : ''; ?>">
                 <a href="<?php echo app_base_url('/admin/subscriptions'); ?>">
                     <i class="fas fa-credit-card"></i>
                     <span>Subscriptions</span>
                 </a>
             </li>
 
-            <li class="<?php echo strpos($currentPath, '/admin/error-logs') !== false ? 'active' : ''; ?>">
+            <li class="<?php echo strpos($currentPath, '/admin/widgets') !== false ? 'active' : ''; ?>">
                 <a href="<?php echo app_base_url('/admin/widgets'); ?>">
                     <i class="fas fa-cube"></i>
                     <span>Widgets</span>
@@ -124,16 +109,16 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
             </li>
 
             <li class="<?php echo strpos($currentPath, '/admin/premium-themes') !== false ? 'active' : ''; ?>">
-                <a href="<?php echo app_base_url('/admin/widgets'); ?>">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span>Error Logs</span>
+                <a href="<?php echo app_base_url('/admin/premium-themes'); ?>">
+                    <i class="fas fa-star"></i>
+                    <span>Premium Themes</span>
                 </a>
             </li>
 
             <li class="<?php echo strpos($currentPath, '/admin/modules') !== false ? 'active' : ''; ?>">
-                <a href="<?php echo app_base_url('/admin/premium-themes'); ?>">
-                    <i class="fas fa-star"></i>
-                    <span>Premium Themes</span>
+                <a href="<?php echo app_base_url('/admin/modules'); ?>">
+                    <i class="fas fa-puzzle-piece"></i>
+                    <span>Modules</span>
                 </a>
             </li>
 
@@ -150,35 +135,22 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
                 </a>
                 <ul class="submenu">
                     <li><a href="<?php echo app_base_url('/admin/settings/general'); ?>"><i class="fas fa-circle"></i> General</a></li>
-                    <li><a href="<?php echo app_base_url('/admin/settings/general'); ?>"><i class="fas fa-circle"></i> General</a></li>
-                    <li><a href="<?php echo app_base_url('/admin/settings/application'); ?>"><i class="fas fa-circle"></i> Application</a></li>
-                    <li><a href="<?php echo app_base_url('/admin/settings/application'); ?>"><i class="fas fa-circle"></i> Application</a></li>
-                    <li><a href="<?php echo app_base_url('/admin/settings/users'); ?>"><i class="fas fa-circle"></i> Users</a></li>
-                    <li><a href="<?php echo app_base_url('/admin/settings/users'); ?>"><i class="fas fa-circle"></i> Security</a></li>
+                    <li><a href="<?php echo app_base_url('/admin/settings/email'); ?>"><i class="fas fa-circle"></i> Email</a></li>
                     <li><a href="<?php echo app_base_url('/admin/settings/security'); ?>"><i class="fas fa-circle"></i> Security</a></li>
-                    <li><a href="<?php echo app_base_url('/admin/settings/email'); ?>"><i class="fas fa-circle"></i> Email</a></li>
-                    <li><a href="<?php echo app_base_url('/admin/settings/email'); ?>"><i class="fas fa-circle"></i> Email</a></li>
-                    <li><a href="<?php echo app_base_url('/admin/settings/api'); ?>"><i class="fas fa-circle"></i> API</a></li>
-                    <li><a href="<?php echo app_base_url('/admin/settings/api'); ?>"><i class="fas fa-circle"></i> Performance</a></li>
-                    <li><a href="<?php echo app_base_url('/admin/settings/performance'); ?>"><i class="fas fa-circle"></i> Advanced</a></li>
                 </ul>
             </li>
 
             <li class="<?php echo strpos($currentPath, '/admin/themes') !== false ? 'active' : ''; ?>">
-                <a href="<?php echo app_base_url('/admin/settings/advanced'); ?>"><i class="fas fa-circle"></i> Advanced</a>
-            </li>
-            </li>
-
-            <li class="<?php echo strpos($currentPath, '/admin/plugins') !== false ? 'active' : ''; ?>">
                 <a href="<?php echo app_base_url('/admin/themes'); ?>">
                     <i class="fas fa-palette"></i>
                     <span>Themes</span>
                 </a>
             </li>
 
-            <li class="<?php echo strpos($currentPath, '/admin/plugins'); ?>">
-                <i class="fas fa-puzzle-piece"></i>
-                <span>Plugins</span>
+            <li class="<?php echo strpos($currentPath, '/admin/plugins') !== false ? 'active' : ''; ?>">
+                <a href="<?php echo app_base_url('/admin/plugins'); ?>">
+                    <i class="fas fa-puzzle-piece"></i>
+                    <span>Plugins</span>
                 </a>
             </li>
 
@@ -187,22 +159,30 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
                 <span>System</span>
             </li>
 
-            <li class="<?php echo strpos($currentPath, '/admin/logs') !== false ? 'active' : ''; ?>">
-                <a href="<?php echo app_base_url('/admin/plugins'); ?>">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Logs</span>
+            <!-- Debug Submenu -->
+            <li class="has-submenu <?php echo strpos($currentPath, '/admin/debug') !== false ? 'active' : ''; ?>">
+                <a href="#" class="submenu-toggle">
+                    <i class="fas fa-bug"></i>
+                    <span>Debug</span>
+                    <i class="fas fa-chevron-down submenu-arrow"></i>
                 </a>
+                <ul class="submenu">
+                    <li><a href="<?php echo app_base_url('/admin/debug'); ?>"><i class="fas fa-circle"></i> Dashboard</a></li>
+                    <li><a href="<?php echo app_base_url('/admin/debug/error-logs'); ?>"><i class="fas fa-circle"></i> Error Logs</a></li>
+                    <li><a href="<?php echo app_base_url('/admin/debug/tests'); ?>"><i class="fas fa-circle"></i> Tests</a></li>
+                    <li><a href="<?php echo app_base_url('/admin/debug/live-errors'); ?>"><i class="fas fa-circle"></i> Live Errors</a></li>
+                </ul>
             </li>
 
             <li class="<?php echo strpos($currentPath, '/admin/backup') !== false ? 'active' : ''; ?>">
-                <a href="<?php echo app_base_url('/admin/logs'); ?>">
+                <a href="<?php echo app_base_url('/admin/backup'); ?>">
                     <i class="fas fa-database"></i>
                     <span>Backup</span>
                 </a>
             </li>
 
             <li class="<?php echo strpos($currentPath, '/admin/system-status') !== false ? 'active' : ''; ?>">
-                <a href="<?php echo app_base_url('/admin/backup'); ?>">
+                <a href="<?php echo app_base_url('/admin/system-status'); ?>">
                     <i class="fas fa-heartbeat"></i>
                     <span>System Status</span>
                 </a>
@@ -213,8 +193,8 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
                 <span>Support</span>
             </li>
 
-            <li>
-                <a href="<?php echo app_base_url('/admin/system-status'); ?>">
+            <li class="<?php echo strpos($currentPath, '/admin/help') !== false ? 'active' : ''; ?>">
+                <a href="<?php echo app_base_url('/admin/help'); ?>">
                     <i class="fas fa-question-circle"></i>
                     <span>Help Center</span>
                 </a>

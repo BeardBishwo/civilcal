@@ -41,7 +41,7 @@ ob_start();
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="/admin/email-manager/settings">
+                <form method="POST" action="<?php echo app_base_url('/admin/email-manager/settings'); ?>">
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="email_from_name" class="form-label">From Name</label>

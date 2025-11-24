@@ -5,7 +5,7 @@
                 <h1 class="page-title">Theme Preview</h1>
                 <p class="text-muted">Previewing: <?= htmlspecialchars($activeTheme['name'] ?? 'Unknown') ?></p>
             </div>
-            <a href="/admin/themes" class="btn btn-secondary">
+            <a href="<?= app_base_url('/admin/themes') ?>" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Themes
             </a>
         </div>
@@ -19,7 +19,7 @@
                 <i class="fas fa-desktop fa-4x text-muted mb-3"></i>
                 <h3>Preview Mode</h3>
                 <p>This is a placeholder for the theme preview functionality.</p>
-                <a href="/" target="_blank" class="btn btn-primary mt-3">View Live Site</a>
+                <a href="<?= app_base_url('/') ?>" target="_blank" class="btn btn-primary mt-3">View Live Site</a>
             </div>
         </div>
     </div>

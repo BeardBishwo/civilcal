@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($page_title ?? 'Widget Management') ?></title>
-    <link rel="stylesheet" href="/assets/css/admin.css">
-    <link rel="stylesheet" href="/assets/css/widgets.css">
+    <link rel="stylesheet" href="<?php echo asset_url('css/admin.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset_url('css/widgets.css'); ?>">
 </head>
+
 <body>
     <div class="admin-container">
         <!-- Header -->
@@ -46,17 +48,17 @@
 
         <!-- Actions -->
         <div class="actions-section">
-            <a href="/admin/widgets/create" class="btn btn-primary">➕ Create New Widget</a>
-            <a href="/admin/widgets/setup" class="btn btn-secondary">⚙️ Setup Database Tables</a>
+            <a href="<?php echo app_base_url('/admin/widgets/create'); ?>" class="btn btn-primary">➕ Create New Widget</a>
+            <a href="<?php echo app_base_url('/admin/widgets/setup'); ?>" class="btn btn-secondary">⚙️ Setup Database Tables</a>
         </div>
 
         <!-- Widgets List -->
         <div class="widgets-list">
             <h3>Installed Widgets</h3>
-            
+
             <?php if (empty($widgets)): ?>
                 <div class="no-widgets">
-                    <p>No widgets found. <a href="/admin/widgets/create">Create your first widget</a></p>
+                    <p>No widgets found. <a href="<?php echo app_base_url('/admin/widgets/create'); ?>">Create your first widget</a></p>
                 </div>
             <?php else: ?>
                 <div class="widgets-grid">
@@ -65,8 +67,8 @@
                             <div class="widget-header">
                                 <h4><?= htmlspecialchars($widget->getTitle()) ?></h4>
                                 <div class="widget-actions">
-                                    <a href="/admin/widgets/edit/<?= $widget->getId() ?>" class="btn btn-sm">Edit</a>
-                                    <a href="/admin/widgets/preview/<?= $widget->getId() ?>" class="btn btn-sm">Preview</a>
+                                    <a href="<?php echo app_base_url('/admin/widgets/edit/'); ?><?= $widget->getId() ?>" class="btn btn-sm">Edit</a>
+                                    <a href="<?php echo app_base_url('/admin/widgets/preview/'); ?><?= $widget->getId() ?>" class="btn btn-sm">Preview</a>
                                 </div>
                             </div>
                             <div class="widget-content">
@@ -80,12 +82,12 @@
                             </div>
                             <div class="widget-footer">
                                 <div class="footer-actions">
-                                    <form method="post" action="/admin/widgets/toggle/<?= $widget->getId() ?>" style="display: inline;">
+                                    <form method="post" action="<?php echo app_base_url('/admin/widgets/toggle/'); ?><?= $widget->getId() ?>" style="display: inline;">
                                         <button type="submit" class="btn btn-sm <?= $widget->isEnabled() ? 'btn-warning' : 'btn-success' ?>">
                                             <?= $widget->isEnabled() ? 'Disable' : 'Enable' ?>
                                         </button>
                                     </form>
-                                    <form method="post" action="/admin/widgets/delete/<?= $widget->getId() ?>" style="display: inline;" onsubmit="return confirm('Are you sure?')">
+                                    <form method="post" action="<?php echo app_base_url('/admin/widgets/delete/'); ?><?= $widget->getId() ?>" style="display: inline;" onsubmit="return confirm('Are you sure?')">
                                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                     </form>
                                 </div>
@@ -103,7 +105,7 @@
                 <?php foreach ($available_classes ?? [] as $className): ?>
                     <div class="class-item">
                         <code><?= htmlspecialchars($className) ?></code>
-                        <a href="/admin/widgets/create?class=<?= urlencode($className) ?>" class="btn btn-sm">Create Widget</a>
+                        <a href="<?php echo app_base_url('/admin/widgets/create'); ?>?class=<?= urlencode($className) ?>" class="btn btn-sm">Create Widget</a>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -118,4 +120,5 @@
         });
     </script>
 </body>
+
 </html>

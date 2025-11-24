@@ -22,7 +22,7 @@ $content = '
             <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#restoreModal">
                 <i class="bi bi-arrow-counterclockwise me-2"></i>Restore
             </button>
-            <a class="btn btn-outline-dark btn-sm" href="/admin/audit-logs">
+            <a class="btn btn-outline-dark btn-sm" href="' . app_base_url('/admin/audit-logs') . '">
                 <i class="bi bi-file-text me-2"></i>Audit Logs
             </a>
         </div>
@@ -98,12 +98,11 @@ $content = '
                                 </tr>
                             </thead>
                             <tbody>';
-                            
-                            foreach ($logs as $log) {
-                                $levelClass = $log['level'] === 'ERROR' ? 'danger' : 
-                                             ($log['level'] === 'WARNING' ? 'warning' : 'info');
-                                
-                                $content .= '
+
+foreach ($logs as $log) {
+    $levelClass = $log['level'] === 'ERROR' ? 'danger' : ($log['level'] === 'WARNING' ? 'warning' : 'info');
+
+    $content .= '
                                 <tr>
                                     <td>
                                         <span class="badge bg-' . $levelClass . '">' . $log['level'] . '</span>
@@ -112,9 +111,9 @@ $content = '
                                     <td>' . $log['timestamp'] . '</td>
                                     <td><code>' . $log['ip'] . '</code></td>
                                 </tr>';
-                            }
-                            
-                            $content .= '
+}
+
+$content .= '
                             </tbody>
                         </table>
                     </div>
@@ -254,16 +253,16 @@ $content = '
                     <h6>PHP Extensions</h6>
                     <div class="bg-light p-3 rounded" style="max-height: 200px; overflow-y: auto;">
                         <div class="row">';
-                        
-                        foreach (array_chunk($systemInfo['loaded_extensions'], 4) as $chunk) {
-                            $content .= '<div class="col-md-3">';
-                            foreach ($chunk as $extension) {
-                                $content .= '<div class="text-monospace small">' . $extension . '</div>';
-                            }
-                            $content .= '</div>';
-                        }
-                        
-                        $content .= '
+
+foreach (array_chunk($systemInfo['loaded_extensions'], 4) as $chunk) {
+    $content .= '<div class="col-md-3">';
+    foreach ($chunk as $extension) {
+        $content .= '<div class="text-monospace small">' . $extension . '</div>';
+    }
+    $content .= '</div>';
+}
+
+$content .= '
                         </div>
                     </div>
                 </div>
@@ -308,7 +307,7 @@ document.getElementById("clearLogs").addEventListener("click", function() {
         const csrfMeta1 = document.querySelector("meta[name=\"csrf-token\"]");
         const csrf1 = csrfMeta1 ? csrfMeta1.getAttribute("content") : null;
         if (csrf1) { headers1["X-CSRF-Token"] = csrf1; }
-        fetch("/admin/help/clear-logs", {
+        fetch("' . app_base_url('/admin/help/clear-logs') . '", {
             method: "POST",
             headers: headers1
         })
@@ -328,7 +327,7 @@ document.getElementById("exportLogs").addEventListener("click", function() {
     const csrfMeta = document.querySelector("meta[name=\"csrf-token\"]");
     const csrf = csrfMeta ? csrfMeta.getAttribute("content") : null;
     if (csrf) { headers["X-CSRF-Token"] = csrf; }
-    fetch("/admin/help/export-logs", { method: "POST", headers: headers })
+    fetch("' . app_base_url('/admin/help/export-logs') . '", { method: "POST", headers: headers })
         .then(r => r.json())
         .then(d => {
             if (d.success) {
@@ -353,7 +352,7 @@ document.getElementById("createBackup").addEventListener("click", function() {
         const csrfMeta2 = document.querySelector("meta[name=\"csrf-token\"]");
         const csrf2 = csrfMeta2 ? csrfMeta2.getAttribute("content") : null;
         if (csrf2) { headers2["X-CSRF-Token"] = csrf2; }
-        fetch("/admin/help/backup", {
+        fetch("' . app_base_url('/admin/help/backup') . '", {
             method: "POST",
             headers: headers2
         })
@@ -379,7 +378,7 @@ document.getElementById("exportThemes").addEventListener("click", function() {
     const csrfMeta = document.querySelector("meta[name=\"csrf-token\"]");
     const csrf = csrfMeta ? csrfMeta.getAttribute("content") : null;
     if (csrf) { headers["X-CSRF-Token"] = csrf; }
-    fetch("/admin/help/export-themes", { method: "POST", headers: headers })
+    fetch("' . app_base_url('/admin/help/export-themes') . '", { method: "POST", headers: headers })
         .then(r => r.json())
         .then(d => {
             if (d.success) {
@@ -401,7 +400,7 @@ document.getElementById("exportPlugins").addEventListener("click", function() {
     const csrfMeta = document.querySelector("meta[name=\"csrf-token\"]");
     const csrf = csrfMeta ? csrfMeta.getAttribute("content") : null;
     if (csrf) { headers["X-CSRF-Token"] = csrf; }
-    fetch("/admin/help/export-plugins", { method: "POST", headers: headers })
+    fetch("' . app_base_url('/admin/help/export-plugins') . '", { method: "POST", headers: headers })
         .then(r => r.json())
         .then(d => {
             if (d.success) {
@@ -425,7 +424,7 @@ document.getElementById("restoreForm").addEventListener("submit", function(e) {
     const csrfMeta = document.querySelector("meta[name=\"csrf-token\"]");
     const csrf = csrfMeta ? csrfMeta.getAttribute("content") : null;
     if (csrf) { headers["X-CSRF-Token"] = csrf; }
-    fetch("/admin/help/restore", { method: "POST", headers: headers, body: fd })
+    fetch("' . app_base_url('/admin/help/restore') . '", { method: "POST", headers: headers, body: fd })
         .then(r => r.json())
         .then(d => {
             const out = document.getElementById("restoreResult");
@@ -438,4 +437,3 @@ document.getElementById("restoreForm").addEventListener("submit", function(e) {
 ';
 
 include __DIR__ . '/../../layouts/admin.php';
-?>

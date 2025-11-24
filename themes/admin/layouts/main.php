@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" class="admin-theme">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title ?? 'Admin Dashboard'; ?> - Bishwo Calculator</title>
-    
+
     <!-- Admin Styles -->
     <link rel="stylesheet" href="<?php echo app_base_url('themes/admin/assets/css/admin.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Chart.js for analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <style>
         :root {
             --admin-primary: #4f46e5;
@@ -30,11 +31,13 @@
             --admin-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
     </style>
+    <?php $currentUser = current_user(); ?>
 </head>
+
 <body class="admin-body">
     <!-- Admin Wrapper -->
     <div id="admin-wrapper" class="admin-wrapper">
-        
+
         <!-- Sidebar -->
         <aside id="admin-sidebar" class="admin-sidebar">
             <div class="sidebar-header">
@@ -46,7 +49,7 @@
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
-            
+
             <nav class="sidebar-nav">
                 <ul class="nav-menu">
                     <!-- Dashboard -->
@@ -56,7 +59,7 @@
                             <span class="nav-text">Dashboard</span>
                         </a>
                     </li>
-                    
+
                     <!-- Users -->
                     <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/users') !== false ? 'active' : ''; ?>">
                         <a href="<?php echo app_base_url('admin/users'); ?>" class="nav-link">
@@ -70,7 +73,7 @@
                             <li><a href="<?php echo app_base_url('admin/users/roles'); ?>">Roles</a></li>
                         </ul>
                     </li>
-                    
+
                     <!-- Analytics -->
                     <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/analytics') !== false ? 'active' : ''; ?>">
                         <a href="<?php echo app_base_url('admin/analytics'); ?>" class="nav-link">
@@ -84,7 +87,7 @@
                             <li><a href="<?php echo app_base_url('admin/analytics/calculators'); ?>">Calculator Usage</a></li>
                         </ul>
                     </li>
-                    
+
                     <!-- Content -->
                     <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/content') !== false ? 'active' : ''; ?>">
                         <a href="<?php echo app_base_url('admin/content'); ?>" class="nav-link">
@@ -98,7 +101,7 @@
                             <li><a href="<?php echo app_base_url('admin/content/media'); ?>">Media</a></li>
                         </ul>
                     </li>
-                    
+
                     <!-- Modules -->
                     <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/modules') !== false ? 'active' : ''; ?>">
                         <a href="<?php echo app_base_url('admin/modules'); ?>" class="nav-link">
@@ -106,7 +109,7 @@
                             <span class="nav-text">Modules</span>
                         </a>
                     </li>
-                    
+
                     <!-- Themes -->
                     <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/themes') !== false ? 'active' : ''; ?>">
                         <a href="<?php echo app_base_url('admin/themes'); ?>" class="nav-link">
@@ -114,7 +117,7 @@
                             <span class="nav-text">Themes</span>
                         </a>
                     </li>
-                    
+
                     <!-- Settings -->
                     <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/settings') !== false ? 'active' : ''; ?>">
                         <a href="<?php echo app_base_url('admin/settings'); ?>" class="nav-link">
@@ -128,7 +131,7 @@
                             <li><a href="<?php echo app_base_url('admin/settings/security'); ?>">Security</a></li>
                         </ul>
                     </li>
-                    
+
                     <!-- Calculations -->
                     <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/calculations') !== false ? 'active' : ''; ?>">
                         <a href="<?php echo app_base_url('admin/calculations'); ?>" class="nav-link">
@@ -250,7 +253,7 @@
                         </a>
                     </li>
                 </ul>
-                
+
                 <!-- Sidebar Footer -->
                 <div class="sidebar-footer">
                     <div class="system-status">
@@ -262,10 +265,10 @@
                 </div>
             </nav>
         </aside>
-        
+
         <!-- Main Content -->
         <main id="admin-main" class="admin-main">
-            
+
             <!-- Top Header -->
             <header class="admin-header">
                 <div class="header-left">
@@ -277,21 +280,21 @@
                             <i class="fas fa-home"></i>
                             <a href="<?php echo app_base_url('admin'); ?>">Admin</a>
                         </span>
-                        <?php if(isset($breadcrumbs)): ?>
-                            <?php foreach($breadcrumbs as $crumb): ?>
-                            <span class="breadcrumb-divider">/</span>
-                            <span class="breadcrumb-item">
-                                <?php if(isset($crumb['url'])): ?>
-                                    <a href="<?php echo $crumb['url']; ?>"><?php echo $crumb['title']; ?></a>
-                                <?php else: ?>
-                                    <?php echo $crumb['title']; ?>
-                                <?php endif; ?>
-                            </span>
+                        <?php if (isset($breadcrumbs)): ?>
+                            <?php foreach ($breadcrumbs as $crumb): ?>
+                                <span class="breadcrumb-divider">/</span>
+                                <span class="breadcrumb-item">
+                                    <?php if (isset($crumb['url'])): ?>
+                                        <a href="<?php echo $crumb['url']; ?>"><?php echo $crumb['title']; ?></a>
+                                    <?php else: ?>
+                                        <?php echo $crumb['title']; ?>
+                                    <?php endif; ?>
+                                </span>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
                 </div>
-                
+
                 <div class="header-right">
                     <!-- Quick Actions -->
                     <div class="quick-actions">
@@ -306,7 +309,7 @@
                             <span class="notification-badge">3</span>
                         </button>
                     </div>
-                    
+
                     <!-- User Menu -->
                     <div class="user-menu">
                         <div class="user-avatar" onclick="toggleUserDropdown()">
@@ -339,16 +342,16 @@
                     </div>
                 </div>
             </header>
-            
+
             <!-- Page Content -->
             <div class="admin-content">
                 <?php echo $content ?? ''; ?>
             </div>
-            
+
         </main>
-        
+
     </div>
-    
+
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay" style="display: none;">
         <div class="loading-spinner">
@@ -356,19 +359,20 @@
             <span>Loading...</span>
         </div>
     </div>
-    
+
     <!-- Notification Toast -->
     <div id="notification-toast" class="notification-toast"></div>
-    
+
     <!-- Admin Scripts -->
     <script src="<?php echo app_base_url('themes/admin/assets/js/admin.js'); ?>"></script>
-    
+
     <!-- Page Specific Scripts -->
-    <?php if(isset($scripts)): ?>
-        <?php foreach($scripts as $script): ?>
+    <?php if (isset($scripts)): ?>
+        <?php foreach ($scripts as $script): ?>
             <script src="<?php echo $script; ?>"></script>
         <?php endforeach; ?>
     <?php endif; ?>
-    
+
 </body>
+
 </html>

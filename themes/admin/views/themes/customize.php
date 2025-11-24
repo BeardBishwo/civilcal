@@ -5,7 +5,7 @@
                 <h1 class="page-title">Customize Theme</h1>
                 <p class="text-muted">Adjust colors, typography, and layout settings.</p>
             </div>
-            <a href="/admin/themes" class="btn btn-secondary">
+            <a href="<?= app_base_url('/admin/themes') ?>" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Themes
             </a>
         </div>

@@ -15,7 +15,7 @@ $user = $user ?? [];
 
     <!-- Breadcrumb -->
     <nav class="breadcrumb" style="margin-bottom: 24px;">
-        <a href="/admin/users">Users</a>
+        <a href="<?= app_base_url('/admin/users') ?>">Users</a>
         <span class="breadcrumb-divider">/</span>
         <span class="breadcrumb-current">Edit User</span>
     </nav>
@@ -67,7 +67,7 @@ $user = $user ?? [];
             </h3>
         </div>
         <div class="card-content">
-            <form id="editUserForm" method="POST" action="/admin/users/<?php echo $user['id']; ?>/update">
+            <form id="editUserForm" method="POST" action="<?= app_base_url('/admin/users/' . $user['id'] . '/update') ?>">
                 <?php $this->csrfField(); ?>
                 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
@@ -192,40 +192,6 @@ $user = $user ?? [];
                     <div style="background: var(--admin-gray-50); padding: 16px; border-radius: 8px; border-left: 4px solid var(--admin-danger);">
                         <h5 style="margin: 0 0 8px 0; color: var(--admin-danger);">Delete User Account</h5>
                         <p style="margin: 0 0 16px 0; color: var(--admin-gray-600); font-size: 14px;">
-                            Once you delete this user account, there is no going back. Please be certain.
-                        </p>
-                        <button type="button" class="btn btn-danger" onclick="deleteUser(<?php echo $user['id']; ?>)">
-                            <i class="fas fa-trash"></i>
-                            Permanently Delete User
-                        </button>
-                    </div>
-                </div>
-                <?php endif; ?>
-                
-                <!-- Form Actions -->
-                <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--admin-gray-200); display: flex; gap: 16px; justify-content: flex-end;">
-                    <a href="/admin/users" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i>
-                        Cancel
-                    </a>
-                    <button type="button" class="btn btn-secondary" onclick="previewChanges()">
-                        <i class="fas fa-eye"></i>
-                        Preview Changes
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i>
-                        Update User
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<style>
-.badge {
-    padding: 4px 8px;
-    border-radius: 4px;
     font-size: 12px;
     font-weight: 500;
     text-transform: uppercase;
@@ -284,7 +250,7 @@ function updateUser() {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
     submitBtn.disabled = true;
     
-    fetch(`/admin/users/${userId}/update`, {
+    fetch(`<?= app_base_url('/admin/users/') ?>${userId}/update`, {
         method: 'POST',
         body: formData,
         headers: {
@@ -294,7 +260,7 @@ function updateUser() {
     .then(response => {
         if (response.ok) {
             alert('User updated successfully!');
-            window.location.href = '/admin/users';
+            window.location.href = '<?= app_base_url('/admin/users') ?>';
         } else {
             throw new Error('Failed to update user');
         }
@@ -313,7 +279,7 @@ function updateUser() {
 function deleteUser(userId) {
     if (confirm('Are you absolutely sure you want to delete this user? This action cannot be undone.')) {
         if (confirm('This will permanently delete the user account and all associated data. Are you sure?')) {
-            fetch(`/admin/users/${userId}/delete`, {
+            fetch(`<?= app_base_url('/admin/users/') ?>${userId}/delete`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -323,7 +289,7 @@ function deleteUser(userId) {
             .then(response => {
                 if (response.ok) {
                     alert('User deleted successfully!');
-                    window.location.href = '/admin/users';
+                    window.location.href = '<?= app_base_url('/admin/users') ?>';
                 } else {
                     throw new Error('Failed to delete user');
                 }

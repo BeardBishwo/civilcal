@@ -179,20 +179,6 @@
 
                 <div class="col-md-3">
                     <div class="d-flex justify-content-end align-items-center">
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle me-2"></i>
-                                <?= htmlspecialchars($currentUser['username'] ?? 'Admin') ?>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="/profile"><i class="bi bi-person me-2"></i>Profile</a></li>
-                                <li><a class="dropdown-item" href="/settings"><i class="bi bi-gear me-2"></i>Settings</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
-                            </ul>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -205,7 +191,7 @@
             <ul class="sidebar-menu">
                 <!-- Dashboard -->
                 <li>
-                    <a href="/admin/dashboard" class="<?= ($currentPage ?? '') == 'dashboard' ? 'active' : '' ?>">
+                    <a href="<?= app_base_url('/admin/dashboard') ?>" class="<?= ($currentPage ?? '') == 'dashboard' ? 'active' : '' ?>">
                         <i class="bi bi-speedometer2"></i>
                         <span>Dashboard</span>
                     </a>
@@ -213,7 +199,7 @@
 
                 <!-- Users Management -->
                 <li>
-                    <a href="/admin/users" class="<?= $currentPage == 'users' ? 'active' : '' ?>">
+                    <a href="<?= app_base_url('/admin/users') ?>" class="<?= $currentPage == 'users' ? 'active' : '' ?>">
                         <i class="bi bi-people"></i>
                         <span>Users Management</span>
                     </a>
@@ -221,7 +207,7 @@
 
                 <!-- Calculators -->
                 <li>
-                    <a href="/admin/calculators" class="<?= ($currentPage ?? '') == 'calculators' ? 'active' : '' ?>">
+                    <a href="<?= app_base_url('/admin/calculators') ?>" class="<?= ($currentPage ?? '') == 'calculators' ? 'active' : '' ?>">
                         <i class="bi bi-calculator"></i>
                         <span>Calculators</span>
                     </a>
@@ -229,7 +215,7 @@
 
                 <!-- Modules & Categories -->
                 <li>
-                    <a href="/admin/modules" class="<?= $currentPage == 'modules' ? 'active' : '' ?>">
+                    <a href="<?= app_base_url('/admin/modules') ?>" class="<?= $currentPage == 'modules' ? 'active' : '' ?>">
                         <i class="bi bi-grid-3x3-gap"></i>
                         <span>Modules & Categories</span>
                     </a>
@@ -237,7 +223,7 @@
 
                 <!-- Themes -->
                 <li>
-                    <a href="/admin/themes" class="<?= ($currentPage ?? '') == 'themes' ? 'active' : '' ?>">
+                    <a href="<?= app_base_url('/admin/themes') ?>" class="<?= ($currentPage ?? '') == 'themes' ? 'active' : '' ?>">
                         <i class="bi bi-palette"></i>
                         <span>Themes</span>
                     </a>
@@ -245,7 +231,7 @@
 
                 <!-- Plugins -->
                 <li>
-                    <a href="/admin/plugins" class="<?= $currentPage == 'plugins' ? 'active' : '' ?>">
+                    <a href="<?= app_base_url('/admin/plugins') ?>" class="<?= $currentPage == 'plugins' ? 'active' : '' ?>">
                         <i class="bi bi-puzzle"></i>
                         <span>Plugins</span>
                     </a>
@@ -253,7 +239,7 @@
 
                 <!-- System Settings -->
                 <li>
-                    <a href="/admin/settings/general" class="<?= ($currentPage ?? '') == 'settings' ? 'active' : '' ?>">
+                    <a href="<?= app_base_url('/admin/settings/general') ?>" class="<?= ($currentPage ?? '') == 'settings' ? 'active' : '' ?>">
                         <i class="bi bi-gear"></i>
                         <span>System Settings</span>
                     </a>
@@ -261,7 +247,7 @@
 
                 <!-- Email & Notifications -->
                 <li>
-                    <a href="/admin/settings/email" class="<?= $currentPage == 'email' ? 'active' : '' ?>">
+                    <a href="<?= app_base_url('/admin/settings/email') ?>" class="<?= $currentPage == 'email' ? 'active' : '' ?>">
                         <i class="bi bi-envelope"></i>
                         <span>Email & Notifications</span>
                     </a>
@@ -269,7 +255,7 @@
 
                 <!-- Billing / Subscriptions -->
                 <li>
-                    <a href="/admin/subscriptions" class="<?= ($currentPage ?? '') == 'subscriptions' ? 'active' : '' ?>">
+                    <a href="<?= app_base_url('/admin/subscriptions') ?>" class="<?= ($currentPage ?? '') == 'subscriptions' ? 'active' : '' ?>">
                         <i class="bi bi-credit-card"></i>
                         <span>Billing / Subscriptions</span>
                     </a>
@@ -277,7 +263,7 @@
 
                 <!-- Help & Logs -->
                 <li>
-                    <a href="/admin/help" class="<?= ($currentPage ?? '') == 'help' ? 'active' : '' ?>">
+                    <a href="<?= app_base_url('/admin/help') ?>" class="<?= ($currentPage ?? '') == 'help' ? 'active' : '' ?>">
                         <i class="bi bi-question-circle"></i>
                         <span>Help & Logs</span>
                     </a>

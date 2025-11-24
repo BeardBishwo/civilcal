@@ -17,7 +17,7 @@
                     <h6 class="m-0 font-weight-bold text-primary">SMTP Configuration</h6>
                 </div>
                 <div class="card-body">
-                    <form action="/admin/settings/save" method="POST">
+                    <form action="<?php echo app_base_url('/admin/settings/save'); ?>" method="POST">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
 
                         <div class="mb-3 form-check">

@@ -57,7 +57,7 @@ if (!function_exists('getTimeAgo')) {
                         <i class="fas fa-envelope"></i> Thread: <?= htmlspecialchars($thread['subject']) ?>
                     </h3>
                     <div class="card-tools">
-                        <a href="/admin/email-manager/threads" class="btn btn-secondary btn-sm">
+                        <a href="<?php echo app_base_url('/admin/email-manager/threads'); ?>" class="btn btn-secondary btn-sm">
                             <i class="fas fa-arrow-left"></i> Back to Threads
                         </a>
                     </div>
@@ -160,7 +160,7 @@ if (!function_exists('getTimeAgo')) {
                                     <h5 class="card-title mb-0">Add Response</h5>
                                 </div>
                                 <div class="card-body">
-                                    <form id="replyForm" method="POST" action="/admin/email-manager/thread/<?= $thread['id'] ?>/reply">
+                                    <form id="replyForm" method="POST" action="<?php echo app_base_url('/admin/email-manager/thread/'); ?><?= $thread['id'] ?>/reply">
                                         <div class="mb-3">
                                             <label for="template_select" class="form-label">Use Template (Optional)</label>
                                             <select class="form-select" id="template_select" name="template_id">
@@ -204,7 +204,7 @@ if (!function_exists('getTimeAgo')) {
                                 <div class="card-body">
                                     <div class="mb-3">
                                         <label for="status_update" class="form-label">Update Status</label>
-                                        <form method="POST" action="/admin/email-manager/thread/<?= $thread['id'] ?>/status" class="d-flex gap-2">
+                                        <form method="POST" action="<?php echo app_base_url('/admin/email-manager/thread/'); ?><?= $thread['id'] ?>/status" class="d-flex gap-2">
                                             <select class="form-select" id="status_update" name="status">
                                                 <option value="new" <?= $thread['status'] === 'new' ? 'selected' : '' ?>>New</option>
                                                 <option value="in_progress" <?= $thread['status'] === 'in_progress' ? 'selected' : '' ?>>In Progress</option>
@@ -217,7 +217,7 @@ if (!function_exists('getTimeAgo')) {
 
                                     <div class="mb-3">
                                         <label for="priority_update" class="form-label">Update Priority</label>
-                                        <form method="POST" action="/admin/email-manager/thread/<?= $thread['id'] ?>/priority" class="d-flex gap-2">
+                                        <form method="POST" action="<?php echo app_base_url('/admin/email-manager/thread/'); ?><?= $thread['id'] ?>/priority" class="d-flex gap-2">
                                             <select class="form-select" id="priority_update" name="priority">
                                                 <option value="low" <?= $thread['priority'] === 'low' ? 'selected' : '' ?>>Low</option>
                                                 <option value="medium" <?= $thread['priority'] === 'medium' ? 'selected' : '' ?>>Medium</option>
@@ -230,7 +230,7 @@ if (!function_exists('getTimeAgo')) {
 
                                     <div class="mb-3">
                                         <label for="assign_to" class="form-label">Assign To</label>
-                                        <form method="POST" action="/admin/email-manager/thread/<?= $thread['id'] ?>/assign" class="d-flex gap-2">
+                                        <form method="POST" action="<?php echo app_base_url('/admin/email-manager/thread/'); ?><?= $thread['id'] ?>/assign" class="d-flex gap-2">
                                             <select class="form-select" id="assign_to" name="assigned_to">
                                                 <option value="">Unassigned</option>
                                                 <?php foreach ($availableAssignees as $assignee): ?>

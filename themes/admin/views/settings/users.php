@@ -5,7 +5,7 @@
                 <h1 class="page-title">User Settings</h1>
                 <p class="text-muted">Configure user registration and authentication.</p>
             </div>
-            <a href="/admin/settings" class="btn btn-secondary">
+            <a href="<?= app_base_url('/admin/settings') ?>" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Settings
             </a>
         </div>

@@ -5,7 +5,7 @@ return [
         'name' => 'Bishwo Calculator',
         'env' => 'development',
         'debug' => true,
-        'url' => 'http://localhost:8080',
+        'url' => defined('APP_URL') ? APP_URL : 'http://localhost/Bishwo_Calculator',
         'timezone' => 'Asia/Katmandu',
     ],
     'auth' => [

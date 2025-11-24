@@ -5,7 +5,7 @@
                 <h1 class="page-title">Security Settings</h1>
                 <p class="text-muted">Configure application security.</p>
             </div>
-            <a href="/admin/settings" class="btn btn-secondary">
+            <a href="<?= app_base_url('/admin/settings') ?>" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Settings
             </a>
         </div>

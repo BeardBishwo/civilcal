@@ -104,25 +104,10 @@ $role_stats = $role_stats ?? [];
             <div style="display: flex; gap: 16px; flex-wrap: wrap;">
                 <button class="btn btn-primary">
                     <i class="fas fa-plus"></i>
-                    Add Custom Role
-                </button>
-                <button class="btn btn-secondary">
-                    <i class="fas fa-download"></i>
-                    Export Roles
-                </button>
-                <a href="/admin/users" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i>
-                    Back to Users
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-function editRole(roleKey) {
-    // Implement role editing functionality
-    console.log('Edit role:', roleKey);
-    alert('Role editing functionality would be implemented here for: ' + roleKey);
-}
-</script>
+                    <script>
+                        function editRole(roleKey) {
+                            // Implement role editing functionality
+                            console.log('Edit role:', roleKey);
+                            alert('Role editing functionality would be implemented here for: ' + roleKey);
+                        }
+                    </script>

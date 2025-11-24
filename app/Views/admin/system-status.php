@@ -8,7 +8,7 @@
 <div class="container-fluid p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">System Status</h1>
-        <a href="/admin/debug" class="btn btn-sm btn-info shadow-sm">
+        <a href="<?php echo app_base_url('/admin/debug'); ?>" class="btn btn-sm btn-info shadow-sm">
             <i class="fas fa-bug fa-sm text-white-50"></i> Advanced Debug
         </a>
     </div>

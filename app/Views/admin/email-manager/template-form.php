@@ -10,7 +10,7 @@
                         <?php echo $template ? 'Edit Template' : 'Create Template'; ?>
                     </h3>
                     <div class="card-tools">
-                        <a href="/admin/email-manager/templates" class="btn btn-default btn-sm">
+                        <a href="<?php echo app_base_url('/admin/email-manager/templates'); ?>" class="btn btn-default btn-sm">
                             <i class="fas fa-arrow-left"></i> Back to Templates
                         </a>
                     </div>
@@ -28,7 +28,7 @@
                                         <div class="mb-3">
                                             <label for="name" class="form-label">Template Name *</label>
                                             <input type="text" class="form-control" id="name" name="name"
-                                                   value="<?php echo htmlspecialchars($template['name'] ?? ''); ?>" required>
+                                                value="<?php echo htmlspecialchars($template['name'] ?? ''); ?>" required>
                                             <small class="form-text text-muted">A descriptive name for this template</small>
                                         </div>
 
@@ -38,7 +38,7 @@
                                                 <option value="">Select a category...</option>
                                                 <?php foreach ($templateTypes as $type): ?>
                                                     <option value="<?php echo $type; ?>"
-                                                            <?php echo (isset($template['category']) && $template['category'] === $type) ? 'selected' : ''; ?>>
+                                                        <?php echo (isset($template['category']) && $template['category'] === $type) ? 'selected' : ''; ?>>
                                                         <?php echo ucfirst(str_replace('_', ' ', $type)); ?>
                                                     </option>
                                                 <?php endforeach; ?>
@@ -62,7 +62,7 @@
                                         <div class="mb-3">
                                             <label for="subject" class="form-label">Subject *</label>
                                             <input type="text" class="form-control" id="subject" name="subject"
-                                                   value="<?php echo htmlspecialchars($template['subject'] ?? ''); ?>" required>
+                                                value="<?php echo htmlspecialchars($template['subject'] ?? ''); ?>" required>
                                             <small class="form-text text-muted">
                                                 Use variables like {{name}}, {{order_id}}, etc.
                                                 <a href="#" id="insert-variable-subject" class="text-primary">Insert Variable</a>
@@ -111,7 +111,7 @@
                                         <div class="mb-3">
                                             <div class="form-check form-switch">
                                                 <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
-                                                       value="1" <?php echo (isset($template['is_active']) && $template['is_active']) ? 'checked' : ''; ?>>
+                                                    value="1" <?php echo (isset($template['is_active']) && $template['is_active']) ? 'checked' : ''; ?>>
                                                 <label class="form-check-label" for="is_active">
                                                     Active
                                                 </label>
@@ -122,7 +122,7 @@
                                         <div class="mb-3">
                                             <label for="variables" class="form-label">Custom Variables</label>
                                             <textarea class="form-control" id="variables" name="variables" rows="4"
-                                                      placeholder="custom_1, custom_2, custom_3"><?php echo htmlspecialchars($template['variables'] ?? ''); ?></textarea>
+                                                placeholder="custom_1, custom_2, custom_3"><?php echo htmlspecialchars($template['variables'] ?? ''); ?></textarea>
                                             <small class="form-text text-muted">Comma-separated list of custom variables</small>
                                         </div>
                                     </div>
@@ -219,114 +219,114 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('templateForm');
-    const subjectInput = document.getElementById('subject');
-    const contentTextarea = document.getElementById('content');
-    const subjectPreview = document.getElementById('subject-preview');
-    const contentPreview = document.getElementById('content-preview');
-    const variableModal = new bootstrap.Modal(document.getElementById('variableModal'));
-    let currentTarget = null;
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('templateForm');
+        const subjectInput = document.getElementById('subject');
+        const contentTextarea = document.getElementById('content');
+        const subjectPreview = document.getElementById('subject-preview');
+        const contentPreview = document.getElementById('content-preview');
+        const variableModal = new bootstrap.Modal(document.getElementById('variableModal'));
+        let currentTarget = null;
 
-    // Real-time preview
-    subjectInput.addEventListener('input', updatePreview);
-    contentTextarea.addEventListener('input', updatePreview);
+        // Real-time preview
+        subjectInput.addEventListener('input', updatePreview);
+        contentTextarea.addEventListener('input', updatePreview);
 
-    function updatePreview() {
-        subjectPreview.textContent = subjectInput.value || 'Enter subject above...';
-        contentPreview.innerHTML = contentTextarea.value ?
-            contentTextarea.value.replace(/\n/g, '<br>') : 'Enter content above...';
-    }
-
-    // Variable insertion
-    document.getElementById('insert-variable-subject').addEventListener('click', function(e) {
-        e.preventDefault();
-        currentTarget = subjectInput;
-        variableModal.show();
-    });
-
-    document.getElementById('insert-variable-content').addEventListener('click', function(e) {
-        e.preventDefault();
-        currentTarget = contentTextarea;
-        variableModal.show();
-    });
-
-    document.getElementById('insert-variable-btn').addEventListener('click', function() {
-        const selectedVariable = document.getElementById('variable-select').value;
-        if (selectedVariable && currentTarget) {
-            const start = currentTarget.selectionStart;
-            const end = currentTarget.selectionEnd;
-            const text = currentTarget.value;
-            currentTarget.value = text.substring(0, start) + selectedVariable + text.substring(end);
-            currentTarget.focus();
-            currentTarget.setSelectionRange(start + selectedVariable.length, start + selectedVariable.length);
-            updatePreview();
+        function updatePreview() {
+            subjectPreview.textContent = subjectInput.value || 'Enter subject above...';
+            contentPreview.innerHTML = contentTextarea.value ?
+                contentTextarea.value.replace(/\n/g, '<br>') : 'Enter content above...';
         }
-        variableModal.hide();
-    });
 
-    // Form submission
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-        const submitButton = this.querySelector('button[type="submit"]');
-        const originalText = submitButton.innerHTML;
-
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-
-        fetch(this.action, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Template saved successfully!');
-                window.location.href = '/admin/email-manager/templates';
-            } else {
-                const errors = data.errors ? Object.values(data.errors).flat().join('\n') : data.error;
-                alert('Error: ' + errors);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while saving the template.');
-        })
-        .finally(() => {
-            submitButton.disabled = false;
-            submitButton.innerHTML = originalText;
+        // Variable insertion
+        document.getElementById('insert-variable-subject').addEventListener('click', function(e) {
+            e.preventDefault();
+            currentTarget = subjectInput;
+            variableModal.show();
         });
-    });
 
-    // Delete template
-    const deleteBtn = document.getElementById('delete-btn');
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to delete this template? This action cannot be undone.')) {
-                const templateId = <?php echo $template['id']; ?>;
+        document.getElementById('insert-variable-content').addEventListener('click', function(e) {
+            e.preventDefault();
+            currentTarget = contentTextarea;
+            variableModal.show();
+        });
 
-                fetch(`/admin/email-manager/template/${templateId}/delete`, {
-                    method: 'POST'
+        document.getElementById('insert-variable-btn').addEventListener('click', function() {
+            const selectedVariable = document.getElementById('variable-select').value;
+            if (selectedVariable && currentTarget) {
+                const start = currentTarget.selectionStart;
+                const end = currentTarget.selectionEnd;
+                const text = currentTarget.value;
+                currentTarget.value = text.substring(0, start) + selectedVariable + text.substring(end);
+                currentTarget.focus();
+                currentTarget.setSelectionRange(start + selectedVariable.length, start + selectedVariable.length);
+                updatePreview();
+            }
+            variableModal.hide();
+        });
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            fetch(this.action, {
+                    method: 'POST',
+                    body: formData
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Template deleted successfully!');
+                        alert('Template saved successfully!');
                         window.location.href = '/admin/email-manager/templates';
                     } else {
-                        alert('Error: ' + (data.error || 'Failed to delete template'));
+                        const errors = data.errors ? Object.values(data.errors).flat().join('\n') : data.error;
+                        alert('Error: ' + errors);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('An error occurred while deleting the template.');
+                    alert('An error occurred while saving the template.');
+                })
+                .finally(() => {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalText;
                 });
-            }
         });
-    }
-});
+
+        // Delete template
+        const deleteBtn = document.getElementById('delete-btn');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to delete this template? This action cannot be undone.')) {
+                    const templateId = <?php echo $template['id']; ?>;
+
+                    fetch(`/admin/email-manager/template/${templateId}/delete`, {
+                            method: 'POST'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Template deleted successfully!');
+                                window.location.href = '/admin/email-manager/templates';
+                            } else {
+                                alert('Error: ' + (data.error || 'Failed to delete template'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while deleting the template.');
+                        });
+                }
+            });
+        }
+    });
 </script>
 
 <?php require_once __DIR__ . '/../footer.php'; ?>

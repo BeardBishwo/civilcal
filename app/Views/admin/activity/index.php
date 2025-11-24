@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -286,6 +287,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -315,7 +317,7 @@
 
         <!-- Filters -->
         <div class="filters">
-            <form method="GET" action="/admin/activity">
+            <form method="GET" action="<?php echo app_base_url('/admin/activity'); ?>">
                 <div class="filters-grid">
                     <div class="form-group">
                         <label>Search</label>
@@ -341,7 +343,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-search"></i> Filter
                             </button>
-                            <a href="/admin/activity" class="btn btn-secondary">
+                            <a href="<?php echo app_base_url('/admin/activity'); ?>" class="btn btn-secondary">
                                 <i class="fas fa-redo"></i> Reset
                             </a>
                         </div>
@@ -354,101 +356,102 @@
         <div class="activity-table">
             <div class="table-header">
                 <h2>Recent Activities</h2>
-                <a href="/admin/activity/export<?php echo !empty($dateFilter) ? '?date=' . urlencode($dateFilter) : ''; ?>" class="btn btn-secondary">
+                <a href="<?php echo app_base_url('/admin/activity/export'); ?><?php echo !empty($dateFilter) ? '?date=' . urlencode($dateFilter) : ''; ?>" class="btn btn-secondary">
                     <i class="fas fa-download"></i> Export CSV
                 </a>
             </div>
 
             <?php if (!empty($activities)): ?>
-            <table>
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Action</th>
-                        <th>Details</th>
-                        <th>IP Address</th>
-                        <th>Timestamp</th>
-                        <th>Level</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($activities as $activity): ?>
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar">
-                                    <?php echo strtoupper(substr($activity['user'], 0, 1)); ?>
-                                </div>
-                                <span><?php echo htmlspecialchars($activity['user']); ?></span>
-                            </div>
-                        </td>
-                        <td><?php echo htmlspecialchars($activity['action']); ?></td>
-                        <td>
-                            <?php 
-                            $details = is_array($activity['details']) ? $activity['details'] : [];
-                            if (!empty($details)) {
-                                echo '<small>' . htmlspecialchars(substr(json_encode($details), 0, 50)) . '...</small>';
-                            } else {
-                                echo '-';
-                            }
-                            ?>
-                        </td>
-                        <td><?php echo htmlspecialchars($activity['ip_address']); ?></td>
-                        <td><?php echo htmlspecialchars($activity['timestamp']); ?></td>
-                        <td>
-                            <?php 
-                            $levelClass = 'badge-info';
-                            $levelText = strtolower($activity['level'] ?? 'info');
-                            if ($levelText === 'success') $levelClass = 'badge-success';
-                            elseif ($levelText === 'warning') $levelClass = 'badge-warning';
-                            elseif ($levelText === 'error') $levelClass = 'badge-danger';
-                            ?>
-                            <span class="badge <?php echo $levelClass; ?>">
-                                <?php echo htmlspecialchars(ucfirst($levelText)); ?>
-                            </span>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                            <th>IP Address</th>
+                            <th>Timestamp</th>
+                            <th>Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($activities as $activity): ?>
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar">
+                                            <?php echo strtoupper(substr($activity['user'], 0, 1)); ?>
+                                        </div>
+                                        <span><?php echo htmlspecialchars($activity['user']); ?></span>
+                                    </div>
+                                </td>
+                                <td><?php echo htmlspecialchars($activity['action']); ?></td>
+                                <td>
+                                    <?php
+                                    $details = is_array($activity['details']) ? $activity['details'] : [];
+                                    if (!empty($details)) {
+                                        echo '<small>' . htmlspecialchars(substr(json_encode($details), 0, 50)) . '...</small>';
+                                    } else {
+                                        echo '-';
+                                    }
+                                    ?>
+                                </td>
+                                <td><?php echo htmlspecialchars($activity['ip_address']); ?></td>
+                                <td><?php echo htmlspecialchars($activity['timestamp']); ?></td>
+                                <td>
+                                    <?php
+                                    $levelClass = 'badge-info';
+                                    $levelText = strtolower($activity['level'] ?? 'info');
+                                    if ($levelText === 'success') $levelClass = 'badge-success';
+                                    elseif ($levelText === 'warning') $levelClass = 'badge-warning';
+                                    elseif ($levelText === 'error') $levelClass = 'badge-danger';
+                                    ?>
+                                    <span class="badge <?php echo $levelClass; ?>">
+                                        <?php echo htmlspecialchars(ucfirst($levelText)); ?>
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
 
-            <!-- Pagination -->
-            <div class="pagination">
-                <div class="pagination-info">
-                    Showing <?php echo (($page - 1) * $perPage) + 1; ?> to <?php echo min($page * $perPage, $total); ?> of <?php echo $total; ?> activities
+                <!-- Pagination -->
+                <div class="pagination">
+                    <div class="pagination-info">
+                        Showing <?php echo (($page - 1) * $perPage) + 1; ?> to <?php echo min($page * $perPage, $total); ?> of <?php echo $total; ?> activities
+                    </div>
+                    <div class="pagination-controls">
+                        <?php if ($page > 1): ?>
+                            <a href="?page=<?php echo $page - 1; ?>&per_page=<?php echo $perPage; ?>&level=<?php echo urlencode($level ?? ''); ?>&q=<?php echo urlencode($q ?? ''); ?>&date=<?php echo urlencode($dateFilter ?? ''); ?>" class="page-btn">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        <?php endif; ?>
+
+                        <?php
+                        $totalPages = ceil($total / $perPage);
+                        for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++):
+                        ?>
+                            <a href="?page=<?php echo $i; ?>&per_page=<?php echo $perPage; ?>&level=<?php echo urlencode($level ?? ''); ?>&q=<?php echo urlencode($q ?? ''); ?>&date=<?php echo urlencode($dateFilter ?? ''); ?>"
+                                class="page-btn <?php echo $i === $page ? 'active' : ''; ?>">
+                                <?php echo $i; ?>
+                            </a>
+                        <?php endfor; ?>
+
+                        <?php if ($page < $totalPages): ?>
+                            <a href="?page=<?php echo $page + 1; ?>&per_page=<?php echo $perPage; ?>&level=<?php echo urlencode($level ?? ''); ?>&q=<?php echo urlencode($q ?? ''); ?>&date=<?php echo urlencode($dateFilter ?? ''); ?>" class="page-btn">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        <?php endif; ?>
+                    </div>
                 </div>
-                <div class="pagination-controls">
-                    <?php if ($page > 1): ?>
-                        <a href="?page=<?php echo $page - 1; ?>&per_page=<?php echo $perPage; ?>&level=<?php echo urlencode($level ?? ''); ?>&q=<?php echo urlencode($q ?? ''); ?>&date=<?php echo urlencode($dateFilter ?? ''); ?>" class="page-btn">
-                            <i class="fas fa-chevron-left"></i>
-                        </a>
-                    <?php endif; ?>
-                    
-                    <?php 
-                    $totalPages = ceil($total / $perPage);
-                    for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++): 
-                    ?>
-                        <a href="?page=<?php echo $i; ?>&per_page=<?php echo $perPage; ?>&level=<?php echo urlencode($level ?? ''); ?>&q=<?php echo urlencode($q ?? ''); ?>&date=<?php echo urlencode($dateFilter ?? ''); ?>" 
-                           class="page-btn <?php echo $i === $page ? 'active' : ''; ?>">
-                            <?php echo $i; ?>
-                        </a>
-                    <?php endfor; ?>
-                    
-                    <?php if ($page < $totalPages): ?>
-                        <a href="?page=<?php echo $page + 1; ?>&per_page=<?php echo $perPage; ?>&level=<?php echo urlencode($level ?? ''); ?>&q=<?php echo urlencode($q ?? ''); ?>&date=<?php echo urlencode($dateFilter ?? ''); ?>" class="page-btn">
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                    <?php endif; ?>
-                </div>
-            </div>
             <?php else: ?>
-            <div class="empty-state">
-                <i class="fas fa-inbox"></i>
-                <p><strong>No activities found</strong></p>
-                <p>There are no activities matching your filters.</p>
-            </div>
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p><strong>No activities found</strong></p>
+                    <p>There are no activities matching your filters.</p>
+                </div>
             <?php endif; ?>
         </div>
     </div>
 </body>
+
 </html>

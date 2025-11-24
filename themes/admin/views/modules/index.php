@@ -136,7 +136,7 @@ if (!empty($allModules)) {
                     </button>
                     
                     ' . ($isActive ? '
-                    <a href="/admin/modules/' . urlencode($moduleName) . '/settings" class="btn btn-secondary btn-sm">
+                    <a href="' . app_base_url('/admin/modules/' . urlencode($moduleName) . '/settings') . '" class="btn btn-secondary btn-sm">
                         <i class="fas fa-cog"></i>
                         Settings
                     </a>

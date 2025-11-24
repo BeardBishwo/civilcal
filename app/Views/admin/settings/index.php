@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Admin Settings - Comprehensive Settings Management Interface
  * Modern, premium, fully responsive and modular design
@@ -10,20 +11,22 @@ $currentUser = $_SESSION['user'] ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Settings Management' ?> - Admin Panel</title>
-    
+
     <!-- Styles -->
     <link rel="stylesheet" href="/assets/css/admin/settings.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="settings-container">
         <!-- Header -->
@@ -73,9 +76,9 @@ $currentUser = $_SESSION['user'] ?? null;
         </div>
 
         <!-- Settings Form -->
-        <form id="settings-form" method="POST" action="/admin/settings/save" enctype="multipart/form-data">
+        <form id="settings-form" method="POST" action="<?php echo app_base_url('/admin/settings/save'); ?>" enctype="multipart/form-data">
             <div class="settings-content">
-                
+
                 <!-- General Settings -->
                 <div id="general-settings" class="settings-section active">
                     <?php echo $this->renderSettingsGroup('general', $settingsByGroup['general'] ?? [], [
@@ -271,13 +274,15 @@ $currentUser = $_SESSION['user'] ?? null;
     <!-- Scripts -->
     <script src="/assets/js/admin/settings-manager.js"></script>
 </body>
+
 </html>
 
 <?php
 /**
  * Helper function to render settings groups
  */
-function renderSettingsGroup($group, $settings, $categories) {
+function renderSettingsGroup($group, $settings, $categories)
+{
     if (empty($settings)) {
         return '<div class="settings-group">
             <div class="settings-group-header">
@@ -289,7 +294,7 @@ function renderSettingsGroup($group, $settings, $categories) {
             </div>
         </div>';
     }
-    
+
     // Group settings by category
     $settingsByCategory = [];
     foreach ($settings as $setting) {
@@ -299,16 +304,16 @@ function renderSettingsGroup($group, $settings, $categories) {
         }
         $settingsByCategory[$category][] = $setting;
     }
-    
+
     $output = '';
-    
+
     foreach ($settingsByCategory as $categoryKey => $categorySettings) {
         $categoryInfo = $categories[$categoryKey] ?? [
             'title' => ucfirst(str_replace('_', ' ', $categoryKey)),
             'icon' => 'fa-cog',
             'description' => ''
         ];
-        
+
         $output .= '<div class="settings-group">';
         $output .= '<div class="settings-group-header">';
         $output .= '<div class="settings-group-icon"><i class="fas ' . $categoryInfo['icon'] . '"></i></div>';
@@ -317,39 +322,40 @@ function renderSettingsGroup($group, $settings, $categories) {
         $output .= '<p>' . htmlspecialchars($categoryInfo['description']) . '</p>';
         $output .= '</div>';
         $output .= '</div>';
-        
+
         $output .= '<div class="form-row">';
-        
+
         foreach ($categorySettings as $setting) {
             $output .= renderSettingField($setting);
         }
-        
+
         $output .= '</div>';
         $output .= '</div>';
     }
-    
+
     return $output;
 }
 
 /**
  * Render individual setting field based on type
  */
-function renderSettingField($setting) {
+function renderSettingField($setting)
+{
     $key = $setting['setting_key'];
     $value = $setting['setting_value'];
     $type = $setting['setting_type'];
     $description = $setting['description'] ?? '';
     $label = ucfirst(str_replace('_', ' ', $key));
-    
+
     $output = '<div class="form-group">';
     $output .= '<label class="form-label">' . htmlspecialchars($label);
-    
+
     if ($description) {
         $output .= '<span class="form-label-description">' . htmlspecialchars($description) . '</span>';
     }
-    
+
     $output .= '</label>';
-    
+
     switch ($type) {
         case 'boolean':
             $checked = $value == '1' ? 'checked' : '';
@@ -358,19 +364,19 @@ function renderSettingField($setting) {
             $output .= '<span class="toggle-slider"></span>';
             $output .= '</label>';
             break;
-            
+
         case 'color':
             $output .= '<div class="color-input-group">';
             $output .= '<input type="color" name="' . $key . '" value="' . htmlspecialchars($value) . '" class="form-control">';
             $output .= '<input type="text" value="' . htmlspecialchars($value) . '" class="form-control" readonly>';
             $output .= '</div>';
             break;
-            
+
         case 'textarea':
         case 'text':
             $output .= '<textarea name="' . $key . '" class="form-control" rows="4">' . htmlspecialchars($value) . '</textarea>';
             break;
-            
+
         case 'image':
         case 'file':
             $output .= '<div class="image-upload-wrapper">';
@@ -383,7 +389,7 @@ function renderSettingField($setting) {
             $output .= '</label>';
             $output .= '</div>';
             break;
-            
+
         case 'select':
             $validationRules = json_decode($setting['validation_rules'] ?? '{}', true);
             $options = $validationRules['options'] ?? [];
@@ -394,27 +400,27 @@ function renderSettingField($setting) {
             }
             $output .= '</select>';
             break;
-            
+
         case 'integer':
         case 'float':
             $output .= '<input type="number" name="' . $key . '" value="' . htmlspecialchars($value) . '" class="form-control">';
             break;
-            
+
         case 'email':
             $output .= '<input type="email" name="' . $key . '" value="' . htmlspecialchars($value) . '" class="form-control">';
             break;
-            
+
         case 'url':
             $output .= '<input type="url" name="' . $key . '" value="' . htmlspecialchars($value) . '" class="form-control">';
             break;
-            
+
         default:
             $output .= '<input type="text" name="' . $key . '" value="' . htmlspecialchars($value) . '" class="form-control">';
             break;
     }
-    
+
     $output .= '</div>';
-    
+
     return $output;
 }
 ?>

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
@@ -9,7 +10,8 @@ class ActivityController extends Controller
 {
     private $activityLogModel;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         // Check if user is admin
@@ -20,7 +22,7 @@ class ActivityController extends Controller
         // Initialize the ActivityLog model
         $this->activityLogModel = new ActivityLog();
     }
-    
+
     /**
      * Display activity logs page
      */
@@ -31,11 +33,11 @@ class ActivityController extends Controller
         $level = strtoupper(trim($_GET['level'] ?? ''));
         $q = trim($_GET['q'] ?? '');
         $dateFilter = trim($_GET['date'] ?? '');
-        
+
         // Get activity logs
         $activities = $this->getActivityLogs($page, $perPage, $level, $q, $dateFilter);
         $stats = $this->getActivityStats();
-        
+
         $data = [
             'currentPage' => 'activity',
             'activities' => $activities['data'],
@@ -48,37 +50,37 @@ class ActivityController extends Controller
             'stats' => $stats,
             'title' => 'Activity Logs - Admin Panel'
         ];
-        
-        $this->adminView('admin/activity/index', $data);
+
+        $this->view->render('admin/activity/index', $data);
     }
-    
+
     /**
      * Get activity logs from database or log files
      */
     private function getActivityLogs($page = 1, $perPage = 50, $level = '', $q = '', $dateFilter = '')
     {
         $activities = [];
-        
+
         // Try to get from audit logs first
         $logsDir = (defined('STORAGE_PATH') ? STORAGE_PATH : (defined('BASE_PATH') ? BASE_PATH . '/storage' : __DIR__ . '/../../..')) . '/logs';
-        
+
         // If date filter is set, use it, otherwise use today
         $targetDate = $dateFilter ?: date('Y-m-d');
         $filePath = $logsDir . '/audit-' . $targetDate . '.log';
-        
+
         if (is_file($filePath)) {
             $lines = @file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
             foreach ($lines as $line) {
                 $obj = json_decode($line, true);
                 if (!is_array($obj)) continue;
-                
+
                 // Apply filters
                 if ($level && strtoupper($obj['level'] ?? '') !== $level) continue;
                 if ($q) {
                     $hay = ($obj['action'] ?? '') . ' ' . json_encode($obj['details'] ?? []);
                     if (stripos($hay, $q) === false) continue;
                 }
-                
+
                 $activities[] = [
                     'id' => $obj['id'] ?? uniqid(),
                     'user' => $obj['user'] ?? 'System',
@@ -90,27 +92,27 @@ class ActivityController extends Controller
                 ];
             }
         }
-        
+
         // If no logs found, try database
         if (empty($activities)) {
             $activities = $this->getActivityFromDatabase($level, $q, $dateFilter);
         }
-        
+
         // If still no data, provide sample data
         if (empty($activities)) {
             $activities = $this->getSampleActivities();
         }
-        
+
         $total = count($activities);
         $offset = ($page - 1) * $perPage;
         $paged = array_slice($activities, $offset, $perPage);
-        
+
         return [
             'data' => $paged,
             'total' => $total
         ];
     }
-    
+
     /**
      * Get activity logs from database using model
      */
@@ -136,13 +138,13 @@ class ActivityController extends Controller
 
             // If level filter is provided, we'll need to filter manually since the model doesn't have level field
             if ($level) {
-                $activities = array_filter($activities, function($activity) use ($level) {
+                $activities = array_filter($activities, function ($activity) use ($level) {
                     return strtoupper($activity['activity_type'] ?? '') === strtoupper($level);
                 });
             }
 
             // Transform the activities to the required format
-            return array_map(function($activity) {
+            return array_map(function ($activity) {
                 return [
                     'id' => $activity['id'],
                     'user' => $activity['user_id'] ? $this->getUserInfo($activity['user_id']) : 'System',
@@ -153,7 +155,6 @@ class ActivityController extends Controller
                     'level' => $activity['activity_type'] ?? 'info'
                 ];
             }, $activities);
-
         } catch (\Exception $e) {
             return [];
         }
@@ -174,7 +175,7 @@ class ActivityController extends Controller
             return 'Unknown User';
         }
     }
-    
+
     /**
      * Get sample activities for demonstration
      */
@@ -228,7 +229,7 @@ class ActivityController extends Controller
             ]
         ];
     }
-    
+
     /**
      * Get activity statistics
      */
@@ -241,7 +242,7 @@ class ActivityController extends Controller
             'total' => $this->getActivityCount('all')
         ];
     }
-    
+
     /**
      * Get activity count for a period using model
      */
@@ -251,7 +252,7 @@ class ActivityController extends Controller
             return $this->activityLogModel->getActivityCount($period);
         } catch (\Exception $e) {
             // Return mock data
-            return match($period) {
+            return match ($period) {
                 'today' => 45,
                 'week' => 320,
                 'month' => 1250,
@@ -260,7 +261,7 @@ class ActivityController extends Controller
             };
         }
     }
-    
+
     /**
      * Export activity logs
      */
@@ -268,13 +269,13 @@ class ActivityController extends Controller
     {
         $dateFilter = $_GET['date'] ?? '';
         $activities = $this->getActivityLogs(1, 10000, '', '', $dateFilter);
-        
+
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="activity-logs-' . date('Y-m-d') . '.csv"');
-        
+
         $output = fopen('php://output', 'w');
         fputcsv($output, ['ID', 'User', 'Action', 'Details', 'IP Address', 'Timestamp', 'Level']);
-        
+
         foreach ($activities['data'] as $activity) {
             fputcsv($output, [
                 $activity['id'],
@@ -286,7 +287,7 @@ class ActivityController extends Controller
                 $activity['level']
             ]);
         }
-        
+
         fclose($output);
         exit;
     }

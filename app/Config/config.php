@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Bishwo Calculator - Application Configuration
  * Core settings for the application
@@ -17,8 +18,37 @@ if (!defined('ENVIRONMENT')) {
 
 // App configuration
 define('APP_NAME', 'Bishwo Calculator');
-define('APP_BASE', '/Bishwo_Calculator');
-define('APP_URL', 'http://localhost/Bishwo_Calculator');
+
+// Auto-detect base path for flexible installation (main domain, subdomain, or subfolder)
+// Auto-detect base path for flexible installation (main domain, subdomain, or subfolder)
+// Check if APP_BASE is defined in environment
+if (getenv('APP_BASE')) {
+    define('APP_BASE', getenv('APP_BASE'));
+} else {
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
+    $scriptDir = dirname($scriptName);
+
+    // Remove /public suffix if present (since app uses public directory)
+    if (substr($scriptDir, -7) === '/public') {
+        $scriptDir = substr($scriptDir, 0, -7);
+    }
+
+    // Normalize root path to empty string
+    if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
+        $scriptDir = '';
+    }
+
+    define('APP_BASE', $scriptDir);
+}
+
+// Auto-detect APP_URL
+if (getenv('APP_URL')) {
+    define('APP_URL', getenv('APP_URL'));
+} else {
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    define('APP_URL', $protocol . '://' . $host . APP_BASE);
+}
 
 // Security settings
 define('REQUIRE_HTTPS', false);
@@ -44,9 +74,9 @@ if (ENVIRONMENT === 'development') {
 }
 
 // Helper function to get app URL
-function get_app_url() {
+function get_app_url()
+{
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     return $protocol . '://' . $host . APP_BASE;
 }
-?>

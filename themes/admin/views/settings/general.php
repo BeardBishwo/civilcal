@@ -5,7 +5,7 @@
                 <h1 class="page-title">General Settings</h1>
                 <p class="text-muted">Basic application configuration.</p>
             </div>
-            <a href="/admin/settings" class="btn btn-secondary">
+            <a href="<?php echo app_base_url('/admin/settings'); ?>" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Settings
             </a>
         </div>
@@ -17,7 +17,7 @@
         <div class="card">
             <div class="card-body">
                 <p>This view is being consolidated into the main settings index.</p>
-                <a href="/admin/settings" class="btn btn-primary">Go to Settings</a>
+                <a href="<?php echo app_base_url('/admin/settings'); ?>" class="btn btn-primary">Go to Settings</a>
             </div>
         </div>
     </div>

@@ -188,7 +188,7 @@ $content = '
                             </tbody>
                         </table>
                     </div>
-                    <a href="/admin/activity" class="btn btn-sm btn-outline-primary">View All Activity</a>
+                    <a href="' . app_base_url('/admin/activity') . '" class="btn btn-sm btn-outline-primary">View All Activity</a>
                 </div>
             </div>
         </div>
@@ -243,4 +243,3 @@ $content = '
 
 // Include the layout
 include __DIR__ . '/../layouts/admin.php';
-?>

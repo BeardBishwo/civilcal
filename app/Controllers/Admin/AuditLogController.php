@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
@@ -9,8 +10,12 @@ class AuditLogController extends Controller
     {
         $logsDir = (defined('STORAGE_PATH') ? STORAGE_PATH : (defined('BASE_PATH') ? BASE_PATH . '/storage' : __DIR__ . '/../../..')) . '/logs';
         $files = glob($logsDir . '/audit-*.log') ?: [];
-        usort($files, function($a,$b){ return strcmp($b, $a); });
-        $dates = array_map(function($f){ return substr(basename($f), 6, 10); }, $files);
+        usort($files, function ($a, $b) {
+            return strcmp($b, $a);
+        });
+        $dates = array_map(function ($f) {
+            return substr(basename($f), 6, 10);
+        }, $files);
         $selected = $_GET['date'] ?? ($dates[0] ?? date('Y-m-d'));
         $level = strtoupper(trim($_GET['level'] ?? ''));
         $q = trim($_GET['q'] ?? '');
@@ -23,11 +28,17 @@ class AuditLogController extends Controller
             $lines = @file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
             foreach ($lines as $line) {
                 $obj = json_decode($line, true);
-                if (!is_array($obj)) { continue; }
-                if ($level && strtoupper($obj['level'] ?? '') !== $level) { continue; }
+                if (!is_array($obj)) {
+                    continue;
+                }
+                if ($level && strtoupper($obj['level'] ?? '') !== $level) {
+                    continue;
+                }
                 if ($q) {
                     $hay = ($obj['action'] ?? '') . ' ' . json_encode($obj['details'] ?? []);
-                    if (stripos($hay, $q) === false) { continue; }
+                    if (stripos($hay, $q) === false) {
+                        continue;
+                    }
                 }
                 $entries[] = $obj;
             }
@@ -48,7 +59,7 @@ class AuditLogController extends Controller
             'total' => $total,
             'title' => 'Audit Logs - Admin Panel'
         ];
-        $this->adminView('admin/audit/index', $data);
+        $this->view->render('admin/audit/index', $data);
     }
 
     public function download()

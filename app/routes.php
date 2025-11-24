@@ -186,6 +186,18 @@ $router->add(
     ["auth"],
 );
 
+// Activity Log Routes
+$router->add("GET", "/admin/activity", "Admin\ActivityController@index", [
+    "auth",
+    "admin",
+]);
+$router->add(
+    "GET",
+    "/admin/activity/export",
+    "Admin\ActivityController@export",
+    ["auth", "admin"],
+);
+
 // Admin Dashboard Routes (WordPress-like admin system)
 $router->add("GET", "/admin", "Admin\DashboardController@index", [
     "auth",

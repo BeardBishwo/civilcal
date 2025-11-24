@@ -33,32 +33,18 @@
                     </h5>
                     <p class="card-text text-muted small">
                         v<?= htmlspecialchars($theme['version'] ?? '1.0.0') ?> by <?= htmlspecialchars($theme['author'] ?? 'Unknown') ?>
-                    </p>
-                    <p class="card-text"><?= htmlspecialchars($theme['description'] ?? '') ?></p>
-                </div>
-                <div class="card-footer bg-transparent border-top-0">
-                    <div class="d-grid gap-2">
-                        <?php if ($theme['is_active'] ?? false): ?>
-                            <a href="/admin/themes/customize" class="btn btn-outline-primary">
-                                <i class="fas fa-paint-brush"></i> Customize
-                            </a>
-                        <?php else: ?>
-                            <button class="btn btn-primary activate-theme" data-id="<?= $theme['id'] ?>">
-                                <i class="fas fa-check"></i> Activate
-                            </button>
-                        <?php endif; ?>
 
-                        <div class="btn-group">
-                            <a href="/admin/themes/preview/<?= $theme['id'] ?>" class="btn btn-sm btn-outline-secondary" target="_blank">Preview</a>
-                            <?php if (!($theme['is_active'] ?? false)): ?>
-                                <button class="btn btn-sm btn-outline-danger delete-theme" data-id="<?= $theme['id'] ?>">Delete</button>
-                            <?php endif; ?>
-                        </div>
+                    <div class="btn-group">
+                        <a href="<?= app_base_url('/admin/themes/preview/' . $theme['id']) ?>" class="btn btn-sm btn-outline-secondary" target="_blank">Preview</a>
+                        <?php if (!($theme['is_active'] ?? false)): ?>
+                            <button class="btn btn-sm btn-outline-danger delete-theme" data-id="<?= $theme['id'] ?>">Delete</button>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
-    <?php endforeach; ?>
+</div>
+<?php endforeach; ?>
 </div>
 
 <script>
@@ -73,7 +59,7 @@
                 const formData = new FormData();
                 formData.append('theme_id', id);
 
-                fetch('/admin/themes/activate', {
+                fetch('<?= app_base_url('/admin/themes/activate') ?>', {
                         method: 'POST',
                         body: formData,
                         headers: {
@@ -111,7 +97,7 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
 
-            fetch('/admin/themes/upload', {
+            fetch('<?= app_base_url('/admin/themes/upload') ?>', {
                     method: 'POST',
                     body: formData,
                     headers: {
