@@ -43,11 +43,20 @@
             <div class="sidebar-header">
                 <div class="admin-logo">
                     <i class="fas fa-calculator"></i>
-                    <span class="logo-text">Bishwo Admin</span>
+                    <span class="logo-text"><?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Admin Panel')); ?></span>
                 </div>
-                <button id="sidebar-toggle" class="sidebar-toggle">
+                <button id="sidebar-toggle" class="sidebar-toggle" onclick="toggleAdminSidebar(event)">
                     <i class="fas fa-bars"></i>
                 </button>
+                <script>
+                function toggleAdminSidebar(e) {
+                    if (e) e.preventDefault();
+                    const sidebar = document.getElementById('admin-sidebar');
+                    const mainContent = document.getElementById('admin-main');
+                    if (sidebar) sidebar.classList.toggle('collapsed');
+                    if (mainContent) mainContent.classList.toggle('sidebar-collapsed');
+                }
+                </script>
             </div>
 
             <nav class="sidebar-nav">
@@ -301,7 +310,7 @@
                         <button class="btn btn-icon" title="System Health" onclick="window.location.href='<?php echo app_base_url('admin/system-status'); ?>'">
                             <i class="fas fa-heartbeat"></i>
                         </button>
-                        <button class="btn btn-icon" title="Backup" onclick="createBackup()">
+                        <button class="btn btn-icon" title="Backup" onclick="window.location.href='<?php echo app_base_url('admin/backup'); ?>'">
                             <i class="fas fa-download"></i>
                         </button>
                         <button class="btn btn-icon" title="Notifications">

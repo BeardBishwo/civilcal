@@ -24,6 +24,11 @@ const AdminApp = {
         if (sidebarToggle) {
             sidebarToggle.addEventListener('click', () => {
                 sidebar.classList.toggle('collapsed');
+                // Also toggle class on main content area
+                const mainContent = document.getElementById('admin-main');
+                if (mainContent) {
+                    mainContent.classList.toggle('sidebar-collapsed');
+                }
             });
         }
 

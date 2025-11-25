@@ -161,6 +161,7 @@ function get_site_meta(): array
         $site_description = \App\Services\SettingsService::get('site_description');
         $site_logo = \App\Services\SettingsService::get('site_logo');
         $favicon = \App\Services\SettingsService::get('favicon');
+        $header_style = \App\Services\SettingsService::get('header_style');
 
         // Build site meta from database settings
         $site_meta = [];
@@ -174,11 +175,15 @@ function get_site_meta(): array
         }
         
         if ($site_logo) {
-            $site_meta['logo'] = $site_logo;
+            $site_meta['logo'] = app_base_url($site_logo);
         }
         
         if ($favicon) {
-            $site_meta['favicon'] = $favicon;
+            $site_meta['favicon'] = app_base_url($favicon);
+        }
+        
+        if ($header_style) {
+            $site_meta['header_style'] = $header_style;
         }
 
         return array_merge($defaults, $site_meta);

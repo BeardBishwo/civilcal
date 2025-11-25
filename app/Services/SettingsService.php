@@ -36,6 +36,10 @@ class SettingsService
         // Prepare value for storage
         $storageValue = self::prepareValueForStorage($value, $type);
 
+        // Check if the value actually changed
+        $currentValue = self::get($key);
+        $valueChanged = ($currentValue !== $value);
+
         $stmt = $db->prepare("
             INSERT INTO settings (setting_key, setting_value, setting_type, setting_group, description) 
             VALUES (?, ?, ?, ?, ?)
@@ -54,7 +58,8 @@ class SettingsService
             self::$cache[$key] = $value;
         }
 
-        return $result;
+        // Return true only if value actually changed or if it's a new setting
+        return $result && ($valueChanged || $currentValue === null);
     }
 
     public static function getAll($group = null)

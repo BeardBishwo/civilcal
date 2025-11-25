@@ -41,8 +41,8 @@ $desc_safe = htmlspecialchars(
     $site_meta["description"] ?? "Professional Engineering Calculators Suite",
 );
 $logo = $site_meta["logo"] ?? app_base_url("public/theme-assets.php?path=default/assets/images/logo.png");
-$logo_text = $site_meta["logo_text"] ?? "EngiCal Pro";
-$header_style = $site_meta["header_style"] ?? "logo_text";
+$logo_text = $site_meta["logo_text"] ?? (\App\Services\SettingsService::get('site_name', 'Bishwo Calculator') ?: 'Bishwo Calculator');
+$header_style = $site_meta["header_style"] ?? "logo_only";
 $favicon = $site_meta["favicon"] ?? app_base_url("themes/default/assets/images/favicon.png");
 
 // User data for personalized UI
@@ -2092,7 +2092,8 @@ if (
                             alt="<?php echo $title_safe; ?> Logo"
                             class="<?php echo implode(' ', $imgClasses); ?>"
                             style="<?php echo ($header_style === 'text_only') ? 'display: none;' : ''; ?>"
-                            onerror="this.style.display='none'; this.parentNode.querySelector('.logo-text').style.display='block';">
+                            onerror="console.log('Logo image failed to load:', this.src); this.style.display='none'; this.parentNode.querySelector('.logo-text').style.display='block';"
+                            onload="console.log('Logo image loaded successfully:', this.src);">
                         <span class="logo-text" style="<?php echo ($header_style === 'logo_only') ? 'display: none;' : 'display: block;'; ?>"><?php echo htmlspecialchars($logo_text); ?></span>
                     <?php else: ?>
                         <span style="<?php echo ($header_style === 'logo_only') ? 'display: none;' : 'display: block;'; ?>"><?php echo htmlspecialchars($logo_text); ?></span>

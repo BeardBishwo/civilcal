@@ -12,7 +12,7 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
     <div class="sidebar-header">
         <div class="sidebar-logo">
             <i class="fas fa-calculator-alt"></i>
-            <span class="sidebar-logo-text">Bishwo Admin</span>
+            <span class="sidebar-logo-text"><?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Admin Panel')); ?></span>
         </div>
         <button class="sidebar-toggle" id="sidebarToggle">
             <i class="fas fa-bars"></i>

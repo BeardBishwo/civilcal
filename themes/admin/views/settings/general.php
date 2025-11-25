@@ -205,6 +205,31 @@
         margin-bottom: 1.5rem;
         animation: slideDown 0.5s ease-out;
     }
+    
+    /* Logo and Favicon Display Styles */
+    .current-logo-display,
+    .current-favicon-display {
+        text-align: center;
+    }
+    
+    .logo-preview-container,
+    .favicon-preview-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100px;
+    }
+    
+    .favicon-preview-container {
+        min-height: 80px;
+        min-width: 80px;
+    }
+    
+    .current-logo-display img,
+    .current-favicon-display img {
+        display: block;
+        margin: 0 auto;
+    }
 
     @keyframes slideDown {
         from {
@@ -576,23 +601,10 @@
                                 <label for="site_logo" class="form-label">🖼️ Site Logo</label>
                                 <?php if (!empty($settings['site_logo'])): ?>
                                 <!-- Show current logo directly -->
-                                <div class="current-logo-display">
-                                    <div style="background: #dcfce7; padding: 0.5rem; border-radius: 4px; margin-bottom: 0.5rem; font-size: 0.8rem;">
-                                        Logo URL: <code><?= htmlspecialchars($settings['site_logo']) ?></code><br>
-                                        Full URL: <code><?= htmlspecialchars(app_base_url($settings['site_logo'])) ?></code><br>
-                                        Direct URL: <code><?= htmlspecialchars($settings['site_logo']) ?></code><br>
-                                        Web Root: <code><?= htmlspecialchars($_SERVER['DOCUMENT_ROOT'] ?? 'NOT SET') ?></code><br>
-                                        Project URL: <code><?= htmlspecialchars($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ?? 'NOT SET') ?></code><br>
-                                        Logo Variable: <code><?= htmlspecialchars($settings['site_logo'] ?? 'NOT SET') ?></code><br>
-                                        File exists: <code><?php 
-                                            // The files are at: C:/laragon/www/Bishwo_Calculator/public/uploads/settings/
-                                            $actualPath = 'C:/laragon/www/Bishwo_Calculator/public' . $settings['site_logo'];
-                                            $found = file_exists($actualPath);
-                                            echo $found ? 'YES' : 'NO';
-                                        ?></code><br>
-                                        Test Image URL: <code><?= htmlspecialchars('http://' . $_SERVER['HTTP_HOST'] . APP_BASE . $settings['site_logo']) ?></code>
+                                <div class="current-logo-display mb-3">
+                                    <div class="logo-preview-container p-4 bg-light rounded-3 border border-2 border-primary-subtle shadow-sm">
+                                        <img src="<?= htmlspecialchars(app_base_url($settings['site_logo'])) ?>" alt="Current Logo" class="img-fluid mx-auto d-block" style="max-width: 250px; max-height: 180px; object-fit: contain;">
                                     </div>
-                                    <img src="<?= htmlspecialchars('http://' . $_SERVER['HTTP_HOST'] . APP_BASE . $settings['site_logo']) ?>" alt="Current Logo" style="max-width: 200px; max-height: 150px; object-fit: contain; border-radius: 8px; border: 2px solid #e2e8f0;">
                                 </div>
                                 <div class="logo-actions">
                                     <button type="button" class="btn-change" onclick="document.getElementById('site_logo').click()">
@@ -615,36 +627,16 @@
                                 <label for="favicon" class="form-label">🌟 Favicon</label>
                                 <?php if (!empty($settings['favicon'])): ?>
                                 <!-- Show current favicon directly -->
-                                <div class="current-favicon-display">
-                                    <div style="background: #dcfce7; padding: 0.5rem; border-radius: 4px; margin-bottom: 0.5rem; font-size: 0.8rem;">
-                                        Favicon URL: <code><?= htmlspecialchars($settings['favicon']) ?></code><br>
-                                        Full URL: <code><?= htmlspecialchars(app_base_url($settings['favicon'])) ?></code><br>
-                                        Direct URL: <code><?= htmlspecialchars($settings['favicon']) ?></code><br>
-                                        Web Root: <code><?= htmlspecialchars($_SERVER['DOCUMENT_ROOT'] ?? 'NOT SET') ?></code><br>
-                                        Project URL: <code><?= htmlspecialchars($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ?? 'NOT SET') ?></code><br>
-                                        Favicon Variable: <code><?= htmlspecialchars($settings['favicon'] ?? 'NOT SET') ?></code><br>
-                                        File exists: <code><?php 
-                                            // The files are at: C:/laragon/www/Bishwo_Calculator/public/uploads/settings/
-                                            $actualPath = 'C:/laragon/www/Bishwo_Calculator/public' . $settings['favicon'];
-                                            $found = file_exists($actualPath);
-                                            echo $found ? 'YES' : 'NO';
-                                        ?></code><br>
-                                        Test Image URL: <code><?= htmlspecialchars('http://' . $_SERVER['HTTP_HOST'] . APP_BASE . $settings['favicon']) ?></code>
+                                <div class="current-favicon-display mb-3">
+                                    <div class="favicon-preview-container p-3 bg-light rounded-3 border border-2 border-primary-subtle shadow-sm d-inline-block mx-auto">
+                                        <img src="<?= htmlspecialchars(app_base_url($settings['favicon'])) ?>" alt="Current Favicon" class="img-fluid mx-auto d-block" style="max-width: 80px; max-height: 80px; object-fit: contain;">
                                     </div>
-                                    <img src="<?= htmlspecialchars('http://' . $_SERVER['HTTP_HOST'] . APP_BASE . $settings['favicon']) ?>" alt="Current Favicon" style="max-width: 64px; max-height: 64px; object-fit: contain; border-radius: 8px; border: 2px solid #e2e8f0;">
                                 </div>
                                 <div class="favicon-actions">
                                     <button type="button" class="btn-change" onclick="document.getElementById('favicon').click()">
                                         <i class="fas fa-edit"></i><span>Change Favicon</span>
                                     </button>
                                 </div>
-                                <input type="file" 
-                                       class="form-control-file" 
-                                       id="favicon" 
-                                       name="favicon" 
-                                       accept="image/x-icon,image/png"
-                                       onchange="previewImage(event, 'faviconPreview')"
-                                       style="display: none;">
                                 <input type="file" 
                                        class="form-control-file" 
                                        id="favicon" 
@@ -691,9 +683,8 @@
                                 <select class="form-select" id="header_style" name="header_style">
                                     <option value="logo_only" <?php echo ($settings['header_style'] ?? 'logo_text') === 'logo_only' ? 'selected' : ''; ?>>Logo Only</option>
                                     <option value="text_only" <?php echo ($settings['header_style'] ?? 'logo_text') === 'text_only' ? 'selected' : ''; ?>>Text Only</option>
-                                    <option value="logo_text" <?php echo ($settings['header_style'] ?? 'logo_text') === 'logo_text' ? 'selected' : ''; ?>>Logo + Text</option>
                                 </select>
-                                <div class="form-text">Choose how the header displays: logo only, text only, or both.</div>
+                                <div class="form-text">Choose how the header displays: logo only or text only.</div>
                             </div>
                         </div>
                     </div>

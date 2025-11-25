@@ -233,7 +233,7 @@ function sanitize_input($input) {
         <div class="logo-preview" id="logoPreview">
             <img src="<?php echo htmlspecialchars($site_meta['logo'] ?? '/bishwo_calculator/assets/icons/icon-192.png'); ?>" 
                  alt="Logo" id="previewImage">
-            <span id="previewText"><?php echo htmlspecialchars($site_meta['logo_text'] ?? 'EngiCal Pro'); ?></span>
+            <span id="previewText"><?php echo htmlspecialchars($site_meta['logo_text'] ?? (\App\Services\SettingsService::get('site_name', 'Bishwo Calculator') ?: 'Bishwo Calculator')); ?></span>
         </div>
     </div>
     
@@ -253,7 +253,7 @@ function sanitize_input($input) {
                 <div class="form-group">
                     <label for="logo_text">Logo Text</label>
                     <input type="text" id="logo_text" name="logo_text" 
-                           value="<?php echo htmlspecialchars($site_meta['logo_text'] ?? 'EngiCal Pro'); ?>"
+                           value="<?php echo htmlspecialchars($site_meta['logo_text'] ?? (\App\Services\SettingsService::get('site_name', 'Bishwo Calculator') ?: 'Bishwo Calculator')); ?>"
                            placeholder="Your Site Name">
                 </div>
                 

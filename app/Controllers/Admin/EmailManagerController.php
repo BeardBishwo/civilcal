@@ -524,6 +524,31 @@ class EmailManagerController extends Controller
             'template' => $template
         ]);
     }
+
+    public function error()
+    {
+        return $this->view('admin/email-manager/error', [
+            'message' => 'An error occurred',
+            'pageTitle' => 'Email Manager Error'
+        ]);
+    }
+
+    public function threadDetail($id)
+    {
+        $thread = $this->emailThread->getThreadById($id);
+
+        if (!$thread) {
+            return $this->view('admin/email-manager/error', [
+                'message' => 'Thread not found',
+                'pageTitle' => 'Error'
+            ]);
+        }
+
+        return $this->view('admin/email-manager/thread-detail', [
+            'thread' => $thread,
+            'pageTitle' => 'Thread Details'
+        ]);
+    }
     public function settings()
     {
         require_once __DIR__ . '/../../app/Services/EmailManager.php';

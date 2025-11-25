@@ -203,7 +203,15 @@ $router->add("GET", "/admin", "Admin\DashboardController@index", [
     "auth",
     "admin",
 ]);
-$router->add("GET", "/admin/dashboard", "Admin\DashboardController@index", [
+$router->add("GET", "/admin/dashboard", "Admin\\DashboardController@index", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/configured-dashboard", "Admin\\DashboardController@configuredDashboard", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/dashboard/complex", "Admin\\DashboardController@dashboardComplex", [
     "auth",
     "admin",
 ]);
@@ -338,9 +346,13 @@ $router->add("GET", "/developers/playground", "DeveloperController@playground");
 $router->add(
     "GET",
     "/admin/menu-customization",
-    "Admin\DashboardController@menuCustomization",
+    "Admin\\DashboardController@menuCustomization",
     ["auth", "admin"],
 );
+$router->add("GET", "/admin/performance-dashboard", "Admin\\DashboardController@performanceDashboard", [
+    "auth",
+    "admin",
+]);
 $router->add(
     "GET",
     "/admin/widget-management",
@@ -501,12 +513,6 @@ $router->add("GET", "/admin/settings", "Admin\SettingsController@general", [
     "auth",
     "admin",
 ]);
-$router->add(
-    "GET",
-    "/admin/settings/general",
-    "Admin\SettingsController@general",
-    ["auth", "admin"],
-);
 $router->add("GET", "/admin/settings/email", "Admin\SettingsController@email", [
     "auth",
     "admin",
@@ -755,7 +761,11 @@ $router->add(
 );
 
 // Calculators Management Routes
-$router->add("GET", "/admin/calculators", "Admin\CalculatorController@index", [
+$router->add("GET", "/admin/calculators", "Admin\\CalculatorController@index", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/calculators/list", "Admin\\CalculatorController@list", [
     "auth",
     "admin",
 ]);
@@ -1307,8 +1317,50 @@ $router->add(
     "GET",
     "/admin/audit-logs/download",
     "Admin\AuditLogController@download",
-    ["auth", "admin"],
+    ["auth", "admin"]
 );
+
+// Additional Admin Routes for Missing Views
+$router->add("GET", "/admin/activity", "Admin\ActivityController@index", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/audit", "Admin\AuditController@index", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/backup", "Admin\BackupController@index", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/backup/create", "Admin\BackupController@create", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/backup/delete/{backupName}", "Admin\BackupController@delete", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/backup/restore/{backupName}", "Admin\BackupController@restore", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/backup/schedule", "Admin\BackupController@schedule", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/backup/settings", "Admin\BackupController@settings", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/backup/download/{backupName}", "Admin\BackupController@download", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/calculations", "Admin\CalculationsController@index", [
+    "auth",
+    "admin",
+]);
 
 // Theme Customization Routes
 $router->add(
@@ -1367,6 +1419,10 @@ $router->add(
     "Admin\\EmailManagerController@dashboard",
     ["auth", "admin"],
 );
+$router->add("GET", "/admin/email", "Admin\\EmailManagerController@index", [
+    "auth",
+    "admin",
+]);
 $router->add(
     "GET",
     "/admin/email-manager/stats",
@@ -1506,9 +1562,19 @@ $router->add(
 $router->add(
     "POST",
     "/admin/email-manager/thread/{id}/priority",
-    "Admin\\EmailManagerController@updatePriority",
-    ["auth", "admin"],
+    "Admin\EmailManagerController@updatePriority",
+    ["auth", "admin"]
 );
+
+// Additional Email Manager Routes for Missing Views
+$router->add("GET", "/admin/email-manager/error", "Admin\EmailManagerController@error", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/email-manager/thread-detail/{id}", "Admin\EmailManagerController@threadDetail", [
+    "auth",
+    "admin",
+]);
 
 // Email Templates Admin Routes
 $router->add(
@@ -1553,6 +1619,20 @@ $router->add("GET", "/admin/error-logs", "Admin\ErrorLogController@index", [
     "auth",
     "admin",
 ]);
+$router->add("GET", "/admin/logs", "Admin\LogsController@index", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/logs/{id}", "Admin\LogsController@view", [
+    "auth",
+    "admin",
+]);
+
+// System Status Route
+$router->add("GET", "/admin/system/status", "Admin\DashboardController@systemStatus", [
+    "auth",
+    "admin",
+]);
 $router->add(
     "GET",
     "/admin/error-logs/get-error-stats",
@@ -1586,6 +1666,10 @@ $router->add(
 
 // Help & Documentation Routes
 $router->add("GET", "/help", "HelpController@index");
+$router->add("GET", "/admin/help", "Admin\\HelpController@index", [
+    "auth",
+    "admin",
+]);
 $router->add("GET", "/help/{category}", "HelpController@category");
 $router->add("GET", "/help/{category}/{article}", "HelpController@article");
 $router->add("GET", "/developers", "DeveloperController@index");

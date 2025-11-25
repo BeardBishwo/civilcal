@@ -77,7 +77,7 @@ $content = '
                         ' . implode('', array_map(function($backup) {
                             return '<tr>
                                 <td>' . htmlspecialchars($backup['name']) . '</td>
-                                <td>' . $backup['formatted_size'] . '</td>
+                                <td>' . ($backup['size_formatted'] ?? $backup['size'] ?? 'Unknown') . '</td>
                                 <td>' . $backup['date'] . '</td>
                                 <td>
                                     <div class="table-actions">
@@ -106,6 +106,28 @@ $content = '
         </div>
     </div>
 
+    <!-- Backup Settings -->
+    <div class="card" style="margin-top: 24px;">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-cog"></i>
+                Backup Settings
+            </h3>
+        </div>
+        <div class="card-content">
+            <div class="form-group">
+                <label class="form-label">Maximum Backup Size (MB)</label>
+                <input type="number" id="max-backup-size" class="form-control" value="1024" min="100" max="10240">
+                <small class="form-text">Set the maximum size for backup files (100MB - 10GB)</small>
+            </div>
+            
+            <button id="save-backup-settings" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                Save Settings
+            </button>
+        </div>
+    </div>
+    
     <!-- Scheduled Backups -->
     <div class="card" style="margin-top: 24px;">
         <div class="card-header">
@@ -144,6 +166,7 @@ let backupInProgress = false;
 
 document.getElementById("create-backup").addEventListener("click", createBackup);
 document.getElementById("schedule-backup").addEventListener("click", scheduleBackup);
+document.getElementById("save-backup-settings").addEventListener("click", saveBackupSettings);
 
 async function createBackup() {
     if (backupInProgress) return;
@@ -251,6 +274,37 @@ async function scheduleBackup() {
         }
     } catch (error) {
         showMessage("Error scheduling backup: " + error.message, "error");
+    }
+}
+
+async function saveBackupSettings() {
+    try {
+        const maxSize = parseInt(document.getElementById("max-backup-size").value);
+        
+        // Validate input
+        if (isNaN(maxSize) || maxSize < 100 || maxSize > 10240) {
+            showMessage("Please enter a valid maximum backup size between 100 and 10240 MB", "error");
+            return;
+        }
+        
+        // Send settings to the server
+        const response = await fetch("' . app_base_url('/admin/backup/settings') . '", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ max_backup_size: maxSize })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showMessage(result.message, "success");
+        } else {
+            showMessage("Error: " + result.message, "error");
+        }
+    } catch (error) {
+        showMessage("Error saving backup settings: " + error.message, "error");
     }
 }
 
@@ -363,5 +417,5 @@ $page_title = $page_title ?? 'Backup Management - Admin Panel';
 $currentPage = $currentPage ?? 'backup';
 
 // Include the layout
-include __DIR__ . '/../layouts/main.php';
+include __DIR__ . '/../../layouts/main.php';
 ?>

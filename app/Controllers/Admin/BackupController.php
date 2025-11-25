@@ -4,6 +4,7 @@ namespace App\Controllers\Admin;
 use App\Core\Controller;
 use App\Services\BackupService;
 use App\Core\Auth;
+use Exception;
 
 class BackupController extends Controller
 {
@@ -43,9 +44,12 @@ class BackupController extends Controller
             die('Access denied');
         }
 
-        $includeDatabase = $_POST['include_database'] ?? true;
-        $includeFiles = $_POST['include_files'] ?? true;
-        $backupName = $_POST['name'] ?? null;
+        // Handle JSON input
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        $includeDatabase = $input['include_database'] ?? $_POST['include_database'] ?? true;
+        $includeFiles = $input['include_files'] ?? $_POST['include_files'] ?? true;
+        $backupName = $input['name'] ?? $_POST['name'] ?? null;
 
         $result = $this->backupService->createBackup($includeDatabase, $includeFiles, $backupName);
 
@@ -124,6 +128,41 @@ class BackupController extends Controller
         $retention = $_POST['retention'] ?? 7;
 
         $result = $this->backupService->scheduleBackup($schedule, $retention);
+
+        header('Content-Type: application/json');
+        echo json_encode($result);
+    }
+
+    public function settings()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
+
+        // Handle JSON input
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if ($input && isset($input['max_backup_size'])) {
+            try {
+                $this->backupService->setMaxBackupSize($input['max_backup_size']);
+                $result = [
+                    'success' => true,
+                    'message' => 'Backup settings saved successfully'
+                ];
+            } catch (Exception $e) {
+                $result = [
+                    'success' => false,
+                    'message' => 'Error saving backup settings: ' . $e->getMessage()
+                ];
+            }
+        } else {
+            $result = [
+                'success' => false,
+                'message' => 'Invalid input'
+            ];
+        }
 
         header('Content-Type: application/json');
         echo json_encode($result);

@@ -2,7 +2,7 @@
 
 namespace App\Controllers\Admin;
 
-use App\Controllers\Controller;
+use App\Core\Controller;
 use App\Core\Database;
 
 class CalculatorController extends Controller
@@ -122,5 +122,19 @@ class CalculatorController extends Controller
             'estimation' => 'Estimation',
             'management' => 'Project Management'
         ];
+    }
+
+    public function list()
+    {
+        $calculators = $this->getAllCalculators();
+        $categories = $this->getCalculatorCategories();
+
+        // Render the calculators list view with admin layout
+        $this->view->render('admin/calculators/list', [
+            'currentPage' => 'calculators',
+            'calculators' => $calculators,
+            'categories' => $categories,
+            'title' => 'Calculators List - Admin Panel'
+        ]);
     }
 }

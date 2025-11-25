@@ -429,7 +429,7 @@ $page_title = 'Application Settings - Admin Panel';
             <div class="sidebar-header">
                 <div class="sidebar-logo">
                     <i class="fas fa-calculator-alt"></i>
-                    <span class="sidebar-logo-text">Bishwo Admin</span>
+                    <span class="sidebar-logo-text"><?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Admin Panel')); ?></span>
                 </div>
             </div>
             

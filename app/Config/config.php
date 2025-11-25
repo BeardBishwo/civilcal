@@ -38,6 +38,15 @@ if (getenv('APP_BASE')) {
         $scriptDir = '';
     }
 
+    // For Laragon setup, ensure we have the correct base path
+    if (empty($scriptDir) && defined('BASE_PATH')) {
+        $basePath = str_replace('\\', '/', BASE_PATH);
+        $docRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? '');
+        if (!empty($docRoot) && strpos($basePath, $docRoot) === 0) {
+            $scriptDir = str_replace($docRoot, '', $basePath);
+        }
+    }
+
     define('APP_BASE', $scriptDir);
 }
 

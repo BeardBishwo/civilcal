@@ -154,8 +154,9 @@ class DashboardController extends Controller
         $systemHealth = 95.0; // Default good health
 
         // Check disk space
-        $total = disk_total_space(BASE_PATH);
-        $free = disk_free_space(BASE_PATH);
+        $basePath = defined('BASE_PATH') ? BASE_PATH : dirname(dirname(dirname(__DIR__)));
+        $total = disk_total_space($basePath);
+        $free = disk_free_space($basePath);
         $storageUsed = $total > 0 ? round((($total - $free) / $total) * 100, 1) : 0;
 
         if ($storageUsed > 90) {
@@ -169,8 +170,9 @@ class DashboardController extends Controller
 
     private function getStorageUsed()
     {
-        $total = disk_total_space(BASE_PATH);
-        $free = disk_free_space(BASE_PATH);
+        $basePath = defined('BASE_PATH') ? BASE_PATH : dirname(dirname(dirname(__DIR__)));
+        $total = disk_total_space($basePath);
+        $free = disk_free_space($basePath);
         $storageUsed = $total > 0 ? round((($total - $free) / $total) * 100, 1) : 0;
         return $storageUsed;
     }
@@ -574,5 +576,35 @@ class DashboardController extends Controller
             'active_widgets' => [],
             'inactive_widgets' => []
         ];
+    }
+
+    public function configuredDashboard()
+    {
+        $data = [
+            'page_title' => 'Configured Dashboard',
+            'menuItems' => $this->getMenuItems()
+        ];
+
+        $this->view->render('admin/configured-dashboard', $data);
+    }
+
+    public function performanceDashboard()
+    {
+        $data = [
+            'page_title' => 'Performance Dashboard',
+            'menuItems' => $this->getMenuItems()
+        ];
+
+        $this->view->render('admin/performance-dashboard', $data);
+    }
+
+    public function dashboardComplex()
+    {
+        $data = [
+            'page_title' => 'Complex Dashboard',
+            'menuItems' => $this->getMenuItems()
+        ];
+
+        $this->view->render('admin/dashboard_complex', $data);
     }
 }

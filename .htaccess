@@ -26,20 +26,26 @@ RedirectMatch 403 ^/(app|config|database|includes|storage|vendor|tests)/.*$
     RewriteCond %{THE_REQUEST} ^[A-Z]+\ /[^/]*index\.php
     RewriteRule ^index\.php$ - [F,L]
     
-    # Redirect any /public URL to clean URL (permanent redirect)
-    RewriteCond %{REQUEST_URI} public
-    RewriteRule ^(.*)public/?(.*)$ /$1$2 [R=301,L]
-    
-    # Serve existing files directly (don't route through PHP)
+    # Serve existing files from public directory
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule .* - [L]
     
-    # Serve existing directories directly 
+    # Serve existing directories from public directory
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule .* - [L]
     
+    # Serve files from public/uploads directory
+    RewriteRule ^uploads/(.*)$ public/uploads/$1 [L]
+    
     # Serve static assets from public/assets
     RewriteRule ^assets/(.*)$ public/assets/$1 [L]
+    
+    # Redirect favicon.ico requests to the actual favicon
+    RewriteRule ^favicon\.ico$ public/uploads/settings/favicon.png [L]
+    
+    # Redirect any other /public URL to clean URL
+    RewriteCond %{REQUEST_URI} public
+    RewriteRule ^(.*)public/?(.*)$ /$1$2 [R=301,L]
     
     # Route all other requests through public/index.php
     RewriteRule ^(.*)$ public/index.php [L,QSA]

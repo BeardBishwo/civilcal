@@ -12,7 +12,7 @@ class BackupService
     public function __construct()
     {
         $this->backupDir = BASE_PATH . '/storage/backups';
-        $this->maxBackupSize = 500 * 1024 * 1024; // 500MB in bytes
+        $this->maxBackupSize = 1024 * 1024 * 1024; // 1GB in bytes
         $this->ensureBackupDirectory();
     }
 
@@ -40,12 +40,10 @@ class BackupService
             }
 
             // Add database dump if requested
+            $dbDumpPath = null;
             if ($includeDatabase) {
                 $dbDumpPath = $this->createDatabaseDump();
                 $zip->addFile($dbDumpPath, 'database_dump.sql');
-                
-                // Clean up the temporary dump file
-                unlink($dbDumpPath);
             }
 
             // Add files if requested
@@ -54,9 +52,23 @@ class BackupService
             }
 
             $zip->close();
+            
+            // Clean up the temporary dump file after closing the zip
+            if ($dbDumpPath && file_exists($dbDumpPath)) {
+                unlink($dbDumpPath);
+            }
 
-            // Check backup size
+            // Check if file exists and get backup size
+            clearstatcache(); // Clear file status cache
+            if (!file_exists($backupPath)) {
+                throw new Exception("Backup file was not created successfully at: {$backupPath}");
+            }
+            
             $backupSize = filesize($backupPath);
+            if ($backupSize === false) {
+                throw new Exception("Cannot determine backup file size at: {$backupPath}");
+            }
+            
             if ($backupSize > $this->maxBackupSize) {
                 unlink($backupPath); // Delete oversized backup
                 throw new Exception("Backup exceeds maximum allowed size of " . ($this->maxBackupSize / (1024*1024)) . "MB");
@@ -228,6 +240,27 @@ class BackupService
     }
 
     /**
+     * Set maximum backup size
+     */
+    public function setMaxBackupSize($sizeInMB)
+    {
+        if (!is_numeric($sizeInMB) || $sizeInMB < 100 || $sizeInMB > 10240) {
+            throw new Exception("Maximum backup size must be between 100 and 10240 MB");
+        }
+        
+        $this->maxBackupSize = $sizeInMB * 1024 * 1024; // Convert MB to bytes
+        return true;
+    }
+
+    /**
+     * Get maximum backup size in MB
+     */
+    public function getMaxBackupSizeMB()
+    {
+        return $this->maxBackupSize / (1024 * 1024);
+    }
+
+    /**
      * Get backup statistics
      */
     public function getBackupStats()
@@ -396,7 +429,7 @@ class BackupService
     /**
      * Add directory to zip archive
      */
-    private function addDirectoryToZip($zip, $dir, $zipDirName = '', $excludePatterns = ['*/storage/backups/*', '*/cache/*'])
+    private function addDirectoryToZip($zip, $dir, $zipDirName = '', $excludePatterns = ['storage/backups/*', 'cache/*', '*/storage/backups/*', '*/cache/*'])
     {
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS)

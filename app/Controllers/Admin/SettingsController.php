@@ -242,10 +242,19 @@ class SettingsController extends Controller
                         );
                     }
                 }
-            }            return $this->json([
-                'success' => true,
-                'message' => "$updated settings updated successfully"
-            ]);
+            }
+
+            if ($updated > 0) {
+                return $this->json([
+                    'success' => true,
+                    'message' => "$updated settings updated successfully"
+                ]);
+            } else {
+                return $this->json([
+                    'success' => true,
+                    'message' => "No changes were made to the settings"
+                ]);
+            }
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
@@ -370,8 +379,8 @@ class SettingsController extends Controller
         $filepath = $uploadDir . $filename;
 
         if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            // For Laragon with project folder structure, use relative path from project root
-            return '/Bishwo_Calculator/public/uploads/settings/' . $filename;
+            // Return the correct URL path for web access
+            return '/uploads/settings/' . $filename;
         }
 
         return null;
