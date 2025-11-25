@@ -219,9 +219,14 @@ $content = '
             </div>
         </div>
     </div>
+    
+    <!-- Last Updated -->
+    <div class="last-updated">
+        <p><i class="fas fa-clock"></i> Last updated: <span id="last-update-time">' . date('Y-m-d H:i:s') . '</span></p>
+    </div>
 
     <!-- System Actions -->
-    <div class="card" style="margin-top: 24px;">
+    <div class="card">
         <div class="card-header">
             <h3 class="card-title">
                 <i class="fas fa-tools"></i>
@@ -339,138 +344,7 @@ function showMessage(message, type) {
 }
 </script>
 
-<style>
-.system-health-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 24px;
-    margin-top: 24px;
-}
 
-.metric-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-}
-
-.metric-item {
-    padding: 16px;
-    background: var(--admin-gray-50);
-    border-radius: 8px;
-}
-
-.metric-label {
-    font-size: 14px;
-    color: var(--admin-gray-600);
-    margin-bottom: 4px;
-}
-
-.metric-value {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--admin-gray-800);
-}
-
-.status-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.status-online {
-    background: #d4edda;
-    color: #155724;
-}
-
-.status-warning {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.status-critical,
-.status-error,
-.status-offline {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-.system-actions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-}
-
-.action-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 20px;
-    border: 2px solid var(--admin-border);
-    border-radius: 8px;
-    background: white;
-    cursor: pointer;
-    transition: var(--transition);
-    text-align: center;
-}
-
-.action-btn:hover {
-    border-color: var(--admin-primary);
-    color: var(--admin-primary);
-    transform: translateY(-2px);
-    box-shadow: var(--admin-shadow);
-}
-
-.action-btn i {
-    font-size: 24px;
-}
-
-.alert {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px;
-    border-radius: 5px;
-    z-index: 9999;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-warning {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeaa7;
-}
-
-.alert-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.alert-info {
-    background-color: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-}
-
-@media (max-width: 768px) {
-    .system-health-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .metric-grid {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
 ';
 
 // Set breadcrumbs
@@ -482,5 +356,5 @@ $page_title = $page_title ?? 'System Status - Admin Panel';
 $currentPage = $currentPage ?? 'system-status';
 
 // Include the layout
-include __DIR__ . '/../layouts/main.php';
+include BASE_PATH . '/themes/admin/layouts/main.php';
 ?>

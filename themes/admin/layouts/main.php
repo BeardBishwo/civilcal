@@ -45,18 +45,9 @@
                     <i class="fas fa-calculator"></i>
                     <span class="logo-text"><?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Admin Panel')); ?></span>
                 </div>
-                <button id="sidebar-toggle" class="sidebar-toggle" onclick="toggleAdminSidebar(event)">
+                <button id="sidebar-toggle" class="sidebar-toggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <script>
-                function toggleAdminSidebar(e) {
-                    if (e) e.preventDefault();
-                    const sidebar = document.getElementById('admin-sidebar');
-                    const mainContent = document.getElementById('admin-main');
-                    if (sidebar) sidebar.classList.toggle('collapsed');
-                    if (mainContent) mainContent.classList.toggle('sidebar-collapsed');
-                }
-                </script>
             </div>
 
             <nav class="sidebar-nav">

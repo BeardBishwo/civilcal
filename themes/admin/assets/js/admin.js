@@ -22,14 +22,35 @@ const AdminApp = {
         const sidebar = document.getElementById('admin-sidebar');
 
         if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', () => {
+            // Remove any existing event listeners to prevent duplicates
+            const newSidebarToggle = sidebarToggle.cloneNode(true);
+            sidebarToggle.parentNode.replaceChild(newSidebarToggle, sidebarToggle);
+
+            newSidebarToggle.addEventListener('click', (e) => {
+                e.preventDefault();
                 sidebar.classList.toggle('collapsed');
                 // Also toggle class on main content area
                 const mainContent = document.getElementById('admin-main');
                 if (mainContent) {
                     mainContent.classList.toggle('sidebar-collapsed');
                 }
+
+                // Store the sidebar state in localStorage to persist across page loads
+                const isCollapsed = sidebar.classList.contains('collapsed');
+                localStorage.setItem('adminSidebarCollapsed', isCollapsed);
             });
+
+            // Check if sidebar state was saved in localStorage and apply it
+            const savedState = localStorage.getItem('adminSidebarCollapsed');
+            if (savedState === 'true') {
+                sidebar.classList.add('collapsed');
+                const mainContent = document.getElementById('admin-main');
+                if (mainContent) {
+                    mainContent.classList.add('sidebar-collapsed');
+                }
+            }
+        } else {
+            console.error('Sidebar toggle button not found!');
         }
 
         if (mobileSidebarToggle) {
@@ -543,8 +564,21 @@ function sortTable(table, columnIndex, type) {
 
 // Initialize Admin App when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    AdminApp.init();
-    initDataTables();
+    // Add a small delay to ensure all elements are fully loaded
+    setTimeout(() => {
+        AdminApp.init();
+        initDataTables();
+    }, 100);
+});
+
+// Also initialize when the window loads to ensure all resources are ready
+window.addEventListener('load', () => {
+    // Only initialize if not already initialized
+    if (!window.adminAppInitialized) {
+        AdminApp.init();
+        initDataTables();
+        window.adminAppInitialized = true;
+    }
 });
 
 // Global error handler - only log to console, don't show notifications

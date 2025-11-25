@@ -349,6 +349,20 @@ $router->add(
     "Admin\\DashboardController@menuCustomization",
     ["auth", "admin"],
 );
+
+// System Status Routes
+$router->add(
+    "GET",
+    "/admin/system-status",
+    "Admin\\SystemStatusController@index",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/system-status/run-health-check",
+    "Admin\\SystemStatusController@runHealthCheck",
+    ["auth", "admin"],
+);
 $router->add("GET", "/admin/performance-dashboard", "Admin\\DashboardController@performanceDashboard", [
     "auth",
     "admin",
@@ -362,7 +376,7 @@ $router->add(
 $router->add(
     "GET",
     "/admin/system-status",
-    "Admin\DashboardController@systemStatus",
+    "Admin\SystemStatusController@index",
     ["auth", "admin"],
 );
 
