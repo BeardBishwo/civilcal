@@ -1,8 +1,20 @@
 <?php
-$page_title = 'Admin Dashboard - Bishwo Calculator';
-require_once dirname(__DIR__, 2) . '/themes/default/views/partials/header.php';
-?>
+/**
+ * Admin Dashboard View
+ * Located in themes/admin/views for theme consistency
+ * Uses admin layout (sidebar, topbar, NO homepage header)
+ */
 
+$page_title = 'Admin Dashboard - Bishwo Calculator';
+
+// Get current user from session
+$currentUser = $_SESSION['user'] ?? [
+    'full_name' => 'Administrator',
+    'email' => 'admin@example.com'
+];
+
+// Dashboard content
+$content = '
 <style>
     .admin-layout {
         display: flex;
@@ -353,7 +365,9 @@ require_once dirname(__DIR__, 2) . '/themes/default/views/partials/header.php';
         }
     }
 </style>
+';
 
+$content .= '
 <div class="admin-layout">
     <!-- Admin Sidebar -->
     <nav class="admin-sidebar">
@@ -569,5 +583,8 @@ require_once dirname(__DIR__, 2) . '/themes/default/views/partials/header.php';
         </div>
     </main>
 </div>
+';
 
-<?php require_once dirname(__DIR__, 2) . '/themes/default/views/partials/footer.php'; ?>
+// Include admin layout (uses sidebar, topbar)
+include __DIR__ . '/../layouts/main.php';
+?>

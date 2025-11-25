@@ -137,7 +137,7 @@ function app_base_url($path = "")
 }
 
 /**
- * Load site metadata from JSON file (db/site_meta.json) and merge with sensible defaults.
+ * Load site metadata from database settings and merge with sensible defaults.
  * Returns associative array with keys: title, description, keywords, logo, favicon, admin_name, admin_email
  */
 function get_site_meta(): array
@@ -148,22 +148,45 @@ function get_site_meta(): array
             "Professional engineering calculators for civil, electrical, HVAC, plumbing and fire protection.",
         "keywords" =>
             "engineering, calculator, civil, electrical, HVAC, plumbing, fire protection, AEC",
-        "logo" => app_base_url("assets/icons/icon-192.png"),
-        "favicon" => app_base_url("assets/icons/icon-192.png"),
+        "logo" => app_base_url("themes/default/assets/images/logo.png"),
+        "favicon" => app_base_url("themes/default/assets/images/favicon.png"),
         "admin_name" => defined("ADMIN_USER") ? ADMIN_USER : "",
         "admin_email" => defined("MAIL_TO") ? MAIL_TO : "admin@example.com",
         "canonical" => null,
     ];
 
-    $metaFile = __DIR__ . "/../db/site_meta.json";
-    if (file_exists($metaFile)) {
-        $raw = file_get_contents($metaFile);
-        $data = json_decode($raw, true);
-        if (is_array($data)) {
-            return array_merge($defaults, $data);
+    try {
+        // Try to get settings from database using SettingsService
+        $site_name = \App\Services\SettingsService::get('site_name');
+        $site_description = \App\Services\SettingsService::get('site_description');
+        $site_logo = \App\Services\SettingsService::get('site_logo');
+        $favicon = \App\Services\SettingsService::get('favicon');
+
+        // Build site meta from database settings
+        $site_meta = [];
+        
+        if ($site_name) {
+            $site_meta['title'] = $site_name;
         }
+        
+        if ($site_description) {
+            $site_meta['description'] = $site_description;
+        }
+        
+        if ($site_logo) {
+            $site_meta['logo'] = $site_logo;
+        }
+        
+        if ($favicon) {
+            $site_meta['favicon'] = $favicon;
+        }
+
+        return array_merge($defaults, $site_meta);
+    } catch (\Exception $e) {
+        // Fallback to defaults if database access fails
+        error_log("get_site_meta() database error: " . $e->getMessage());
+        return $defaults;
     }
-    return $defaults;
 }
 
 function get_site_settings(): array

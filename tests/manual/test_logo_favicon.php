@@ -1,7 +1,7 @@
 <?php
 // Test file to verify logo and favicon URLs
-require_once __DIR__ . '/app/Config/config.php';
-require_once __DIR__ . '/app/Helpers/functions.php';
+require_once __DIR__ . '/../../app/Config/config.php';
+require_once __DIR__ . '/../../app/Helpers/functions.php';
 
 // Start session
 session_start();

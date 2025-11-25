@@ -17,7 +17,18 @@ class SettingsController extends Controller
     {
         $this->requireAdminWithBasicAuth();
 
-        $settings = SettingsService::getAll('general');
+        // Get all general settings
+        $generalSettings = SettingsService::getAll('general');
+        
+        // Get logo and favicon settings (they might be in different groups)
+        $siteLogo = SettingsService::get('site_logo');
+        $favicon = SettingsService::get('favicon');
+        
+        // Merge all settings together
+        $settings = array_merge($generalSettings, [
+            'site_logo' => $siteLogo,
+            'favicon' => $favicon
+        ]);
 
         $this->view->render('admin/settings/general', [
             'title' => 'General Settings',
@@ -190,7 +201,48 @@ class SettingsController extends Controller
                 }
             }
 
-            return $this->json([
+// Handle logo and favicon file uploads specifically
+            $fileFields = ['site_logo', 'favicon'];
+            foreach ($fileFields as $field) {
+                if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
+                    $uploadedPath = $this->handleFileUpload($_FILES[$field]);
+                    if ($uploadedPath && SettingsService::set($field, $uploadedPath)) {
+                        $updated++;
+
+                        // Log the change
+                        GDPRService::logActivity(
+                            $_SESSION['user_id'] ?? null,
+                            'setting_updated',
+                            'settings',
+                            null,
+                            "Setting $field updated via file upload",
+                            null,
+                            ['key' => $field, 'value' => $uploadedPath]
+                        );
+                    }
+                }
+                
+                // Handle removal of current images
+                $removeField = 'remove_' . $field;
+                if (isset($_POST[$removeField]) && $_POST[$removeField] == '1') {
+                    // Remove the current image
+                    $currentValue = SettingsService::get($field, '');
+                    if ($currentValue && SettingsService::set($field, '')) {
+                        $updated++;
+
+                        // Log the removal
+                        GDPRService::logActivity(
+                            $_SESSION['user_id'] ?? null,
+                            'setting_updated',
+                            'settings',
+                            null,
+                            "Setting $field removed (cleared)",
+                            null,
+                            ['key' => $field, 'old_value' => $currentValue, 'new_value' => '']
+                        );
+                    }
+                }
+            }            return $this->json([
                 'success' => true,
                 'message' => "$updated settings updated successfully"
             ]);
@@ -318,7 +370,8 @@ class SettingsController extends Controller
         $filepath = $uploadDir . $filename;
 
         if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            return '/uploads/settings/' . $filename;
+            // For Laragon with project folder structure, use relative path from project root
+            return '/Bishwo_Calculator/public/uploads/settings/' . $filename;
         }
 
         return null;
@@ -407,6 +460,21 @@ class SettingsController extends Controller
         }
     }
     /**
+     * Alias for save() method - some routes point to saveSettings
+     */
+    public function saveSettings()
+    {
+        return $this->save();
+    }
+
+    /**
+     * Alias for save() method - support routes that call `update`
+     */
+    public function update()
+    {
+        return $this->save();
+    }
+    /**
      * Send a test email using current settings
      */
     public function sendTestEmail()
@@ -421,38 +489,148 @@ class SettingsController extends Controller
             // Get current email settings
             $settings = SettingsService::getAll('email');
 
-            // Get recipient email (current user)
+            // Get recipient email (current user or from settings)
             $recipientEmail = $_SESSION['user']['email'] ?? $settings['admin_email'] ?? 'admin@example.com';
 
-            // In a real implementation, we would use PHPMailer or a similar library here
-            // For now, we'll simulate the process and log it
-
+            // Get SMTP configuration
             $smtpHost = $settings['smtp_host'] ?? '';
-            $smtpPort = $settings['smtp_port'] ?? '';
-            $smtpUser = $settings['smtp_username'] ?? '';
+            $smtpPort = $settings['smtp_port'] ?? 587;
+            $smtpUsername = $settings['smtp_username'] ?? '';
+            $smtpPassword = $settings['smtp_password'] ?? '';
+            $smtpEncryption = $settings['smtp_encryption'] ?? 'tls';
+            $fromEmail = $settings['from_email'] ?? $smtpUsername;
+            $fromName = $settings['from_name'] ?? 'System';
 
             if (empty($smtpHost)) {
                 throw new \Exception('SMTP Host is not configured');
             }
 
-            // Log the attempt
+            if (empty($smtpUsername)) {
+                throw new \Exception('SMTP Username is not configured');
+            }
+
+            if (empty($smtpPassword)) {
+                throw new \Exception('SMTP Password is not configured');
+            }
+
+            // Try to send test email using PHPMailer
+            try {
+                $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+                
+                // Server settings
+                $mail->isSMTP();
+                $mail->Host = $smtpHost;
+                $mail->Port = $smtpPort;
+                $mail->SMTPAuth = true;
+                $mail->Username = $smtpUsername;
+                $mail->Password = $smtpPassword;
+                
+                // Set encryption
+                if ($smtpEncryption === 'ssl') {
+                    $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+                } elseif ($smtpEncryption === 'tls') {
+                    $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+                }
+
+                // Disable SSL certificate verification (for testing - use with caution)
+                $mail->SMTPOptions = [
+                    'ssl' => [
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                        'allow_self_signed' => true
+                    ]
+                ];
+
+                // Recipients
+                $mail->setFrom($fromEmail, $fromName);
+                $mail->addAddress($recipientEmail);
+
+                // Content
+                $mail->isHTML(true);
+                $mail->Subject = '🧪 SMTP Test Email from ' . ($_SESSION['user']['username'] ?? 'Admin');
+                $mail->Body = '
+                    <html>
+                    <head>
+                        <style>
+                            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                            .container { max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 20px; border-radius: 8px; }
+                            .header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
+                            .content { background: white; padding: 20px; }
+                            .footer { background: #e9ecef; padding: 15px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 8px 8px; }
+                            .success { color: #10b981; font-weight: bold; }
+                            .info { background: #f0f4ff; border-left: 4px solid #667eea; padding: 15px; margin: 10px 0; border-radius: 4px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <div class="header">
+                                <h1>✅ SMTP Configuration Test</h1>
+                                <p>Email delivery is working correctly!</p>
+                            </div>
+                            <div class="content">
+                                <p class="success">🎉 Congratulations! Your SMTP settings are configured correctly.</p>
+                                <p>This is a test email to verify your email configuration.</p>
+                                
+                                <div class="info">
+                                    <strong>📧 Email Details:</strong><br>
+                                    <strong>From:</strong> ' . htmlspecialchars($fromName) . ' &lt;' . htmlspecialchars($fromEmail) . '&gt;<br>
+                                    <strong>To:</strong> ' . htmlspecialchars($recipientEmail) . '<br>
+                                    <strong>SMTP Host:</strong> ' . htmlspecialchars($smtpHost) . ':' . htmlspecialchars($smtpPort) . '<br>
+                                    <strong>Encryption:</strong> ' . strtoupper($smtpEncryption) . '<br>
+                                    <strong>Sent At:</strong> ' . date('Y-m-d H:i:s') . '
+                                </div>
+                                
+                                <p>You can now use this configuration to send emails from your application.</p>
+                            </div>
+                            <div class="footer">
+                                <p>This email was sent from your Bishwo Calculator Admin Panel</p>
+                                <p>&copy; ' . date('Y') . ' All Rights Reserved</p>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                ';
+                $mail->AltBody = 'Your SMTP settings are configured correctly!';
+
+                $mail->send();
+
+                // Log successful test
+                GDPRService::logActivity(
+                    $_SESSION['user_id'] ?? null,
+                    'test_email_sent',
+                    'system',
+                    null,
+                    "✅ Test email sent successfully to $recipientEmail using SMTP host $smtpHost:$smtpPort",
+                    null,
+                    [
+                        'smtp_host' => $smtpHost,
+                        'smtp_port' => $smtpPort,
+                        'recipient' => $recipientEmail
+                    ]
+                );
+
+                return $this->json([
+                    'success' => true,
+                    'message' => "✅ Test email sent successfully to $recipientEmail! Check your inbox."
+                ]);
+            } catch (\PHPMailer\PHPMailer\Exception $e) {
+                throw new \Exception("SMTP Error: " . $e->errorMessage());
+            }
+        } catch (\Exception $e) {
+            // Log failed test
             GDPRService::logActivity(
                 $_SESSION['user_id'] ?? null,
-                'test_email_sent',
+                'test_email_failed',
                 'system',
                 null,
-                "Test email sent to $recipientEmail using SMTP host $smtpHost"
+                "❌ Test email failed: " . $e->getMessage(),
+                null,
+                ['error' => $e->getMessage()]
             );
 
-            // Return success (mock)
-            return $this->json([
-                'success' => true,
-                'message' => "Test email sent successfully to $recipientEmail"
-            ]);
-        } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
-                'message' => 'Failed to send test email: ' . $e->getMessage()
+                'message' => '❌ Failed to send test email: ' . $e->getMessage()
             ]);
         }
     }

@@ -168,8 +168,11 @@ const AdminApp = {
 
     // AJAX Form Handling
     initAjaxForms() {
+        console.log('AdminApp.initAjaxForms() called');
         document.querySelectorAll('.ajax-form').forEach(form => {
+            console.log('Found ajax-form:', form.id || form.className);
             form.addEventListener('submit', async (e) => {
+                console.log('Ajax form submitted:', e.target.id || e.target.className);
                 e.preventDefault();
 
                 const submitBtn = form.querySelector('[type="submit"]');
@@ -181,15 +184,36 @@ const AdminApp = {
 
                 try {
                     const formData = new FormData(form);
+                    console.log('FormData created, action:', form.action);
+                    
+                    // Debug: log all form data
+                    for (let [key, value] of formData.entries()) {
+                        console.log('Form data:', key, value);
+                    }
+                    
                     const response = await fetch(form.action, {
                         method: form.method,
                         body: formData
                     });
 
+                    console.log('Response status:', response.status);
+                    
                     const result = await response.json();
+                    console.log('Parsed result:', result);
 
                     if (result.success) {
-                        this.showNotification(result.message || 'Operation completed successfully!', 'success');
+                        // Extract the number of updated settings from the message
+                        const match = result.message.match(/(\d+) settings? updated/);
+                        const updatedCount = match ? parseInt(match[1]) : 0;
+                        
+                        if (updatedCount > 0) {
+                            // Green toast for actual changes saved
+                            this.showNotification(result.message || 'Settings saved successfully!', 'success');
+                        } else {
+                            // Red toast for no changes made
+                            this.showNotification('No changes were made. Settings remain unchanged.', 'error');
+                        }
+                        
                         if (result.redirect) {
                             setTimeout(() => window.location.href = result.redirect, 1500);
                         }
@@ -197,7 +221,8 @@ const AdminApp = {
                         this.showNotification(result.error || 'An error occurred', 'error');
                     }
                 } catch (error) {
-                    this.showNotification('Network error occurred', 'error');
+                    console.error('AJAX form error:', error);
+                    this.showNotification('Network error occurred: ' + error.message, 'error');
                 } finally {
                     submitBtn.disabled = false;
                     submitBtn.textContent = originalText;
@@ -527,3 +552,47 @@ window.addEventListener('error', (e) => {
 // Export for global use
 window.AdminApp = AdminApp;
 window.ModuleManager = ModuleManager;
+
+// Global showToast wrapper for compatibility with other theme scripts
+// Usage: showToast(type, titleOrMessage, message?)
+// Examples:
+//  showToast('success', 'Saved successfully')
+//  showToast('info', 'Mode', 'Switched to dark mode')
+window.showToast = function(type = 'info', titleOrMessage = '', message = '') {
+    try {
+        let text = '';
+
+        if (message && titleOrMessage) {
+            text = `${titleOrMessage} — ${message}`;
+        } else {
+            text = titleOrMessage || message || '';
+        }
+
+        // Prefer AdminApp.showNotification if available
+        if (window.AdminApp && typeof window.AdminApp.showNotification === 'function') {
+            window.AdminApp.showNotification(text, type);
+            return;
+        }
+
+        // Fallback to ProCalculator's showNotification if present
+        if (window.ProCalculator && typeof window.ProCalculator.showNotification === 'function') {
+            window.ProCalculator.showNotification(type, text);
+            return;
+        }
+
+        // Generic fallback: create a simple DOM toast
+        const existing = document.getElementById('notification-toast');
+        if (existing) {
+            existing.className = `notification-toast ${type}`;
+            existing.innerHTML = `<div style="display:flex;align-items:center;gap:12px;"><i class="fas fa-info-circle"></i><span>${text}</span></div>`;
+            existing.classList.add('show');
+            setTimeout(() => existing.classList.remove('show'), 5000);
+            return;
+        }
+
+        // Last resort: alert
+        alert(text || (type + ' notification'));
+    } catch (e) {
+        console.error('showToast error:', e);
+    }
+};

@@ -43,7 +43,7 @@ $desc_safe = htmlspecialchars(
 $logo = $site_meta["logo"] ?? app_base_url("public/theme-assets.php?path=default/assets/images/logo.png");
 $logo_text = $site_meta["logo_text"] ?? "EngiCal Pro";
 $header_style = $site_meta["header_style"] ?? "logo_text";
-$favicon = $site_meta["favicon"] ?? app_base_url("assets/images/favicon.png");
+$favicon = $site_meta["favicon"] ?? app_base_url("themes/default/assets/images/favicon.png");
 
 // User data for personalized UI
 // Support both new structure ($_SESSION['user']) and legacy session keys (user_id, username, full_name, role)
@@ -136,6 +136,7 @@ if (
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -159,7 +160,7 @@ if (
     foreach ($cssFiles as $css) {
         $cssPath = dirname(__DIR__) . "/assets/css/" . $css;
         $mtime = file_exists($cssPath) ? filemtime($cssPath) : time();
-        
+
         // Use ThemeManager to generate the correct proxy URL
         if ($themeManager) {
             $url = $themeManager->themeUrl("assets/css/" . $css . "?v=" . $mtime);
@@ -169,7 +170,7 @@ if (
                 "themes/default/assets/css/" . $css . "?v=" . $mtime,
             );
         }
-        
+
         echo '<link rel="stylesheet" href="' .
             htmlspecialchars($url) .
             '">' .
@@ -180,26 +181,16 @@ if (
         /* Logo CSS Variables from Admin Settings */
         :root {
             --logo-spacing: <?php echo $site_meta["logo_settings"]["spacing"] ??
-                "12px"; ?>;
-            --logo-text-weight: <?php echo $site_meta["logo_settings"][
-                "text_weight"
-            ] ?? "700"; ?>;
-            --logo-text-size: <?php echo $site_meta["logo_settings"][
-                "text_size"
-            ] ?? "1.5rem"; ?>;
-            --logo-height: <?php echo $site_meta["logo_settings"][
-                "logo_height"
-            ] ?? "40px"; ?>;
-            --logo-border-radius: <?php echo $site_meta["logo_settings"][
-                "border_radius"
-            ] ?? "8px"; ?>;
+                                "12px"; ?>;
+            --logo-text-weight: <?php echo $site_meta["logo_settings"]["text_weight"] ?? "700"; ?>;
+            --logo-text-size: <?php echo $site_meta["logo_settings"]["text_size"] ?? "1.5rem"; ?>;
+            --logo-height: <?php echo $site_meta["logo_settings"]["logo_height"] ?? "40px"; ?>;
+            --logo-border-radius: <?php echo $site_meta["logo_settings"]["border_radius"] ?? "8px"; ?>;
             --brand-primary: <?php echo $site_meta["brand_colors"]["primary"] ??
-                "#4f46e5"; ?>;
-            --brand-secondary: <?php echo $site_meta["brand_colors"][
-                "secondary"
-            ] ?? "#10b981"; ?>;
+                                    "#4f46e5"; ?>;
+            --brand-secondary: <?php echo $site_meta["brand_colors"]["secondary"] ?? "#10b981"; ?>;
             --brand-accent: <?php echo $site_meta["brand_colors"]["accent"] ??
-                "#f59e0b"; ?>;
+                                "#f59e0b"; ?>;
         }
     </style>
     <style>
@@ -232,16 +223,16 @@ if (
             color: #0f172a;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-        
+
         body:not(.dark-theme) .site-header .logo-text {
             color: #0f172a !important;
         }
 
         /* Dark theme header */
         body.dark-theme .site-header {
-            background: rgba(6,8,12,0.72);
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+            background: rgba(6, 8, 12, 0.72);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
             color: #e6eefc;
         }
 
@@ -267,7 +258,8 @@ if (
         }
 
         /* Ensure no body/html margins interfere */
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -285,7 +277,7 @@ if (
             background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 50%, #e1e8ed 100%) !important;
             color: #1a202c;
         }
-        
+
         body:not(.dark-theme) h1,
         body:not(.dark-theme) h2,
         body:not(.dark-theme) h3,
@@ -294,17 +286,17 @@ if (
         body:not(.dark-theme) h6 {
             color: #0f172a !important;
         }
-        
+
         body:not(.dark-theme) p,
         body:not(.dark-theme) span,
         body:not(.dark-theme) .text-primary {
             color: #334155 !important;
         }
-        
+
         body:not(.dark-theme) a {
             color: #3b82f6 !important;
         }
-        
+
         body:not(.dark-theme) .card,
         body:not(.dark-theme) .section {
             background: #ffffff !important;
@@ -382,19 +374,15 @@ if (
             display: flex;
             align-items: center;
             gap: <?php echo $site_meta["logo_settings"]["spacing"] ??
-                "12px"; ?>;
+                        "12px"; ?>;
             text-decoration: none;
-            font-weight: <?php echo $site_meta["logo_settings"][
-                "text_weight"
-            ] ?? "700"; ?>;
+            font-weight: <?php echo $site_meta["logo_settings"]["text_weight"] ?? "700"; ?>;
             font-size: <?php echo $site_meta["logo_settings"]["text_size"] ??
-                "1.5rem"; ?>;
+                            "1.5rem"; ?>;
             color: #2d3748;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             padding: 8px 12px;
-            border-radius: <?php echo $site_meta["logo_settings"][
-                "border_radius"
-            ] ?? "8px"; ?>;
+            border-radius: <?php echo $site_meta["logo_settings"]["border_radius"] ?? "8px"; ?>;
             align-items: center;
             justify-content: flex-start;
             /* reduced padding-right so middle section doesn't push into header-right at smaller widths */
@@ -471,7 +459,7 @@ if (
             left: 0;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             padding: 0.5rem;
             min-width: 220px;
             opacity: 0;
@@ -484,7 +472,7 @@ if (
             margin: 0;
         }
 
-        .dropdown > li {
+        .dropdown>li {
             margin: 0 !important;
             padding: 0 !important;
             display: block !important;
@@ -575,7 +563,8 @@ if (
             position: relative;
             flex: 1 1 360px;
             max-width: 420px;
-            margin-right: 1rem; /* prevent overlap with header-right */
+            margin-right: 1rem;
+            /* prevent overlap with header-right */
         }
 
         .search-input {
@@ -619,7 +608,7 @@ if (
             transition: opacity 0.2s ease, transform 0.2s ease;
         }
 
-        .search-input:focus + .search-suggestions,
+        .search-input:focus+.search-suggestions,
         .search-suggestions:hover {
             opacity: 1;
             visibility: visible;
@@ -646,10 +635,13 @@ if (
             gap: 0.75rem;
             flex-shrink: 0;
             flex-wrap: nowrap;
-            width: auto; /* don't force full width which can push content */
+            width: auto;
+            /* don't force full width which can push content */
             justify-content: flex-end;
-            padding: 0 1rem; /* increased padding to prevent scrollbar overlap */
-            margin-right: 15px; /* extra margin to ensure login button is visible */
+            padding: 0 1rem;
+            /* increased padding to prevent scrollbar overlap */
+            margin-right: 15px;
+            /* extra margin to ensure login button is visible */
             overflow: visible;
         }
 
@@ -657,8 +649,8 @@ if (
         .user-actions .user-greeting {
             padding: 0.4rem 0.75rem;
             font-size: 0.8rem;
-            background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(5,150,105,0.05));
-            border: 1px solid rgba(16,185,129,0.2);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+            border: 1px solid rgba(16, 185, 129, 0.2);
             border-radius: 12px;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -730,7 +722,7 @@ if (
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
         }
-        
+
         /* Animated gradient background */
         .theme-toggle-btn::before {
             content: '';
@@ -739,25 +731,28 @@ if (
             left: -50%;
             width: 200%;
             height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent,
-                rgba(99, 102, 241, 0.3),
-                transparent
-            );
+            background: linear-gradient(45deg,
+                    transparent,
+                    rgba(99, 102, 241, 0.3),
+                    transparent);
             transform: rotate(45deg);
             transition: all 0.5s ease;
             opacity: 0;
         }
-        
+
         .theme-toggle-btn:hover::before {
             opacity: 1;
             animation: shimmerEffect 1.5s ease-in-out infinite;
         }
-        
+
         @keyframes shimmerEffect {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
         }
 
         /* Tooltip styling */
@@ -800,7 +795,8 @@ if (
             cursor: pointer;
             transition: all 0.2s ease;
             color: #4a5568;
-            flex-shrink: 0; /* prevent shrinking */
+            flex-shrink: 0;
+            /* prevent shrinking */
         }
 
         .search-toggle-btn:hover {
@@ -814,22 +810,22 @@ if (
             color: white;
             border-color: #8b5cf6;
             transform: scale(1.1) rotate(5deg);
-            box-shadow: 
+            box-shadow:
                 0 8px 24px rgba(99, 102, 241, 0.5),
                 0 0 40px rgba(168, 85, 247, 0.4);
         }
-        
+
         .theme-toggle-btn:active {
             transform: scale(0.95) rotate(0deg);
             box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
         }
-        
+
         .theme-toggle-btn i {
             position: relative;
             z-index: 1;
             transition: transform 0.4s ease;
         }
-        
+
         .theme-toggle-btn:hover i {
             transform: rotate(20deg) scale(1.1);
         }
@@ -844,7 +840,7 @@ if (
             background: linear-gradient(135deg, #a855f7, #ec4899);
             color: white;
             border-color: #a855f7;
-            box-shadow: 
+            box-shadow:
                 0 8px 24px rgba(168, 85, 247, 0.5),
                 0 0 40px rgba(236, 72, 153, 0.4);
         }
@@ -875,6 +871,7 @@ if (
             .login-btn .btn-text {
                 display: none;
             }
+
             .login-btn {
                 padding: 0.5rem;
                 border-radius: 50%;
@@ -952,7 +949,8 @@ if (
         }
 
         .hamburger-btn {
-            display: none !important; /* Force hide on desktop */
+            display: none !important;
+            /* Force hide on desktop */
             background: none;
             border: 1px solid #e2e8f0;
             border-radius: 50%;
@@ -1020,19 +1018,28 @@ if (
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
         }
 
         /* Responsive Design */
         @media (max-width: 1024px) {
             .header-content {
                 gap: 1rem;
-                padding: 0 15px; /* increased padding on smaller screens */
+                padding: 0 15px;
+                /* increased padding on smaller screens */
             }
 
             .user-actions {
-                margin-right: 10px; /* more margin on smaller screens */
+                margin-right: 10px;
+                /* more margin on smaller screens */
                 padding: 0 0.75rem;
             }
         }
@@ -1040,7 +1047,8 @@ if (
         @media (max-width: 768px) {
             .header-content {
                 gap: 0.5rem;
-                padding: 0 12px; /* ensure adequate padding */
+                padding: 0 12px;
+                /* ensure adequate padding */
             }
 
             .header-middle {
@@ -1052,7 +1060,8 @@ if (
 
             .user-actions {
                 margin-right: 8px;
-                gap: 0.5rem; /* reduce gap on mobile to fit better */
+                gap: 0.5rem;
+                /* reduce gap on mobile to fit better */
             }
 
             .hamburger-btn {
@@ -1082,20 +1091,20 @@ if (
             }
         }
 
-            /* Compact layout for small screens */
-            @media (max-width: 640px) {
-                .user-actions .user-greeting {
-                    padding: 0.2rem 0.4rem;
-                    font-size: 0.65rem;
-                    max-width: 120px;
-                    min-height: 1.8rem;
-                }
-
-                .user-actions .user-greeting strong {
-                    max-width: 60px;
-                    font-size: 0.65rem;
-                }
+        /* Compact layout for small screens */
+        @media (max-width: 640px) {
+            .user-actions .user-greeting {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.65rem;
+                max-width: 120px;
+                min-height: 1.8rem;
             }
+
+            .user-actions .user-greeting strong {
+                max-width: 60px;
+                font-size: 0.65rem;
+            }
+        }
 
         @media (max-width: 480px) {
             .header-content {
@@ -1135,7 +1144,7 @@ if (
         .search-modal {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             display: none;
             align-items: center;
             justify-content: center;
@@ -1143,7 +1152,9 @@ if (
             padding: 1rem;
         }
 
-        .search-modal.active { display: flex; }
+        .search-modal.active {
+            display: flex;
+        }
 
         .search-modal .modal-content {
             width: 100%;
@@ -1151,11 +1162,11 @@ if (
             background: rgba(30, 30, 60, 0.95);
             border-radius: 12px;
             padding: 1rem;
-            box-shadow: 0 20px 40px rgba(2,6,23,0.4);
+            box-shadow: 0 20px 40px rgba(2, 6, 23, 0.4);
         }
 
         body.dark-theme .search-modal .modal-content {
-            background: rgba(6,8,12,0.95);
+            background: rgba(6, 8, 12, 0.95);
             color: #e6eefc;
         }
 
@@ -1195,15 +1206,15 @@ if (
 
         /* Dark theme overrides for header elements to keep contrast */
         body.dark-theme {
-            --glass-bg: rgba(8,10,15,0.6);
-            --glass-border: rgba(255,255,255,0.03);
+            --glass-bg: rgba(8, 10, 15, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.03);
             color: #e6eefc;
         }
 
         body.dark-theme .site-header {
-            background: rgba(6,8,12,0.72);
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+            background: rgba(6, 8, 12, 0.72);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
             color: #e6eefc;
         }
 
@@ -1214,17 +1225,17 @@ if (
 
         /* Hover state: avoid bright white background which hides text */
         body.dark-theme .main-nav a:hover {
-            background: rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.06);
             color: #ffffff;
             transform: translateY(-1px);
         }
 
         /* Dropdown in dark mode */
         body.dark-theme .dropdown {
-            background: linear-gradient(180deg, rgba(10,12,16,0.95), rgba(6,8,12,0.95));
-            border: 1px solid rgba(255,255,255,0.04);
+            background: linear-gradient(180deg, rgba(10, 12, 16, 0.95), rgba(6, 8, 12, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.04);
             color: #e6eefc;
-            box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.6);
         }
 
         body.dark-theme .dropdown a {
@@ -1235,44 +1246,51 @@ if (
         body.dark-theme .btn-primary {
             background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
             color: #fff;
-            box-shadow: 0 6px 18px rgba(99,102,241,0.35);
-            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         body.dark-theme .btn-secondary {
-            background: rgba(255,255,255,0.03);
+            background: rgba(255, 255, 255, 0.03);
             color: #e6eefc;
-            border: 1px solid rgba(255,255,255,0.06);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         /* Make sure search suggestions are readable in both themes */
-        .search-suggestions a, .search-suggestions div {
+        .search-suggestions a,
+        .search-suggestions div {
             color: #2d3748;
         }
-        body.dark-theme .search-suggestions a, body.dark-theme .search-suggestions div {
+
+        body.dark-theme .search-suggestions a,
+        body.dark-theme .search-suggestions div {
             color: #e6eefc;
         }
 
         /* Avoid header text blending into white backgrounds */
-        .site-header, .header-content, .main-nav a, .user-actions .btn-text, .logo span {
+        .site-header,
+        .header-content,
+        .main-nav a,
+        .user-actions .btn-text,
+        .logo span {
             color: inherit;
         }
 
         body.dark-theme .dropdown a:hover {
-            background: rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.06);
             color: #fff;
         }
 
         /* Search input in dark mode */
         body.dark-theme .search-input {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             color: #e6eefc;
         }
 
         body.dark-theme .search-suggestions {
-            background: rgba(6,8,12,0.95);
-            border: 1px solid rgba(255,255,255,0.04);
+            background: rgba(6, 8, 12, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             color: #e6eefc;
         }
 
@@ -1303,11 +1321,11 @@ if (
             background: #f1f5f9;
             color: #3b82f6 !important;
         }
-        
+
         body:not(.dark-theme) .dropdown .grid-item {
             border-color: #e2e8f0;
         }
-        
+
         body:not(.dark-theme) .dropdown .grid-item:hover {
             border-color: #3b82f6;
         }
@@ -1316,12 +1334,12 @@ if (
             color: #1e293b !important;
             font-weight: 600;
         }
-        
+
         body:not(.dark-theme) .btn-primary,
         body:not(.dark-theme) button {
             color: #ffffff !important;
         }
-        
+
         body:not(.dark-theme) input,
         body:not(.dark-theme) textarea,
         body:not(.dark-theme) select {
@@ -1329,7 +1347,7 @@ if (
             background: #ffffff !important;
             border-color: #cbd5e1 !important;
         }
-        
+
         body:not(.dark-theme) input::placeholder,
         body:not(.dark-theme) textarea::placeholder {
             color: #94a3b8 !important;
@@ -1345,7 +1363,7 @@ if (
             border: 1px solid #cbd5e1 !important;
             color: #1e293b !important;
         }
-        
+
         body:not(.dark-theme) .search-input::placeholder {
             color: #94a3b8 !important;
         }
@@ -1358,8 +1376,8 @@ if (
         }
 
         body:not(.dark-theme) .user-greeting {
-            background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(5,150,105,0.05));
-            border: 1px solid rgba(16,185,129,0.2);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+            border: 1px solid rgba(16, 185, 129, 0.2);
             color: #1a202c;
         }
 
@@ -1369,21 +1387,19 @@ if (
             border-color: rgba(245, 158, 11, 0.4);
             box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
         }
-        
+
         body:not(.dark-theme) .theme-toggle-btn::before {
-            background: linear-gradient(
-                45deg,
-                transparent,
-                rgba(245, 158, 11, 0.3),
-                transparent
-            );
+            background: linear-gradient(45deg,
+                    transparent,
+                    rgba(245, 158, 11, 0.3),
+                    transparent);
         }
 
         body:not(.dark-theme) .theme-toggle-btn:hover {
             background: linear-gradient(135deg, #f59e0b, #fbbf24, #fb923c);
             color: white;
             border-color: #f59e0b;
-            box-shadow: 
+            box-shadow:
                 0 8px 24px rgba(245, 158, 11, 0.5),
                 0 0 40px rgba(251, 191, 36, 0.4);
         }
@@ -1402,31 +1418,31 @@ if (
             overflow: hidden;
         }
 
-        body:not(.dark-theme) .search-toggle-btn:hover{
+        body:not(.dark-theme) .search-toggle-btn:hover {
             background: linear-gradient(135deg, #f7fafc, #f7fafc);
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        .search-toggle-btn:hover{
-            background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(124,58,237,0.2));
+        .search-toggle-btn:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(124, 58, 237, 0.2));
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
-        body.dark-theme .search-toggle-btn{
-            background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15));
-            border: 1px solid rgba(139,92,246,0.3);
+        body.dark-theme .search-toggle-btn {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
+            border: 1px solid rgba(139, 92, 246, 0.3);
             color: #a78bfa;
         }
 
-        body.dark-theme .search-toggle-btn:hover{
-            background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(59,130,246,0.25));
-            box-shadow: 0 4px 12px rgba(139,92,246,0.4);
+        body.dark-theme .search-toggle-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(59, 130, 246, 0.25));
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
         }
 
         /* Beautiful Glassmorphism Search Modal */
-        .search-modal{
+        .search-modal {
             display: none;
             position: fixed;
             z-index: 1200;
@@ -1437,25 +1453,27 @@ if (
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             background: linear-gradient(135deg,
-                rgba(102,126,234,0.1) 0%,
-                rgba(124,58,237,0.1) 50%,
-                rgba(16,185,129,0.1) 100%);
+                    rgba(102, 126, 234, 0.1) 0%,
+                    rgba(124, 58, 237, 0.1) 50%,
+                    rgba(16, 185, 129, 0.1) 100%);
             align-items: center;
             justify-content: center;
             padding: 2rem;
         }
 
-        .search-modal.active{ display: flex; }
+        .search-modal.active {
+            display: flex;
+        }
 
-        .search-modal .modal-content{
+        .search-modal .modal-content {
             background: linear-gradient(135deg,
-                rgba(255,255,255,0.25) 0%,
-                rgba(255,255,255,0.1) 100%);
+                    rgba(255, 255, 255, 0.25) 0%,
+                    rgba(255, 255, 255, 0.1) 100%);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.18);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
-                        0 0 0 1px rgba(255,255,255,0.05) inset;
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
             width: min(800px, 95%);
             max-height: 85vh;
             border-radius: 20px;
@@ -1464,13 +1482,13 @@ if (
             animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        body.dark-theme .search-modal .modal-content{
+        body.dark-theme .search-modal .modal-content {
             background: linear-gradient(135deg,
-                rgba(15,23,42,0.4) 0%,
-                rgba(30,41,59,0.2) 100%);
-            border: 1px solid rgba(148,163,184,0.18);
+                    rgba(15, 23, 42, 0.4) 0%,
+                    rgba(30, 41, 59, 0.2) 100%);
+            border: 1px solid rgba(148, 163, 184, 0.18);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6),
-                        0 0 0 1px rgba(148,163,184,0.05) inset;
+                0 0 0 1px rgba(148, 163, 184, 0.05) inset;
         }
 
         @keyframes modalSlideIn {
@@ -1478,19 +1496,20 @@ if (
                 opacity: 0;
                 transform: translateY(-20px) scale(0.95);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
             }
         }
 
-        .search-modal .modal-input{
+        .search-modal .modal-input {
             width: 100%;
             padding: 1.25rem 1.5rem;
             font-size: 1.1rem;
-            border: 2px solid rgba(102,126,234,0.2);
+            border: 2px solid rgba(102, 126, 234, 0.2);
             border-radius: 12px;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             box-sizing: border-box;
@@ -1501,7 +1520,7 @@ if (
         }
 
         /* Animated gradient border effect */
-        .search-modal .modal-input::before{
+        .search-modal .modal-input::before {
             content: '';
             position: absolute;
             top: -2px;
@@ -1517,482 +1536,510 @@ if (
             transition: opacity 0.3s ease;
             transform: translateY(-20px) scale(0.95);
         }
+
         to {
             opacity: 1;
             transform: translateY(0) scale(1);
         }
-    }
-
-    .search-modal .modal-input{
-        width: 100%;
-        padding: 1.25rem 1.5rem;
-        font-size: 1.1rem;
-        border: 2px solid rgba(102,126,234,0.2);
-        border-radius: 12px;
-        background: rgba(255,255,255,0.9);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        box-sizing: border-box;
-        transition: all 0.3s ease;
-        margin-bottom: 1.5rem;
-        position: relative;
-        overflow: hidden;
-    }
-
-    /* Animated gradient border effect */
-    .search-modal .modal-input::before{
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c, #10b981, #3b82f6, #667eea);
-        background-size: 400% 400%;
-        border-radius: 14px;
-        z-index: -1;
-        animation: gradientBorder 3s ease infinite;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .search-modal .modal-input:focus::before{
-        opacity: 1;
-    }
-
-    @keyframes gradientBorder {
-        0% { background-position: 0% 50%; }
-        25% { background-position: 100% 50%; }
-        50% { background-position: 100% 100%; }
-        75% { background-position: 0% 100%; }
-        100% { background-position: 0% 50%; }
-    }
-
-    body.dark-theme .search-modal .modal-input::before{
-        background: linear-gradient(45deg, #a78bfa, #3b82f6, #06b6d4, #10b981, #f59e0b, #ef4444, #a78bfa);
-        background-size: 400% 400%;
-    }
-
-    .search-modal .modal-input:focus{
-        outline: none;
-        border-color: rgba(102,126,234,0.6);
-        box-shadow: 0 0 0 3px rgba(102,126,234,0.1),
-                    0 4px 20px rgba(102,126,234,0.15);
-        background: rgba(255,255,255,0.95);
-    }
-
-    body.dark-theme .search-modal .modal-input{
-        background: rgba(15,23,42,0.6);
-        border: 2px solid rgba(139,92,246,0.3);
-        color: #e2e8f0;
-    }
-
-    body.dark-theme .search-modal .modal-input:focus{
-        border-color: rgba(139,92,246,0.6);
-        box-shadow: 0 0 0 3px rgba(139,92,246,0.1),
-                    0 4px 20px rgba(139,92,246,0.15);
-        background: rgba(15,23,42,0.8);
-    }
-
-    .search-modal .modal-close{
-        position: absolute;
-        right: 0.75rem;
-        top: 0.75rem;
-        background: linear-gradient(135deg, rgba(239,68,68,0.9), rgba(220,38,38,0.9));
-        border: 2px solid rgba(255,255,255,0.2);
-        color: white;
-        font-size: 0.75rem;
-        font-weight: 600;
-        cursor: pointer;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        box-shadow: 0 4px 20px rgba(239,68,68,0.4), 0 0 0 2px rgba(255,255,255,0.1);
-        z-index: 15;
-    }
-
-    .search-modal .modal-close:hover{
-        background: linear-gradient(135deg, rgba(220,38,38,1), rgba(185,28,28,1));
-        transform: scale(1.1) rotate(90deg);
-        box-shadow: 0 6px 25px rgba(239,68,68,0.6), 0 0 0 2px rgba(255,255,255,0.2);
-    }
-
-    body.dark-theme .search-modal .modal-close{
-        background: linear-gradient(135deg, rgba(248,113,113,0.9), rgba(239,68,68,0.9));
-        border: 2px solid rgba(148,163,184,0.2);
-        color: white;
-        box-shadow: 0 4px 20px rgba(248,113,113,0.4), 0 0 0 2px rgba(148,163,184,0.1);
-    }
-
-    body.dark-theme .search-modal .modal-close:hover{
-        background: linear-gradient(135deg, rgba(239,68,68,1), rgba(220,38,38,1));
-        box-shadow: 0 6px 25px rgba(248,113,113,0.6), 0 0 0 2px rgba(148,163,184,0.2);
-    }
-
-    @media (max-width: 768px) {
-        .search-modal .modal-close {
-            right: 0.5rem;
-            top: 0.5rem;
-            width: 32px;
-            height: 32px;
-            font-size: 0.7rem;
         }
-    }
 
-    /* Search Results Styling */
-    .search-result-item{
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid rgba(102,126,234,0.1);
-        transition: all 0.2s ease;
-        border-radius: 8px;
-        margin-bottom: 0.5rem;
-        background: rgba(255,255,255,0.5);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
+        .search-modal .modal-input {
+            width: 100%;
+            padding: 1.25rem 1.5rem;
+            font-size: 1.1rem;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .search-result-item:hover{
-        background: rgba(102,126,234,0.08);
-        transform: translateX(4px);
-        box-shadow: 0 4px 12px rgba(102,126,234,0.1);
-    }
+        /* Animated gradient border effect */
+        .search-modal .modal-input::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c, #10b981, #3b82f6, #667eea);
+            background-size: 400% 400%;
+            border-radius: 14px;
+            z-index: -1;
+            animation: gradientBorder 3s ease infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
 
-    body.dark-theme .search-result-item{
-        background: rgba(15,23,42,0.3);
-        border-bottom: 1px solid rgba(139,92,246,0.1);
-    }
+        .search-modal .modal-input:focus::before {
+            opacity: 1;
+        }
 
-    body.dark-theme .search-result-item:hover{
-        background: rgba(139,92,246,0.1);
-        box-shadow: 0 4px 12px rgba(139,92,246,0.2);
-    }
+        @keyframes gradientBorder {
+            0% {
+                background-position: 0% 50%;
+            }
 
-    .search-result-item a{
-        color: inherit;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 1rem;
-        display: block;
-        margin-bottom: 0.5rem;
-    }
+            25% {
+                background-position: 100% 50%;
+            }
 
-    .category-badge, .subcategory-badge{
-        font-size: 0.75rem;
-        padding: 0.25rem 0.6rem;
-        border-radius: 20px;
-        margin-right: 0.5rem;
-        display: inline-block;
-        font-weight: 500;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
+            50% {
+                background-position: 100% 100%;
+            }
 
-    .category-badge{
-        background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(124,58,237,0.2));
-        color: #5b67d8;
-        border: 1px solid rgba(102,126,234,0.3);
-    }
+            75% {
+                background-position: 0% 100%;
+            }
 
-    .subcategory-badge{
-        background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.2));
-        color: #059669;
-        border: 1px solid rgba(16,185,129,0.3);
-    }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
 
-    body.dark-theme .category-badge{
-        background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(124,58,237,0.2));
-        color: #a78bfa;
-        border: 1px solid rgba(139,92,246,0.3);
-    }
+        body.dark-theme .search-modal .modal-input::before {
+            background: linear-gradient(45deg, #a78bfa, #3b82f6, #06b6d4, #10b981, #f59e0b, #ef4444, #a78bfa);
+            background-size: 400% 400%;
+        }
 
-    body.dark-theme .subcategory-badge{
-        background: linear-gradient(135deg, rgba(52,211,153,0.2), rgba(34,197,94,0.2));
-        color: #34d399;
-        border: 1px solid rgba(52,211,153,0.3);
-    }
+        .search-modal .modal-input:focus {
+            outline: none;
+            border-color: rgba(102, 126, 234, 0.6);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1),
+                0 4px 20px rgba(102, 126, 234, 0.15);
+            background: rgba(255, 255, 255, 0.95);
+        }
 
-    @media (min-width: 769px){
-    /* Hide the inline search on wider screens; use the search icon */
-    .search-container{ display: none; }
-    }    .profile-btn {
-        background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(124,58,237,0.05));
-        border: 1px solid rgba(139,92,246,0.2);
-        color: #8b5cf6 !important;
-        cursor: pointer;
-        font-size: 0.875rem;
-        padding: 0.75rem;
-        border-radius: 50%;
-        transition: all 0.3s ease;
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-        font-weight: 500;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
-        min-height: 44px;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
+        body.dark-theme .search-modal .modal-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            color: #e2e8f0;
+        }
 
-    .profile-btn:hover {
-        background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(124,58,237,0.1));
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(139,92,246,0.3);
-        color: #7c3aed !important;
-    }
+        body.dark-theme .search-modal .modal-input:focus {
+            border-color: rgba(139, 92, 246, 0.6);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1),
+                0 4px 20px rgba(139, 92, 246, 0.15);
+            background: rgba(15, 23, 42, 0.8);
+        }
 
-    body.dark-theme .profile-btn {
-        background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(139,92,246,0.1));
-        border: 1px solid rgba(168,85,247,0.3);
-        color: #a78bfa !important;
-    }
-
-    body.dark-theme .profile-btn:hover {
-        background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(139,92,246,0.15));
-        color: #c084fc !important;
-    }
-
-    body.dark-theme .user-actions .user-greeting {
-        background: linear-gradient(135deg, rgba(52,211,153,0.15), rgba(34,197,94,0.1));
-        border: 1px solid rgba(52,211,153,0.3);
-        color: #a7f3d0;
-    }
-
-    /* Quick favorites button */
-    .quick-favorites-btn {
-        background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(217,119,6,0.05));
-        border: 1px solid rgba(245,158,11,0.2);
-        color: #d97706;
-        cursor: pointer;
-        font-size: 0.875rem;
-        padding: 0.5rem 0.75rem;
-        margin-left: 0.25rem;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 500;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
-
-    .quick-favorites-btn:hover {
-        background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.1));
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(245,158,11,0.3);
-        color: #b45309;
-    }
-
-    body.dark-theme .quick-favorites-btn {
-        background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.1));
-        border: 1px solid rgba(251,191,36,0.3);
-        color: #fbbf24;
-    }
-
-    body.dark-theme .quick-favorites-btn:hover {
-        background: linear-gradient(135deg, rgba(251,191,36,0.25), rgba(245,158,11,0.15));
-        color: #f59e0b;
-    }
-
-    /* Favorites dropdown */
-    .favorites-dropdown {
-        display: none;
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: rgba(255,255,255,0.95);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 12px;
-        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-        min-width: 300px;
-        z-index: 1000;
-        margin-top: 0.5rem;
-    }
-
-    .favorites-dropdown.active { display: block; }
-
-    .favorites-dropdown .dropdown-header {
-        padding: 1rem;
-        border-bottom: 1px solid rgba(0,0,0,0.1);
-        font-weight: 600;
-        color: #374151;
-    }
-
-    .favorites-dropdown .favorite-item {
-        padding: 0.75rem 1rem;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        transition: all 0.2s ease;
-        cursor: pointer;
-    }
-
-    .favorites-dropdown .favorite-item:hover {
-        background: rgba(102,126,234,0.1);
-    }
-
-    .favorites-dropdown .favorite-item:last-child {
-        border-bottom: none;
-    }
-
-    body.dark-theme .favorites-dropdown {
-        background: rgba(15,23,42,0.95);
-        border: 1px solid rgba(148,163,184,0.2);
-    }
-
-    body.dark-theme .favorites-dropdown .dropdown-header {
-        color: #e2e8f0;
-        border-bottom-color: rgba(148,163,184,0.2);
-    }
-
-    body.dark-theme .favorites-dropdown .favorite-item {
-        border-bottom-color: rgba(148,163,184,0.1);
-    }
-
-    /* Help button */
-    .help-btn {
-        background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(37,99,235,0.05));
-        border: 1px solid rgba(59,130,246,0.2);
-        color: #2563eb;
-        cursor: pointer;
-        font-size: 0.875rem;
-        padding: 0.5rem 0.75rem;
-        margin-left: 0.25rem;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 500;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
-
-    .help-btn:hover {
-        background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(37,99,235,0.1));
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(59,130,246,0.3);
-        color: #1d4ed8;
-    }
-
-    body.dark-theme .help-btn {
-        background: linear-gradient(135deg, rgba(96,165,250,0.15), rgba(59,130,246,0.1));
-        border: 1px solid rgba(96,165,250,0.3);
-        color: #93c5fd;
-    }
-
-    body.dark-theme .help-btn:hover {
-        background: linear-gradient(135deg, rgba(96,165,250,0.25), rgba(59,130,246,0.15));
-        color: #60a5fa;
-    }
-
-    /* Profile dropdown */
-    .profile-dropdown {
-        display: none;
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: rgba(255,255,255,0.95);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 12px;
-        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-        min-width: 200px;
-        z-index: 1000;
-        margin-top: 0.5rem;
-        overflow: hidden;
-    }
-
-    .profile-dropdown.active { display: block; }
-
-    .profile-dropdown .menu-item {
-        padding: 0.75rem 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        transition: all 0.2s ease;
-        cursor: pointer;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-        text-decoration: none;
-        color: inherit;
-    }
-
-    .profile-dropdown .menu-item:hover {
-        background: rgba(102,126,234,0.1);
-    }
-
-    .profile-dropdown .menu-item:last-child {
-        border-bottom: none;
-    }
-
-    .profile-dropdown .menu-item i {
-        font-size: 1rem;
-        width: 20px;
-        text-align: center;
-    }
-
-    .profile-dropdown .menu-item .text {
-        font-weight: 500;
-    }
-
-    body.dark-theme .profile-dropdown {
-        background: rgba(15,23,42,0.95);
-        border: 1px solid rgba(148,163,184,0.2);
-    }
-
-    body.dark-theme .profile-dropdown .menu-item {
-        border-bottom-color: rgba(148,163,184,0.1);
-    }
-
-    body.dark-theme .profile-dropdown .menu-item:hover {
-        background: rgba(139,92,246,0.1);
-    }
-
-    /* Update badge for profile dropdown */
-    .update-badge {
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-        color: white;
-        font-size: 0.65rem;
-        padding: 0.1rem 0.4rem;
-        border-radius: 10px;
-        margin-left: auto;
-        font-weight: 600;
-        animation: pulse 2s infinite;
-    }
-
-    /* Responsive profile button */
-    @media (max-width: 768px) {
-        .profile-btn {
+        .search-modal .modal-close {
+            position: absolute;
+            right: 0.75rem;
+            top: 0.75rem;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9));
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
             width: 36px;
             height: 36px;
-            padding: 0.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4), 0 0 0 2px rgba(255, 255, 255, 0.1);
+            z-index: 15;
         }
 
-        .profile-dropdown-wrapper {
+        .search-modal .modal-close:hover {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 1), rgba(185, 28, 28, 1));
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 6px 25px rgba(239, 68, 68, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.2);
+        }
+
+        body.dark-theme .search-modal .modal-close {
+            background: linear-gradient(135deg, rgba(248, 113, 113, 0.9), rgba(239, 68, 68, 0.9));
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            color: white;
+            box-shadow: 0 4px 20px rgba(248, 113, 113, 0.4), 0 0 0 2px rgba(148, 163, 184, 0.1);
+        }
+
+        body.dark-theme .search-modal .modal-close:hover {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 1), rgba(220, 38, 38, 1));
+            box-shadow: 0 6px 25px rgba(248, 113, 113, 0.6), 0 0 0 2px rgba(148, 163, 184, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .search-modal .modal-close {
+                right: 0.5rem;
+                top: 0.5rem;
+                width: 32px;
+                height: 32px;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Search Results Styling */
+        .search-result-item {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .search-result-item:hover {
+            background: rgba(102, 126, 234, 0.08);
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        body.dark-theme .search-result-item {
+            background: rgba(15, 23, 42, 0.3);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+        }
+
+        body.dark-theme .search-result-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+        }
+
+        .search-result-item a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .category-badge,
+        .subcategory-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            margin-right: 0.5rem;
+            display: inline-block;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .category-badge {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(124, 58, 237, 0.2));
+            color: #5b67d8;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .subcategory-badge {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        body.dark-theme .category-badge {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(124, 58, 237, 0.2));
+            color: #a78bfa;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        body.dark-theme .subcategory-badge {
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(34, 197, 94, 0.2));
+            color: #34d399;
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+
+        @media (min-width: 769px) {
+
+            /* Hide the inline search on wider screens; use the search icon */
+            .search-container {
+                display: none;
+            }
+        }
+
+        .profile-btn {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(124, 58, 237, 0.05));
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            color: #8b5cf6 !important;
+            cursor: pointer;
+            font-size: 0.875rem;
+            padding: 0.75rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            min-height: 44px;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .profile-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(124, 58, 237, 0.1));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            color: #7c3aed !important;
+        }
+
+        body.dark-theme .profile-btn {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            color: #a78bfa !important;
+        }
+
+        body.dark-theme .profile-btn:hover {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(139, 92, 246, 0.15));
+            color: #c084fc !important;
+        }
+
+        body.dark-theme .user-actions .user-greeting {
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(34, 197, 94, 0.1));
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            color: #a7f3d0;
+        }
+
+        /* Quick favorites button */
+        .quick-favorites-btn {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.05));
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: #d97706;
+            cursor: pointer;
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
             margin-left: 0.25rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
-    }
 
-    /* Hide inline search on desktop; use icon-triggered modal instead */
-    @media (min-width: 769px) {
-        .search-container { display: none; }
-    }
+        .quick-favorites-btn:hover {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            color: #b45309;
+        }
+
+        body.dark-theme .quick-favorites-btn {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1));
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            color: #fbbf24;
+        }
+
+        body.dark-theme .quick-favorites-btn:hover {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.25), rgba(245, 158, 11, 0.15));
+            color: #f59e0b;
+        }
+
+        /* Favorites dropdown */
+        .favorites-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            min-width: 300px;
+            z-index: 1000;
+            margin-top: 0.5rem;
+        }
+
+        .favorites-dropdown.active {
+            display: block;
+        }
+
+        .favorites-dropdown .dropdown-header {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .favorites-dropdown .favorite-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .favorites-dropdown .favorite-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .favorites-dropdown .favorite-item:last-child {
+            border-bottom: none;
+        }
+
+        body.dark-theme .favorites-dropdown {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        body.dark-theme .favorites-dropdown .dropdown-header {
+            color: #e2e8f0;
+            border-bottom-color: rgba(148, 163, 184, 0.2);
+        }
+
+        body.dark-theme .favorites-dropdown .favorite-item {
+            border-bottom-color: rgba(148, 163, 184, 0.1);
+        }
+
+        /* Help button */
+        .help-btn {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #2563eb;
+            cursor: pointer;
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+            margin-left: 0.25rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .help-btn:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            color: #1d4ed8;
+        }
+
+        body.dark-theme .help-btn {
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.15), rgba(59, 130, 246, 0.1));
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            color: #93c5fd;
+        }
+
+        body.dark-theme .help-btn:hover {
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.25), rgba(59, 130, 246, 0.15));
+            color: #60a5fa;
+        }
+
+        /* Profile dropdown */
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .profile-dropdown.active {
+            display: block;
+        }
+
+        .profile-dropdown .menu-item {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .profile-dropdown .menu-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .profile-dropdown .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .profile-dropdown .menu-item i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .profile-dropdown .menu-item .text {
+            font-weight: 500;
+        }
+
+        body.dark-theme .profile-dropdown {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        body.dark-theme .profile-dropdown .menu-item {
+            border-bottom-color: rgba(148, 163, 184, 0.1);
+        }
+
+        body.dark-theme .profile-dropdown .menu-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        /* Update badge for profile dropdown */
+        .update-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            font-size: 0.65rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 10px;
+            margin-left: auto;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive profile button */
+        @media (max-width: 768px) {
+            .profile-btn {
+                width: 36px;
+                height: 36px;
+                padding: 0.5rem;
+            }
+
+            .profile-dropdown-wrapper {
+                margin-left: 0.25rem;
+            }
+        }
+
+        /* Hide inline search on desktop; use icon-triggered modal instead */
+        @media (min-width: 769px) {
+            .search-container {
+                display: none;
+            }
+        }
     </style>
 </head>
+
 <body class="<?php echo htmlspecialchars($body_class); ?>">
     <header class="site-header" id="siteHeader">
         <div class="header-content">
@@ -2032,8 +2079,8 @@ if (
                 $logoClassString = implode(" ", $logoClasses);
                 ?>
                 <a href="<?php echo app_base_url(
-                    "/",
-                ); ?>" class="<?php echo $logoClassString; ?>">
+                                "/",
+                            ); ?>" class="<?php echo $logoClassString; ?>">
                     <?php
                     $imgClasses = ["logo-img"];
                     if ($shadow === "strong") {
@@ -2042,12 +2089,13 @@ if (
                     ?>
                     <?php if (!empty($logo)): ?>
                         <img src="<?php echo htmlspecialchars($logo); ?>"
-                             alt="<?php echo $title_safe; ?> Logo"
-                             class="<?php echo implode(" ", $imgClasses); ?>"
-                             onerror="this.style.display='none'; this.parentNode.querySelector('.logo-text').style.display='block';">
-                        <span class="logo-text" style="display: none;"><?php echo htmlspecialchars($logo_text); ?></span>
+                            alt="<?php echo $title_safe; ?> Logo"
+                            class="<?php echo implode(' ', $imgClasses); ?>"
+                            style="<?php echo ($header_style === 'text_only') ? 'display: none;' : ''; ?>"
+                            onerror="this.style.display='none'; this.parentNode.querySelector('.logo-text').style.display='block';">
+                        <span class="logo-text" style="<?php echo ($header_style === 'logo_only') ? 'display: none;' : 'display: block;'; ?>"><?php echo htmlspecialchars($logo_text); ?></span>
                     <?php else: ?>
-                        <span><?php echo htmlspecialchars($logo_text); ?></span>
+                        <span style="<?php echo ($header_style === 'logo_only') ? 'display: none;' : 'display: block;'; ?>"><?php echo htmlspecialchars($logo_text); ?></span>
                     <?php endif; ?>
                 </a>
             </div>
@@ -2075,49 +2123,49 @@ if (
                                     "</a></li>";
                             }
                         } else {
-                             ?>
-                        <li><a href="<?php echo app_base_url(
-                            "civil",
-                        ); ?>"><i class="fas fa-hard-hat"></i>Civil</a></li>
-                        <li><a href="<?php echo app_base_url(
-                            "electrical",
-                        ); ?>"><i class="fas fa-bolt"></i>Electrical</a></li>
-                        <li><a href="<?php echo app_base_url(
-                            "plumbing",
-                        ); ?>"><i class="fas fa-faucet"></i>Plumbing</a></li>
-                        <li><a href="<?php echo app_base_url(
-                            "hvac",
-                        ); ?>"><i class="fas fa-wind"></i>HVAC</a></li>
-                        <li><a href="<?php echo app_base_url(
-                            "fire",
-                        ); ?>"><i class="fas fa-fire-extinguisher"></i>Fire Protection</a></li>
-                        <li class="has-dropdown">
-                            <a href="#" aria-haspopup="true" aria-expanded="false" role="button" tabindex="0">
-                                <i class="fas fa-layer-group"></i>
-                                More Tools
-                                <i class="fas fa-chevron-down"></i>
-                            </a>
-                            <ul class="dropdown" role="menu">
-                                <li role="none"><a href="<?php echo app_base_url(
-                                    "site",
-                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-map-marked-alt"></i>Site Development</a></li>
-                                <li role="none"><a href="<?php echo app_base_url(
-                                    "structural",
-                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-building"></i>Structural Analysis</a></li>
-                                <li role="none"><a href="<?php echo app_base_url(
-                                    "mep",
-                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-cogs"></i>MEP Coordination</a></li>
-                                <li role="none"><a href="<?php echo app_base_url(
-                                    "estimation",
-                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-calculator"></i>Estimation Suite</a></li>
-                                <li role="none"><a href="<?php echo app_base_url(
-                                    "management",
-                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-project-diagram"></i>Management</a></li>
-                                <li role="none"><a href="<?php echo app_base_url(
-                                    "developers",
-                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-code"></i>API & Developers</a></li>
-                            </ul>
-                        </li>
+                        ?>
+                            <li><a href="<?php echo app_base_url(
+                                                "civil",
+                                            ); ?>"><i class="fas fa-hard-hat"></i>Civil</a></li>
+                            <li><a href="<?php echo app_base_url(
+                                                "electrical",
+                                            ); ?>"><i class="fas fa-bolt"></i>Electrical</a></li>
+                            <li><a href="<?php echo app_base_url(
+                                                "plumbing",
+                                            ); ?>"><i class="fas fa-faucet"></i>Plumbing</a></li>
+                            <li><a href="<?php echo app_base_url(
+                                                "hvac",
+                                            ); ?>"><i class="fas fa-wind"></i>HVAC</a></li>
+                            <li><a href="<?php echo app_base_url(
+                                                "fire",
+                                            ); ?>"><i class="fas fa-fire-extinguisher"></i>Fire Protection</a></li>
+                            <li class="has-dropdown">
+                                <a href="#" aria-haspopup="true" aria-expanded="false" role="button" tabindex="0">
+                                    <i class="fas fa-layer-group"></i>
+                                    More Tools
+                                    <i class="fas fa-chevron-down"></i>
+                                </a>
+                                <ul class="dropdown" role="menu">
+                                    <li role="none"><a href="<?php echo app_base_url(
+                                                                    "site",
+                                                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-map-marked-alt"></i>Site Development</a></li>
+                                    <li role="none"><a href="<?php echo app_base_url(
+                                                                    "structural",
+                                                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-building"></i>Structural Analysis</a></li>
+                                    <li role="none"><a href="<?php echo app_base_url(
+                                                                    "mep",
+                                                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-cogs"></i>MEP Coordination</a></li>
+                                    <li role="none"><a href="<?php echo app_base_url(
+                                                                    "estimation",
+                                                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-calculator"></i>Estimation Suite</a></li>
+                                    <li role="none"><a href="<?php echo app_base_url(
+                                                                    "management",
+                                                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-project-diagram"></i>Management</a></li>
+                                    <li role="none"><a href="<?php echo app_base_url(
+                                                                    "developers",
+                                                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-code"></i>API & Developers</a></li>
+                                </ul>
+                            </li>
                         <?php
                         }
                         ?>
@@ -2144,10 +2192,10 @@ if (
                     <!-- User greeting (shown for all users) -->
                     <div class="user-greeting" id="userGreeting">
                         Hi, <strong><?php if (!empty($userName)) {
-                            echo htmlspecialchars(explode(" ", $userName)[0]);
-                        } else {
-                            echo "Guest";
-                        } ?></strong> 👋
+                                        echo htmlspecialchars(explode(" ", $userName)[0]);
+                                    } else {
+                                        echo "Guest";
+                                    } ?></strong> 👋
                     </div>
 
                     <!-- Login Button (Only for guests) -->
@@ -2159,8 +2207,8 @@ if (
                         !empty($_SESSION["full_name"]);
                     if (!$is_logged_in): ?>
                         <a href="<?php echo app_base_url(
-                            "login",
-                        ); ?>" class="btn btn-primary login-btn">
+                                        "login",
+                                    ); ?>" class="btn btn-primary login-btn">
                             <i class="fas fa-sign-in-alt"></i>
                             <span class="btn-text">Login</span>
                         </a>
@@ -2175,8 +2223,8 @@ if (
                             <div class="update-notification" title="Update Available">
                                 <i class="fas fa-download"></i>
                                 v<?php echo htmlspecialchars(
-                                    $updateAvailable["latest"],
-                                ); ?>
+                                        $updateAvailable["latest"],
+                                    ); ?>
                             </div>
                         <?php endif; ?>
                     <?php endif; ?>
@@ -2195,15 +2243,15 @@ if (
                             </button>
                             <div class="profile-dropdown" id="profileDropdown">
                                 <a href="<?php echo app_base_url(
-                                    "user/profile",
-                                ); ?>" class="menu-item">
+                                                "user/profile",
+                                            ); ?>" class="menu-item">
                                     <i class="fas fa-user-edit" style="color: #8b5cf6;"></i>
                                     <span class="text">Profile Settings</span>
                                 </a>
                                 <?php if (!empty($_SESSION["is_admin"])): ?>
                                     <a href="<?php echo app_base_url(
-                                        "admin",
-                                    ); ?>" class="menu-item">
+                                                    "admin",
+                                                ); ?>" class="menu-item">
                                         <i class="fas fa-shield-alt" style="color: #ef4444;"></i>
                                         <span class="text">Admin Panel</span>
                                     </a>
@@ -2213,14 +2261,14 @@ if (
                                     <span class="text">Favorites</span>
                                 </a>
                                 <a href="<?php echo app_base_url(
-                                    "help",
-                                ); ?>" class="menu-item" id="helpMenuItem">
+                                                "help",
+                                            ); ?>" class="menu-item" id="helpMenuItem">
                                     <i class="fas fa-question-circle" style="color: #3b82f6;"></i>
                                     <span class="text">Help</span>
                                 </a>
                                 <a href="<?php echo app_base_url(
-                                    "logout",
-                                ); ?>" class="menu-item">
+                                                "logout",
+                                            ); ?>" class="menu-item">
                                     <i class="fas fa-sign-out-alt" style="color: #6b7280;"></i>
                                     <span class="text">Logout</span>
                                 </a>
@@ -2233,36 +2281,36 @@ if (
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
-        </div>
+            </div>
 
-        <div class="mobile-nav" id="mobileNav">
-            <ul>
-                <li><a href="<?php echo app_base_url(
-                    "civil",
-                ); ?>"><i class="fas fa-hard-hat"></i> Civil</a></li>
-                <li><a href="<?php echo app_base_url(
-                    "electrical",
-                ); ?>"><i class="fas fa-bolt"></i> Electrical</a></li>
-                <li><a href="<?php echo app_base_url(
-                    "plumbing",
-                ); ?>"><i class="fas fa-faucet"></i> Plumbing</a></li>
-                <li><a href="<?php echo app_base_url(
-                    "hvac",
-                ); ?>"><i class="fas fa-wind"></i> HVAC</a></li>
-                <li><a href="<?php echo app_base_url(
-                    "fire",
-                ); ?>"><i class="fas fa-fire-extinguisher"></i> Fire Protection</a></li>
-                <li><a href="<?php echo app_base_url(
-                    "site",
-                ); ?>"><i class="fas fa-map-marked-alt"></i> Site Development</a></li>
-                <li><a href="<?php echo app_base_url(
-                    "estimation",
-                ); ?>"><i class="fas fa-calculator"></i> Estimation</a></li>
-                <li><a href="<?php echo app_base_url(
-                    "structural",
-                ); ?>"><i class="fas fa-building"></i> Structural</a></li>
-            </ul>
-        </div>
+            <div class="mobile-nav" id="mobileNav">
+                <ul>
+                    <li><a href="<?php echo app_base_url(
+                                        "civil",
+                                    ); ?>"><i class="fas fa-hard-hat"></i> Civil</a></li>
+                    <li><a href="<?php echo app_base_url(
+                                        "electrical",
+                                    ); ?>"><i class="fas fa-bolt"></i> Electrical</a></li>
+                    <li><a href="<?php echo app_base_url(
+                                        "plumbing",
+                                    ); ?>"><i class="fas fa-faucet"></i> Plumbing</a></li>
+                    <li><a href="<?php echo app_base_url(
+                                        "hvac",
+                                    ); ?>"><i class="fas fa-wind"></i> HVAC</a></li>
+                    <li><a href="<?php echo app_base_url(
+                                        "fire",
+                                    ); ?>"><i class="fas fa-fire-extinguisher"></i> Fire Protection</a></li>
+                    <li><a href="<?php echo app_base_url(
+                                        "site",
+                                    ); ?>"><i class="fas fa-map-marked-alt"></i> Site Development</a></li>
+                    <li><a href="<?php echo app_base_url(
+                                        "estimation",
+                                    ); ?>"><i class="fas fa-calculator"></i> Estimation</a></li>
+                    <li><a href="<?php echo app_base_url(
+                                        "structural",
+                                    ); ?>"><i class="fas fa-building"></i> Structural</a></li>
+                </ul>
+            </div>
     </header>
 
     <!-- Search modal popup (hidden by default) -->
@@ -2272,167 +2320,167 @@ if (
                 Esc
             </button>
             <input id="searchModalInput" class="modal-input" type="search"
-                   placeholder="Search calculators, tools, and utilities..."
-                   aria-label="Search" />
+                placeholder="Search calculators, tools, and utilities..."
+                aria-label="Search" />
             <div id="searchModalResults" style="margin-top: 1rem; max-height: 60vh; overflow-y: auto;"></div>
         </div>
     </div>
 
     <main class="main-content">
 
-    <script>
-    // Helper functions for search result styling
-    function hexToRgb(hex) {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ?
-            `${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)}` :
-            '108,117,125';
-    }
-
-    function adjustColor(hex, percent) {
-        const num = parseInt(hex.replace("#",""), 16);
-        const amt = Math.round(2.55 * percent);
-        const R = (num >> 16) + amt;
-        const G = (num >> 8 & 0x00FF) + amt;
-        const B = (num & 0x0000FF) + amt;
-        return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 +
-            (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255))
-            .toString(16).slice(1);
-    }
-
-    // Header search modal toggle with typing effect
-    (function(){
-        const toggleBtn = document.getElementById('searchToggleBtn');
-        const modal = document.getElementById('searchModal');
-        const closeBtn = document.getElementById('searchModalClose');
-        const input = document.getElementById('searchModalInput');
-        const results = document.getElementById('searchModalResults');
-
-        if(!toggleBtn || !modal) return;
-
-        // Typing effect configuration
-        const typingData = {
-            phrases: [
-                'Search 1 main category • 4 subcategories • 14 tools/calculators',
-                'Search concrete volume • rebar calculation • foundation design',
-                'Search civil tools • structural analysis • earthwork calculations',
-                'Search calculators for engineering projects',
-                'Search 14 engineering calculators and tools',
-                'Search design tools and calculators',
-                'Search engineering utilities and apps'
-            ],
-            typingSpeed: 50,
-            deletingSpeed: 30,
-            pauseBetween: 2000
-        };
-
-        let typingIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-        let typingTimeout;
-
-        function typeText() {
-            const currentPhrase = typingData.phrases[typingIndex];
-
-            if (isDeleting) {
-                input.placeholder = currentPhrase.substring(0, charIndex - 1);
-                charIndex--;
-            } else {
-                input.placeholder = currentPhrase.substring(0, charIndex + 1);
-                charIndex++;
+        <script>
+            // Helper functions for search result styling
+            function hexToRgb(hex) {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ?
+                    `${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)}` :
+                    '108,117,125';
             }
 
-            let timeout = isDeleting ? typingData.deletingSpeed : typingData.typingSpeed;
-
-            if (!isDeleting && charIndex === currentPhrase.length) {
-                timeout = typingData.pauseBetween;
-                isDeleting = true;
-            } else if (isDeleting && charIndex === 0) {
-                isDeleting = false;
-                typingIndex = (typingIndex + 1) % typingData.phrases.length;
-                timeout = 500;
+            function adjustColor(hex, percent) {
+                const num = parseInt(hex.replace("#", ""), 16);
+                const amt = Math.round(2.55 * percent);
+                const R = (num >> 16) + amt;
+                const G = (num >> 8 & 0x00FF) + amt;
+                const B = (num & 0x0000FF) + amt;
+                return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                        (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255))
+                    .toString(16).slice(1);
             }
 
-            typingTimeout = setTimeout(typeText, timeout);
-        }
+            // Header search modal toggle with typing effect
+            (function() {
+                const toggleBtn = document.getElementById('searchToggleBtn');
+                const modal = document.getElementById('searchModal');
+                const closeBtn = document.getElementById('searchModalClose');
+                const input = document.getElementById('searchModalInput');
+                const results = document.getElementById('searchModalResults');
 
-        function startTypingEffect() {
-            stopTypingEffect();
-            charIndex = 0;
-            isDeleting = false;
-            typingIndex = 0;
-            typeText();
-        }
+                if (!toggleBtn || !modal) return;
 
-        function stopTypingEffect() {
-            if (typingTimeout) {
-                clearTimeout(typingTimeout);
-            }
-        }
+                // Typing effect configuration
+                const typingData = {
+                    phrases: [
+                        'Search 1 main category • 4 subcategories • 14 tools/calculators',
+                        'Search concrete volume • rebar calculation • foundation design',
+                        'Search civil tools • structural analysis • earthwork calculations',
+                        'Search calculators for engineering projects',
+                        'Search 14 engineering calculators and tools',
+                        'Search design tools and calculators',
+                        'Search engineering utilities and apps'
+                    ],
+                    typingSpeed: 50,
+                    deletingSpeed: 30,
+                    pauseBetween: 2000
+                };
 
-        function openModal(){
-            modal.classList.add('active');
-            modal.setAttribute('aria-hidden','false');
-            input.focus();
-            input.select();
-            startTypingEffect();
+                let typingIndex = 0;
+                let charIndex = 0;
+                let isDeleting = false;
+                let typingTimeout;
 
-            // Removed automatic loading of popular calculators
-            results.innerHTML = '';
-        }
+                function typeText() {
+                    const currentPhrase = typingData.phrases[typingIndex];
 
-        function loadPopularCalculators() {
-            const currentPath = window.location.pathname;
-            let baseUrl = '';
-
-            // Detect if we're in a subdirectory
-            if (currentPath.includes('/Bishwo_Calculator/')) {
-                baseUrl = '/Bishwo_Calculator';
-            } else if (currentPath.includes('/bishwo_calculator/')) {
-                baseUrl = '/bishwo_calculator';
-            } else if (currentPath.includes('/aec-calculator/')) {
-                baseUrl = '/aec-calculator';
-            }
-
-            console.log('Loading popular calculators from:', `${baseUrl}/api/search.php`);
-
-            fetch(`${baseUrl}/api/search.php`)
-                .then(r => {
-                    console.log('Popular calculators response status:', r.status);
-                    return r.json();
-                })
-                .then(data => {
-                    console.log('Popular calculators data:', data);
-                    if (Array.isArray(data) && data.length > 0) {
-                        renderSearchResults(data);
+                    if (isDeleting) {
+                        input.placeholder = currentPhrase.substring(0, charIndex - 1);
+                        charIndex--;
+                    } else {
+                        input.placeholder = currentPhrase.substring(0, charIndex + 1);
+                        charIndex++;
                     }
-                })
-                .catch(err => {
-                    console.error('Failed to load popular calculators:', err);
-                    results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-calculator" style="margin-right:0.5rem;"></i>Popular calculators will appear here</div>';
-                });
-        }
 
-        function renderSearchResults(data) {
-            if (!data || !Array.isArray(data)) {
-                results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-exclamation-circle" style="margin-right:0.5rem;"></i>No results</div>';
-                return;
-            }
+                    let timeout = isDeleting ? typingData.deletingSpeed : typingData.typingSpeed;
 
-            if (data.length === 0) {
-                results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-search" style="margin-right:0.5rem;"></i>No calculators found matching your search</div>';
-                return;
-            }
+                    if (!isDeleting && charIndex === currentPhrase.length) {
+                        timeout = typingData.pauseBetween;
+                        isDeleting = true;
+                    } else if (isDeleting && charIndex === 0) {
+                        isDeleting = false;
+                        typingIndex = (typingIndex + 1) % typingData.phrases.length;
+                        timeout = 500;
+                    }
 
-            results.innerHTML = data.map(item => {
-                const icon = item.icon || 'fas fa-calculator';
-                const color = item.color || '#6c757d';
-                const categoryBadge = item.category ? `<span class="category-badge" style="font-size:.75rem;color:${color};background:rgba(${hexToRgb(color)},0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(${hexToRgb(color)},0.2);font-weight:500;">${item.category}</span>` : '';
-                const subcategoryBadge = item.subcategory ? `<span class="subcategory-badge" style="font-size:.75rem;color:#64748b;background:rgba(100,116,139,0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(100,116,139,0.2);margin-left:0.25rem;">${item.subcategory}</span>` : '';
-                const snippet = item.description ? `<div style="font-size:.9rem;color:#64748b;margin-top:.4rem;line-height:1.4;">${item.description}</div>` : '';
-                const url = item.url || '#';
+                    typingTimeout = setTimeout(typeText, timeout);
+                }
 
-                return `<div class="search-result-item" style="cursor:pointer;padding:1rem;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:0.75rem;transition:all 0.2s ease;background:white;"
+                function startTypingEffect() {
+                    stopTypingEffect();
+                    charIndex = 0;
+                    isDeleting = false;
+                    typingIndex = 0;
+                    typeText();
+                }
+
+                function stopTypingEffect() {
+                    if (typingTimeout) {
+                        clearTimeout(typingTimeout);
+                    }
+                }
+
+                function openModal() {
+                    modal.classList.add('active');
+                    modal.setAttribute('aria-hidden', 'false');
+                    input.focus();
+                    input.select();
+                    startTypingEffect();
+
+                    // Removed automatic loading of popular calculators
+                    results.innerHTML = '';
+                }
+
+                function loadPopularCalculators() {
+                    const currentPath = window.location.pathname;
+                    let baseUrl = '';
+
+                    // Detect if we're in a subdirectory
+                    if (currentPath.includes('/Bishwo_Calculator/')) {
+                        baseUrl = '/Bishwo_Calculator';
+                    } else if (currentPath.includes('/bishwo_calculator/')) {
+                        baseUrl = '/bishwo_calculator';
+                    } else if (currentPath.includes('/aec-calculator/')) {
+                        baseUrl = '/aec-calculator';
+                    }
+
+                    console.log('Loading popular calculators from:', `${baseUrl}/api/search.php`);
+
+                    fetch(`${baseUrl}/api/search.php`)
+                        .then(r => {
+                            console.log('Popular calculators response status:', r.status);
+                            return r.json();
+                        })
+                        .then(data => {
+                            console.log('Popular calculators data:', data);
+                            if (Array.isArray(data) && data.length > 0) {
+                                renderSearchResults(data);
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Failed to load popular calculators:', err);
+                            results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-calculator" style="margin-right:0.5rem;"></i>Popular calculators will appear here</div>';
+                        });
+                }
+
+                function renderSearchResults(data) {
+                    if (!data || !Array.isArray(data)) {
+                        results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-exclamation-circle" style="margin-right:0.5rem;"></i>No results</div>';
+                        return;
+                    }
+
+                    if (data.length === 0) {
+                        results.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;"><i class="fas fa-search" style="margin-right:0.5rem;"></i>No calculators found matching your search</div>';
+                        return;
+                    }
+
+                    results.innerHTML = data.map(item => {
+                        const icon = item.icon || 'fas fa-calculator';
+                        const color = item.color || '#6c757d';
+                        const categoryBadge = item.category ? `<span class="category-badge" style="font-size:.75rem;color:${color};background:rgba(${hexToRgb(color)},0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(${hexToRgb(color)},0.2);font-weight:500;">${item.category}</span>` : '';
+                        const subcategoryBadge = item.subcategory ? `<span class="subcategory-badge" style="font-size:.75rem;color:#64748b;background:rgba(100,116,139,0.1);padding:.25rem .6rem;border-radius:20px;border:1px solid rgba(100,116,139,0.2);margin-left:0.25rem;">${item.subcategory}</span>` : '';
+                        const snippet = item.description ? `<div style="font-size:.9rem;color:#64748b;margin-top:.4rem;line-height:1.4;">${item.description}</div>` : '';
+                        const url = item.url || '#';
+
+                        return `<div class="search-result-item" style="cursor:pointer;padding:1rem;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:0.75rem;transition:all 0.2s ease;background:white;"
                              onmouseover="this.style.borderColor='${color}';this.style.boxShadow='0 4px 20px rgba(${hexToRgb(color)},0.15)';this.style.transform='translateY(-2px)';"
                              onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='none';this.style.transform='translateY(0)';"
                              onclick="window.location.href='${url}';closeModal();">
@@ -2453,236 +2501,241 @@ if (
                         </div>
                     </div>
                 </div>`;
-            }).join('');
-        }
-
-        function closeModal(){
-            modal.classList.remove('active');
-            modal.setAttribute('aria-hidden','true');
-            results.innerHTML = '';
-            input.value = '';
-            stopTypingEffect();
-            // Reset to default placeholder
-            input.placeholder = 'Search calculators, tools, and utilities...';
-        }
-
-        toggleBtn.addEventListener('click', openModal);
-        closeBtn && closeBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', function(e){ if(e.target===modal) closeModal(); });
-
-        // Add ESC key support to close modal
-        document.addEventListener('keydown', function(e){
-            if(e.key === 'Escape' && modal.classList.contains('active')) {
-                closeModal();
-            }
-        });
-
-        // Stop typing effect when user starts typing
-        input.addEventListener('input', function(){
-            if (typingTimeout) {
-                clearTimeout(typingTimeout);
-                typingTimeout = null;
-            }
-            // User typed something, keep their text
-        });
-
-        let debounceTimer = null;
-        input.addEventListener('input', function(){
-            clearTimeout(debounceTimer);
-            const q = input.value.trim();
-            if(q.length < 2){ results.innerHTML = ''; return; }
-            debounceTimer = setTimeout(()=>{
-                // Use dynamic base URL to avoid path issues
-                const currentPath = window.location.pathname;
-                let baseUrl = '';
-
-                // Detect if we're in a subdirectory
-                if (currentPath.includes('/Bishwo_Calculator/')) {
-                    baseUrl = '/Bishwo_Calculator';
-                } else if (currentPath.includes('/bishwo_calculator/')) {
-                    baseUrl = '/bishwo_calculator';
-                } else if (currentPath.includes('/aec-calculator/')) {
-                    baseUrl = '/aec-calculator';
+                    }).join('');
                 }
 
-                console.log('Search API URL:', `${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`);
-                fetch(`${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`)
-                .then(r=>r.json())
-                .then(data=>{
-                    console.log('Search results received:', data);
-                    renderSearchResults(data);
-                }).catch(err=>{
-                    console.error('Search API Error:', err);
-                    console.error('Search URL was:', `${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`);
+                function closeModal() {
+                    modal.classList.remove('active');
+                    modal.setAttribute('aria-hidden', 'true');
+                    results.innerHTML = '';
+                    input.value = '';
+                    stopTypingEffect();
+                    // Reset to default placeholder
+                    input.placeholder = 'Search calculators, tools, and utilities...';
+                }
 
-                    results.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">
+                toggleBtn.addEventListener('click', openModal);
+                closeBtn && closeBtn.addEventListener('click', closeModal);
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) closeModal();
+                });
+
+                // Add ESC key support to close modal
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && modal.classList.contains('active')) {
+                        closeModal();
+                    }
+                });
+
+                // Stop typing effect when user starts typing
+                input.addEventListener('input', function() {
+                    if (typingTimeout) {
+                        clearTimeout(typingTimeout);
+                        typingTimeout = null;
+                    }
+                    // User typed something, keep their text
+                });
+
+                let debounceTimer = null;
+                input.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    const q = input.value.trim();
+                    if (q.length < 2) {
+                        results.innerHTML = '';
+                        return;
+                    }
+                    debounceTimer = setTimeout(() => {
+                        // Use dynamic base URL to avoid path issues
+                        const currentPath = window.location.pathname;
+                        let baseUrl = '';
+
+                        // Detect if we're in a subdirectory
+                        if (currentPath.includes('/Bishwo_Calculator/')) {
+                            baseUrl = '/Bishwo_Calculator';
+                        } else if (currentPath.includes('/bishwo_calculator/')) {
+                            baseUrl = '/bishwo_calculator';
+                        } else if (currentPath.includes('/aec-calculator/')) {
+                            baseUrl = '/aec-calculator';
+                        }
+
+                        console.log('Search API URL:', `${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`);
+                        fetch(`${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`)
+                            .then(r => r.json())
+                            .then(data => {
+                                console.log('Search results received:', data);
+                                renderSearchResults(data);
+                            }).catch(err => {
+                                console.error('Search API Error:', err);
+                                console.error('Search URL was:', `${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`);
+
+                                results.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">
                         <i class="fas fa-exclamation-triangle" style="margin-right:0.5rem;"></i>
                         Search failed. Please try again.
                         <div style="font-size:0.8rem;margin-top:0.5rem;color:#64748b;">
                             Check browser console for details
                         </div>
                     </div>`;
+                            });
+                    }, 300);
                 });
-            }, 300);
-        });
-    })();
+            })();
 
-    // Profile dropdown functionality with hover and click
-    (function(){
-        const profileToggle = document.getElementById('profileToggleBtn');
-        const profileDropdown = document.getElementById('profileDropdown');
-        const profileWrapper = document.querySelector('.profile-dropdown-wrapper');
+            // Profile dropdown functionality with hover and click
+            (function() {
+                const profileToggle = document.getElementById('profileToggleBtn');
+                const profileDropdown = document.getElementById('profileDropdown');
+                const profileWrapper = document.querySelector('.profile-dropdown-wrapper');
 
-        // Profile dropdown toggle
-        if (profileToggle && profileDropdown && profileWrapper) {
-            let dropdownTimeout;
+                // Profile dropdown toggle
+                if (profileToggle && profileDropdown && profileWrapper) {
+                    let dropdownTimeout;
 
-            // Show on hover
-            profileWrapper.addEventListener('mouseenter', function() {
-                clearTimeout(dropdownTimeout);
-                profileDropdown.classList.add('active');
-            });
+                    // Show on hover
+                    profileWrapper.addEventListener('mouseenter', function() {
+                        clearTimeout(dropdownTimeout);
+                        profileDropdown.classList.add('active');
+                    });
 
-            // Hide on mouse leave
-            profileWrapper.addEventListener('mouseleave', function() {
-                dropdownTimeout = setTimeout(() => {
-                    profileDropdown.classList.remove('active');
-                }, 200);
-            });
+                    // Hide on mouse leave
+                    profileWrapper.addEventListener('mouseleave', function() {
+                        dropdownTimeout = setTimeout(() => {
+                            profileDropdown.classList.remove('active');
+                        }, 200);
+                    });
 
-            // Toggle on click
-            profileToggle.addEventListener('click', function(e){
-                e.stopPropagation();
-                profileDropdown.classList.toggle('active');
-            });
+                    // Toggle on click
+                    profileToggle.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        profileDropdown.classList.toggle('active');
+                    });
 
-            // Close profile dropdown when clicking outside
-            document.addEventListener('click', function(e){
-                if (!profileToggle.contains(e.target) && !profileDropdown.contains(e.target)) {
-                    profileDropdown.classList.remove('active');
+                    // Close profile dropdown when clicking outside
+                    document.addEventListener('click', function(e) {
+                        if (!profileToggle.contains(e.target) && !profileDropdown.contains(e.target)) {
+                            profileDropdown.classList.remove('active');
+                        }
+                    });
                 }
-            });
-        }
-    })();
+            })();
 
-    // Favorites and Help functionality
-    (function(){
-        const favoritesItem = document.getElementById('favoritesMenuItem');
-        const helpItem = document.getElementById('helpMenuItem');
+            // Favorites and Help functionality
+            (function() {
+                const favoritesItem = document.getElementById('favoritesMenuItem');
+                const helpItem = document.getElementById('helpMenuItem');
 
-        if (favoritesItem) {
-            favoritesItem.addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('Favorites feature coming soon!');
-            });
-        }
-    })();
-
-    // Global function to open search modal from favorites
-    window.openSearchModal = function() {
-        const searchModal = document.getElementById('searchModal');
-        const searchToggleBtn = document.getElementById('searchToggleBtn');
-        if (searchModal && searchToggleBtn) {
-            searchToggleBtn.click();
-        }
-    };
-
-        // Enhanced JavaScript for header functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const header = document.getElementById('siteHeader');
-            const hamburgerBtn = document.getElementById('hamburgerBtn');
-            const mobileNav = document.getElementById('mobileNav');
-            const themeToggleBtn = document.getElementById('themeToggleBtn');
-            const globalSearch = document.getElementById('globalSearch');
-            const searchSuggestions = document.getElementById('searchSuggestions');
-
-            // Scroll effect for header
-            window.addEventListener('scroll', function() {
-                if (window.scrollY > 50) {
-                    header.classList.add('scrolled');
-                } else {
-                    header.classList.remove('scrolled');
+                if (favoritesItem) {
+                    favoritesItem.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        alert('Favorites feature coming soon!');
+                    });
                 }
-            });
+            })();
 
-            // Mobile menu toggle
-            hamburgerBtn.addEventListener('click', function() {
-                mobileNav.classList.toggle('active');
-                this.innerHTML = mobileNav.classList.contains('active') ?
-                    '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
-            });
-
-            // Theme Toggle Functionality - Day/Night Mode
-            if (themeToggleBtn) {
-                // Check for saved theme preference or default to dark
-                const savedTheme = localStorage.getItem('theme') || 'dark';
-                
-                // Apply saved theme
-                if (savedTheme === 'dark') {
-                    document.body.classList.add('dark-theme');
-                    document.body.setAttribute('data-theme', 'dark');
-                    themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
-                    themeToggleBtn.setAttribute('data-label', 'Dark Mode');
-                } else {
-                    document.body.classList.remove('dark-theme');
-                    document.body.setAttribute('data-theme', 'light');
-                    themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
-                    themeToggleBtn.setAttribute('data-label', 'Light Mode');
+            // Global function to open search modal from favorites
+            window.openSearchModal = function() {
+                const searchModal = document.getElementById('searchModal');
+                const searchToggleBtn = document.getElementById('searchToggleBtn');
+                if (searchModal && searchToggleBtn) {
+                    searchToggleBtn.click();
                 }
-                
-                // Toggle theme on button click
-                themeToggleBtn.addEventListener('click', function() {
-                    const icon = this.querySelector('i');
-                    const isDark = document.body.classList.contains('dark-theme');
-                    
-                    // Toggle theme
-                    if (isDark) {
-                        // Switch to light mode
-                        document.body.classList.remove('dark-theme');
-                        document.body.setAttribute('data-theme', 'light');
-                        icon.className = 'fas fa-sun';
-                        this.setAttribute('data-label', 'Light Mode');
-                        localStorage.setItem('theme', 'light');
-                        
-                        // Animate icon change
-                        icon.style.transform = 'rotate(180deg) scale(1.2)';
-                        setTimeout(() => {
-                            icon.style.transform = '';
-                        }, 400);
-                        
-                        showThemeNotification('☀️ Light Mode Enabled');
+            };
+
+            // Enhanced JavaScript for header functionality
+            document.addEventListener('DOMContentLoaded', function() {
+                const header = document.getElementById('siteHeader');
+                const hamburgerBtn = document.getElementById('hamburgerBtn');
+                const mobileNav = document.getElementById('mobileNav');
+                const themeToggleBtn = document.getElementById('themeToggleBtn');
+                const globalSearch = document.getElementById('globalSearch');
+                const searchSuggestions = document.getElementById('searchSuggestions');
+
+                // Scroll effect for header
+                window.addEventListener('scroll', function() {
+                    if (window.scrollY > 50) {
+                        header.classList.add('scrolled');
                     } else {
-                        // Switch to dark mode
-                        document.body.classList.add('dark-theme');
-                        document.body.setAttribute('data-theme', 'dark');
-                        icon.className = 'fas fa-moon';
-                        this.setAttribute('data-label', 'Dark Mode');
-                        localStorage.setItem('theme', 'dark');
-                        
-                        // Animate icon change
-                        icon.style.transform = 'rotate(-180deg) scale(1.2)';
-                        setTimeout(() => {
-                            icon.style.transform = '';
-                        }, 400);
-                        
-                        showThemeNotification('🌙 Dark Mode Enabled');
+                        header.classList.remove('scrolled');
                     }
                 });
-            }
-            
-            // Show theme change notification
-            function showThemeNotification(message) {
-                // Remove existing notification if any
-                const existing = document.querySelector('.theme-notification');
-                if (existing) {
-                    existing.remove();
+
+                // Mobile menu toggle
+                hamburgerBtn.addEventListener('click', function() {
+                    mobileNav.classList.toggle('active');
+                    this.innerHTML = mobileNav.classList.contains('active') ?
+                        '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+                });
+
+                // Theme Toggle Functionality - Day/Night Mode
+                if (themeToggleBtn) {
+                    // Check for saved theme preference or default to dark
+                    const savedTheme = localStorage.getItem('theme') || 'dark';
+
+                    // Apply saved theme
+                    if (savedTheme === 'dark') {
+                        document.body.classList.add('dark-theme');
+                        document.body.setAttribute('data-theme', 'dark');
+                        themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+                        themeToggleBtn.setAttribute('data-label', 'Dark Mode');
+                    } else {
+                        document.body.classList.remove('dark-theme');
+                        document.body.setAttribute('data-theme', 'light');
+                        themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+                        themeToggleBtn.setAttribute('data-label', 'Light Mode');
+                    }
+
+                    // Toggle theme on button click
+                    themeToggleBtn.addEventListener('click', function() {
+                        const icon = this.querySelector('i');
+                        const isDark = document.body.classList.contains('dark-theme');
+
+                        // Toggle theme
+                        if (isDark) {
+                            // Switch to light mode
+                            document.body.classList.remove('dark-theme');
+                            document.body.setAttribute('data-theme', 'light');
+                            icon.className = 'fas fa-sun';
+                            this.setAttribute('data-label', 'Light Mode');
+                            localStorage.setItem('theme', 'light');
+
+                            // Animate icon change
+                            icon.style.transform = 'rotate(180deg) scale(1.2)';
+                            setTimeout(() => {
+                                icon.style.transform = '';
+                            }, 400);
+
+                            showThemeNotification('☀️ Light Mode Enabled');
+                        } else {
+                            // Switch to dark mode
+                            document.body.classList.add('dark-theme');
+                            document.body.setAttribute('data-theme', 'dark');
+                            icon.className = 'fas fa-moon';
+                            this.setAttribute('data-label', 'Dark Mode');
+                            localStorage.setItem('theme', 'dark');
+
+                            // Animate icon change
+                            icon.style.transform = 'rotate(-180deg) scale(1.2)';
+                            setTimeout(() => {
+                                icon.style.transform = '';
+                            }, 400);
+
+                            showThemeNotification('🌙 Dark Mode Enabled');
+                        }
+                    });
                 }
-                
-                // Create notification
-                const notification = document.createElement('div');
-                notification.className = 'theme-notification';
-                notification.textContent = message;
-                notification.style.cssText = `
+
+                // Show theme change notification
+                function showThemeNotification(message) {
+                    // Remove existing notification if any
+                    const existing = document.querySelector('.theme-notification');
+                    if (existing) {
+                        existing.remove();
+                    }
+
+                    // Create notification
+                    const notification = document.createElement('div');
+                    notification.className = 'theme-notification';
+                    notification.textContent = message;
+                    notification.style.cssText = `
                     position: fixed;
                     top: 80px;
                     right: 20px;
@@ -2698,120 +2751,120 @@ if (
                     transform: translateY(-10px);
                     transition: all 0.3s ease;
                 `;
-                
-                document.body.appendChild(notification);
-                
-                // Animate in
-                setTimeout(() => {
-                    notification.style.opacity = '1';
-                    notification.style.transform = 'translateY(0)';
-                }, 10);
-                
-                // Animate out and remove
-                setTimeout(() => {
-                    notification.style.opacity = '0';
-                    notification.style.transform = 'translateY(-10px)';
+
+                    document.body.appendChild(notification);
+
+                    // Animate in
                     setTimeout(() => {
-                        notification.remove();
-                    }, 300);
-                }, 2000);
-            }
+                        notification.style.opacity = '1';
+                        notification.style.transform = 'translateY(0)';
+                    }, 10);
 
-            console.log('Theme toggle enabled - Day/Night mode ready');
-
-            // Enhanced search functionality
-            let searchTimer = null;
-
-            function displaySearchResults(results) {
-                if (results.length === 0) {
-                    searchSuggestions.innerHTML = '<div class="p-3 text-gray-500">No tools found</div>';
-                    return;
+                    // Animate out and remove
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                        notification.style.transform = 'translateY(-10px)';
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 300);
+                    }, 2000);
                 }
 
-                searchSuggestions.innerHTML = results.map(result => `
+                console.log('Theme toggle enabled - Day/Night mode ready');
+
+                // Enhanced search functionality
+                let searchTimer = null;
+
+                function displaySearchResults(results) {
+                    if (results.length === 0) {
+                        searchSuggestions.innerHTML = '<div class="p-3 text-gray-500">No tools found</div>';
+                        return;
+                    }
+
+                    searchSuggestions.innerHTML = results.map(result => `
                     <a href="${result.url}" class="block p-3 hover:bg-blue-50 border-b border-gray-100 last:border-0">
                         <div class="font-medium text-gray-800">${result.name}</div>
                         <div class="text-sm text-gray-500">${result.category}</div>
                     </a>
                 `).join('');
-            }
-
-            // Close mobile menu and any open dropdowns when clicking outside the header
-            document.addEventListener('click', function(event) {
-                if (!header.contains(event.target)) {
-                    mobileNav.classList.remove('active');
-                    hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                    // Close any open dropdowns
-                    document.querySelectorAll('.has-dropdown.open').forEach(d => d.classList.remove('open'));
-                    // Update aria-expanded attributes
-                    document.querySelectorAll('.has-dropdown [aria-expanded="true"]').forEach(el => el.setAttribute('aria-expanded', 'false'));
                 }
-            });
 
-            // Enhanced dropdown functionality for both hover and click
-            document.querySelectorAll('.has-dropdown').forEach(dropdown => {
-                const trigger = dropdown.querySelector('[role="button"]');
-                const menu = dropdown.querySelector('.dropdown');
-
-                // Show on hover for desktop
-                dropdown.addEventListener('mouseenter', () => {
-                    if (window.innerWidth > 768) {
-                        dropdown.classList.add('open');
-                        if (trigger) trigger.setAttribute('aria-expanded', 'true');
+                // Close mobile menu and any open dropdowns when clicking outside the header
+                document.addEventListener('click', function(event) {
+                    if (!header.contains(event.target)) {
+                        mobileNav.classList.remove('active');
+                        hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                        // Close any open dropdowns
+                        document.querySelectorAll('.has-dropdown.open').forEach(d => d.classList.remove('open'));
+                        // Update aria-expanded attributes
+                        document.querySelectorAll('.has-dropdown [aria-expanded="true"]').forEach(el => el.setAttribute('aria-expanded', 'false'));
                     }
                 });
 
-                dropdown.addEventListener('mouseleave', () => {
-                    if (window.innerWidth > 768) {
-                        dropdown.classList.remove('open');
-                        if (trigger) trigger.setAttribute('aria-expanded', 'false');
-                    }
-                });
+                // Enhanced dropdown functionality for both hover and click
+                document.querySelectorAll('.has-dropdown').forEach(dropdown => {
+                    const trigger = dropdown.querySelector('[role="button"]');
+                    const menu = dropdown.querySelector('.dropdown');
 
-                // Toggle on click for mobile/touch
-                trigger.addEventListener('click', (e) => {
-                    if (window.innerWidth <= 768 || 'ontouchstart' in window) {
-                        e.preventDefault();
-                        const wasOpen = dropdown.classList.contains('open');
-
-                        // Close all other dropdowns
-                        document.querySelectorAll('.has-dropdown.open').forEach(d => {
-                            if (d !== dropdown) {
-                                d.classList.remove('open');
-                                const t = d.querySelector('[aria-expanded]');
-                                if (t) t.setAttribute('aria-expanded', 'false');
-                            }
-                        });
-
-                        // Toggle this dropdown
-                        dropdown.classList.toggle('open');
-                        trigger.setAttribute('aria-expanded', !wasOpen);
-                    }
-                });
-
-                // Keyboard support (Enter/Space)
-                if (trigger) {
-                    trigger.addEventListener('keydown', function(ev) {
-                        if (ev.key === 'Enter' || ev.key === ' ') {
-                            ev.preventDefault();
-                            drop.classList.toggle('open');
-                            trigger.setAttribute('aria-expanded', drop.classList.contains('open') ? 'true' : 'false');
+                    // Show on hover for desktop
+                    dropdown.addEventListener('mouseenter', () => {
+                        if (window.innerWidth > 768) {
+                            dropdown.classList.add('open');
+                            if (trigger) trigger.setAttribute('aria-expanded', 'true');
                         }
                     });
-                }
-            });
 
-            // Header dynamic update helpers (allow login page to refresh header without full reload)
-            const HEADER_STATUS_URL = '<?php echo app_base_url(
-                "api/header_status.php",
-            ); ?>';
+                    dropdown.addEventListener('mouseleave', () => {
+                        if (window.innerWidth > 768) {
+                            dropdown.classList.remove('open');
+                            if (trigger) trigger.setAttribute('aria-expanded', 'false');
+                        }
+                    });
 
-            function buildUserActionsHtml(user, isAdmin) {
-                const name = user.name || '';
-                const initial = user.initial || (name ? name.charAt(0).toUpperCase() : 'U');
-                const role = user.role || '';
+                    // Toggle on click for mobile/touch
+                    trigger.addEventListener('click', (e) => {
+                        if (window.innerWidth <= 768 || 'ontouchstart' in window) {
+                            e.preventDefault();
+                            const wasOpen = dropdown.classList.contains('open');
 
-                return `
+                            // Close all other dropdowns
+                            document.querySelectorAll('.has-dropdown.open').forEach(d => {
+                                if (d !== dropdown) {
+                                    d.classList.remove('open');
+                                    const t = d.querySelector('[aria-expanded]');
+                                    if (t) t.setAttribute('aria-expanded', 'false');
+                                }
+                            });
+
+                            // Toggle this dropdown
+                            dropdown.classList.toggle('open');
+                            trigger.setAttribute('aria-expanded', !wasOpen);
+                        }
+                    });
+
+                    // Keyboard support (Enter/Space)
+                    if (trigger) {
+                        trigger.addEventListener('keydown', function(ev) {
+                            if (ev.key === 'Enter' || ev.key === ' ') {
+                                ev.preventDefault();
+                                drop.classList.toggle('open');
+                                trigger.setAttribute('aria-expanded', drop.classList.contains('open') ? 'true' : 'false');
+                            }
+                        });
+                    }
+                });
+
+                // Header dynamic update helpers (allow login page to refresh header without full reload)
+                const HEADER_STATUS_URL = '<?php echo app_base_url(
+                                                "api/header_status.php",
+                                            ); ?>';
+
+                function buildUserActionsHtml(user, isAdmin) {
+                    const name = user.name || '';
+                    const initial = user.initial || (name ? name.charAt(0).toUpperCase() : 'U');
+                    const role = user.role || '';
+
+                    return `
                     <div class="has-dropdown">
                         <div class="user-avatar" title="${escapeHtml(name)}">${escapeHtml(initial)}</div>
                         <ul class="dropdown user-dropdown">
@@ -2820,189 +2873,205 @@ if (
                                 ${role ? `<div class="user-role">${escapeHtml(role)}</div>` : ''}
                             </li>
                             ${isAdmin ? `<li><a href="${escapeHtml('<?php echo app_base_url(
-                                "admin",
-                            ); ?>')}"><i class="fas fa-cog"></i> Admin Panel</a></li>` : ''}
+                                                                        "admin",
+                                                                    ); ?>')}"><i class="fas fa-cog"></i> Admin Panel</a></li>` : ''}
                             <li><a href="<?php echo app_base_url(
-                                "dashboard",
-                            ); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                                                "dashboard",
+                                            ); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                             <li><a href="<?php echo app_base_url(
-                                "profile",
-                            ); ?>"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
+                                                "profile",
+                                            ); ?>"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
                             <li><a href="<?php echo app_base_url(
-                                "logout",
-                            ); ?>"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                                                "logout",
+                                            ); ?>"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                         </ul>
                     </div>
                 `;
-            }
-
-            // Allow immediate header update using server-returned user object (from login API)
-            window.applyHeaderUser = function(serverUser, isAdmin) {
-                if (!serverUser) return;
-                // serverUser may contain full_name, username or name/initial from header_status
-                var name = serverUser.full_name || serverUser.name || serverUser.username || '';
-                var initial = serverUser.initial || (name ? name.charAt(0).toUpperCase() : 'U');
-                var role = serverUser.role || serverUser.user_role || serverUser.role_name || '';
-                var userObj = { name: name, initial: initial, role: role };
-                try {
-                    const ua = document.querySelector('.user-actions');
-                    if (!ua) return;
-                    ua.innerHTML = buildUserActionsHtml(userObj, !!isAdmin);
-                } catch (e) {
-                    console.warn('applyHeaderUser failed', e);
                 }
-            };
 
-            function escapeHtml(str) {
-                if (!str) return '';
-                return String(str).replace(/[&<>"'`]/g, function (s) {
-                    return ({'&':'&','<':'<','>':'>','"':'"',"'":'&#39;', '`':'&#96;'})[s];
-                });
-            }
-
-            window.refreshHeaderFromServer = async function() {
-                try {
-                    const res = await fetch(HEADER_STATUS_URL, { credentials: 'include' });
-                    if (!res.ok) return;
-                    const data = await res.json();
-                    const ua = document.querySelector('.user-actions');
-                    if (!ua) return;
-
-                    if (data.logged_in) {
-                        ua.innerHTML = buildUserActionsHtml(data.user, data.is_admin);
-                    } else {
-                        ua.innerHTML = '<a href="<?php echo app_base_url(
-                            "login",
-                        ); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
+                // Allow immediate header update using server-returned user object (from login API)
+                window.applyHeaderUser = function(serverUser, isAdmin) {
+                    if (!serverUser) return;
+                    // serverUser may contain full_name, username or name/initial from header_status
+                    var name = serverUser.full_name || serverUser.name || serverUser.username || '';
+                    var initial = serverUser.initial || (name ? name.charAt(0).toUpperCase() : 'U');
+                    var role = serverUser.role || serverUser.user_role || serverUser.role_name || '';
+                    var userObj = {
+                        name: name,
+                        initial: initial,
+                        role: role
+                    };
+                    try {
+                        const ua = document.querySelector('.user-actions');
+                        if (!ua) return;
+                        ua.innerHTML = buildUserActionsHtml(userObj, !!isAdmin);
+                    } catch (e) {
+                        console.warn('applyHeaderUser failed', e);
                     }
-                } catch (e) {
-                    console.warn('refreshHeaderFromServer failed', e);
+                };
+
+                function escapeHtml(str) {
+                    if (!str) return '';
+                    return String(str).replace(/[&<>"'`]/g, function(s) {
+                        return ({
+                            '&': '&',
+                            '<': '<',
+                            '>': '>',
+                            '"': '"',
+                            "'": '&#39;',
+                            '`': '&#96;'
+                        })[s];
+                    });
                 }
-            };
 
-            // Apply logged-out header - now shows login button
-            if (!document.querySelector('.user-actions .has-dropdown')) {
-                // No user actions dropdown found, means not logged in
-            }
+                window.refreshHeaderFromServer = async function() {
+                    try {
+                        const res = await fetch(HEADER_STATUS_URL, {
+                            credentials: 'include'
+                        });
+                        if (!res.ok) return;
+                        const data = await res.json();
+                        const ua = document.querySelector('.user-actions');
+                        if (!ua) return;
 
-            // Intercept logout link clicks to update header immediately (AJAX-friendly)
-            document.addEventListener('click', function(ev){
-                const a = ev.target.closest && ev.target.closest('a');
-                if (!a) return;
-                const href = a.getAttribute('href') || '';
-                if (href.indexOf('logout') !== -1) {
-                    // Prevent default navigation to allow immediate header update
-                    ev.preventDefault();
-                    (async function(){
-                        try {
-                            // Call logout endpoint (GET). include credentials to ensure session is destroyed.
-                            await fetch(href, { method: 'GET', credentials: 'include' });
-                        } catch (e) {
-                            // ignore network errors
+                        if (data.logged_in) {
+                            ua.innerHTML = buildUserActionsHtml(data.user, data.is_admin);
+                        } else {
+                            ua.innerHTML = '<a href="<?php echo app_base_url(
+                                                            "login",
+                                                        ); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
                         }
-                        // Update header - show login button
-                        try {
-                            const ua = document.querySelector('.user-actions');
-                            if (ua) ua.innerHTML = '<a href="<?php echo app_base_url(
-                                "login",
-                            ); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
-                        } catch (e) {
-                            console.warn('Header update failed', e);
-                        }
-                        // Then navigate to the logout href (redirect) or homepage
-                        window.location.href = href || '<?php echo app_base_url(
-                            "/",
-                        ); ?>';
-                    })();
+                    } catch (e) {
+                        console.warn('refreshHeaderFromServer failed', e);
+                    }
+                };
+
+                // Apply logged-out header - now shows login button
+                if (!document.querySelector('.user-actions .has-dropdown')) {
+                    // No user actions dropdown found, means not logged in
                 }
+
+                // Intercept logout link clicks to update header immediately (AJAX-friendly)
+                document.addEventListener('click', function(ev) {
+                    const a = ev.target.closest && ev.target.closest('a');
+                    if (!a) return;
+                    const href = a.getAttribute('href') || '';
+                    if (href.indexOf('logout') !== -1) {
+                        // Prevent default navigation to allow immediate header update
+                        ev.preventDefault();
+                        (async function() {
+                            try {
+                                // Call logout endpoint (GET). include credentials to ensure session is destroyed.
+                                await fetch(href, {
+                                    method: 'GET',
+                                    credentials: 'include'
+                                });
+                            } catch (e) {
+                                // ignore network errors
+                            }
+                            // Update header - show login button
+                            try {
+                                const ua = document.querySelector('.user-actions');
+                                if (ua) ua.innerHTML = '<a href="<?php echo app_base_url(
+                                                                        "login",
+                                                                    ); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
+                            } catch (e) {
+                                console.warn('Header update failed', e);
+                            }
+                            // Then navigate to the logout href (redirect) or homepage
+                            window.location.href = href || '<?php echo app_base_url(
+                                                                "/",
+                                                            ); ?>';
+                        })();
+                    }
+                });
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', function(event) {
+                    // Ctrl+K or / for search
+                    if ((event.ctrlKey && event.key === 'k') || event.key === '/') {
+                        event.preventDefault();
+                        globalSearch.focus();
+                    }
+
+                    // Escape to close mobile menu
+                    if (event.key === 'Escape') {
+                        mobileNav.classList.remove('active');
+                        hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                });
+
+                // Add search shortcut hint
+                globalSearch.addEventListener('focus', function() {
+                    this.setAttribute('placeholder', 'Press Ctrl+K to search quickly...');
+                });
+
+                globalSearch.addEventListener('blur', function() {
+                    this.setAttribute('placeholder', 'Search 50+ engineering tools...');
+                });
             });
 
-            // Keyboard shortcuts
-            document.addEventListener('keydown', function(event) {
-                // Ctrl+K or / for search
-                if ((event.ctrlKey && event.key === 'k') || event.key === '/') {
-                    event.preventDefault();
-                    globalSearch.focus();
+            // Auto-fit user greeting text
+            (function() {
+                const userGreeting = document.getElementById('userGreeting');
+                if (!userGreeting) return;
+
+                function autoFitGreeting() {
+                    const greeting = userGreeting;
+                    const strongElement = greeting.querySelector('strong');
+                    if (!strongElement) return;
+
+                    const nameText = strongElement.textContent.trim();
+                    const nameLength = nameText.length;
+
+                    // Reset classes
+                    greeting.classList.remove('long-name', 'very-long-name', 'extra-long-name');
+
+                    // Add appropriate class based on name length
+                    if (nameLength > 15) {
+                        greeting.classList.add('extra-long-name');
+                    } else if (nameLength > 10) {
+                        greeting.classList.add('very-long-name');
+                    } else if (nameLength > 7) {
+                        greeting.classList.add('long-name');
+                    }
+
+                    // Dynamic font size adjustment
+                    let fontSize = '0.8rem';
+                    if (nameLength > 15) {
+                        fontSize = '0.65rem';
+                    } else if (nameLength > 10) {
+                        fontSize = '0.7rem';
+                    } else if (nameLength > 7) {
+                        fontSize = '0.75rem';
+                    }
+
+                    greeting.style.fontSize = fontSize;
+
+                    // Adjust strong element max-width
+                    let maxWidth = '120px';
+                    if (nameLength > 15) {
+                        maxWidth = '90px';
+                    } else if (nameLength > 10) {
+                        maxWidth = '100px';
+                    } else if (nameLength > 7) {
+                        maxWidth = '110px';
+                    }
+
+                    strongElement.style.maxWidth = maxWidth;
+
+                    console.log(`Auto-fit greeting: "${nameText}" (${nameLength} chars) -> ${fontSize}, max-width: ${maxWidth}`);
                 }
 
-                // Escape to close mobile menu
-                if (event.key === 'Escape') {
-                    mobileNav.classList.remove('active');
-                    hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                }
-            });
+                // Run on page load
+                autoFitGreeting();
 
-            // Add search shortcut hint
-            globalSearch.addEventListener('focus', function() {
-                this.setAttribute('placeholder', 'Press Ctrl+K to search quickly...');
-            });
+                // Run on window resize
+                window.addEventListener('resize', autoFitGreeting);
 
-            globalSearch.addEventListener('blur', function() {
-                this.setAttribute('placeholder', 'Search 50+ engineering tools...');
-            });
-        });
-
-        // Auto-fit user greeting text
-        (function() {
-            const userGreeting = document.getElementById('userGreeting');
-            if (!userGreeting) return;
-
-            function autoFitGreeting() {
-                const greeting = userGreeting;
-                const strongElement = greeting.querySelector('strong');
-                if (!strongElement) return;
-
-                const nameText = strongElement.textContent.trim();
-                const nameLength = nameText.length;
-
-                // Reset classes
-                greeting.classList.remove('long-name', 'very-long-name', 'extra-long-name');
-
-                // Add appropriate class based on name length
-                if (nameLength > 15) {
-                    greeting.classList.add('extra-long-name');
-                } else if (nameLength > 10) {
-                    greeting.classList.add('very-long-name');
-                } else if (nameLength > 7) {
-                    greeting.classList.add('long-name');
-                }
-
-                // Dynamic font size adjustment
-                let fontSize = '0.8rem';
-                if (nameLength > 15) {
-                    fontSize = '0.65rem';
-                } else if (nameLength > 10) {
-                    fontSize = '0.7rem';
-                } else if (nameLength > 7) {
-                    fontSize = '0.75rem';
-                }
-
-                greeting.style.fontSize = fontSize;
-
-                // Adjust strong element max-width
-                let maxWidth = '120px';
-                if (nameLength > 15) {
-                    maxWidth = '90px';
-                } else if (nameLength > 10) {
-                    maxWidth = '100px';
-                } else if (nameLength > 7) {
-                    maxWidth = '110px';
-                }
-
-                strongElement.style.maxWidth = maxWidth;
-
-                console.log(`Auto-fit greeting: "${nameText}" (${nameLength} chars) -> ${fontSize}, max-width: ${maxWidth}`);
-            }
-
-            // Run on page load
-            autoFitGreeting();
-
-            // Run on window resize
-            window.addEventListener('resize', autoFitGreeting);
-
-            // Add CSS classes for different name lengths
-            const style = document.createElement('style');
-            style.textContent = `
+                // Add CSS classes for different name lengths
+                const style = document.createElement('style');
+                style.textContent = `
                 .user-greeting.long-name {
                     padding: 0.35rem 0.65rem;
                 }
@@ -3033,8 +3102,6 @@ if (
                     }
                 }
             `;
-            document.head.appendChild(style);
-        })();
-    </script>
-</body>
-</html>
+                document.head.appendChild(style);
+            })();
+        </script>

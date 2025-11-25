@@ -1,8 +1,19 @@
 <?php
-$page_title = 'Admin Dashboard - Bishwo Calculator';
-require_once dirname(__DIR__, 3) . '/themes/default/views/partials/header.php';
-?>
+/**
+ * Admin Dashboard Complex View
+ * Uses admin layout (sidebar, topbar, NO homepage header)
+ */
 
+$page_title = 'Admin Dashboard - Bishwo Calculator';
+
+// Get current user from session
+$currentUser = $_SESSION['user'] ?? [
+    'full_name' => 'Administrator',
+    'email' => 'admin@example.com'
+];
+
+// Dashboard content starts here
+$content = '
 <style>
     .admin-layout {
         display: flex;
@@ -357,7 +368,10 @@ require_once dirname(__DIR__, 3) . '/themes/default/views/partials/header.php';
         }
     }
 </style>
+';
 
+// Append the HTML content to the $content variable
+$content .= '
 <div class="admin-layout">
     <!-- Admin Sidebar -->
     <nav class="admin-sidebar">
@@ -571,5 +585,8 @@ require_once dirname(__DIR__, 3) . '/themes/default/views/partials/header.php';
         </div>
     </main>
 </div>
+';
 
-<?php require_once dirname(__DIR__, 3) . '/themes/default/views/partials/footer.php'; ?>
+// Include admin layout - uses sidebar, topbar, NO homepage header/footer
+include __DIR__ . '/layout.php';
+?>
