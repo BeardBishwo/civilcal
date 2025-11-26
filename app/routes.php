@@ -705,7 +705,7 @@ $router->add(
     "POST",
     "/admin/debug/run-tests",
     "Admin\DebugController@runTests",
-    ["auth", "admin"],
+    ["auth", "admin", "csrf"],
 );
 $router->add(
     "GET",
@@ -717,13 +717,13 @@ $router->add(
     "POST",
     "/admin/debug/live-errors",
     "Admin\DebugController@liveErrors",
-    ["auth", "admin"],
+    ["auth", "admin", "csrf"],
 );
 $router->add(
     "POST",
     "/admin/debug/clear-logs",
     "Admin\DebugController@clearLogs",
-    ["auth", "admin"],
+    ["auth", "admin", "csrf"],
 );
 
 // API Routes (Enhanced)

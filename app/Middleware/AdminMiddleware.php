@@ -76,7 +76,7 @@ class AdminMiddleware
      */
     private function redirectToLogin()
     {
-        $redirectUrl = app_base_url("/login");
+        $redirectUrl = \app_base_url("/login");
         if (!empty($_SERVER['REQUEST_URI'])) {
             $redirectUrl .= "?redirect=" . urlencode($_SERVER['REQUEST_URI']);
         }
