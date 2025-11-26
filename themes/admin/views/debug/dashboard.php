@@ -18,11 +18,11 @@ $content = '
                 <i class="fas fa-play"></i>
                 Run All Tests
             </button>
-            <a href="/Bishwo_Calculator/admin/debug/error-logs" class="btn btn-secondary">
+            <a href="' . app_base_url('admin/debug/error-logs') . '" class="btn btn-secondary">
                 <i class="fas fa-file-alt"></i>
                 View Error Logs
             </a>
-            <a href="/Bishwo_Calculator/admin/debug/live-errors" class="btn btn-info">
+            <a href="' . app_base_url('admin/debug/live-errors') . '" class="btn btn-info">
                 <i class="fas fa-broadcast-tower"></i>
                 Live Monitor
             </a>
@@ -186,7 +186,7 @@ $content .= '
                 <i class="fas fa-exclamation-triangle"></i>
                 Recent Errors
             </h3>
-            <a href="/Bishwo_Calculator/admin/debug/error-logs" class="btn btn-sm btn-primary">View All</a>
+            <a href="' . app_base_url('admin/debug/error-logs') . '" class="btn btn-sm btn-primary">View All</a>
         </div>
         <div class="card-content">
             <div class="error-list">';

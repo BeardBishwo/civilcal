@@ -21,7 +21,7 @@ const AdminApp = {
         const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
         const sidebar = document.getElementById('admin-sidebar');
 
-        if (sidebarToggle) {
+        if (sidebarToggle && sidebar) {
             // Remove any existing event listeners to prevent duplicates
             const newSidebarToggle = sidebarToggle.cloneNode(true);
             sidebarToggle.parentNode.replaceChild(newSidebarToggle, sidebarToggle);
@@ -49,40 +49,180 @@ const AdminApp = {
                     mainContent.classList.add('sidebar-collapsed');
                 }
             }
-        } else {
-            console.error('Sidebar toggle button not found!');
         }
 
-        if (mobileSidebarToggle) {
+        if (mobileSidebarToggle && sidebar) {
             mobileSidebarToggle.addEventListener('click', () => {
                 sidebar.classList.toggle('show');
             });
         }
 
         // Submenu handling
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                const parent = link.closest('.nav-item');
-                const submenu = parent.querySelector('.nav-submenu');
+        // Submenu handling
+        // Use event delegation to handle clicks on nav links
+        const navMenu = document.querySelector('.nav-menu');
+        if (navMenu) {
+            navMenu.addEventListener('click', (e) => {
+                const link = e.target.closest('.nav-link');
+                if (link) {
+                    const parent = link.closest('.nav-item');
+                    const submenu = parent ? parent.querySelector('.nav-submenu') : null;
 
-                if (submenu) {
-                    e.preventDefault();
-                    parent.classList.toggle('active');
+                    if (submenu) {
+                        e.preventDefault();
 
-                    // Close other submenus
-                    document.querySelectorAll('.nav-item').forEach(item => {
-                        if (item !== parent && !item.querySelector('.nav-submenu a[href="' + window.location.pathname + '"]')) {
-                            item.classList.remove('active');
+                        // Toggle active class
+                        parent.classList.toggle('active');
+
+                        // Handle dynamic max-height for smooth transition
+                        if (parent.classList.contains('active')) {
+                            submenu.style.maxHeight = submenu.scrollHeight + "px";
+                        } else {
+                            submenu.style.maxHeight = null;
                         }
-                    });
+
+                        // Rotate arrow icon
+                        const arrow = link.querySelector('.nav-arrow');
+                        if (arrow) {
+                            if (parent.classList.contains('active')) {
+                                arrow.style.transform = 'rotate(90deg)';
+                            } else {
+                                arrow.style.transform = 'rotate(0deg)';
+                            }
+                        }
+
+                        // Position submenu correctly when sidebar is collapsed
+                        const sidebar = document.getElementById('admin-sidebar');
+                        if (sidebar && sidebar.classList.contains('collapsed')) {
+                            if (parent.classList.contains('active')) {
+                                // Position submenu to the right of the collapsed sidebar
+                                submenu.style.position = 'absolute';
+                                submenu.style.left = '70px';
+                                submenu.style.top = parent.offsetTop + 'px';
+                                submenu.style.background = 'var(--admin-white)';
+                                submenu.style.boxShadow = 'var(--admin-shadow-lg)';
+                                submenu.style.borderRadius = '0 8px 8px 0';
+                                submenu.style.minWidth = '200px';
+                                submenu.style.zIndex = '1001';
+                                submenu.style.maxHeight = 'none'; // Allow full height when collapsed
+                            } else {
+                                // Reset submenu styles when closing
+                                submenu.style.position = '';
+                                submenu.style.left = '';
+                                submenu.style.top = '';
+                                submenu.style.background = '';
+                                submenu.style.boxShadow = '';
+                                submenu.style.borderRadius = '';
+                                submenu.style.minWidth = '';
+                                submenu.style.zIndex = '';
+                                submenu.style.maxHeight = null;
+                            }
+                        }
+
+                        // Close other submenus
+                        document.querySelectorAll('.nav-item').forEach(item => {
+                            if (item !== parent && item.classList.contains('active')) {
+                                item.classList.remove('active');
+
+                                // Reset arrow rotation for other items
+                                const otherArrow = item.querySelector('.nav-link .nav-arrow');
+                                if (otherArrow) {
+                                    otherArrow.style.transform = 'rotate(0deg)';
+                                }
+
+                                // Reset submenu styles for other items
+                                const otherSubmenu = item.querySelector('.nav-submenu');
+                                if (otherSubmenu) {
+                                    otherSubmenu.style.maxHeight = null;
+
+                                    otherSubmenu.style.position = '';
+                                    otherSubmenu.style.left = '';
+                                    otherSubmenu.style.top = '';
+                                    otherSubmenu.style.background = '';
+                                    otherSubmenu.style.boxShadow = '';
+                                    otherSubmenu.style.borderRadius = '';
+                                    otherSubmenu.style.minWidth = '';
+                                    otherSubmenu.style.zIndex = '';
+                                }
+                            }
+                        });
+                    }
                 }
             });
-        });
+        }
 
         // Auto-open active submenu
-        const activeSubmenuLink = document.querySelector('.nav-submenu a[href="' + window.location.pathname + '"]');
-        if (activeSubmenuLink) {
-            activeSubmenuLink.closest('.nav-item').classList.add('active');
+        try {
+            const currentPath = window.location.pathname;
+            let activeSubmenuLink = document.querySelector('.nav-submenu a[href="' + currentPath + '"]');
+
+            if (activeSubmenuLink) {
+                const parentItem = activeSubmenuLink.closest('.nav-item');
+                if (parentItem) {
+                    parentItem.classList.add('active');
+                    // Rotate arrow icon for active item
+                    const parentLink = parentItem.querySelector('.nav-link');
+                    if (parentLink) {
+                        const arrow = parentLink.querySelector('.nav-arrow');
+                        if (arrow) {
+                            arrow.style.transform = 'rotate(90deg)';
+                        }
+                    }
+
+                    // Position submenu correctly when sidebar is collapsed
+                    const sidebar = document.getElementById('admin-sidebar');
+                    const submenu = parentItem.querySelector('.nav-submenu');
+                    if (sidebar && sidebar.classList.contains('collapsed') && submenu) {
+                        // Position submenu to the right of the collapsed sidebar
+                        submenu.style.position = 'absolute';
+                        submenu.style.left = '70px';
+                        submenu.style.top = parentItem.offsetTop + 'px';
+                        submenu.style.background = 'var(--admin-white)';
+                        submenu.style.boxShadow = 'var(--admin-shadow-lg)';
+                        submenu.style.borderRadius = '0 8px 8px 0';
+                        submenu.style.minWidth = '200px';
+                        submenu.style.zIndex = '1001';
+                    }
+                }
+            } else {
+                // Try to match without base path
+                const pathParts = currentPath.split('/');
+                if (pathParts.length > 2) {
+                    const adminPath = '/' + pathParts.slice(2).join('/');
+                    const activeSubmenuLinkAlt = document.querySelector('.nav-submenu a[href="' + adminPath + '"]');
+                    if (activeSubmenuLinkAlt) {
+                        const parentItem = activeSubmenuLinkAlt.closest('.nav-item');
+                        if (parentItem) {
+                            parentItem.classList.add('active');
+                            // Rotate arrow icon for active item
+                            const parentLink = parentItem.querySelector('.nav-link');
+                            if (parentLink) {
+                                const arrow = parentLink.querySelector('.nav-arrow');
+                                if (arrow) {
+                                    arrow.style.transform = 'rotate(90deg)';
+                                }
+                            }
+
+                            // Position submenu correctly when sidebar is collapsed
+                            const sidebar = document.getElementById('admin-sidebar');
+                            const submenu = parentItem.querySelector('.nav-submenu');
+                            if (sidebar && sidebar.classList.contains('collapsed') && submenu) {
+                                // Position submenu to the right of the collapsed sidebar
+                                submenu.style.position = 'absolute';
+                                submenu.style.left = '70px';
+                                submenu.style.top = parentItem.offsetTop + 'px';
+                                submenu.style.background = 'var(--admin-white)';
+                                submenu.style.boxShadow = 'var(--admin-shadow-lg)';
+                                submenu.style.borderRadius = '0 8px 8px 0';
+                                submenu.style.minWidth = '200px';
+                                submenu.style.zIndex = '1001';
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to auto-open active submenu:', error);
         }
     },
 
@@ -98,8 +238,10 @@ const AdminApp = {
             });
 
             // Close dropdown when clicking outside
-            document.addEventListener('click', () => {
-                userDropdown.classList.remove('show');
+            document.addEventListener('click', (e) => {
+                if (!userAvatar.contains(e.target)) {
+                    userDropdown.classList.remove('show');
+                }
             });
         }
     },
@@ -211,19 +353,19 @@ const AdminApp = {
                 try {
                     const formData = new FormData(form);
                     console.log('FormData created, action:', form.action);
-                    
+
                     // Debug: log all form data
                     for (let [key, value] of formData.entries()) {
                         console.log('Form data:', key, value);
                     }
-                    
+
                     const response = await fetch(form.action, {
                         method: form.method,
                         body: formData
                     });
 
                     console.log('Response status:', response.status);
-                    
+
                     const result = await response.json();
                     console.log('Parsed result:', result);
 
@@ -231,7 +373,7 @@ const AdminApp = {
                         // Extract the number of updated settings from the message
                         const match = result.message.match(/(\d+) settings? updated/);
                         const updatedCount = match ? parseInt(match[1]) : 0;
-                        
+
                         if (updatedCount > 0) {
                             // Green toast for actual changes saved
                             this.showNotification(result.message || 'Settings saved successfully!', 'success');
@@ -239,7 +381,7 @@ const AdminApp = {
                             // Red toast for no changes made
                             this.showNotification('No changes were made. Settings remain unchanged.', 'error');
                         }
-                        
+
                         if (result.redirect) {
                             setTimeout(() => window.location.href = result.redirect, 1500);
                         }
@@ -597,7 +739,7 @@ window.ModuleManager = ModuleManager;
 // Examples:
 //  showToast('success', 'Saved successfully')
 //  showToast('info', 'Mode', 'Switched to dark mode')
-window.showToast = function(type = 'info', titleOrMessage = '', message = '') {
+window.showToast = function (type = 'info', titleOrMessage = '', message = '') {
     try {
         let text = '';
 
