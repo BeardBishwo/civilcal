@@ -146,10 +146,110 @@ const AdminApp = {
                                 }
                             }
                         });
+
+                        // Navigate to the first submenu link by default
+                        const firstSubLink = submenu.querySelector('a');
+                        if (firstSubLink && firstSubLink.href) {
+                            // Slight delay to let UI reflect the expand action
+                            setTimeout(() => {
+                                window.location.href = firstSubLink.href;
+                            }, 50);
+                        }
                     }
                 }
             });
         }
+
+        try {
+            const sidebarEl = document.getElementById('admin-sidebar');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            navItems.forEach((item) => {
+                item.addEventListener('mouseenter', () => {
+                    if (!sidebarEl || !sidebarEl.classList.contains('collapsed')) return;
+                    const submenu = item.querySelector('.nav-submenu');
+                    if (!submenu) return;
+                    item.classList.add('active');
+                    submenu.style.position = 'absolute';
+                    submenu.style.left = '70px';
+                    submenu.style.top = item.offsetTop + 'px';
+                    submenu.style.background = 'var(--admin-white)';
+                    submenu.style.boxShadow = 'var(--admin-shadow-lg)';
+                    submenu.style.borderRadius = '0 8px 8px 0';
+                    submenu.style.minWidth = '200px';
+                    submenu.style.zIndex = '1001';
+                    submenu.style.maxHeight = 'none';
+                });
+
+                item.addEventListener('mouseleave', () => {
+                    if (!sidebarEl || !sidebarEl.classList.contains('collapsed')) return;
+                    const submenu = item.querySelector('.nav-submenu');
+                    if (!submenu) return;
+                    item.classList.remove('active');
+                    submenu.style.position = '';
+                    submenu.style.left = '';
+                    submenu.style.top = '';
+                    submenu.style.background = '';
+                    submenu.style.boxShadow = '';
+                    submenu.style.borderRadius = '';
+                    submenu.style.minWidth = '';
+                    submenu.style.zIndex = '';
+                    submenu.style.maxHeight = null;
+                });
+            });
+        } catch (e) {}
+
+        // Explicit toggle when clicking the arrow icon
+        try {
+            document.querySelectorAll('.nav-arrow').forEach((arrow) => {
+                const newArrow = arrow.cloneNode(true);
+                arrow.parentNode.replaceChild(newArrow, arrow);
+
+                newArrow.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const parent = newArrow.closest('.nav-item');
+                    if (!parent) return;
+                    const submenu = parent.querySelector('.nav-submenu');
+                    if (!submenu) return;
+
+                    parent.classList.toggle('active');
+
+                    // Smooth max-height transition in expanded mode
+                    if (parent.classList.contains('active')) {
+                        submenu.style.maxHeight = submenu.scrollHeight + 'px';
+                    } else {
+                        submenu.style.maxHeight = null;
+                    }
+
+                    // Position submenu when sidebar is collapsed
+                    const sidebar = document.getElementById('admin-sidebar');
+                    if (sidebar && sidebar.classList.contains('collapsed')) {
+                        if (parent.classList.contains('active')) {
+                            submenu.style.position = 'absolute';
+                            submenu.style.left = '70px';
+                            submenu.style.top = parent.offsetTop + 'px';
+                            submenu.style.background = 'var(--admin-white)';
+                            submenu.style.boxShadow = 'var(--admin-shadow-lg)';
+                            submenu.style.borderRadius = '0 8px 8px 0';
+                            submenu.style.minWidth = '200px';
+                            submenu.style.zIndex = '1001';
+                            submenu.style.maxHeight = 'none';
+                        } else {
+                            submenu.style.position = '';
+                            submenu.style.left = '';
+                            submenu.style.top = '';
+                            submenu.style.background = '';
+                            submenu.style.boxShadow = '';
+                            submenu.style.borderRadius = '';
+                            submenu.style.minWidth = '';
+                            submenu.style.zIndex = '';
+                            submenu.style.maxHeight = null;
+                        }
+                    }
+                });
+            });
+        } catch (e) {}
 
         // Auto-open active submenu
         try {
