@@ -84,7 +84,6 @@
             color: #333;
             text-decoration: none;
             transition: all 0.3s ease;
-            position: relative;
         }
 
         .sidebar-menu a:hover {
@@ -104,21 +103,6 @@
 
         .sidebar-collapsed .sidebar-menu span {
             display: none;
-        }
-
-        .sidebar-collapsed .sidebar-menu a:hover span {
-            display: inline-block;
-            position: absolute;
-            left: 60px;
-            top: 50%;
-            transform: translateY(-50%);
-            white-space: nowrap;
-            background: #ffffff;
-            color: #333333;
-            padding: 6px 10px;
-            border-radius: 6px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
-            z-index: 1001;
         }
 
         /* Main Content */

@@ -57,7 +57,7 @@
         function poll() {
             if (!isPolling) return;
 
-            fetch('/Bishwo_Calculator/admin/debug/live-errors', {
+            fetch('<?= app_base_url('admin/debug/live-errors') ?>', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',

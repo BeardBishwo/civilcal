@@ -84,6 +84,15 @@ class DebugController extends Controller
             return;
         }
 
+        if (empty($_SESSION['csrf_token'])) {
+            if (class_exists('Security')) {
+                \Security::generateCsrfToken();
+            } else {
+                $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+                $_SESSION['csrf_expiry'] = time() + 3600;
+            }
+        }
+
         $data = [
             'page_title' => 'System Tests',
             'available_tests' => $this->getAvailableTests(),

@@ -226,6 +226,8 @@ $content .= '
 
 <script>
 // Test runner functions
+const csrfToken = '<?= $_SESSION['csrf_token'] ?? '' ?>';
+
 async function runAllTests() {
     const button = event.target;
     const originalText = button.innerHTML;
@@ -233,12 +235,12 @@ async function runAllTests() {
     button.innerHTML = \'<i class="fas fa-spinner fa-spin"></i> Running Tests...\';
     
     try {
-        const response = await fetch("/Bishwo_Calculator/admin/debug/run-tests", {
+        const response = await fetch("<?= app_base_url('admin/debug/run-tests') ?>", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "test_type=all"
+            body: `test_type=all&csrf_token=${encodeURIComponent(csrfToken)}`
         });
         
         const result = await response.json();
@@ -314,7 +316,7 @@ async function clearErrorLogs() {
     }
     
     try {
-        const response = await fetch("/Bishwo_Calculator/admin/debug/clear-logs", {
+        const response = await fetch("<?= app_base_url('admin/debug/clear-logs') ?>", {
             method: "POST"
         });
         

@@ -90,25 +90,6 @@
     display: none;
 }
 
-.admin-sidebar.collapsed .nav-link {
-    position: relative;
-}
-
-.admin-sidebar.collapsed .nav-link:hover .nav-text {
-    display: inline-block;
-    position: absolute;
-    left: 70px;
-    top: 50%;
-    transform: translateY(-50%);
-    white-space: nowrap;
-    background: var(--admin-white);
-    color: var(--admin-gray-800);
-    padding: 6px 10px;
-    border-radius: 6px;
-    box-shadow: var(--admin-shadow-lg);
-    z-index: 1001;
-}
-
 /* Show active submenus even when sidebar is collapsed */
 .admin-sidebar.collapsed .nav-item.active .nav-submenu {
     display: block;
@@ -214,7 +195,6 @@
 .nav-arrow {
     font-size: 12px;
     transition: var(--transition);
-    cursor: pointer;
 }
 
 .nav-item.active .nav-arrow {
