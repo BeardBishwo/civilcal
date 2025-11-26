@@ -13,6 +13,30 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <meta name="csrf-token" content="<?php echo function_exists('csrf_token') ? csrf_token() : ($_SESSION['csrf_token'] ?? ''); ?>">
+    <script>
+    (function(){
+      var meta = document.querySelector('meta[name="csrf-token"]');
+      var token = meta ? meta.getAttribute('content') : '';
+      var origFetch = window.fetch;
+      window.fetch = function(input, init){
+        init = init || {};
+        var method = String(init.method || 'GET').toUpperCase();
+        if (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE'){
+          var headers = init.headers || {};
+          if (typeof Headers !== 'undefined' && headers instanceof Headers){
+            headers.set('X-CSRF-Token', token);
+          } else if (Array.isArray(headers)){
+            headers.push(['X-CSRF-Token', token]);
+          } else {
+            headers['X-CSRF-Token'] = token;
+          }
+          init.headers = headers;
+          if (!init.credentials) init.credentials = 'same-origin';
+        }
+        return origFetch(input, init);
+      };
+    })();
+    </script>
 
     <!-- Chart.js for analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

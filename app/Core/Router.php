@@ -31,6 +31,11 @@ class Router
             $mw[] = 'cors';
         }
 
+        $methodUpper = strtoupper($method);
+        if (in_array($methodUpper, ['POST','PUT','PATCH','DELETE'], true) && !in_array('csrf', $mw, true)) {
+            $mw[] = 'csrf';
+        }
+
         $this->routes[] = [
             'method' => $method,
             'uri' => $uri,
