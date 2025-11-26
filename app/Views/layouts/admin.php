@@ -149,6 +149,32 @@
             margin: 5px;
             border-radius: 20px;
         }
+
+        /* Submenu */
+        .has-submenu > a {
+            position: relative;
+        }
+        .submenu-arrow {
+            margin-left: auto;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        .has-submenu.active .submenu-arrow {
+            transform: rotate(180deg);
+        }
+        .submenu {
+            display: block;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .has-submenu.active .submenu {
+            max-height: 500px;
+        }
+        .submenu li a {
+            padding-left: 3.5rem;
+            font-size: 0.8125rem;
+        }
     </style>
 </head>
 
@@ -191,9 +217,49 @@
     <aside class="admin-sidebar">
         <ul class="sidebar-menu">
             <li><a href="<?= app_base_url('/admin/dashboard') ?>"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a></li>
-            <li><a href="<?= app_base_url('/admin/users') ?>"><i class="bi bi-people"></i><span>Users</span></a></li>
+
+            <li class="has-submenu <?php echo strpos($_SERVER['REQUEST_URI'] ?? '', '/admin/users') !== false ? 'active' : ''; ?>">
+                <a href="#" class="submenu-toggle">
+                    <i class="bi bi-people"></i>
+                    <span>Users</span>
+                    <i class="bi bi-chevron-down submenu-arrow"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="<?= app_base_url('/admin/users') ?>"><i class="bi bi-circle"></i> All Users</a></li>
+                    <li><a href="<?= app_base_url('/admin/users/create') ?>"><i class="bi bi-plus-circle"></i> Add New</a></li>
+                    <li><a href="<?= app_base_url('/admin/users/roles') ?>"><i class="bi bi-shield-lock"></i> Roles</a></li>
+                </ul>
+            </li>
+
             <li><a href="<?= app_base_url('/admin/modules') ?>"><i class="bi bi-grid-3x3-gap"></i><span>Modules</span></a></li>
-            <li><a href="<?= app_base_url('/admin/analytics') ?>"><i class="bi bi-graph-up"></i><span>Analytics</span></a></li>
+
+            <li class="has-submenu <?php echo strpos($_SERVER['REQUEST_URI'] ?? '', '/admin/analytics') !== false ? 'active' : ''; ?>">
+                <a href="#" class="submenu-toggle">
+                    <i class="bi bi-graph-up"></i>
+                    <span>Analytics</span>
+                    <i class="bi bi-chevron-down submenu-arrow"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="<?= app_base_url('/admin/analytics/overview') ?>"><i class="bi bi-circle"></i> Overview</a></li>
+                    <li><a href="<?= app_base_url('/admin/analytics/users') ?>"><i class="bi bi-circle"></i> Users</a></li>
+                    <li><a href="<?= app_base_url('/admin/analytics/calculators') ?>"><i class="bi bi-circle"></i> Calculators</a></li>
+                    <li><a href="<?= app_base_url('/admin/analytics/performance') ?>"><i class="bi bi-circle"></i> Performance</a></li>
+                </ul>
+            </li>
+
+            <li class="has-submenu <?php echo strpos($_SERVER['REQUEST_URI'] ?? '', '/admin/content') !== false ? 'active' : ''; ?>">
+                <a href="#" class="submenu-toggle">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Content</span>
+                    <i class="bi bi-chevron-down submenu-arrow"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="<?= app_base_url('/admin/content/pages') ?>"><i class="bi bi-circle"></i> Pages</a></li>
+                    <li><a href="<?= app_base_url('/admin/content/menus') ?>"><i class="bi bi-circle"></i> Menus</a></li>
+                    <li><a href="<?= app_base_url('/admin/content/media') ?>"><i class="bi bi-circle"></i> Media</a></li>
+                </ul>
+            </li>
+
             <li><a href="<?= app_base_url('/admin/settings') ?>"><i class="bi bi-gear"></i><span>Settings</span></a></li>
         </ul>
     </aside>
@@ -213,6 +279,64 @@
             // Save preference in cookie
             const isCollapsed = document.body.classList.contains('sidebar-collapsed');
             document.cookie = `sidebar_collapsed=${isCollapsed ? 'sidebar-collapsed' : ''}; path=/; max-age=31536000`;
+        });
+
+        (function(){
+          const sidebarMenu = document.querySelector('.sidebar-menu');
+          if (!sidebarMenu) return;
+          sidebarMenu.addEventListener('click', function(e) {
+            const toggle = e.target.closest('.submenu-toggle');
+            if (!toggle) return;
+            e.preventDefault();
+            const item = toggle.closest('.has-submenu');
+            if (!item) return;
+
+            const submenu = item.querySelector('.submenu');
+            const arrow = toggle.querySelector('.submenu-arrow');
+            const isActive = item.classList.contains('active');
+
+            document.querySelectorAll('.has-submenu').forEach(function(other){
+              if (other !== item) {
+                other.classList.remove('active');
+                const otherSub = other.querySelector('.submenu');
+                const otherArrow = other.querySelector('.submenu-toggle .submenu-arrow');
+                if (otherSub) otherSub.style.maxHeight = null;
+                if (otherArrow) otherArrow.style.transform = 'rotate(0deg)';
+              }
+            });
+
+            if (isActive) {
+              item.classList.remove('active');
+              if (submenu) submenu.style.maxHeight = null;
+              if (arrow) arrow.style.transform = 'rotate(0deg)';
+            } else {
+              item.classList.add('active');
+              if (submenu) submenu.style.maxHeight = submenu.scrollHeight + 'px';
+              if (arrow) arrow.style.transform = 'rotate(180deg)';
+            }
+          });
+        })();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const currentPath = window.location.pathname;
+                let link = document.querySelector('.submenu a[href="' + currentPath + '"]');
+                if (!link) {
+                    const parts = currentPath.split('/');
+                    if (parts.length > 2) {
+                        const adminPath = '/' + parts.slice(2).join('/');
+                        link = document.querySelector('.submenu a[href="' + adminPath + '"]');
+                    }
+                }
+                if (link) {
+                    const item = link.closest('.has-submenu');
+                    const submenu = item ? item.querySelector('.submenu') : null;
+                    const arrow = item ? item.querySelector('.submenu-toggle .submenu-arrow') : null;
+                    if (item) item.classList.add('active');
+                    if (submenu) submenu.style.maxHeight = submenu.scrollHeight + 'px';
+                    if (arrow) arrow.style.transform = 'rotate(180deg)';
+                }
+            } catch (err) {}
         });
 
         // Initialize Charts

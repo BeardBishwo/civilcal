@@ -29,7 +29,7 @@
     <?php include __DIR__ . '/partials/sidebar.php'; ?>
     
     <!-- MAIN CONTENT WRAPPER -->
-    <div class="admin-main">
+    <div class="admin-main" id="admin-main">
         
         <!-- TOP NAVBAR -->
         <?php include __DIR__ . '/partials/topbar.php'; ?>
@@ -58,7 +58,7 @@
     </div>
     
     <!-- Admin JS -->
-    <script src="<?php echo asset_url('js/admin.js'); ?>"></script>
+    <script src="<?php echo asset_url('themes/admin/assets/js/admin.js'); ?>"></script>
     
     <?php if (isset($additional_js)): ?>
         <?php foreach ($additional_js as $js): ?>

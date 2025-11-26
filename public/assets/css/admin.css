@@ -191,33 +191,33 @@ body.admin-body {
     position: relative;
 }
 
-.submenu-arrow {
+.nav-arrow {
     margin-left: auto !important;
     font-size: 0.75rem !important;
     transition: var(--transition-fast);
     width: auto !important;
 }
 
-.has-submenu.active .submenu-arrow {
-    transform: rotate(180deg);
+.has-submenu.active .nav-arrow {
+    transform: rotate(90deg);
 }
 
-.submenu {
+.nav-submenu {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease;
 }
 
-.has-submenu.active .submenu {
+.has-submenu.active .nav-submenu {
     max-height: 500px;
 }
 
-.submenu li a {
+.nav-submenu li a {
     padding-left: 3.5rem;
     font-size: 0.8125rem;
 }
 
-.submenu li a i {
+.nav-submenu li a i {
     font-size: 0.375rem;
 }
 
@@ -670,7 +670,7 @@ body.admin-body {
 .admin-sidebar.collapsed .sidebar-menu span,
 .admin-sidebar.collapsed .menu-divider span,
 .admin-sidebar.collapsed .sidebar-user-info,
-.admin-sidebar.collapsed .submenu-arrow {
+.admin-sidebar.collapsed .nav-arrow {
     display: none;
 }
 
