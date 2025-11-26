@@ -66,11 +66,11 @@
         <!-- Sidebar -->
         <aside id="admin-sidebar" class="admin-sidebar">
             <div class="sidebar-header">
-                <div class="admin-logo">
-                    <i class="fas fa-calculator"></i>
+                <div class="sidebar-logo">
+                    <i class="sidebar-logo-icon fas fa-calculator"></i>
                     <span class="logo-text"><?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Admin Panel')); ?></span>
                 </div>
-                <button id="sidebar-toggle" class="sidebar-toggle">
+                <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>

@@ -5,6 +5,10 @@
 
 // Admin App Object
 const AdminApp = {
+    sidebarElement: null,
+    submenuItems: [],
+    submenuInitialized: false,
+    submenuResizeHandler: null,
     init() {
         this.initSidebar();
         this.initUserMenu();
@@ -16,38 +20,45 @@ const AdminApp = {
 
     // Sidebar Management
     initSidebar() {
-        // Sidebar toggle
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
         const sidebar = document.getElementById('admin-sidebar');
+        const mainContent = document.getElementById('admin-main');
+        this.sidebarElement = sidebar;
+
+        const syncSidebarState = (shouldCollapse, persist = true) => {
+            if (!sidebar) {
+                return;
+            }
+
+            sidebar.classList.toggle('collapsed', shouldCollapse);
+
+            if (mainContent) {
+                mainContent.classList.toggle('sidebar-collapsed', shouldCollapse);
+            }
+
+            this.syncActiveSubmenuDisplay();
+
+            if (persist) {
+                localStorage.setItem('adminSidebarCollapsed', shouldCollapse ? 'true' : 'false');
+            }
+        };
 
         if (sidebarToggle && sidebar) {
-            // Remove any existing event listeners to prevent duplicates
             const newSidebarToggle = sidebarToggle.cloneNode(true);
             sidebarToggle.parentNode.replaceChild(newSidebarToggle, sidebarToggle);
 
             newSidebarToggle.addEventListener('click', (e) => {
                 e.preventDefault();
-                sidebar.classList.toggle('collapsed');
-                // Also toggle class on main content area
-                const mainContent = document.getElementById('admin-main');
-                if (mainContent) {
-                    mainContent.classList.toggle('sidebar-collapsed');
-                }
-
-                // Store the sidebar state in localStorage to persist across page loads
-                const isCollapsed = sidebar.classList.contains('collapsed');
-                localStorage.setItem('adminSidebarCollapsed', isCollapsed);
+                const shouldCollapse = !sidebar.classList.contains('collapsed');
+                syncSidebarState(shouldCollapse);
             });
 
-            // Check if sidebar state was saved in localStorage and apply it
             const savedState = localStorage.getItem('adminSidebarCollapsed');
             if (savedState === 'true') {
-                sidebar.classList.add('collapsed');
-                const mainContent = document.getElementById('admin-main');
-                if (mainContent) {
-                    mainContent.classList.add('sidebar-collapsed');
-                }
+                syncSidebarState(true, false);
+            } else {
+                this.syncActiveSubmenuDisplay();
             }
         }
 
@@ -57,172 +68,184 @@ const AdminApp = {
             });
         }
 
-        // Submenu handling
-        // Submenu handling
-        // Use event delegation to handle clicks on nav links
-        const navMenu = document.querySelector('.nav-menu');
-        if (navMenu) {
-            navMenu.addEventListener('click', (e) => {
-                const link = e.target.closest('.nav-link');
-                if (link) {
-                    const parent = link.closest('.nav-item');
-                    const submenu = parent ? parent.querySelector('.nav-submenu') : null;
+        this.setupSubmenus(sidebar);
+    },
 
-                    if (submenu) {
-                        e.preventDefault();
-
-                        // Toggle active class
-                        parent.classList.toggle('active');
-
-                        // Handle dynamic max-height for smooth transition
-                        if (parent.classList.contains('active')) {
-                            submenu.style.maxHeight = submenu.scrollHeight + "px";
-                        } else {
-                            submenu.style.maxHeight = null;
-                        }
-
-                        // Rotate arrow icon
-                        const arrow = link.querySelector('.nav-arrow');
-                        if (arrow) {
-                            if (parent.classList.contains('active')) {
-                                arrow.style.transform = 'rotate(90deg)';
-                            } else {
-                                arrow.style.transform = 'rotate(0deg)';
-                            }
-                        }
-
-                        // Position submenu correctly when sidebar is collapsed
-                        const sidebar = document.getElementById('admin-sidebar');
-                        if (sidebar && sidebar.classList.contains('collapsed')) {
-                            if (parent.classList.contains('active')) {
-                                // Position submenu to the right of the collapsed sidebar
-                                submenu.style.position = 'absolute';
-                                submenu.style.left = '70px';
-                                submenu.style.top = parent.offsetTop + 'px';
-                                submenu.style.background = 'var(--admin-white)';
-                                submenu.style.boxShadow = 'var(--admin-shadow-lg)';
-                                submenu.style.borderRadius = '0 8px 8px 0';
-                                submenu.style.minWidth = '200px';
-                                submenu.style.zIndex = '1001';
-                                submenu.style.maxHeight = 'none'; // Allow full height when collapsed
-                            } else {
-                                // Reset submenu styles when closing
-                                submenu.style.position = '';
-                                submenu.style.left = '';
-                                submenu.style.top = '';
-                                submenu.style.background = '';
-                                submenu.style.boxShadow = '';
-                                submenu.style.borderRadius = '';
-                                submenu.style.minWidth = '';
-                                submenu.style.zIndex = '';
-                                submenu.style.maxHeight = null;
-                            }
-                        }
-
-                        // Close other submenus
-                        document.querySelectorAll('.nav-item').forEach(item => {
-                            if (item !== parent && item.classList.contains('active')) {
-                                item.classList.remove('active');
-
-                                // Reset arrow rotation for other items
-                                const otherArrow = item.querySelector('.nav-link .nav-arrow');
-                                if (otherArrow) {
-                                    otherArrow.style.transform = 'rotate(0deg)';
-                                }
-
-                                // Reset submenu styles for other items
-                                const otherSubmenu = item.querySelector('.nav-submenu');
-                                if (otherSubmenu) {
-                                    otherSubmenu.style.maxHeight = null;
-
-                                    otherSubmenu.style.position = '';
-                                    otherSubmenu.style.left = '';
-                                    otherSubmenu.style.top = '';
-                                    otherSubmenu.style.background = '';
-                                    otherSubmenu.style.boxShadow = '';
-                                    otherSubmenu.style.borderRadius = '';
-                                    otherSubmenu.style.minWidth = '';
-                                    otherSubmenu.style.zIndex = '';
-                                }
-                            }
-                        });
-                    }
-                }
-            });
+    setupSubmenus(sidebar) {
+        if (this.submenuInitialized) {
+            this.syncActiveSubmenuDisplay();
+            return;
         }
 
-        // Auto-open active submenu
-        try {
-            const currentPath = window.location.pathname;
-            let activeSubmenuLink = document.querySelector('.nav-submenu a[href="' + currentPath + '"]');
+        const submenuItems = Array.from(document.querySelectorAll('.nav-item')).filter(item => item.querySelector('.nav-submenu'));
 
-            if (activeSubmenuLink) {
-                const parentItem = activeSubmenuLink.closest('.nav-item');
-                if (parentItem) {
-                    parentItem.classList.add('active');
-                    // Rotate arrow icon for active item
-                    const parentLink = parentItem.querySelector('.nav-link');
-                    if (parentLink) {
-                        const arrow = parentLink.querySelector('.nav-arrow');
-                        if (arrow) {
-                            arrow.style.transform = 'rotate(90deg)';
-                        }
-                    }
+        if (!submenuItems.length) {
+            return;
+        }
 
-                    // Position submenu correctly when sidebar is collapsed
-                    const sidebar = document.getElementById('admin-sidebar');
-                    const submenu = parentItem.querySelector('.nav-submenu');
-                    if (sidebar && sidebar.classList.contains('collapsed') && submenu) {
-                        // Position submenu to the right of the collapsed sidebar
-                        submenu.style.position = 'absolute';
-                        submenu.style.left = '70px';
-                        submenu.style.top = parentItem.offsetTop + 'px';
-                        submenu.style.background = 'var(--admin-white)';
-                        submenu.style.boxShadow = 'var(--admin-shadow-lg)';
-                        submenu.style.borderRadius = '0 8px 8px 0';
-                        submenu.style.minWidth = '200px';
-                        submenu.style.zIndex = '1001';
-                    }
-                }
+        this.submenuItems = submenuItems;
+
+        submenuItems.forEach(item => {
+            const link = item.querySelector('.nav-link');
+            if (!link) {
+                return;
+            }
+
+            link.setAttribute('aria-haspopup', 'true');
+            link.setAttribute('aria-expanded', item.classList.contains('active') ? 'true' : 'false');
+
+            if (!link.dataset.submenuInit) {
+                link.dataset.submenuInit = 'true';
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const shouldExpand = !item.classList.contains('active');
+
+                    this.submenuItems.forEach(other => {
+                        this.setSubmenuExpanded(other, other === item ? shouldExpand : false, sidebar);
+                    });
+                });
+            }
+
+            this.setSubmenuExpanded(item, item.classList.contains('active'), sidebar);
+        });
+
+        const hasServerActive = submenuItems.some(item => item.classList.contains('active'));
+        if (!hasServerActive) {
+            this.autoActivateSubmenuForCurrentPath(sidebar);
+        } else {
+            this.syncActiveSubmenuDisplay();
+        }
+
+        if (!this.submenuResizeHandler) {
+            this.submenuResizeHandler = () => this.syncActiveSubmenuDisplay();
+            window.addEventListener('resize', this.submenuResizeHandler);
+        }
+
+        this.submenuInitialized = true;
+    },
+
+    setSubmenuExpanded(item, expand, sidebar) {
+        const submenu = item.querySelector('.nav-submenu');
+        if (!submenu) {
+            return;
+        }
+
+        item.classList.toggle('active', expand);
+
+        const link = item.querySelector('.nav-link');
+        if (link) {
+            link.setAttribute('aria-expanded', expand ? 'true' : 'false');
+        }
+
+        if (expand) {
+            if (sidebar && sidebar.classList.contains('collapsed')) {
+                submenu.style.maxHeight = 'none';
+                this.positionFloatingSubmenu(item, submenu, sidebar);
             } else {
-                // Try to match without base path
-                const pathParts = currentPath.split('/');
-                if (pathParts.length > 2) {
-                    const adminPath = '/' + pathParts.slice(2).join('/');
-                    const activeSubmenuLinkAlt = document.querySelector('.nav-submenu a[href="' + adminPath + '"]');
-                    if (activeSubmenuLinkAlt) {
-                        const parentItem = activeSubmenuLinkAlt.closest('.nav-item');
-                        if (parentItem) {
-                            parentItem.classList.add('active');
-                            // Rotate arrow icon for active item
-                            const parentLink = parentItem.querySelector('.nav-link');
-                            if (parentLink) {
-                                const arrow = parentLink.querySelector('.nav-arrow');
-                                if (arrow) {
-                                    arrow.style.transform = 'rotate(90deg)';
-                                }
-                            }
+                this.resetFloatingSubmenu(submenu);
+                submenu.style.maxHeight = submenu.scrollHeight + 'px';
+            }
+        } else {
+            submenu.style.maxHeight = null;
+            this.resetFloatingSubmenu(submenu);
+        }
+    },
 
-                            // Position submenu correctly when sidebar is collapsed
-                            const sidebar = document.getElementById('admin-sidebar');
-                            const submenu = parentItem.querySelector('.nav-submenu');
-                            if (sidebar && sidebar.classList.contains('collapsed') && submenu) {
-                                // Position submenu to the right of the collapsed sidebar
-                                submenu.style.position = 'absolute';
-                                submenu.style.left = '70px';
-                                submenu.style.top = parentItem.offsetTop + 'px';
-                                submenu.style.background = 'var(--admin-white)';
-                                submenu.style.boxShadow = 'var(--admin-shadow-lg)';
-                                submenu.style.borderRadius = '0 8px 8px 0';
-                                submenu.style.minWidth = '200px';
-                                submenu.style.zIndex = '1001';
-                            }
-                        }
-                    }
+    positionFloatingSubmenu(item, submenu, sidebar) {
+        if (!sidebar || !submenu) {
+            return;
+        }
+
+        const sidebarWidth = sidebar.offsetWidth || 70;
+        submenu.style.position = 'absolute';
+        submenu.style.left = `${sidebarWidth}px`;
+        submenu.style.top = `${item.offsetTop - sidebar.scrollTop}px`;
+        submenu.style.background = 'var(--admin-white)';
+        submenu.style.boxShadow = 'var(--admin-shadow-lg)';
+        submenu.style.borderRadius = '0 8px 8px 0';
+        submenu.style.minWidth = '200px';
+        submenu.style.zIndex = '1001';
+        submenu.dataset.floating = 'true';
+    },
+
+    resetFloatingSubmenu(submenu) {
+        if (!submenu) {
+            return;
+        }
+
+        submenu.style.position = '';
+        submenu.style.left = '';
+        submenu.style.top = '';
+        submenu.style.background = '';
+        submenu.style.boxShadow = '';
+        submenu.style.borderRadius = '';
+        submenu.style.minWidth = '';
+        submenu.style.zIndex = '';
+        if (submenu.dataset && submenu.dataset.floating) {
+            delete submenu.dataset.floating;
+        }
+    },
+
+    syncActiveSubmenuDisplay() {
+        const sidebar = this.sidebarElement || document.getElementById('admin-sidebar');
+        if (!sidebar) {
+            return;
+        }
+
+        const items = this.submenuItems.length ? this.submenuItems : Array.from(document.querySelectorAll('.nav-item')).filter(item => item.querySelector('.nav-submenu'));
+
+        items.forEach(item => {
+            if (item.classList.contains('active')) {
+                this.setSubmenuExpanded(item, true, sidebar);
+            } else {
+                const submenu = item.querySelector('.nav-submenu');
+                if (submenu) {
+                    submenu.style.maxHeight = null;
+                    this.resetFloatingSubmenu(submenu);
+                }
+                const link = item.querySelector('.nav-link');
+                if (link) {
+                    link.setAttribute('aria-expanded', 'false');
                 }
             }
+        });
+    },
+
+    autoActivateSubmenuForCurrentPath(sidebar) {
+        const currentPath = this.normalizePath(window.location.pathname);
+
+        for (const item of this.submenuItems) {
+            const submenuLinks = item.querySelectorAll('.nav-submenu a[href]');
+            for (const submenuLink of submenuLinks) {
+                const linkPath = this.normalizePath(submenuLink.getAttribute('href'));
+                if (linkPath && linkPath === currentPath) {
+                    this.submenuItems.forEach(other => {
+                        this.setSubmenuExpanded(other, other === item, sidebar);
+                    });
+                    this.syncActiveSubmenuDisplay();
+                    return;
+                }
+            }
+        }
+
+        this.syncActiveSubmenuDisplay();
+    },
+
+    normalizePath(href) {
+        if (!href) {
+            return '';
+        }
+
+        const stripTrailingSlash = (path) => {
+            const cleaned = (path || '').replace(/\/+$/, '') || '/';
+            return cleaned.replace(/^\/index\.php/, '') || '/';
+        };
+
+        try {
+            const url = new URL(href, window.location.origin);
+            return stripTrailingSlash(url.pathname);
         } catch (error) {
-            console.warn('Failed to auto-open active submenu:', error);
+            return stripTrailingSlash(href);
         }
     },
 
@@ -705,23 +728,20 @@ function sortTable(table, columnIndex, type) {
 }
 
 // Initialize Admin App when DOM is loaded
+function bootAdminApp() {
+    if (window.adminAppInitialized) {
+        return;
+    }
+    AdminApp.init();
+    initDataTables();
+    window.adminAppInitialized = true;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Add a small delay to ensure all elements are fully loaded
-    setTimeout(() => {
-        AdminApp.init();
-        initDataTables();
-    }, 100);
+    setTimeout(bootAdminApp, 100);
 });
 
-// Also initialize when the window loads to ensure all resources are ready
-window.addEventListener('load', () => {
-    // Only initialize if not already initialized
-    if (!window.adminAppInitialized) {
-        AdminApp.init();
-        initDataTables();
-        window.adminAppInitialized = true;
-    }
-});
+window.addEventListener('load', bootAdminApp);
 
 // Global error handler - only log to console, don't show notifications
 window.addEventListener('error', (e) => {
