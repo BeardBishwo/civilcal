@@ -917,6 +917,11 @@ $router->add("POST", "/admin/themes/upload", "Admin\ThemeController@upload", [
     "admin",
     "ratelimit",
 ]);
+$router->add("POST", "/admin/themes/deactivate", "Admin\\ThemeController@deactivate", [
+    "auth",
+    "admin",
+    "ratelimit",
+]);
 $router->add(
     "POST",
     "/admin/themes/activate/{slug}",

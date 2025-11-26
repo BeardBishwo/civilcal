@@ -215,9 +215,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const slug = this.dataset.slug;
             this.disabled = true;
             
-            fetch('<?= app_base_url('admin/plugins') ?>/' + encodeURIComponent(slug) + '/delete', {
-                method: 'POST'
-            })
+                fetch('<?= app_base_url('admin/plugins/delete') ?>/' + encodeURIComponent(slug), {
+                    method: 'POST'
+                })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {

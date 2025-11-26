@@ -445,7 +445,38 @@ class ThemeController extends Controller
 
     public function previewById($id)
     {
-        $this->redirect('/');
+        try {
+            $themes = $this->themeManager->getAllThemes();
+            $selected = null;
+            foreach ($themes as $t) {
+                if ((int)($t['id'] ?? 0) === (int)$id) { $selected = $t; break; }
+            }
+            if (!$selected) { $this->redirect('/admin/themes'); return; }
+            $this->view->render('admin/themes/preview', ['currentPage' => 'themes', 'activeTheme' => $selected, 'title' => 'Theme Preview']);
+        } catch (Exception $e) {
+            $this->redirect('/admin/themes');
+        }
+    }
+
+    public function details($slug)
+    {
+        header('Content-Type: application/json');
+        try {
+            $themes = $this->themeManager->getAllThemes();
+            $found = null;
+            foreach ($themes as $t) {
+                if (is_numeric($slug)) {
+                    if ((int)($t['id'] ?? 0) === (int)$slug) { $found = $t; break; }
+                } else {
+                    $candidate = $t['slug'] ?? ($t['name'] ?? null);
+                    if ($candidate && strcasecmp($candidate, $slug) === 0) { $found = $t; break; }
+                }
+            }
+            if (!$found) { echo json_encode(['success' => false, 'message' => 'Theme not found']); return; }
+            echo json_encode(['success' => true, 'data' => $found]);
+        } catch (\Throwable $e) {
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
     }
 
     public function saveColors($id)
