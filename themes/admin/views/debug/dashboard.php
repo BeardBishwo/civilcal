@@ -226,7 +226,7 @@ $content .= '
 
 <script>
 // Test runner functions
-const csrfToken = '<?= $_SESSION['csrf_token'] ?? '' ?>';
+const csrfToken = \'' . (isset($_SESSION['csrf_token']) ? $_SESSION['csrf_token'] : '') . '\';
 
 async function runAllTests() {
     const button = event.target;
@@ -235,7 +235,7 @@ async function runAllTests() {
     button.innerHTML = \'<i class="fas fa-spinner fa-spin"></i> Running Tests...\';
     
     try {
-        const response = await fetch("<?= app_base_url('admin/debug/run-tests') ?>", {
+        const response = await fetch("' . app_base_url('admin/debug/run-tests') . '", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -316,7 +316,7 @@ async function clearErrorLogs() {
     }
     
     try {
-        const response = await fetch("<?= app_base_url('admin/debug/clear-logs') ?>", {
+        const response = await fetch("' . app_base_url('admin/debug/clear-logs') . '", {
             method: "POST"
         });
         

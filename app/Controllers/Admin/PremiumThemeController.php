@@ -485,7 +485,7 @@ class PremiumThemeController
         extract($data);
         
         ob_start();
-        include __DIR__ . '/../../../themes/premium/views/admin/' . $view . '.php';
+        include __DIR__ . '/../../../themes/admin/views/' . $view . '.php';
         return ob_get_clean();
     }
     
@@ -514,6 +514,27 @@ class PremiumThemeController
     
     // Missing controller methods for routes
     
+    /**
+     * Show create theme form
+     * 
+     * @return string
+     */
+    public function create()
+    {
+        try {
+            $data = [
+                'title' => 'Create Premium Theme',
+                'hasFeature' => function($feature) {
+                    return $this->themeManager->hasFeature($feature);
+                }
+            ];
+            
+            return $this->renderView('admin/premium-themes/create', $data);
+            
+        } catch (Exception $e) {
+            return $this->renderError('Failed to load create form: ' . $e->getMessage());
+        }
+    }
     
     /**
      * Show theme details

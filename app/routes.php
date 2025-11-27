@@ -686,6 +686,59 @@ $router->add(
     ["auth", "admin"],
 );
 
+// Backup Management Routes
+$router->add(
+    "GET",
+    "/admin/backup",
+    "Admin\BackupController@index",
+    ["auth", "admin"],
+);
+
+// Add route for trailing slash
+$router->add(
+    "GET",
+    "/admin/backup/",
+    "Admin\BackupController@index",
+    ["auth", "admin"],
+);
+
+$router->add(
+    "POST",
+    "/admin/backup/create",
+    "Admin\BackupController@create",
+    ["auth", "admin"],
+);
+$router->add(
+    "GET",
+    "/admin/backup/download/{backupName}",
+    "Admin\BackupController@download",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/backup/delete/{backupName}",
+    "Admin\BackupController@delete",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/backup/restore/{backupName}",
+    "Admin\BackupController@restore",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/backup/schedule",
+    "Admin\BackupController@schedule",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/backup/settings",
+    "Admin\BackupController@settings",
+    ["auth", "admin"],
+);
+
 // Debug & Testing Routes
 $router->add("GET", "/admin/debug", "Admin\DebugController@index", [
     "auth",
@@ -1483,3 +1536,17 @@ try {
 
 // Page routes
 $router->add('GET', '/page/{slug}', 'PageController@show');
+
+// Billing & Subscriptions Management Routes
+$router->add(
+    "GET",
+    "/admin/subscriptions",
+    "Admin\SubscriptionController@index",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/subscriptions/create-plan",
+    "Admin\SubscriptionController@createPlan",
+    ["auth", "admin"],
+);

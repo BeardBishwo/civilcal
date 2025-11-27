@@ -18,6 +18,9 @@ class BackupController extends Controller
 
     public function index()
     {
+        // Debug output
+        error_log("BackupController@index called");
+        
         $user = Auth::user();
         if (!$user || !$user->is_admin) {
             http_response_code(403);

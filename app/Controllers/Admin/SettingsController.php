@@ -166,8 +166,12 @@ class SettingsController extends Controller
     {
         $this->requireAdminWithBasicAuth();
 
+        // Set JSON header first to ensure proper response format
+        header('Content-Type: application/json');
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            return $this->json(['success' => false, 'message' => 'Invalid request']);
+            echo json_encode(['success' => false, 'message' => 'Invalid request']);
+            exit;
         }
 
         try {
@@ -246,22 +250,23 @@ class SettingsController extends Controller
             }
 
             if ($updated > 0) {
-                return $this->json([
+                echo json_encode([
                     'success' => true,
                     'message' => "$updated settings updated successfully"
                 ]);
             } else {
-                return $this->json([
+                echo json_encode([
                     'success' => true,
                     'message' => "No changes were made to the settings"
                 ]);
             }
         } catch (\Exception $e) {
-            return $this->json([
+            echo json_encode([
                 'success' => false,
                 'message' => 'Error updating settings: ' . $e->getMessage()
             ]);
         }
+        exit;
     }
 
     public function reset()
@@ -407,7 +412,12 @@ class SettingsController extends Controller
             'require_api_key',
             'enable_dark_mode',
             'smtp_enabled',
-            'require_strong_password'
+            'require_strong_password',
+            'force_https',
+            'ip_whitelist_enabled',
+            'admin_ip_notification',
+            'log_failed_logins',
+            'log_admin_activity'
         ];
 
         return in_array($key, $checkboxFields);
