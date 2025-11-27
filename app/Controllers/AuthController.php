@@ -11,6 +11,7 @@ use App\Core\Controller;
 use App\Models\User;
 use App\Core\Auth;
 use App\Services\AuditLogger;
+use App\Services\SecurityNotificationService;
 
 class AuthController extends Controller
 {

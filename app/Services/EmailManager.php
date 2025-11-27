@@ -84,7 +84,17 @@ class EmailManager
                 $this->mailer->Password = $this->settings['smtp_password'];
             }
 
-            $this->mailer->SMTPSecure = $this->settings['smtp_encryption'];
+            // Handle encryption properly
+            $encryption = $this->settings['smtp_encryption'] ?? 'tls';
+            if ($encryption === 'ssl') {
+                $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            } elseif ($encryption === 'tls') {
+                $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            } else {
+                $this->mailer->SMTPSecure = '';
+                $this->mailer->SMTPAutoTLS = false;
+            }
+
             $this->mailer->SMTPDebug = 0; // Set to 2 for debugging
 
             // Default sender

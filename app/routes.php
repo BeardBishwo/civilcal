@@ -1251,192 +1251,33 @@ $router->add(
 // Email & Notifications Management Routes
 $router->add("GET", "/admin/email", "Admin\EmailManagerController@index", [
     "auth",
-    "admin",
+    "admin"
 ]);
 $router->add(
     "POST",
     "/admin/email/send-test",
     "Admin\EmailManagerController@sendTestEmail",
-    ["auth", "admin"],
+    ["auth", "admin"]
 );
 $router->add(
     "POST",
     "/admin/email/save-template",
     "Admin\EmailManagerController@saveTemplate",
-    ["auth", "admin"],
-);
-
-// Billing & Subscriptions Management Routes
-$router->add(
-    "GET",
-    "/admin/subscriptions",
-    "Admin\SubscriptionController@index",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/subscriptions/create-plan",
-    "Admin\SubscriptionController@createPlan",
-    ["auth", "admin"],
-);
-
-// Help & Logs Management Routes
-$router->add("GET", "/admin/help", "Admin\HelpController@index", [
-    "auth",
-    "admin",
-]);
-$router->add(
-    "POST",
-    "/admin/help/clear-logs",
-    "Admin\HelpController@clearLogs",
-    ["auth", "admin", "ratelimit"],
-);
-$router->add(
-    "POST",
-    "/admin/help/backup",
-    "Admin\HelpController@backupSystem",
-    ["auth", "admin", "ratelimit"],
-);
-$router->add(
-    "POST",
-    "/admin/help/export-themes",
-    "Admin\HelpController@exportThemes",
-    ["auth", "admin", "ratelimit"],
-);
-$router->add(
-    "POST",
-    "/admin/help/export-plugins",
-    "Admin\HelpController@exportPlugins",
-    ["auth", "admin", "ratelimit"],
-);
-$router->add("POST", "/admin/help/restore", "Admin\HelpController@restore", [
-    "auth",
-    "admin",
-    "ratelimit",
-]);
-$router->add(
-    "GET",
-    "/admin/help/download-backup",
-    "Admin\HelpController@downloadBackup",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/help/export-logs",
-    "Admin\HelpController@exportLogs",
-    ["auth", "admin", "ratelimit"],
-);
-
-// Audit Logs Viewer
-$router->add("GET", "/admin/audit-logs", "Admin\AuditLogController@index", [
-    "auth",
-    "admin",
-]);
-$router->add(
-    "GET",
-    "/admin/audit-logs/download",
-    "Admin\AuditLogController@download",
     ["auth", "admin"]
 );
 
-// Additional Admin Routes for Missing Views
-$router->add("GET", "/admin/activity", "Admin\ActivityController@index", [
-    "auth",
-    "admin",
-]);
-$router->add("GET", "/admin/audit", "Admin\AuditController@index", [
-    "auth",
-    "admin",
-]);
-$router->add("GET", "/admin/backup", "Admin\BackupController@index", [
-    "auth",
-    "admin",
-]);
-$router->add("POST", "/admin/backup/create", "Admin\BackupController@create", [
-    "auth",
-    "admin",
-]);
-$router->add("POST", "/admin/backup/delete/{backupName}", "Admin\BackupController@delete", [
-    "auth",
-    "admin",
-]);
-$router->add("POST", "/admin/backup/restore/{backupName}", "Admin\BackupController@restore", [
-    "auth",
-    "admin",
-]);
-$router->add("POST", "/admin/backup/schedule", "Admin\BackupController@schedule", [
-    "auth",
-    "admin",
-]);
-$router->add("POST", "/admin/backup/settings", "Admin\BackupController@settings", [
-    "auth",
-    "admin",
-]);
-$router->add("GET", "/admin/backup/download/{backupName}", "Admin\BackupController@download", [
-    "auth",
-    "admin",
-]);
-$router->add("GET", "/admin/calculations", "Admin\CalculationsController@index", [
-    "auth",
-    "admin",
-]);
-
-// Theme Customization Routes
-$router->add(
-    "GET",
-    "/admin/themes/:id/customize",
-    "Admin\ThemeCustomizeController@index",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/themes/:id/save-colors",
-    "Admin\ThemeCustomizeController@saveColors",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/themes/:id/save-typography",
-    "Admin\ThemeCustomizeController@saveTypography",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/themes/:id/save-features",
-    "Admin\ThemeCustomizeController@saveFeatures",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/themes/:id/save-layout",
-    "Admin\ThemeCustomizeController@saveLayout",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/themes/:id/save-custom_css",
-    "Admin\\ThemeCustomizeController@saveCustomCSS",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/themes/:id/preview",
-    "Admin\\ThemeCustomizeController@preview",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/themes/:id/reset",
-    "Admin\\ThemeCustomizeController@reset",
-    ["auth", "admin"],
-);
+// Remove the duplicate route that was causing conflicts
+// $router->add("GET", "/admin/email", "Admin\\EmailManagerController@index", [
+//     "auth",
+//     "admin",
+// ]);
 
 // Email Manager Admin Routes
 $router->add(
     "GET",
     "/admin/email-manager",
     "Admin\\EmailManagerController@dashboard",
-    ["auth", "admin"],
+    ["auth", "admin"]
 );
 $router->add("GET", "/admin/email", "Admin\\EmailManagerController@index", [
     "auth",

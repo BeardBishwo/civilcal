@@ -14,6 +14,7 @@ abstract class BaseWidget
     protected string $title;
     protected string $description;
     protected bool $isEnabled = true;
+    protected bool $isVisible = true;
     protected array $config = [];
     protected array $cssClasses = [];
     protected string $widgetType = 'default';
@@ -31,6 +32,11 @@ abstract class BaseWidget
     protected function initialize(): void
     {
         // Child classes can override this method
+        // Set default properties from config
+        $this->title = $this->getConfig('title', $this->getDefaultTitle());
+        $this->description = $this->getConfig('description', $this->getDefaultDescription());
+        $this->isEnabled = $this->getConfig('enabled', true);
+        $this->isVisible = $this->getConfig('visible', true);
     }
 
     /**
@@ -52,6 +58,7 @@ abstract class BaseWidget
             'title' => $this->title,
             'description' => $this->description,
             'is_enabled' => $this->isEnabled,
+            'is_visible' => $this->isVisible,
             'css_classes' => $this->cssClasses,
             'config' => $this->config,
             'version' => $this->getVersion(),
@@ -70,11 +77,29 @@ abstract class BaseWidget
     }
 
     /**
+     * Set widget title
+     */
+    public function setTitle(string $title): void
+    {
+        $this->title = $title;
+        $this->setConfig('title', $title);
+    }
+
+    /**
      * Get widget description
      */
     public function getDescription(): string
     {
         return $this->description;
+    }
+
+    /**
+     * Set widget description
+     */
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+        $this->setConfig('description', $description);
     }
 
     /**
@@ -102,11 +127,38 @@ abstract class BaseWidget
     }
 
     /**
-     * Enable/disable widget
+     * Enable widget
      */
-    public function setEnabled(bool $enabled): void
+    public function enable(): void
     {
-        $this->isEnabled = $enabled;
+        $this->isEnabled = true;
+        $this->setConfig('enabled', true);
+    }
+
+    /**
+     * Disable widget
+     */
+    public function disable(): void
+    {
+        $this->isEnabled = false;
+        $this->setConfig('enabled', false);
+    }
+
+    /**
+     * Check if widget is visible
+     */
+    public function isVisible(): bool
+    {
+        return $this->isVisible;
+    }
+
+    /**
+     * Set widget visibility
+     */
+    public function setVisible(bool $visible): void
+    {
+        $this->isVisible = $visible;
+        $this->setConfig('visible', $visible);
     }
 
     /**
@@ -432,6 +484,22 @@ abstract class BaseWidget
     public function getPosition(): int
     {
         return $this->getConfig('position', 0);
+    }
+    
+    /**
+     * Set widget position
+     */
+    public function setPosition(int $position): void
+    {
+        $this->setConfig('position', $position);
+    }
+    
+    /**
+     * Set widget setting
+     */
+    public function setSetting(string $key, $value): void
+    {
+        $this->setConfig($key, $value);
     }
 }
 ?>

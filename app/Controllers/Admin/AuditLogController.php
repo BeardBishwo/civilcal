@@ -44,11 +44,11 @@ class AuditLogController extends Controller
             }
         }
         $total = count($entries);
+        $pages = max(1, (int)ceil($total / max(1, $perPage)));
         $offset = ($page - 1) * $perPage;
         $paged = array_slice($entries, $offset, $perPage);
 
         $data = [
-            'currentPage' => 'audit-logs',
             'entries' => $paged,
             'dates' => $dates,
             'selectedDate' => $selected,
@@ -57,8 +57,15 @@ class AuditLogController extends Controller
             'page' => $page,
             'perPage' => $perPage,
             'total' => $total,
-            'title' => 'Audit Logs - Admin Panel'
+            'pages' => $pages,
+            'page_title' => 'Audit Logs',
+            'breadcrumbs' => [
+                ['title' => 'Dashboard', 'url' => '/admin'],
+                ['title' => 'Audit Logs', 'url' => '/admin/audit-logs']
+            ]
         ];
+        
+        // Use the View class's render method to properly use themes/admin layout
         $this->view->render('admin/audit/index', $data);
     }
 

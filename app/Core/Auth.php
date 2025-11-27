@@ -2,6 +2,8 @@
 
 namespace App\Core;
 
+use App\Services\SecurityNotificationService;
+
 class Auth
 {
     public static function check()
@@ -120,6 +122,11 @@ class Auth
         $_SESSION['is_admin'] = ($user->role === 'admin');
         $_SESSION['first_name'] = $user->first_name ?? '';
         $_SESSION['last_name'] = $user->last_name ?? '';
+
+        // Check for new IP address and send security notification for admin users
+        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+        $securityService = new SecurityNotificationService();
+        $securityService->checkAndNotifyNewLogin($user->id, $ipAddress);
 
         return [
             'success' => true,

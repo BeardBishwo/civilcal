@@ -407,6 +407,55 @@
                     <label class="form-check-label" for="ip_whitelist_enabled">Enable IP Whitelisting</label>
                     <div class="form-text">Only allow admin access from specific IP addresses. Recommended for sensitive deployments.</div>
                 </div>
+                
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label for="ip_whitelist" class="form-label">IP Whitelist</label>
+                        <textarea class="form-control" id="ip_whitelist" name="ip_whitelist" rows="4" placeholder="Enter one IP address per line&#10;Example:&#10;192.168.1.100&#10;10.0.0.0/8"><?= htmlspecialchars($settings['ip_whitelist'] ?? '') ?></textarea>
+                        <div class="form-text">Enter allowed IP addresses, one per line. You can use CIDR notation (e.g., 192.168.1.0/24) for IP ranges.</div>
+                    </div>
+                </div>
+                
+                <div class="settings-divider"></div>
+                
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="admin_ip_notification" name="admin_ip_notification" value="1" <?= ($settings['admin_ip_notification'] ?? '0') == '1' ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="admin_ip_notification">Notify Admin on New IP Login</label>
+                    <div class="form-text">Send email notification when admin logs in from a new IP address.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Security Logging Section -->
+        <div class="security-section">
+            <div class="section-header" style="background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%); border-bottom: none; color: #333;">
+                <span class="section-icon">📝</span>
+                <div class="section-title-group">
+                    <h2>Security Logging</h2>
+                    <p>Monitor and log security events</p>
+                </div>
+            </div>
+
+            <div class="section-body">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="log_failed_logins" name="log_failed_logins" value="1" <?= ($settings['log_failed_logins'] ?? '0') == '1' ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="log_failed_logins">Log Failed Login Attempts</label>
+                    <div class="form-text">Record all failed login attempts for security analysis.</div>
+                </div>
+                
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="log_admin_activity" name="log_admin_activity" value="1" <?= ($settings['log_admin_activity'] ?? '0') == '1' ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="log_admin_activity">Log Admin Activity</label>
+                    <div class="form-text">Track all administrative actions for audit purposes.</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="log_retention_days" class="form-label">Log Retention Period (Days)</label>
+                        <input type="number" class="form-control" id="log_retention_days" name="log_retention_days" placeholder="30" value="<?= htmlspecialchars($settings['log_retention_days'] ?? '30') ?>" min="1" max="365">
+                        <div class="form-text">Number of days to keep security logs before automatic deletion.</div>
+                    </div>
+                </div>
             </div>
         </div>
 

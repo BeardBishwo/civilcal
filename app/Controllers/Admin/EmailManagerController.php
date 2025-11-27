@@ -35,17 +35,49 @@ class EmailManagerController extends Controller
         $recentThreads = $this->emailThread->getRecentThreads(5);
         $templateStats = $this->emailTemplate->getStats();
 
-        return $this->view('admin/email-manager/dashboard', [
+        $data = [
             'stats' => $stats,
             'recentThreads' => $recentThreads,
             'templateStats' => $templateStats,
-            'pageTitle' => 'Email Manager Dashboard'
-        ]);
+            'page_title' => 'Email Manager Dashboard',
+            'breadcrumbs' => [
+                ['title' => 'Dashboard', 'url' => '/admin'],
+                ['title' => 'Email Manager', 'url' => '/admin/email-manager']
+            ]
+        ];
+        
+        // Use the View class's render method to properly use themes/admin layout
+        $this->view->render('admin/email-manager/dashboard', $data);
     }
 
     public function sendTestEmail()
     {
-        echo "Test Email Sent";
+        header('Content-Type: application/json');
+        
+        try {
+            // Get test email from JSON body or POST data
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (!$input) {
+                $input = $_POST;
+            }
+            
+            $testEmail = $input['test_email'] ?? '';
+            
+            if (empty($testEmail)) {
+                echo json_encode(['success' => false, 'message' => 'Test email address is required']);
+                return;
+            }
+
+            $emailManager = new \EmailManager();
+            $result = $emailManager->testEmailSettings($testEmail);
+
+            echo json_encode($result);
+        } catch (\Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
+        }
     }
 
     public function saveTemplate()
@@ -118,15 +150,23 @@ class EmailManagerController extends Controller
         }
 
         // Return view for regular requests
-        return $this->view('admin/email-manager/threads', [
+        $data = [
             'threads' => $threads,
             'total' => $totalCount,
             'page' => $page,
             'limit' => $limit,
             'total_pages' => ceil($totalCount / $limit),
             'filters' => $filters,
-            'pageTitle' => 'Email Threads'
-        ]);
+            'page_title' => 'Email Threads',
+            'breadcrumbs' => [
+                ['title' => 'Dashboard', 'url' => '/admin'],
+                ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
+                ['title' => 'Threads', 'url' => '/admin/email-manager/threads']
+            ]
+        ];
+        
+        // Use the View class's render method to properly use themes/admin layout
+        $this->view->render('admin/email-manager/threads', $data);
     }
 
     private function isAjaxRequest()
@@ -140,21 +180,39 @@ class EmailManagerController extends Controller
         $thread = $this->emailThread->getThreadById($id);
 
         if (!$thread) {
-            return $this->view('admin/email-manager/error', [
+            $data = [
                 'message' => 'Thread not found',
-                'pageTitle' => 'Error'
-            ]);
+                'page_title' => 'Error',
+                'breadcrumbs' => [
+                    ['title' => 'Dashboard', 'url' => '/admin'],
+                    ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
+                    ['title' => 'Error', 'url' => '']
+                ]
+            ];
+            
+            // Use the View class's render method to properly use themes/admin layout
+            $this->view->render('admin/email-manager/error', $data);
+            return;
         }
 
         $availableAssignees = $this->emailThread->getAvailableAssignees();
         $templates = $this->emailTemplate->getActiveTemplates();
 
-        return $this->view('admin/email-manager/thread-detail', [
+        $data = [
             'thread' => $thread,
             'availableAssignees' => $availableAssignees,
             'templates' => $templates,
-            'pageTitle' => 'Thread: ' . $thread['subject']
-        ]);
+            'page_title' => 'Thread: ' . $thread['subject'],
+            'breadcrumbs' => [
+                ['title' => 'Dashboard', 'url' => '/admin'],
+                ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
+                ['title' => 'Threads', 'url' => '/admin/email-manager/threads'],
+                ['title' => 'View Thread', 'url' => '']
+            ]
+        ];
+        
+        // Use the View class's render method to properly use themes/admin layout
+        $this->view->render('admin/email-manager/thread-detail', $data);
     }
 
     public function reply($id)
@@ -326,7 +384,7 @@ class EmailManagerController extends Controller
         }
 
         // Return view for regular requests
-        return $this->view('admin/email-manager/templates', [
+        $data = [
             'templates' => $templatesData['templates'],
             'total' => $templatesData['total'],
             'page' => $page,
@@ -334,8 +392,16 @@ class EmailManagerController extends Controller
             'total_pages' => $templatesData['total_pages'],
             'filters' => $filters,
             'templateTypes' => $this->emailTemplate->getTemplateTypes(),
-            'pageTitle' => 'Email Templates'
-        ]);
+            'page_title' => 'Email Templates',
+            'breadcrumbs' => [
+                ['title' => 'Dashboard', 'url' => '/admin'],
+                ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
+                ['title' => 'Templates', 'url' => '/admin/email-manager/templates']
+            ]
+        ];
+        
+        // Use the View class's render method to properly use themes/admin layout
+        $this->view->render('admin/email-manager/templates', $data);
     }
 
     public function createTemplate()
@@ -378,11 +444,20 @@ class EmailManagerController extends Controller
         }
 
         // Return form for GET requests
-        return $this->view('admin/email-manager/template-form', [
+        $data = [
             'template' => null,
             'templateTypes' => $this->emailTemplate->getTemplateTypes(),
-            'pageTitle' => 'Create Email Template'
-        ]);
+            'page_title' => 'Create Email Template',
+            'breadcrumbs' => [
+                ['title' => 'Dashboard', 'url' => '/admin'],
+                ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
+                ['title' => 'Templates', 'url' => '/admin/email-manager/templates'],
+                ['title' => 'Create Template', 'url' => '']
+            ]
+        ];
+        
+        // Use the View class's render method to properly use themes/admin layout
+        $this->view->render('admin/email-manager/template-form', $data);
     }
 
     public function editTemplate($id)
@@ -390,10 +465,19 @@ class EmailManagerController extends Controller
         $template = $this->emailTemplate->getTemplateById($id);
 
         if (!$template) {
-            return $this->view('admin/email-manager/error', [
+            $data = [
                 'message' => 'Template not found',
-                'pageTitle' => 'Error'
-            ]);
+                'page_title' => 'Error',
+                'breadcrumbs' => [
+                    ['title' => 'Dashboard', 'url' => '/admin'],
+                    ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
+                    ['title' => 'Error', 'url' => '']
+                ]
+            ];
+            
+            // Use the View class's render method to properly use themes/admin layout
+            $this->view->render('admin/email-manager/error', $data);
+            return;
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -432,11 +516,20 @@ class EmailManagerController extends Controller
         }
 
         // Return form for GET requests
-        return $this->view('admin/email-manager/template-form', [
+        $data = [
             'template' => $template,
             'templateTypes' => $this->emailTemplate->getTemplateTypes(),
-            'pageTitle' => 'Edit Email Template'
-        ]);
+            'page_title' => 'Edit Email Template',
+            'breadcrumbs' => [
+                ['title' => 'Dashboard', 'url' => '/admin'],
+                ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
+                ['title' => 'Templates', 'url' => '/admin/email-manager/templates'],
+                ['title' => 'Edit Template', 'url' => '']
+            ]
+        ];
+        
+        // Use the View class's render method to properly use themes/admin layout
+        $this->view->render('admin/email-manager/template-form', $data);
     }
 
     public function updateTemplate($id)
@@ -527,10 +620,18 @@ class EmailManagerController extends Controller
 
     public function error()
     {
-        return $this->view('admin/email-manager/error', [
+        $data = [
             'message' => 'An error occurred',
-            'pageTitle' => 'Email Manager Error'
-        ]);
+            'page_title' => 'Email Manager Error',
+            'breadcrumbs' => [
+                ['title' => 'Dashboard', 'url' => '/admin'],
+                ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
+                ['title' => 'Error', 'url' => '']
+            ]
+        ];
+        
+        // Use the View class's render method to properly use themes/admin layout
+        $this->view->render('admin/email-manager/error', $data);
     }
 
     public function threadDetail($id)
@@ -555,10 +656,18 @@ class EmailManagerController extends Controller
         $emailManager = new \EmailManager();
         $settings = $emailManager->getSettings();
 
-        return $this->view('admin/email-manager/settings', [
+        $data = [
             'settings' => $settings,
-            'pageTitle' => 'Email Settings'
-        ]);
+            'page_title' => 'Email Settings',
+            'breadcrumbs' => [
+                ['title' => 'Dashboard', 'url' => '/admin'],
+                ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
+                ['title' => 'Settings', 'url' => '/admin/email-manager/settings']
+            ]
+        ];
+        
+        // Use the View class's render method to properly use themes/admin layout
+        $this->view->render('admin/email-manager/settings', $data);
     }
 
     public function updateSettings()

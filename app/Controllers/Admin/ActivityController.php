@@ -39,7 +39,6 @@ class ActivityController extends Controller
         $stats = $this->getActivityStats();
 
         $data = [
-            'currentPage' => 'activity',
             'activities' => $activities['data'],
             'total' => $activities['total'],
             'page' => $page,
@@ -48,9 +47,14 @@ class ActivityController extends Controller
             'q' => $q,
             'dateFilter' => $dateFilter,
             'stats' => $stats,
-            'title' => 'Activity Logs - Admin Panel'
+            'page_title' => 'Activity Logs',
+            'breadcrumbs' => [
+                ['title' => 'Dashboard', 'url' => '/admin'],
+                ['title' => 'Activity Logs', 'url' => '/admin/activity']
+            ]
         ];
 
+        // Use the View class's render method to properly use themes/admin layout
         $this->view->render('admin/activity/index', $data);
     }
 

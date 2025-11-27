@@ -491,16 +491,30 @@ class SettingsController extends Controller
     {
         $this->requireAdminWithBasicAuth();
 
+        // Set JSON header first
+        header('Content-Type: application/json');
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            return $this->json(['success' => false, 'message' => 'Invalid request']);
+            echo json_encode(['success' => false, 'message' => 'Invalid request']);
+            return;
         }
 
         try {
+            // Get test email from JSON body or POST data
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (!$input) {
+                $input = $_POST;
+            }
+            
+            $testEmail = $input['test_email'] ?? '';
+            
+            if (empty($testEmail)) {
+                echo json_encode(['success' => false, 'message' => 'Test email address is required']);
+                return;
+            }
+
             // Get current email settings
             $settings = SettingsService::getAll('email');
-
-            // Get recipient email (current user or from settings)
-            $recipientEmail = $_SESSION['user']['email'] ?? $settings['admin_email'] ?? 'admin@example.com';
 
             // Get SMTP configuration
             $smtpHost = $settings['smtp_host'] ?? '';
@@ -553,7 +567,7 @@ class SettingsController extends Controller
 
                 // Recipients
                 $mail->setFrom($fromEmail, $fromName);
-                $mail->addAddress($recipientEmail);
+                $mail->addAddress($testEmail);
 
                 // Content
                 $mail->isHTML(true);
@@ -584,7 +598,7 @@ class SettingsController extends Controller
                                 <div class="info">
                                     <strong>📧 Email Details:</strong><br>
                                     <strong>From:</strong> ' . htmlspecialchars($fromName) . ' &lt;' . htmlspecialchars($fromEmail) . '&gt;<br>
-                                    <strong>To:</strong> ' . htmlspecialchars($recipientEmail) . '<br>
+                                    <strong>To:</strong> ' . htmlspecialchars($testEmail) . '<br>
                                     <strong>SMTP Host:</strong> ' . htmlspecialchars($smtpHost) . ':' . htmlspecialchars($smtpPort) . '<br>
                                     <strong>Encryption:</strong> ' . strtoupper($smtpEncryption) . '<br>
                                     <strong>Sent At:</strong> ' . date('Y-m-d H:i:s') . '
@@ -610,18 +624,18 @@ class SettingsController extends Controller
                     'test_email_sent',
                     'system',
                     null,
-                    "✅ Test email sent successfully to $recipientEmail using SMTP host $smtpHost:$smtpPort",
+                    "✅ Test email sent successfully to $testEmail using SMTP host $smtpHost:$smtpPort",
                     null,
                     [
                         'smtp_host' => $smtpHost,
                         'smtp_port' => $smtpPort,
-                        'recipient' => $recipientEmail
+                        'recipient' => $testEmail
                     ]
                 );
 
-                return $this->json([
+                echo json_encode([
                     'success' => true,
-                    'message' => "✅ Test email sent successfully to $recipientEmail! Check your inbox."
+                    'message' => "✅ Test email sent successfully to $testEmail! Check your inbox."
                 ]);
             } catch (\PHPMailer\PHPMailer\Exception $e) {
                 throw new \Exception("SMTP Error: " . $e->errorMessage());
@@ -638,7 +652,7 @@ class SettingsController extends Controller
                 ['error' => $e->getMessage()]
             );
 
-            return $this->json([
+            echo json_encode([
                 'success' => false,
                 'message' => '❌ Failed to send test email: ' . $e->getMessage()
             ]);

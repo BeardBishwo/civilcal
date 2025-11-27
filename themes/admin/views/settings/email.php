@@ -341,13 +341,20 @@
                         <input type="text" class="form-control" id="from_name" name="from_name" placeholder="Your Company Name" value="<?= htmlspecialchars($settings['from_name'] ?? '') ?>">
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Action Buttons -->
-        <div class="button-group">
-            <button type="submit" class="btn btn-primary">💾 Save Changes</button>
-            <button type="button" class="btn btn-secondary" id="sendTestEmail">🧪 Send Test Email</button>
+                <!-- Action Buttons -->
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                    <button type="button" class="btn btn-secondary" id="sendTestEmail">🧪 Send Test Email</button>
+                </div>
+                
+                <!-- Test Email Input -->
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label for="test_email" class="form-label">Test Email Address</label>
+                    <input type="email" class="form-control" id="test_email" name="test_email" placeholder="bishwonathpaudel24@gmail.com" value="<?= htmlspecialchars($_SESSION['user']['email'] ?? '') ?>">
+                    <div class="form-text">Enter the email address where you want to receive the test email.</div>
+                </div>
+            </div>
         </div>
     </form>
 </div>
@@ -382,7 +389,13 @@
     });
 
     function sendTestEmail() {
-        if (!confirm('📧 Send a test email to verify SMTP settings?')) {
+        const testEmail = document.getElementById('test_email').value;
+        if (!testEmail) {
+            alert('📧 Please enter a test email address');
+            return;
+        }
+        
+        if (!confirm('📧 Send a test email to ' + testEmail + ' to verify SMTP settings?')) {
             return;
         }
 
@@ -396,7 +409,7 @@
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': document.querySelector('input[name="csrf_token"]').value
             },
-            body: JSON.stringify({})
+            body: JSON.stringify({test_email: testEmail})
         })
         .then(response => {
             if (!response.ok) {

@@ -5,6 +5,7 @@ namespace App\Controllers\Api;
 use App\Core\Controller;
 use App\Core\Database;
 use App\Models\User;
+use App\Services\SecurityNotificationService;
 use Exception;
 
 class AuthController extends Controller
@@ -80,6 +81,11 @@ class AuthController extends Controller
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['user'] = $user;
                 $_SESSION['is_admin'] = $user['is_admin'] ?? false;
+
+                // Check for new IP address and send security notification for admin users
+                $ipAddress = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+                $securityService = new SecurityNotificationService();
+                $securityService->checkAndNotifyNewLogin($user['id'], $ipAddress);
 
                 // Also create a database-backed session and auth_token cookie
                 // so that session management tests and Auth::check() can rely

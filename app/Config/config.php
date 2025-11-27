@@ -72,6 +72,7 @@ define('DB_PASS', '');
 // Admin settings
 define('ADMIN_USER', 'admin');
 define('ADMIN_PASS', 'password');
+define('ADMIN_EMAIL', 'admin@newsbishwo.com');
 
 // Error reporting
 if (ENVIRONMENT === 'development') {
