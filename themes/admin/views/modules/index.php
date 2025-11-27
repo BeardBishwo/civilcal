@@ -1,191 +1,217 @@
 <?php
-// Modules Management View
-$content = '
-<div class="admin-content">
-    <!-- Page Header -->
-    <div class="page-header">
-        <h1 class="page-title">
-            <i class="fas fa-puzzle-piece"></i>
-            Module Management
-        </h1>
-        <p class="page-description">Manage and configure your admin modules. Activate, deactivate, or configure module settings.</p>
-    </div>
-    
-    <!-- Module Statistics -->
-    <div class="stats-grid" style="margin-bottom: 32px;">
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon primary">
-                    <i class="fas fa-puzzle-piece"></i>
-                </div>
-            </div>
-            <div class="stat-value">' . count($allModules ?? []) . '</div>
-            <div class="stat-label">Total Modules</div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon success">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-            </div>
-            <div class="stat-value">' . count($activeModules ?? []) . '</div>
-            <div class="stat-label">Active Modules</div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon warning">
-                    <i class="fas fa-pause-circle"></i>
-                </div>
-            </div>
-            <div class="stat-value">' . (count($allModules ?? []) - count($activeModules ?? [])) . '</div>
-            <div class="stat-label">Inactive Modules</div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon info">
-                    <i class="fas fa-cog"></i>
-                </div>
-            </div>
-            <div class="stat-value">0</div>
-            <div class="stat-label">Updates Available</div>
-        </div>
-    </div>
-    
-    <!-- Module Actions Bar -->
-    <div class="module-actions-bar">
-        <div class="actions-left">
-            <button class="btn btn-primary" onclick="refreshModules()">
-                <i class="fas fa-sync-alt"></i>
-                Refresh Modules
-            </button>
-            <button class="btn btn-secondary" onclick="installModule()">
-                <i class="fas fa-plus"></i>
-                Install New Module
-            </button>
-        </div>
-        
-        <div class="actions-right">
-            <div class="module-filter">
-                <select id="moduleFilter" onchange="filterModules(this.value)" class="form-control">
-                    <option value="all">All Modules</option>
-                    <option value="active">Active Only</option>
-                    <option value="inactive">Inactive Only</option>
-                </select>
-            </div>
-            
-            <div class="module-search">
-                <input type="text" placeholder="Search modules..." class="form-control" onkeyup="searchModules(this.value)">
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modules Grid -->
-    <div class="modules-grid" id="modulesGrid">
-';
+// Remove the variable assignment approach and use the themes/admin layout system
+$page_title = 'Module Management - Admin Panel';
+$currentPage = 'modules';
 
-if (!empty($allModules)) {
-    foreach ($allModules as $moduleName => $moduleInfo) {
-        $isActive = isset($activeModules[$moduleName]);
-        $statusClass = $isActive ? 'active' : 'inactive';
-        $statusIcon = $isActive ? 'fa-check-circle' : 'fa-pause-circle';
-        $statusText = $isActive ? 'Active' : 'Inactive';
-        $actionText = $isActive ? 'Deactivate' : 'Activate';
-        $actionClass = $isActive ? 'danger' : 'success';
-        $actionIcon = $isActive ? 'fa-pause' : 'fa-play';
+// Set breadcrumbs
+$breadcrumbs = [
+    ['title' => 'Modules']
+];
 
-        $content .= '
-        <div class="module-card ' . $statusClass . '" data-module="' . htmlspecialchars($moduleName) . '" data-status="' . $statusClass . '">
-            <div class="module-header">
-                <div class="module-icon">
-                    <i class="' . htmlspecialchars($moduleInfo['icon'] ?? 'fas fa-cube') . '"></i>
-                </div>
-                <div class="module-status">
-                    <span class="status-badge status-' . $statusClass . '">
-                        <i class="fas ' . $statusIcon . '"></i>
-                        ' . $statusText . '
-                    </span>
-                </div>
+?>
+
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-puzzle-piece"></i>
+        Module Management
+    </h1>
+    <p class="page-description">Manage and configure your admin modules. Activate, deactivate, or configure module settings.</p>
+</div>
+
+<!-- Module Statistics -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon primary">
+                <i class="fas fa-puzzle-piece"></i>
             </div>
+        </div>
+        <div class="stat-value"><?php echo count($modules ?? []); ?></div>
+        <div class="stat-label">Total Modules</div>
+    </div>
+    
+    <?php 
+    // Count active modules
+    $activeCount = 0;
+    foreach ($modules ?? [] as $module) {
+        if (isset($module['is_active']) && $module['is_active']) {
+            $activeCount++;
+        } elseif (isset($module['status']) && $module['status'] === 'active') {
+            $activeCount++;
+        }
+    }
+    ?>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+        </div>
+        <div class="stat-value"><?php echo $activeCount; ?></div>
+        <div class="stat-label">Active Modules</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon warning">
+                <i class="fas fa-pause-circle"></i>
+            </div>
+        </div>
+        <div class="stat-value"><?php echo count($modules ?? []) - $activeCount; ?></div>
+        <div class="stat-label">Inactive Modules</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon info">
+                <i class="fas fa-cog"></i>
+            </div>
+        </div>
+        <div class="stat-value">0</div>
+        <div class="stat-label">Updates Available</div>
+    </div>
+</div>
+
+<!-- Module Actions Bar -->
+<div class="toolbar">
+    <div class="toolbar-left">
+        <button class="btn btn-primary" onclick="refreshModules()">
+            <i class="fas fa-sync-alt"></i>
+            Refresh Modules
+        </button>
+        <button class="btn btn-secondary" onclick="installModule()">
+            <i class="fas fa-plus"></i>
+            Install New Module
+        </button>
+    </div>
+    
+    <div class="toolbar-right">
+        <div class="module-filter">
+            <select id="moduleFilter" onchange="filterModules(this.value)" class="form-control">
+                <option value="all">All Modules</option>
+                <option value="active">Active Only</option>
+                <option value="inactive">Inactive Only</option>
+            </select>
+        </div>
+        
+        <div class="module-search">
+            <input type="text" placeholder="Search modules..." class="form-control" onkeyup="searchModules(this.value)">
+        </div>
+    </div>
+</div>
+
+<!-- Modules Grid -->
+<div class="modules-grid" id="modulesGrid">
+    <?php if (!empty($modules)): ?>
+        <?php foreach ($modules as $module): ?>
+            <?php
+            // Handle both database and file system module structures
+            $moduleName = $module['name'] ?? $module['slug'] ?? 'Unknown Module';
+            $moduleSlug = $module['slug'] ?? strtolower(str_replace(' ', '-', $moduleName));
+            $moduleDescription = $module['description'] ?? 'No description available';
+            $moduleVersion = $module['version'] ?? '1.0.0';
+            $moduleCategory = $module['category'] ?? 'general';
+            $moduleIcon = $module['icon'] ?? 'fas fa-cube';
             
-            <div class="module-body">
-                <h3 class="module-name">' . htmlspecialchars($moduleInfo['name']) . '</h3>
-                <p class="module-description">' . htmlspecialchars($moduleInfo['description']) . '</p>
+            // Determine if module is active
+            $isActive = false;
+            if (isset($module['is_active'])) {
+                $isActive = (bool)$module['is_active'];
+            } elseif (isset($module['status'])) {
+                $isActive = $module['status'] === 'active';
+            }
+            
+            $statusClass = $isActive ? 'active' : 'inactive';
+            $statusIcon = $isActive ? 'fa-check-circle' : 'fa-pause-circle';
+            $statusText = $isActive ? 'Active' : 'Inactive';
+            $actionText = $isActive ? 'Deactivate' : 'Activate';
+            $actionClass = $isActive ? 'danger' : 'success';
+            $actionIcon = $isActive ? 'fa-pause' : 'fa-play';
+            ?>
+            
+            <div class="module-card <?php echo $statusClass; ?>" data-module="<?php echo htmlspecialchars($moduleSlug); ?>" data-status="<?php echo $statusClass; ?>">
+                <div class="module-header">
+                    <div class="module-icon">
+                        <i class="<?php echo htmlspecialchars($moduleIcon); ?>"></i>
+                    </div>
+                    <div class="module-status">
+                        <span class="status-badge status-<?php echo $statusClass; ?>">
+                            <i class="fas <?php echo $statusIcon; ?>"></i>
+                            <?php echo $statusText; ?>
+                        </span>
+                    </div>
+                </div>
                 
-                <div class="module-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">Version:</span>
-                        <span class="meta-value">' . htmlspecialchars($moduleInfo['version'] ?? '1.0.0') . '</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Author:</span>
-                        <span class="meta-value">' . htmlspecialchars($moduleInfo['author'] ?? 'Unknown') . '</span>
+                <div class="module-body">
+                    <h3 class="module-name"><?php echo htmlspecialchars($moduleName); ?></h3>
+                    <p class="module-description"><?php echo htmlspecialchars($moduleDescription); ?></p>
+                    
+                    <div class="module-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Version:</span>
+                            <span class="meta-value"><?php echo htmlspecialchars($moduleVersion); ?></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Category:</span>
+                            <span class="meta-value"><?php echo htmlspecialchars(ucwords(str_replace('-', ' ', $moduleCategory))); ?></span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="module-footer">
-                <div class="module-actions">
-                    <button class="btn btn-' . $actionClass . ' btn-sm toggle-module" 
-                            data-module="' . htmlspecialchars($moduleName) . '"
-                            data-action="' . ($isActive ? 'deactivate' : 'activate') . '">
-                        <i class="fas ' . $actionIcon . '"></i>
-                        ' . $actionText . '
-                    </button>
-                    
-                    ' . ($isActive ? '
-                    <a href="' . app_base_url('/admin/modules/' . urlencode($moduleName) . '/settings') . '" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-cog"></i>
-                        Settings
-                    </a>
-                    ' : '') . '
-                    
-                    <div class="dropdown">
-                        <button class="btn btn-icon btn-sm dropdown-toggle" data-toggle="dropdown">
-                            <i class="fas fa-ellipsis-v"></i>
+                
+                <div class="module-footer">
+                    <div class="module-actions">
+                        <button class="btn btn-<?php echo $actionClass; ?> btn-sm toggle-module" 
+                                data-module="<?php echo htmlspecialchars($moduleSlug); ?>"
+                                data-action="<?php echo $isActive ? 'deactivate' : 'activate'; ?>">
+                            <i class="fas <?php echo $actionIcon; ?>"></i>
+                            <?php echo $actionText; ?>
                         </button>
-                        <div class="dropdown-menu">
-                            <a href="#" class="dropdown-item">
-                                <i class="fas fa-info-circle"></i>
-                                Module Info
-                            </a>
-                            <a href="#" class="dropdown-item">
-                                <i class="fas fa-bug"></i>
-                                Report Issue
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a href="#" class="dropdown-item text-danger">
-                                <i class="fas fa-trash"></i>
-                                Uninstall
-                            </a>
+                        
+                        <?php if ($isActive): ?>
+                        <a href="<?php echo app_base_url('/admin/modules/' . urlencode($moduleSlug) . '/settings'); ?>" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </a>
+                        <?php endif; ?>
+                        
+                        <div class="dropdown">
+                            <button class="btn btn-icon btn-sm dropdown-toggle" data-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a href="#" class="dropdown-item">
+                                    <i class="fas fa-info-circle"></i>
+                                    Module Info
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <i class="fas fa-bug"></i>
+                                    Report Issue
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item text-danger">
+                                    <i class="fas fa-trash"></i>
+                                    Uninstall
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-puzzle-piece"></i>
+            </div>
+            <h3>No Modules Found</h3>
+            <p>No admin modules are currently available. Install some modules to get started.</p>
+            <button class="btn btn-primary" onclick="installModule()">
+                <i class="fas fa-plus"></i>
+                Install Your First Module
+            </button>
         </div>
-        ';
-    }
-} else {
-    $content .= '
-    <div class="empty-state">
-        <div class="empty-icon">
-            <i class="fas fa-puzzle-piece"></i>
-        </div>
-        <h3>No Modules Found</h3>
-        <p>No admin modules are currently available. Install some modules to get started.</p>
-        <button class="btn btn-primary" onclick="installModule()">
-            <i class="fas fa-plus"></i>
-            Install Your First Module
-        </button>
-    </div>
-    ';
-}
-
-$content .= '
-    </div>
-    
+    <?php endif; ?>
 </div>
 
 <!-- Module Actions Scripts -->
@@ -198,178 +224,135 @@ document.addEventListener("DOMContentLoaded", function() {
             const moduleName = this.dataset.module;
             const action = this.dataset.action;
             
-            // Show loading state
-            const originalText = this.innerHTML;
-            this.disabled = true;
-            this.innerHTML = \'<i class="fas fa-spinner fa-spin"></i> \' + (action === "activate" ? "Activating..." : "Deactivating...");
-            
             try {
-                await ModuleManager.toggleModule(moduleName, action);
+                const response = await fetch(`/admin/modules/${moduleName}/${action}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({module: moduleName})
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Reload the page to reflect changes
+                    location.reload();
+                } else {
+                    alert('Error: ' + result.message);
+                }
             } catch (error) {
-                // Restore button state on error
-                this.disabled = false;
-                this.innerHTML = originalText;
+                console.error('Error:', error);
+                alert('An error occurred while processing your request.');
             }
         });
     });
 });
 
-// Filter modules by status
-function filterModules(status) {
-    const modules = document.querySelectorAll(".module-card");
-    
-    modules.forEach(module => {
-        const moduleStatus = module.dataset.status;
-        
-        if (status === "all" || status === moduleStatus) {
-            module.style.display = "block";
+// Refresh modules function
+function refreshModules() {
+    location.reload();
+}
+
+// Install module function
+function installModule() {
+    alert('Module installation functionality would go here in a real implementation.');
+}
+
+// Filter modules function
+function filterModules(filter) {
+    const moduleCards = document.querySelectorAll('.module-card');
+    moduleCards.forEach(card => {
+        const status = card.dataset.status;
+        if (filter === 'all' || status === filter) {
+            card.style.display = 'block';
         } else {
-            module.style.display = "none";
+            card.style.display = 'none';
         }
     });
 }
 
-// Search modules by name
+// Search modules function
 function searchModules(query) {
-    const modules = document.querySelectorAll(".module-card");
+    const moduleCards = document.querySelectorAll('.module-card');
     const searchTerm = query.toLowerCase();
     
-    modules.forEach(module => {
-        const moduleName = module.querySelector(".module-name").textContent.toLowerCase();
-        const moduleDescription = module.querySelector(".module-description").textContent.toLowerCase();
+    moduleCards.forEach(card => {
+        const moduleName = card.querySelector('.module-name').textContent.toLowerCase();
+        const moduleDescription = card.querySelector('.module-description').textContent.toLowerCase();
         
         if (moduleName.includes(searchTerm) || moduleDescription.includes(searchTerm)) {
-            module.style.display = "block";
+            card.style.display = 'block';
         } else {
-            module.style.display = "none";
+            card.style.display = 'none';
         }
     });
 }
-
-// Refresh modules list
-async function refreshModules() {
-    AdminApp.showLoading(true, "Refreshing modules...");
-    
-    try {
-        // Simulate refresh delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        window.location.reload();
-    } catch (error) {
-        AdminApp.showNotification("Failed to refresh modules", "error");
-    } finally {
-        AdminApp.showLoading(false);
-    }
-}
-
-// Install new module
-function installModule() {
-    AdminApp.showNotification("Module installation feature coming soon!", "info");
-}
-
-// Dropdown functionality
-document.addEventListener("click", function(e) {
-    if (e.target.matches(".dropdown-toggle") || e.target.closest(".dropdown-toggle")) {
-        e.preventDefault();
-        const dropdown = e.target.closest(".dropdown");
-        const menu = dropdown.querySelector(".dropdown-menu");
-        
-        // Close all other dropdowns
-        document.querySelectorAll(".dropdown-menu.show").forEach(m => {
-            if (m !== menu) m.classList.remove("show");
-        });
-        
-        menu.classList.toggle("show");
-    } else if (!e.target.closest(".dropdown-menu")) {
-        // Close all dropdowns when clicking outside
-        document.querySelectorAll(".dropdown-menu.show").forEach(m => {
-            m.classList.remove("show");
-        });
-    }
-});
 </script>
 
 <style>
 /* Module Management Styles */
-.module-actions-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 32px;
-    padding: 20px 24px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: var(--admin-shadow);
-    border: 1px solid var(--admin-gray-200);
-}
-
-.actions-left {
-    display: flex;
-    gap: 12px;
-}
-
-.actions-right {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-}
-
-.module-filter select,
-.module-search input {
-    min-width: 200px;
-}
-
 .modules-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 24px;
+    margin-top: 24px;
 }
 
 .module-card {
-    background: white;
+    border: 1px solid var(--admin-border);
     border-radius: 12px;
-    box-shadow: var(--admin-shadow);
-    border: 1px solid var(--admin-gray-200);
     overflow: hidden;
+    background: white;
     transition: var(--transition);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .module-card:hover {
+    box-shadow: var(--admin-shadow);
     transform: translateY(-2px);
-    box-shadow: var(--admin-shadow-lg);
 }
 
 .module-card.active {
-    border-left: 4px solid var(--admin-success);
+    border-color: var(--admin-success);
 }
 
 .module-card.inactive {
-    border-left: 4px solid var(--admin-gray-300);
+    opacity: 0.7;
 }
 
 .module-header {
-    padding: 20px 24px 16px;
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--admin-border);
+    background: var(--admin-gray-50);
 }
 
 .module-icon {
-    width: 48px;
-    height: 48px;
+    width: 50px;
+    height: 50px;
     border-radius: 12px;
-    background: linear-gradient(135deg, var(--admin-primary), var(--admin-primary-dark));
+    background: var(--admin-primary);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 24px;
+}
+
+.module-status {
+    display: flex;
+    align-items: center;
 }
 
 .status-badge {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 8px;
+    padding: 6px 12px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 500;
@@ -381,52 +364,53 @@ document.addEventListener("click", function(e) {
 }
 
 .status-badge.status-inactive {
-    background: rgba(107, 114, 128, 0.1);
-    color: var(--admin-gray-600);
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--admin-warning);
 }
 
 .module-body {
-    padding: 0 24px 16px;
+    padding: 20px;
 }
 
 .module-name {
+    margin: 0 0 12px 0;
     font-size: 18px;
     font-weight: 600;
-    color: var(--admin-gray-900);
-    margin-bottom: 8px;
+    color: var(--admin-gray-800);
 }
 
 .module-description {
+    margin: 0 0 16px 0;
     color: var(--admin-gray-600);
-    font-size: 14px;
     line-height: 1.5;
-    margin-bottom: 16px;
 }
 
 .module-meta {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
 .meta-item {
     display: flex;
-    justify-content: space-between;
-    font-size: 12px;
+    flex-direction: column;
 }
 
 .meta-label {
+    font-size: 12px;
     color: var(--admin-gray-500);
-    font-weight: 500;
+    margin-bottom: 2px;
 }
 
 .meta-value {
+    font-size: 14px;
+    font-weight: 500;
     color: var(--admin-gray-700);
 }
 
 .module-footer {
-    padding: 16px 24px 20px;
-    border-top: 1px solid var(--admin-gray-200);
+    padding: 16px 20px;
+    border-top: 1px solid var(--admin-border);
     background: var(--admin-gray-50);
 }
 
@@ -436,98 +420,83 @@ document.addEventListener("click", function(e) {
     align-items: center;
 }
 
-.dropdown {
-    position: relative;
+.module-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.module-actions .dropdown {
     margin-left: auto;
 }
 
-.dropdown-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: white;
-    border: 1px solid var(--admin-gray-200);
-    border-radius: 8px;
-    box-shadow: var(--admin-shadow-lg);
-    min-width: 180px;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: var(--transition);
-}
-
-.dropdown-menu.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-.dropdown-item {
+.module-actions-bar {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    color: var(--admin-gray-700);
-    text-decoration: none;
-    font-size: 14px;
-    transition: var(--transition);
+    margin: 24px 0;
+    gap: 16px;
 }
 
-.dropdown-item:hover {
-    background: var(--admin-gray-50);
+.actions-left {
+    display: flex;
+    gap: 12px;
 }
 
-.dropdown-item.text-danger {
-    color: var(--admin-danger);
+.actions-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.module-filter,
+.module-search {
+    min-width: 200px;
 }
 
 .empty-state {
+    grid-column: 1 / -1;
     text-align: center;
-    padding: 64px 32px;
-    color: var(--admin-gray-600);
+    padding: 64px 24px;
 }
 
 .empty-icon {
-    font-size: 64px;
-    color: var(--admin-gray-300);
-    margin-bottom: 16px;
-}
-
-.empty-state h3 {
-    font-size: 24px;
-    color: var(--admin-gray-700);
-    margin-bottom: 8px;
-}
-
-.empty-state p {
-    font-size: 16px;
+    font-size: 48px;
+    color: var(--admin-gray-400);
     margin-bottom: 24px;
 }
 
+.empty-state h3 {
+    margin: 0 0 12px 0;
+    color: var(--admin-gray-800);
+}
+
+.empty-state p {
+    margin: 0 0 24px 0;
+    color: var(--admin-gray-600);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 @media (max-width: 768px) {
+    .modules-grid {
+        grid-template-columns: 1fr;
+    }
+    
     .module-actions-bar {
         flex-direction: column;
-        gap: 16px;
+        align-items: stretch;
     }
     
     .actions-left,
     .actions-right {
         width: 100%;
-        justify-content: center;
     }
     
-    .modules-grid {
-        grid-template-columns: 1fr;
+    .module-filter,
+    .module-search {
+        min-width: auto;
     }
 }
 </style>
-';
-
-// Set breadcrumbs
-$breadcrumbs = [
-    ['title' => 'Modules']
-];
-
-// Include the layout
-include __DIR__ . '/../../layouts/main.php';
