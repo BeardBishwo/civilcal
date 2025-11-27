@@ -102,7 +102,7 @@ $content = '
                         <i class="fas fa-clock"></i>
                         Recent Activity
                     </h3>
-                    <a href="' . app_base_url('/admin/activity') . '" class="btn btn-sm btn-primary">View All</a>
+                    <a href="/admin/activity" class="btn btn-sm btn-primary">View All</a>
                 </div>
                 <div class="card-content">
                     <div class="activity-list">
@@ -161,7 +161,7 @@ $content = '
                         <i class="fas fa-exclamation-triangle"></i>
                         Error Monitoring
                     </h3>
-                    <a href="' . app_base_url('/admin/error-logs') . '" class="btn btn-sm btn-primary">View All</a>
+                    <a href="/admin/error-logs" class="btn btn-sm btn-primary">View All</a>
                 </div>
                 <div class="card-content">
                     <div class="error-stats-grid">
@@ -196,7 +196,7 @@ $content = '
                         <i class="fas fa-dollar-sign"></i>
                         Revenue & Subscriptions
                     </h3>
-                    <a href="' . app_base_url('/admin/subscriptions') . '" class="btn btn-sm btn-primary">View All</a>
+                    <a href="/admin/subscriptions" class="btn btn-sm btn-primary">View All</a>
                 </div>
                 <div class="card-content">
                     <div class="revenue-stats-grid">
@@ -226,7 +226,7 @@ $content = '
                         <i class="fas fa-chart-bar"></i>
                         Calculator Usage Stats
                     </h3>
-                    <a href="' . app_base_url('/admin/analytics/calculators') . '" class="btn btn-sm btn-primary">View All</a>
+                    <a href="/admin/analytics/calculators" class="btn btn-sm btn-primary">View All</a>
                 </div>
                 <div class="card-content">
                     <div class="calculator-usage-list">
@@ -272,14 +272,14 @@ $content = '
                 </div>
                 <div class="card-content">
                     <div class="quick-actions-grid">
-                        <a href="' . app_base_url('/admin/users/create') . '" class="quick-action-item">
+                        <a href="/admin/users/create" class="quick-action-item">
                             <div class="action-icon">
                                 <i class="fas fa-user-plus"></i>
                             </div>
                             <div class="action-label">Add User</div>
                         </a>
 
-                        <a href="' . app_base_url('/admin/content/pages') . '" class="quick-action-item">
+                        <a href="/admin/content/pages" class="quick-action-item">
                             <div class="action-icon">
                                 <i class="fas fa-plus"></i>
                             </div>
@@ -587,117 +587,117 @@ include __DIR__ . '/../layouts/main.php';
 ?>
 
 <script>
-    // Initialize charts when the page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize revenue chart
-        if (document.getElementById('revenueChart')) {
-            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-            new Chart(revenueCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                    datasets: [{
-                        label: 'Revenue',
-                        data: [500, 750, 1200, 2450],
-                        borderColor: 'var(--admin-success)',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.3
-                    }]
+// Initialize charts when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize revenue chart
+    if (document.getElementById('revenueChart')) {
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [500, 750, 1200, 2450],
+                    borderColor: 'var(--admin-success)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
+                scales: {
+                    x: {
+                        display: false
                     },
-                    scales: {
-                        x: {
-                            display: false
-                        },
-                        y: {
-                            display: false
-                        }
+                    y: {
+                        display: false
                     }
                 }
-            });
-        }
-
-        // Initialize user growth chart (if it exists)
-        if (document.getElementById('userGrowthChart')) {
-            const userCtx = document.getElementById('userGrowthChart').getContext('2d');
-            new Chart(userCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Users',
-                        data: [120, 190, 300, 500, 750, 1234],
-                        borderColor: 'var(--admin-primary)',
-                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        // Initialize calculator usage chart (if it exists)
-        if (document.getElementById('calculatorUsageChart')) {
-            const calcCtx = document.getElementById('calculatorUsageChart').getContext('2d');
-            new Chart(calcCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Concrete', 'Electrical', 'Structural', 'HVAC', 'Other'],
-                    datasets: [{
-                        data: [35, 25, 20, 15, 5],
-                        backgroundColor: [
-                            'var(--admin-primary)',
-                            'var(--admin-warning)',
-                            'var(--admin-danger)',
-                            'var(--admin-info)',
-                            'var(--admin-gray-400)'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right'
-                        }
-                    }
-                }
-            });
-        }
-    });
-
-    // Function for backup (if called from quick actions)
-    function createBackup() {
-        alert('Backup functionality will be implemented here');
+            }
+        });
     }
 
-    // Function for system health check (if called from quick actions)
-    function checkSystemHealth() {
-        alert('System health check will be performed here');
+    // Initialize user growth chart (if it exists)
+    if (document.getElementById('userGrowthChart')) {
+        const userCtx = document.getElementById('userGrowthChart').getContext('2d');
+        new Chart(userCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Users',
+                    data: [120, 190, 300, 500, 750, 1234],
+                    borderColor: 'var(--admin-primary)',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
     }
+
+    // Initialize calculator usage chart (if it exists)
+    if (document.getElementById('calculatorUsageChart')) {
+        const calcCtx = document.getElementById('calculatorUsageChart').getContext('2d');
+        new Chart(calcCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Concrete', 'Electrical', 'Structural', 'HVAC', 'Other'],
+                datasets: [{
+                    data: [35, 25, 20, 15, 5],
+                    backgroundColor: [
+                        'var(--admin-primary)',
+                        'var(--admin-warning)',
+                        'var(--admin-danger)',
+                        'var(--admin-info)',
+                        'var(--admin-gray-400)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    }
+});
+
+// Function for backup (if called from quick actions)
+function createBackup() {
+    alert('Backup functionality will be implemented here');
+}
+
+// Function for system health check (if called from quick actions)
+function checkSystemHealth() {
+    alert('System health check will be performed here');
+}
 </script>

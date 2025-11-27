@@ -1043,6 +1043,12 @@ $router->add(
 );
 $router->add(
     "GET",
+    "/admin/premium-themes/marketplace",
+    "Admin\PremiumThemeController@marketplace",
+    ["auth", "admin"],
+);
+$router->add(
+    "GET",
     "/admin/premium-themes/{id}",
     "Admin\PremiumThemeController@show",
     ["auth", "admin"],
@@ -1129,12 +1135,6 @@ $router->add(
     "POST",
     "/admin/premium-themes/upload-zip",
     "Admin\PremiumThemeController@uploadZip",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/premium-themes/marketplace",
-    "Admin\PremiumThemeController@marketplace",
     ["auth", "admin"],
 );
 $router->add(
