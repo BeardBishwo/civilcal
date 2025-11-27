@@ -1,4 +1,9 @@
-<?php $this->layout('admin/layout', ['pageTitle' => 'Email Threads - Email Manager']); ?>
+<?php 
+$this->layout('admin/layout', [
+    'pageTitle' => 'Email Threads - Email Manager',
+    'additional_css' => [asset_url('css/email-manager.css')]
+]); 
+?>
 
 <!-- Page Header -->
 <div class="page-header">

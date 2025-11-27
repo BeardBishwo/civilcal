@@ -1,79 +1,87 @@
 <?php
-// Media Library View
-$content = '
-<div class="admin-content">
-    <!-- Page Header -->
-    <div class="page-header">
-        <h1 class="page-title">
-            <i class="fas fa-images"></i>
-            Media Library
-        </h1>
-        <p class="page-description">Manage images, documents, and other media files</p>
-    </div>
+// Remove the variable assignment approach and use the themes/admin layout system
+$page_title = 'Media Library - Admin Panel';
+$currentPage = 'content';
 
-    <!-- Toolbar -->
-    <div class="toolbar">
-        <button class="btn btn-primary" onclick="document.getElementById(\'upload-form\').click()">
-            <i class="fas fa-upload"></i>
-            Upload Files
-        </button>
-        <div class="toolbar-actions">
-            <div class="search-box">
-                <input type="text" placeholder="Search media..." class="form-control">
-                <i class="fas fa-search"></i>
-            </div>
+// Set breadcrumbs
+$breadcrumbs = [
+    ['title' => 'Content Management', 'url' => app_base_url('admin/content')],
+    ['title' => 'Media']
+];
+?>
+
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-images"></i>
+        Media Library
+    </h1>
+    <p class="page-description">Manage images, documents, and other media files</p>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+    <button class="btn btn-primary" onclick="document.getElementById('upload-form').click()">
+        <i class="fas fa-upload"></i>
+        Upload Files
+    </button>
+    <div class="toolbar-actions">
+        <div class="search-box">
+            <input type="text" placeholder="Search media..." class="form-control">
+            <i class="fas fa-search"></i>
         </div>
     </div>
+</div>
 
-    <!-- Hidden upload form -->
-    <form id="upload-form" style="display: none;" enctype="multipart/form-data">
-        <input type="file" name="files[]" multiple onchange="handleFileUpload(this)">
-    </form>
+<!-- Hidden upload form -->
+<form id="upload-form" style="display: none;" enctype="multipart/form-data">
+    <input type="file" name="files[]" multiple onchange="handleFileUpload(this)">
+</form>
 
-    <!-- Media Grid -->
-    <div class="media-grid">
-        ' . implode('', array_map(function($item) {
-                            $extension = pathinfo($item['filename'], PATHINFO_EXTENSION);
-                            $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
-                            
-                            if ($isImage) {
-                                $icon = '<img src="' . $item['url'] . '" alt="' . htmlspecialchars($item['filename']) . '" class="media-thumb">';
-                            } else {
-                                $icon = '<div class="media-icon"><i class="fas fa-file"></i></div>';
-                            }
-                            
-                            return '<div class="media-item">
-                                <div class="media-thumb-container">
-                                    ' . $icon . '
-                                </div>
-                                <div class="media-info">
-                                    <div class="media-filename">' . htmlspecialchars($item['filename']) . '</div>
-                                    <div class="media-meta">' . $item['type'] . ' • ' . $item['size'] . '</div>
-                                    <div class="media-date">' . $item['uploaded_at'] . '</div>
-                                </div>
-                                <div class="media-actions">
-                                    <button class="btn btn-sm btn-icon" title="View" onclick="viewMedia(\'' . $item['url'] . '\')">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-icon" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-icon text-danger" title="Delete" onclick="confirmDelete(\'' . htmlspecialchars($item['filename']) . '\')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>';
-                        }, $media ?? [])) . '
-    </div>
+<!-- Media Grid -->
+<div class="media-grid">
+    <?php foreach ($media ?? [] as $item): ?>
+        <?php
+        $extension = pathinfo($item['filename'], PATHINFO_EXTENSION);
+        $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+        
+        if ($isImage) {
+            $icon = '<img src="' . $item['url'] . '" alt="' . htmlspecialchars($item['filename']) . '" class="media-thumb">';
+        } else {
+            $icon = '<div class="media-icon"><i class="fas fa-file"></i></div>';
+        }
+        ?>
+        
+        <div class="media-item">
+            <div class="media-thumb-container">
+                <?php echo $icon; ?>
+            </div>
+            <div class="media-info">
+                <div class="media-filename"><?php echo htmlspecialchars($item['filename']); ?></div>
+                <div class="media-meta"><?php echo $item['type'] . ' • ' . $item['size']; ?></div>
+                <div class="media-date"><?php echo $item['uploaded_at']; ?></div>
+            </div>
+            <div class="media-actions">
+                <button class="btn btn-sm btn-icon" title="View" onclick="viewMedia('<?php echo $item['url']; ?>')">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-icon" title="Edit">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-icon text-danger" title="Delete" onclick="confirmDelete('<?php echo htmlspecialchars($item['filename']); ?>')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    <?php endforeach; ?>
+</div>
 
-    <!-- Pagination -->
-    <div class="pagination">
-        <a href="#" class="page-link">Previous</a>
-        <a href="#" class="page-link active">1</a>
-        <a href="#" class="page-link">2</a>
-        <a href="#" class="page-link">3</a>
-        <a href="#" class="page-link">Next</a>
-    </div>
+<!-- Pagination -->
+<div class="pagination">
+    <a href="#" class="page-link">Previous</a>
+    <a href="#" class="page-link active">1</a>
+    <a href="#" class="page-link">2</a>
+    <a href="#" class="page-link">3</a>
+    <a href="#" class="page-link">Next</a>
 </div>
 
 <script>
@@ -183,17 +191,3 @@ function confirmDelete(filename) {
     }
 }
 </style>
-';
-
-// Set breadcrumbs
-$breadcrumbs = [
-    ['title' => 'Content Management', 'url' => app_base_url('admin/content')],
-    ['title' => 'Media']
-];
-
-$page_title = $page_title ?? 'Media Library - Admin Panel';
-$currentPage = $currentPage ?? 'content';
-
-// Include the layout
-include __DIR__ . '/../layouts/main.php';
-?>

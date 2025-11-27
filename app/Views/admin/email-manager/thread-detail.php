@@ -368,12 +368,9 @@ if (!function_exists('getTimeAgo')) {
 
 <?php
 $content = ob_get_clean();
-// Removed custom CSS - using default admin theme
-// $additional_css = [
-//     '/assets/css/admin/email-manager.css'
-// ];
 $this->layout('admin/layout', array_merge(get_defined_vars(), [
     'content' => $content,
-    // 'additional_css' => $additional_css
+    'pageTitle' => 'Email Thread Detail',
+    'additional_css' => [asset_url('css/email-manager.css')]
 ]));
 ?>

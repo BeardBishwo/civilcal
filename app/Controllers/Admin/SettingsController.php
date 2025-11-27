@@ -154,6 +154,7 @@ class SettingsController extends Controller
             $settingsByGroup[$group] = SettingsService::getAll($group);
         }
 
+        // Use the original index view
         $this->view->render('admin/settings/index', [
             'title' => 'Settings Management',
             'settingsByGroup' => $settingsByGroup,

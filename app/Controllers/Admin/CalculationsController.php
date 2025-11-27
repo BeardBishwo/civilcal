@@ -43,7 +43,8 @@ class CalculationsController extends Controller
             'stats' => $stats
         ];
 
-        $this->view('admin/calculations/index', $data);
+        // Use the View class's render method to properly use themes/admin layout
+        $this->view->render('admin/calculations/index', $data);
     }
 
     /**

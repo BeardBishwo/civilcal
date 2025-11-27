@@ -1535,55 +1535,6 @@ $router->add(
     "Admin\EmailManagerController@deleteTemplate",
     ["auth", "admin"],
 );
-// Email Manager Admin Routes
-$router->add(
-    "GET",
-    "/admin/email-manager",
-    "Admin\\EmailManagerController@dashboard",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/email-manager/stats",
-    "Admin\\EmailManagerController@stats",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/email-manager/threads",
-    "Admin\\EmailManagerController@threads",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/email-manager/thread/{id}",
-    "Admin\\EmailManagerController@viewThread",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/email-manager/thread/{id}/reply",
-    "Admin\\EmailManagerController@reply",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/email-manager/thread/{id}/status",
-    "Admin\\EmailManagerController@updateStatus",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/email-manager/thread/{id}/assign",
-    "Admin\\EmailManagerController@assign",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/email-manager/thread/{id}/priority",
-    "Admin\EmailManagerController@updatePriority",
-    ["auth", "admin"]
-);
 
 // Additional Email Manager Routes for Missing Views
 $router->add("GET", "/admin/email-manager/error", "Admin\EmailManagerController@error", [
@@ -1595,37 +1546,7 @@ $router->add("GET", "/admin/email-manager/thread-detail/{id}", "Admin\EmailManag
     "admin",
 ]);
 
-// Email Templates Admin Routes
-$router->add(
-    "GET",
-    "/admin/email-manager/templates",
-    "Admin\\EmailManagerController@templates",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/email-manager/templates",
-    "Admin\\EmailManagerController@createTemplate",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/email-manager/template/{id}",
-    "Admin\\EmailManagerController@editTemplate",
-    ["auth", "admin"],
-);
-$router->add(
-    "PUT",
-    "/admin/email-manager/template/{id}",
-    "Admin\\EmailManagerController@updateTemplate",
-    ["auth", "admin"],
-);
-$router->add(
-    "DELETE",
-    "/admin/email-manager/template/{id}",
-    "Admin\\EmailManagerController@deleteTemplate",
-    ["auth", "admin"],
-);
+// Email Template Use Route
 $router->add(
     "POST",
     "/admin/email-manager/templates/{id}/use",

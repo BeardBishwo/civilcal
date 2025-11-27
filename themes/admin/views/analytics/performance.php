@@ -1,26 +1,59 @@
-<div class="row">
-    <div class="col-md-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="page-title">Performance Analytics</h1>
-                <p class="text-muted">System performance metrics and monitoring.</p>
-            </div>
+<div class="page-header">
+    <div class="page-header-content">
+        <div>
+            <h1 class="page-title"><i class="fas fa-tachometer-alt"></i> Performance Analytics</h1>
+            <p class="page-description">System performance metrics and monitoring.</p>
+        </div>
+        <div class="page-header-actions">
+            <button onclick="window.location.reload()" class="btn btn-secondary">
+                <i class="fas fa-sync-alt"></i>
+                <span>Refresh</span>
+            </button>
         </div>
     </div>
 </div>
 
 <!-- Performance Metrics -->
-<div class="row">
+<div class="stats-grid">
     <?php if (isset($performance_metrics) && is_array($performance_metrics)): ?>
         <?php foreach ($performance_metrics as $key => $value): ?>
-            <div class="col-md-3 mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <h2 class="mb-1 text-info"><?php echo htmlspecialchars($value); ?></h2>
-                        <p class="text-muted mb-0"><?php echo ucwords(str_replace('_', ' ', $key)); ?></p>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon info">
+                        <i class="fas fa-server"></i>
                     </div>
                 </div>
+                <div class="stat-value"><?php echo htmlspecialchars($value); ?></div>
+                <div class="stat-label"><?php echo ucwords(str_replace('_', ' ', $key)); ?></div>
             </div>
         <?php endforeach; ?>
+    <?php else: ?>
+        <div class="no-data">No performance metrics available</div>
     <?php endif; ?>
+</div>
+
+<!-- Additional Performance Details -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-chart-bar"></i>
+            Detailed Performance Metrics
+        </h3>
+    </div>
+    <div class="card-content">
+        <div class="performance-details">
+            <?php if (isset($performance_metrics) && is_array($performance_metrics)): ?>
+                <div class="metrics-grid">
+                    <?php foreach ($performance_metrics as $key => $value): ?>
+                        <div class="metric-item">
+                            <div class="metric-label"><?php echo ucwords(str_replace('_', ' ', $key)); ?></div>
+                            <div class="metric-value"><?php echo htmlspecialchars($value); ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="no-data text-center">No detailed performance data available</div>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>

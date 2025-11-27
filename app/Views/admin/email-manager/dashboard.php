@@ -1,15 +1,348 @@
-<!DOCTYPE html>
-<html lang="en">
+<?php 
+$this->layout('admin/layout', [
+    'pageTitle' => 'Email Manager Dashboard',
+    'additional_css' => [asset_url('css/email-manager.css')]
+]); 
+?>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Manager - Bishwo Calculator</title>
-    <!-- <link rel="stylesheet" href="/assets/css/admin/email-manager.css"> -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
+<style>
+    .email-dashboard {
+        padding: 2rem;
+    }
 
-<body>
+    .dashboard-header {
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--admin-text-primary);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .dashboard-header p {
+        color: var(--admin-text-muted);
+        font-size: 0.95rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--admin-border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: var(--transition-normal);
+    }
+
+    .stat-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--admin-primary);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--admin-primary-light);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--admin-text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-change {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .stat-change.positive {
+        color: var(--admin-success);
+    }
+
+    .stat-change.negative {
+        color: var(--admin-warning);
+    }
+
+    .filter-bar {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--admin-border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-label {
+        color: var(--admin-text-muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .filter-select,
+    .search-box input {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--admin-border);
+        color: var(--admin-text-primary);
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: var(--transition-fast);
+    }
+
+    .filter-select:hover,
+    .search-box input:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--admin-primary);
+    }
+
+    .filter-select:focus,
+    .search-box input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--admin-primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .search-box {
+        position: relative;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .search-icon {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--admin-text-muted);
+        pointer-events: none;
+    }
+
+    .btn-primary-small {
+        background: var(--admin-primary);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: var(--transition-fast);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary-small:hover {
+        background: var(--admin-primary-light);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+    }
+
+    .threads-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .thread-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--admin-border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: var(--transition-normal);
+    }
+
+    .thread-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--admin-primary);
+        transform: translateY(-2px);
+    }
+
+    .thread-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+    }
+
+    .thread-subject {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--admin-text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .thread-meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-size: 0.85rem;
+    }
+
+    .thread-priority,
+    .thread-status,
+    .thread-assignee,
+    .thread-date {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--admin-text-secondary);
+    }
+
+    .thread-priority.priority-high {
+        background: rgba(239, 68, 68, 0.1);
+        color: #fca5a5;
+    }
+
+    .thread-priority.priority-medium {
+        background: rgba(245, 158, 11, 0.1);
+        color: #fcd34d;
+    }
+
+    .thread-priority.priority-low {
+        background: rgba(16, 185, 129, 0.1);
+        color: #86efac;
+    }
+
+    .thread-status.status-open {
+        background: rgba(6, 182, 212, 0.1);
+        color: #67e8f9;
+    }
+
+    .thread-status.status-pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: #fcd34d;
+    }
+
+    .thread-status.status-resolved {
+        background: rgba(16, 185, 129, 0.1);
+        color: #86efac;
+    }
+
+    .thread-preview {
+        color: var(--admin-text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+
+    .thread-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .thread-tags {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .thread-tag {
+        background: rgba(67, 97, 238, 0.2);
+        color: var(--admin-primary-light);
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+    }
+
+    .thread-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-small {
+        background: var(--admin-primary);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-small:hover {
+        background: var(--admin-primary-light);
+    }
+
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        gap: 1rem;
+    }
+
+    .spinner-lg {
+        width: 40px;
+        height: 40px;
+        border: 4px solid var(--admin-border);
+        border-top-color: var(--admin-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: var(--admin-text-muted);
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--admin-text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state-description {
+        font-size: 0.9rem;
+    }
+</style>
+
+<div class="email-dashboard">
     <div class="email-manager-container">
         <!-- Dashboard Header -->
         <div class="dashboard-header">
@@ -464,11 +797,9 @@
                     name: 'Calculation Help',
                     category: 'Support',
                     preview: 'Thank you for your question about calculations...',
-                    variables: ['{{user_name}}', '{{specific_calculator}}']
+                    variables: ['{{user_name}}', '{{specific_calculator}}', '{{calculation_result}}']
                 }
             ];
         }
     </script>
-</body>
-
-</html>
+</div>

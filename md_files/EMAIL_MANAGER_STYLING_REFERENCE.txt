@@ -1,0 +1,354 @@
+================================================================================
+EMAIL MANAGER - STYLING REFERENCE GUIDE
+================================================================================
+
+ADMIN PANEL THEME INTEGRATION COMPLETE ✅
+
+================================================================================
+COLOR PALETTE (Admin Panel Dark Theme)
+================================================================================
+
+PRIMARY COLORS:
+  --admin-primary:        #4361ee (Blue)
+  --admin-primary-light:  #4cc9f0 (Cyan)
+  
+BACKGROUNDS:
+  --admin-dark-bg:        #0a0e27 (Navy)
+  --admin-dark-alt:       #1a1a4d (Dark Blue)
+  --admin-sidebar-bg:     #0f0f2e (Darker Navy)
+  --admin-topbar-bg:      rgba(255, 255, 255, 0.03)
+  
+TEXT COLORS:
+  --admin-text-primary:   #f9fafb (Off-white)
+  --admin-text-secondary: #e5e7eb (Light Gray)
+  --admin-text-muted:     #9ca3af (Medium Gray)
+  
+STATUS COLORS:
+  --admin-success:        #10b981 (Green)
+  --admin-warning:        #f59e0b (Orange)
+  --admin-danger:         #ef4444 (Red)
+  --admin-info:           #06b6d4 (Cyan)
+  
+BORDERS & SHADOWS:
+  --admin-border:         rgba(102, 126, 234, 0.2)
+  --admin-shadow:         0 1px 3px rgba(0, 0, 0, 0.2)
+  --admin-shadow-lg:      0 4px 12px rgba(0, 0, 0, 0.3)
+
+================================================================================
+COMPONENT STYLING GUIDE
+================================================================================
+
+STATISTICS CARDS:
+  Background:     rgba(255, 255, 255, 0.03)
+  Border:         1px solid var(--admin-border)
+  Border Radius:  12px
+  Padding:        1.5rem
+  Number Color:   var(--admin-primary-light) (#4cc9f0)
+  Label Color:    var(--admin-text-secondary)
+  Hover:          background: rgba(255, 255, 255, 0.05)
+                  border-color: var(--admin-primary)
+
+THREAD ITEMS:
+  Background:     rgba(255, 255, 255, 0.03)
+  Border:         1px solid var(--admin-border)
+  Border Radius:  12px
+  Padding:        1.5rem
+  Hover:          background: rgba(255, 255, 255, 0.05)
+                  border-color: var(--admin-primary)
+                  transform: translateY(-2px)
+  Unread:         border-left: 4px solid var(--admin-primary)
+
+PRIORITY BADGES:
+  HIGH:
+    Background:   rgba(239, 68, 68, 0.15)
+    Color:        #fca5a5 (Light Red)
+    
+  MEDIUM:
+    Background:   rgba(245, 158, 11, 0.15)
+    Color:        #fcd34d (Light Orange)
+    
+  LOW:
+    Background:   rgba(16, 185, 129, 0.15)
+    Color:        #86efac (Light Green)
+    
+  URGENT:
+    Background:   rgba(239, 68, 68, 0.2)
+    Color:        #ff6b6b (Bright Red)
+
+STATUS BADGES:
+  NEW/OPEN:
+    Background:   rgba(6, 182, 212, 0.15)
+    Color:        #67e8f9 (Light Cyan)
+    
+  PENDING/IN_PROGRESS:
+    Background:   rgba(245, 158, 11, 0.15)
+    Color:        #fcd34d (Light Orange)
+    
+  RESOLVED:
+    Background:   rgba(16, 185, 129, 0.15)
+    Color:        #86efac (Light Green)
+    
+  CLOSED:
+    Background:   rgba(107, 114, 128, 0.15)
+    Color:        #d1d5db (Light Gray)
+
+BUTTONS:
+  Primary:
+    Background:   var(--admin-primary) (#4361ee)
+    Color:        white
+    Hover:        background: var(--admin-primary-light) (#4cc9f0)
+                  transform: translateY(-2px)
+                  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3)
+    
+  Secondary:
+    Background:   rgba(255, 255, 255, 0.1)
+    Color:        var(--admin-text-secondary)
+    Border:       1px solid var(--admin-border)
+    Hover:        background: rgba(255, 255, 255, 0.15)
+                  border-color: var(--admin-primary)
+
+FORM INPUTS:
+  Background:     rgba(255, 255, 255, 0.05)
+  Border:         1px solid var(--admin-border)
+  Color:          var(--admin-text-primary)
+  Padding:        0.75rem 1rem
+  Border Radius:  8px
+  Focus:          outline: none
+                  background: rgba(255, 255, 255, 0.1)
+                  border-color: var(--admin-primary)
+                  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1)
+
+MODALS:
+  Background:     var(--admin-dark-alt) (#1a1a4d)
+  Border:         1px solid var(--admin-border)
+  Border Radius:  12px
+  Box Shadow:     0 20px 60px rgba(0, 0, 0, 0.5)
+  Overlay:        rgba(0, 0, 0, 0.7)
+
+ALERTS:
+  Success:
+    Background:   rgba(16, 185, 129, 0.15)
+    Border:       1px solid rgba(16, 185, 129, 0.3)
+    Color:        #86efac
+    
+  Danger:
+    Background:   rgba(239, 68, 68, 0.15)
+    Border:       1px solid rgba(239, 68, 68, 0.3)
+    Color:        #fca5a5
+    
+  Warning:
+    Background:   rgba(245, 158, 11, 0.15)
+    Border:       1px solid rgba(245, 158, 11, 0.3)
+    Color:        #fcd34d
+    
+  Info:
+    Background:   rgba(6, 182, 212, 0.15)
+    Border:       1px solid rgba(6, 182, 212, 0.3)
+    Color:        #67e8f9
+
+================================================================================
+SPACING & SIZING
+================================================================================
+
+PADDING:
+  Small:          0.5rem
+  Medium:         0.75rem
+  Large:          1rem
+  Extra Large:    1.5rem
+  XXL:            2rem
+
+BORDER RADIUS:
+  Small:          6px
+  Medium:         8px
+  Large:          12px
+
+FONT SIZES:
+  Page Title:     2rem (32px)
+  Card Title:     1.1rem (17.6px)
+  Body Text:      0.9rem (14.4px)
+  Small Text:     0.85rem (13.6px)
+  Tiny Text:      0.8rem (12.8px)
+
+GAPS:
+  Small:          0.5rem
+  Medium:         1rem
+  Large:          1.5rem
+  Extra Large:    2rem
+
+================================================================================
+ANIMATIONS & TRANSITIONS
+================================================================================
+
+TRANSITION SPEEDS:
+  Fast:           all 0.2s ease
+  Normal:         all 0.3s ease
+
+ANIMATIONS:
+  Spin:           360deg rotation, 1s linear infinite
+  Pulse:          opacity 0.5-1, 2s infinite
+  Slide Down:     0.3s ease, -10px to 0px translateY
+
+HOVER EFFECTS:
+  Cards:          translateY(-2px) + shadow
+  Buttons:        color change + shadow
+  Inputs:         background + border color change
+
+================================================================================
+RESPONSIVE BREAKPOINTS
+================================================================================
+
+DESKTOP (1024px+):
+  - Full sidebar visible
+  - Multi-column layouts
+  - All features visible
+  - Optimal spacing
+
+TABLET (768px - 1023px):
+  - Responsive grid
+  - Adjusted spacing
+  - Touch-friendly buttons
+  - Optimized forms
+
+MOBILE (< 768px):
+  - Single column layout
+  - Collapsible filters
+  - Full-width buttons
+  - Optimized for touch
+  - Readable text sizes
+
+================================================================================
+CSS VARIABLES USAGE
+================================================================================
+
+In your views, use these CSS variables:
+
+  Color:                  color: var(--admin-text-primary);
+  Background:             background: var(--admin-dark-bg);
+  Border:                 border: 1px solid var(--admin-border);
+  Shadow:                 box-shadow: var(--admin-shadow);
+  Transition:             transition: var(--transition-normal);
+
+Example:
+  .my-element {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--admin-border);
+    color: var(--admin-text-primary);
+    padding: 1.5rem;
+    border-radius: 12px;
+    transition: var(--transition-normal);
+  }
+  
+  .my-element:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--admin-primary);
+  }
+
+================================================================================
+FILES REFERENCE
+================================================================================
+
+CSS FILE:
+  public/assets/css/email-manager.css
+  - Complete styling for email manager
+  - Matches admin panel theme
+  - Responsive design
+  - Professional animations
+
+VIEW FILES:
+  app/Views/admin/email-manager/dashboard.php
+  app/Views/admin/email-manager/threads.php
+  app/Views/admin/email-manager/thread-detail.php
+  
+  All include:
+    - Admin layout integration
+    - Email manager CSS reference
+    - Professional styling
+    - Responsive design
+
+================================================================================
+QUICK STYLING CHECKLIST
+================================================================================
+
+When adding new elements to email manager:
+
+  [ ] Use admin CSS variables for colors
+  [ ] Apply 12px border-radius to cards
+  [ ] Use 1.5rem padding for cards
+  [ ] Add hover effects with translateY(-2px)
+  [ ] Use rgba(255, 255, 255, 0.03) for backgrounds
+  [ ] Use var(--admin-border) for borders
+  [ ] Apply smooth transitions (0.2s-0.3s)
+  [ ] Use color-coded badges for status/priority
+  [ ] Ensure responsive design (mobile-first)
+  [ ] Test on mobile, tablet, desktop
+  [ ] Verify accessibility (contrast, focus states)
+  [ ] Check animations are smooth (60fps)
+
+================================================================================
+COMMON PATTERNS
+================================================================================
+
+CARD PATTERN:
+  <div style="background: rgba(255, 255, 255, 0.03);
+              border: 1px solid var(--admin-border);
+              border-radius: 12px;
+              padding: 1.5rem;
+              transition: var(--transition-normal);">
+    Content here
+  </div>
+
+BUTTON PATTERN:
+  <button style="background: var(--admin-primary);
+                 color: white;
+                 border: none;
+                 padding: 0.75rem 1.5rem;
+                 border-radius: 8px;
+                 cursor: pointer;
+                 transition: var(--transition-fast);">
+    Button Text
+  </button>
+
+BADGE PATTERN:
+  <span style="background: rgba(67, 97, 238, 0.2);
+               color: var(--admin-primary-light);
+               padding: 0.25rem 0.75rem;
+               border-radius: 6px;
+               font-size: 0.8rem;">
+    Badge Text
+  </span>
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Colors look wrong?
+  → Check CSS variables are defined in admin.css
+  → Verify rgba() values match theme
+  → Clear browser cache (Ctrl+Shift+R)
+
+Animations not smooth?
+  → Check transition duration (0.2s-0.3s)
+  → Verify GPU acceleration (transform, opacity)
+  → Test on different browsers
+
+Responsive design broken?
+  → Check media queries in email-manager.css
+  → Verify grid-template-columns
+  → Test on actual mobile device
+
+Text not readable?
+  → Check color contrast (WCAG AA minimum)
+  → Verify text color vs background
+  → Use var(--admin-text-primary) for main text
+
+================================================================================
+SUPPORT & DOCUMENTATION
+================================================================================
+
+For more information, see:
+  - EMAIL_MANAGER_UI_UPDATE.md (UI changes overview)
+  - EMAIL_SYSTEM_COMPLETE_GUIDE.md (Full implementation guide)
+  - EMAIL_MANAGER_QUICK_START.md (Quick reference)
+  - public/assets/css/email-manager.css (CSS source)
+
+================================================================================
