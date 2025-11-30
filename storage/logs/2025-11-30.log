@@ -271,3 +271,7 @@
 {"timestamp":"2025-11-30 11:04:46","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
 {"timestamp":"2025-11-30 11:04:46","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
 {"timestamp":"2025-11-30 11:04:46","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-11-30 12:59:19","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-11-30 12:59:19","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-11-30 12:59:19","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-11-30 12:59:19","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
