@@ -474,7 +474,7 @@ class PremiumThemeController
     }
     
     /**
-     * Render view
+     * Render view using the View system
      * 
      * @param string $view
      * @param array $data
@@ -482,11 +482,10 @@ class PremiumThemeController
      */
     private function renderView($view, $data)
     {
-        extract($data);
-        
-        ob_start();
-        include __DIR__ . '/../../../themes/admin/views/' . $view . '.php';
-        return ob_get_clean();
+        // Use the View system to render the view
+        $viewRenderer = new \App\Core\View();
+        $viewRenderer->render($view, $data);
+        return '';
     }
     
     /**
