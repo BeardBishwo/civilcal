@@ -1,698 +1,600 @@
 <?php
-/**
- * Advanced Settings Page
- * Fixed version that works with current Bishwo Calculator setup
- */
-
-// Security check
-if (!defined('ABSPATH')) {
-    exit('Access denied');
-}
-
-// Initialize container if not available
-if (!isset($container)) {
-    $container = \App\Core\Container::create();
-}
-
-// Get current advanced settings (mock data for demonstration)
-$advanced_settings = [
-    'custom_css' => [
-        'label' => 'Custom CSS',
-        'value' => '/* Add your custom CSS here */\n\n.admin-layout {\n    /* Custom admin layout styles */\n}\n\n.calculator-widget {\n    /* Custom calculator widget styles */\n}',
-        'type' => 'textarea',
-        'required' => false,
-        'description' => 'Custom CSS to override default styles'
-    ],
-    'custom_js' => [
-        'label' => 'Custom JavaScript',
-        'value' => '// Add your custom JavaScript here\n\n$(document).ready(function() {\n    // Custom initialization code\n    console.log("Bishwo Calculator Custom JS Loaded");\n});\n\n// Custom calculator functions\nfunction customCalculation() {\n    // Add custom calculation logic\n}',
-        'type' => 'textarea',
-        'required' => false,
-        'description' => 'Custom JavaScript for additional functionality'
-    ],
-    'google_analytics_id' => [
-        'label' => 'Google Analytics ID',
-        'value' => '',
-        'type' => 'text',
-        'required' => false,
-        'description' => 'Google Analytics tracking ID (UA-XXXXX-X or G-XXXXX)'
-    ],
-    'custom_meta_title' => [
-        'label' => 'Custom Meta Title',
-        'value' => '',
-        'type' => 'text',
-        'required' => false,
-        'description' => 'Override default page title for SEO'
-    ],
-    'custom_meta_description' => [
-        'label' => 'Custom Meta Description',
-        'value' => '',
-        'type' => 'textarea',
-        'required' => false,
-        'description' => 'Custom meta description for SEO (150-160 characters)'
-    ],
-    'maintenance_mode_message' => [
-        'label' => 'Maintenance Mode Message',
-        'value' => 'We are currently performing scheduled maintenance. Please check back soon.',
-        'type' => 'textarea',
-        'required' => false,
-        'description' => 'Custom message displayed during maintenance mode'
-    ],
-    'backup_retention_days' => [
-        'label' => 'Backup Retention (days)',
-        'value' => '30',
-        'type' => 'number',
-        'required' => true,
-        'description' => 'How many days to keep backup files',
-        'min' => '1',
-        'max' => '3650'
-    ],
-    'log_retention_days' => [
-        'label' => 'Log Retention (days)',
-        'value' => '90',
-        'type' => 'number',
-        'required' => true,
-        'description' => 'How many days to keep system logs',
-        'min' => '1',
-        'max' => '3650'
-    ],
-    'session_cleanup_interval' => [
-        'label' => 'Session Cleanup Interval (hours)',
-        'value' => '24',
-        'type' => 'number',
-        'required' => true,
-        'description' => 'How often to clean expired sessions',
-        'min' => '1',
-        'max' => '168'
-    ],
-    'cache_cleanup_interval' => [
-        'label' => 'Cache Cleanup Interval (hours)',
-        'value' => '12',
-        'type' => 'number',
-        'required' => true,
-        'description' => 'How often to clean expired cache entries',
-        'min' => '1',
-        'max' => '168'
-    ],
-    'enable_debug_toolbar' => [
-        'label' => 'Enable Debug Toolbar',
-        'value' => false,
-        'type' => 'checkbox',
-        'required' => false,
-        'description' => 'Show debug information in admin interface'
-    ],
-    'enable_profiler' => [
-        'label' => 'Enable Performance Profiler',
-        'value' => false,
-        'type' => 'checkbox',
-        'required' => false,
-        'description' => 'Enable detailed performance profiling'
-    ],
-    'custom_error_pages' => [
-        'label' => 'Custom Error Pages',
-        'value' => true,
-        'type' => 'checkbox',
-        'required' => false,
-        'description' => 'Use custom error page templates'
-    ],
-    'enable_cdn' => [
-        'label' => 'Enable CDN',
-        'value' => false,
-        'type' => 'checkbox',
-        'required' => false,
-        'description' => 'Use CDN for static assets'
-    ],
-    'cdn_url' => [
-        'label' => 'CDN Base URL',
-        'value' => '',
-        'type' => 'text',
-        'required' => false,
-        'description' => 'Base URL for CDN assets (e.g., https://cdn.example.com)'
-    ],
-    'system_health_check' => [
-        'label' => 'System Health Check',
-        'value' => true,
-        'type' => 'checkbox',
-        'required' => false,
-        'description' => 'Enable automatic system health monitoring'
-    ]
-];
-
-$current_section = 'advanced';
-$page_title = 'Advanced Settings - Admin Panel';
+$page_title = $page_title ?? 'Advanced Settings';
+$advanced_settings = $advanced_settings ?? [];
+$system_info = $system_info ?? [];
+$debug_options = $debug_options ?? [];
+require_once __DIR__ . '/../../layouts/admin.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($page_title) ?></title>
-    
-    <!-- Font Awesome Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- Admin CSS -->
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-        
-        /* Admin Layout */
-        .admin-layout {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        .admin-sidebar {
-            width: 250px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 1rem;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-        }
-        
-        .admin-content {
-            flex: 1;
-            padding: 2rem;
-            margin-left: 250px;
-            width: calc(100% - 250px);
-        }
-        
-        /* Sidebar Styles */
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        
-        .sidebar-logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #667eea;
-        }
-        
-        .sidebar-menu ul {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .sidebar-menu li {
-            margin-bottom: 0.25rem;
-        }
-        
-        .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            color: #666;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .sidebar-menu a:hover, .sidebar-menu a.active {
-            background: #667eea;
-            color: white;
-        }
-        
-        .menu-divider {
-            margin: 1.5rem 0 0.5rem 0;
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        /* Page Header */
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .page-header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .page-header p {
-            color: rgba(255, 255, 255, 0.8);
-            margin-top: 0.5rem;
-        }
-        
-        /* Settings Navigation */
-        .settings-nav {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 2rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        
-        .settings-nav a {
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            color: #9ca3af;
-            border: 1px solid transparent;
-        }
-        
-        .settings-nav a:hover {
-            background: rgba(67, 97, 238, 0.1);
-            color: #4cc9f0;
-            border: 1px solid rgba(67, 97, 234, 0.3);
-        }
-        
-        .settings-nav a.active {
-            background: rgba(67, 97, 238, 0.2);
-            color: #4cc9f0;
-            border: 1px solid rgba(67, 97, 238, 0.3);
-        }
-        
-        /* Settings Form */
-        .settings-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .settings-card h3 {
-            color: #333;
-            margin: 0 0 1.5rem 0;
-            font-size: 1.125rem;
-            font-weight: 600;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-label {
-            display: block;
-            color: #333;
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        
-        .form-label.required::after {
-            content: ' *';
-            color: #ef4444;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 0.75rem;
-            background: rgba(15, 15, 46, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 8px;
-            color: #333;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .form-textarea {
-            min-height: 120px;
-            resize: vertical;
-            font-family: 'Courier New', monospace;
-            font-size: 0.875rem;
-        }
-        
-        .form-select {
-            background: rgba(15, 15, 46, 0.1);
-            cursor: pointer;
-        }
-        
-        .form-checkbox-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-        }
-        
-        .form-checkbox {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-        
-        .form-description {
-            display: block;
-            color: #666;
-            font-size: 0.75rem;
-            margin-top: 0.25rem;
-        }
-        
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-        
-        .btn {
-            padding: 0.75rem 2rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-block;
-            border: none;
-            font-size: 0.875rem;
-        }
-        
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #5a6fd8;
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #666;
-            border: 1px solid rgba(102, 126, 234, 0.2);
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: #333;
-        }
-        
-        @media (max-width: 768px) {
-            .admin-sidebar {
-                width: 100%;
-                position: relative;
-                height: auto;
-            }
-            
-            .admin-content {
-                margin-left: 0;
-                width: 100%;
-                padding: 1rem;
-            }
-            
-            .settings-nav {
-                flex-direction: column;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="admin-layout">
-        <!-- Sidebar -->
-        <div class="admin-sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">
-                    <i class="fas fa-calculator-alt"></i>
-                    <span class="sidebar-logo-text"><?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Admin Panel')); ?></span>
-                </div>
-            </div>
-            
-            <nav class="sidebar-menu">
-                <ul>
-                    <li>
-                        <a href="configured-dashboard.php">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    
-                    <li>
-                        <a href="#">
-                            <i class="fas fa-users"></i>
-                            <span>Users</span>
-                        </a>
-                    </li>
-                    
-                    <li>
-                        <a href="#">
-                            <i class="fas fa-calculator"></i>
-                            <span>Calculations</span>
-                        </a>
-                    </li>
-                    
-                    <li>
-                        <a href="#">
-                            <i class="fas fa-cubes"></i>
-                            <span>Modules</span>
-                        </a>
-                    </li>
-                    
-                    <li class="menu-divider">
-                        <span>Configuration</span>
-                    </li>
-                    
-                    <li>
-                        <a href="general.php">
-                            <i class="fas fa-globe"></i>
-                            <span>General</span>
-                        </a>
-                    </li>
-                    
-                    <li>
-                        <a href="application.php">
-                            <i class="fas fa-cog"></i>
-                            <span>Application</span>
-                        </a>
-                    </li>
-                    
-                    <li>
-                        <a href="users.php">
-                            <i class="fas fa-users"></i>
-                            <span>Users</span>
-                        </a>
-                    </li>
-                    
-                    <li>
-                        <a href="security.php">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Security</span>
-                        </a>
-                    </li>
-                    
-                    <li>
-                        <a href="email.php">
-                            <i class="fas fa-envelope"></i>
-                            <span>Email</span>
-                        </a>
-                    </li>
-                    
-                    <li>
-                        <a href="api.php">
-                            <i class="fas fa-plug"></i>
-                            <span>API</span>
-                        </a>
-                    </li>
-                    
-                    <li>
-                        <a href="performance-dashboard.php">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Performance</span>
-                        </a>
-                    </li>
-                    
-                    <li class="active">
-                        <a href="#">
-                            <i class="fas fa-tools"></i>
-                            <span>Advanced</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+<div class="admin-content">
+    <div class="page-header">
+        <h1><i class="fas fa-cogs"></i> Advanced Settings</h1>
+        <p>Configure advanced system settings and debugging options</p>
+        <div class="page-actions">
+            <button class="btn btn-warning" onclick="resetToDefaults()">
+                <i class="fas fa-undo"></i> Reset to Defaults
+            </button>
+            <button class="btn btn-primary" onclick="saveAdvancedSettings()">
+                <i class="fas fa-save"></i> Save Settings
+            </button>
         </div>
-        
-        <!-- Main Content -->
-        <div class="admin-content">
-            <!-- Page Header -->
-            <div class="page-header">
-                <div>
-                    <h1><?= htmlspecialchars($page_title) ?></h1>
-                    <p>Configure your site settings and preferences</p>
-                </div>
+    </div>
+
+    <!-- System Information -->
+    <div class="system-info-section">
+        <h3>System Information</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Application Version</label>
+                <span><?= htmlspecialchars($system_info['app_version'] ?? 'Unknown') ?></span>
             </div>
-            
-            <!-- Settings Navigation -->
-            <div class="settings-nav">
-                <a href="general.php">
-                    <i class="fas fa-globe"></i>
-                    General
-                </a>
-                <a href="application.php">
-                    <i class="fas fa-cog"></i>
-                    Application
-                </a>
-                <a href="users.php">
-                    <i class="fas fa-users"></i>
-                    Users
-                </a>
-                <a href="security.php">
-                    <i class="fas fa-shield-alt"></i>
-                    Security
-                </a>
-                <a href="email.php">
-                    <i class="fas fa-envelope"></i>
-                    Email
-                </a>
-                <a href="api.php">
-                    <i class="fas fa-plug"></i>
-                    API
-                </a>
-                <a href="performance-dashboard.php">
-                    <i class="fas fa-chart-line"></i>
-                    Performance
-                </a>
-                <a href="advanced.php" class="active">
-                    <i class="fas fa-tools"></i>
-                    Advanced
-                </a>
+            <div class="info-item">
+                <label>PHP Version</label>
+                <span><?= htmlspecialchars($system_info['php_version'] ?? 'Unknown') ?></span>
             </div>
-            
-            <!-- Settings Form -->
-            <form id="settingsForm" method="POST" action="#">
-                <input type="hidden" name="section" value="advanced">
+            <div class="info-item">
+                <label>Database Version</label>
+                <span><?= htmlspecialchars($system_info['db_version'] ?? 'Unknown') ?></span>
+            </div>
+            <div class="info-item">
+                <label>Web Server</label>
+                <span><?= htmlspecialchars($system_info['web_server'] ?? 'Unknown') ?></span>
+            </div>
+            <div class="info-item">
+                <label>Operating System</label>
+                <span><?= htmlspecialchars($system_info['os'] ?? 'Unknown') ?></span>
+            </div>
+            <div class="info-item">
+                <label>Memory Limit</label>
+                <span><?= htmlspecialchars($system_info['memory_limit'] ?? 'Unknown') ?></span>
+            </div>
+            <div class="info-item">
+                <label>Max Upload Size</label>
+                <span><?= htmlspecialchars($system_info['upload_max_size'] ?? 'Unknown') ?></span>
+            </div>
+            <div class="info-item">
+                <label>Time Zone</label>
+                <span><?= htmlspecialchars($system_info['timezone'] ?? 'Unknown') ?></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="advanced-settings-container">
+        <!-- Performance Settings -->
+        <div class="settings-section">
+            <h3>Performance Settings</h3>
+            <form id="performance-settings">
+                <?php $this->csrfField(); ?>
                 
-                <div class="settings-card">
-                    <h3>Advanced Configuration</h3>
-                    
-                    <?php foreach ($advanced_settings as $key => $setting): ?>
-                        <div class="form-group">
-                            <label class="form-label<?php echo ($setting['required'] ?? false) ? ' required' : ''; ?>">
-                                <?= htmlspecialchars($setting['label'] ?? $key) ?>
-                            </label>
-                            
-                            <?php if (($setting['type'] ?? 'text') === 'textarea'): ?>
-                                <textarea name="settings[<?php echo $key; ?>]" 
-                                          class="form-input form-textarea"
-                                          <?php echo ($setting['required'] ?? false) ? 'required' : ''; ?>><?php echo htmlspecialchars($setting['value'] ?? ''); ?></textarea>
-                            <?php elseif (($setting['type'] ?? 'text') === 'select'): ?>
-                                <select name="settings[<?php echo $key; ?>]" 
-                                        class="form-input form-select"
-                                        <?php echo ($setting['required'] ?? false) ? 'required' : ''; ?>>
-                                    <?php foreach ($setting['options'] ?? [] as $optKey => $optLabel): ?>
-                                        <option value="<?= htmlspecialchars($optKey); ?>" <?php echo ($setting['value'] ?? '') == $optKey ? 'selected' : ''; ?>>
-                                            <?= htmlspecialchars($optLabel); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            <?php elseif (($setting['type'] ?? 'text') === 'checkbox'): ?>
-                                <label class="form-checkbox-container">
-                                    <input type="checkbox" 
-                                           name="settings[<?php echo $key; ?>]" 
-                                           value="1" 
-                                           class="form-checkbox"
-                                           <?php echo ($setting['value'] ?? false) ? 'checked' : ''; ?>>
-                                    <span><?= htmlspecialchars($setting['description'] ?? 'Enable'); ?></span>
-                                </label>
-                            <?php elseif (($setting['type'] ?? 'text') === 'number'): ?>
-                                <input type="number" 
-                                       name="settings[<?php echo $key; ?>]" 
-                                       value="<?= htmlspecialchars($setting['value'] ?? ''); ?>" 
-                                       class="form-input"
-                                       <?php echo ($setting['required'] ?? false) ? 'required' : ''; ?>
-                                       <?php if (isset($setting['min'])): ?>min="<?= htmlspecialchars($setting['min']); ?>"<?php endif; ?>
-                                       <?php if (isset($setting['max'])): ?>max="<?= htmlspecialchars($setting['max']); ?>"<?php endif; ?>>
-                            <?php else: ?>
-                                <input type="<?= htmlspecialchars($setting['type'] ?? 'text'); ?>" 
-                                       name="settings[<?php echo $key; ?>]" 
-                                       value="<?= htmlspecialchars($setting['value'] ?? ''); ?>" 
-                                       class="form-input"
-                                       <?php echo ($setting['required'] ?? false) ? 'required' : ''; ?>>
-                            <?php endif; ?>
-                            
-                            <?php if (isset($setting['description']) && ($setting['type'] ?? 'text') !== 'checkbox'): ?>
-                                <small class="form-description"><?= htmlspecialchars($setting['description']); ?></small>
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
+                <div class="form-group">
+                    <label for="cache-enabled">
+                        <input type="checkbox" id="cache-enabled" name="cache_enabled" 
+                               <?= ($advanced_settings['cache_enabled'] ?? true) ? 'checked' : '' ?>>
+                        Enable Caching
+                    </label>
+                    <small class="form-text text-muted">
+                        Enable system-wide caching for improved performance
+                    </small>
                 </div>
-                
-                <!-- Action Buttons -->
-                <div class="action-buttons">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Save Settings
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="cache-ttl">Cache TTL (seconds)</label>
+                        <input type="number" class="form-control" id="cache-ttl" name="cache_ttl" 
+                               value="<?= $advanced_settings['cache_ttl'] ?? 3600 ?>" min="60" max="86400">
+                        <small class="form-text text-muted">
+                            How long cached data remains valid
+                        </small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="cache-driver">Cache Driver</label>
+                        <select class="form-control" id="cache-driver" name="cache_driver">
+                            <option value="file" <?= ($advanced_settings['cache_driver'] ?? 'file') === 'file' ? 'selected' : '' ?>>File</option>
+                            <option value="redis" <?= ($advanced_settings['cache_driver'] ?? 'file') === 'redis' ? 'selected' : '' ?>>Redis</option>
+                            <option value="memcached" <?= ($advanced_settings['cache_driver'] ?? 'file') === 'memcached' ? 'selected' : '' ?>>Memcached</option>
+                            <option value="database" <?= ($advanced_settings['cache_driver'] ?? 'file') === 'database' ? 'selected' : '' ?>>Database</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="compression-enabled">
+                        <input type="checkbox" id="compression-enabled" name="compression_enabled" 
+                               <?= ($advanced_settings['compression_enabled'] ?? false) ? 'checked' : '' ?>>
+                        Enable Output Compression
+                    </label>
+                    <small class="form-text text-muted">
+                        Compress HTML output for faster page loads
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="minify-assets">
+                        <input type="checkbox" id="minify-assets" name="minify_assets" 
+                               <?= ($advanced_settings['minify_assets'] ?? false) ? 'checked' : '' ?>>
+                        Minify CSS and JavaScript
+                    </label>
+                    <small class="form-text text-muted">
+                        Automatically minify assets for improved performance
+                    </small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="session-lifetime">Session Lifetime (minutes)</label>
+                        <input type="number" class="form-control" id="session-lifetime" name="session_lifetime" 
+                               value="<?= $advanced_settings['session_lifetime'] ?? 120 ?>" min="5" max="1440">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="max-concurrent-users">Max Concurrent Users</label>
+                        <input type="number" class="form-control" id="max-concurrent-users" name="max_concurrent_users" 
+                               value="<?= $advanced_settings['max_concurrent_users'] ?? 1000 ?>" min="10" max="10000">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Security Settings -->
+        <div class="settings-section">
+            <h3>Security Settings</h3>
+            <form id="security-settings">
+                <div class="form-group">
+                    <label for="force-https">
+                        <input type="checkbox" id="force-https" name="force_https" 
+                               <?= ($advanced_settings['force_https'] ?? false) ? 'checked' : '' ?>>
+                        Force HTTPS
+                    </label>
+                    <small class="form-text text-muted">
+                        Redirect all HTTP requests to HTTPS
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="security-headers">
+                        <input type="checkbox" id="security-headers" name="security_headers" 
+                               <?= ($advanced_settings['security_headers'] ?? true) ? 'checked' : '' ?>>
+                        Enable Security Headers
+                    </label>
+                    <small class="form-text text-muted">
+                        Add security headers to all responses
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="rate-limiting">
+                        <input type="checkbox" id="rate-limiting" name="rate_limiting" 
+                               <?= ($advanced_settings['rate_limiting'] ?? true) ? 'checked' : '' ?>>
+                        Enable Rate Limiting
+                    </label>
+                    <small class="form-text text-muted">
+                        Limit number of requests per time period
+                    </small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="rate-limit-requests">Rate Limit (requests/minute)</label>
+                        <input type="number" class="form-control" id="rate-limit-requests" name="rate_limit_requests" 
+                               value="<?= $advanced_settings['rate_limit_requests'] ?? 60 ?>" min="1" max="1000">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="login-attempts">Max Login Attempts</label>
+                        <input type="number" class="form-control" id="login-attempts" name="login_attempts" 
+                               value="<?= $advanced_settings['login_attempts'] ?? 5 ?>" min="1" max="20">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="csrf-protection">
+                        <input type="checkbox" id="csrf-protection" name="csrf_protection" 
+                               <?= ($advanced_settings['csrf_protection'] ?? true) ? 'checked' : '' ?>>
+                        Enable CSRF Protection
+                    </label>
+                    <small class="form-text text-muted">
+                        Protect forms from Cross-Site Request Forgery attacks
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="xss-protection">
+                        <input type="checkbox" id="xss-protection" name="xss_protection" 
+                               <?= ($advanced_settings['xss_protection'] ?? true) ? 'checked' : '' ?>>
+                        Enable XSS Protection
+                    </label>
+                    <small class="form-text text-muted">
+                        Filter and sanitize user input for XSS attacks
+                    </small>
+                </div>
+            </form>
+        </div>
+
+        <!-- Debug Settings -->
+        <div class="settings-section">
+            <h3>Debug Settings</h3>
+            <form id="debug-settings">
+                <div class="form-group">
+                    <label for="debug-mode">
+                        <input type="checkbox" id="debug-mode" name="debug_mode" 
+                               <?= ($advanced_settings['debug_mode'] ?? false) ? 'checked' : '' ?>>
+                        Enable Debug Mode
+                    </label>
+                    <small class="form-text text-muted">
+                        Show detailed error messages and debug information
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="error-logging">
+                        <input type="checkbox" id="error-logging" name="error_logging" 
+                               <?= ($advanced_settings['error_logging'] ?? true) ? 'checked' : '' ?>>
+                        Enable Error Logging
+                    </label>
+                    <small class="form-text text-muted">
+                        Log errors to file for troubleshooting
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="query-debug">
+                        <input type="checkbox" id="query-debug" name="query_debug" 
+                               <?= ($advanced_settings['query_debug'] ?? false) ? 'checked' : '' ?>>
+                        Enable Query Debug
+                    </label>
+                    <small class="form-text text-muted">
+                        Log database queries for performance analysis
+                    </small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="log-level">Log Level</label>
+                        <select class="form-control" id="log-level" name="log_level">
+                            <option value="error" <?= ($advanced_settings['log_level'] ?? 'error') === 'error' ? 'selected' : '' ?>>Error</option>
+                            <option value="warning" <?= ($advanced_settings['log_level'] ?? 'error') === 'warning' ? 'selected' : '' ?>>Warning</option>
+                            <option value="info" <?= ($advanced_settings['log_level'] ?? 'error') === 'info' ? 'selected' : '' ?>>Info</option>
+                            <option value="debug" <?= ($advanced_settings['log_level'] ?? 'error') === 'debug' ? 'selected' : '' ?>>Debug</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="performance-monitoring">Performance Monitoring</label>
+                        <select class="form-control" id="performance-monitoring" name="performance_monitoring">
+                            <option value="disabled" <?= ($advanced_settings['performance_monitoring'] ?? 'disabled') === 'disabled' ? 'selected' : '' ?>>Disabled</option>
+                            <option value="basic" <?= ($advanced_settings['performance_monitoring'] ?? 'disabled') === 'basic' ? 'selected' : '' ?>>Basic</option>
+                            <option value="detailed" <?= ($advanced_settings['performance_monitoring'] ?? 'disabled') === 'detailed' ? 'selected' : '' ?>>Detailed</option>
+                            <option value="comprehensive" <?= ($advanced_settings['performance_monitoring'] ?? 'disabled') === 'comprehensive' ? 'selected' : '' ?>>Comprehensive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="debug-actions">
+                    <button type="button" class="btn btn-outline-info" onclick="viewSystemLogs()">
+                        <i class="fas fa-file-alt"></i> View System Logs
                     </button>
-                    <button type="button" onclick="document.getElementById('settingsForm').reset();" class="btn btn-secondary">
-                        <i class="fas fa-undo"></i> Reset
+                    <button type="button" class="btn btn-outline-warning" onclick="clearSystemLogs()">
+                        <i class="fas fa-trash"></i> Clear System Logs
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" onclick="runDiagnostics()">
+                        <i class="fas fa-stethoscope"></i> Run Diagnostics
                     </button>
                 </div>
             </form>
         </div>
+
+        <!-- API Settings -->
+        <div class="settings-section">
+            <h3>API Settings</h3>
+            <form id="api-settings">
+                <div class="form-group">
+                    <label for="api-enabled">
+                        <input type="checkbox" id="api-enabled" name="api_enabled" 
+                               <?= ($advanced_settings['api_enabled'] ?? true) ? 'checked' : '' ?>>
+                        Enable API
+                    </label>
+                    <small class="form-text text-muted">
+                        Enable REST API for external integrations
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="api-key">API Key</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="api-key" name="api_key" 
+                               value="<?= $advanced_settings['api_key'] ?? '' ?>" readonly>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" onclick="generateApiKey()">
+                                <i class="fas fa-sync"></i> Generate
+                            </button>
+                        </div>
+                    </div>
+                    <small class="form-text text-muted">
+                        API key for authenticating external requests
+                    </small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="api-rate-limit">API Rate Limit (requests/hour)</label>
+                        <input type="number" class="form-control" id="api-rate-limit" name="api_rate_limit" 
+                               value="<?= $advanced_settings['api_rate_limit'] ?? 1000 ?>" min="1" max="10000">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="api-timeout">API Timeout (seconds)</label>
+                        <input type="number" class="form-control" id="api-timeout" name="api_timeout" 
+                               value="<?= $advanced_settings['api_timeout'] ?? 30 ?>" min="1" max="300">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cors-origins">CORS Allowed Origins</label>
+                    <textarea class="form-control" id="cors-origins" name="cors_origins" rows="3"
+                              placeholder="https://example.com&#10;https://app.example.com"><?= htmlspecialchars($advanced_settings['cors_origins'] ?? '') ?></textarea>
+                    <small class="form-text text-muted">
+                        Enter one origin per line. Use * for all origins.
+                    </small>
+                </div>
+            </form>
+        </div>
     </div>
-    
-    <script>
-        // Form submission handler
-        document.getElementById('settingsForm').addEventListener('submit', function(e) {
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializeAdvancedSettings();
+});
+
+function initializeAdvancedSettings() {
+    // Handle form submissions
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Advanced settings saved successfully!');
-            // In a real implementation, this would submit to the server
+            saveAdvancedSettings();
         });
-        
-        // Sidebar navigation (basic functionality)
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuItems = document.querySelectorAll('.sidebar-menu a');
-            menuItems.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    menuItems.forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // In a real implementation, this would load the actual page
-                    alert('Navigation to: ' + this.textContent.trim());
-                });
-            });
+    });
+}
+
+function saveAdvancedSettings() {
+    const formData = new FormData();
+    
+    // Collect all form data
+    document.querySelectorAll('input, select, textarea').forEach(field => {
+        if (field.type === 'checkbox') {
+            formData.append(field.name, field.checked ? '1' : '0');
+        } else {
+            formData.append(field.name, field.value);
+        }
+    });
+    
+    // Add CSRF token
+    formData.append('csrf_token', '<?= $this->csrfToken() ?>');
+    
+    showNotification('Saving advanced settings...', 'info');
+    
+    fetch('<?= app_base_url('/admin/settings/advanced/save') ?>', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Advanced settings saved successfully', 'success');
+        } else {
+            showNotification('Failed to save settings: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('Error saving settings', 'error');
+    });
+}
+
+function resetToDefaults() {
+    if (confirm('Are you sure you want to reset all advanced settings to their default values? This action cannot be undone.')) {
+        fetch('<?= app_base_url('/admin/settings/advanced/reset') ?>', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Settings reset to defaults', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showNotification('Failed to reset settings', 'error');
+            }
         });
-    </script>
-</body>
-</html>
+    }
+}
+
+function generateApiKey() {
+    fetch('<?= app_base_url('/admin/settings/advanced/generate-api-key') ?>', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('api-key').value = data.api_key;
+            showNotification('New API key generated', 'success');
+        } else {
+            showNotification('Failed to generate API key', 'error');
+        }
+    });
+}
+
+function viewSystemLogs() {
+    window.open('<?= app_base_url('/admin/logs/view') ?>', '_blank');
+}
+
+function clearSystemLogs() {
+    if (confirm('Are you sure you want to clear all system logs? This action cannot be undone.')) {
+        fetch('<?= app_base_url('/admin/logs/clear') ?>', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('System logs cleared successfully', 'success');
+            } else {
+                showNotification('Failed to clear logs', 'error');
+            }
+        });
+    }
+}
+
+function runDiagnostics() {
+    showNotification('Running system diagnostics...', 'info');
+    
+    fetch('<?= app_base_url('/admin/diagnostics/run') ?>', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Diagnostics completed successfully', 'success');
+            window.open('<?= app_base_url('/admin/diagnostics/results') ?>', '_blank');
+        } else {
+            showNotification('Diagnostics failed: ' + data.message, 'error');
+        }
+    });
+}
+</script>
+
+<style>
+.system-info-section {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.system-info-section h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    color: #212529;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-item label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.info-item span {
+    color: #212529;
+    font-family: monospace;
+    background: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.advanced-settings-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.settings-section {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.settings-section h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    color: #212529;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #495057;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-text {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+    display: block;
+}
+
+.input-group {
+    display: flex;
+    align-items: stretch;
+}
+
+.input-group-append {
+    display: flex;
+    margin-left: -1px;
+}
+
+.debug-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+@media (max-width: 768px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .debug-actions {
+        flex-direction: column;
+    }
+}
+</style>

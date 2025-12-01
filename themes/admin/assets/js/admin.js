@@ -282,6 +282,238 @@ const AdminApp = {
 
     // Charts Initialization
     initCharts() {
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js is not loaded. Charts will not be initialized.');
+            // Try to load Chart.js dynamically
+            this.loadChartJS().then(() => {
+                this.initializeAllCharts();
+            }).catch(error => {
+                console.error('Failed to load Chart.js:', error);
+            });
+            return;
+        }
+
+        // Set default Chart.js configuration
+        this.configureChartDefaults();
+        
+        // Initialize all charts
+        this.initializeAllCharts();
+    },
+
+    // Load Chart.js dynamically if not available
+    async loadChartJS() {
+        return new Promise((resolve, reject) => {
+            // Check if already loading
+            if (window.chartJSLoading) {
+                window.chartJSLoading.then(resolve).catch(reject);
+                return;
+            }
+
+            window.chartJSLoading = new Promise((res, rej) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js';
+                script.onload = () => {
+                    console.log('Chart.js loaded successfully');
+                    res();
+                };
+                script.onerror = () => {
+                    console.error('Failed to load Chart.js from CDN');
+                    rej(new Error('Chart.js failed to load'));
+                };
+                document.head.appendChild(script);
+            });
+
+            window.chartJSLoading.then(resolve).catch(reject);
+        });
+    },
+
+    // Configure Chart.js defaults
+    configureChartDefaults() {
+        if (typeof Chart === 'undefined') return;
+
+        Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        Chart.defaults.color = '#6b7280';
+        Chart.defaults.borderColor = '#e5e7eb';
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        Chart.defaults.plugins.tooltip.padding = 12;
+        Chart.defaults.plugins.tooltip.cornerRadius = 8;
+        Chart.defaults.plugins.tooltip.titleFont = { size: 14, weight: '600' };
+        Chart.defaults.plugins.tooltip.bodyFont = { size: 13 };
+    },
+
+    // Initialize all charts
+    initializeAllCharts() {
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js not available, skipping chart initialization');
+            return;
+        }
+
+        try {
+            this.initializeServerLoadChart();
+            this.initializeMemoryUsageChart();
+            this.initializeResponseTimeChart();
+            this.initializeDbQueriesChart();
+            this.initializePerformanceCharts();
+            this.initializeDashboardCharts();
+            this.initializeAdvancedCharts();
+        } catch (error) {
+            console.error('Error initializing charts:', error);
+        }
+    },
+
+    // Initialize additional advanced charts
+    initializeAdvancedCharts() {
+        // System Performance Chart
+        this.initializeSystemPerformanceChart();
+        
+        // Revenue Chart
+        this.initializeRevenueChart();
+        
+        // Activity Heatmap
+        this.initializeActivityHeatmap();
+        
+        // Resource Usage Chart
+        this.initializeResourceUsageChart();
+    },
+
+    // Server Load Chart
+    initializeServerLoadChart() {
+        const ctx = document.getElementById('serverLoadChart');
+        if (!ctx) return;
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: this.generateTimeLabels(24),
+                datasets: [{
+                    label: 'Server Load',
+                    data: this.generateRandomData(24, 0.2, 0.8),
+                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1
+                    }
+                }
+            }
+        });
+    },
+
+    // Memory Usage Chart
+    initializeMemoryUsageChart() {
+        const ctx = document.getElementById('memoryUsageChart');
+        if (!ctx) return;
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: this.generateTimeLabels(24),
+                datasets: [{
+                    label: 'Memory Usage (%)',
+                    data: this.generateRandomData(24, 40, 80),
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    },
+
+    // Response Time Chart
+    initializeResponseTimeChart() {
+        const ctx = document.getElementById('responseTimeChart');
+        if (!ctx) return;
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: this.generateTimeLabels(24),
+                datasets: [{
+                    label: 'Response Time (ms)',
+                    data: this.generateRandomData(24, 50, 300),
+                    borderColor: '#ffc107',
+                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    },
+
+    // Database Queries Chart
+    initializeDbQueriesChart() {
+        const ctx = document.getElementById('dbQueriesChart');
+        if (!ctx) return;
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: this.generateTimeLabels(24),
+                datasets: [{
+                    label: 'Database Queries',
+                    data: this.generateRandomData(24, 100, 500),
+                    backgroundColor: '#6f42c1',
+                    borderColor: '#6f42c1',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    },
+
+    // Performance Dashboard Charts
+    initializePerformanceCharts() {
+        // Initialize all performance dashboard charts
+        const chartIds = [
+            'serverLoadChart', 'memoryUsageChart', 'responseTimeChart',
+            'dbQueriesChart', 'userGrowthChart', 'calculatorUsageChart'
+        ];
+        
+        chartIds.forEach(id => {
+            const ctx = document.getElementById(id);
+            if (ctx && !ctx.chart) {
+                // Chart will be initialized by specific functions above
+                ctx.chart = 'initialized';
+            }
+        });
+    },
+
+    // Dashboard Charts
+    initializeDashboardCharts() {
         // User Growth Chart
         const userGrowthCanvas = document.getElementById('userGrowthChart');
         if (userGrowthCanvas) {
@@ -355,6 +587,261 @@ const AdminApp = {
                 }
             });
         }
+    },
+
+    // System Performance Chart
+    initializeSystemPerformanceChart() {
+        const canvas = document.getElementById('systemPerformanceChart');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                datasets: [{
+                    label: 'CPU Usage (%)',
+                    data: [25, 22, 35, 68, 72, 58, 32],
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Memory Usage (%)',
+                    data: [45, 48, 52, 65, 70, 62, 50],
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        align: 'end'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: '#f3f4f6'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    },
+
+    // Revenue Chart
+    initializeRevenueChart() {
+        const canvas = document.getElementById('revenueChart');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [12500, 15800, 18200, 16800, 22100, 24500],
+                    backgroundColor: '#4f46e5',
+                    borderRadius: 6,
+                    barThickness: 40
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f3f4f6'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    },
+
+    // Activity Heatmap
+    initializeActivityHeatmap() {
+        const canvas = document.getElementById('activityHeatmap');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        const heatmapData = [];
+        for (let i = 0; i < 7; i++) {
+            for (let j = 0; j < 24; j++) {
+                heatmapData.push({
+                    x: j,
+                    y: i,
+                    v: Math.floor(Math.random() * 100)
+                });
+            }
+        }
+
+        new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Activity',
+                    data: heatmapData,
+                    backgroundColor: function(context) {
+                        const value = context.raw.v;
+                        const alpha = value / 100;
+                        return `rgba(79, 70, 229, ${alpha})`;
+                    },
+                    pointRadius: 8,
+                    pointHoverRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        min: 0,
+                        max: 23,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                return value + ':00';
+                            }
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        min: 0,
+                        max: 6,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                                return days[value];
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    },
+
+    // Resource Usage Chart
+    initializeResourceUsageChart() {
+        const canvas = document.getElementById('resourceUsageChart');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['CPU', 'Memory', 'Storage', 'Network', 'Database', 'Cache'],
+                datasets: [{
+                    label: 'Current Usage',
+                    data: [68, 72, 45, 58, 82, 35],
+                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#4f46e5',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }, {
+                    label: 'Optimal Range',
+                    data: [50, 50, 50, 50, 50, 50],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            stepSize: 20,
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    },
+
+    // Helper function to generate time labels
+    generateTimeLabels(hours) {
+        const labels = [];
+        const now = new Date();
+        for (let i = hours - 1; i >= 0; i--) {
+            const time = new Date(now - i * 60 * 60 * 1000);
+            labels.push(time.getHours() + ':00');
+        }
+        return labels;
+    },
+
+    // Helper function to generate random data
+    generateRandomData(count, min, max) {
+        const data = [];
+        for (let i = 0; i < count; i++) {
+            data.push(Math.random() * (max - min) + min);
+        }
+        return data;
     },
 
     // AJAX Form Handling

@@ -1,0 +1,18 @@
+<?php
+/**
+ * Admin Logo SVG (converted to PNG placeholder)
+ * This would normally be a real PNG file, but for now we'll create a placeholder
+ */
+
+// Create a simple SVG logo that can be used as placeholder
+$svg = '<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <rect width="40" height="40" rx="8" fill="#4f46e5"/>
+  <text x="20" y="25" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">A</text>
+</svg>';
+
+// For now, we'll create a simple placeholder file
+// In a real application, this would be an actual PNG file
+file_put_contents(__DIR__ . '/admin-logo.svg', $svg);
+
+echo "Admin logo placeholder created";
+?>
