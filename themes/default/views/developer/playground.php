@@ -1,7 +1,3 @@
-<?php
-$page_title = 'API Playground - Test Engineering Calculator APIs';
-require_once dirname(__DIR__, 3) . '/themes/default/views/partials/header.php';
-?>
 
 <style>
     .playground-container {
@@ -674,4 +670,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<?php require_once dirname(__DIR__, 3) . '/themes/default/views/partials/footer.php'; ?>

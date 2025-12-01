@@ -1,7 +1,3 @@
-<?php
-$page_title = 'API Reference for Developers - Engineering Calculator API';
-require_once dirname(__DIR__, 3) . '/themes/default/views/partials/header.php';
-?>
 
 <style>
     .developer-layout {
@@ -635,4 +631,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<?php require_once dirname(__DIR__, 3) . '/themes/default/views/partials/footer.php'; ?>

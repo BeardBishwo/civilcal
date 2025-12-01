@@ -20,11 +20,10 @@ class DeveloperController extends Controller
      */
     public function index()
     {
-        $this->setTitle('API Reference for Developers - Engineering Calculator API');
-        $this->setDescription('Complete API documentation for integrating engineering calculations into your applications');
-        $this->setCategory('developer');
-
         $data = [
+            'title' => 'API Reference for Developers - Engineering Calculator API',
+            'description' => 'Complete API documentation for integrating engineering calculations into your applications',
+            'category' => 'developer',
             'page_title' => 'API Reference for Developers',
             'api_sections' => $this->getApiSections(),
             'quick_start' => $this->getQuickStartGuide(),
@@ -53,11 +52,10 @@ class DeveloperController extends Controller
             return;
         }
 
-        $this->setTitle($endpointData['title'] . ' - API Documentation');
-        $this->setDescription($endpointData['description']);
-        $this->setCategory('developer');
-
         $data = [
+            'title' => $endpointData['title'] . ' - API Documentation',
+            'description' => $endpointData['description'],
+            'category' => 'developer',
             'page_title' => $endpointData['title'],
             'endpoint' => $endpointData,
             'related_endpoints' => $this->getRelatedEndpoints($category)
@@ -78,11 +76,10 @@ class DeveloperController extends Controller
             return;
         }
 
-        $this->setTitle($categoryInfo['name'] . ' API - Developer Documentation');
-        $this->setDescription('API documentation for ' . $categoryInfo['name']);
-        $this->setCategory('developer');
-
         $data = [
+            'title' => $categoryInfo['name'] . ' API - Developer Documentation',
+            'description' => 'API documentation for ' . $categoryInfo['name'],
+            'category' => 'developer',
             'page_title' => $categoryInfo['name'] . ' API',
             'category' => $categoryInfo,
             'endpoints' => $this->getEndpointsByCategory($category)
@@ -113,10 +110,9 @@ class DeveloperController extends Controller
             return;
         }
 
-        $this->setTitle($sdkData['name'] . ' SDK - Developer Documentation');
-        $this->setCategory('developer');
-
         $data = [
+            'title' => $sdkData['name'] . ' SDK - Developer Documentation',
+            'category' => 'developer',
             'page_title' => $sdkData['name'] . ' SDK',
             'sdk' => $sdkData
         ];
@@ -129,10 +125,9 @@ class DeveloperController extends Controller
      */
     public function playground()
     {
-        $this->setTitle('API Playground - Test Engineering Calculator APIs');
-        $this->setCategory('developer');
-
         $data = [
+            'title' => 'API Playground - Test Engineering Calculator APIs',
+            'category' => 'developer',
             'page_title' => 'API Playground',
             'endpoints' => $this->getPlaygroundEndpoints()
         ];
