@@ -3,7 +3,7 @@ $page_title = $page_title ?? 'Backup Settings';
 $backup_settings = $backup_settings ?? [];
 $backup_history = $backup_history ?? [];
 $system_info = $system_info ?? [];
-require_once __DIR__ . '/../../layouts/admin.php';
+require_once __DIR__ . '/../../layouts/main.php';
 ?>
 
 <div class="admin-content">
@@ -83,7 +83,7 @@ require_once __DIR__ . '/../../layouts/admin.php';
         <div class="settings-section">
             <h3>Backup Configuration</h3>
             <form method="POST" action="<?= app_base_url('/admin/settings/backup') ?>" id="backup-settings-form">
-                <?php $this->csrfField(); ?>
+                <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                 
                 <div class="form-row">
                     <div class="form-group col-md-6">
@@ -399,7 +399,7 @@ function createBackupNow() {
         fetch('<?= app_base_url('/admin/backup/create') ?>', {
             method: 'POST',
             headers: {
-                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+                'X-CSRF-Token': '<?= csrf_token() ?>'
             }
         })
         .then(response => response.json())
@@ -463,7 +463,7 @@ function restoreFromBackup(backupId) {
         fetch(`<?= app_base_url('/admin/backup/restore-from-id') ?>/${backupId}`, {
             method: 'POST',
             headers: {
-                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+                'X-CSRF-Token': '<?= csrf_token() ?>'
             }
         })
         .then(response => response.json())
@@ -490,7 +490,7 @@ function deleteBackup(backupId) {
         fetch(`<?= app_base_url('/admin/backup/delete') ?>/${backupId}`, {
             method: 'DELETE',
             headers: {
-                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+                'X-CSRF-Token': '<?= csrf_token() ?>'
             }
         })
         .then(response => response.json())
@@ -510,7 +510,7 @@ function cleanupOldBackups() {
         fetch('<?= app_base_url('/admin/backup/cleanup') ?>', {
             method: 'POST',
             headers: {
-                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+                'X-CSRF-Token': '<?= csrf_token() ?>'
             }
         })
         .then(response => response.json())
@@ -535,7 +535,7 @@ function testBackupConfiguration() {
     fetch('<?= app_base_url('/admin/backup/test') ?>', {
         method: 'POST',
         headers: {
-            'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+            'X-CSRF-Token': '<?= csrf_token() ?>'
         }
     })
     .then(response => response.json())

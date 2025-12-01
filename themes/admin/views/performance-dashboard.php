@@ -4,7 +4,7 @@ $performance_metrics = $performance_metrics ?? [];
 $system_stats = $system_stats ?? [];
 $database_stats = $database_stats ?? [];
 $cache_stats = $cache_stats ?? [];
-require_once __DIR__ . '/../layouts/admin.php';
+require_once __DIR__ . '/../layouts/main.php';
 ?>
 
 <div class="admin-content">
@@ -285,7 +285,7 @@ function refreshMetrics() {
     fetch('<?= app_base_url('/admin/performance/refresh') ?>', {
         method: 'POST',
         headers: {
-            'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+            'X-CSRF-Token': '<?= csrf_token() ?>'
         }
     })
     .then(response => response.json())
@@ -321,7 +321,7 @@ function applyRecommendation(recommendationId) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+                'X-CSRF-Token': '<?= csrf_token() ?>'
             },
             body: JSON.stringify({ recommendation_id: recommendationId })
         })

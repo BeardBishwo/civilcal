@@ -39,7 +39,7 @@
     </script>
 
     <!-- Chart.js for analytics -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 
     <style>
         :root {
@@ -56,7 +56,7 @@
             --admin-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
     </style>
-    <?php $currentUser = current_user(); ?>
+    <?php $currentUser = function_exists('current_user') ? current_user() : null; ?>
 </head>
 
 <body class="admin-body">
@@ -68,7 +68,7 @@
             <div class="sidebar-header">
                 <div class="sidebar-logo">
                     <i class="sidebar-logo-icon fas fa-calculator"></i>
-                    <span class="logo-text"><?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Admin Panel')); ?></span>
+                    <span class="logo-text"><?php echo htmlspecialchars(class_exists('\App\Services\SettingsService') ? \App\Services\SettingsService::get('site_name', 'Admin Panel') : 'Admin Panel'); ?></span>
                 </div>
                 <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
                     <i class="fas fa-bars"></i>
@@ -397,6 +397,79 @@
             <script src="<?php echo $script; ?>"></script>
         <?php endforeach; ?>
     <?php endif; ?>
+
+    <!-- Global Chart.js Helper Functions -->
+    <script>
+        // Global Chart.js configuration
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#6b7280';
+        Chart.defaults.borderColor = '#e5e7eb';
+
+        // Helper function to create charts
+        function createChart(ctx, type, data, options = {}) {
+            return new Chart(ctx, {
+                type: type,
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        }
+                    },
+                    ...options
+                }
+            });
+        }
+
+        // Helper function for chart colors
+        function getChartColors(count = 6) {
+            const colors = [
+                '#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6',
+                '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1', '#14b8a6'
+            ];
+            return colors.slice(0, count);
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const toast = document.getElementById('notification-toast');
+            toast.className = `notification-toast notification-${type}`;
+            toast.textContent = message;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Loading overlay
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        // User dropdown toggle
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('user-dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('user-dropdown');
+            const userAvatar = document.querySelector('.user-avatar');
+            
+            if (!userAvatar.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+    </script>
 
 </body>
 

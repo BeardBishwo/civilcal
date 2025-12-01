@@ -3,7 +3,7 @@ $page_title = $page_title ?? 'Advanced Settings';
 $advanced_settings = $advanced_settings ?? [];
 $system_info = $system_info ?? [];
 $debug_options = $debug_options ?? [];
-require_once __DIR__ . '/../../layouts/admin.php';
+require_once __DIR__ . '/../../layouts/main.php';
 ?>
 
 <div class="admin-content">
@@ -64,7 +64,7 @@ require_once __DIR__ . '/../../layouts/admin.php';
         <div class="settings-section">
             <h3>Performance Settings</h3>
             <form id="performance-settings">
-                <?php $this->csrfField(); ?>
+                <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                 
                 <div class="form-group">
                     <label for="cache-enabled">
@@ -365,7 +365,7 @@ function saveAdvancedSettings() {
     });
     
     // Add CSRF token
-    formData.append('csrf_token', '<?= $this->csrfToken() ?>');
+    formData.append('csrf_token', '<?= csrf_token() ?>');
     
     showNotification('Saving advanced settings...', 'info');
     
@@ -391,7 +391,7 @@ function resetToDefaults() {
         fetch('<?= app_base_url('/admin/settings/advanced/reset') ?>', {
             method: 'POST',
             headers: {
-                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+                'X-CSRF-Token': '<?= csrf_token() ?>'
             }
         })
         .then(response => response.json())
@@ -410,7 +410,7 @@ function generateApiKey() {
     fetch('<?= app_base_url('/admin/settings/advanced/generate-api-key') ?>', {
         method: 'POST',
         headers: {
-            'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+            'X-CSRF-Token': '<?= csrf_token() ?>'
         }
     })
     .then(response => response.json())
@@ -433,7 +433,7 @@ function clearSystemLogs() {
         fetch('<?= app_base_url('/admin/logs/clear') ?>', {
             method: 'POST',
             headers: {
-                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+                'X-CSRF-Token': '<?= csrf_token() ?>'
             }
         })
         .then(response => response.json())
@@ -453,7 +453,7 @@ function runDiagnostics() {
     fetch('<?= app_base_url('/admin/diagnostics/run') ?>', {
         method: 'POST',
         headers: {
-            'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+            'X-CSRF-Token': '<?= csrf_token() ?>'
         }
     })
     .then(response => response.json())

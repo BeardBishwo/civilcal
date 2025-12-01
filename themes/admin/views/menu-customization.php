@@ -1,9 +1,9 @@
 <?php
 $page_title = $page_title ?? 'Menu Customization';
-$menu_items = $menu_items ?? $this->getMenuItems();
-$available_modules = $available_modules ?? $this->getAllModules();
+$menu_items = $menu_items ?? [];
+$available_modules = $available_modules ?? [];
 $menu_config = $menu_config ?? [];
-require_once __DIR__ . '/../layouts/admin.php';
+require_once __DIR__ . '/../layouts/main.php';
 ?>
 
 <div class="admin-content">
@@ -88,7 +88,7 @@ require_once __DIR__ . '/../layouts/admin.php';
             <div class="panel-content">
                 <div class="menu-structure" id="current-menu">
                     <?php if (!empty($menu_config['structure'])): ?>
-                        <?php $this->renderMenuStructure($menu_config['structure']); ?>
+                        <?php // Menu structure will be rendered via JavaScript ?>
                     <?php else: ?>
                         <div class="empty-menu">
                             <i class="fas fa-plus-circle"></i>
@@ -162,7 +162,7 @@ require_once __DIR__ . '/../layouts/admin.php';
             </div>
             <div class="modal-body">
                 <form id="menu-item-form">
-                    <?php $this->csrfField(); ?>
+                    <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                     <div class="form-group">
                         <label for="item-label">Label *</label>
                         <input type="text" class="form-control" id="item-label" name="label" required>
@@ -390,7 +390,7 @@ function loadDefaultMenu() {
     fetch('<?= app_base_url('/admin/menu/load-default') ?>', {
         method: 'POST',
         headers: {
-            'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+            'X-CSRF-Token': '<?= csrf_token() ?>'
         }
     })
     .then(response => response.json())
@@ -416,7 +416,7 @@ function saveMenuConfiguration() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+            'X-CSRF-Token': '<?= csrf_token() ?>'
         },
         body: JSON.stringify(config)
     })

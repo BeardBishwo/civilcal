@@ -4,7 +4,7 @@ $system_status = $system_status ?? [];
 $health_checks = $health_checks ?? [];
 $performance_metrics = $performance_metrics ?? [];
 $recent_logs = $recent_logs ?? [];
-require_once __DIR__ . '/../layouts/admin.php';
+require_once __DIR__ . '/../layouts/main.php';
 ?>
 
 <div class="admin-content">
@@ -342,7 +342,7 @@ function refreshStatus() {
     fetch('<?= app_base_url('/admin/system-status/refresh') ?>', {
         method: 'POST',
         headers: {
-            'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+            'X-CSRF-Token': '<?= csrf_token() ?>'
         }
     })
     .then(response => response.json())
@@ -365,7 +365,7 @@ function runDiagnostics() {
     fetch('<?= app_base_url('/admin/diagnostics/run') ?>', {
         method: 'POST',
         headers: {
-            'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+            'X-CSRF-Token': '<?= csrf_token() ?>'
         }
     })
     .then(response => response.json())
@@ -406,7 +406,7 @@ function clearSystemCache() {
         fetch('<?= app_base_url('/admin/cache/clear') ?>', {
             method: 'POST',
             headers: {
-                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+                'X-CSRF-Token': '<?= csrf_token() ?>'
             }
         })
         .then(response => response.json())
@@ -432,7 +432,7 @@ function optimizeDatabase() {
         fetch('<?= app_base_url('/admin/database/optimize') ?>', {
             method: 'POST',
             headers: {
-                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+                'X-CSRF-Token': '<?= csrf_token() ?>'
             }
         })
         .then(response => response.json())
@@ -456,7 +456,7 @@ function runBackup() {
         fetch('<?= app_base_url('/admin/backup/run') ?>', {
             method: 'POST',
             headers: {
-                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+                'X-CSRF-Token': '<?= csrf_token() ?>'
             }
         })
         .then(response => response.json())

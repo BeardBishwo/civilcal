@@ -4,7 +4,7 @@ $widgets = $widgets ?? [];
 $available_widgets = $available_widgets ?? [];
 $menu_items = $menu_items ?? [];
 $widget_categories = $widget_categories ?? [];
-require_once __DIR__ . '/../layouts/admin.php';
+require_once __DIR__ . '/../layouts/main.php';
 ?>
 
 <div class="admin-content">
@@ -239,7 +239,7 @@ require_once __DIR__ . '/../layouts/admin.php';
             </div>
             <div class="modal-body">
                 <form id="create-widget-form">
-                    <?php $this->csrfField(); ?>
+                    <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="widget-name">Widget Name *</label>
@@ -432,7 +432,7 @@ function toggleWidget(widgetId) {
     fetch(`<?= app_base_url('/admin/widgets/toggle') ?>/${widgetId}`, {
         method: 'POST',
         headers: {
-            'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+            'X-CSRF-Token': '<?= csrf_token() ?>'
         }
     })
     .then(response => response.json())
@@ -455,7 +455,7 @@ function duplicateWidget(widgetId) {
         fetch(`<?= app_base_url('/admin/widgets/duplicate') ?>/${widgetId}`, {
             method: 'POST',
             headers: {
-                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+                'X-CSRF-Token': '<?= csrf_token() ?>'
             }
         })
         .then(response => response.json())
@@ -479,7 +479,7 @@ function deleteWidget(widgetId) {
         fetch(`<?= app_base_url('/admin/widgets/delete') ?>/${widgetId}`, {
             method: 'DELETE',
             headers: {
-                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+                'X-CSRF-Token': '<?= csrf_token() ?>'
             }
         })
         .then(response => response.json())
@@ -530,7 +530,7 @@ function installWidget(widgetId) {
     fetch(`<?= app_base_url('/admin/widgets/install') ?>/${widgetId}`, {
         method: 'POST',
         headers: {
-            'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+            'X-CSRF-Token': '<?= csrf_token() ?>'
         }
     })
     .then(response => response.json())

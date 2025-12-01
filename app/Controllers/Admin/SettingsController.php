@@ -36,6 +36,15 @@ class SettingsController extends Controller
         ]);
     }
 
+    public function application()
+    {
+        $this->requireAdminWithBasicAuth();
+
+        $this->view->render('admin/settings/application', [
+            'title' => 'Application Settings'
+        ]);
+    }
+
     public function users()
     {
         $this->requireAdminWithBasicAuth();
@@ -93,6 +102,15 @@ class SettingsController extends Controller
 
         $this->view->render('admin/settings/advanced', [
             'title' => 'Advanced Settings'
+        ]);
+    }
+
+    public function backup()
+    {
+        $this->requireAdminWithBasicAuth();
+
+        $this->view->render('admin/settings/backup', [
+            'title' => 'Backup Settings'
         ]);
     }
 

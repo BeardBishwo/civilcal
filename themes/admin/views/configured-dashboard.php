@@ -3,7 +3,7 @@ $page_title = $page_title ?? 'Configured Dashboard';
 $dashboard_config = $dashboard_config ?? [];
 $available_widgets = $available_widgets ?? [];
 $menu_items = $menu_items ?? [];
-require_once __DIR__ . '/../layouts/admin.php';
+require_once __DIR__ . '/../layouts/main.php';
 ?>
 
 <div class="admin-content">
@@ -219,7 +219,7 @@ function saveDashboardConfig() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+            'X-CSRF-Token': '<?= csrf_token() ?>'
         },
         body: JSON.stringify(config)
     })
@@ -241,7 +241,7 @@ function resetToDefault() {
         fetch('<?= app_base_url('/admin/dashboard/reset-config') ?>', {
             method: 'POST',
             headers: {
-                'X-CSRF-Token': '<?= $this->csrfToken() ?>'
+                'X-CSRF-Token': '<?= csrf_token() ?>'
             }
         })
         .then(response => response.json())
