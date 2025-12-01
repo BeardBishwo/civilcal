@@ -37,7 +37,7 @@ class SetupController extends Controller
             'system_status' => $this->getSystemStatus()
         ];
 
-        $this->view('admin/setup/checklist', $data);
+        $this->view->render('admin/setup/checklist', $data);
     }
 
     /**

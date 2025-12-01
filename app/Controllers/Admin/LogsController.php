@@ -40,7 +40,7 @@ class LogsController extends Controller
             'logFiles' => $logFiles
         ];
 
-        $this->view('admin/logs/index', $data);
+        $this->view->render('admin/logs/index', $data);
     }
 
     public function download($filename)
@@ -86,7 +86,7 @@ class LogsController extends Controller
             'content' => $content
         ];
 
-        $this->view('admin/logs/view', $data);
+        $this->view->render('admin/logs/view', $data);
     }
 
     private function checkAdminAccess()

@@ -40,7 +40,7 @@ class ExportController extends Controller {
                 'formats' => ['pdf', 'excel', 'csv', 'json']
             ];
             
-            $this->view('user/exports', $data);
+            $this->view->render('user/exports', $data);
         } catch (Exception $e) {
             $this->setFlashMessage('error', 'Error loading templates: ' . $e->getMessage());
             $this->redirect('/user/history');

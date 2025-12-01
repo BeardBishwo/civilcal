@@ -33,7 +33,7 @@ class DeveloperController extends Controller
             'sdk_info' => $this->getSdkInfo()
         ];
 
-        $this->view('developer/index', $data);
+        $this->view->render('developer/index', $data);
     }
 
     /**
@@ -63,7 +63,7 @@ class DeveloperController extends Controller
             'related_endpoints' => $this->getRelatedEndpoints($category)
         ];
 
-        $this->view('developer/endpoint', $data);
+        $this->view->render('developer/endpoint', $data);
     }
 
     /**
@@ -88,7 +88,7 @@ class DeveloperController extends Controller
             'endpoints' => $this->getEndpointsByCategory($category)
         ];
 
-        $this->view('developer/category', $data);
+        $this->view->render('developer/category', $data);
     }
 
     /**
@@ -102,7 +102,7 @@ class DeveloperController extends Controller
                 'page_title' => 'SDKs and Libraries',
                 'sdks' => $this->getAllSdks()
             ];
-            $this->view('developer/sdk-overview', $data);
+            $this->view->render('developer/sdk-overview', $data);
             return;
         }
 
@@ -121,7 +121,7 @@ class DeveloperController extends Controller
             'sdk' => $sdkData
         ];
 
-        $this->view('developer/sdk', $data);
+        $this->view->render('developer/sdk', $data);
     }
 
     /**
@@ -137,7 +137,7 @@ class DeveloperController extends Controller
             'endpoints' => $this->getPlaygroundEndpoints()
         ];
 
-        $this->view('developer/playground', $data);
+        $this->view->render('developer/playground', $data);
     }
 
     /**

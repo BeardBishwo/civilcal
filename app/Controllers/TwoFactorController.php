@@ -56,7 +56,7 @@ class TwoFactorController extends Controller
             'user' => $user
         ];
         
-        $this->view('user/2fa-setup', $data);
+        $this->view->render('user/2fa-setup', $data);
     }
     
     /**
@@ -204,7 +204,7 @@ class TwoFactorController extends Controller
             return;
         }
         
-        $this->view('auth/2fa-verify', []);
+        $this->view->render('auth/2fa-verify', []);
     }
     
     /**

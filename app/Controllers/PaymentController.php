@@ -36,7 +36,7 @@ class PaymentController extends Controller
             'payment_methods' => $this->getAvailablePaymentMethods($userCountry)
         ];
         
-        $this->view('payment/checkout', $data);
+        $this->view->render('payment/checkout', $data);
     }
     
     /**
@@ -221,7 +221,7 @@ class PaymentController extends Controller
         // Log payment attempt
         $this->logPaymentAttempt('esewa', $amount, $feature, 'initiated');
         
-        $this->view('payment/esewa-form', $data);
+        $this->view->render('payment/esewa-form', $data);
     }
     
     /**
@@ -273,7 +273,7 @@ class PaymentController extends Controller
         // Mark payment as completed
         $this->completePayment($gateway, $data['amount'], $data['feature'], $data);
         
-        $this->view('payment/success', $data);
+        $this->view->render('payment/success', $data);
     }
     
     /**
@@ -288,7 +288,7 @@ class PaymentController extends Controller
             'error' => $_GET['error'] ?? 'Payment was not completed'
         ];
         
-        $this->view('payment/failed', $data);
+        $this->view->render('payment/failed', $data);
     }
     
     /**

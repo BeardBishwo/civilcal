@@ -22,7 +22,7 @@ class AuditController extends Controller
         $logs = $this->getAuditLogs();
         
         // Render the audit view with admin layout
-        $this->view('admin/audit/index', [
+        $this->view->render('admin/audit/index', [
             'currentPage' => 'audit',
             'logs' => $logs,
             'title' => 'Audit Logs - Admin Panel'

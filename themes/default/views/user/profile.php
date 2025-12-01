@@ -460,7 +460,7 @@ $pageTitle = $page_title ?? 'User Profile';
     // Save the $user variable before including header (header overwrites it with session data)
     $profileUser = $user;
     
-    $headerPath = __DIR__ . '/../../../themes/default/views/partials/header.php';
+    $headerPath = BASE_PATH . '/themes/default/views/partials/header.php';
     if (file_exists($headerPath)) {
         include $headerPath;
     }
@@ -988,7 +988,7 @@ $pageTitle = $page_title ?? 'User Profile';
     </script>
     
     <?php 
-    $footerPath = __DIR__ . '/../../../themes/default/views/partials/footer.php';
+    $footerPath = BASE_PATH . '/themes/default/views/partials/footer.php';
     if (file_exists($footerPath)) {
         include $footerPath;
     }

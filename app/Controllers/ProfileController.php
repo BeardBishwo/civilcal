@@ -66,7 +66,7 @@ class ProfileController extends Controller
             'export_requests' => $exportRequests
         ];
 
-        $this->view('user/profile', $data);
+        $this->view->render('user/profile', $data);
     }
 
     /**

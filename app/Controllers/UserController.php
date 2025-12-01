@@ -24,7 +24,7 @@ class UserController extends Controller {
             'subtitle' => 'Manage your account settings'
         ];
         
-        $this->view('user/profile', $data);
+        $this->view->render('user/profile', $data);
     }
     
     /**
@@ -42,7 +42,7 @@ class UserController extends Controller {
             'subtitle' => 'Update your account information'
         ];
         
-        $this->view('user/edit-profile', $data);
+        $this->view->render('user/edit-profile', $data);
     }
     
     /**
@@ -85,7 +85,7 @@ class UserController extends Controller {
             'subtitle' => 'Update your account security'
         ];
         
-        $this->view('user/change-password', $data);
+        $this->view->render('user/change-password', $data);
     }
     
     /**

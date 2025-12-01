@@ -100,7 +100,7 @@ class ShareController extends Controller
             
             if (!$share) {
                 http_response_code(404);
-                $this->view('errors/404', [
+                $this->view->render('errors/404', [
                     'title' => 'Share Not Found',
                     'message' => 'The shared calculation you are looking for does not exist or has been removed.'
                 ]);
@@ -110,7 +110,7 @@ class ShareController extends Controller
             // Check if share has expired
             if ($share['expires_at'] && strtotime($share['expires_at']) < time()) {
                 http_response_code(410);
-                $this->view('errors/410', [
+                $this->view->render('errors/410', [
                     'title' => 'Share Expired',
                     'message' => 'This shared calculation has expired and is no longer available.'
                 ]);
@@ -126,7 +126,7 @@ class ShareController extends Controller
             
             if (!$calculation) {
                 http_response_code(500);
-                $this->view('errors/500', [
+                $this->view->render('errors/500', [
                     'title' => 'Calculation Error',
                     'message' => 'An error occurred while loading the calculation data.'
                 ]);
@@ -151,12 +151,12 @@ class ShareController extends Controller
             $this->setDescription($share['description'] ?: 'View this shared engineering calculation');
             $this->setKeywords('calculator, engineering, calculation, share, ' . $calculation['calculator_type']);
             
-            $this->view('share/public-view', $data);
+            $this->view->render('share/public-view', $data);
             
         } catch (Exception $e) {
             error_log("Share view error: " . $e->getMessage());
             http_response_code(500);
-            $this->view('errors/500', [
+            $this->view->render('errors/500', [
                 'title' => 'Server Error',
                 'message' => 'An error occurred while processing your request.'
             ]);
@@ -186,7 +186,7 @@ class ShareController extends Controller
             $this->setCategory('share');
             $this->setTitle('My Shares - ' . $data['title']);
             
-            $this->view('share/my-shares', $data);
+            $this->view->render('share/my-shares', $data);
             
         } catch (Exception $e) {
             error_log("My shares error: " . $e->getMessage());

@@ -639,13 +639,13 @@ class EmailManagerController extends Controller
         $thread = $this->emailThread->getThreadById($id);
 
         if (!$thread) {
-            return $this->view('admin/email-manager/error', [
+            return $this->view->render('admin/email-manager/error', [
                 'message' => 'Thread not found',
                 'pageTitle' => 'Error'
             ]);
         }
 
-        return $this->view('admin/email-manager/thread-detail', [
+        return $this->view->render('admin/email-manager/thread-detail', [
             'thread' => $thread,
             'pageTitle' => 'Thread Details'
         ]);

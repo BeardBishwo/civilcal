@@ -32,7 +32,7 @@ class HelpController extends Controller
             'recent_articles' => $this->getRecentArticles()
         ];
 
-        $this->view('help/index', $data);
+        $this->view->render('help/index', $data);
     }
 
     /**
@@ -57,7 +57,7 @@ class HelpController extends Controller
             'related_articles' => $this->getRelatedArticles($article['category'], $article['id'])
         ];
 
-        $this->view('help/article', $data);
+        $this->view->render('help/article', $data);
     }
 
     /**
@@ -82,7 +82,7 @@ class HelpController extends Controller
             'articles' => $this->getArticlesByCategory($category)
         ];
 
-        $this->view('help/category', $data);
+        $this->view->render('help/category', $data);
     }
 
     /**
@@ -107,7 +107,7 @@ class HelpController extends Controller
             'total_results' => count($results)
         ];
 
-        $this->view('help/search', $data);
+        $this->view->render('help/search', $data);
     }
 
     /**
