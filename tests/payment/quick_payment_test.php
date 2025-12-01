@@ -25,10 +25,10 @@ if (class_exists('PayTMLibrary')) {
 // Test 3: Check payment views
 echo "\n3. Testing Payment Views...\n";
 $paymentViews = [
-    'app/Views/payment/checkout.php',
-    'app/Views/payment/esewa-form.php',
-    'app/Views/payment/success.php',
-    'app/Views/payment/failed.php'
+    'themes/default/views/payment/checkout.php',
+    'themes/default/views/payment/esewa-form.php',
+    'themes/default/views/payment/success.php',
+    'themes/default/views/payment/failed.php'
 ];
 
 $viewCount = 0;

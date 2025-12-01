@@ -226,7 +226,7 @@ class PaymentSystemTestSuite
     {
         // Test Payment Views Directory
         $this->runTest('Payment Views Directory', function() {
-            if (is_dir('app/Views/payment')) {
+            if (is_dir('themes/default/views/payment')) {
                 return ['status' => 'pass', 'details' => 'Payment views directory exists'];
             } else {
                 return ['status' => 'fail', 'details' => 'Payment views directory not found'];
@@ -235,7 +235,7 @@ class PaymentSystemTestSuite
 
         // Test Checkout View
         $this->runTest('Payment Checkout View', function() {
-            $viewFile = 'app/Views/payment/checkout.php';
+            $viewFile = 'themes/default/views/payment/checkout.php';
             if (file_exists($viewFile)) {
                 $content = file_get_contents($viewFile);
                 if (strpos($content, 'payment_method') !== false && strpos($content, 'Proceed to Payment') !== false) {
@@ -250,7 +250,7 @@ class PaymentSystemTestSuite
 
         // Test eSewa Form View
         $this->runTest('eSewa Form View', function() {
-            $viewFile = 'app/Views/payment/esewa-form.php';
+            $viewFile = 'themes/default/views/payment/esewa-form.php';
             if (file_exists($viewFile)) {
                 $content = file_get_contents($viewFile);
                 if (strpos($content, 'esewa') !== false && strpos($content, 'PROCEED') !== false) {
@@ -265,7 +265,7 @@ class PaymentSystemTestSuite
 
         // Test Success View
         $this->runTest('Payment Success View', function() {
-            $viewFile = 'app/Views/payment/success.php';
+            $viewFile = 'themes/default/views/payment/success.php';
             if (file_exists($viewFile)) {
                 $content = file_get_contents($viewFile);
                 if (strpos($content, 'Payment Successful') !== false && strpos($content, 'Transaction ID') !== false) {
@@ -280,7 +280,7 @@ class PaymentSystemTestSuite
 
         // Test Failed View
         $this->runTest('Payment Failed View', function() {
-            $viewFile = 'app/Views/payment/failed.php';
+            $viewFile = 'themes/default/views/payment/failed.php';
             if (file_exists($viewFile)) {
                 $content = file_get_contents($viewFile);
                 if (strpos($content, 'Payment Failed') !== false && strpos($content, 'Try Again') !== false) {

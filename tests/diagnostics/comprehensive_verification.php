@@ -70,9 +70,9 @@
                 '/app/Controllers/ProfileController.php' => 'Profile Controller'
             ],
             'Views' => [
-                '/app/Views/admin/dashboard.php' => 'Admin Dashboard View',
-                '/app/Views/help/index.php' => 'Help Center View',
-                '/app/Views/user/profile.php' => 'User Profile View'
+                '/themes/admin/views/dashboard.php' => 'Admin Dashboard View',
+                '/themes/default/views/help/index.php' => 'Help Center View',
+                '/themes/default/views/user/profile.php' => 'User Profile View'
             ],
             'Core Files' => [
                 '/app/Core/Controller.php' => 'Base Controller',
