@@ -299,14 +299,15 @@
     }
 </style>
 
-<div class="security-settings-container">
-    <div class="security-header">
-        <h1>🔒 Security & Access Control</h1>
-        <p>Protect your system with advanced security configurations</p>
-    </div>
+<div class="admin-content">
+    <div class="security-settings-container">
+        <div class="security-header">
+            <h1>🔒 Security & Access Control</h1>
+            <p>Protect your system with advanced security configurations</p>
+        </div>
 
-    <form action="<?php echo app_base_url('/admin/settings/update'); ?>" method="POST" class="security-form ajax-form" id="securitySettingsForm">
-        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+        <form action="<?php echo app_base_url('/admin/settings/update'); ?>" method="POST" class="security-form ajax-form" id="securitySettingsForm">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
 
         <!-- Authentication Section -->
         <div class="security-section">
@@ -462,8 +463,9 @@
         <!-- Action Buttons -->
         <div class="button-group">
             <button type="submit" class="btn btn-primary">💾 Save Security Settings</button>
-        </div>
-    </form>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>

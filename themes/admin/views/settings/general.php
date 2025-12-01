@@ -542,26 +542,27 @@
     }
 </style>
 
-<div class="general-settings-container">
-    <div class="settings-breadcrumb">
-        <h1>⚙️ General Settings</h1>
-        <p>Manage your website's core configuration and information</p>
-    </div>
+<div class="admin-content">
+    <div class="general-settings-container">
+        <div class="settings-breadcrumb">
+            <h1>⚙️ General Settings</h1>
+            <p>Manage your website's core configuration and information</p>
+        </div>
 
-    <div class="general-form-container">
-        <!-- Site Identity Card -->
-        <div class="settings-card">
-            <div class="card-icon-header">
-                <span class="card-icon">🌍</span>
-                <div class="card-header-text">
-                    <h2>Site Identity</h2>
-                    <p>Configure your website's name, description, and branding</p>
+        <div class="general-form-container">
+            <!-- Site Identity Card -->
+            <div class="settings-card">
+                <div class="card-icon-header">
+                    <span class="card-icon">🌍</span>
+                    <div class="card-header-text">
+                        <h2>Site Identity</h2>
+                        <p>Configure your website's name, description, and branding</p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="card-body">
-                <form id="generalSettingsForm" action="<?php echo app_base_url('/admin/settings/update'); ?>" method="POST" enctype="multipart/form-data" class="ajax-form">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                <div class="card-body">
+                    <form id="generalSettingsForm" action="<?php echo app_base_url('/admin/settings/update'); ?>" method="POST" enctype="multipart/form-data" class="ajax-form">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                     
                     <div class="form-section">
                         <div class="form-row">
@@ -728,7 +729,8 @@
                     <div class="button-group">
                         <button type="submit" class="btn btn-save">💾 Save All Changes</button>
                     </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

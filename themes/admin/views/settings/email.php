@@ -255,14 +255,15 @@
     }
 </style>
 
-<div class="email-settings-container">
-    <div class="settings-header">
-        <h1>📧 Email Configuration</h1>
-        <p>Manage your email delivery system and SMTP settings</p>
-    </div>
+<div class="admin-content">
+    <div class="email-settings-container">
+        <div class="settings-header">
+            <h1>📧 Email Configuration</h1>
+            <p>Manage your email delivery system and SMTP settings</p>
+        </div>
 
-    <form action="<?php echo app_base_url('/admin/settings/update'); ?>" method="POST" class="settings-form ajax-form" id="emailSettingsForm">
-        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+        <form action="<?php echo app_base_url('/admin/settings/update'); ?>" method="POST" class="settings-form ajax-form" id="emailSettingsForm">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
 
         <!-- SMTP Configuration Section -->
         <div class="settings-section">
@@ -355,8 +356,9 @@
                     <div class="form-text">Enter the email address where you want to receive the test email.</div>
                 </div>
             </div>
-        </div>
-    </form>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>

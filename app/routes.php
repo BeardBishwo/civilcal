@@ -211,7 +211,7 @@ $router->add("GET", "/admin/configured-dashboard", "Admin\\DashboardController@c
     "auth",
     "admin",
 ]);
-$router->add("GET", "/admin/dashboard/complex", "Admin\\DashboardController@dashboardComplex", [
+$router->add("GET", "/admin/dashboard_complex", "Admin\\DashboardController@dashboardComplex", [
     "auth",
     "admin",
 ]);

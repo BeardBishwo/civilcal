@@ -82,7 +82,14 @@
                         <a href="<?php echo app_base_url('admin/dashboard'); ?>" class="nav-link">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <span class="nav-text">Dashboard</span>
+                            <i class="nav-arrow fas fa-chevron-right"></i>
                         </a>
+                        <ul class="nav-submenu">
+                            <li><a href="<?php echo app_base_url('admin/dashboard'); ?>">Overview</a></li>
+                            <li><a href="<?php echo app_base_url('admin/configured-dashboard'); ?>">Configured Dashboard</a></li>
+                            <li><a href="<?php echo app_base_url('admin/performance-dashboard'); ?>">Performance Dashboard</a></li>
+                            <li><a href="<?php echo app_base_url('admin/dashboard_complex'); ?>">Analytics Dashboard</a></li>
+                        </ul>
                     </li>
 
                     <!-- Users -->
@@ -123,6 +130,7 @@
                         <ul class="nav-submenu">
                             <li><a href="<?php echo app_base_url('admin/content/pages'); ?>">Pages</a></li>
                             <li><a href="<?php echo app_base_url('admin/content/menus'); ?>">Menus</a></li>
+                            <li><a href="<?php echo app_base_url('admin/menu-customization'); ?>">Menu Customization</a></li>
                             <li><a href="<?php echo app_base_url('admin/content/media'); ?>">Media</a></li>
                         </ul>
                     </li>
@@ -151,9 +159,12 @@
                             <i class="nav-arrow fas fa-chevron-right"></i>
                         </a>
                         <ul class="nav-submenu">
+                            <li><a href="<?php echo app_base_url('admin/settings/application'); ?>">Application</a></li>
                             <li><a href="<?php echo app_base_url('admin/settings/general'); ?>">General</a></li>
                             <li><a href="<?php echo app_base_url('admin/settings/email'); ?>">Email</a></li>
                             <li><a href="<?php echo app_base_url('admin/settings/security'); ?>">Security</a></li>
+                            <li><a href="<?php echo app_base_url('admin/settings/backup'); ?>">Backup</a></li>
+                            <li><a href="<?php echo app_base_url('admin/settings/advanced'); ?>">Advanced</a></li>
                         </ul>
                     </li>
 
@@ -244,7 +255,13 @@
                         <a href="<?php echo app_base_url('admin/system-status'); ?>" class="nav-link">
                             <i class="nav-icon fas fa-server"></i>
                             <span class="nav-text">System</span>
+                            <i class="nav-arrow fas fa-chevron-right"></i>
                         </a>
+                        <ul class="nav-submenu">
+                            <li><a href="<?php echo app_base_url('admin/system-status'); ?>">System Status</a></li>
+                            <li><a href="<?php echo app_base_url('admin/widget-management'); ?>">Widget Management</a></li>
+                            <li><a href="<?php echo app_base_url('admin/menu-customization'); ?>">Menu Customization</a></li>
+                        </ul>
                     </li>
 
                     <!-- Debug & Testing -->
