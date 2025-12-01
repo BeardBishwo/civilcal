@@ -20,11 +20,10 @@ class HelpController extends Controller
      */
     public function index()
     {
-        $this->setTitle('Help Center - Engineering Calculator Support');
-        $this->setDescription('Get help with engineering calculations, tutorials, and frequently asked questions');
-        $this->setCategory('help');
-
         $data = [
+            'title' => 'Help Center - Engineering Calculator Support',
+            'description' => 'Get help with engineering calculations, tutorials, and frequently asked questions',
+            'category' => 'help',
             'page_title' => 'Help Center',
             'featured_articles' => $this->getFeaturedArticles(),
             'categories' => $this->getHelpCategories(),
@@ -47,11 +46,10 @@ class HelpController extends Controller
             return;
         }
 
-        $this->setTitle($article['title'] . ' - Help Center');
-        $this->setDescription($article['excerpt']);
-        $this->setCategory('help');
-
         $data = [
+            'title' => $article['title'] . ' - Help Center',
+            'description' => $article['excerpt'],
+            'category' => 'help',
             'page_title' => $article['title'],
             'article' => $article,
             'related_articles' => $this->getRelatedArticles($article['category'], $article['id'])
@@ -72,13 +70,12 @@ class HelpController extends Controller
             return;
         }
 
-        $this->setTitle($categoryInfo['name'] . ' - Help Center');
-        $this->setDescription('Help articles about ' . $categoryInfo['name']);
-        $this->setCategory('help');
-
         $data = [
+            'title' => $categoryInfo['name'] . ' - Help Center',
+            'description' => 'Help articles about ' . $categoryInfo['name'],
+            'category' => 'help',
             'page_title' => $categoryInfo['name'],
-            'category' => $categoryInfo,
+            'category_info' => $categoryInfo,
             'articles' => $this->getArticlesByCategory($category)
         ];
 
@@ -97,10 +94,9 @@ class HelpController extends Controller
             $results = $this->searchArticles($query);
         }
 
-        $this->setTitle('Search Results - Help Center');
-        $this->setCategory('help');
-
         $data = [
+            'title' => 'Search Results - Help Center',
+            'category' => 'help',
             'page_title' => 'Search Results',
             'query' => $query,
             'results' => $results,
