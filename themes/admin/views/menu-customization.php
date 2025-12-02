@@ -3,7 +3,6 @@ $page_title = $page_title ?? 'Menu Customization';
 $menu_items = $menu_items ?? [];
 $available_modules = $available_modules ?? [];
 $menu_config = $menu_config ?? [];
-require_once __DIR__ . '/../layouts/main.php';
 ?>
 
 <div class="admin-content">
