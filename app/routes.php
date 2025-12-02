@@ -849,8 +849,11 @@ $router->add("GET", "/admin/modules", "Admin\ModuleController@index", [
     "admin",
 ]);
 
-// Widget Management Routes
 $router->add("GET", "/admin/widgets", "WidgetController@index", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/widgets/settings", "WidgetController@index", [
     "auth",
     "admin",
 ]);
