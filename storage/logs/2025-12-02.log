@@ -576,3 +576,115 @@
 {"timestamp":"2025-12-02 16:05:27","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
 {"timestamp":"2025-12-02 16:05:27","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
 {"timestamp":"2025-12-02 16:05:27","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:09:39","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:09:39","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:09:39","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:09:39","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:09:43","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:09:43","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:09:43","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:09:43","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:09:46","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:09:46","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:09:46","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:09:46","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:09:49","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:09:49","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:09:49","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:09:49","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:09:51","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:09:51","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:09:51","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:09:51","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:09:53","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:09:53","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:09:53","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:09:53","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:09:56","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:09:56","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:09:56","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:09:56","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:09:59","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:09:59","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:09:59","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:09:59","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:10:01","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:10:01","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:10:01","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:10:01","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:10:04","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:10:04","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:10:04","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:10:04","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:10:06","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:10:06","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:10:06","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:10:06","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:10:09","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:10:09","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:10:09","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:10:09","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:10:12","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:10:12","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:10:12","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:10:12","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:10:15","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:10:15","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:10:15","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:10:15","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:10:18","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:10:18","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:10:18","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:10:18","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:10:21","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:10:21","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:10:21","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:10:21","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:10:25","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:10:25","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:10:25","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:10:25","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:10:34","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:10:34","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:10:34","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:10:34","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-02 16:10:34","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":97}}
+{"timestamp":"2025-12-02 16:10:34","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":97}}
+{"timestamp":"2025-12-02 16:10:34","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":128}}
+{"timestamp":"2025-12-02 16:10:34","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":128}}
+{"timestamp":"2025-12-02 16:10:34","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":132}}
+{"timestamp":"2025-12-02 16:10:34","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":132}}
+{"timestamp":"2025-12-02 16:10:34","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":137}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":137}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":140}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":140}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":141}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":141}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":144}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":144}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":147}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":147}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":151}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":151}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":97}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":97}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":128}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":128}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":132}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":132}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":137}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":137}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":140}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":140}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":141}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":141}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":144}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":144}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":147}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":147}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"Undefined array key \"id\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":151}}
+{"timestamp":"2025-12-02 16:10:35","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\widget-management.php","line":151}}
+{"timestamp":"2025-12-02 16:10:52","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-02 16:10:52","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-02 16:10:52","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-02 16:10:52","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
