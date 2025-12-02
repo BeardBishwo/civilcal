@@ -3,7 +3,7 @@ $page_title = $page_title ?? 'Advanced Settings';
 $advanced_settings = $advanced_settings ?? [];
 $system_info = $system_info ?? [];
 $debug_options = $debug_options ?? [];
-require_once __DIR__ . '/../../layouts/main.php';
+?>
 ?>
 
 <div class="admin-content">

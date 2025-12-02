@@ -4,7 +4,6 @@ $system_status = $system_status ?? [];
 $health_checks = $health_checks ?? [];
 $performance_metrics = $performance_metrics ?? [];
 $recent_logs = $recent_logs ?? [];
-require_once __DIR__ . '/../layouts/main.php';
 ?>
 
 <div class="admin-content">

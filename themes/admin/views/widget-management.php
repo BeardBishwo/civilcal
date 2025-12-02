@@ -4,7 +4,6 @@ $widgets = $widgets ?? [];
 $available_widgets = $available_widgets ?? [];
 $menu_items = $menu_items ?? [];
 $widget_categories = $widget_categories ?? [];
-require_once __DIR__ . '/../layouts/main.php';
 ?>
 
 <div class="admin-content">

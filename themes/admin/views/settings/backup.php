@@ -3,7 +3,6 @@ $page_title = $page_title ?? 'Backup Settings';
 $backup_settings = $backup_settings ?? [];
 $backup_history = $backup_history ?? [];
 $system_info = $system_info ?? [];
-require_once __DIR__ . '/../../layouts/main.php';
 ?>
 
 <div class="admin-content">
