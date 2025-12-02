@@ -35,6 +35,29 @@ const AdminApp = {
 
             if (mainContent) {
                 mainContent.classList.toggle('sidebar-collapsed', shouldCollapse);
+                
+                // Force reflow to ensure content area adjusts properly
+                setTimeout(() => {
+                    mainContent.style.display = 'none';
+                    mainContent.offsetHeight; // Trigger reflow
+                    mainContent.style.display = '';
+                   
+                    // Force charts and other elements to resize
+                    const charts = mainContent.querySelectorAll('canvas');
+                    charts.forEach(chart => {
+                        if (chart.chart) {
+                            chart.chart.resize();
+                        }
+                    });
+                   
+                    // Sync dashboard layout specifically
+                    this.syncDashboardLayout();
+                   
+                    // Dispatch custom event for other components to listen to
+                    window.dispatchEvent(new CustomEvent('sidebarStateChanged', {
+                        detail: { collapsed: shouldCollapse }
+                    }));
+                }, 50);
             }
 
             this.syncActiveSubmenuDisplay();
@@ -246,6 +269,42 @@ const AdminApp = {
             return stripTrailingSlash(url.pathname);
         } catch (error) {
             return stripTrailingSlash(href);
+        }
+    },
+
+    // Dashboard Layout Synchronization
+    syncDashboardLayout() {
+        const dashboardGrid = document.querySelector('.dashboard-grid');
+        if (!dashboardGrid) {
+            return;
+        }
+
+        // Force grid recalculation
+        dashboardGrid.style.display = 'none';
+        dashboardGrid.offsetHeight; // Trigger reflow
+        dashboardGrid.style.display = '';
+
+        // Resize all charts in dashboard
+        const charts = dashboardGrid.querySelectorAll('canvas');
+        charts.forEach(chart => {
+            if (chart.chart) {
+                chart.chart.resize();
+            }
+        });
+
+        // Force dashboard columns to recalculate
+        const dashboardLeft = dashboardGrid.querySelector('.dashboard-left');
+        const dashboardRight = dashboardGrid.querySelector('.dashboard-right');
+        
+        if (dashboardLeft && dashboardRight) {
+            // Trigger layout recalculation for columns
+            dashboardLeft.style.minWidth = '';
+            dashboardRight.style.minWidth = '';
+            
+            // Force browser to recalculate layout
+            dashboardGrid.style.gridTemplateColumns = '';
+            dashboardGrid.offsetHeight; // Force reflow
+            dashboardGrid.style.gridTemplateColumns = '';
         }
     },
 
@@ -1221,7 +1280,45 @@ function bootAdminApp() {
     }
     AdminApp.init();
     initDataTables();
+    initDashboardLayoutObserver();
     window.adminAppInitialized = true;
+}
+
+// Dashboard Layout Observer
+function initDashboardLayoutObserver() {
+    const dashboardGrid = document.querySelector('.dashboard-grid');
+    if (!dashboardGrid) {
+        return;
+    }
+
+    // Create ResizeObserver to monitor dashboard grid changes
+    const dashboardObserver = new ResizeObserver(entries => {
+        entries.forEach(entry => {
+            const charts = entry.target.querySelectorAll('canvas');
+            charts.forEach(chart => {
+                if (chart.chart) {
+                    chart.chart.resize();
+                }
+            });
+        });
+    });
+
+    // Observe dashboard grid
+    dashboardObserver.observe(dashboardGrid);
+
+    // Also observe window resize for additional safety
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            const charts = dashboardGrid.querySelectorAll('canvas');
+            charts.forEach(chart => {
+                if (chart.chart) {
+                    chart.chart.resize();
+                }
+            });
+        }, 250);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {

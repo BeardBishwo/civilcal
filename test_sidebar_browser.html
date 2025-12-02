@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Sidebar Responsiveness Test</title>
+    <link rel="stylesheet" href="themes/admin/assets/css/admin.css">
+    <style>
+        .test-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 9999;
+            max-width: 300px;
+        }
+        .test-info h4 {
+            margin: 0 0 10px 0;
+            color: #4f46e5;
+        }
+        .test-info .status {
+            color: #10b981;
+        }
+        .test-info .warning {
+            color: #f59e0b;
+        }
+        .test-info .error {
+            color: #ef4444;
+        }
+        .debug-info {
+            background: rgba(79, 70, 229, 0.1);
+            border: 1px solid #4f46e5;
+            border-radius: 4px;
+            padding: 8px;
+            margin: 5px 0;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <!-- Test Information Panel -->
+    <div class="test-info">
+        <h4>Sidebar Responsiveness Test</h4>
+        <div class="status">✅ Test Page Loaded</div>
+        <div id="sidebar-status" class="debug-info">
+            Sidebar State: <span id="state">Expanded</span><br>
+            Main Content Width: <span id="content-width">Calculating...</span><br>
+            Sidebar Width: <span id="sidebar-width">Calculating...</span>
+        </div>
+        <div class="warning">⚠️ Click the hamburger menu to test</div>
+        <div class="debug-info">
+            <strong>Instructions:</strong><br>
+            1. Click hamburger to collapse sidebar<br>
+            2. Verify content expands fully<br>
+            3. Click again to expand sidebar<br>
+            4. Verify content adjusts properly<br>
+            5. Check mobile responsiveness
+        </div>
+    </div>
+
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <aside id="admin-sidebar" class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="sidebar-logo-icon">⚙️</i>
+                    <span class="logo-text">Admin Panel</span>
+                </div>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <i class="fas fa-bars">☰</i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon">📊</i>
+                            <span class="nav-text">Dashboard</span>
+                            <i class="nav-arrow">▶</i>
+                        </a>
+                        <ul class="nav-submenu">
+                            <li><a href="#">Analytics</a></li>
+                            <li><a href="#">Reports</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon">⚙️</i>
+                            <span class="nav-text">Settings</span>
+                            <i class="nav-arrow">▶</i>
+                        </a>
+                        <ul class="nav-submenu">
+                            <li><a href="#">General</a></li>
+                            <li><a href="#">Security</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon">👥</i>
+                            <span class="nav-text">Users</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="admin-main" class="admin-main">
+            <header class="admin-header">
+                <div class="header-left">
+                    <button id="mobile-sidebar-toggle" class="mobile-sidebar-toggle">
+                        <i>☰</i>
+                    </button>
+                    <div class="breadcrumb">
+                        <span class="breadcrumb-item">Admin</span>
+                        <span class="breadcrumb-divider">/</span>
+                        <span class="breadcrumb-item">Test</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="quick-actions">
+                        <button class="btn btn-icon">
+                            <i>🔔</i>
+                        </button>
+                        <div class="user-menu">
+                            <div class="user-avatar">
+                                <img src="https://via.placeholder.com/36x36" alt="User">
+                                <span>Admin User</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <div class="page-header">
+                    <h1 class="page-title">Sidebar Responsiveness Test</h1>
+                    <p class="page-description">Test the sidebar collapse/expand functionality</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon primary">📊</div>
+                        </div>
+                        <div class="stat-value">1,234</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon success">✅</div>
+                        </div>
+                        <div class="stat-value">98.5%</div>
+                        <div class="stat-label">System Health</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon warning">⚡</div>
+                        </div>
+                        <div class="stat-value">45ms</div>
+                        <div class="stat-label">Response Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon info">💾</div>
+                        </div>
+                        <div class="stat-value">2.1GB</div>
+                        <div class="stat-label">Storage Used</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📈 Performance Chart</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="chart-container">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">🔧 System Status</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="metric-grid">
+                                <div class="metric-item">
+                                    <div class="metric-label">CPU Usage</div>
+                                    <div class="metric-value">45%</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-label">Memory</div>
+                                    <div class="metric-value">67%</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-label">Disk Space</div>
+                                    <div class="metric-value">23%</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-label">Network</div>
+                                    <div class="metric-value">12ms</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin">⏳</i>
+            <span>Loading...</span>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast" class="notification-toast"></div>
+
+    <script src="themes/admin/assets/js/admin.js"></script>
+    <script>
+        // Additional debugging for sidebar responsiveness
+        function updateDebugInfo() {
+            const sidebar = document.getElementById('admin-sidebar');
+            const mainContent = document.getElementById('admin-main');
+            const stateElement = document.getElementById('state');
+            const contentWidthElement = document.getElementById('content-width');
+            const sidebarWidthElement = document.getElementById('sidebar-width');
+            
+            if (sidebar && mainContent) {
+                const isCollapsed = sidebar.classList.contains('collapsed');
+                stateElement.textContent = isCollapsed ? 'Collapsed' : 'Expanded';
+                stateElement.className = isCollapsed ? 'warning' : 'status';
+                
+                contentWidthElement.textContent = mainContent.offsetWidth + 'px';
+                sidebarWidthElement.textContent = sidebar.offsetWidth + 'px';
+                
+                // Check if content is properly positioned
+                const contentRect = mainContent.getBoundingClientRect();
+                const sidebarRect = sidebar.getBoundingClientRect();
+                
+                if (isCollapsed && contentRect.left < sidebarRect.right) {
+                    console.warn('Content is overlapping with collapsed sidebar');
+                } else if (!isCollapsed && contentRect.left < sidebarRect.right) {
+                    console.error('Content is overlapping with expanded sidebar');
+                } else {
+                    console.log('Content positioning is correct');
+                }
+            }
+        }
+
+        // Update debug info on load and sidebar changes
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(updateDebugInfo, 100);
+            
+            // Listen for sidebar state changes
+            window.addEventListener('sidebarStateChanged', (e) => {
+                setTimeout(updateDebugInfo, 100);
+            });
+            
+            // Update on window resize
+            window.addEventListener('resize', updateDebugInfo);
+        });
+
+        // Add click handler for sidebar toggle
+        document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
+            setTimeout(updateDebugInfo, 200);
+        });
+
+        // Create a simple chart for testing
+        setTimeout(() => {
+            const canvas = document.getElementById('performanceChart');
+            if (canvas && typeof Chart !== 'undefined') {
+                new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Performance',
+                            data: [65, 78, 82, 91, 86, 95],
+                            borderColor: '#4f46e5',
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+        }, 500);
+    </script>
+    
+    <!-- Load Chart.js for chart testing -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+</body>
+</html>
