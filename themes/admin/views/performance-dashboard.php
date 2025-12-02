@@ -4,7 +4,6 @@ $performance_metrics = $performance_metrics ?? [];
 $system_stats = $system_stats ?? [];
 $database_stats = $database_stats ?? [];
 $cache_stats = $cache_stats ?? [];
-require_once __DIR__ . '/../layouts/main.php';
 ?>
 
 <div class="admin-content">

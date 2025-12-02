@@ -3,9 +3,7 @@ $page_title = $page_title ?? 'Configured Dashboard';
 $dashboard_config = $dashboard_config ?? [];
 $available_widgets = $available_widgets ?? [];
 $menu_items = $menu_items ?? [];
-require_once __DIR__ . '/../layouts/main.php';
 ?>
-
 <div class="admin-content">
     <div class="page-header">
         <h1><i class="fas fa-cog"></i> Configured Dashboard</h1>

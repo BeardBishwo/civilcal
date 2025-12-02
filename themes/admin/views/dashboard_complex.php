@@ -5,7 +5,6 @@ $user_metrics = $user_metrics ?? [];
 $calculator_stats = $calculator_stats ?? [];
 $revenue_data = $revenue_data ?? [];
 $engagement_metrics = $engagement_metrics ?? [];
-require_once __DIR__ . '/../layouts/main.php';
 ?>
 
 <div class="admin-content">
