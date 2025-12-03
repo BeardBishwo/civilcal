@@ -1,5 +1,5 @@
 <?php
-// Notification Center View
+// Notification Center View - Beautiful UI
 $content = '
 <div class="admin-content">
     <!-- Page Header -->
@@ -22,6 +22,10 @@ $content = '
                 <i class="fas fa-sync"></i>
                 Refresh
             </button>
+        </div>
+        <div class="notification-stats">
+            <span class="stats-label">Total: <span class="stats-value">' . count($notifications ?? []) . '</span></span>
+            <span class="stats-label">Unread: <span class="stats-value unread-count">' . ($unreadCount ?? 0) . '</span></span>
         </div>
     </div>
 
@@ -55,7 +59,24 @@ $content = '
                         $typeClass = 'notification-info';
                         break;
                 }
-                
+
+                $timeAgo = '';
+                if (!empty($notification['created_at'])) {
+                    $createdAt = new DateTime($notification['created_at']);
+                    $now = new DateTime();
+                    $diff = $now->diff($createdAt);
+
+                    if ($diff->days > 0) {
+                        $timeAgo = $diff->days . 'd ago';
+                    } elseif ($diff->h > 0) {
+                        $timeAgo = $diff->h . 'h ago';
+                    } elseif ($diff->i > 0) {
+                        $timeAgo = $diff->i . 'm ago';
+                    } else {
+                        $timeAgo = 'Just now';
+                    }
+                }
+
                 return '<div class="notification-item ' . $typeClass . ' ' . ($notification['is_read'] ? '' : 'notification-unread') . '" data-id="' . $notification['id'] . '">
                     <div class="notification-icon">
                         <i class="fas fa-' . $icon . '"></i>
@@ -64,14 +85,18 @@ $content = '
                         <div class="notification-header">
                             <h4 class="notification-title">' . htmlspecialchars($notification['title']) . '</h4>
                             <div class="notification-meta">
-                                <span class="notification-time">' . date('M j, Y g:i A', strtotime($notification['created_at'])) . '</span>
-                                <button class="btn btn-sm btn-icon notification-dismiss" data-id="' . $notification['id'] . '">
+                                <span class="notification-time">' . $timeAgo . '</span>
+                                <button class="btn btn-sm btn-icon notification-dismiss" data-id="' . $notification['id'] . '" title="Delete">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="notification-message">
                             ' . htmlspecialchars($notification['message']) . '
+                        </div>
+                        <div class="notification-footer">
+                            <span class="notification-date">' . date('M j, Y g:i A', strtotime($notification['created_at'])) . '</span>
+                            ' . ($notification['is_read'] ? '<span class="read-badge"><i class="fas fa-check-circle"></i> Read</span>' : '<span class="unread-badge"><i class="fas fa-circle"></i> Unread</span>') . '
                         </div>
                     </div>
                 </div>';
@@ -81,37 +106,60 @@ $content = '
 
     <!-- Pagination -->
     ' . ((($page ?? 1) > 1 || count($notifications ?? []) === 20) ? '<div class="pagination">
-        ' . (($page ?? 1) > 1 ? '<a href="?page=' . (($page ?? 1) - 1) . '" class="page-link">Previous</a>' : '') . '
+        ' . (($page ?? 1) > 1 ? '<a href="?page=' . (($page ?? 1) - 1) . '" class="page-link">
+            <i class="fas fa-chevron-left"></i> Previous
+        </a>' : '') . '
         <span class="page-link active">' . ($page ?? 1) . '</span>
-        ' . (count($notifications ?? []) === 20 ? '<a href="?page=' . (($page ?? 1) + 1) . '" class="page-link">Next</a>' : '') . '
+        ' . (count($notifications ?? []) === 20 ? '<a href="?page=' . (($page ?? 1) + 1) . '" class="page-link">
+            Next <i class="fas fa-chevron-right"></i>
+        </a>' : '') . '
     </div>' : '') . '
 </div>
 
 <script>
+// Enhanced JavaScript with better UX
 document.addEventListener("DOMContentLoaded", function() {
     // Mark all as read button
     document.getElementById("mark-all-read").addEventListener("click", markAllAsRead);
-    
+
     // Refresh button
     document.getElementById("refresh-notifications").addEventListener("click", refreshNotifications);
-    
+
+    // Create test notification button (if empty state)
+    const createTestBtn = document.getElementById("create-test-notification");
+    if (createTestBtn) {
+        createTestBtn.addEventListener("click", createTestNotification);
+    }
+
     // Add event listeners to dismiss buttons
     document.querySelectorAll(".notification-dismiss").forEach(button => {
-        button.addEventListener("click", function() {
+        button.addEventListener("click", function(e) {
+            e.stopPropagation();
             const notificationId = this.getAttribute("data-id");
             dismissNotification(notificationId);
         });
     });
-    
+
     // Add event listeners to notification items to mark as read when clicked
     document.querySelectorAll(".notification-item").forEach(item => {
         item.addEventListener("click", function() {
             const notificationId = this.getAttribute("data-id");
             if (!this.classList.contains("notification-unread")) return;
-            
+
             markAsRead(notificationId);
         });
     });
+
+    // Add smooth animations on page load
+    setTimeout(() => {
+        document.querySelectorAll(".notification-item").forEach((item, index) => {
+            item.style.animation = "fadeIn 0.5s ease-out " + (index * 0.1) + "s forwards";
+            item.style.opacity = "0";
+            setTimeout(() => {
+                item.style.opacity = "1";
+            }, 10);
+        });
+    }, 100);
 });
 
 async function markAsRead(notificationId) {
@@ -225,115 +273,260 @@ function showEmptyState() {
 }
 </script>
 
+
 <style>
-.notifications-container {
-    margin-top: 24px;
-}
 
-.notification-list {
+/* Additional inline styles for specific elements */
+.notification-stats {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.notification-item {
-    display: flex;
-    gap: 12px;
-    padding: 16px;
-    border: 1px solid var(--admin-border);
-    border-radius: 8px;
-    background: white;
-    transition: var(--transition);
-    cursor: pointer;
-}
-
-.notification-item:hover {
-    box-shadow: var(--admin-shadow);
-    border-color: var(--admin-primary);
-}
-
-.notification-item.notification-unread {
-    border-left: 4px solid var(--admin-primary);
-    background-color: var(--admin-gray-50);
-}
-
-.notification-icon {
-    font-size: 20px;
-    padding-top: 2px;
-}
-
-.notification-info .notification-icon {
-    color: var(--admin-info);
-}
-
-.notification-success .notification-icon {
-    color: var(--admin-success);
-}
-
-.notification-warning .notification-icon {
-    color: var(--admin-warning);
-}
-
-.notification-error .notification-icon {
-    color: var(--admin-danger);
-}
-
-.notification-content {
-    flex: 1;
-}
-
-.notification-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 4px;
-}
-
-.notification-title {
-    margin: 0;
-    font-weight: 600;
-    color: var(--admin-gray-800);
-    font-size: 16px;
-}
-
-.notification-meta {
-    display: flex;
+    gap: 20px;
     align-items: center;
-    gap: 8px;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--admin-gray-600);
 }
 
-.notification-time {
-    white-space: nowrap;
+.stats-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
-.notification-dismiss {
-    color: var(--admin-gray-400);
+.stats-value {
+    font-weight: 600;
+    color: var(--admin-primary);
+    font-size: 16px;
 }
 
-.notification-dismiss:hover {
+.stats-value.unread-count {
     color: var(--admin-danger);
+    font-size: 16px;
 }
 
-.notification-message {
-    color: var(--admin-gray-700);
-    line-height: 1.5;
+.read-badge {
+    background: var(--admin-success);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 12px;
 }
 
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
+.unread-badge {
+    background: var(--admin-danger);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 12px;
+}
+
+.notification-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--admin-gray-100);
+    font-size: 12px;
     color: var(--admin-gray-500);
 }
 
-.empty-state i {
-    margin-bottom: 16px;
-    opacity: 0.5;
+.notification-date {
+    color: var(--admin-gray-400);
+    font-size: 11px;
 }
 
-.toolbar-actions {
+.mt-3 {
+    margin-top: 16px;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
-    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.loading-spinner {
+    background: white;
+    padding: 24px 32px;
+    border-radius: 12px;
+    text-align: center;
+    color: var(--admin-gray-700);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.loading-spinner i {
+    font-size: 24px;
+    margin-bottom: 12px;
+    color: var(--admin-primary);
+    animation: spin 1s linear infinite;
+}
+
+.loading-state {
+    padding: 16px;
+    text-align: center;
+    color: var(--admin-gray-500);
+    font-size: 14px;
+}
+
+.loading-state i {
+    font-size: 18px;
+    margin-right: 8px;
+    color: var(--admin-primary);
+    animation: spin 1s linear infinite;
+}
+
+/* Toast notifications */
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 280px;
+    max-width: 400px;
+    padding: 0;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    transform: translateX(400px);
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease;
+    opacity: 0;
+    font-family: Inter, sans-serif;
+}
+
+.notification-toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.notification-toast.notification-success {
+    border-left: 4px solid var(--admin-success);
+}
+
+.notification-toast.notification-error {
+    border-left: 4px solid var(--admin-danger);
+}
+
+.notification-toast.notification-warning {
+    border-left: 4px solid var(--admin-warning);
+}
+
+.notification-toast.notification-info {
+    border-left: 4px solid var(--admin-info);
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    background: white;
+    border-radius: 12px;
+}
+
+.toast-icon {
+    font-size: 20px;
+    margin-right: 12px;
+    width: 24px;
+    text-align: center;
+}
+
+.toast-icon.fa-check-circle {
+    color: var(--admin-success);
+}
+
+.toast-icon.fa-exclamation-circle {
+    color: var(--admin-danger);
+}
+
+.toast-icon.fa-exclamation-triangle {
+    color: var(--admin-warning);
+}
+
+.toast-icon.fa-info-circle {
+    color: var(--admin-info);
+}
+
+.toast-message {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--admin-gray-800);
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--admin-gray-400);
+    cursor: pointer;
+    padding: 4px;
+    margin-left: 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 16px;
+}
+
+.toast-close:hover {
+    background: var(--admin-gray-100);
+    color: var(--admin-gray-600);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .toolbar {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+    }
+
+    .toolbar-actions {
+        justify-content: space-between;
+    }
+
+    .notification-stats {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
 }
 </style>
 ';
@@ -348,4 +541,6 @@ $currentPage = $currentPage ?? 'notifications';
 
 // Include the layout
 include __DIR__ . '/../layouts/main.php';
-?>
+
+// Add the beautiful CSS link after the layout
+echo '<link rel="stylesheet" href="' . app_base_url('themes/admin/assets/css/notifications-beautiful.css') . '">';

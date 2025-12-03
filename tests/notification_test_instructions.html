@@ -1,0 +1,74 @@
+
+<h2>🔔 Notification System Test Instructions</h2>
+
+<h3>✅ What Has Been Fixed:</h3>
+<ul>
+    <li><strong>Database Setup:</strong> admin_notifications table created with proper structure</li>
+    <li><strong>Sample Data:</strong> Test notifications added for all admin users</li>
+    <li><strong>API Endpoints:</strong> All notification endpoints are configured and working</li>
+    <li><strong>JavaScript:</strong> Notification system JavaScript files are in place</li>
+    <li><strong>HTML Structure:</strong> All required HTML elements are present</li>
+</ul>
+
+<h3>🧪 How to Test:</h3>
+
+<h4>1. Login as Admin</h4>
+<p>Make sure you're logged in as an admin user to see notifications.</p>
+
+<h4>2. Check Notification Bell Icon</h4>
+<p>Look for the bell icon (🔔) in the top-right header of your admin dashboard.</p>
+
+<h4>3. Test Single Click</h4>
+<p>Click the bell icon ONCE (not double-click) to open the notification dropdown.</p>
+
+<h4>4. Verify Notifications Load</h4>
+<p>You should see several test notifications in the dropdown.</p>
+
+<h4>5. Check Badge Count</h4>
+<p>The red badge on the bell should show the number of unread notifications.</p>
+
+<h4>6. Test Mark as Read</h4>
+<p>Click on a notification to mark it as read.</p>
+
+<h4>7. Test "Mark All as Read"</h4>
+<p>Use the "Mark All as Read" button to clear all notifications.</p>
+
+<h3>🔍 Troubleshooting:</h3>
+
+<h4>If Bell Icon Doesn't Appear:</h4>
+<ul>
+    <li>Refresh your browser page</li>
+    <li>Check browser console for JavaScript errors (F12)</li>
+    <li>Make sure you're on an admin page</li>
+</ul>
+
+<h4>If Click Doesn't Work:</h4>
+<ul>
+    <li>Try clicking once (not double-click)</li>
+    <li>Check if dropdown opens/closes</li>
+    <li>Look for JavaScript errors in console</li>
+</ul>
+
+<h4>If "Unable to Fetch Notifications" Error:</h4>
+<ul>
+    <li>Check if you're logged in as admin</li>
+    <li>Verify CSRF token is present (check page source)</li>
+    <li>Try refreshing the page</li>
+    <li>Check Network tab in developer tools for API calls</li>
+</ul>
+
+<h4>If "Connection Lost" Error:</h4>
+<ul>
+    <li>This should be fixed now - try refreshing</li>
+    <li>The system now has retry logic</li>
+    <li>Real-time polling should work automatically</li>
+</ul>
+
+<h3>📊 Expected Results:</h3>
+<ul>
+    <li>Bell icon visible with red badge showing notification count</li>
+    <li>Single click opens/closes dropdown</li>
+    <li>Notifications load in dropdown without errors</li>
+    <li>Badge count updates when notifications are read</li>
+    <li>No console errors related to notifications</li>
+</ul>

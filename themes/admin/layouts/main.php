@@ -909,7 +909,7 @@
 
     <!-- Admin Scripts -->
     <script src="<?php echo app_base_url('themes/admin/assets/js/admin.js'); ?>"></script>
-    <script src="<?php echo app_base_url('themes/admin/assets/js/notification-unified.js'); ?>"></script>
+    <script src="<?php echo app_base_url('themes/admin/assets/js/notification-fixed.js'); ?>"></script>
     <script src="<?php echo app_base_url('themes/admin/assets/js/theme-toggle.js'); ?>"></script>
 
     <!-- Page Specific Scripts -->
