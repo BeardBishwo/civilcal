@@ -56,6 +56,54 @@
             --admin-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
+        /* Dark Theme Variables */
+        :root.dark-theme {
+            --admin-primary: #6366f1;
+            --admin-primary-dark: #4f46e5;
+            --admin-secondary: #10b981;
+            --admin-danger: #f87171;
+            --admin-warning: #fbbf24;
+            --admin-info: #60a5fa;
+            --admin-success: #34d399;
+            --admin-dark: #f8fafc;
+            --admin-light: #1f2937;
+            --admin-border: #374151;
+            --admin-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --admin-gray-50: #111827;
+            --admin-gray-100: #1f2937;
+            --admin-gray-200: #374151;
+            --admin-gray-300: #4b5563;
+            --admin-gray-600: #9ca3af;
+            --admin-gray-700: #d1d5db;
+            --admin-gray-800: #f3f4f6;
+            --admin-gray-900: #f9fafb;
+            --admin-white: #0f172a;
+        }
+
+        /* Light Theme Variables (default) */
+        :root.light-theme {
+            --admin-primary: #4f46e5;
+            --admin-primary-dark: #3730a3;
+            --admin-secondary: #10b981;
+            --admin-danger: #ef4444;
+            --admin-warning: #f59e0b;
+            --admin-info: #3b82f6;
+            --admin-success: #10b981;
+            --admin-dark: #1f2937;
+            --admin-light: #f8fafc;
+            --admin-border: #e5e7eb;
+            --admin-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --admin-gray-50: #f9fafb;
+            --admin-gray-100: #f3f4f6;
+            --admin-gray-200: #e5e7eb;
+            --admin-gray-300: #d1d5db;
+            --admin-gray-600: #4b5563;
+            --admin-gray-700: #374151;
+            --admin-gray-800: #1f2937;
+            --admin-gray-900: #111827;
+            --admin-white: #ffffff;
+        }
+
         /* Notification Dropdown Styles */
         .notification-dropdown {
             position: absolute;
@@ -227,6 +275,50 @@
             transition: all 0.2s ease !important;
         }
 
+        /* Theme Toggle Button Styles */
+        #themeToggle {
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            cursor: pointer !important;
+            position: relative;
+            z-index: 1001;
+            padding: 8px 12px !important;
+            background: var(--admin-gray-800) !important;
+            color: white !important;
+            border-radius: 8px !important;
+            border: none !important;
+            transition: all 0.2s ease !important;
+            margin-left: 8px !important;
+            min-width: 40px !important;
+            height: 40px !important;
+        }
+
+        /* Ensure theme toggle button is always visible */
+        .theme-toggle-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 16px !important;
+        }
+
+        /* Fallback for theme toggle button */
+        #themeToggle.fallback-visible {
+            background: #4f46e5 !important;
+            color: white !important;
+            border: 2px solid #3730a3 !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        #themeToggle:hover {
+            background: var(--admin-gray-900) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        #themeToggle:active {
+            transform: translateY(0) !important;
+        }
+
         #notificationToggle:hover {
             background: var(--admin-primary-dark) !important;
             transform: translateY(-1px) !important;
@@ -351,6 +443,43 @@
 
         .notification-list .error button {
             margin-top: 10px;
+        }
+
+        /* Theme Feedback Toast */
+        .theme-feedback-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--admin-primary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: var(--admin-shadow-lg);
+            z-index: 2000;
+            font-size: 14px;
+            font-weight: 500;
+            animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-out 1.5s forwards;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
         }
     </style>
     <?php $currentUser = current_user(); ?>
@@ -632,6 +761,10 @@
                             <i class="fas fa-bell"></i>
                             <span class="notification-badge" id="notificationBadge">0</span>
                         </button>
+                        <!-- Theme Toggle Button -->
+                        <button class="btn btn-icon theme-toggle-btn" title="Toggle Theme" id="themeToggle">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </button>
                     </div>
 
                     <!-- Notification Dropdown -->
@@ -704,6 +837,7 @@
     <!-- Admin Scripts -->
     <script src="<?php echo app_base_url('themes/admin/assets/js/admin.js'); ?>"></script>
     <script src="<?php echo app_base_url('themes/admin/assets/js/notification-unified.js'); ?>"></script>
+    <script src="<?php echo app_base_url('themes/admin/assets/js/theme-toggle.js'); ?>"></script>
 
     <!-- Page Specific Scripts -->
     <?php if (isset($scripts)): ?>
@@ -804,6 +938,45 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("✅ Fallback click handler attached");
         }
     }, 500);
+});
+</script>
+
+<!-- Theme Toggle Fallback Initialization -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function() {
+        const themeBtn = document.getElementById("themeToggle");
+        const themeIcon = document.getElementById("themeIcon");
+
+        if (themeBtn) {
+            // Ensure button is visible
+            themeBtn.classList.add("fallback-visible");
+            themeBtn.style.display = "inline-block";
+            themeBtn.style.visibility = "visible";
+            themeBtn.style.opacity = "1";
+
+            // Add basic click handler if no JS loaded
+            if (!themeBtn.onclick) {
+                themeBtn.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    const currentIcon = themeIcon.className;
+                    if (currentIcon.includes("fa-moon")) {
+                        themeIcon.className = "fas fa-sun";
+                        document.documentElement.classList.add("dark-theme");
+                        document.documentElement.classList.remove("light-theme");
+                    } else {
+                        themeIcon.className = "fas fa-moon";
+                        document.documentElement.classList.add("light-theme");
+                        document.documentElement.classList.remove("dark-theme");
+                    }
+                    console.log("✅ Fallback theme toggle handler attached");
+                });
+            }
+            console.log("✅ Theme toggle button initialized");
+        } else {
+            console.error("❌ Theme toggle button not found");
+        }
+    }, 1000);
 });
 </script></body>
 
