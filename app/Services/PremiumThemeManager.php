@@ -1,7 +1,6 @@
 <?php
 
 // No namespace - standalone class for easier integration
-use PDO;
 
 /**
  * Premium Theme Manager Service

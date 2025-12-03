@@ -49,7 +49,9 @@ class View
         
         // For admin views, check themes/admin first
         if (strpos($view, "admin/") === 0) {
-            $adminThemeViewPath = BASE_PATH . "/themes/admin/views/" . substr($view, 6) . ".php";
+            // Convert view path to file system path (replace slashes with directory separators)
+            $adminViewPath = str_replace('/', DIRECTORY_SEPARATOR, substr($view, 6));
+            $adminThemeViewPath = BASE_PATH . "/themes/admin/views/" . $adminViewPath . ".php";
             if (file_exists($adminThemeViewPath)) {
                 include $adminThemeViewPath;
             } else {

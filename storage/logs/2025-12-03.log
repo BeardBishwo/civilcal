@@ -204,3 +204,49 @@
 {"timestamp":"2025-12-03 12:47:37","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
 {"timestamp":"2025-12-03 12:47:37","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
 {"timestamp":"2025-12-03 12:47:37","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-03 14:37:07","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-03 14:37:07","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-03 14:37:07","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-03 14:37:07","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-03 14:37:24","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-03 14:37:24","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-03 14:37:24","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-03 14:37:24","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-03 14:37:24","level":"error","message":"The use statement with non-compound name 'PDO' has no effect","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\app\\Services\\PremiumThemeManager.php","line":4}}
+{"timestamp":"2025-12-03 14:37:24","level":"error","message":"The use statement with non-compound name 'PDO' has no effect","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\app\\Services\\PremiumThemeManager.php","line":4}}
+{"timestamp":"2025-12-03 14:40:26","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-03 14:40:26","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-03 14:40:26","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-03 14:40:26","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-03 14:45:23","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-03 14:45:23","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-03 14:45:23","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-03 14:45:23","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-03 14:45:23","level":"error","message":"The use statement with non-compound name 'PDO' has no effect","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\app\\Services\\PremiumThemeManager.php","line":4}}
+{"timestamp":"2025-12-03 14:45:23","level":"error","message":"The use statement with non-compound name 'PDO' has no effect","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\app\\Services\\PremiumThemeManager.php","line":4}}
+{"timestamp":"2025-12-03 14:45:27","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-03 14:45:27","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-03 14:45:27","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-03 14:45:27","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-03 14:45:27","level":"error","message":"The use statement with non-compound name 'PDO' has no effect","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\app\\Services\\PremiumThemeManager.php","line":4}}
+{"timestamp":"2025-12-03 14:45:27","level":"error","message":"The use statement with non-compound name 'PDO' has no effect","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\app\\Services\\PremiumThemeManager.php","line":4}}
+{"timestamp":"2025-12-03 14:46:36","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-03 14:46:36","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-03 14:46:36","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-03 14:46:36","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-03 14:46:52","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-03 14:46:52","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-03 14:46:52","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-03 14:46:52","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-03 14:46:54","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-03 14:46:54","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-03 14:46:54","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-03 14:46:54","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-03 14:46:59","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-03 14:46:59","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-03 14:46:59","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-03 14:46:59","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-03 14:47:01","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-03 14:47:01","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-03 14:47:01","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-03 14:47:01","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
