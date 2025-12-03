@@ -1433,6 +1433,37 @@ $router->add(
     ["auth", "admin"],
 );
 
+// Notification System Routes
+$router->add("GET", "/admin/notifications", "Admin\NotificationController@index", [
+    "auth",
+    "admin"
+]);
+$router->add("GET", "/admin/notifications/api", "Admin\NotificationController@getNotifications", [
+    "auth",
+    "admin"
+]);
+$router->add("POST", "/admin/notifications/mark-read/{id}", "Admin\NotificationController@markAsRead", [
+    "auth",
+    "admin"
+]);
+$router->add("POST", "/admin/notifications/mark-all-read", "Admin\NotificationController@markAllAsRead", [
+    "auth",
+    "admin"
+]);
+$router->add("DELETE", "/admin/notifications/delete/{id}", "Admin\NotificationController@delete", [
+    "auth",
+    "admin"
+]);
+$router->add("POST", "/admin/notifications/create", "Admin\NotificationController@create", [
+    "auth",
+    "admin"
+]);
+
+// API Endpoints for Real-time Notifications
+$router->add("GET", "/api/notifications/unread-count", "Admin\NotificationController@getUnreadCount", ["auth"]);
+$router->add("GET", "/api/notifications/list", "Admin\NotificationController@getNotifications", ["auth"]);
+$router->add("POST", "/api/notifications/mark-read/{id}", "Admin\NotificationController@markAsRead", ["auth"]);
+$router->add("POST", "/api/notifications/mark-all-read", "Admin\NotificationController@markAllAsRead", ["auth"]);
 // Additional Email Manager Routes for Missing Views
 $router->add("GET", "/admin/email-manager/error", "Admin\EmailManagerController@error", [
     "auth",

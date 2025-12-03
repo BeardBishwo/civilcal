@@ -40,13 +40,13 @@ class Notification extends Model
     /**
      * Create a new notification
      */
-    public function create($userId, $title, $message, $type = 'info', $data = [])
+    public function createNotification($userId, $title, $message, $type = 'info', $data = [])
     {
         $dataJson = json_encode($data);
-        
+
         $stmt = $this->db->prepare("
-            INSERT INTO {$this->table} 
-            (user_id, title, message, type, data, created_at) 
+            INSERT INTO {$this->table}
+            (user_id, title, message, type, data, created_at)
             VALUES (?, ?, ?, ?, ?, NOW())
         ");
         return $stmt->execute([$userId, $title, $message, $type, $dataJson]);

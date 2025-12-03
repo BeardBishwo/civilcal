@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notification Click Test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .header { display: flex; justify-content: flex-end; padding: 10px; background: #f0f0f0; }
+        .notification-btn { position: relative; padding: 10px; background: #4f46e5; color: white; border: none; border-radius: 50%; cursor: pointer; }
+        .notification-badge { position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; }
+        .notification-dropdown { position: absolute; right: 0; top: 50px; width: 300px; background: white; border: 1px solid #ddd; padding: 10px; display: none; }
+        .notification-dropdown.show { display: block; }
+        .notification-item { padding: 10px; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Notification Click Test</h1>
+
+    <div class="header">
+        <button id="notificationToggle" class="notification-btn" title="Notifications">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+        </button>
+
+        <div id="notificationDropdown" class="notification-dropdown">
+            <h3>Notifications (3)</h3>
+            <div class="notification-item">Test notification 1</div>
+            <div class="notification-item">Test notification 2</div>
+            <div class="notification-item">Test notification 3</div>
+        </div>
+    </div>
+
+    <h2>Test Results:</h2>
+    <div id="results"></div>
+
+    <script>
+        // Test the notification system
+        document.addEventListener("DOMContentLoaded", function() {
+            const btn = document.getElementById("notificationToggle");
+            const dropdown = document.getElementById("notificationDropdown");
+            const results = document.getElementById("results");
+
+            if (btn && dropdown) {
+                // Add click handler
+                btn.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    dropdown.classList.toggle("show");
+                    results.innerHTML += "<p>✅ Click handler working!</p>";
+                });
+
+                results.innerHTML = "<p>✅ Button and dropdown found</p>";
+                results.innerHTML += "<p>✅ Click handler attached</p>";
+                results.innerHTML += "<p>👆 Click the bell icon above to test</p>";
+            } else {
+                results.innerHTML = "<p>❌ Elements not found</p>";
+            }
+        });
+    </script>
+</body>
+</html>

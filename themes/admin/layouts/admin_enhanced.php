@@ -153,24 +153,6 @@
             line-height: 1.4;
         }
 
-        .notification-badge {
-            background-color: var(--admin-danger);
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 12px;
-            font-weight: 600;
-            min-width: 20px;
-            height: 20px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-            position: absolute;
-            top: -8px;
-            right: -8px;
-        }
-
         .notification-footer {
             padding: 12px 16px;
             border-top: 1px solid var(--admin-border);
@@ -193,164 +175,6 @@
             text-align: center;
             padding: 20px;
             color: var(--admin-gray-500);
-        }
-
-        /* Enhanced Notification Toast Styles */
-        .notification-toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            min-width: 300px;
-            max-width: 500px;
-            padding: 0;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            z-index: 10000;
-            transform: translateX(400px);
-            transition: transform 0.3s ease-in-out;
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Ensure notification button is always visible and interactive */
-        #notificationToggle {
-            display: inline-block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            cursor: pointer !important;
-            position: relative;
-            z-index: 1001;
-            padding: 8px 12px !important;
-            background: var(--admin-primary) !important;
-            color: white !important;
-            border-radius: 8px !important;
-            border: none !important;
-            transition: all 0.2s ease !important;
-        }
-
-        #notificationToggle:hover {
-            background: var(--admin-primary-dark) !important;
-            transform: translateY(-1px) !important;
-        }
-
-        #notificationToggle:active {
-            transform: translateY(0) !important;
-        }
-
-        /* Ensure notification dropdown has proper z-index */
-        #notificationDropdown {
-            z-index: 10000 !important;
-        }
-
-        /* Fix for notification items */
-        .notification-item {
-            cursor: pointer !important;
-            transition: all 0.2s ease !important;
-        }
-
-        .notification-item:hover {
-            background-color: var(--admin-gray-50) !important;
-            transform: translateX(2px) !important;
-        }
-
-        .notification-toast.show {
-            transform: translateX(0);
-        }
-
-        .notification-toast .toast-content {
-            display: flex;
-            align-items: center;
-            padding: 16px;
-            background: white;
-            border-radius: 8px;
-        }
-
-        .notification-toast .toast-icon {
-            font-size: 20px;
-            margin-right: 12px;
-            width: 24px;
-            text-align: center;
-        }
-
-        .notification-toast .toast-message {
-            flex: 1;
-            font-size: 14px;
-            line-height: 1.4;
-            color: var(--admin-gray-800);
-        }
-
-        .notification-toast .toast-close {
-            background: none;
-            border: none;
-            color: var(--admin-gray-400);
-            cursor: pointer;
-            padding: 4px;
-            margin-left: 8px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-
-        .notification-toast .toast-close:hover {
-            background: var(--admin-gray-100);
-            color: var(--admin-gray-600);
-        }
-
-        /* Toast type variations */
-        .notification-toast.notification-success {
-            border-left: 4px solid var(--admin-success);
-        }
-
-        .notification-toast.notification-success .toast-icon {
-            color: var(--admin-success);
-        }
-
-        .notification-toast.notification-error {
-            border-left: 4px solid var(--admin-danger);
-        }
-
-        .notification-toast.notification-error .toast-icon {
-            color: var(--admin-danger);
-        }
-
-        .notification-toast.notification-warning {
-            border-left: 4px solid var(--admin-warning);
-        }
-
-        .notification-toast.notification-warning .toast-icon {
-            color: var(--admin-warning);
-        }
-
-        .notification-toast.notification-info {
-            border-left: 4px solid var(--admin-info);
-        }
-
-        .notification-toast.notification-info .toast-icon {
-            color: var(--admin-info);
-        }
-
-        .notification-toast.notification-system {
-            border-left: 4px solid var(--admin-primary);
-        }
-
-        .notification-toast.notification-system .toast-icon {
-            color: var(--admin-primary);
-        }
-
-        /* Loading and error states */
-        .notification-list .loading {
-            text-align: center;
-            padding: 20px;
-            color: var(--admin-gray-500);
-            font-size: 14px;
-        }
-
-        .notification-list .error {
-            text-align: center;
-            padding: 20px;
-            color: var(--admin-danger);
-        }
-
-        .notification-list .error button {
-            margin-top: 10px;
         }
     </style>
     <?php $currentUser = current_user(); ?>
@@ -703,7 +527,7 @@
 
     <!-- Admin Scripts -->
     <script src="<?php echo app_base_url('themes/admin/assets/js/admin.js'); ?>"></script>
-    <script src="<?php echo app_base_url('themes/admin/assets/js/notification-unified.js'); ?>"></script>
+    <script src="<?php echo app_base_url('themes/admin/assets/js/notification-system.js'); ?>"></script>
 
     <!-- Page Specific Scripts -->
     <?php if (isset($scripts)): ?>
@@ -785,26 +609,6 @@
         });
     </script>
 
-<script>
-// Fallback notification click handler
-document.addEventListener("DOMContentLoaded", function() {
-    setTimeout(function() {
-        const btn = document.getElementById("notificationToggle");
-        const dropdown = document.getElementById("notificationDropdown");
-
-        if (btn && !btn.onclick) {
-            btn.addEventListener("click", function(e) {
-                e.preventDefault();
-                if (dropdown) {
-                    const isVisible = dropdown.classList.contains("show");
-                    dropdown.classList.toggle("show");
-                    console.log("Dropdown toggled: " + (dropdown.classList.contains("show") ? "open" : "closed"));
-                }
-            });
-            console.log("✅ Fallback click handler attached");
-        }
-    }, 500);
-});
-</script></body>
+</body>
 
 </html>
