@@ -55,8 +55,507 @@
             --admin-border: #e5e7eb;
             --admin-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
+
+        /* Dark Theme Variables */
+        :root.dark-theme {
+            --admin-primary: #6366f1;
+            --admin-primary-dark: #4f46e5;
+            --admin-secondary: #10b981;
+            --admin-danger: #f87171;
+            --admin-warning: #fbbf24;
+            --admin-info: #60a5fa;
+            --admin-success: #34d399;
+            --admin-dark: #f8fafc;
+            --admin-light: #1f2937;
+            --admin-border: #374151;
+            --admin-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --admin-gray-50: #111827;
+            --admin-gray-100: #1f2937;
+            --admin-gray-200: #374151;
+            --admin-gray-300: #4b5563;
+            --admin-gray-600: #9ca3af;
+            --admin-gray-700: #d1d5db;
+            --admin-gray-800: #f3f4f6;
+            --admin-gray-900: #f9fafb;
+            --admin-white: #0f172a;
+        }
+
+        /* Light Theme Variables (default) */
+        :root.light-theme {
+            --admin-primary: #4f46e5;
+            --admin-primary-dark: #3730a3;
+            --admin-secondary: #10b981;
+            --admin-danger: #ef4444;
+            --admin-warning: #f59e0b;
+            --admin-info: #3b82f6;
+            --admin-success: #10b981;
+            --admin-dark: #1f2937;
+            --admin-light: #f8fafc;
+            --admin-border: #e5e7eb;
+            --admin-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --admin-gray-50: #f9fafb;
+            --admin-gray-100: #f3f4f6;
+            --admin-gray-200: #e5e7eb;
+            --admin-gray-300: #d1d5db;
+            --admin-gray-600: #4b5563;
+            --admin-gray-700: #374151;
+            --admin-gray-800: #1f2937;
+            --admin-gray-900: #111827;
+            --admin-white: #ffffff;
+        }
+
+        /* Notification Dropdown Styles */
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 20px;
+            width: 350px;
+            background: white;
+            border: 1px solid var(--admin-border);
+            border-radius: 8px;
+            box-shadow: var(--admin-shadow);
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+
+        .notification-dropdown.show {
+            display: block;
+        }
+
+        .notification-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--admin-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-header h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--admin-dark);
+        }
+
+        .notification-header .view-all {
+            color: var(--admin-primary);
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .notification-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .notification-item {
+            padding: 12px 16px;
+            display: flex;
+            gap: 12px;
+            border-bottom: 1px solid var(--admin-border);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .notification-item:hover {
+            background-color: var(--admin-gray-50);
+        }
+
+        .notification-item.unread {
+            background-color: var(--admin-gray-50);
+            border-left: 3px solid var(--admin-primary);
+        }
+
+        .notification-icon {
+            font-size: 18px;
+            padding-top: 2px;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .notification-title {
+            margin: 0;
+            font-weight: 600;
+            color: var(--admin-gray-800);
+            font-size: 14px;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: var(--admin-gray-500);
+        }
+
+        .notification-message {
+            color: var(--admin-gray-700);
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .notification-badge {
+            background-color: var(--admin-danger);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+        }
+
+        .notification-footer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--admin-border);
+            text-align: center;
+        }
+
+        .notification-footer button {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .loading {
+            padding: 12px 16px;
+            text-align: center;
+            color: var(--admin-gray-500);
+            font-size: 13px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 20px;
+            color: var(--admin-gray-500);
+        }
+
+        /* Enhanced Notification Toast Styles */
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            min-width: 300px;
+            max-width: 500px;
+            padding: 0;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 10000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease-in-out;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Ensure notification button is always visible and interactive */
+        #notificationToggle {
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            cursor: pointer !important;
+            position: relative;
+            z-index: 1001;
+            padding: 8px 12px !important;
+            background: var(--admin-primary) !important;
+            color: white !important;
+            border-radius: 8px !important;
+            border: none !important;
+            transition: all 0.2s ease !important;
+        }
+
+        /* Theme Toggle Button Styles */
+        #themeToggle {
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            cursor: pointer !important;
+            position: relative;
+            z-index: 1001;
+            padding: 8px 12px !important;
+            background: var(--admin-gray-800) !important;
+            color: white !important;
+            border-radius: 8px !important;
+            border: none !important;
+            transition: all 0.2s ease !important;
+            margin-left: 8px !important;
+            min-width: 40px !important;
+            height: 40px !important;
+        }
+
+        /* Ensure theme toggle button is always visible */
+        .theme-toggle-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 16px !important;
+        }
+
+        /* Fallback for theme toggle button */
+        #themeToggle.fallback-visible {
+            background: #4f46e5 !important;
+            color: white !important;
+            border: 2px solid #3730a3 !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        #themeToggle:hover {
+            background: var(--admin-gray-900) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        #themeToggle:active {
+            transform: translateY(0) !important;
+        }
+
+        #notificationToggle:hover {
+            background: var(--admin-primary-dark) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        #notificationToggle:active {
+            transform: translateY(0) !important;
+        }
+
+        /* Ensure notification dropdown has proper z-index */
+        #notificationDropdown {
+            z-index: 10000 !important;
+        }
+
+        /* Fix for notification items */
+        .notification-item {
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .notification-item:hover {
+            background-color: var(--admin-gray-50) !important;
+            transform: translateX(2px) !important;
+        }
+
+        .notification-toast.show {
+            transform: translateX(0);
+        }
+
+        .notification-toast .toast-content {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .notification-toast .toast-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .notification-toast .toast-message {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.4;
+            color: var(--admin-gray-800);
+        }
+
+        .notification-toast .toast-close {
+            background: none;
+            border: none;
+            color: var(--admin-gray-400);
+            cursor: pointer;
+            padding: 4px;
+            margin-left: 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .notification-toast .toast-close:hover {
+            background: var(--admin-gray-100);
+            color: var(--admin-gray-600);
+        }
+
+        /* Toast type variations */
+        .notification-toast.notification-success {
+            border-left: 4px solid var(--admin-success);
+        }
+
+        .notification-toast.notification-success .toast-icon {
+            color: var(--admin-success);
+        }
+
+        .notification-toast.notification-error {
+            border-left: 4px solid var(--admin-danger);
+        }
+
+        .notification-toast.notification-error .toast-icon {
+            color: var(--admin-danger);
+        }
+
+        .notification-toast.notification-warning {
+            border-left: 4px solid var(--admin-warning);
+        }
+
+        .notification-toast.notification-warning .toast-icon {
+            color: var(--admin-warning);
+        }
+
+        .notification-toast.notification-info {
+            border-left: 4px solid var(--admin-info);
+        }
+
+        .notification-toast.notification-info .toast-icon {
+            color: var(--admin-info);
+        }
+
+        .notification-toast.notification-system {
+            border-left: 4px solid var(--admin-primary);
+        }
+
+        .notification-toast.notification-system .toast-icon {
+            color: var(--admin-primary);
+        }
+
+        /* Loading and error states */
+        .notification-list .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--admin-gray-500);
+            font-size: 14px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .notification-list .error {
+            text-align: center;
+            padding: 20px;
+            color: var(--admin-danger);
+            animation: shake 0.5s ease;
+        }
+
+        .notification-list .error button {
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        /* Smooth animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* Apply animations to notification dropdown */
+        .notification-dropdown {
+            animation: slideDown 0.3s ease-out !important;
+            transition: all 0.3s ease !important;
+        }
+
+        /* Apply animations to notification items */
+        .notification-item {
+            animation: fadeIn 0.3s ease-out !important;
+            transition: all 0.3s ease !important;
+        }
+
+        /* Apply animations to toast notifications */
+        .notification-toast {
+            animation: slideIn 0.3s ease-out !important;
+            transition: all 0.3s ease !important;
+        }
+
+        /* Smooth hover effects */
+        .notification-item:hover {
+            transform: translateX(2px) !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+        }
+
+        /* Smooth theme toggle button */
+        #themeToggle {
+            transition: all 0.3s ease !important;
+        }
+
+        #themeToggle:hover {
+            transform: scale(1.05) !important;
+        }
+
+        /* Smooth notification button */
+        #notificationToggle:hover {
+            transform: scale(1.05) !important;
+        }
+
+        /* Theme Feedback Toast */
+        .theme-feedback-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--admin-primary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: var(--admin-shadow-lg);
+            z-index: 2000;
+            font-size: 14px;
+            font-weight: 500;
+            animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-out 1.5s forwards;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
     </style>
-    <?php $currentUser = function_exists('current_user') ? current_user() : null; ?>
+    <?php $currentUser = current_user(); ?>
 </head>
 
 <body class="admin-body">
@@ -68,7 +567,7 @@
             <div class="sidebar-header">
                 <div class="sidebar-logo">
                     <i class="sidebar-logo-icon fas fa-calculator"></i>
-                    <span class="logo-text"><?php echo htmlspecialchars(class_exists('\App\Services\SettingsService') ? \App\Services\SettingsService::get('site_name', 'Admin Panel') : 'Admin Panel'); ?></span>
+                    <span class="logo-text"><?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Admin Panel')); ?></span>
                 </div>
                 <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
                     <i class="fas fa-bars"></i>
@@ -82,14 +581,7 @@
                         <a href="<?php echo app_base_url('admin/dashboard'); ?>" class="nav-link">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <span class="nav-text">Dashboard</span>
-                            <i class="nav-arrow fas fa-chevron-right"></i>
                         </a>
-                        <ul class="nav-submenu">
-                            <li><a href="<?php echo app_base_url('admin/dashboard'); ?>">Overview</a></li>
-                            <li><a href="<?php echo app_base_url('admin/configured-dashboard'); ?>">Configured Dashboard</a></li>
-                            <li><a href="<?php echo app_base_url('admin/performance-dashboard'); ?>">Performance Dashboard</a></li>
-                            <li><a href="<?php echo app_base_url('admin/dashboard_complex'); ?>">Analytics Dashboard</a></li>
-                        </ul>
                     </li>
 
                     <!-- Users -->
@@ -130,7 +622,6 @@
                         <ul class="nav-submenu">
                             <li><a href="<?php echo app_base_url('admin/content/pages'); ?>">Pages</a></li>
                             <li><a href="<?php echo app_base_url('admin/content/menus'); ?>">Menus</a></li>
-                            <li><a href="<?php echo app_base_url('admin/menu-customization'); ?>">Menu Customization</a></li>
                             <li><a href="<?php echo app_base_url('admin/content/media'); ?>">Media</a></li>
                         </ul>
                     </li>
@@ -159,7 +650,6 @@
                             <i class="nav-arrow fas fa-chevron-right"></i>
                         </a>
                         <ul class="nav-submenu">
-                            <li><a href="<?php echo app_base_url('admin/settings/application'); ?>">Application</a></li>
                             <li><a href="<?php echo app_base_url('admin/settings/general'); ?>">General</a></li>
                             <li><a href="<?php echo app_base_url('admin/settings/email'); ?>">Email</a></li>
                             <li><a href="<?php echo app_base_url('admin/settings/security'); ?>">Security</a></li>
@@ -255,13 +745,7 @@
                         <a href="<?php echo app_base_url('admin/system-status'); ?>" class="nav-link">
                             <i class="nav-icon fas fa-server"></i>
                             <span class="nav-text">System</span>
-                            <i class="nav-arrow fas fa-chevron-right"></i>
                         </a>
-                        <ul class="nav-submenu">
-                            <li><a href="<?php echo app_base_url('admin/system-status'); ?>">System Status</a></li>
-                            <li><a href="<?php echo app_base_url('admin/widget-management'); ?>">Widget Management</a></li>
-                            <li><a href="<?php echo app_base_url('admin/menu-customization'); ?>">Menu Customization</a></li>
-                        </ul>
                     </li>
 
                     <!-- Debug & Testing -->
@@ -346,10 +830,28 @@
                         <button class="btn btn-icon" title="Backup" onclick="window.location.href='<?php echo app_base_url('admin/backup'); ?>'">
                             <i class="fas fa-download"></i>
                         </button>
-                        <button class="btn btn-icon" title="Notifications">
+                        <button class="btn btn-icon" title="Notifications" id="notificationToggle">
                             <i class="fas fa-bell"></i>
-                            <span class="notification-badge">3</span>
+                            <span class="notification-badge" id="notificationBadge">0</span>
                         </button>
+                        <!-- Theme Toggle Button -->
+                        <button class="btn btn-icon theme-toggle-btn" title="Toggle Theme" id="themeToggle">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </button>
+                    </div>
+
+                    <!-- Notification Dropdown -->
+                    <div id="notificationDropdown" class="notification-dropdown">
+                        <div class="notification-header">
+                            <h4>Notifications</h4>
+                            <a href="<?php echo app_base_url('admin/notifications'); ?>" class="view-all">View All</a>
+                        </div>
+                        <div class="notification-list">
+                            <div class="loading">Loading notifications...</div>
+                        </div>
+                        <div class="notification-footer">
+                            <button id="markAllRead" class="btn btn-sm btn-outline-primary">Mark All as Read</button>
+                        </div>
                     </div>
 
                     <!-- User Menu -->
@@ -407,6 +909,8 @@
 
     <!-- Admin Scripts -->
     <script src="<?php echo app_base_url('themes/admin/assets/js/admin.js'); ?>"></script>
+    <script src="<?php echo app_base_url('themes/admin/assets/js/notification-unified.js'); ?>"></script>
+    <script src="<?php echo app_base_url('themes/admin/assets/js/theme-toggle.js'); ?>"></script>
 
     <!-- Page Specific Scripts -->
     <?php if (isset($scripts)): ?>
@@ -456,7 +960,7 @@
             toast.className = `notification-toast notification-${type}`;
             toast.textContent = message;
             toast.style.display = 'block';
-            
+
             setTimeout(() => {
                 toast.style.display = 'none';
             }, 3000);
@@ -481,13 +985,72 @@
         document.addEventListener('click', function(event) {
             const dropdown = document.getElementById('user-dropdown');
             const userAvatar = document.querySelector('.user-avatar');
-            
+
             if (!userAvatar.contains(event.target)) {
                 dropdown.style.display = 'none';
             }
         });
     </script>
 
-</body>
+<script>
+// Fallback notification click handler
+document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function() {
+        const btn = document.getElementById("notificationToggle");
+        const dropdown = document.getElementById("notificationDropdown");
+
+        if (btn && !btn.onclick) {
+            btn.addEventListener("click", function(e) {
+                e.preventDefault();
+                if (dropdown) {
+                    const isVisible = dropdown.classList.contains("show");
+                    dropdown.classList.toggle("show");
+                    console.log("Dropdown toggled: " + (dropdown.classList.contains("show") ? "open" : "closed"));
+                }
+            });
+            console.log("✅ Fallback click handler attached");
+        }
+    }, 500);
+});
+</script>
+
+<!-- Theme Toggle Fallback Initialization -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function() {
+        const themeBtn = document.getElementById("themeToggle");
+        const themeIcon = document.getElementById("themeIcon");
+
+        if (themeBtn) {
+            // Ensure button is visible
+            themeBtn.classList.add("fallback-visible");
+            themeBtn.style.display = "inline-block";
+            themeBtn.style.visibility = "visible";
+            themeBtn.style.opacity = "1";
+
+            // Add basic click handler if no JS loaded
+            if (!themeBtn.onclick) {
+                themeBtn.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    const currentIcon = themeIcon.className;
+                    if (currentIcon.includes("fa-moon")) {
+                        themeIcon.className = "fas fa-sun";
+                        document.documentElement.classList.add("dark-theme");
+                        document.documentElement.classList.remove("light-theme");
+                    } else {
+                        themeIcon.className = "fas fa-moon";
+                        document.documentElement.classList.add("light-theme");
+                        document.documentElement.classList.remove("dark-theme");
+                    }
+                    console.log("✅ Fallback theme toggle handler attached");
+                });
+            }
+            console.log("✅ Theme toggle button initialized");
+        } else {
+            console.error("❌ Theme toggle button not found");
+        }
+    }, 1000);
+});
+</script></body>
 
 </html>

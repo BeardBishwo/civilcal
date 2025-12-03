@@ -74,7 +74,7 @@ foreach ($viewFiles as $file) {
 echo "<h2>2. Checking Layout Files</h2>";
 $layoutFiles = [
     'themes/admin/layouts/main.php',
-    'themes/admin/layouts/admin.php',
+    'themes/admin/layouts/main.php',
     'themes/admin/layouts/header.php',
     'themes/admin/layouts/sidebar.php'
 ];

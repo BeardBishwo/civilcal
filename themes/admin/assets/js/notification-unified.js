@@ -240,11 +240,15 @@ class NotificationSystem {
         try {
             this.log('📊 Fetching unread notification count...');
 
+            // Get CSRF token from meta tag
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
             const response = await fetch(`${this.config.apiBase}/unread-count`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-Token': csrfToken
                 },
                 credentials: 'same-origin'
             });
@@ -330,11 +334,15 @@ class NotificationSystem {
             url.searchParams.append('unread_only', 'true');
             url.searchParams.append('limit', '10');
 
+            // Get CSRF token from meta tag
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
             const response = await fetch(url.toString(), {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-Token': csrfToken
                 },
                 credentials: 'same-origin'
             });

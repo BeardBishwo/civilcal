@@ -167,7 +167,6 @@ class TestSuite
         $this->runTest('View Templates Exist', function() {
             $viewFiles = [
                 'themes/default/views/layouts/main.php',
-                'themes/default/views/layouts/admin.php',
                 'themes/default/views/layouts/auth.php',
                 'themes/default/views/partials/header.php',
                 'themes/default/views/partials/footer.php'

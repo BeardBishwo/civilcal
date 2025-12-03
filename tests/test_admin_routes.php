@@ -135,7 +135,7 @@ class AdminRoutesTest {
         echo str_repeat("-", 40) . "\n";
         
         $layoutPaths = [
-            'themes/admin/layouts/admin.php',
+            'themes/admin/layouts/main.php',
             'themes/admin/layouts/sidebar.php',
             'themes/admin/layouts/header.php'
         ];
