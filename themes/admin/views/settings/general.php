@@ -1,4 +1,3 @@
-
 <?php
 /**
  * General Settings Page - Premium Modern UI/UX Design
@@ -727,7 +726,7 @@
 
                     <!-- Action Buttons -->
                     <div class="button-group">
-                        <button type="submit" class="btn btn-save">💾 Save All Changes</button>
+                        <button type="submit" class="btn btn-save">💾 Save</button>
                     </div>
                     </form>
                 </div>

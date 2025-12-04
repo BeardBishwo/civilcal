@@ -345,7 +345,7 @@
 
                 <!-- Action Buttons -->
                 <div class="button-group">
-                    <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                    <button type="submit" class="btn btn-primary">💾 Save</button>
                     <button type="button" class="btn btn-secondary" id="sendTestEmail">🧪 Send Test Email</button>
                 </div>
                 
@@ -450,7 +450,7 @@
         // Re-enable after 3 seconds
         setTimeout(() => {
             submitButton.disabled = false;
-            submitButton.textContent = '💾 Save Changes';
+            submitButton.textContent = '💾 Save';
         }, 3000);
     });
 </script>

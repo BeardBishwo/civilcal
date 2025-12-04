@@ -401,7 +401,7 @@ function sanitize_input($input) {
         
         <div style="text-align: center; margin-top: 2rem;">
             <button type="submit" class="btn">
-                <i class="fas fa-save"></i> Save Logo Settings
+                <i class="fas fa-save"></i> Save
             </button>
             <button type="button" class="btn btn-secondary" onclick="resetPreview()">
                 <i class="fas fa-undo"></i> Reset Preview

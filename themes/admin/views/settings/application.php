@@ -26,7 +26,7 @@ if (!class_exists('App\\Services\\SettingsService')) {
             <i class="bi bi-eye"></i> Preview
         </button>
         <button class="btn btn-success" id="saveSettings">
-            <i class="bi bi-save"></i> Save Changes
+            <i class="bi bi-save"></i> Save
         </button>
         <button class="btn btn-outline-danger" id="resetSettings">
             <i class="bi bi-arrow-clockwise"></i> Reset

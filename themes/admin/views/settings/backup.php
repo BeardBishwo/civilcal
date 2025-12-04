@@ -174,7 +174,7 @@ $system_info = $system_info ?? [];
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Save Backup Settings
+                        <i class="fas fa-save"></i> Save
                     </button>
                     <button type="button" class="btn btn-secondary" onclick="testBackupConfiguration()">
                         <i class="fas fa-play"></i> Test Configuration

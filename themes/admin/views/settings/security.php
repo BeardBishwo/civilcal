@@ -462,7 +462,7 @@
 
         <!-- Action Buttons -->
         <div class="button-group">
-            <button type="submit" class="btn btn-primary">💾 Save Security Settings</button>
+            <button type="submit" class="btn btn-primary">💾 Save</button>
             </div>
         </form>
     </div>

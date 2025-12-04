@@ -73,7 +73,7 @@
                     
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Save Settings
+                            <i class="fas fa-save"></i> Save
                         </button>
                         <button type="button" class="btn btn-outline-secondary" onclick="testEmailSettings()">
                             <i class="fas fa-paper-plane"></i> Test Email

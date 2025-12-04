@@ -84,7 +84,7 @@ $currentPrivacy = $user['calculation_privacy'] ?? 'private';
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="saveNotificationsBtn">
                         <span class="loading-spinner" id="notificationsLoading"></span>
-                        <i class="fas fa-save me-2"></i>Save Preferences
+                        <i class="fas fa-save me-2"></i>Save
                     </button>
                 </div>
             </form>
@@ -150,7 +150,7 @@ $currentPrivacy = $user['calculation_privacy'] ?? 'private';
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="savePrivacyBtn">
                         <span class="loading-spinner" id="privacyLoading"></span>
-                        <i class="fas fa-save me-2"></i>Save Settings
+                        <i class="fas fa-save me-2"></i>Save
                     </button>
                 </div>
             </form>

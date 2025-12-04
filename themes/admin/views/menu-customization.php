@@ -14,7 +14,7 @@ $menu_config = $menu_config ?? [];
                 <i class="fas fa-undo"></i> Reset to Default
             </button>
             <button class="btn btn-primary" onclick="saveMenuConfiguration()">
-                <i class="fas fa-save"></i> Save Configuration
+                <i class="fas fa-save"></i> Save
             </button>
         </div>
     </div>
@@ -213,7 +213,7 @@ $menu_config = $menu_config ?? [];
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('menuItemModal')">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="saveMenuItem()">Save Changes</button>
+                <button type="button" class="btn btn-primary" onclick="saveMenuItem()">Save</button>
             </div>
         </div>
     </div>

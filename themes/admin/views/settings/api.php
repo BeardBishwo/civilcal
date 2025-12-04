@@ -631,7 +631,7 @@ $page_title = 'API Settings - Admin Panel';
                 <!-- Action Buttons -->
                 <div class="action-buttons">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Save Settings
+                        <i class="fas fa-save"></i> Save
                     </button>
                     <button type="button" onclick="document.getElementById('settingsForm').reset();" class="btn btn-secondary">
                         <i class="fas fa-undo"></i> Reset

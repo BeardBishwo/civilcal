@@ -13,7 +13,7 @@ $menu_items = $menu_items ?? [];
                 <i class="fas fa-undo"></i> Reset to Default
             </button>
             <button class="btn btn-primary" onclick="saveDashboardConfig()">
-                <i class="fas fa-save"></i> Save Configuration
+                <i class="fas fa-save"></i> Save
             </button>
         </div>
     </div>

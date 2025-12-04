@@ -123,7 +123,7 @@ $content = '
             
             <button id="save-backup-settings" class="btn btn-primary">
                 <i class="fas fa-save"></i>
-                Save Settings
+                Save
             </button>
         </div>
     </div>

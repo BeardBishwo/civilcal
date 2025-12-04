@@ -15,7 +15,7 @@ $debug_options = $debug_options ?? [];
                 <i class="fas fa-undo"></i> Reset to Defaults
             </button>
             <button class="btn btn-primary" onclick="saveAdvancedSettings()">
-                <i class="fas fa-save"></i> Save Settings
+                <i class="fas fa-save"></i> Save
             </button>
         </div>
     </div>

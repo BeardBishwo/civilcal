@@ -476,7 +476,7 @@ $pageTitle = $page_title ?? 'User Profile';
             <h1><i class="fas fa-user-circle" style="margin-right: 0.5rem; color: #4cc9f0;"></i>User Profile</h1>
             <button type="submit" form="profileForm" class="btn-save" id="saveProfileBtn">
                 <span class="loading-spinner" id="profileLoading"></span>
-                <i class="fas fa-save"></i> Save Changes
+                <i class="fas fa-save"></i> Save
             </button>
         </div>
         
@@ -781,7 +781,7 @@ $pageTitle = $page_title ?? 'User Profile';
                                                 ];
                                                 $color = $statusColors[$request['status']] ?? '#9ca3af';
                                                 ?>
-                                                <span style="color: <?php echo $color; ?>;">
+                                                <span style="color: <?php echo $color; ?>">
                                                     ● <?php echo ucfirst($request['status']); ?>
                                                 </span>
                                             </td>

@@ -55,7 +55,7 @@
             
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Save Changes
+                    <i class="fas fa-save"></i> Save
                 </button>
                 <a href="<?php echo app_base_url('/admin/widgets'); ?>" class="btn btn-outline-secondary">
                     Cancel

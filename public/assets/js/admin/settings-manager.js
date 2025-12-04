@@ -93,7 +93,7 @@ class SettingsManager {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                this.showNotification('Settings saved successfully!', 'success');
+                this.showNotification('saved successfully!', 'success');
                 this.unsavedChanges = false;
                 
                 // Refresh preview if available

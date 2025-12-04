@@ -5,12 +5,12 @@
  */
 
 // Security check
-if (!defined('ABSPATH')) {
+if (!defined('ABSPATH')) {    
     exit('Access denied');
 }
 
 // Initialize container if not available
-if (!isset($container)) {
+if (!isset($container)) {    
     $container = \App\Core\Container::create();
 }
 
@@ -628,7 +628,7 @@ $page_title = 'User Settings - Admin Panel';
                 <!-- Action Buttons -->
                 <div class="action-buttons">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Save Settings
+                        <i class="fas fa-save"></i> Save
                     </button>
                     <button type="button" onclick="document.getElementById('settingsForm').reset();" class="btn btn-secondary">
                         <i class="fas fa-undo"></i> Reset

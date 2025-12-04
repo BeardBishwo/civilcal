@@ -23,7 +23,7 @@
             
             <div class="form-group">
                 <button type="submit" class="btn btn-primary" disabled>
-                    <i class="fas fa-save"></i> Save Settings
+                    <i class="fas fa-save"></i> Save
                 </button>
             </div>
         </form>

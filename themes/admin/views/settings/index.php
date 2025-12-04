@@ -393,7 +393,7 @@ function renderSettingField($key, $setting) {
                     <i class="fas fa-undo"></i> Reset
                 </button>
                 <button type="submit" class="btn btn-primary" id="save-settings">
-                    <i class="fas fa-save"></i> Save Changes
+                    <i class="fas fa-save"></i> Save
                 </button>
             </div>
         </form>
