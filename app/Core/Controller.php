@@ -27,23 +27,7 @@ class Controller {
             $this->view = new View();
         }
     }
-    
-    protected function view($view, $data = []) {
-        // Extract data for template use
-        extract($data);
-        
-        // Build view path
-        $viewPath = __DIR__ . '/../Views/' . str_replace('.', '/', $view) . '.php';
-        
-        if (file_exists($viewPath)) {
-            include $viewPath;
-        } else {
-            echo "<h1>View Error</h1>";
-            echo "<p>View file not found: " . htmlspecialchars($view) . "</p>";
-            echo "<p>Expected path: " . htmlspecialchars($viewPath) . "</p>";
-        }
-    }
-    
+
     /**
      * Render a view wrapped in a layout
      * 
