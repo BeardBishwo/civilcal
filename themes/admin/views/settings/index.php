@@ -196,7 +196,8 @@ function renderSettingField($key, $setting) {
         </div>
         
         <!-- Settings Form -->
-        <form id="settings-form" method="POST" action="<?php echo app_base_url('/admin/settings/save'); ?>" enctype="multipart/form-data">
+        <form id="settings-form" method="POST" action="<?php echo app_base_url('/admin/settings/update'); ?>" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
             <div class="settings-content">
                 <!-- General Settings -->
                 <div id="general-settings" class="settings-section active">

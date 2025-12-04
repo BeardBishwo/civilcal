@@ -1,27 +1,30 @@
 <?php
+
 namespace App\Middleware;
 
-class AuthMiddleware {
-    public function handle($request, $next) {
+class AuthMiddleware
+{
+    public function handle($request, $next)
+    {
         // Start session if not already started
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
-        
+
         // Check if user is logged in via session
         $authenticated = false;
         $httpBasicAuthProvided = isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW']);
         $httpBasicAuthFailed = false;
-        
+
         // If HTTP Basic Auth is provided, prioritize it over session
         // This ensures that new credentials override any existing session
         if ($httpBasicAuthProvided) {
             $username = $_SERVER['PHP_AUTH_USER'];
             $password = $_SERVER['PHP_AUTH_PW'];
-            
+
             $userModel = new \App\Models\User();
             $user = $userModel->findByUsername($username);
-            
+
             if ($user) {
                 $userArray = is_array($user) ? $user : (array) $user;
                 if (password_verify($password, $userArray['password'])) {
@@ -41,14 +44,14 @@ class AuthMiddleware {
                 $httpBasicAuthFailed = true;
             }
         }
-        
+
         // Fallback to session-based auth if no HTTP Basic Auth provided
         if (!$authenticated && !$httpBasicAuthProvided) {
             if (!empty($_SESSION['user_id']) || !empty($_SESSION['user'])) {
                 $authenticated = true;
             }
         }
-        
+
         if (!$authenticated) {
             // If HTTP Basic Auth was provided but failed, return 401
             if ($httpBasicAuthFailed) {
@@ -57,13 +60,15 @@ class AuthMiddleware {
                 echo json_encode(['error' => 'Unauthorized - Invalid credentials']);
                 exit;
             }
-            // Check if this is an API request (JSON or has /api/ in path)
+            // Check if this is an API request (JSON or has /api/ or /admin/ in path)
+            // Admin routes use AJAX forms that expect JSON responses
             $isApiRequest = (
                 (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) ||
                 (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) ||
-                strpos($_SERVER['REQUEST_URI'], '/api/') !== false
+                strpos($_SERVER['REQUEST_URI'], '/api/') !== false ||
+                strpos($_SERVER['REQUEST_URI'], '/admin/') !== false
             );
-            
+
             if ($isApiRequest) {
                 // Return 401 for API requests
                 http_response_code(401);
@@ -83,8 +88,7 @@ class AuthMiddleware {
                 exit;
             }
         }
-        
+
         return $next($request);
     }
 }
-?>

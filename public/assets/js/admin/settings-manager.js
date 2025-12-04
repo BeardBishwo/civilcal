@@ -79,32 +79,54 @@ class SettingsManager {
     saveSettings() {
         const form = document.getElementById('settings-form');
         const formData = new FormData(form);
-        
+
+        // Enhanced debugging
+        console.log('[SETTINGS_DEBUG] saveSettings() called');
+        console.log('[SETTINGS_DEBUG] Form element:', form);
+        console.log('[SETTINGS_DEBUG] Form data entries:');
+        for (let [key, value] of formData.entries()) {
+            console.log(`[SETTINGS_DEBUG]   ${key}: ${value}`);
+        }
+
         // Show loading
         this.showLoading('Saving settings...');
 
-        fetch(window.APP_BASE_URL + 'admin/settings/save', {
+        // Use the correct endpoint from routes.php
+        const saveUrl = window.APP_BASE_URL ? window.APP_BASE_URL + 'admin/settings/update' : '/admin/settings/update';
+        console.log('[SETTINGS_DEBUG] Save URL:', saveUrl);
+        console.log('[SETTINGS_DEBUG] APP_BASE_URL:', window.APP_BASE_URL);
+
+        fetch(saveUrl, {
             method: 'POST',
             body: formData,
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                this.showNotification('saved successfully!', 'success');
+                this.showNotification('Settings saved successfully!', 'success');
                 this.unsavedChanges = false;
-                
+
                 // Refresh preview if available
                 this.refreshPreview();
             } else {
-                this.showNotification(data.message || 'Failed to save settings', 'error');
+                // Show specific error message from backend
+                const errorMsg = data.message || data.error || 'Failed to save settings';
+                this.showNotification(errorMsg, 'error');
+                console.error('Backend error:', data);
             }
         })
         .catch(error => {
-            this.showNotification('An error occurred while saving', 'error');
-            console.error(error);
+            // Show detailed error message
+            this.showNotification(`Error: ${error.message}. Please check console for details.`, 'error');
+            console.error('Settings save error:', error);
         })
         .finally(() => {
             this.hideLoading();
@@ -318,7 +340,7 @@ class SettingsManager {
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
     window.settingsManager = new SettingsManager();
-    
+
     // Load tab from URL hash
     if (window.location.hash) {
         const group = window.location.hash.substring(1);
@@ -326,4 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.settingsManager.switchTab(group);
         }
     }
+
+    // Add cache busting parameter to ensure fresh JavaScript is loaded
+    console.log('Settings Manager v2.1 - Cache busted: ' + new Date().getTime());
 });

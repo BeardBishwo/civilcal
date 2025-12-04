@@ -35,13 +35,13 @@ const AdminApp = {
 
             if (mainContent) {
                 mainContent.classList.toggle('sidebar-collapsed', shouldCollapse);
-                
+
                 // Force reflow to ensure content area adjusts properly
                 setTimeout(() => {
                     mainContent.style.display = 'none';
                     mainContent.offsetHeight; // Trigger reflow
                     mainContent.style.display = '';
-                   
+
                     // Force charts and other elements to resize
                     const charts = mainContent.querySelectorAll('canvas');
                     charts.forEach(chart => {
@@ -49,10 +49,10 @@ const AdminApp = {
                             chart.chart.resize();
                         }
                     });
-                   
+
                     // Sync dashboard layout specifically
                     this.syncDashboardLayout();
-                   
+
                     // Dispatch custom event for other components to listen to
                     window.dispatchEvent(new CustomEvent('sidebarStateChanged', {
                         detail: { collapsed: shouldCollapse }
@@ -295,12 +295,12 @@ const AdminApp = {
         // Force dashboard columns to recalculate
         const dashboardLeft = dashboardGrid.querySelector('.dashboard-left');
         const dashboardRight = dashboardGrid.querySelector('.dashboard-right');
-        
+
         if (dashboardLeft && dashboardRight) {
             // Trigger layout recalculation for columns
             dashboardLeft.style.minWidth = '';
             dashboardRight.style.minWidth = '';
-            
+
             // Force browser to recalculate layout
             dashboardGrid.style.gridTemplateColumns = '';
             dashboardGrid.offsetHeight; // Force reflow
@@ -355,7 +355,7 @@ const AdminApp = {
 
         // Set default Chart.js configuration
         this.configureChartDefaults();
-        
+
         // Initialize all charts
         this.initializeAllCharts();
     },
@@ -425,13 +425,13 @@ const AdminApp = {
     initializeAdvancedCharts() {
         // System Performance Chart
         this.initializeSystemPerformanceChart();
-        
+
         // Revenue Chart
         this.initializeRevenueChart();
-        
+
         // Activity Heatmap
         this.initializeActivityHeatmap();
-        
+
         // Resource Usage Chart
         this.initializeResourceUsageChart();
     },
@@ -440,7 +440,7 @@ const AdminApp = {
     initializeServerLoadChart() {
         const ctx = document.getElementById('serverLoadChart');
         if (!ctx) return;
-        
+
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -470,7 +470,7 @@ const AdminApp = {
     initializeMemoryUsageChart() {
         const ctx = document.getElementById('memoryUsageChart');
         if (!ctx) return;
-        
+
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -500,7 +500,7 @@ const AdminApp = {
     initializeResponseTimeChart() {
         const ctx = document.getElementById('responseTimeChart');
         if (!ctx) return;
-        
+
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -529,7 +529,7 @@ const AdminApp = {
     initializeDbQueriesChart() {
         const ctx = document.getElementById('dbQueriesChart');
         if (!ctx) return;
-        
+
         new Chart(ctx, {
             type: 'bar',
             data: {
@@ -561,7 +561,7 @@ const AdminApp = {
             'serverLoadChart', 'memoryUsageChart', 'responseTimeChart',
             'dbQueriesChart', 'userGrowthChart', 'calculatorUsageChart'
         ];
-        
+
         chartIds.forEach(id => {
             const ctx = document.getElementById(id);
             if (ctx && !ctx.chart) {
@@ -694,7 +694,7 @@ const AdminApp = {
                             color: '#f3f4f6'
                         },
                         ticks: {
-                            callback: function(value) {
+                            callback: function (value) {
                                 return value + '%';
                             }
                         }
@@ -742,7 +742,7 @@ const AdminApp = {
                             color: '#f3f4f6'
                         },
                         ticks: {
-                            callback: function(value) {
+                            callback: function (value) {
                                 return '$' + value.toLocaleString();
                             }
                         }
@@ -780,7 +780,7 @@ const AdminApp = {
                 datasets: [{
                     label: 'Activity',
                     data: heatmapData,
-                    backgroundColor: function(context) {
+                    backgroundColor: function (context) {
                         const value = context.raw.v;
                         const alpha = value / 100;
                         return `rgba(79, 70, 229, ${alpha})`;
@@ -805,7 +805,7 @@ const AdminApp = {
                         max: 23,
                         ticks: {
                             stepSize: 1,
-                            callback: function(value) {
+                            callback: function (value) {
                                 return value + ':00';
                             }
                         }
@@ -816,7 +816,7 @@ const AdminApp = {
                         max: 6,
                         ticks: {
                             stepSize: 1,
-                            callback: function(value) {
+                            callback: function (value) {
                                 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
                                 return days[value];
                             }
@@ -873,7 +873,7 @@ const AdminApp = {
                         max: 100,
                         ticks: {
                             stepSize: 20,
-                            callback: function(value) {
+                            callback: function (value) {
                                 return value + '%';
                             }
                         }
@@ -934,28 +934,44 @@ const AdminApp = {
                     });
 
                     console.log('Response status:', response.status);
+                    console.log('Response headers:', [...response.headers.entries()]);
 
-                    const result = await response.json();
+                    const responseText = await response.text();
+                    console.log('Raw response text:', responseText);
+
+                    let result;
+                    try {
+                        result = JSON.parse(responseText);
+                    } catch (parseError) {
+                        console.error('JSON parse error:', parseError);
+                        console.error('Response was:', responseText.substring(0, 500));
+                        throw new Error('Server returned invalid JSON: ' + responseText.substring(0, 100));
+                    }
+
                     console.log('Parsed result:', result);
+                    console.log('result.success =', result.success, 'type:', typeof result.success);
 
                     if (result.success) {
-                        // Extract the number of updated settings from the message
-                        const match = result.message.match(/(\d+) settings? updated/);
-                        const updatedCount = match ? parseInt(match[1]) : 0;
+                        // Show appropriate message based on the result
+                        const message = result.message || 'Settings saved successfully!';
 
-                        if (updatedCount > 0) {
+                        // Check if any changes were made
+                        const hasChanges = message.match(/(\d+) settings? updated/);
+
+                        if (hasChanges && parseInt(hasChanges[1]) > 0) {
                             // Green toast for actual changes saved
-                            this.showNotification(result.message || 'Settings saved successfully!', 'success');
+                            this.showNotification(message, 'success');
                         } else {
-                            // Red toast for no changes made
-                            this.showNotification('No changes were made. Settings remain unchanged.', 'error');
+                            // Info toast (not error) for no changes made - still a success
+                            this.showNotification(message, 'info');
                         }
 
                         if (result.redirect) {
                             setTimeout(() => window.location.href = result.redirect, 1500);
                         }
                     } else {
-                        this.showNotification(result.error || 'An error occurred', 'error');
+                        // Show actual error message from server
+                        this.showNotification(result.message || result.error || 'An error occurred', 'error');
                     }
                 } catch (error) {
                     console.error('AJAX form error:', error);

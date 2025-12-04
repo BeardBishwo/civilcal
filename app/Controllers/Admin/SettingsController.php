@@ -19,11 +19,11 @@ class SettingsController extends Controller
 
         // Get all general settings
         $generalSettings = SettingsService::getAll('general');
-        
+
         // Get logo and favicon settings (they might be in different groups)
         $siteLogo = SettingsService::get('site_logo');
         $favicon = SettingsService::get('favicon');
-        
+
         // Merge all settings together
         $settings = array_merge($generalSettings, [
             'site_logo' => $siteLogo,
@@ -148,14 +148,16 @@ class SettingsController extends Controller
         }
 
         if (!$isAuthenticated) {
+            header('Content-Type: application/json');
             http_response_code(401);
-            echo json_encode(['error' => 'Unauthorized']);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized - Please log in']);
             exit;
         }
 
         if (!$isAdmin) {
+            header('Content-Type: application/json');
             http_response_code(403);
-            echo json_encode(['error' => 'Forbidden - Admin access required']);
+            echo json_encode(['success' => false, 'message' => 'Forbidden - Admin access required']);
             exit;
         }
     }
@@ -187,44 +189,83 @@ class SettingsController extends Controller
         // Set JSON header first to ensure proper response format
         header('Content-Type: application/json');
 
+        // Enhanced debugging - write to server error log
+        error_log("[SETTINGS_DEBUG] save() method called at " . date('Y-m-d H:i:s'));
+        error_log("[SETTINGS_DEBUG] REQUEST_METHOD: " . $_SERVER['REQUEST_METHOD']);
+        error_log("[SETTINGS_DEBUG] REQUEST_URI: " . $_SERVER['REQUEST_URI']);
+        error_log("[SETTINGS_DEBUG] User: " . ($_SESSION['user']['username'] ?? 'unknown'));
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            error_log("[SETTINGS_DEBUG] ERROR: Invalid request method");
             echo json_encode(['success' => false, 'message' => 'Invalid request']);
             exit;
         }
 
+        // CSRF Token validation
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        $sessionToken = $_SESSION['csrf_token'] ?? '';
+        if (empty($csrfToken) || empty($sessionToken) || !hash_equals($sessionToken, $csrfToken)) {
+            error_log("[SETTINGS_DEBUG] ERROR: Invalid CSRF token");
+            error_log("[SETTINGS_DEBUG] Submitted CSRF: $csrfToken");
+            error_log("[SETTINGS_DEBUG] Session CSRF: $sessionToken");
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            exit;
+        }
+
         try {
+            // Log raw POST data for debugging
+            error_log("[SETTINGS_DEBUG] Raw POST data: " . json_encode($_POST));
+            error_log("[SETTINGS_DEBUG] FILES data: " . json_encode($_FILES));
             $updated = 0;
+
+            // DEBUG: Log what we receive to a specific file
+            $logFile = __DIR__ . '/../../../debug_save.log';
+            file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "SettingsController::save() - POST keys: " . implode(', ', array_keys($_POST)) . "\n", FILE_APPEND);
+            file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "SettingsController::save() - POST data: " . json_encode($_POST) . "\n", FILE_APPEND);
 
             foreach ($_POST as $key => $value) {
                 if ($key !== 'csrf_token' && strpos($key, '_') !== false) {
+                    error_log("[SETTINGS_DEBUG] Processing setting: $key = $value");
+
                     // Handle file uploads for image/file type settings
                     if (isset($_FILES[$key]) && $_FILES[$key]['error'] === UPLOAD_ERR_OK) {
+                        error_log("[SETTINGS_DEBUG] Handling file upload for: $key");
                         $value = $this->handleFileUpload($_FILES[$key]);
+                        error_log("[SETTINGS_DEBUG] File upload result for $key: " . ($value ?: 'FAILED'));
                     }
 
                     // Handle checkboxes (boolean values)
                     if (!isset($_POST[$key]) && $this->isCheckboxField($key)) {
                         $value = '0';
+                        error_log("[SETTINGS_DEBUG] Checkbox field $key set to 0 (unchecked)");
                     }
 
-                    if (SettingsService::set($key, $value)) {
-                        $updated++;
+                    try {
+                        $setResult = SettingsService::set($key, $value);
+                        error_log("[SETTINGS_DEBUG] SettingsService::set($key, $value) result: " . ($setResult ? 'SUCCESS' : 'FAILED'));
 
-                        // Log the change
-                        GDPRService::logActivity(
-                            $_SESSION['user_id'] ?? null,
-                            'setting_updated',
-                            'settings',
-                            null,
-                            "Setting $key updated",
-                            null,
-                            ['key' => $key, 'value' => $value]
-                        );
+                        if ($setResult) {
+                            $updated++;
+                            // Log the change
+                            GDPRService::logActivity(
+                                $_SESSION['user_id'] ?? null,
+                                'setting_updated',
+                                'settings',
+                                null,
+                                "Setting $key updated",
+                                json_encode(['old_value' => SettingsService::get($key)]),
+                                json_encode(['key' => $key, 'value' => $value])
+                            );
+                        } else {
+                            error_log("[SETTINGS_DEBUG] SettingsService::set() returned false for key: $key");
+                        }
+                    } catch (\Exception $e) {
+                        error_log("[SETTINGS_DEBUG] Exception in SettingsService::set() for key $key: " . $e->getMessage());
                     }
                 }
             }
 
-// Handle logo and favicon file uploads specifically
+            // Handle logo and favicon file uploads specifically
             $fileFields = ['site_logo', 'favicon'];
             foreach ($fileFields as $field) {
                 if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
@@ -239,12 +280,12 @@ class SettingsController extends Controller
                             'settings',
                             null,
                             "Setting $field updated via file upload",
-                            null,
-                            ['key' => $field, 'value' => $uploadedPath]
+                            json_encode(['old_value' => SettingsService::get($field)]),
+                            json_encode(['key' => $field, 'value' => $uploadedPath])
                         );
                     }
                 }
-                
+
                 // Handle removal of current images
                 $removeField = 'remove_' . $field;
                 if (isset($_POST[$removeField]) && $_POST[$removeField] == '1') {
@@ -260,8 +301,8 @@ class SettingsController extends Controller
                             'settings',
                             null,
                             "Setting $field removed (cleared)",
-                            null,
-                            ['key' => $field, 'old_value' => $currentValue, 'new_value' => '']
+                            json_encode(['old_value' => $currentValue, 'new_value' => '']),
+                            json_encode(['key' => $field])
                         );
                     }
                 }
@@ -533,9 +574,9 @@ class SettingsController extends Controller
             if (!$input) {
                 $input = $_POST;
             }
-            
+
             $testEmail = $input['test_email'] ?? '';
-            
+
             if (empty($testEmail)) {
                 echo json_encode(['success' => false, 'message' => 'Test email address is required']);
                 return;
@@ -568,7 +609,7 @@ class SettingsController extends Controller
             // Try to send test email using PHPMailer
             try {
                 $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-                
+
                 // Server settings
                 $mail->isSMTP();
                 $mail->Host = $smtpHost;
@@ -576,7 +617,7 @@ class SettingsController extends Controller
                 $mail->SMTPAuth = true;
                 $mail->Username = $smtpUsername;
                 $mail->Password = $smtpPassword;
-                
+
                 // Set encryption
                 if ($smtpEncryption === 'ssl') {
                     $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;

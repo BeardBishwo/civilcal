@@ -31,35 +31,41 @@ class SettingsService
 
     public static function set($key, $value, $type = 'string', $group = 'general', $description = '')
     {
-        $db = Database::getInstance();
+        try {
+            $db = Database::getInstance();
 
-        // Prepare value for storage
-        $storageValue = self::prepareValueForStorage($value, $type);
+            // Prepare value for storage
+            $storageValue = self::prepareValueForStorage($value, $type);
 
-        // Check if the value actually changed
-        $currentValue = self::get($key);
-        $valueChanged = ($currentValue !== $value);
+            // Check if the value actually changed
+            $currentValue = self::get($key);
+            $valueChanged = ($currentValue !== $value);
 
-        $stmt = $db->prepare("
-            INSERT INTO settings (setting_key, setting_value, setting_type, setting_group, description) 
-            VALUES (?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE 
-            setting_value = VALUES(setting_value),
-            setting_type = VALUES(setting_type),
-            setting_group = VALUES(setting_group),
-            description = VALUES(description),
-            updated_at = NOW()
-        ");
+            $stmt = $db->prepare("
+                INSERT INTO settings (setting_key, setting_value, setting_type, setting_group, description)
+                VALUES (?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                setting_value = VALUES(setting_value),
+                setting_type = VALUES(setting_type),
+                setting_group = VALUES(setting_group),
+                description = VALUES(description),
+                updated_at = NOW()
+            ");
 
-        $result = $stmt->execute([$key, $storageValue, $type, $group, $description]);
+            $result = $stmt->execute([$key, $storageValue, $type, $group, $description]);
 
-        // Update cache
-        if ($result) {
-            self::$cache[$key] = $value;
+            // Update cache
+            if ($result) {
+                self::$cache[$key] = $value;
+            }
+
+            // Return true only if value actually changed or if it's a new setting
+            return $result && ($valueChanged || $currentValue === null);
+        } catch (\Exception $e) {
+            // Log the error but don't throw to maintain compatibility
+            error_log("SettingsService::set() failed for key '$key': " . $e->getMessage());
+            return false;
         }
-
-        // Return true only if value actually changed or if it's a new setting
-        return $result && ($valueChanged || $currentValue === null);
     }
 
     public static function getAll($group = null)

@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Sign In - EngiCal Pro';
+$page_title = 'Sign In - Civil Cal ';
 
 // CSRF token is already handled by the framework/controller
 if (session_status() === PHP_SESSION_NONE) {
@@ -29,7 +29,7 @@ $csrf_token = $_SESSION['csrf_token'];
             <!-- Header Section -->
             <div class="auth-header">
                 <h1>Welcome Back</h1>
-                <p class="auth-subtitle">Sign in to your EngiCal Pro account</p>
+                <p class="auth-subtitle">Sign in to your Civil Cal account</p>
             </div>
 
             <form id="loginForm" class="auth-form">
