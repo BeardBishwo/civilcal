@@ -11,6 +11,7 @@ class SettingsController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->ensureCsrfToken();
     }
 
     public function general()
@@ -112,6 +113,17 @@ class SettingsController extends Controller
         $this->view->render('admin/settings/backup', [
             'title' => 'Backup Settings'
         ]);
+    }
+
+    private function ensureCsrfToken(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (empty($_SESSION['csrf_token']) || strlen($_SESSION['csrf_token']) < 32) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
     }
 
     private function requireAdminWithBasicAuth()

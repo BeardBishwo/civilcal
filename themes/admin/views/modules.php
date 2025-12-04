@@ -70,29 +70,33 @@ $menuItems = $menuItems ?? [];
 </div>
 
 <!-- Module Actions Bar -->
-<div class="toolbar">
-    <div class="toolbar-left">
-        <button class="btn btn-primary" onclick="refreshModules()">
-            <i class="fas fa-sync-alt"></i>
-            Refresh Modules
-        </button>
-        <button class="btn btn-secondary" onclick="installModule()">
-            <i class="fas fa-plus"></i>
-            Install New Module
-        </button>
-    </div>
-    
-    <div class="toolbar-right">
-        <div class="module-filter">
-            <select id="moduleFilter" onchange="filterModules(this.value)" class="form-control">
-                <option value="all">All Modules</option>
-                <option value="active">Active Only</option>
-                <option value="inactive">Inactive Only</option>
-            </select>
+<div class="module-toolbar">
+    <div class="module-toolbar__inner">
+        <div class="module-toolbar__primary">
+            <div class="module-search-group">
+                <span class="module-search-group__icon"><i class="fas fa-search"></i></span>
+                <input type="text" placeholder="Search modules..." class="module-search-group__input" onkeyup="searchModules(this.value)">
+            </div>
+
+            <div class="module-filter-group">
+                <span class="module-filter-group__label"><i class="fas fa-filter"></i> Filter</span>
+                <select id="moduleFilter" onchange="filterModules(this.value)" class="module-filter-group__select">
+                    <option value="all">All Modules</option>
+                    <option value="active">Active Only</option>
+                    <option value="inactive">Inactive Only</option>
+                </select>
+            </div>
         </div>
-        
-        <div class="module-search">
-            <input type="text" placeholder="Search modules..." class="form-control" onkeyup="searchModules(this.value)">
+
+        <div class="module-toolbar__actions">
+            <button class="btn btn-soft" onclick="refreshModules()">
+                <i class="fas fa-sync-alt"></i>
+                Refresh
+            </button>
+            <button class="btn btn-primary" onclick="installModule()">
+                <i class="fas fa-plus"></i>
+                Install Module
+            </button>
         </div>
     </div>
 </div>
@@ -448,6 +452,146 @@ function searchModules(query) {
 .module-filter,
 .module-search {
     min-width: 200px;
+}
+
+.module-ac.module-toolbar {
+    margin: 24px 0;
+}
+
+.module-toolbar__inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: white;
+    box-shadow: 0 10px 30px -20px rgba(15, 23, 42, 0.4);
+    align-items: center;
+    justify-content: space-between;
+}
+
+.module-toolbar__primary {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.module-toolbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.module-search-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    border-radius: 12px;
+    padding: 10px 14px;
+    min-width: 240px;
+    transition: all 0.2s ease;
+}
+
+.module-search-group:focus-within {
+    border-color: #6366f1;
+    box-shadow: 0 8px 24px -20px rgba(99, 102, 241, 0.6);
+}
+
+.module-search-group__icon {
+    color: #6366f1;
+    margin-right: 10px;
+    font-size: 15px;
+}
+
+.module-search-group__input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    width: 100%;
+    color: #1f2937;
+}
+
+.module-search-group__input::placeholder {
+    color: #9ca3af;
+}
+
+.module-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8fafc;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    border-radius: 12px;
+    padding: 10px 14px;
+    transition: all 0.2s ease;
+}
+
+.module-filter-group:hover,
+.module-filter-group:focus-within {
+    border-color: #0ea5e9;
+    box-shadow: 0 8px 24px -20px rgba(14, 165, 233, 0.6);
+}
+
+.module-filter-group__label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.module-filter-group__select {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    color: #1f2937;
+    cursor: pointer;
+}
+
+.module-filter-group__select option {
+    color: #1f2937;
+}
+
+.btn.btn-soft {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.btn.btn-soft:hover {
+    background: #e2e8f0;
+}
+
+.btn-primary i,
+.btn-soft i {
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .module-toolbar__inner {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .module-toolbar__primary,
+    .module-toolbar__actions {
+        width: 100%;
+    }
+
+    .module-toolbar__actions {
+        justify-content: space-between;
+    }
+
+    .module-search-group,
+    .module-filter-group {
+        width: 100%;
+    }
 }
 
 .empty-state {

@@ -4,159 +4,163 @@
     "date": "2025-11-19",
     "prepared_by": "Backend Testing Team"
   },
-  "product_overview": "This document details the comprehensive backend testing requirements for the Bishwo Calculator platform. It covers REST APIs, service layers, database integrity, security, integration, and performance testing to ensure a robust and secure backend system. The testing is designed to validate all core backend functionalities, security aspects, and performance criteria for the custom PHP MVC based system.",
+  "product_overview": "Comprehensive backend testing suite for Bishwo Calculator platform ensuring correct functionality, security, performance, and reliability of APIs, services, and database operations using TestSprite framework.",
   "core_goals": [
-    "Achieve 100% REST API endpoint coverage to ensure all backend functionality works as intended.",
-    "Validate service layer business logic correctness and robustness for all 34 services.",
-    "Ensure data persistence and integrity with rigorous database CRUD and migration testing.",
-    "Confirm security measures against authentication bypass, authorization violations, and common vulnerabilities like SQL injection and CSRF.",
-    "Verify integration points with payment gateways, email services, and external APIs for reliability.",
-    "Meet performance benchmarks with API response times under 500ms and stable behavior under load."
+    "Achieve 100% coverage of backend REST API endpoints",
+    "Validate service layer logic across 34 services",
+    "Ensure database integrity and proper migration handling",
+    "Verify security controls including authentication, authorization, and input validation",
+    "Confirm reliability of third-party integrations such as payment gateways and email services",
+    "Meet performance benchmarks with API response times under 500ms"
   ],
   "key_features": [
-    "Authentication API testing including login, registration, logout, and session management.",
-    "Profile API validation for authenticated user data fetch and update operations.",
-    "Admin Dashboard API testing enforcing admin-only access and correct statistics delivery.",
-    "Comprehensive test cases covering all critical REST endpoints, business logic validations, and input handling.",
-    "Extensive security testing for authentication, authorization, input validation, CSRF, and rate limiting.",
-    "Performance testing including response time benchmarks and load test scenarios.",
-    "Service and database testing with transaction and migration validation.",
-    "Integration tests covering end-to-end user flows including auth, calculator, payment, and admin actions."
+    "API testing of all endpoints including authentication, calculator, admin, history, export, payment, theme, plugin, GDPR, and analytics",
+    "Unit and integration testing of service layer components",
+    "Database tests covering CRUD operations, transactions, constraints, and migrations",
+    "Security testing including CSRF protection, XSS and SQL injection prevention, rate limiting",
+    "Performance and load testing simulating concurrent users and stress scenarios",
+    "Structured test data setups for users, calculators, and payment methods"
   ],
   "user_flow_summary": [
-    "User registration with email verification followed by login and profile management.",
-    "Authenticated user performing calculator operations, saving history, exporting results, and sharing calculations.",
-    "Admin users accessing dashboard, managing users, updating settings, themes, and plugins.",
-    "Payment flow from plan selection through successful subscription activation and notification.",
-    "GDPR related flows such as data export request and account deletion with cascade effects.",
-    "Two-factor authentication setup and verification processes for enhanced security."
+    "User registration, email verification, login, and logout with 2FA support",
+    "Performing various calculator operations with input validation and saving results",
+    "Admin operations including user management, settings update, theme/plugin management",
+    "Payment processing workflows covering Stripe, PayTM, and subscription management",
+    "Calculation history management, export to multiple formats, and sharing functionality",
+    "GDPR data export request and data deletion flows"
   ],
   "validation_criteria": [
-    "All API endpoints return correct HTTP status codes and validate request and response payloads accurately.",
-    "Service layer methods correctly perform calculations, validations, and state changes as expected.",
-    "Database operations maintain data consistency with constraints, transactional atomicity, and proper migrations.",
-    "Security tests block unauthorized access, prevent injection attacks, enforce CSRF tokens, and uphold session security.",
-    "Integration tests confirm seamless interactions across components, including third-party services.",
-    "Performance tests demonstrate API response times under 500ms and system stability under concurrent load.",
-    "Test coverage metrics exceed 90% code coverage and 95% service method coverage with zero critical bugs.",
-    "Pass rate for automated tests minimum 98%, with all critical paths and security features fully verified."
+    "All API endpoints return expected status codes and correctly formatted responses",
+    "Business logic calculations produce accurate and expected outputs",
+    "Database operations maintain data consistency and enforce constraints",
+    "Authentication and authorization mechanisms prevent unauthorized access",
+    "CSRF and input validation properly prevent security vulnerabilities",
+    "Performance tests meet response time and concurrency benchmarks",
+    "Critical paths and all service methods achieve >95% code coverage",
+    "Test execution completes with >98% pass rate and zero critical bugs"
   ],
   "code_summary": {
     "tech_stack": [
-      "PHP 7.4+",
-      "Custom MVC framework",
-      "MySQL/MariaDB",
-      "Composer packages (FastRoute, PHPMailer, Guzzle, etc.)"
+      "PHP 8.3",
+      "Custom MVC Framework",
+      "MySQL",
+      "Apache/Nginx",
+      "Session-based Authentication",
+      "Intervention Image Library",
+      "PHPMailer",
+      "Stripe Payment",
+      "PayTMLibrary",
+      "QR Code Generation",
+      "PDF Generation (FPDF/MPDF/TCPDF)",
+      "Monolog Logging",
+      "File Upload/Download",
+      "QR Code Reader",
+      "Guardian Anti-Malware",
+      "Carbon DateTime"
     ],
     "features": [
       {
         "name": "Authentication API",
-        "description": "Provides JSON-based login, registration, and logout endpoints with session + token handling for both users and admins.",
+        "description": "Handles user login, registration, forgot password, logout, profile management, and 2FA",
         "files": [
           "api/login.php",
-          "app/Controllers/Api/AuthController.php"
+          "api/register.php",
+          "api/forgot-password.php",
+          "api/logout.php",
+          "api/profile.php",
+          "api/check-username.php",
+          "api/test-notifications.php",
+          "app/Controllers/AuthController.php",
+          "app/Controllers/ApiController.php",
+          "app/Controllers/UserController.php",
+          "app/Controllers/TwoFactorController.php",
+          "app/Models/User.php"
         ],
         "api_doc": {
           "openapi": "3.0.0",
           "info": {
             "title": "Authentication API",
-            "version": "1.0.0"
+            "version": "1.0.0",
+            "description": "API endpoints for user authentication and account management"
           },
           "paths": {
-            "/api/login.php": {
+            "/api/login": {
               "post": {
-                "summary": "Authenticate a user",
-                "requestBody": {
-                  "required": true,
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "username_email": {
-                            "type": "string"
-                          },
-                          "password": {
-                            "type": "string"
-                          },
-                          "remember_me": {
-                            "type": "boolean"
-                          }
-                        },
-                        "required": [
-                          "username_email",
-                          "password"
-                        ]
-                      }
+                "summary": "User login",
+                "parameters": [
+                  {
+                    "name": "username_email",
+                    "in": "formData",
+                    "required": true,
+                    "schema": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "name": "password",
+                    "in": "formData",
+                    "required": true,
+                    "schema": {
+                      "type": "string"
                     }
                   }
-                },
+                ],
                 "responses": {
                   "200": {
-                    "description": "Successful login returns user data and redirect."
-                  },
-                  "400": {
-                    "description": "Missing credentials or bad input."
+                    "description": "Login successful"
                   },
                   "401": {
-                    "description": "Invalid credentials."
+                    "description": "Invalid credentials"
                   }
                 }
               }
             },
-            "/api/logout.php": {
+            "/api/register": {
               "post": {
-                "summary": "Destroy the current authenticated session",
+                "summary": "User registration",
+                "parameters": [
+                  {
+                    "name": "username",
+                    "in": "formData",
+                    "required": true,
+                    "schema": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "name": "email",
+                    "in": "formData",
+                    "required": true,
+                    "schema": {
+                      "type": "string",
+                      "format": "email"
+                    }
+                  },
+                  {
+                    "name": "password",
+                    "in": "formData",
+                    "required": true,
+                    "schema": {
+                      "type": "string"
+                    }
+                  }
+                ],
                 "responses": {
                   "200": {
-                    "description": "Logout successful."
+                    "description": "Registration successful"
                   },
-                  "401": {
-                    "description": "No active session."
+                  "400": {
+                    "description": "Validation error"
                   }
                 }
               }
             },
-            "/api/register.php": {
+            "/api/logout": {
               "post": {
-                "summary": "Register a new user account",
-                "requestBody": {
-                  "required": true,
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "username": {
-                            "type": "string"
-                          },
-                          "email": {
-                            "type": "string",
-                            "format": "email"
-                          },
-                          "password": {
-                            "type": "string"
-                          },
-                          "first_name": {
-                            "type": "string"
-                          }
-                        },
-                        "required": [
-                          "username",
-                          "email",
-                          "password",
-                          "first_name"
-                        ]
-                      }
-                    }
-                  }
-                },
+                "summary": "User logout",
                 "responses": {
                   "200": {
-                    "description": "Registration successful."
-                  },
-                  "400": {
-                    "description": "Validation failure."
+                    "description": "Logout successful"
                   }
                 }
               }
@@ -165,66 +169,53 @@
         }
       },
       {
-        "name": "Profile API",
-        "description": "Session-aware profile endpoint that lets authenticated users fetch and update their profile fields (first name, last name, company, phone).",
+        "name": "Calculator API",
+        "description": "Provides engineering and traditional unit calculators for multiple disciplines",
         "files": [
-          "api/profile.php",
-          "app/Models/User.php"
+          "api/calculator/index.php",
+          "app/Controllers/CalculatorController.php",
+          "app/Controllers/ApiController.php",
+          "app/Calculators/BaseCalculator.php",
+          "app/Calculators/CivilCalculator.php",
+          "app/Calculators/ElectricalCalculator.php",
+          "app/Calculators/HvacCalculator.php",
+          "app/Calculators/PlumbingCalculator.php",
+          "app/Calculators/TraditionalUnitsCalculator.php"
         ],
         "api_doc": {
           "openapi": "3.0.0",
           "info": {
-            "title": "Profile API",
-            "version": "1.0.0"
+            "title": "Calculator API",
+            "version": "1.0.0",
+            "description": "API for various engineering calculations"
           },
           "paths": {
-            "/api/profile.php": {
-              "get": {
-                "summary": "Retrieve the authenticated user's profile",
-                "responses": {
-                  "200": {
-                    "description": "Profile data returned."
+            "/api/calculate": {
+              "post": {
+                "summary": "Perform calculation",
+                "parameters": [
+                  {
+                    "name": "calculator",
+                    "in": "query",
+                    "required": true,
+                    "schema": {
+                      "type": "string"
+                    }
                   },
-                  "401": {
-                    "description": "Unauthorized."
-                  }
-                }
-              },
-              "put": {
-                "summary": "Update profile fields",
-                "requestBody": {
-                  "required": true,
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "first_name": {
-                            "type": "string"
-                          },
-                          "last_name": {
-                            "type": "string"
-                          },
-                          "company": {
-                            "type": "string"
-                          },
-                          "phone": {
-                            "type": "string"
-                          }
-                        }
-                      }
+                  {
+                    "name": "parameters",
+                    "in": "body",
+                    "schema": {
+                      "type": "object"
                     }
                   }
-                },
+                ],
                 "responses": {
                   "200": {
-                    "description": "Updated fields returned."
+                    "description": "Calculation result"
                   },
                   "400": {
-                    "description": "Validation failure."
-                  },
-                  "401": {
-                    "description": "Unauthorized."
+                    "description": "Invalid parameters"
                   }
                 }
               }
@@ -234,27 +225,136 @@
       },
       {
         "name": "Admin Dashboard API",
-        "description": "Admin-only dashboard data endpoint that exposes statistics, activity feeds, and system metrics for the admin panel UI.",
+        "description": "Administrative functions including user management, system settings, plugins, themes",
         "files": [
-          "app/Controllers/Admin/DashboardController.php",
-          "resources/views/admin/dashboard.php"
+          "api/admin/dashboard.php",
+          "api/admin/settings.php",
+          "app/Controllers/Admin/",
+          "app/Core/AdminModule.php",
+          "app/Models/AuditLog.php",
+          "app/Models/ActivityLog.php"
         ],
         "api_doc": {
           "openapi": "3.0.0",
           "info": {
-            "title": "Admin Dashboard API",
-            "version": "1.0.0"
+            "title": "Admin API",
+            "version": "1.0.0",
+            "description": "Administrative API endpoints"
           },
           "paths": {
-            "/admin/dashboard/data": {
+            "/api/admin/dashboard/stats": {
               "get": {
-                "summary": "Return dashboard statistics for authenticated admins",
+                "summary": "Get dashboard statistics",
                 "responses": {
                   "200": {
-                    "description": "Dashboard metrics returned."
-                  },
-                  "401": {
-                    "description": "Unauthorized or non-admin user."
+                    "description": "Dashboard stats"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "History & Export API",
+        "description": "User calculation history management and export functionality",
+        "files": [
+          "app/Controllers/HistoryController.php",
+          "app/Controllers/DataExportController.php",
+          "app/Controllers/ExportController.php",
+          "app/Models/Calculation.php"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "History & Export API",
+            "version": "1.0.0",
+            "description": "Calculation history and export features"
+          },
+          "paths": {
+            "/api/calculations": {
+              "get": {
+                "summary": "Get user calculations",
+                "responses": {
+                  "200": {
+                    "description": "List of calculations"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "File Upload/Download",
+        "description": "Handles file operations including profile uploads, exports, backups",
+        "files": [
+          "app/Controllers/ProfileImageController.php",
+          "app/Controllers/DataExportController.php",
+          "app/Helpers/ImageHelper.php",
+          "storage/uploads/",
+          "storage/exports/"
+        ]
+      },
+      {
+        "name": "Notification & Email System",
+        "description": "Email notifications, templates, and notification management",
+        "files": [
+          "app/Controllers/Admin/EmailManagerController.php",
+          "app/Controllers/Admin/NotificationController.php",
+          "app/Services/EmailManager.php",
+          "config/mail.php",
+          "utils/notification_system_comprehensive_fix.php"
+        ]
+      },
+      {
+        "name": "Payment Integration",
+        "description": "Integration with Stripe and PayTM for subscription payments",
+        "files": [
+          "app/Controllers/PaymentController.php",
+          "app/Libraries/PayTMLibrary.php",
+          "composer.json"
+        ]
+      },
+      {
+        "name": "Database Connectivity",
+        "description": "Database layer with connection pooling and schema management",
+        "files": [
+          "app/Core/Database.php",
+          "app/Core/EnhancedDatabase.php",
+          "app/Core/PDOCompat.php",
+          "config/database.php",
+          "database/"
+        ]
+      },
+      {
+        "name": "Security & Validation",
+        "description": "CSRF protection, rate limiting, data validation, logging",
+        "files": [
+          "app/Middleware/CsrfMiddleware.php",
+          "app/Middleware/RateLimitMiddleware.php",
+          "app/Middleware/SecurityMiddleware.php",
+          "app/Core/Validator.php",
+          "app/Models/AuditLog.php"
+        ]
+      },
+      {
+        "name": "Health Check & Monitoring",
+        "description": "System health monitoring, error logging, and status checks",
+        "files": [
+          "debug/",
+          "storage/logs/",
+          "app/Controllers/Admin/SystemStatusController.php"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "paths": {
+            "/api/v1/health": {
+              "get": {
+                "summary": "System health check",
+                "responses": {
+                  "200": {
+                    "description": "System healthy"
                   }
                 }
               }

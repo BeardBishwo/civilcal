@@ -46,12 +46,79 @@ class UserManagementController extends Controller
 
     public function store()
     {
-        // Handle user creation
         $this->checkCSRF();
 
-        // Validation and creation logic here
-        $_SESSION['flash_messages']['success'] = 'User created successfully';
-        redirect('/admin/users');
+        try {
+            $firstName = trim($_POST['first_name'] ?? '');
+            $lastName = trim($_POST['last_name'] ?? '');
+            $username = trim($_POST['username'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $password = $_POST['password'] ?? '';
+            $confirm = $_POST['password_confirmation'] ?? '';
+            $role = $_POST['role'] ?? '';
+
+            $errors = [];
+
+            if (!$firstName) {
+                $errors[] = 'First name is required.';
+            }
+            if (!$lastName) {
+                $errors[] = 'Last name is required.';
+            }
+            if (!$username) {
+                $errors[] = 'Username is required.';
+            }
+            if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = 'A valid email is required.';
+            }
+            if (!$password || strlen($password) < 6) {
+                $errors[] = 'Password must be at least 6 characters.';
+            }
+            if ($password !== $confirm) {
+                $errors[] = 'Passwords do not match.';
+            }
+            if (!$role) {
+                $errors[] = 'Role selection is required.';
+            }
+
+            $userModel = new User();
+
+            if ($userModel->findByEmail($email)) {
+                $errors[] = 'Email already exists.';
+            }
+            if ($userModel->findByUsername($username)) {
+                $errors[] = 'Username already exists.';
+            }
+
+            if (!empty($errors)) {
+                $_SESSION['flash_messages']['error'] = implode('\n', $errors);
+                redirect('/admin/users/create');
+                return;
+            }
+
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+            $userId = $userModel->create([
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'username' => $username,
+                'email' => $email,
+                'password' => $hashedPassword,
+                'role' => $role,
+                'is_active' => isset($_POST['is_active']) ? (int) $_POST['is_active'] : 1,
+                'email_verified' => !empty($_POST['email_verified']) ? 1 : 0,
+                'terms_agreed' => !empty($_POST['terms_agreed']) ? 1 : 0,
+                'marketing_emails' => !empty($_POST['marketing_emails']) ? 1 : 0,
+                'send_welcome_email' => !empty($_POST['send_welcome_email']) ? 1 : 0,
+            ]);
+
+            $_SESSION['flash_messages']['success'] = 'User created successfully.';
+            redirect('/admin/users/' . $userId . '/edit');
+        } catch (\Exception $e) {
+            error_log('User creation failed: ' . $e->getMessage());
+            $_SESSION['flash_messages']['error'] = 'Failed to create user: ' . $e->getMessage();
+            redirect('/admin/users/create');
+        }
     }
 
     public function edit($id)

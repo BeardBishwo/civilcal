@@ -7,7 +7,7 @@
 
 <style>
     .general-settings-container {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #f8fafc;
         min-height: 100vh;
         padding: 2.5rem;
     }
@@ -574,7 +574,9 @@
                                        placeholder="Enter your site name">
                                 <div class="form-text">The name displayed in browser tabs and search results.</div>
                             </div>
-                            
+                        </div>
+
+                        <div class="form-row">
                             <div class="form-group">
                                 <label for="site_description" class="form-label">📄 Site Description</label>
                                 <textarea class="form-control" 
@@ -707,7 +709,9 @@
                                        placeholder="Copyright © 2024 Your Company">
                                 <div class="form-text">Text displayed in your website footer.</div>
                             </div>
-                            
+                        </div>
+
+                        <div class="form-row">
                             <div class="form-group">
                                 <label for="support_email" class="form-label">💌 Support Email</label>
                                 <input type="email" class="form-control" 

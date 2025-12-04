@@ -28,17 +28,35 @@ class AnalyticsService
         try {
             $stats = [];
 
-            // Total users
-            $stats['total_users'] = $this->userModel->getTotalUserCount();
+            // Total users and growth (vs previous month)
+            $totalUsers = $this->userModel->getTotalUserCount();
+            $newUsersCurrent = $this->userModel->getNewUserCount(30);
+            $newUsersPrevious = $this->userModel->getNewUserCount(60) - $newUsersCurrent;
+            $stats['total_users'] = $totalUsers;
+            $stats['new_users'] = $newUsersCurrent;
+            $stats['user_growth'] = $this->calculateGrowthRate($newUsersCurrent, $newUsersPrevious);
 
-            // Active users (last 30 days)
-            $stats['active_users'] = $this->calculationModel->getActiveUserCount(30);
+            // Active users
+            $activeCurrent = $this->calculationModel->getActiveUserCount(30);
+            $activePrevious = $this->calculationModel->getActiveUserCountBetween(60, 30);
+            $stats['active_users'] = $activeCurrent;
+            $stats['active_user_growth'] = $this->calculateGrowthRate($activeCurrent, $activePrevious);
 
-            // Total calculations
-            $stats['total_calculations'] = $this->calculationModel->getTotalCalculationCount();
+            // Calculations
+            $totalCalculations = $this->calculationModel->getTotalCalculationCount();
+            $monthlyCalculations = $this->calculationModel->getMonthlyCalculationCount(30);
+            $previousMonthCalculations = $this->calculationModel->getCalculationCountBetween(60, 30);
+            $stats['total_calculations'] = $totalCalculations;
+            $stats['monthly_calculations'] = $monthlyCalculations;
+            $stats['calculation_growth'] = $this->calculateGrowthRate($monthlyCalculations, $previousMonthCalculations);
+            $stats['monthly_calculation_growth'] = $stats['calculation_growth'];
 
-            // Monthly calculations
-            $stats['monthly_calculations'] = $this->calculationModel->getMonthlyCalculationCount(30);
+            // Engagement / performance placeholders
+            $stats['avg_session_duration'] = $this->formatDuration(5 * 60 + 12); // 5m12s placeholder
+            $stats['bounce_rate'] = 27.4; // placeholder — replace when real metric available
+
+            // Top calculators
+            $stats['top_calculators'] = $this->calculationModel->getTopCalculators(5);
 
             return $stats;
         } catch (Exception $e) {
@@ -47,7 +65,14 @@ class AnalyticsService
                 'total_users' => 0,
                 'active_users' => 0,
                 'total_calculations' => 0,
-                'monthly_calculations' => 0
+                'monthly_calculations' => 0,
+                'user_growth' => 0,
+                'active_user_growth' => 0,
+                'calculation_growth' => 0,
+                'monthly_calculation_growth' => 0,
+                'avg_session_duration' => '0m 00s',
+                'bounce_rate' => 0,
+                'top_calculators' => []
             ];
         }
     }

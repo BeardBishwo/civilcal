@@ -298,6 +298,108 @@ class Calculation
     }
 
     /**
+     * Get calculation count between two relative day offsets
+     */
+    public function getCalculationCountBetween($startDays, $endDays = 0)
+    {
+        [$startDate, $endDate] = $this->buildDateRange($startDays, $endDays);
+
+        $query = "SELECT COUNT(*) as count FROM calculation_history WHERE created_at >= :start";
+        $params = ['start' => $startDate];
+
+        if ($endDate) {
+            $query .= " AND created_at < :end";
+            $params['end'] = $endDate;
+        }
+
+        $stmt = $this->db->getPdo()->prepare($query);
+        $stmt->execute($params);
+        $result = $stmt->fetch();
+
+        return $result ? (int)$result['count'] : 0;
+    }
+
+    /**
+     * Get active user count for a relative day range
+     */
+    public function getActiveUserCountBetween($startDays, $endDays = 0)
+    {
+        [$startDate, $endDate] = $this->buildDateRange($startDays, $endDays);
+
+        $query = "SELECT COUNT(DISTINCT user_id) as count FROM calculation_history WHERE created_at >= :start";
+        $params = ['start' => $startDate];
+
+        if ($endDate) {
+            $query .= " AND created_at < :end";
+            $params['end'] = $endDate;
+        }
+
+        $stmt = $this->db->getPdo()->prepare($query);
+        $stmt->execute($params);
+        $result = $stmt->fetch();
+
+        return $result ? (int)$result['count'] : 0;
+    }
+
+    /**
+     * Get most used calculators
+     */
+    public function getTopCalculators($limit = 5)
+    {
+        $pdo = $this->db->getPdo();
+
+        $total = $this->getTotalCalculationCount();
+        if ($total === 0) {
+            return [];
+        }
+
+        $stmt = $pdo->prepare("
+            SELECT calculator_type, COUNT(*) as usage
+            FROM calculation_history
+            GROUP BY calculator_type
+            ORDER BY usage DESC
+            LIMIT :limit
+        ");
+        $stmt->bindValue(':limit', (int)$limit, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        $results = [];
+        while ($row = $stmt->fetch()) {
+            $usage = (int)$row['usage'];
+            $results[] = [
+                'name' => $row['calculator_type'] ?? 'Unknown',
+                'uses' => $usage,
+                'share' => $total > 0 ? round(($usage / $total) * 100, 1) : 0,
+            ];
+        }
+
+        return $results;
+    }
+
+    /**
+     * Helper to build absolute date range from relative days
+     */
+    private function buildDateRange($startDays, $endDays = 0)
+    {
+        $startDays = max(0, (int)$startDays);
+        $endDays = max(0, (int)$endDays);
+
+        $start = new \DateTime();
+        $start->modify("-{$startDays} days");
+
+        $end = null;
+        if ($endDays > 0) {
+            $end = new \DateTime();
+            $end->modify("-{$endDays} days");
+        }
+
+        return [
+            $start->format('Y-m-d H:i:s'),
+            $end ? $end->format('Y-m-d H:i:s') : null,
+        ];
+    }
+
+    /**
      * Get comprehensive calculation statistics
      */
     public function getCalculationStats()

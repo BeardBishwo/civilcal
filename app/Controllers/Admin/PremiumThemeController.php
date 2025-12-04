@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Admin;
 
+use App\Core\Controller;
 use App\Services\PremiumThemeManager;
 use App\Services\FileUploadService;
 use Exception;
@@ -14,14 +15,14 @@ use Exception;
  * @package App\Controllers\Admin
  * @version 1.0.0
  */
-class PremiumThemeController
+class PremiumThemeController extends Controller
 {
     private $themeManager;
-    private $database;
     
     public function __construct()
     {
-        $this->themeManager = new PremiumThemeManager($this->getDatabaseConnection());
+        parent::__construct();
+        $this->themeManager = new PremiumThemeManager($this->db);
     }
     
     /**
@@ -35,17 +36,18 @@ class PremiumThemeController
             $themes = $this->themeManager->getAvailableThemes();
             $activeTheme = $this->getActiveTheme();
             
-            $data = [
+            $this->view->render('admin/premium-themes/index', [
                 'title' => 'Premium Themes',
                 'themes' => $themes['themes'] ?? [],
                 'activeTheme' => $activeTheme,
                 'userHasAccess' => $this->userHasPremiumAccess()
-            ];
-            
-            return $this->renderView('admin/premium-themes/index', $data);
+            ]);
             
         } catch (Exception $e) {
-            return $this->renderError('Failed to load premium themes: ' . $e->getMessage());
+            $this->view->render('admin/error', [
+                'title' => 'Error',
+                'message' => 'Failed to load premium themes: ' . $e->getMessage()
+            ]);
         }
     }
     
@@ -61,29 +63,35 @@ class PremiumThemeController
             // Get theme settings
             $settings = $this->themeManager->getThemeSettings($themeName);
             if (!$settings['success']) {
-                return $this->renderError($settings['message']);
+                $this->view->render('admin/error', [
+                    'title' => 'Error',
+                    'message' => $settings['message']
+                ]);
+                return;
             }
             
             // Get customization options
             $options = $this->themeManager->getCustomizationOptions($themeName);
             if (!$options['success']) {
-                return $this->renderError($options['message']);
+                $this->view->render('admin/error', [
+                    'title' => 'Error',
+                    'message' => $options['message']
+                ]);
+                return;
             }
             
-            $data = [
+            $this->view->render('admin/premium-themes/customize', [
                 'title' => 'Customize Theme: ' . ucfirst($themeName),
                 'themeName' => $themeName,
-                'settings' => $settings['settings'],
-                'options' => $options['options'],
-                'hasFeature' => function($feature) {
-                    return $this->themeManager->hasFeature($feature);
-                }
-            ];
-            
-            return $this->renderView('admin/premium-themes/customize', $data);
+                'settings' => $settings['settings'] ?? [],
+                'options' => $options['options'] ?? []
+            ]);
             
         } catch (Exception $e) {
-            return $this->renderError('Failed to load customization: ' . $e->getMessage());
+            $this->view->render('admin/error', [
+                'title' => 'Error',
+                'message' => 'Failed to load customization: ' . $e->getMessage()
+            ]);
         }
     }
     
@@ -158,18 +166,16 @@ class PremiumThemeController
         try {
             $licenses = $this->getAllLicenses();
             
-            $data = [
+            $this->view->render('admin/premium-themes/licenses', [
                 'title' => 'Theme Licenses',
-                'licenses' => $licenses,
-                'hasFeature' => function($feature) {
-                    return $this->themeManager->hasFeature($feature);
-                }
-            ];
-            
-            return $this->renderView('admin/premium-themes/licenses', $data);
+                'licenses' => $licenses
+            ]);
             
         } catch (Exception $e) {
-            return $this->renderError('Failed to load licenses: ' . $e->getMessage());
+            $this->view->render('admin/error', [
+                'title' => 'Error',
+                'message' => 'Failed to load licenses: ' . $e->getMessage()
+            ]);
         }
     }
     
@@ -218,14 +224,9 @@ class PremiumThemeController
      */
     public function install()
     {
-        $data = [
-            'title' => 'Install Theme',
-            'hasFeature' => function($feature) {
-                return $this->themeManager->hasFeature($feature);
-            }
-        ];
-        
-        return $this->renderView('admin/premium-themes/install', $data);
+        $this->view->render('admin/premium-themes/install', [
+            'title' => 'Install Theme'
+        ]);
     }
     
     /**
@@ -511,6 +512,187 @@ class PremiumThemeController
         exit;
     }
     
+    /**
+     * Store new theme
+     */
+    public function store()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/premium-themes/create');
+        }
+        
+        try {
+            $name = $_POST['name'] ?? '';
+            $description = $_POST['description'] ?? '';
+            $userId = $_SESSION['user_id'] ?? 'default';
+            
+            if (empty($name)) {
+                $this->addFlashMessage('error', 'Theme name is required');
+                $this->redirect('/admin/premium-themes/create');
+            }
+            
+            $stmt = $this->db->prepare("
+                INSERT INTO premium_themes (name, description, created_by, created_at)
+                VALUES (?, ?, ?, NOW())
+            ");
+            $result = $stmt->execute([$name, $description, $userId]);
+            
+            if ($result) {
+                $this->addFlashMessage('success', 'Theme created successfully');
+                $this->logThemeEvent($name, 'creation', 'Theme created', $userId);
+            } else {
+                $this->addFlashMessage('error', 'Failed to create theme');
+            }
+            
+            $this->redirect('/admin/premium-themes');
+        } catch (Exception $e) {
+            $this->addFlashMessage('error', 'Error: ' . $e->getMessage());
+            $this->redirect('/admin/premium-themes/create');
+        }
+    }
+
+    /**
+     * Update theme
+     */
+    public function update($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
+            $this->redirect('/admin/premium-themes/' . $id . '/edit');
+        }
+        
+        try {
+            $name = $_POST['name'] ?? '';
+            $description = $_POST['description'] ?? '';
+            
+            if (empty($name)) {
+                $this->addFlashMessage('error', 'Theme name is required');
+                $this->redirect('/admin/premium-themes/' . $id . '/edit');
+            }
+            
+            $stmt = $this->db->prepare("
+                UPDATE premium_themes SET name = ?, description = ?, updated_at = NOW() WHERE id = ?
+            ");
+            $result = $stmt->execute([$name, $description, $id]);
+            
+            if ($result) {
+                $this->addFlashMessage('success', 'Theme updated successfully');
+            } else {
+                $this->addFlashMessage('error', 'Failed to update theme');
+            }
+            
+            $this->redirect('/admin/premium-themes/' . $id);
+        } catch (Exception $e) {
+            $this->addFlashMessage('error', 'Error: ' . $e->getMessage());
+            $this->redirect('/admin/premium-themes/' . $id . '/edit');
+        }
+    }
+
+    /**
+     * Delete theme
+     */
+    public function destroy($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            $this->redirect('/admin/premium-themes');
+        }
+        
+        try {
+            $stmt = $this->db->prepare("DELETE FROM premium_themes WHERE id = ?");
+            $result = $stmt->execute([$id]);
+            
+            if ($result) {
+                $this->addFlashMessage('success', 'Theme deleted successfully');
+            } else {
+                $this->addFlashMessage('error', 'Failed to delete theme');
+            }
+            
+            $this->redirect('/admin/premium-themes');
+        } catch (Exception $e) {
+            $this->addFlashMessage('error', 'Error: ' . $e->getMessage());
+            $this->redirect('/admin/premium-themes');
+        }
+    }
+
+    /**
+     * Deactivate theme
+     */
+    public function deactivate($id)
+    {
+        try {
+            $stmt = $this->db->prepare("UPDATE premium_themes SET is_active = 0 WHERE id = ?");
+            $stmt->execute([$id]);
+            
+            $this->addFlashMessage('success', 'Theme deactivated');
+            $this->redirect('/admin/premium-themes');
+        } catch (Exception $e) {
+            $this->addFlashMessage('error', 'Error: ' . $e->getMessage());
+            $this->redirect('/admin/premium-themes');
+        }
+    }
+
+    /**
+     * Show analytics (alias for showAnalytics)
+     */
+    public function analytics($id)
+    {
+        return $this->showAnalytics($id);
+    }
+
+    /**
+     * Update customization
+     */
+    public function updateCustomization($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/premium-themes/' . $id . '/customize');
+        }
+        
+        try {
+            $customization = $_POST['customization'] ?? [];
+            $userId = $_SESSION['user_id'] ?? 'default';
+            
+            $stmt = $this->db->prepare("
+                UPDATE premium_themes SET customization = ?, updated_at = NOW() WHERE id = ?
+            ");
+            $result = $stmt->execute([json_encode($customization), $id]);
+            
+            if ($result) {
+                $this->addFlashMessage('success', 'Customization saved');
+                $this->logThemeEvent('theme_' . $id, 'customization_update', 'Theme customized', $userId);
+            } else {
+                $this->addFlashMessage('error', 'Failed to save customization');
+            }
+            
+            $this->redirect('/admin/premium-themes/' . $id . '/customize');
+        } catch (Exception $e) {
+            $this->addFlashMessage('error', 'Error: ' . $e->getMessage());
+            $this->redirect('/admin/premium-themes/' . $id . '/customize');
+        }
+    }
+
+    /**
+     * Export theme
+     */
+    public function export($id)
+    {
+        try {
+            $theme = $this->getThemeById($id);
+            if (!$theme) {
+                $this->addFlashMessage('error', 'Theme not found');
+                $this->redirect('/admin/premium-themes');
+            }
+            
+            // Return JSON export
+            header('Content-Type: application/json');
+            header('Content-Disposition: attachment; filename="theme-' . $theme['id'] . '.json"');
+            echo json_encode($theme, JSON_PRETTY_PRINT);
+            exit;
+        } catch (Exception $e) {
+            $this->addFlashMessage('error', 'Error: ' . $e->getMessage());
+            $this->redirect('/admin/premium-themes');
+        }
+    }
+
     // Missing controller methods for routes
     
     /**
@@ -521,17 +703,15 @@ class PremiumThemeController
     public function create()
     {
         try {
-            $data = [
-                'title' => 'Create Premium Theme',
-                'hasFeature' => function($feature) {
-                    return $this->themeManager->hasFeature($feature);
-                }
-            ];
-            
-            return $this->renderView('admin/premium-themes/create', $data);
+            $this->view->render('admin/premium-themes/create', [
+                'title' => 'Create Premium Theme'
+            ]);
             
         } catch (Exception $e) {
-            return $this->renderError('Failed to load create form: ' . $e->getMessage());
+            $this->view->render('admin/error', [
+                'title' => 'Error',
+                'message' => 'Failed to load create form: ' . $e->getMessage()
+            ]);
         }
     }
     
@@ -546,21 +726,23 @@ class PremiumThemeController
         try {
             $theme = $this->getThemeById($id);
             if (!$theme) {
-                return $this->renderError('Theme not found');
+                $this->view->render('admin/error', [
+                    'title' => 'Error',
+                    'message' => 'Theme not found'
+                ]);
+                return;
             }
             
-            $data = [
-                'title' => 'Theme Details: ' . $theme['name'],
-                'theme' => $theme,
-                'hasFeature' => function($feature) {
-                    return $this->themeManager->hasFeature($feature);
-                }
-            ];
-            
-            return $this->renderView('admin/premium-themes/show', $data);
+            $this->view->render('admin/premium-themes/show', [
+                'title' => 'Theme Details: ' . ($theme['name'] ?? 'Unknown'),
+                'theme' => $theme
+            ]);
             
         } catch (Exception $e) {
-            return $this->renderError('Failed to load theme: ' . $e->getMessage());
+            $this->view->render('admin/error', [
+                'title' => 'Error',
+                'message' => 'Failed to load theme: ' . $e->getMessage()
+            ]);
         }
     }
     
@@ -575,21 +757,23 @@ class PremiumThemeController
         try {
             $theme = $this->getThemeById($id);
             if (!$theme) {
-                return $this->renderError('Theme not found');
+                $this->view->render('admin/error', [
+                    'title' => 'Error',
+                    'message' => 'Theme not found'
+                ]);
+                return;
             }
             
-            $data = [
-                'title' => 'Edit Theme: ' . $theme['name'],
-                'theme' => $theme,
-                'hasFeature' => function($feature) {
-                    return $this->themeManager->hasFeature($feature);
-                }
-            ];
-            
-            return $this->renderView('admin/premium-themes/edit', $data);
+            $this->view->render('admin/premium-themes/edit', [
+                'title' => 'Edit Theme: ' . ($theme['name'] ?? 'Unknown'),
+                'theme' => $theme
+            ]);
             
         } catch (Exception $e) {
-            return $this->renderError('Failed to load theme: ' . $e->getMessage());
+            $this->view->render('admin/error', [
+                'title' => 'Error',
+                'message' => 'Failed to load theme: ' . $e->getMessage()
+            ]);
         }
     }
     
@@ -607,24 +791,26 @@ class PremiumThemeController
         try {
             $theme = $this->getThemeById($id);
             if (!$theme) {
-                return $this->renderError('Theme not found');
+                $this->view->render('admin/error', [
+                    'title' => 'Error',
+                    'message' => 'Theme not found'
+                ]);
+                return;
             }
             
             $settings = $this->themeManager->getThemeSettings($theme['name']);
             
-            $data = [
-                'title' => 'Theme Settings: ' . $theme['name'],
+            $this->view->render('admin/premium-themes/settings', [
+                'title' => 'Theme Settings: ' . ($theme['name'] ?? 'Unknown'),
                 'theme' => $theme,
-                'settings' => $settings['settings'] ?? [],
-                'hasFeature' => function($feature) {
-                    return $this->themeManager->hasFeature($feature);
-                }
-            ];
-            
-            return $this->renderView('admin/premium-themes/settings', $data);
+                'settings' => $settings['settings'] ?? []
+            ]);
             
         } catch (Exception $e) {
-            return $this->renderError('Failed to load settings: ' . $e->getMessage());
+            $this->view->render('admin/error', [
+                'title' => 'Error',
+                'message' => 'Failed to load settings: ' . $e->getMessage()
+            ]);
         }
     }
     
@@ -639,24 +825,26 @@ class PremiumThemeController
         try {
             $theme = $this->getThemeById($id);
             if (!$theme) {
-                return $this->renderError('Theme not found');
+                $this->view->render('admin/error', [
+                    'title' => 'Error',
+                    'message' => 'Theme not found'
+                ]);
+                return;
             }
             
             $analytics = $this->getThemeAnalyticsById($id);
             
-            $data = [
-                'title' => 'Theme Analytics: ' . $theme['name'],
+            $this->view->render('admin/premium-themes/analytics', [
+                'title' => 'Theme Analytics: ' . ($theme['name'] ?? 'Unknown'),
                 'theme' => $theme,
-                'analytics' => $analytics,
-                'hasFeature' => function($feature) {
-                    return $this->themeManager->hasFeature($feature);
-                }
-            ];
-            
-            return $this->renderView('admin/premium-themes/analytics', $data);
+                'analytics' => $analytics
+            ]);
             
         } catch (Exception $e) {
-            return $this->renderError('Failed to load analytics: ' . $e->getMessage());
+            $this->view->render('admin/error', [
+                'title' => 'Error',
+                'message' => 'Failed to load analytics: ' . $e->getMessage()
+            ]);
         }
     }
     
@@ -672,22 +860,24 @@ class PremiumThemeController
         try {
             $theme = $this->getThemeById($id);
             if (!$theme) {
-                return $this->renderError('Theme not found');
+                $this->view->render('admin/error', [
+                    'title' => 'Error',
+                    'message' => 'Theme not found'
+                ]);
+                return;
             }
             
-            $data = [
-                'title' => 'Preview: ' . $theme['name'],
+            $this->view->render('admin/premium-themes/preview', [
+                'title' => 'Preview: ' . ($theme['name'] ?? 'Unknown'),
                 'theme' => $theme,
-                'preview' => true,
-                'hasFeature' => function($feature) {
-                    return $this->themeManager->hasFeature($feature);
-                }
-            ];
-            
-            return $this->renderView('admin/premium-themes/preview', $data);
+                'preview' => true
+            ]);
             
         } catch (Exception $e) {
-            return $this->renderError('Failed to load preview: ' . $e->getMessage());
+            $this->view->render('admin/error', [
+                'title' => 'Error',
+                'message' => 'Failed to load preview: ' . $e->getMessage()
+            ]);
         }
     }
     
@@ -763,18 +953,16 @@ class PremiumThemeController
         try {
             $marketplaceThemes = $this->getMarketplaceThemes();
             
-            $data = [
+            $this->view->render('admin/premium-themes/marketplace', [
                 'title' => 'Theme Marketplace',
-                'themes' => $marketplaceThemes,
-                'hasFeature' => function($feature) {
-                    return $this->themeManager->hasFeature($feature);
-                }
-            ];
-            
-            return $this->renderView('admin/premium-themes/marketplace', $data);
+                'themes' => $marketplaceThemes
+            ]);
             
         } catch (Exception $e) {
-            return $this->renderError('Failed to load marketplace: ' . $e->getMessage());
+            $this->view->render('admin/error', [
+                'title' => 'Error',
+                'message' => 'Failed to load marketplace: ' . $e->getMessage()
+            ]);
         }
     }
     
@@ -855,5 +1043,86 @@ class PremiumThemeController
                 'preview_image' => '/assets/themes/modern-light-preview.jpg'
             ]
         ];
+    }
+
+    /**
+     * Get active theme
+     */
+    private function getActiveTheme()
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM premium_themes WHERE is_active = 1 LIMIT 1");
+            $stmt->execute();
+            return $stmt->fetch(\PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Check if user has premium access
+     */
+    private function userHasPremiumAccess()
+    {
+        // Check if user has active subscription or is admin
+        if ($this->auth->isAdmin()) {
+            return true;
+        }
+        
+        $userId = $_SESSION['user_id'] ?? null;
+        if (!$userId) {
+            return false;
+        }
+
+        try {
+            $stmt = $this->db->prepare("
+                SELECT COUNT(*) as count FROM subscriptions 
+                WHERE user_id = ? AND status = 'active' AND expires_at > NOW()
+            ");
+            $stmt->execute([$userId]);
+            $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+            return ($result['count'] ?? 0) > 0;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Redirect to URL
+     */
+    private function redirect($url)
+    {
+        header('Location: ' . $url);
+        exit;
+    }
+
+    /**
+     * Add flash message
+     */
+    private function addFlashMessage($type, $message)
+    {
+        if (!isset($_SESSION['flash_messages'])) {
+            $_SESSION['flash_messages'] = [];
+        }
+        $_SESSION['flash_messages'][] = [
+            'type' => $type,
+            'message' => $message
+        ];
+    }
+
+    /**
+     * Log theme event
+     */
+    private function logThemeEvent($themeName, $eventType, $description, $userId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                INSERT INTO theme_analytics (theme_name, event_type, description, user_id, created_at)
+                VALUES (?, ?, ?, ?, NOW())
+            ");
+            $stmt->execute([$themeName, $eventType, $description, $userId]);
+        } catch (Exception $e) {
+            // Silently fail
+        }
     }
 }

@@ -1,223 +1,286 @@
 <?php
-// Remove the ob_start() and header inclusion since we're using the themes/admin layout
 $page_title = 'Analytics Overview - Bishwo Calculator';
-// Remove the require_once for header.php
+
+$overviewStats = $stats ?? [];
+$chartData = $charts['daily_calculations'] ?? [];
+$topCalculators = $stats['top_calculators'] ?? [];
 ?>
 
-<div class="page-header">
-    <div class="page-header-content">
+<section class="analytics-hero">
+    <div class="analytics-hero__content">
         <div>
-            <h1 class="page-title"><i class="fas fa-chart-line"></i> Analytics Overview</h1>
-            <p class="page-description">Comprehensive analytics and insights for your platform.</p>
+            <h1>
+                <span class="icon-circle icon-circle--primary">
+                    <i class="fas fa-chart-line"></i>
+                </span>
+                Analytics Overview
+            </h1>
+            <p>Track adoption, engagement, and calculator performance at a glance.</p>
         </div>
-        <div class="page-header-actions">
-            <button onclick="window.location.reload()" class="btn btn-secondary">
+        <div class="analytics-hero__actions">
+            <button type="button" class="btn btn-secondary" onclick="window.location.reload()">
                 <i class="fas fa-sync-alt"></i>
-                <span>Refresh</span>
+                Refresh
             </button>
-            <a href="<?php echo app_base_url('/admin/analytics/reports'); ?>" class="btn btn-primary">
+            <a class="btn btn-primary" href="<?php echo app_base_url('/admin/analytics/reports'); ?>">
                 <i class="fas fa-file-alt"></i>
-                <span>Reports</span>
+                Reports
             </a>
         </div>
     </div>
-</div>
-
-<!-- Statistics Cards -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-header">
-            <div class="stat-icon primary">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-period">All Time</div>
+    <div class="analytics-hero__summary">
+        <div class="summary-pill">
+            <span class="summary-pill__label">New Users (30d)</span>
+            <span class="summary-pill__value"><?php echo number_format($overviewStats['new_users'] ?? 0); ?></span>
         </div>
-        <div class="stat-value"><?php echo number_format($stats['total_users'] ?? 0); ?></div>
-        <div class="stat-label">Total Users</div>
+        <div class="divider"></div>
+        <div class="summary-pill">
+            <span class="summary-pill__label">Bounce Rate</span>
+            <span class="summary-pill__value"><?php echo number_format($overviewStats['bounce_rate'] ?? 0, 1); ?>%</span>
+        </div>
+        <div class="divider"></div>
+        <div class="summary-pill">
+            <span class="summary-pill__label">Avg. Session</span>
+            <span class="summary-pill__value"><?php echo htmlspecialchars($overviewStats['avg_session_duration'] ?? '0m 00s'); ?></span>
+        </div>
+    </div>
+</section>
+
+<section class="analytics-section">
+    <div class="analytics-metric-grid">
         <?php
-        $growth = $stats['user_growth'] ?? 0;
-        $is_positive = $growth >= 0;
-        ?>
-        <div class="stat-trend <?php echo $is_positive ? 'positive' : 'negative'; ?>">
-            <i class="fas fa-<?php echo $is_positive ? 'arrow-up' : 'arrow-down'; ?>"></i>
-            <?php echo abs($growth); ?>% from last month
-        </div>
-    </div>
+        $metrics = [
+            [
+                'label' => 'Total Users',
+                'value' => number_format($overviewStats['total_users'] ?? 0),
+                'trend' => $overviewStats['user_growth'] ?? 0,
+                'description' => 'All registered users across the platform',
+                'icon' => 'fas fa-users',
+                'accent' => 'primary'
+            ],
+            [
+                'label' => 'Active Users (30d)',
+                'value' => number_format($overviewStats['active_users'] ?? 0),
+                'trend' => $overviewStats['active_user_growth'] ?? 0,
+                'description' => 'Unique users running calculations in the last 30 days',
+                'icon' => 'fas fa-user-check',
+                'accent' => 'success'
+            ],
+            [
+                'label' => 'Total Calculations',
+                'value' => number_format($overviewStats['total_calculations'] ?? 0),
+                'trend' => $overviewStats['calculation_growth'] ?? 0,
+                'description' => 'All-time calculations completed',
+                'icon' => 'fas fa-calculator',
+                'accent' => 'warning'
+            ],
+            [
+                'label' => 'Calculations (30d)',
+                'value' => number_format($overviewStats['monthly_calculations'] ?? 0),
+                'trend' => $overviewStats['monthly_calculation_growth'] ?? 0,
+                'description' => 'Recent calculation volume compared to the previous month',
+                'icon' => 'fas fa-chart-area',
+                'accent' => 'info'
+            ],
+        ];
 
-    <div class="stat-card">
-        <div class="stat-header">
-            <div class="stat-icon success">
-                <i class="fas fa-user-check"></i>
+        foreach ($metrics as $metric):
+            $trend = $metric['trend'];
+            $isPositive = $trend >= 0;
+        ?>
+            <article class="analytics-metric-card analytics-metric-card--<?php echo $metric['accent']; ?>">
+                <div class="analytics-metric-card__icon">
+                    <i class="<?php echo $metric['icon']; ?>"></i>
+                </div>
+                <div class="analytics-metric-card__body">
+                    <h3><?php echo htmlspecialchars($metric['label']); ?></h3>
+                    <p class="metric-value"><?php echo $metric['value']; ?></p>
+                    <p class="metric-description"><?php echo htmlspecialchars($metric['description']); ?></p>
+                </div>
+                <div class="analytics-metric-card__trend <?php echo $isPositive ? 'trend--up' : 'trend--down'; ?>">
+                    <i class="fas fa-<?php echo $isPositive ? 'arrow-up' : 'arrow-down'; ?>"></i>
+                    <span><?php echo number_format(abs($trend), 1); ?>% vs. prev. period</span>
+                </div>
+            </article>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+<section class="analytics-section analytics-section--split">
+    <div class="analytics-card analytics-card--wide">
+        <div class="analytics-card__header">
+            <div>
+                <h3><i class="fas fa-chart-area"></i> Activity Trend</h3>
+                <span class="analytics-card__subtitle">Daily calculation volume for the last 30 days</span>
             </div>
-            <div class="stat-period">Last 30 Days</div>
+            <div class="chip chip--neutral">Live</div>
         </div>
-        <div class="stat-value"><?php echo number_format($stats['active_users'] ?? 0); ?></div>
-        <div class="stat-label">Active Users (30d)</div>
-        <?php
-        $growth = $stats['active_user_growth'] ?? 0;
-        $is_positive = $growth >= 0;
-        ?>
-        <div class="stat-trend <?php echo $is_positive ? 'positive' : 'negative'; ?>">
-            <i class="fas fa-<?php echo $is_positive ? 'arrow-up' : 'arrow-down'; ?>"></i>
-            <?php echo abs($growth); ?>% from last month
+        <div class="analytics-card__body analytics-card__body--chart">
+            <canvas id="analytics-daily-activity"></canvas>
         </div>
     </div>
 
-    <div class="stat-card">
-        <div class="stat-header">
-            <div class="stat-icon warning">
-                <i class="fas fa-calculator"></i>
+    <div class="analytics-card analytics-card--compact">
+        <div class="analytics-card__header">
+            <div>
+                <h3><i class="fas fa-fire"></i> Top Calculators</h3>
+                <span class="analytics-card__subtitle">Most used calculators across the platform</span>
             </div>
-            <div class="stat-period">All Time</div>
         </div>
-        <div class="stat-value"><?php echo number_format($stats['total_calculations'] ?? 0); ?></div>
-        <div class="stat-label">Total Calculations</div>
-        <?php
-        $growth = $stats['calculation_growth'] ?? 0;
-        $is_positive = $growth >= 0;
-        ?>
-        <div class="stat-trend <?php echo $is_positive ? 'positive' : 'negative'; ?>">
-            <i class="fas fa-<?php echo $is_positive ? 'arrow-up' : 'arrow-down'; ?>"></i>
-            <?php echo abs($growth); ?>% from last month
+        <div class="analytics-card__body">
+            <?php if (!empty($topCalculators)): ?>
+                <ul class="top-calculator-list">
+                    <?php foreach ($topCalculators as $calculator): ?>
+                        <li class="top-calculator-list__item">
+                            <div class="avatar avatar--gradient">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <div class="top-calculator-list__content">
+                                <span class="top-calculator-list__name"><?php echo htmlspecialchars($calculator['name']); ?></span>
+                                <span class="top-calculator-list__meta"><?php echo number_format($calculator['uses']); ?> uses · <?php echo number_format($calculator['share'] ?? 0, 1); ?>% share</span>
+                            </div>
+                            <span class="badge badge--pill badge--soft-primary"><?php echo number_format($calculator['uses']); ?></span>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php else: ?>
+                <div class="empty-state">
+                    <i class="fas fa-info-circle"></i>
+                    <p>No calculator usage data yet.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
+</section>
 
-    <div class="stat-card">
-        <div class="stat-header">
-            <div class="stat-icon info">
-                <i class="fas fa-chart-line"></i>
+<section class="analytics-section">
+    <div class="analytics-card">
+        <div class="analytics-card__header">
+            <div>
+                <h3><i class="fas fa-compass"></i> Deep Dive</h3>
+                <span class="analytics-card__subtitle">Explore detailed analytics segments</span>
             </div>
-            <div class="stat-period">This Month</div>
         </div>
-        <div class="stat-value"><?php echo number_format($stats['monthly_calculations'] ?? 0); ?></div>
-        <div class="stat-label">Monthly Calculations</div>
-        <?php
-        $growth = $stats['monthly_calculation_growth'] ?? 0;
-        $is_positive = $growth >= 0;
-        ?>
-        <div class="stat-trend <?php echo $is_positive ? 'positive' : 'negative'; ?>">
-            <i class="fas fa-<?php echo $is_positive ? 'arrow-up' : 'arrow-down'; ?>"></i>
-            <?php echo abs($growth); ?>% from last month
-        </div>
-    </div>
-</div>
+        <div class="analytics-card__body analytics-card__body--grid">
+            <?php
+            $links = [
+                [
+                    'title' => 'User Analytics',
+                    'description' => 'Conversion funnel, cohort retention, and growth trends',
+                    'icon' => 'fas fa-users',
+                    'accent' => 'primary',
+                    'href' => app_base_url('/admin/analytics/users')
+                ],
+                [
+                    'title' => 'Calculator Performance',
+                    'description' => 'Success rate, completion time, and error hotspots',
+                    'icon' => 'fas fa-calculator',
+                    'accent' => 'success',
+                    'href' => app_base_url('/admin/analytics/calculators')
+                ],
+                [
+                    'title' => 'System Performance',
+                    'description' => 'Server response times, uptime, and bottlenecks',
+                    'icon' => 'fas fa-tachometer-alt',
+                    'accent' => 'warning',
+                    'href' => app_base_url('/admin/analytics/performance')
+                ],
+                [
+                    'title' => 'Reports & Exports',
+                    'description' => 'Downloadable CSV reports and scheduled digests',
+                    'icon' => 'fas fa-file-export',
+                    'accent' => 'info',
+                    'href' => app_base_url('/admin/analytics/reports')
+                ],
+            ];
 
-<!-- Charts Section -->
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">
-            <i class="fas fa-chart-area"></i>
-            User Activity Trends
-        </h3>
-    </div>
-    <div class="card-content">
-        <div style="height: 400px; background: rgba(15, 23, 42, 0.5); border-radius: 8px; padding: 1rem;">
-            <canvas id="userActivityChart" style="width: 100%; height: 350px;"></canvas>
-        </div>
-    </div>
-</div>
-
-<!-- Top Performing Calculators -->
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">
-            <i class="fas fa-trophy"></i>
-            Top Performing Calculators
-        </h3>
-    </div>
-    <div class="card-content">
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Calculator</th>
-                        <th>Uses</th>
-                        <th>Success Rate</th>
-                        <th>Avg. Time</th>
-                        <th>Trend</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($top_calculators)): ?>
-                        <?php foreach ($top_calculators as $calc): ?>
-                            <tr>
-                                <td>
-                                    <div class="table-cell-content">
-                                        <i class="<?php echo $calc['icon'] ?? 'fas fa-calculator'; ?>"></i>
-                                        <span><?php echo htmlspecialchars($calc['name'] ?? 'Unknown Calculator'); ?></span>
-                                    </div>
-                                </td>
-                                <td><?php echo number_format($calc['uses'] ?? 0); ?></td>
-                                <td><?php echo number_format($calc['success_rate'] ?? 0, 2); ?>%</td>
-                                <td><?php echo $calc['avg_time'] ?? '0s'; ?></td>
-                                <td>
-                                    <span class="trend <?php echo ($calc['trend'] ?? 0) >= 0 ? 'positive' : 'negative'; ?>">
-                                        <i class="fas fa-<?php echo ($calc['trend'] ?? 0) >= 0 ? 'arrow-up' : 'arrow-down'; ?>"></i>
-                                        <?php echo abs($calc['trend'] ?? 0); ?>%
-                                    </span>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="5" class="text-center">No calculator data available</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+            foreach ($links as $link): ?>
+                <a class="insight-card insight-card--<?php echo $link['accent']; ?>" href="<?php echo $link['href']; ?>">
+                    <span class="insight-card__icon"><i class="<?php echo $link['icon']; ?>"></i></span>
+                    <span class="insight-card__title"><?php echo htmlspecialchars($link['title']); ?></span>
+                    <span class="insight-card__description"><?php echo htmlspecialchars($link['description']); ?></span>
+                    <span class="insight-card__cta">
+                        View details
+                        <i class="fas fa-arrow-right"></i>
+                    </span>
+                </a>
+            <?php endforeach; ?>
         </div>
     </div>
-</div>
+</section>
 
-<!-- Quick Links -->
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">
-            <i class="fas fa-compass"></i>
-            Detailed Analytics
-        </h3>
-    </div>
-    <div class="card-content">
-        <div class="quick-actions-grid">
-            <a href="<?php echo app_base_url('/admin/analytics/users'); ?>" class="quick-action-card">
-                <div class="quick-action-icon primary">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="quick-action-content">
-                    <h4>User Analytics</h4>
-                    <p>Detailed user metrics and behavior</p>
-                </div>
-            </a>
-
-            <a href="<?php echo app_base_url('/admin/analytics/calculators'); ?>" class="quick-action-card">
-                <div class="quick-action-icon success">
-                    <i class="fas fa-calculator"></i>
-                </div>
-                <div class="quick-action-content">
-                    <h4>Calculator Analytics</h4>
-                    <p>Performance and usage statistics</p>
-                </div>
-            </a>
-
-            <a href="<?php echo app_base_url('/admin/analytics/performance'); ?>" class="quick-action-card">
-                <div class="quick-action-icon warning">
-                    <i class="fas fa-tachometer-alt"></i>
-                </div>
-                <div class="quick-action-content">
-                    <h4>Performance</h4>
-                    <p>System performance metrics</p>
-                </div>
-            </a>
-        </div>
-    </div>
-</div>
-
-<!-- Chart.js Initialization -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize charts if data is available
-    if (typeof initAnalyticsCharts === 'function') {
-        initAnalyticsCharts(<?php echo json_encode($charts ?? []); ?>);
+document.addEventListener('DOMContentLoaded', () => {
+    const ctx = document.getElementById('analytics-daily-activity');
+    if (!ctx || !window.Chart) {
+        return;
     }
+
+    const series = <?php echo json_encode($chartData); ?>;
+    const labels = series.map(point => point.date);
+    const values = series.map(point => point.count);
+
+    if (window.analyticsDailyChart) {
+        window.analyticsDailyChart.destroy();
+    }
+
+    window.analyticsDailyChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Daily Calculations',
+                data: values,
+                borderColor: 'rgba(102, 126, 234, 1)',
+                backgroundColor: 'rgba(102, 126, 234, 0.15)',
+                tension: 0.35,
+                fill: true,
+                pointRadius: 3,
+                pointBackgroundColor: '#667eea',
+                pointBorderWidth: 0,
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0f172a',
+                    titleColor: '#fff',
+                    bodyColor: '#cbd5f5',
+                    borderColor: '#1e293b',
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: (context) => `${context.parsed.y.toLocaleString()} calculations`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: '#94a3b8',
+                        maxTicksLimit: 7,
+                        callback: (value, index) => {
+                            const date = labels[index];
+                            return new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                        }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(148, 163, 184, 0.15)',
+                        drawBorder: false,
+                    },
+                    ticks: {
+                        color: '#94a3b8',
+                        callback: (value) => value.toLocaleString()
+                    }
+                }
+            }
+        }
+    });
 });
 </script>

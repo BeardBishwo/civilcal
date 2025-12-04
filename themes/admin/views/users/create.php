@@ -29,7 +29,7 @@ $page_title = $page_title ?? 'Create New User';
         </div>
         <div class="card-content">
             <form id="createUserForm" method="POST" action="<?= app_base_url('/admin/users/store') ?>">
-                <!-- CSRF token removed for testing -->
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
                     <!-- Personal Information -->
@@ -109,34 +109,46 @@ $page_title = $page_title ?? 'Create New User';
 
                 <!-- Additional Options -->
                 <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--admin-gray-200);">
-                    <h4 style="margin-bottom: 16px; color: var(--admin-gray-700); border-bottom: 1px solid var(--admin-gray-200); padding-bottom: 8px;">
+                    <h4 class="form-section-title">
                         <i class="fas fa-envelope"></i>
                         Additional Options
                     </h4>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <div class="option-grid">
+                        <label class="option-checkbox">
                             <input type="checkbox" name="email_verified" value="1" checked>
                             <span>Auto-verify email</span>
                         </label>
 
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <label class="option-checkbox">
                             <input type="checkbox" name="terms_agreed" value="1" checked>
                             <span>Auto-agree to terms</span>
                         </label>
 
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <label class="option-checkbox">
                             <input type="checkbox" name="marketing_emails" value="1">
                             <span>Allow marketing emails</span>
                         </label>
 
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <label class="option-checkbox">
                             <input type="checkbox" name="send_welcome_email" value="1" checked>
                             <span>Send welcome email</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <div class="footer-actions">
+                        <button type="button" class="btn btn-secondary" onclick="previewUser()">
+                            <i class="fas fa-eye"></i>
+                            Preview
+                        </button>
+                        <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i>
                             Create User
-                            </button>
+                        </button>
                     </div>
+                </div>
             </form>
         </div>
     </div>
@@ -232,8 +244,9 @@ $page_title = $page_title ?? 'Create New User';
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
+                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                credentials: 'same-origin'
             })
             .then(response => {
                 if (response.ok) {

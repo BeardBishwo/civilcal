@@ -1,0 +1,440 @@
+[
+  {
+    "id": "TC001",
+    "title": "User Registration Success",
+    "description": "Verify that a new user can successfully register with valid username, email, and password.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send POST request to /api/register with valid username, valid email, and valid password."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that the response status code is 200 and registration is successful."
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "User Registration Validation Error",
+    "description": "Verify that registration fails with invalid email and missing required fields.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send POST request to /api/register with invalid email and missing password."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that the response status code is 400 with appropriate validation error messages."
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "User Login Success",
+    "description": "Verify that a registered user can log in successfully with username or email and correct password.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send POST request to /api/login with correct username/email and password."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that the response status code is 200 and login is successful with session established."
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "User Login Failure with Incorrect Credentials",
+    "description": "Verify login fails when incorrect username/email or password is provided.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send POST request to /api/login with invalid username/email or wrong password."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that the response status code is 401 with invalid credentials message."
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "User Logout Success",
+    "description": "Verify that a logged-in user can log out successfully.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send POST request to /api/logout with valid session authentication."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that the response status code is 200 and session is invalidated."
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Perform Calculation with Valid Parameters",
+    "description": "Verify that the calculator API returns correct results for valid calculation requests across different calculator types.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send POST request to /api/calculate with 'calculator' parameter set to 'CivilCalculator' and a valid parameters object."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that the response status code is 200 and returned calculation result matches expected value."
+      },
+      {
+        "type": "action",
+        "description": "Repeat for 'ElectricalCalculator', 'HVACCalculator', 'PlumbingCalculator', and 'TraditionalUnitsCalculator'."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify responses are correctly formatted and calculations accurate."
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Perform Calculation with Invalid Parameters",
+    "description": "Verify the calculation API returns validation errors for missing or invalid input parameters.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send POST request to /api/calculate with missing 'calculator' parameter."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that response status code is 400 with an invalid parameter error."
+      },
+      {
+        "type": "action",
+        "description": "Send POST request to /api/calculate with invalid or incomplete parameters object."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that response status code is 400 and error message describes input issue."
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Admin Dashboard Statistics Retrieval",
+    "description": "Verify that admin users can retrieve dashboard statistics successfully.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send authorized GET request to /api/admin/dashboard/stats."
+      },
+      {
+        "type": "assertion",
+        "description": "Check response status is 200 with valid statistics data structure."
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Calculation History Retrieval",
+    "description": "Verify that users can retrieve their calculation history correctly.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send authenticated GET request to /api/calculations."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify response returns 200 status with a list of calculations belonging to the user."
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Calculation History Export in Multiple Formats",
+    "description": "Verify users can export their calculation history in supported formats (e.g., CSV, PDF).",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Initiate export request in CSV format via relevant API or export controller."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure response is a file download with correctly formatted CSV content."
+      },
+      {
+        "type": "action",
+        "description": "Repeat export request for PDF format."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify PDF file is generated and downloadable with correct calculation data."
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Payment Processing with Stripe Success",
+    "description": "Verify payment processing and subscription management using Stripe completes successfully.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send payment initiation request via PaymentController with valid Stripe payment details."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that payment succeeds and subscription is activated."
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Payment Processing with PayTM Success",
+    "description": "Verify payment processing and subscription management using PayTM completes successfully.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send payment initiation request via PaymentController with valid PayTM payment details."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm payment completes successfully and subscription is updated."
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Database CRUD Operations",
+    "description": "Verify Create, Read, Update, and Delete operations on key database entities maintain consistency and enforce constraints.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Create new user record via API or service layer."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that record is successfully stored in MySQL database."
+      },
+      {
+        "type": "action",
+        "description": "Update user profile fields using API or service methods."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify updates persist and constraints (e.g., unique email) enforced."
+      },
+      {
+        "type": "action",
+        "description": "Delete test user record."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm record removal and database consistency."
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Database Migration Handling",
+    "description": "Verify database schema migrations apply correctly without data loss or corruption.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Apply pending migrations to test database environment."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm schema updates are reflected properly and existing data remains intact."
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Authentication Authorization Enforcement",
+    "description": "Ensure endpoints enforce authentication and role-based authorization preventing unauthorized access.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Attempt to access protected API endpoints without authentication."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify response status code is 401 Unauthorized."
+      },
+      {
+        "type": "action",
+        "description": "Access admin-only APIs with authenticated non-admin user."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm response is 403 Forbidden."
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "CSRF Protection Verification",
+    "description": "Verify that CSRF tokens are required and validated on state-changing requests.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send POST request to sensitive endpoints without CSRF token."
+      },
+      {
+        "type": "assertion",
+        "description": "Response should be rejected with appropriate CSRF validation error."
+      },
+      {
+        "type": "action",
+        "description": "Send POST request with valid CSRF token."
+      },
+      {
+        "type": "assertion",
+        "description": "Request should succeed."
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Input Validation Against XSS and SQL Injection",
+    "description": "Verify that inputs are sanitized to prevent XSS and SQL injection attacks.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Submit input containing typical XSS payloads in form fields."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify input is sanitized and no script executes or is stored."
+      },
+      {
+        "type": "action",
+        "description": "Submit input containing SQL injection patterns."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify queries are parameterized and injection is prevented."
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Rate Limiting Enforcement",
+    "description": "Verify that API rate limits are enforced to prevent abuse.",
+    "category": "security",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send rapid consecutive requests exceeding rate limit thresholds."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that subsequent requests are rejected with HTTP 429 Too Many Requests."
+      }
+    ]
+  },
+  {
+    "id": "TC019",
+    "title": "Third-Party Email Notification Success",
+    "description": "Verify email notifications are sent correctly through configured SMTP service.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Trigger notification sending via notification system."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify email delivery success and content correctness."
+      }
+    ]
+  },
+  {
+    "id": "TC020",
+    "title": "System Health Check Endpoint",
+    "description": "Verify that the system health check endpoint returns healthy status.",
+    "category": "functional",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send GET request to /api/v1/health."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm response status code is 200 with 'System healthy' message."
+      }
+    ]
+  },
+  {
+    "id": "TC021",
+    "title": "Performance Test: API Response Time Under 500ms",
+    "description": "Verify that key API endpoints respond within the 500ms performance benchmark under normal load.",
+    "category": "performance",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send requests to critical API endpoints and measure response times."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure all responses complete within 500ms."
+      }
+    ]
+  },
+  {
+    "id": "TC022",
+    "title": "Load Test: Concurrent Users Handling",
+    "description": "Simulate multiple concurrent users performing typical workflows and verify system stability and response times.",
+    "category": "performance",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Simulate concurrent user sessions performing login, calculations, and payment processing."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify system maintains response times under threshold and does not crash."
+      }
+    ]
+  }
+]

@@ -48,31 +48,54 @@ class User
 
         $stmt = $this->db->getPdo()->prepare("
             INSERT INTO users (
-                username, email, password, first_name, last_name, company, phone, role, 
+                username, email, password, first_name, last_name, company, phone, role,
                 email_verified, is_active, terms_agreed, terms_agreed_at, marketing_emails
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
-        $termsAgreed = isset($data['terms_agree']) && $data['terms_agree'] ? 1 : 0;
-        $marketingEmails = isset($data['marketing_agree']) && $data['marketing_agree'] ? 1 : 0;
+        $emailVerified = !empty($data['email_verified']) ? 1 : 0;
+        $termsAgreed = !empty($data['terms_agreed']) ? 1 : 0;
+        $marketingEmails = !empty($data['marketing_emails']) ? 1 : 0;
 
-        $stmt->execute([
-            isset($data['username']) ? $data['username'] : null,
+        $executed = $stmt->execute([
+            $data['username'] ?? null,
             $data['email'],
             $data['password'],
-            isset($data['first_name']) ? $data['first_name'] : '',
-            isset($data['last_name']) ? $data['last_name'] : '',
-            isset($data['company']) ? $data['company'] : '',
-            isset($data['phone']) ? $data['phone'] : '',
-            isset($data['role']) ? $data['role'] : 'user',
-            isset($data['email_verified']) ? $data['email_verified'] : 0,
-            isset($data['is_active']) ? $data['is_active'] : 1,
+            $data['first_name'] ?? '',
+            $data['last_name'] ?? '',
+            $data['company'] ?? '',
+            $data['phone'] ?? '',
+            $data['role'] ?? 'user',
+            $emailVerified,
+            $data['is_active'] ?? 1,
             $termsAgreed,
             $termsAgreed ? date('Y-m-d H:i:s') : null,
             $marketingEmails
         ]);
 
-        return $this->db->getPdo()->lastInsertId();
+        if (!$executed) {
+            $errorInfo = $stmt->errorInfo();
+            $message = $errorInfo[2] ?? 'Unknown database error';
+            throw new \RuntimeException('Database insert failed: ' . $message);
+        }
+
+        $userId = $this->db->getPdo()->lastInsertId();
+
+        // Optionally send welcome email if requested
+        if (!empty($data['send_welcome_email'])) {
+            try {
+                $emailManager = new \App\Services\EmailManager();
+                $emailManager->sendWelcomeEmail(
+                    $data['email'],
+                    trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? '')),
+                    $data['username'] ?? ''
+                );
+            } catch (\Exception $e) {
+                error_log('Failed to send welcome email: ' . $e->getMessage());
+            }
+        }
+
+        return $userId;
     }
 
     /**
@@ -83,24 +106,45 @@ class User
         try {
             $pdo = $this->db->getPdo();
 
-            // Check if columns exist and add them if they don't
-            $columns = [
-                'terms_agreed' => 'ALTER TABLE users ADD COLUMN terms_agreed TINYINT(1) DEFAULT 0',
-                'terms_agreed_at' => 'ALTER TABLE users ADD COLUMN terms_agreed_at DATETIME NULL',
-                'marketing_emails' => 'ALTER TABLE users ADD COLUMN marketing_emails TINYINT(1) DEFAULT 0',
-                'privacy_agreed' => 'ALTER TABLE users ADD COLUMN privacy_agreed TINYINT(1) DEFAULT 0',
-                'privacy_agreed_at' => 'ALTER TABLE users ADD COLUMN privacy_agreed_at DATETIME NULL'
+            $columns = [];
+            $columnsStmt = $pdo->query('SHOW COLUMNS FROM users');
+            while ($row = $columnsStmt->fetch(\PDO::FETCH_ASSOC)) {
+                $columns[$row['Field']] = $row;
+            }
+
+            $requiredColumns = [
+                'username' => "ALTER TABLE users ADD COLUMN username VARCHAR(150) NULL AFTER id",
+                'phone' => "ALTER TABLE users ADD COLUMN phone VARCHAR(100) NULL AFTER company",
+                'is_active' => "ALTER TABLE users ADD COLUMN is_active TINYINT(1) DEFAULT 1 AFTER email_verified_at",
+                'email_verified' => "ALTER TABLE users ADD COLUMN email_verified TINYINT(1) DEFAULT 0 AFTER is_active",
+                'terms_agreed' => "ALTER TABLE users ADD COLUMN terms_agreed TINYINT(1) DEFAULT 0 AFTER email_verified",
+                'terms_agreed_at' => "ALTER TABLE users ADD COLUMN terms_agreed_at DATETIME NULL AFTER terms_agreed",
+                'marketing_emails' => "ALTER TABLE users ADD COLUMN marketing_emails TINYINT(1) DEFAULT 0 AFTER terms_agreed_at",
+                'privacy_agreed' => "ALTER TABLE users ADD COLUMN privacy_agreed TINYINT(1) DEFAULT 0 AFTER marketing_emails",
+                'privacy_agreed_at' => "ALTER TABLE users ADD COLUMN privacy_agreed_at DATETIME NULL AFTER privacy_agreed"
             ];
 
-            foreach ($columns as $columnName => $alterSql) {
-                // Check if column exists
-                $checkSql = "SHOW COLUMNS FROM users LIKE '{$columnName}'";
-                $result = $pdo->query($checkSql);
-
-                if ($result->rowCount() == 0) {
-                    // Column doesn't exist, add it
+            foreach ($requiredColumns as $columnName => $alterSql) {
+                if (!isset($columns[$columnName])) {
                     $pdo->exec($alterSql);
                     error_log("Added column '{$columnName}' to users table");
+                }
+            }
+
+            // Ensure username is unique if column exists
+            if (isset($columns['username'])) {
+                $indexStmt = $pdo->query("SHOW INDEX FROM users WHERE Key_name = 'idx_users_username'");
+                if ($indexStmt->rowCount() === 0) {
+                    $pdo->exec('CREATE UNIQUE INDEX idx_users_username ON users(username)');
+                }
+            }
+
+            // Ensure role column supports all roles used in the app
+            if (isset($columns['role'])) {
+                $type = strtolower($columns['role']['Type'] ?? '');
+                if (strpos($type, "'engineer'") === false) {
+                    $pdo->exec("ALTER TABLE users MODIFY COLUMN role ENUM('user','admin','engineer') DEFAULT 'user'");
+                    error_log("Updated users.role enum to include 'engineer'");
                 }
             }
         } catch (Exception $e) {
