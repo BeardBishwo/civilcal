@@ -1,8 +1,63 @@
 {
+  "name": "bishwo-calculator-api-tests",
+  "version": "1.0.0",
+  "description": "Comprehensive API test suite for Bishwo Calculator AEC SaaS platform",
+  "main": "tests/index.js",
+  "scripts": {
+    "test": "node tests/index.js",
+    "test:local": "TEST_ENV=local node tests/index.js",
+    "test:staging": "TEST_ENV=staging node tests/index.js",
+    "test:prod": "TEST_ENV=production node tests/index.js",
+    "test:report": "npx playwright show-report test-results/api-tests",
+    "test:debug": "DEBUG=* npx playwright test tests/Api/ --trace on",
+    "test:auth": "npx playwright test tests/Api/auth.spec.js",
+    "test:calculator": "npx playwright test tests/Api/calculator.spec.js",
+    "test:admin": "npx playwright test tests/Api/admin-dashboard.spec.js tests/Api/admin-settings.spec.js",
+    "test:security": "npx playwright test tests/Api/security.spec.js",
+    "test:health": "npx playwright test tests/Api/health-check.spec.js",
+    "test:ci": "TEST_ENV=staging npx playwright test tests/Api/ --reporter=json --reporter=junit",
+    "install:browsers": "npx playwright install",
+    "clean:results": "rm -rf test-results/*",
+    "validate:config": "node -e \"console.log('Configuration valid:', require('./tests/config.json').baseUrl)\""
+  },
+  "keywords": [
+    "api-testing",
+    "playwright",
+    "aec",
+    "engineering",
+    "calculator",
+    "saas",
+    "testing",
+    "automation"
+  ],
+  "author": "Bishwo Calculator Team",
+  "license": "UNLICENSED",
   "devDependencies": {
-    "axios": "^1.13.2",
-    "chai": "^6.2.1",
-    "mocha": "^11.7.5",
-    "nyc": "^17.1.0"
+    "@playwright/test": "^1.40.0",
+    "playwright": "^1.40.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bishwo-calculator/api-tests"
+  },
+  "bugs": {
+    "url": "https://github.com/bishwo-calculator/api-tests/issues"
+  },
+  "homepage": "https://bishwocalculator.com",
+  "config": {
+    "testTimeout": 30000,
+    "expectTimeout": 10000,
+    "maxRetries": 2,
+    "workers": 4
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.spec.js"
+    ]
   }
 }
