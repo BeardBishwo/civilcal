@@ -46,7 +46,34 @@ class UserManagementController extends Controller
 
     public function store()
     {
-        $this->checkCSRF();
+        // Check if this is an AJAX request
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
+        // Get CSRF token - try both header and POST data
+        $submittedToken = '';
+        if ($isAjax) {
+            $submittedToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['csrf_token'] ?? '');
+        } else {
+            $submittedToken = $_POST['csrf_token'] ?? '';
+        }
+        
+        $sessionToken = $_SESSION['csrf_token'] ?? '';
+        
+        if (empty($submittedToken) || $submittedToken !== $sessionToken) {
+            if ($isAjax) {
+                http_response_code(403);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Invalid CSRF token'
+                ]);
+                exit;
+            } else {
+                $_SESSION['flash_messages']['error'] = 'Invalid CSRF token';
+                redirect('/admin/users/create');
+                return;
+            }
+        }
 
         try {
             $firstName = trim($_POST['first_name'] ?? '');
@@ -91,9 +118,19 @@ class UserManagementController extends Controller
             }
 
             if (!empty($errors)) {
-                $_SESSION['flash_messages']['error'] = implode('\n', $errors);
-                redirect('/admin/users/create');
-                return;
+                $errorMessage = implode(' ', $errors);
+                if ($isAjax) {
+                    http_response_code(400);
+                    echo json_encode([
+                        'success' => false,
+                        'message' => $errorMessage
+                    ]);
+                    exit;
+                } else {
+                    $_SESSION['flash_messages']['error'] = $errorMessage;
+                    redirect('/admin/users/create');
+                    return;
+                }
             }
 
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
@@ -112,12 +149,32 @@ class UserManagementController extends Controller
                 'send_welcome_email' => !empty($_POST['send_welcome_email']) ? 1 : 0,
             ]);
 
-            $_SESSION['flash_messages']['success'] = 'User created successfully.';
-            redirect('/admin/users/' . $userId . '/edit');
+            if ($isAjax) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'User created successfully!',
+                    'redirect' => '/admin/users/' . $userId . '/edit'
+                ]);
+                exit;
+            } else {
+                $_SESSION['flash_messages']['success'] = 'User created successfully.';
+                redirect('/admin/users/' . $userId . '/edit');
+            }
         } catch (\Exception $e) {
             error_log('User creation failed: ' . $e->getMessage());
-            $_SESSION['flash_messages']['error'] = 'Failed to create user: ' . $e->getMessage();
-            redirect('/admin/users/create');
+            $errorMessage = 'Failed to create user: ' . $e->getMessage();
+            
+            if ($isAjax) {
+                http_response_code(500);
+                echo json_encode([
+                    'success' => false,
+                    'message' => $errorMessage
+                ]);
+                exit;
+            } else {
+                $_SESSION['flash_messages']['error'] = $errorMessage;
+                redirect('/admin/users/create');
+            }
         }
     }
 
@@ -147,7 +204,7 @@ class UserManagementController extends Controller
         $submittedToken = $_POST['csrf_token'] ?? '';
         $sessionToken = $_SESSION['csrf_token'] ?? '';
 
-        if (empty($submittedToken) || $submittedToken !== $sessionToken) {
+        if (empty($submittedToken) !== $sessionToken || $submittedToken) {
             $_SESSION['flash_messages']['error'] = 'Invalid CSRF token';
             redirect('/admin/users');
             return;
