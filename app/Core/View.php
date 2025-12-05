@@ -46,21 +46,39 @@ class View
         extract($data);
         $title = isset($title) ? $title : "Bishwo Calculator";
         ob_start();
-        $viewPath = $this->themesPath() . $view . ".php";
-        if (file_exists($viewPath)) {
-            include $viewPath;
-        } else {
-            $this->themeManager->renderView($view, $data);
-            $altPath =
-                BASE_PATH .
-                "/app/Views/" .
-                str_replace(".", "/", $view) .
-                ".php";
-            if (!file_exists($altPath)) {
+        
+        // For admin views, check themes/admin first
+        if (strpos($view, "admin/") === 0) {
+            // Convert view path to file system path (replace slashes with directory separators)
+            $adminViewPath = str_replace('/', DIRECTORY_SEPARATOR, substr($view, 6));
+            $adminThemeViewPath = BASE_PATH . "/themes/admin/views/" . $adminViewPath . ".php";
+            if (file_exists($adminThemeViewPath)) {
+                include $adminThemeViewPath;
+            } else {
+                // Fallback to app/Views
                 $altPath = BASE_PATH . "/app/Views/" . $view . ".php";
+                if (file_exists($altPath)) {
+                    include $altPath;
+                }
             }
-            if (file_exists($altPath)) {
-                include $altPath;
+        } else {
+            // For non-admin views, use regular theme path
+            $viewPath = $this->themesPath() . $view . ".php";
+            if (file_exists($viewPath)) {
+                include $viewPath;
+            } else {
+                $this->themeManager->renderView($view, $data);
+                $altPath =
+                    BASE_PATH .
+                    "/app/Views/" .
+                    str_replace(".", "/", $view) .
+                    ".php";
+                if (!file_exists($altPath)) {
+                    $altPath = BASE_PATH . "/app/Views/" . $view . ".php";
+                }
+                if (file_exists($altPath)) {
+                    include $altPath;
+                }
             }
         }
         $content = ob_get_clean();
@@ -79,31 +97,38 @@ class View
         }
 
         // Otherwise, wrap in layout
-        $layoutPath = $this->themesPath() . "layouts/main.php";
-        if (!file_exists($layoutPath)) {
-            $layoutPath = BASE_PATH . "/app/Views/layouts/main.php";
-            if (strpos($view, "admin/") === 0) {
+        // For admin views, use themes/admin/layouts/main.php
+        if (strpos($view, "admin/") === 0) {
+            $layoutPath = BASE_PATH . "/themes/admin/layouts/main.php";
+            if (!file_exists($layoutPath)) {
                 $layoutPath = BASE_PATH . "/app/Views/layouts/admin.php";
-            } elseif (strpos($view, "auth/") === 0) {
-                $layoutPath = BASE_PATH . "/app/Views/layouts/auth.php";
-                // Check for theme-specific landing layout
-                $themeLandingLayout =
-                    $this->themesPath() . "layouts/landing.php";
-                if (
-                    strpos($view, "landing/") === 0 &&
-                    file_exists($themeLandingLayout)
-                ) {
-                    $layoutPath = $themeLandingLayout;
-                }
-            } elseif (strpos($view, "landing/") === 0) {
-                // Check for landing layout in theme first
-                $themeLandingLayout =
-                    $this->themesPath() . "layouts/landing.php";
-                if (file_exists($themeLandingLayout)) {
-                    $layoutPath = $themeLandingLayout;
+            }
+        } else {
+            $layoutPath = $this->themesPath() . "layouts/main.php";
+            if (!file_exists($layoutPath)) {
+                $layoutPath = BASE_PATH . "/app/Views/layouts/main.php";
+                if (strpos($view, "auth/") === 0) {
+                    $layoutPath = BASE_PATH . "/app/Views/layouts/auth.php";
+                    // Check for theme-specific landing layout
+                    $themeLandingLayout =
+                        $this->themesPath() . "layouts/landing.php";
+                    if (
+                        strpos($view, "landing/") === 0 &&
+                        file_exists($themeLandingLayout)
+                    ) {
+                        $layoutPath = $themeLandingLayout;
+                    }
+                } elseif (strpos($view, "landing/") === 0) {
+                    // Check for landing layout in theme first
+                    $themeLandingLayout =
+                        $this->themesPath() . "layouts/landing.php";
+                    if (file_exists($themeLandingLayout)) {
+                        $layoutPath = $themeLandingLayout;
+                    }
                 }
             }
         }
+        
         if (file_exists($layoutPath)) {
             $data["content"] = $content;
             extract($data);

@@ -1,21 +1,3 @@
-# Set default directory index
-DirectoryIndex index.php
-
-# MIME Types for proper asset loading
-<IfModule mod_mime.c>
-    AddType text/css .css
-    AddType application/javascript .js
-    AddType image/png .png
-    AddType image/jpeg .jpg .jpeg
-    AddType image/gif .gif
-    AddType image/svg+xml .svg
-    AddType font/woff .woff
-    AddType font/woff2 .woff2
-    AddType font/truetype .ttf
-    AddType font/opentype .otf
-    AddType image/x-icon .ico
-</IfModule>
-
 # Security: Block access to sensitive directories and files
 <FilesMatch "^\.">
     Order allow,deny
@@ -23,19 +5,48 @@ DirectoryIndex index.php
 </FilesMatch>
 
 # Block access to sensitive directories
-RedirectMatch 403 ^/(app|config|database|storage|vendor|tests)/.*$
+RedirectMatch 403 ^/(app|config|database|includes|storage|vendor|tests)/.*$
+
+# Block access to sensitive files
+<FilesMatch "(^#.*#|\.(bak|conf|dist|fla|in[ci]|log|psd|sh|sql|sw[op])|~)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block composer files
+<FilesMatch "^(composer\.(json|lock)|\.env.*|\.git.*)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
     
-    # Automatically detect the base path (works in subdirectories)
-    RewriteBase /Bishwo_Calculator/
+    # Block direct access to index.php in root (force .htaccess routing)
+    RewriteCond %{THE_REQUEST} ^[A-Z]+\ /[^/]*index\.php
+    RewriteRule ^index\.php$ - [F,L]
     
-    # Serve existing files and directories directly (no rewriting)
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    # Serve existing files from public directory
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule .* - [L]
+    
+    # Serve existing directories from public directory
     RewriteCond %{REQUEST_FILENAME} -d
-    RewriteRule ^ - [L]
+    RewriteRule .* - [L]
     
-    # Route non-existing files/dirs through index.php
-    RewriteRule ^(.*)$ index.php?url=$1 [L,QSA]
+    # Serve files from public/uploads directory
+    RewriteRule ^uploads/(.*)$ public/uploads/$1 [L]
+    
+    # Serve static assets from public/assets
+    RewriteRule ^assets/(.*)$ public/assets/$1 [L]
+    
+    # Redirect favicon.ico requests to the actual favicon
+    RewriteRule ^favicon\.ico$ public/uploads/settings/favicon.png [L]
+    
+    # Redirect any other /public URL to clean URL
+    RewriteCond %{REQUEST_URI} public
+    RewriteRule ^(.*)public/?(.*)$ /$1$2 [R=301,L]
+    
+    # Route all other requests through public/index.php
+    RewriteRule ^(.*)$ public/index.php [L,QSA]
 </IfModule>

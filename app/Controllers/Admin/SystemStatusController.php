@@ -1,126 +1,196 @@
 <?php
-
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
+use App\Services\SystemMonitoringService;
+use App\Core\Auth;
 
 class SystemStatusController extends Controller
 {
+    private $monitoringService;
+
     public function __construct()
     {
         parent::__construct();
+<<<<<<< HEAD
             }
+=======
+        $this->monitoringService = new SystemMonitoringService();
+    }
+>>>>>>> temp-branch
 
     public function index()
     {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
+
+        $systemHealth = $this->monitoringService->getSystemHealth();
+        
         $data = [
-            'page_title' => 'System Status',
-            'php_version' => phpversion(),
-            'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
-            'database_version' => $this->getDatabaseVersion(),
-            'disk_space' => $this->getDiskSpace(),
-            'memory_usage' => $this->getMemoryUsage(),
-            'system_health' => $this->getSystemHealth()
+            'user' => $user,
+            'systemHealth' => $systemHealth,
+            'page_title' => 'System Status - Admin Panel',
+            'currentPage' => 'system-status'
         ];
 
-        $this->view('admin/system/status', $data);
+        $this->view->render('admin/system-status/index', $data);
     }
 
-    private function getDatabaseVersion()
+    /**
+     * Get system health via API
+     */
+    public function getSystemHealth()
     {
-        try {
-            $stmt = $this->db->query("SELECT VERSION()");
-            return $stmt->fetchColumn();
-        } catch (\Exception $e) {
-            return 'Unknown';
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Access denied']);
+            return;
         }
+
+        $systemHealth = $this->monitoringService->getSystemHealth();
+        
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true,
+            'data' => $systemHealth,
+            'timestamp' => date('Y-m-d H:i:s')
+        ]);
     }
 
-    private function getDiskSpace()
+    /**
+     * Get specific system metrics
+     */
+    public function getMetrics($type)
     {
-        $total = disk_total_space(BASE_PATH);
-        $free = disk_free_space(BASE_PATH);
-        $used = $total - $free;
-        
-        return [
-            'total' => $total,
-            'used' => $used,
-            'free' => $free,
-            'percent_used' => $total > 0 ? round(($used / $total) * 100, 2) : 0
-        ];
-    }
-
-    private function getMemoryUsage()
-    {
-        return [
-            'current' => memory_get_usage(true),
-            'peak' => memory_get_peak_usage(true),
-            'limit' => ini_get('memory_limit')
-        ];
-    }
-
-    private function getSystemHealth()
-    {
-        $checks = [];
-        
-        // Check database connection
-        $checks['database'] = $this->checkDatabase();
-        
-        // Check file permissions
-        $checks['permissions'] = $this->checkPermissions();
-        
-        // Check PHP extensions
-        $checks['extensions'] = $this->checkExtensions();
-        
-        return $checks;
-    }
-
-    private function checkDatabase()
-    {
-        try {
-            $this->db->query("SELECT 1");
-            return ['status' => 'ok', 'message' => 'Database connection successful'];
-        } catch (\Exception $e) {
-            return ['status' => 'error', 'message' => 'Database connection failed: ' . $e->getMessage()];
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Access denied']);
+            return;
         }
+
+        $metrics = [];
+        
+        switch ($type) {
+            case 'server':
+                $metrics = $this->monitoringService->getServerMetrics();
+                break;
+            case 'database':
+                $metrics = $this->monitoringService->getDatabaseMetrics();
+                break;
+            case 'storage':
+                $metrics = $this->monitoringService->getStorageMetrics();
+                break;
+            case 'application':
+                $metrics = $this->monitoringService->getApplicationMetrics();
+                break;
+            case 'security':
+                $metrics = $this->monitoringService->getSecurityMetrics();
+                break;
+            default:
+                http_response_code(400);
+                echo json_encode(['error' => 'Invalid metric type']);
+                return;
+        }
+        
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true,
+            'type' => $type,
+            'data' => $metrics,
+            'timestamp' => date('Y-m-d H:i:s')
+        ]);
     }
 
-    private function checkPermissions()
+    /**
+     * Run a system health check
+     */
+    public function runHealthCheck()
     {
-        $paths = [
-            BASE_PATH . '/storage',
-            BASE_PATH . '/storage/logs',
-            BASE_PATH . '/storage/cache',
-            BASE_PATH . '/public/uploads'
-        ];
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Access denied']);
+            return;
+        }
+
+        $systemHealth = $this->monitoringService->getSystemHealth();
         
+        $issues = $this->findIssues($systemHealth);
+        
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true,
+            'health' => $systemHealth,
+            'issues' => $issues,
+            'timestamp' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    /**
+     * Find any issues in the system health data
+     */
+    private function findIssues($systemHealth)
+    {
         $issues = [];
-        foreach ($paths as $path) {
-            if (!is_writable($path)) {
-                $issues[] = basename($path) . ' is not writable';
+        
+        foreach ($systemHealth as $category => $metrics) {
+            if (isset($metrics['status'])) {
+                if ($metrics['status'] === 'critical' || $metrics['status'] === 'offline' || $metrics['status'] === 'error') {
+                    $issues[] = [
+                        'category' => $category,
+                        'severity' => $metrics['status'],
+                        'message' => $this->getStatusMessage($category, $metrics),
+                        'data' => $metrics
+                    ];
+                }
             }
         }
         
-        return [
-            'status' => empty($issues) ? 'ok' : 'warning',
-            'message' => empty($issues) ? 'All directories writable' : implode(', ', $issues)
-        ];
+        return $issues;
     }
 
-    private function checkExtensions()
+    /**
+     * Get status message based on category and metrics
+     */
+    private function getStatusMessage($category, $metrics)
     {
-        $required = ['pdo', 'pdo_mysql', 'mbstring', 'openssl', 'curl'];
-        $missing = [];
-        
-        foreach ($required as $ext) {
-            if (!extension_loaded($ext)) {
-                $missing[] = $ext;
-            }
+        switch ($category) {
+            case 'server':
+                if ($metrics['status'] === 'critical') {
+                    if ($metrics['load_average']['1min'] > 4) {
+                        return "High server load: {$metrics['load_average']['1min']}";
+                    }
+                    if ($metrics['memory_usage']['percent'] > 90) {
+                        return "High memory usage: {$metrics['memory_usage']['percent']}%";
+                    }
+                }
+                break;
+            case 'database':
+                if ($metrics['status'] === 'critical') {
+                    return "Database connection issue";
+                }
+                break;
+            case 'storage':
+                if ($metrics['usage_percent'] > 90) {
+                    return "Storage usage critical: {$metrics['usage_percent']}%";
+                }
+                break;
+            case 'security':
+                if ($metrics['failed_login_attempts'] > 20) {
+                    return "High number of failed login attempts: {$metrics['failed_login_attempts']}";
+                }
+                break;
         }
         
-        return [
-            'status' => empty($missing) ? 'ok' : 'error',
-            'message' => empty($missing) ? 'All required extensions loaded' : 'Missing: ' . implode(', ', $missing)
-        ];
+        return "System {$category} reporting status: {$metrics['status']}";
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> temp-branch

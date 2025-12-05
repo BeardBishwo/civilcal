@@ -1,8 +1,6 @@
 <?php
 
 // No namespace - standalone class for easier integration
-use Exception;
-use PDO;
 
 /**
  * Premium Theme Manager Service
@@ -76,7 +74,7 @@ class PremiumThemeManager
                 'expires_at' => $localLicense['expires_at']
             ];
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('License validation error: ' . $e->getMessage());
             return $this->createErrorResponse('License validation failed');
         }
@@ -127,7 +125,7 @@ class PremiumThemeManager
                 'message' => 'Theme installed successfully'
             ];
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Theme installation error: ' . $e->getMessage());
             return $this->createErrorResponse('Theme installation failed');
         }
@@ -160,7 +158,7 @@ class PremiumThemeManager
                 'theme' => $theme
             ];
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Get theme settings error: ' . $e->getMessage());
             return $this->createErrorResponse('Failed to get theme settings');
         }
@@ -195,7 +193,7 @@ class PremiumThemeManager
                 return $this->createErrorResponse('Failed to save settings');
             }
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Update theme settings error: ' . $e->getMessage());
             return $this->createErrorResponse('Failed to update settings');
         }
@@ -227,7 +225,7 @@ class PremiumThemeManager
                 'themes' => $availableThemes
             ];
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Get available themes error: ' . $e->getMessage());
             return $this->createErrorResponse('Failed to get available themes');
         }
@@ -262,7 +260,7 @@ class PremiumThemeManager
                 'message' => 'Theme activated successfully'
             ];
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Activate theme error: ' . $e->getMessage());
             return $this->createErrorResponse('Failed to activate theme');
         }
@@ -297,7 +295,7 @@ class PremiumThemeManager
                 'options' => $options
             ];
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Get customization options error: ' . $e->getMessage());
             return $this->createErrorResponse('Failed to get customization options');
         }
@@ -323,7 +321,7 @@ class PremiumThemeManager
             
             return in_array($feature, $features);
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Check feature error: ' . $e->getMessage());
             return false;
         }
@@ -618,7 +616,7 @@ class PremiumThemeManager
             $this->database->commit();
             return true;
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->database->rollBack();
             error_log('Save theme settings error: ' . $e->getMessage());
             return false;

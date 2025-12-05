@@ -1,48 +1,229 @@
 <?php
+
 namespace App\Services;
 
-class ContentService {
-    private $storePath;
+use App\Core\Database;
+use PDO;
 
-    public function __construct() {
-        $this->storePath = (defined('STORAGE_PATH') ? STORAGE_PATH : dirname(__DIR__,2) . '/storage') . '/content.json';
-        if (!file_exists(dirname($this->storePath))) { @mkdir(dirname($this->storePath), 0755, true); }
-        if (!file_exists($this->storePath)) { file_put_contents($this->storePath, json_encode(['pages'=>[]])); }
-    }
+/**
+ * Content Management Service
+ * Handles pages, menus, and dynamic content
+ */
+class ContentService
+{
+    private static $cache = [];
 
-    public function load() {
-        $raw = file_get_contents($this->storePath);
-        $data = json_decode($raw, true);
-        return is_array($data) ? $data : ['pages'=>[]];
-    }
-
-    public function save($data) {
-        file_put_contents($this->storePath, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        return true;
-    }
-
-    public function allPages() {
-        $data = $this->load();
-        return $data['pages'] ?? [];
-    }
-
-    public function getPage($slug) {
-        $pages = $this->allPages();
-        foreach ($pages as $p) { if (($p['slug'] ?? '') === $slug) return $p; }
-        return null;
-    }
-
-    public function upsertPage($page) {
-        $data = $this->load();
-        $pages = $data['pages'] ?? [];
-        $found = false;
-        for ($i=0; $i<count($pages); $i++) {
-            if (($pages[$i]['slug'] ?? '') === ($page['slug'] ?? '')) { $pages[$i] = $page; $found = true; break; }
+    /**
+     * Get page by slug
+     */
+    public static function getPage($slug)
+    {
+        if (isset(self::$cache['page_' . $slug])) {
+            return self::$cache['page_' . $slug];
         }
-        if (!$found) { $pages[] = $page; }
-        $data['pages'] = $pages;
-        $this->save($data);
+
+        $db = Database::getInstance();
+        $stmt = $db->prepare("
+            SELECT p.*, u.username as author_username 
+            FROM pages p 
+            LEFT JOIN users u ON p.author_id = u.id 
+            WHERE p.slug = ? AND p.status = 'published'
+        ");
+        $stmt->execute([$slug]);
+        $page = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($page) {
+            self::$cache['page_' . $slug] = $page;
+        }
+
         return $page;
     }
+
+    /**
+     * Get all pages
+     */
+    public static function getAllPages($status = null)
+    {
+        $db = Database::getInstance();
+
+        if ($status) {
+            $stmt = $db->prepare("
+                SELECT p.*, u.username as author_username 
+                FROM pages p 
+                LEFT JOIN users u ON p.author_id = u.id 
+                WHERE p.status = ?
+                ORDER BY p.created_at DESC
+            ");
+            $stmt->execute([$status]);
+        } else {
+            $stmt = $db->prepare("
+                SELECT p.*, u.username as author_username 
+                FROM pages p 
+                LEFT JOIN users u ON p.author_id = u.id 
+                ORDER BY p.created_at DESC
+            ");
+            $stmt->execute();
+        }
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Alias for getAllPages() for backward compatibility
+     */
+    public static function allPages($status = null)
+    {
+        return self::getAllPages($status);
+    }
+
+    /**
+     * Create new page
+     */
+    public static function createPage($data)
+    {
+        $db = Database::getInstance();
+
+        $stmt = $db->prepare("
+            INSERT INTO pages 
+            (slug, title, content, excerpt, meta_title, meta_description, meta_keywords, status, template, author_id, published_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+
+        $publishedAt = ($data['status'] ?? 'draft') === 'published' ? date('Y-m-d H:i:s') : null;
+
+        return $stmt->execute([
+            $data['slug'],
+            $data['title'],
+            $data['content'] ?? '',
+            $data['excerpt'] ?? '',
+            $data['meta_title'] ?? $data['title'],
+            $data['meta_description'] ?? '',
+            $data['meta_keywords'] ?? '',
+            $data['status'] ?? 'draft',
+            $data['template'] ?? 'default',
+            $data['author_id'] ?? null,
+            $publishedAt
+        ]);
+    }
+
+    /**
+     * Update page
+     */
+    public static function updatePage($id, $data)
+    {
+        $db = Database::getInstance();
+
+        $fields = [];
+        $values = [];
+
+        $allowedFields = ['slug', 'title', 'content', 'excerpt', 'meta_title', 'meta_description', 'meta_keywords', 'status', 'template'];
+
+        foreach ($allowedFields as $field) {
+            if (isset($data[$field])) {
+                $fields[] = "$field = ?";
+                $values[] = $data[$field];
+            }
+        }
+
+        if (empty($fields)) {
+            return false;
+        }
+
+        $values[] = $id;
+
+        $sql = "UPDATE pages SET " . implode(', ', $fields) . " WHERE id = ?";
+        $stmt = $db->prepare($sql);
+
+        return $stmt->execute($values);
+    }
+
+    /**
+     * Delete page
+     */
+    public static function deletePage($id)
+    {
+        $db = Database::getInstance();
+        $stmt = $db->prepare("DELETE FROM pages WHERE id = ?");
+        return $stmt->execute([$id]);
+    }
+
+    /**
+     * Get menu by location
+     */
+    public static function getMenu($location)
+    {
+        if (isset(self::$cache['menu_' . $location])) {
+            return self::$cache['menu_' . $location];
+        }
+
+        $db = Database::getInstance();
+        $stmt = $db->prepare("
+            SELECT * FROM menus 
+            WHERE location = ? AND is_active = 1
+            ORDER BY display_order ASC
+            LIMIT 1
+        ");
+        $stmt->execute([$location]);
+        $menu = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($menu && isset($menu['items'])) {
+            $menu['items'] = json_decode($menu['items'], true);
+            self::$cache['menu_' . $location] = $menu;
+        }
+
+        return $menu;
+    }
+
+    /**
+     * Get all menus
+     */
+    public static function getAllMenus()
+    {
+        $db = Database::getInstance();
+        $stmt = $db->prepare("SELECT * FROM menus ORDER BY display_order ASC");
+        $stmt->execute();
+        $menus = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($menus as &$menu) {
+            if (isset($menu['items'])) {
+                $menu['items'] = json_decode($menu['items'], true);
+            }
+        }
+
+        return $menus;
+    }
+
+    /**
+     * Save menu
+     */
+    public static function saveMenu($id, $data)
+    {
+        $db = Database::getInstance();
+
+        if (is_array($data['items'])) {
+            $data['items'] = json_encode($data['items']);
+        }
+
+        $stmt = $db->prepare("
+            UPDATE menus 
+            SET name = ?, items = ?, is_active = ?, display_order = ?
+            WHERE id = ?
+        ");
+
+        return $stmt->execute([
+            $data['name'],
+            $data['items'],
+            $data['is_active'] ?? 1,
+            $data['display_order'] ?? 0,
+            $id
+        ]);
+    }
+
+    /**
+     * Clear cache
+     */
+    public static function clearCache()
+    {
+        self::$cache = [];
+    }
 }
-?>

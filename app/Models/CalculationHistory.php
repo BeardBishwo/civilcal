@@ -19,7 +19,7 @@ class CalculationHistory {
     
     // Helper method to decode JSON data
     public static function decodeJsonField($value) {
-        return json_decode($value, true);
+        return json_decode($value ?? '{}', true);
     }
     
     // Helper method to encode JSON data
@@ -41,8 +41,8 @@ class CalculationHistory {
         
         // Decode JSON fields
         foreach ($results as &$result) {
-            $result['input_data'] = json_decode($result['input_data'], true);
-            $result['result_data'] = json_decode($result['result_data'], true);
+            $result['input_data'] = json_decode($result['input_data'] ?? '{}', true);
+            $result['result_data'] = json_decode($result['result_data'] ?? '{}', true);
         }
         
         return $results;
@@ -64,8 +64,8 @@ class CalculationHistory {
         
         // Decode JSON fields
         foreach ($results as &$result) {
-            $result['input_data'] = json_decode($result['input_data'], true);
-            $result['result_data'] = json_decode($result['result_data'], true);
+            $result['input_data'] = json_decode($result['input_data'] ?? '{}', true);
+            $result['result_data'] = json_decode($result['result_data'] ?? '{}', true);
         }
         
         return $results;
@@ -150,8 +150,8 @@ class CalculationHistory {
         $result = $stmt->fetch();
         
         if ($result) {
-            $result['input_data'] = json_decode($result['input_data'], true);
-            $result['result_data'] = json_decode($result['result_data'], true);
+            $result['input_data'] = json_decode($result['input_data'] ?? '{}', true);
+            $result['result_data'] = json_decode($result['result_data'] ?? '{}', true);
         }
         
         return $result;
@@ -183,8 +183,8 @@ class CalculationHistory {
         $result = $stmt->fetch();
         
         if ($result) {
-            $result['input_data'] = json_decode($result['input_data'], true);
-            $result['result_data'] = json_decode($result['result_data'], true);
+            $result['input_data'] = json_decode($result['input_data'] ?? '{}', true);
+            $result['result_data'] = json_decode($result['result_data'] ?? '{}', true);
         }
         
         return $result;
@@ -247,8 +247,8 @@ class CalculationHistory {
         
         // Decode JSON fields
         foreach ($results as &$result) {
-            $result['input_data'] = json_decode($result['input_data'], true);
-            $result['result_data'] = json_decode($result['result_data'], true);
+            $result['input_data'] = json_decode($result['input_data'] ?? '{}', true);
+            $result['result_data'] = json_decode($result['result_data'] ?? '{}', true);
         }
         
         return $results;

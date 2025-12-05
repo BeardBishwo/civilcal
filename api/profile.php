@@ -10,17 +10,36 @@ use App\Models\User;
 
 header('Content-Type: application/json');
 
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Get request method
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Check authentication (session already started in bootstrap)
-if (!isset($_SESSION['user_id'])) {
+// Check authentication - support both session and HTTP Basic Auth
+$userId = null;
+
+if (isset($_SESSION['user_id'])) {
+    $userId = $_SESSION['user_id'];
+} elseif (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+    // Authenticate using HTTP Basic Auth
+    $user = User::findByUsername($_SERVER['PHP_AUTH_USER']);
+    if ($user) {
+        $userArray = is_array($user) ? $user : (array) $user;
+        if (password_verify($_SERVER['PHP_AUTH_PW'], $userArray['password'])) {
+            $userId = $userArray['id'];
+        }
+    }
+}
+
+if (!$userId) {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Unauthorized']);
     exit;
 }
 
-$userId = $_SESSION['user_id'];
 $userModel = new User();
 
 try {

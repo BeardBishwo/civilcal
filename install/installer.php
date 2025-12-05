@@ -87,7 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (getAutoDeleteSetting()) {
                     deleteInstallFolder();
                 }
-                header('Location: ../admin/dashboard');
+                $baseUrl = getAppBaseUrl();
+                header('Location: ' . $baseUrl . '/admin/dashboard');
                 exit;
             } else {
                 $errors[] = $result['error'];
@@ -97,6 +98,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Helper functions
+
+/**
+ * Get the base URL for the application
+ */
+function getAppBaseUrl() {
+    // Determine base path from REQUEST_URI
+    $scriptPath = dirname($_SERVER['SCRIPT_NAME']); // /install or /Bishwo_Calculator/install
+    $basePath = dirname($scriptPath); // / or /Bishwo_Calculator
+    
+    // Clean up the base path
+    if ($basePath === '/' || $basePath === '\\') {
+        $basePath = '';
+    }
+    
+    return $basePath;
+}
+
 function checkSystemRequirements() {
     $errors = [];
     

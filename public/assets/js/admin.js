@@ -43,20 +43,50 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // ===== SUBMENU TOGGLE ===== //
     
-    const submenuToggles = document.querySelectorAll('.submenu-toggle');
-    
-    submenuToggles.forEach(toggle => {
-        toggle.addEventListener('click', function(e) {
+    // Use event delegation for submenu toggles
+    if (sidebar) {
+        sidebar.addEventListener('click', function(e) {
+            const toggle = e.target.closest('.submenu-toggle');
+            if (!toggle) return;
+            
             e.preventDefault();
-            const parent = this.closest('.has-submenu');
+            const parent = toggle.closest('.has-submenu');
+            if (!parent) return;
+            
+            const submenu = parent.querySelector('.submenu');
+            const arrow = toggle.querySelector('.submenu-arrow');
+            
+            // Close other submenus
+            document.querySelectorAll('.has-submenu').forEach(item => {
+                if (item !== parent && item.classList.contains('active')) {
+                    item.classList.remove('active');
+                    const otherSubmenu = item.querySelector('.submenu');
+                    const otherArrow = item.querySelector('.submenu-arrow');
+                    if (otherSubmenu) otherSubmenu.style.maxHeight = null;
+                    if (otherArrow) otherArrow.style.transform = 'rotate(0deg)';
+                }
+            });
+            
+            // Toggle current submenu
             parent.classList.toggle('active');
+            
+            if (parent.classList.contains('active')) {
+                if (submenu) submenu.style.maxHeight = submenu.scrollHeight + 'px';
+                if (arrow) arrow.style.transform = 'rotate(90deg)';
+            } else {
+                if (submenu) submenu.style.maxHeight = null;
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
+            }
         });
-    });
+    }
     
     // Auto-expand active submenu
     const activeSubmenu = document.querySelector('.has-submenu.active');
     if (activeSubmenu) {
-        activeSubmenu.classList.add('active');
+        const submenu = activeSubmenu.querySelector('.submenu');
+        const arrow = activeSubmenu.querySelector('.submenu-arrow');
+        if (submenu) submenu.style.maxHeight = submenu.scrollHeight + 'px';
+        if (arrow) arrow.style.transform = 'rotate(90deg)';
     }
     
     // ===== DROPDOWN TOGGLES ===== //
@@ -70,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
             notificationDropdown.classList.toggle('show');
             // Close profile dropdown if open
+            const profileDropdown = document.getElementById('profileDropdown');
             if (profileDropdown) {
                 profileDropdown.classList.remove('show');
             }
@@ -85,6 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
             profileDropdown.classList.toggle('show');
             // Close notification dropdown if open
+            const notificationDropdown = document.getElementById('notificationDropdown');
             if (notificationDropdown) {
                 notificationDropdown.classList.remove('show');
             }
@@ -93,6 +125,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Close dropdowns when clicking outside
     document.addEventListener('click', function() {
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        const profileDropdown = document.getElementById('profileDropdown');
+        
         if (notificationDropdown) {
             notificationDropdown.classList.remove('show');
         }
@@ -143,7 +178,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function handleResize() {
         if (window.innerWidth > 768) {
-            sidebar.classList.remove('show');
+            const sidebar = document.getElementById('adminSidebar');
+            if (sidebar) {
+                sidebar.classList.remove('show');
+            }
         }
     }
     

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
@@ -15,7 +16,7 @@ class ThemeController extends Controller
     {
         parent::__construct();
         $this->themeManager = new ThemeManager();
-        
+
         // Check admin authentication
         if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
             $this->redirect('/login');
@@ -34,10 +35,12 @@ class ThemeController extends Controller
             if (empty($payload)) {
                 $raw = file_get_contents('php://input');
                 $json = json_decode($raw, true);
-                if (is_array($json)) { $payload = $json; }
+                if (is_array($json)) {
+                    $payload = $json;
+                }
             }
 
-            $allowed = ['primary','secondary','accent','background','text','text_secondary','dark_mode_enabled','typography_style'];
+            $allowed = ['primary', 'secondary', 'accent', 'background', 'text', 'text_secondary', 'dark_mode_enabled', 'typography_style'];
             $settings = [];
             foreach ($allowed as $k) {
                 if (array_key_exists($k, $payload)) {
@@ -73,7 +76,13 @@ class ThemeController extends Controller
             $themes = $this->themeManager->getAllThemes();
             $stats = $this->themeManager->getThemeStats();
             $activeTheme = $this->getActiveThemeData();
-            
+
+            // Add is_active key for backward compatibility with views
+            foreach ($themes as &$theme) {
+                $theme['is_active'] = ($theme['status'] === 'active') ? 1 : 0;
+            }
+            unset($theme); // Break the reference
+
             // Prepare data for the view
             $data = [
                 'currentPage' => 'themes',
@@ -82,12 +91,12 @@ class ThemeController extends Controller
                 'stats' => $stats,
                 'title' => 'Themes Management - Admin Panel'
             ];
-            
+
             // Load the admin view
-            $this->adminView('admin/themes/index', $data);
+            $this->view->render('admin/themes/index', $data);
         } catch (Exception $e) {
             error_log("Theme Index Error: " . $e->getMessage());
-            $this->adminView('admin/themes/index', [
+            $this->view->render('admin/themes/index', [
                 'error' => 'Failed to load themes: ' . $e->getMessage(),
                 'title' => 'Themes Management - Admin Panel'
             ]);
@@ -109,10 +118,10 @@ class ThemeController extends Controller
 
             $themeId = intval($_POST['theme_id']);
             $result = $this->themeManager->activateTheme($themeId);
-            
+
             // Log the action
             error_log("Theme Admin Activity: theme_activated - Theme ID: {$themeId}");
-            
+
             if ($result['success']) {
                 AuditLogger::info('theme_activated', ['theme_id' => $themeId]);
                 $this->success('Theme activated successfully', $result);
@@ -141,10 +150,10 @@ class ThemeController extends Controller
 
             $themeId = intval($_POST['theme_id']);
             $result = $this->themeManager->deactivateTheme($themeId);
-            
+
             // Log the action
             error_log("Theme Admin Activity: theme_deactivated - Theme ID: {$themeId}");
-            
+
             if ($result['success']) {
                 AuditLogger::info('theme_deactivated', ['theme_id' => $themeId]);
                 $this->success('Theme deactivated successfully', $result);
@@ -174,11 +183,11 @@ class ThemeController extends Controller
             $themeId = intval($_POST['theme_id']);
             $createBackup = isset($_POST['create_backup']) ? (bool)$_POST['create_backup'] : true;
             $result = $this->themeManager->deleteTheme($themeId, $createBackup);
-            
+
             // Log the action
             $action = $createBackup ? 'theme_deleted_with_backup' : 'theme_deleted';
             error_log("Theme Admin Activity: {$action} - Theme ID: {$themeId}");
-            
+
             if ($result['success']) {
                 AuditLogger::info($action, ['theme_id' => $themeId]);
                 $this->success('Theme deleted successfully', $result);
@@ -207,10 +216,10 @@ class ThemeController extends Controller
 
             $themeId = intval($_POST['theme_id']);
             $result = $this->themeManager->restoreTheme($themeId);
-            
+
             // Log the action
             error_log("Theme Admin Activity: theme_restored - Theme ID: {$themeId}");
-            
+
             if ($result['success']) {
                 AuditLogger::info('theme_restored', ['theme_id' => $themeId]);
                 $this->success('Theme restored successfully', $result);
@@ -239,10 +248,10 @@ class ThemeController extends Controller
 
             $themeId = intval($_POST['theme_id']);
             $result = $this->themeManager->hardDeleteTheme($themeId);
-            
+
             // Log the action
             error_log("Theme Admin Activity: theme_hard_deleted - Theme ID: {$themeId}");
-            
+
             if ($result['success']) {
                 AuditLogger::info('theme_hard_deleted', ['theme_id' => $themeId]);
                 $this->success('Theme permanently deleted', $result);
@@ -279,7 +288,7 @@ class ThemeController extends Controller
             }
 
             $result = $this->themeManager->installThemeFromZip($upload['file_path']);
-            
+
             // Log the action
             if ($result['success']) {
                 error_log("Theme Admin Activity: theme_uploaded - Theme: " . ($result['theme_name'] ?? 'Unknown'));
@@ -314,7 +323,7 @@ class ThemeController extends Controller
 
             $themeName = $_POST['theme_name'];
             $result = $this->themeManager->validateTheme($themeName);
-            
+
             $this->success('Validation completed', $result);
         } catch (Exception $e) {
             error_log("Theme Validation Error: " . $e->getMessage());
@@ -332,9 +341,9 @@ class ThemeController extends Controller
         try {
             $query = $_GET['q'] ?? '';
             $limit = intval($_GET['limit'] ?? 20);
-            
+
             $themes = $this->themeManager->searchThemes($query, $limit);
-            
+
             $this->success('Search completed', ['themes' => $themes]);
         } catch (Exception $e) {
             error_log("Theme Search Error: " . $e->getMessage());
@@ -347,17 +356,17 @@ class ThemeController extends Controller
         try {
             $themeId = $_GET['theme_id'] ?? null;
             $backups = $this->themeManager->getThemeBackups($themeId);
-            
+
             $data = [
                 'currentPage' => 'theme-backups',
                 'backups' => $backups,
                 'title' => 'Theme Backups - Admin Panel'
             ];
-            
-            $this->adminView('admin/themes/backups', $data);
+
+            $this->view->render('admin/themes/backups', $data);
         } catch (Exception $e) {
             error_log("Theme Backups Error: " . $e->getMessage());
-            $this->adminView('admin/themes/backups', [
+            $this->view->render('admin/themes/backups', [
                 'error' => 'Failed to load backups: ' . $e->getMessage(),
                 'title' => 'Theme Backups - Admin Panel'
             ]);
@@ -401,7 +410,7 @@ class ThemeController extends Controller
 
             // Log the bulk action
             error_log("Theme Admin Activity: bulk_theme_action - Action: {$action}, Count: " . count($themeIds));
-            
+
             $this->success("Bulk action '{$action}' completed", [
                 'results' => $results
             ]);
@@ -424,19 +433,50 @@ class ThemeController extends Controller
 
     private function isAjax()
     {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-               strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
     public function preview()
     {
         $theme = $this->getActiveThemeData();
-        $this->adminView('admin/themes/preview', ['currentPage'=>'themes','activeTheme'=>$theme,'title'=>'Theme Preview']);
+        $this->view->render('admin/themes/preview', ['currentPage' => 'themes', 'activeTheme' => $theme, 'title' => 'Theme Preview']);
     }
 
     public function previewById($id)
     {
-        $this->redirect('/');
+        try {
+            $themes = $this->themeManager->getAllThemes();
+            $selected = null;
+            foreach ($themes as $t) {
+                if ((int)($t['id'] ?? 0) === (int)$id) { $selected = $t; break; }
+            }
+            if (!$selected) { $this->redirect('/admin/themes'); return; }
+            $this->view->render('admin/themes/preview', ['currentPage' => 'themes', 'activeTheme' => $selected, 'title' => 'Theme Preview']);
+        } catch (Exception $e) {
+            $this->redirect('/admin/themes');
+        }
+    }
+
+    public function details($slug)
+    {
+        header('Content-Type: application/json');
+        try {
+            $themes = $this->themeManager->getAllThemes();
+            $found = null;
+            foreach ($themes as $t) {
+                if (is_numeric($slug)) {
+                    if ((int)($t['id'] ?? 0) === (int)$slug) { $found = $t; break; }
+                } else {
+                    $candidate = $t['slug'] ?? ($t['name'] ?? null);
+                    if ($candidate && strcasecmp($candidate, $slug) === 0) { $found = $t; break; }
+                }
+            }
+            if (!$found) { echo json_encode(['success' => false, 'message' => 'Theme not found']); return; }
+            echo json_encode(['success' => true, 'data' => $found]);
+        } catch (\Throwable $e) {
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
     }
 
     public function saveColors($id)
@@ -512,9 +552,8 @@ class ThemeController extends Controller
 
     public function resetCustomizations($id)
     {
-        $settings = ['colors'=>[], 'typography'=>[], 'features'=>[], 'layout'=>[], 'custom_css'=>''];
+        $settings = ['colors' => [], 'typography' => [], 'features' => [], 'layout' => [], 'custom_css' => ''];
         $res = $this->themeManager->updateThemeSettings((int)$id, $settings);
         $this->json($res);
     }
 }
-?>

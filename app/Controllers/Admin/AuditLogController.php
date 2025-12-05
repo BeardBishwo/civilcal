@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
@@ -9,8 +10,12 @@ class AuditLogController extends Controller
     {
         $logsDir = (defined('STORAGE_PATH') ? STORAGE_PATH : (defined('BASE_PATH') ? BASE_PATH . '/storage' : __DIR__ . '/../../..')) . '/logs';
         $files = glob($logsDir . '/audit-*.log') ?: [];
-        usort($files, function($a,$b){ return strcmp($b, $a); });
-        $dates = array_map(function($f){ return substr(basename($f), 6, 10); }, $files);
+        usort($files, function ($a, $b) {
+            return strcmp($b, $a);
+        });
+        $dates = array_map(function ($f) {
+            return substr(basename($f), 6, 10);
+        }, $files);
         $selected = $_GET['date'] ?? ($dates[0] ?? date('Y-m-d'));
         $level = strtoupper(trim($_GET['level'] ?? ''));
         $q = trim($_GET['q'] ?? '');
@@ -23,21 +28,27 @@ class AuditLogController extends Controller
             $lines = @file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
             foreach ($lines as $line) {
                 $obj = json_decode($line, true);
-                if (!is_array($obj)) { continue; }
-                if ($level && strtoupper($obj['level'] ?? '') !== $level) { continue; }
+                if (!is_array($obj)) {
+                    continue;
+                }
+                if ($level && strtoupper($obj['level'] ?? '') !== $level) {
+                    continue;
+                }
                 if ($q) {
                     $hay = ($obj['action'] ?? '') . ' ' . json_encode($obj['details'] ?? []);
-                    if (stripos($hay, $q) === false) { continue; }
+                    if (stripos($hay, $q) === false) {
+                        continue;
+                    }
                 }
                 $entries[] = $obj;
             }
         }
         $total = count($entries);
+        $pages = max(1, (int)ceil($total / max(1, $perPage)));
         $offset = ($page - 1) * $perPage;
         $paged = array_slice($entries, $offset, $perPage);
 
         $data = [
-            'currentPage' => 'audit-logs',
             'entries' => $paged,
             'dates' => $dates,
             'selectedDate' => $selected,
@@ -46,9 +57,16 @@ class AuditLogController extends Controller
             'page' => $page,
             'perPage' => $perPage,
             'total' => $total,
-            'title' => 'Audit Logs - Admin Panel'
+            'pages' => $pages,
+            'page_title' => 'Audit Logs',
+            'breadcrumbs' => [
+                ['title' => 'Dashboard', 'url' => '/admin'],
+                ['title' => 'Audit Logs', 'url' => '/admin/audit-logs']
+            ]
         ];
-        $this->adminView('admin/audit/index', $data);
+        
+        // Use the View class's render method to properly use themes/admin layout
+        $this->view->render('admin/audit/index', $data);
     }
 
     public function download()

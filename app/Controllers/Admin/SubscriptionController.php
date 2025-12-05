@@ -13,7 +13,13 @@ class SubscriptionController extends Controller
         $stats = $this->getBillingStats();
         
         // Load the subscriptions management view
-        include __DIR__ . '/../../Views/admin/subscriptions/index.php';
+        // Load the subscriptions management view
+        $this->view->render('admin/subscriptions/index', [
+            'plans' => $plans,
+            'transactions' => $transactions,
+            'stats' => $stats,
+            'title' => 'Subscription Management'
+        ]);
     }
 
     public function createPlan()

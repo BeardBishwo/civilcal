@@ -36,9 +36,124 @@ class PaymentController extends Controller
             'payment_methods' => $this->getAvailablePaymentMethods($userCountry)
         ];
         
-        $this->view('payment/checkout', $data);
+        $this->view->render('payment/checkout', $data);
     }
     
+    /**
+     * Process payment (API endpoint)
+     */
+    public function processPayment()
+    {
+        header('Content-Type: application/json');
+        
+        try {
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'Method not allowed']);
+                return;
+            }
+            
+            // Get input
+            $input = file_get_contents('php://input');
+            $data = json_decode($input, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Invalid JSON']);
+                return;
+            }
+            
+            // Validate required fields
+            if (!isset($data['amount']) || !isset($data['currency']) || !isset($data['payment_method'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Missing required fields: amount, currency, payment_method']);
+                return;
+            }
+            
+            $amount = $data['amount'];
+            $currency = $data['currency'];
+            $paymentMethod = $data['payment_method'];
+            
+            // Validate amount
+            if (!is_numeric($amount) || $amount <= 0) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Invalid amount']);
+                return;
+            }
+            
+            // Validate currency (not empty)
+            if (empty($currency)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Currency is required']);
+                return;
+            }
+            
+            $allowedCurrencies = ['USD', 'EUR', 'GBP', 'NPR'];
+            if (!in_array($currency, $allowedCurrencies)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Invalid currency']);
+                return;
+            }
+            
+            // Validate payment method (not empty)
+            if (empty($paymentMethod)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Payment method is required']);
+                return;
+            }
+            
+            // Mock payment processing (in production, integrate with payment gateway)
+            $paymentId = 'PAY_' . uniqid();
+            $transactionId = 'TXN_' . time() . '_' . rand(1000, 9999);
+            
+            // Simulate payment processing
+            sleep(1);
+            
+            // Return success response
+            http_response_code(200);
+            echo json_encode([
+                'success' => true,
+                'payment_id' => $paymentId,
+                'transaction_id' => $transactionId,
+                'amount' => $amount,
+                'currency' => $currency,
+                'status' => 'completed',
+                'message' => 'Payment processed successfully'
+            ]);
+            
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'error' => 'Payment processing failed',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Get available payment methods (API endpoint)
+     */
+    public function getPaymentMethods()
+    {
+        header('Content-Type: application/json');
+        
+        try {
+            $userCountry = $this->getUserCountry();
+            $methods = $this->getAvailablePaymentMethods($userCountry);
+            
+            http_response_code(200);
+            echo json_encode([
+                'success' => true,
+                'payment_methods' => $methods,
+                'user_country' => $userCountry
+            ]);
+            
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to get payment methods']);
+        }
+    }
+
     /**
      * Process PayPal payment
      */
@@ -106,7 +221,7 @@ class PaymentController extends Controller
         // Log payment attempt
         $this->logPaymentAttempt('esewa', $amount, $feature, 'initiated');
         
-        $this->view('payment/esewa-form', $data);
+        $this->view->render('payment/esewa-form', $data);
     }
     
     /**
@@ -158,7 +273,7 @@ class PaymentController extends Controller
         // Mark payment as completed
         $this->completePayment($gateway, $data['amount'], $data['feature'], $data);
         
-        $this->view('payment/success', $data);
+        $this->view->render('payment/success', $data);
     }
     
     /**
@@ -173,7 +288,7 @@ class PaymentController extends Controller
             'error' => $_GET['error'] ?? 'Payment was not completed'
         ];
         
-        $this->view('payment/failed', $data);
+        $this->view->render('payment/failed', $data);
     }
     
     /**

@@ -14,289 +14,72 @@ class Controller {
         require_once __DIR__ . '/../Config/db.php';
         require_once __DIR__ . '/../Helpers/functions.php';
         
-        // Session is already started in bootstrap.php - no need to start again
-        
-        // Initialize database connection using global function
+        // Initialize database connection
         $this->db = get_db();
         
-        // Initialize authentication (if Auth class exists)
-        if (class_exists('Auth')) {
+        // Initialize authentication
+        if (class_exists('App\Core\Auth')) {
             $this->auth = new Auth();
         }
         
-        // Initialize theme manager (if method exists)
-        if (method_exists($this, 'initTheme')) {
-            $this->initTheme();
-        }
-        
-        // Initialize view (if View class exists)
-        if (class_exists('\App\Core\View')) {
-            try {
-                $this->view = new \App\Core\View();
-            } catch (Exception $e) {
-                error_log("View initialization failed: " . $e->getMessage());
-                $this->view = null;
-            }
-        } else {
-            error_log("View class not found");
-            $this->view = null;
-        }
-        
-        // Initialize session (if Session class exists)
-        if (class_exists('Session')) {
-            $this->session = new Session();
+        // Initialize View object
+        if (class_exists('App\Core\View')) {
+            $this->view = new View();
         }
     }
 
-
     /**
-     * Initialize theme system
+     * Render a view wrapped in a layout
+     * 
+     * @param string $layoutName The layout file (e.g., 'admin/layout')
+     * @param array $data Data to pass to both view and layout
      */
-    private function initTheme() {
-        // Set default category if not set
-        if (!isset($_SESSION['default_category'])) {
-            $_SESSION['default_category'] = 'home';
-        }
+    protected function layout($layoutName, $data = []) {
+        // Start output buffering to capture the view content
+        ob_start();
         
-        // Set default page title if not set
-        if (!isset($_SESSION['default_title'])) {
-            $_SESSION['default_title'] = 'Bishwo Calculator - Professional Engineering Calculations';
-        }
-    }
-    
-    /**
-     * Set current page category for theme styling
-     */
-    protected function setCategory($category) {
-        $_SESSION['current_category'] = $category;
-        $this->theme = $category;
-    }
-    
-    /**
-     * Set page title
-     */
-    protected function setTitle($title) {
-        $_SESSION['page_title'] = $title;
-    }
-    
-    /**
-     * Set page description
-     */
-    protected function setDescription($description) {
-        $_SESSION['page_description'] = $description;
-    }
-    
-    /**
-     * Set page keywords
-     */
-    protected function setKeywords($keywords) {
-        $_SESSION['page_keywords'] = $keywords;
-    }
-    
-    /**
-     * Render view with theme integration
-     */
-    protected function view($view, $data = []) {
-        // Set default data
-        $data['current_category'] = isset($_SESSION['current_category']) ? $_SESSION['current_category'] : 'home';
-        $data['page_title'] = isset($_SESSION['page_title']) ? $_SESSION['page_title'] : 'Bishwo Calculator';
-        $data['page_description'] = isset($_SESSION['page_description']) ? $_SESSION['page_description'] : 'Professional engineering calculations and design tools';
-        $data['page_keywords'] = isset($_SESSION['page_keywords']) ? $_SESSION['page_keywords'] : 'engineering, calculator, design, construction';
+        // If there's a specific view to render, do it now
+        // The calling file (view) will output its content, which we'll capture
         
-        // Add theme metadata (with null checks)
-        if ($this->view && method_exists($this->view, 'getThemeMetadata')) {
-            $data['theme_metadata'] = $this->view->getThemeMetadata();
-            $data['active_theme'] = $this->view->getActiveTheme();
-            $data['theme_config'] = $this->view->getThemeConfig();
-        } else {
-            // Fallback theme data
-            $data['theme_metadata'] = [];
-            $data['active_theme'] = 'default';
-            $data['theme_config'] = [];
-        }
+        // Get the buffered content (this will be set by the calling view file)
+        $content = ob_get_clean();
         
-        // Clear session data for next request
-        unset($_SESSION['current_category'], $_SESSION['page_title'], $_SESSION['page_description'], $_SESSION['page_keywords']);
-        
-        // Render the view
-        if ($this->view && method_exists($this->view, 'render')) {
-            $this->view->render($view, $data);
-        } else {
-            // Fallback: simple include-based rendering
-            $this->simpleRender($view, $data);
-        }
-    }
-    
-    /**
-     * Simple fallback rendering when View class is not available
-     */
-    private function simpleRender($view, $data = []) {
-        // Extract data for template use
+        // Extract data for layout use
         extract($data);
         
-        // Build view path
-        $viewPath = __DIR__ . '/../Views/' . str_replace('.', '/', $view) . '.php';
+        // Build layout path
+        $layoutPath = __DIR__ . '/../Views/' . str_replace('.', '/', $layoutName) . '.php';
         
-        if (file_exists($viewPath)) {
-            include $viewPath;
+        if (file_exists($layoutPath)) {
+            include $layoutPath;
         } else {
-            // Show basic error page
-            echo "<h1>View Error</h1>";
-            echo "<p>View file not found: " . htmlspecialchars($view) . "</p>";
-            echo "<p>Expected path: " . htmlspecialchars($viewPath) . "</p>";
+            echo "<h1>Layout Error</h1>";
+            echo "<p>Layout file not found: " . htmlspecialchars($layoutName) . "</p>";
+            echo "<p>Expected path: " . htmlspecialchars($layoutPath) . "</p>";
         }
     }
     
     /**
-     * Render view with admin layout
+     * Send JSON response
+     * 
+     * @param array $data The data to send as JSON
+     * @param int $statusCode HTTP status code (default 200)
      */
-    protected function adminView($view, $data = []) {
-        $data['layout'] = 'admin';
-        $data['current_category'] = 'admin';
-        $this->view($view, $data);
-    }
-    
-    /**
-     * Render view with auth layout
-     */
-    protected function authView($view, $data = []) {
-        $data['layout'] = 'auth';
-        $data['current_category'] = 'auth';
-        $this->view($view, $data);
-    }
-    
-    /**
-     * Render JSON response
-     */
-    protected function json($data, $status = 200) {
-        http_response_code($status);
+    protected function json($data, $statusCode = 200) {
+        http_response_code($statusCode);
         header('Content-Type: application/json');
         echo json_encode($data);
         exit;
     }
     
     /**
-     * Render plain text response
-     */
-    protected function plain($text, $status = 200) {
-        http_response_code($status);
-        header('Content-Type: text/plain');
-        echo $text;
-        exit;
-    }
-    
-    /**
-     * Redirect to URL
+     * Redirect to a URL
+     * 
+     * @param string $url The URL to redirect to
      */
     protected function redirect($url) {
-        header("Location: $url");
+        header('Location: ' . $url);
         exit;
-    }
-    
-    /**
-     * Get current user
-     */
-    protected function getUser() {
-        // Support both new structure ($_SESSION['user']) and legacy session keys
-        if (!empty($_SESSION['user']) && is_array($_SESSION['user'])) {
-            return $_SESSION['user'];
-        } else if (!empty($_SESSION['user_id'])) {
-            // Build user array from legacy session vars
-            return [
-                'id' => $_SESSION['user_id'],
-                'username' => $_SESSION['username'] ?? '',
-                'email' => $_SESSION['email'] ?? '',
-                'role' => $_SESSION['role'] ?? 'user'
-            ];
-        }
-        return null;
-    }
-    
-    /**
-     * Get current user ID
-     */
-    protected function getCurrentUserId() {
-        $user = $this->getUser();
-        return $user ? ($user['id'] ?? null) : null;
-    }
-    
-    /**
-     * Check if user is authenticated
-     */
-    protected function isAuthenticated() {
-        // Placeholder - will be implemented when Auth class is complete
-        return isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true;
-    }
-    
-    /**
-     * Check if user has role
-     */
-    protected function hasRole($role) {
-        // Placeholder - will be implemented when Auth class is complete
-        $user = $this->getUser();
-        return $user && isset($user['role']) && $user['role'] === $role;
-    }
-    
-    /**
-     * Require authentication
-     */
-    protected function requireAuth() {
-        if (!$this->isAuthenticated()) {
-            $this->redirect('/auth/login');
-        }
-    }
-    
-    /**
-     * Require specific role
-     */
-    protected function requireRole($role) {
-        $this->requireAuth();
-        if (!$this->hasRole($role)) {
-            $this->redirect('/unauthorized');
-        }
-    }
-    
-    /**
-     * Send error response
-     * 
-     * @param string $message Error message
-     * @param int $status HTTP status code
-     * @param array $data Additional error data
-     */
-    protected function error($message, $status = 400, $data = []) {
-        $response = [
-            'success' => false,
-            'error' => [
-                'message' => $message,
-                'code' => $status
-            ]
-        ];
-        
-        if (!empty($data)) {
-            $response['error']['data'] = $data;
-        }
-        
-        $this->json($response, $status);
-    }
-    
-    /**
-     * Send success response
-     * 
-     * @param string $message Success message
-     * @param mixed $data Response data
-     * @param int $status HTTP status code
-     */
-    protected function success($message = 'Success', $data = null, $status = 200) {
-        $response = [
-            'success' => true,
-            'message' => $message
-        ];
-        
-        if ($data !== null) {
-            $response['data'] = $data;
-        }
-        
-        $this->json($response, $status);
     }
 }
 ?>

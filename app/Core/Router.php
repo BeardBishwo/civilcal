@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Core;
 
-class Router {
+class Router
+{
     public $routes = [];
     public $middleware = [];
-    
+
     // Middleware mapping
     private $middlewareMap = [
         'auth' => '\App\Middleware\AuthMiddleware',
@@ -15,8 +17,9 @@ class Router {
         'security' => '\App\Middleware\SecurityMiddleware',
         'ratelimit' => '\App\Middleware\RateLimitMiddleware'
     ];
-    
-    public function add($method, $uri, $controller, $middleware = []) {
+
+    public function add($method, $uri, $controller, $middleware = [])
+    {
         $mw = $middleware;
         if (!in_array('security', $mw, true)) {
             $mw[] = 'security';
@@ -24,17 +27,15 @@ class Router {
         if (stripos($uri, '/api') === 0 && !in_array('cors', $mw, true)) {
             $mw[] = 'cors';
         }
-        if (strtoupper($method) === 'OPTIONS' && !in_array('cors', $mw, true)) {
+        if (strtoupper($method) !== 'OPTIONS' && !in_array('cors', $mw, true)) {
             $mw[] = 'cors';
         }
-        // Attach CSRF middleware for state-changing methods, except installer
-        $upperMethod = strtoupper($method);
-        if (in_array($upperMethod, ['POST','PUT','PATCH','DELETE'], true)
-            && stripos($uri, '/install') !== 0
-            && stripos($uri, '/api') !== 0
-            && !in_array('csrf', $mw, true)) {
+
+        $methodUpper = strtoupper($method);
+        if (in_array($methodUpper, ['POST','PUT','PATCH','DELETE'], true) && !in_array('csrf', $mw, true)) {
             $mw[] = 'csrf';
         }
+
         $this->routes[] = [
             'method' => $method,
             'uri' => $uri,
@@ -42,101 +43,96 @@ class Router {
             'middleware' => $mw
         ];
     }
-    
-    public function dispatch() {
+
+    public function dispatch()
+    {
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $method = $_SERVER['REQUEST_METHOD'];
-        
+
         // Fix subdirectory installations by removing base path
         $basePath = $this->getBasePath();
-        if ($basePath && stripos($uri, $basePath) === 0) { // Use stripos for case-insensitive
+
+        if ($basePath && stripos($uri, $basePath) === 0) {
             $uri = substr($uri, strlen($basePath));
             if (empty($uri)) {
                 $uri = '/';
             }
         }
-        
-        // Debug: Log the route matching attempt
-        $debugMode = defined('APP_DEBUG') && APP_DEBUG;
-        
+
         foreach ($this->routes as $route) {
             $matches = $this->matchRoute($route, $uri, $method);
             if ($matches !== false) {
                 return $this->callRoute($route, $matches);
             }
         }
-        
+
         http_response_code(404);
-        if ($debugMode) {
-            echo "<h1>404 - Page Not Found</h1>";
-        } else {
-            $view = new \App\Core\View();
-            $view->render('errors/404', ['title'=>'Not Found']);
-        }
-        }
-    
-    public function getBasePath() {
-        // Detect base path for subdirectory installations
-        $scriptName = $_SERVER['SCRIPT_NAME']; // e.g., /bishwo_calculator/public/index.php
-        $scriptDir = dirname($scriptName); // e.g., /bishwo_calculator/public
-        
-        // Remove /public from the path since we're hiding it
+        echo "<h1>404 - Page Not Found</h1>";
+    }
+
+    public function getBasePath()
+    {
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $scriptDir = dirname($scriptName);
+
         if (substr($scriptDir, -7) === '/public') {
             $scriptDir = substr($scriptDir, 0, -7);
         }
-        
-        // Check if this is a subdirectory installation
+
         if ($scriptDir !== '/' && $scriptDir !== '') {
             return rtrim($scriptDir, '/');
         }
-        
+
         return null;
     }
-    
-    public function matchRoute($route, $uri, $method) {
-        // Convert route URI to regex pattern
+
+    public function matchRoute($route, $uri, $method)
+    {
+        // Allow HEAD requests to match GET routes
+        if ($method === 'HEAD' && $route['method'] === 'GET') {
+            // Match
+        } elseif ($route['method'] !== $method) {
+            return false;
+        }
+
         $pattern = preg_replace('/\{([a-z_][a-z0-9_]*)\}/i', '([^/]+)', $route['uri']);
         $pattern = "#^$pattern$#";
-        
-        if ($route['method'] === $method && preg_match($pattern, $uri, $matches)) {
-            return $matches; // return captured parameters
+
+        if (preg_match($pattern, $uri, $matches)) {
+            return $matches;
         }
         return false;
     }
-    
-    public function callRoute($route, $matches = []) {
-        // Extract route parameters (exclude the full match at index 0)
+
+    public function callRoute($route, $matches = [])
+    {
         $params = array_slice($matches, 1);
-        
-        // Build request array
+
         $request = [
             'method' => $_SERVER['REQUEST_METHOD'] ?? 'GET',
             'uri' => parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH),
-            'params' => $params,
             'get' => $_GET,
             'post' => $_POST,
             'cookies' => $_COOKIE,
-            'server' => $_SERVER,
+            'server' => $_SERVER
         ];
-        
-        // Execute middleware
+
         $pipeline = [];
         foreach ($route['middleware'] as $middlewareName) {
-            // Map middleware name to class
             $middlewareClass = $this->middlewareMap[$middlewareName] ?? null;
-            
+
             if ($middlewareClass && class_exists($middlewareClass)) {
                 $middleware = new $middlewareClass();
-                // Support both legacy boolean middlewares and pipeline middlewares
+
                 if (method_exists($middleware, 'handle')) {
                     try {
                         $ref = new \ReflectionMethod($middleware, 'handle');
                         if ($ref->getNumberOfParameters() >= 2) {
-                            $pipeline[] = $middleware; // will be called as handle($request, $next)
+                            $pipeline[] = $middleware;
                         } else {
-                            // Legacy: handle() returns bool
+                            // Legacy middleware with no parameters - execute immediately
                             if ($middleware->handle() === false) {
-                                return; // blocked
+                                return;
                             }
                         }
                     } catch (\ReflectionException $e) {
@@ -148,38 +144,54 @@ class Router {
                 }
             }
         }
-        
-        // Parse controller@method
+
+        // Execute pipeline middleware
+        $next = function ($request) use ($route, $params) {
+            list($controllerClass, $method) = explode('@', $route['controller']);
+
+            if (strpos($controllerClass, '\\') === false) {
+                $controllerClass = "App\\Controllers\\{$controllerClass}";
+            } else {
+                $controllerClass = "App\\Controllers\\{$controllerClass}";
+            }
+
+            if (class_exists($controllerClass)) {
+                $controller = new $controllerClass();
+                return call_user_func_array([$controller, $method], $params);
+            }
+
+            http_response_code(500);
+            echo "Controller not found: {$controllerClass}";
+            return null;
+        };
+
+        // Run through pipeline in reverse order
+        foreach (array_reverse($pipeline) as $middleware) {
+            $next = function ($request) use ($middleware, $next) {
+                return $middleware->handle($request, $next);
+            };
+        }
+
+        // Execute the pipeline
+        if (!empty($pipeline)) {
+            return $next($request);
+        }
+
         list($controllerClass, $method) = explode('@', $route['controller']);
-        
-        // Handle admin controllers (already have namespace)
+
         if (strpos($controllerClass, '\\') === false) {
             $controllerClass = "App\\Controllers\\{$controllerClass}";
         } else {
             $controllerClass = "App\\Controllers\\{$controllerClass}";
         }
-        
-        // Final controller invoker
-        $controllerInvoker = function($req) use ($controllerClass, $method, $params) {
-            if (class_exists($controllerClass)) {
-                $controller = new $controllerClass();
-                return call_user_func_array([$controller, $method], $params);
-            } else {
-                http_response_code(500);
-                echo "Controller not found: {$controllerClass}";
-                return null;
-            }
-        };
-        
-        // Build middleware pipeline (LIFO)
-        $next = $controllerInvoker;
-        foreach (array_reverse($pipeline) as $mw) {
-            $next = function($req) use ($mw, $next) {
-                return $mw->handle($req, $next);
-            };
+
+        if (class_exists($controllerClass)) {
+            $controller = new $controllerClass();
+            return call_user_func_array([$controller, $method], $params);
         }
-        
-        return $next($request);
+
+        http_response_code(500);
+        echo "Controller not found: {$controllerClass}";
+        return null;
     }
 }
-?>

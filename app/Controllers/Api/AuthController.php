@@ -5,6 +5,7 @@ namespace App\Controllers\Api;
 use App\Core\Controller;
 use App\Core\Database;
 use App\Models\User;
+use App\Services\SecurityNotificationService;
 use Exception;
 
 class AuthController extends Controller
@@ -27,28 +28,47 @@ class AuthController extends Controller
                 return;
             }
 
+            // Try to get JSON input first, fall back to POST data for testing compatibility
             $rawInput = file_get_contents('php://input');
             error_log('API Login raw input: ' . $rawInput);
-            
+
             $input = json_decode($rawInput, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                error_log('API Login JSON decode error: ' . json_last_error_msg());
-                http_response_code(400);
-                echo json_encode(['error' => 'Invalid JSON input']);
-                return;
+
+            // If JSON decode fails or returns empty, try POST data (for test compatibility)
+            if (json_last_error() !== JSON_ERROR_NONE || empty($input)) {
+                error_log('API Login using POST data fallback for testing');
+                $input = $_POST;
             }
-            
-            $username = $input['username_email'] ?? $input['username'] ?? $_POST['username_email'] ?? $_POST['username'] ?? '';
+
+            // Support multiple field names: username, email, username_email
+            // Check in order of priority
+            $username = '';
+            if (isset($input['username_email'])) {
+                $username = $input['username_email'];
+            } elseif (isset($input['email'])) {
+                $username = $input['email'];
+            } elseif (isset($input['username'])) {
+                $username = $input['username'];
+            } elseif (isset($_POST['username_email'])) {
+                $username = $_POST['username_email'];
+            } elseif (isset($_POST['email'])) {
+                $username = $_POST['email'];
+            } elseif (isset($_POST['username'])) {
+                $username = $_POST['username'];
+            }
+
             $password = $input['password'] ?? $_POST['password'] ?? '';
             $rememberMe = $input['remember_me'] ?? $_POST['remember_me'] ?? false;
             
             error_log('API Login attempt for username: ' . $username);
 
             if (empty($username) || empty($password)) {
+                error_log('API Login error: Missing credentials - username: ' . ($username ?: 'empty') . ', password: ' . ($password ? 'provided' : 'empty'));
                 http_response_code(400);
                 echo json_encode(['error' => 'Username and password are required']);
                 return;
             }
+
 
             // Find user by username or email
             $user = User::findByUsername($username);
@@ -63,6 +83,11 @@ class AuthController extends Controller
                 $_SESSION['user'] = $user;
                 $_SESSION['is_admin'] = $user['is_admin'] ?? false;
                 $_SESSION['api_authenticated'] = true; // Mark as API login
+
+                // Check for new IP address and send security notification for admin users
+                $ipAddress = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+                $securityService = new SecurityNotificationService();
+                $securityService->checkAndNotifyNewLogin($user['id'], $ipAddress);
 
                 // Also create a database-backed session and auth_token cookie
                 // so that session management tests and Auth::check() can rely
@@ -149,7 +174,7 @@ class AuthController extends Controller
                         'role' => $user['role'] ?? 'user',
                         'is_admin' => $user['is_admin'] ?? false
                     ],
-                    'redirect_url' => ($user['is_admin'] ?? false) ? '/admin/dashboard' : '/'
+                    'redirect_url' => ($user['is_admin'] ?? false) ? app_base_url('/admin/dashboard') : app_base_url('/')
                 ]);
             } else {
                 http_response_code(401);
@@ -178,9 +203,16 @@ class AuthController extends Controller
     public function register()
     {
         header('Content-Type: application/json');
-        
+
         try {
+            // Try JSON input first, fall back to POST data for testing
             $input = json_decode(file_get_contents('php://input'), true);
+
+            // If JSON decode fails or returns empty, try POST data (for test compatibility)
+            if (json_last_error() !== JSON_ERROR_NONE || empty($input)) {
+                $input = $_POST;
+            }
+
             $username = $input['username'] ?? '';
             $email = $input['email'] ?? '';
             $password = $input['password'] ?? '';
@@ -196,7 +228,7 @@ class AuthController extends Controller
                 $firstName = $nameParts[0] ?? '';
                 $lastName = $nameParts[1] ?? '';
             }
-            
+
             $phoneNumber = $input['phone_number'] ?? $input['phone'] ?? '';
             $engineerRoles = $input['engineer_roles'] ?? [];
             $termsAgree = $input['terms_agree'] ?? false;
@@ -259,9 +291,15 @@ class AuthController extends Controller
         } catch (Exception $e) {
             error_log('Registration error: ' . $e->getMessage());
             
+<<<<<<< HEAD
             // Check if it's a duplicate entry error
             if (strpos($e->getMessage(), 'Duplicate entry') !== false || strpos($e->getMessage(), '1062') !== false) {
                 http_response_code(409);
+=======
+            // Check if this is a duplicate entry error
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false || strpos($e->getMessage(), '1062') !== false) {
+                http_response_code(400);
+>>>>>>> temp-branch
                 echo json_encode(['error' => 'Username or email already exists']);
             } else {
                 http_response_code(500);
@@ -278,6 +316,36 @@ class AuthController extends Controller
         header('Content-Type: application/json');
         
         try {
+            // Check if user is authenticated via session or auth_token cookie
+            $isAuthenticated = false;
+            
+            // Check session first
+            if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
+                $isAuthenticated = true;
+            }
+            
+            // Check auth_token cookie as backup
+            if (!$isAuthenticated && isset($_COOKIE['auth_token'])) {
+                try {
+                    $db = Database::getInstance();
+                    $pdo = $db->getPdo();
+                    $stmt = $pdo->prepare("SELECT user_id FROM user_sessions WHERE session_token = ? AND expires_at > NOW()");
+                    $stmt->execute([$_COOKIE['auth_token']]);
+                    if ($stmt->fetch()) {
+                        $isAuthenticated = true;
+                    }
+                } catch (Exception $e) {
+                    error_log('Error checking auth token: ' . $e->getMessage());
+                }
+            }
+            
+            // If not authenticated, return 401
+            if (!$isAuthenticated) {
+                http_response_code(401);
+                echo json_encode(['error' => 'Unauthorized - not logged in']);
+                return;
+            }
+            
             // Session is already started in bootstrap.php
             
             // Get user_id before destroying session to delete DB session
@@ -402,8 +470,22 @@ class AuthController extends Controller
         header('Content-Type: application/json');
 
         try {
-            $input = json_decode(file_get_contents('php://input'), true);
-            $username = trim($input['username'] ?? '');
+            // Support both GET and POST methods
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $usernameRaw = $_GET['username'] ?? '';
+            } else {
+                $input = json_decode(file_get_contents('php://input'), true);
+                $usernameRaw = $input['username'] ?? '';
+            }
+            
+            // Validate username is a string before trimming
+            if (!is_string($usernameRaw)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Username must be a string']);
+                return;
+            }
+            
+            $username = trim($usernameRaw);
 
             if (empty($username)) {
                 http_response_code(400);

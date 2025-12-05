@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
@@ -10,23 +9,15 @@ class LogoController extends Controller
     {
         // Check admin authentication
         if (empty($_SESSION['is_admin'])) {
-            header('Location: /login');
+            http_response_code(403);
+            echo "Access denied";
             exit;
         }
         
-        // Load the logo settings view
-        $viewPath = __DIR__ . '/../../../themes/admin/views/logo-settings.php';
-        if (file_exists($viewPath)) {
-            include $viewPath;
-        } else {
-            // Fallback to default theme
-            $fallbackPath = __DIR__ . '/../../../themes/default/views/admin/logo-settings.php';
-            if (file_exists($fallbackPath)) {
-                include $fallbackPath;
-            } else {
-                echo "Logo settings page not found.";
-            }
-        }
+        // Use the View system to render the logo settings view
+        $this->view->render('admin/logo-settings', [
+            'title' => 'Logo Settings'
+        ]);
     }
     
     public function update()
@@ -94,7 +85,7 @@ class LogoController extends Controller
                 } else {
                     // Redirect back with success message
                     $_SESSION['logo_success'] = 'Logo settings updated successfully!';
-                    header('Location: /admin/logo-settings');
+                    header('Location: ' . app_base_url('/admin/logo-settings'));
                 }
             } else {
                 throw new \Exception('Failed to save logo settings');
@@ -109,7 +100,7 @@ class LogoController extends Controller
                 echo json_encode(['error' => 'Failed to update logo settings: ' . $e->getMessage()]);
             } else {
                 $_SESSION['logo_error'] = 'Failed to update logo settings: ' . $e->getMessage();
-                header('Location: /admin/logo-settings');
+                header('Location: ' . app_base_url('/admin/logo-settings'));
             }
         }
         

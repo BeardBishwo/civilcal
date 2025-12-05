@@ -142,11 +142,23 @@ class ThemeManager
     }
 
     /**
-     * Get all themes from database
+     * Get all themes from database, filtering out themes that don't exist in filesystem
      */
     public function getAllThemes($status = null, $isPremium = null, $limit = null, $offset = 0)
     {
-        return $this->themeModel->getAll($status, $isPremium, $limit, $offset);
+        $themes = $this->themeModel->getAll($status, $isPremium, $limit, $offset);
+        
+        // Filter out themes that don't exist in the filesystem
+        $validThemes = [];
+        foreach ($themes as $theme) {
+            $themePath = $this->themesPath . $theme['name'];
+            // Check if theme directory exists or if it's a premium theme with assets
+            if (is_dir($themePath) || $this->hasPremiumAssets($theme['name'])) {
+                $validThemes[] = $theme;
+            }
+        }
+        
+        return $validThemes;
     }
 
     /**
@@ -174,11 +186,42 @@ class ThemeManager
     }
 
     /**
-     * Get theme statistics
+     * Get theme statistics, only counting themes that exist in filesystem
      */
     public function getThemeStats()
     {
-        return $this->themeModel->getStats();
+        $allThemes = $this->getAllThemes();
+        
+        $stats = [
+            'total' => 0,
+            'active' => 0,
+            'inactive' => 0,
+            'deleted' => 0,
+            'premium' => 0,
+            'updates' => 0
+        ];
+        
+        foreach ($allThemes as $theme) {
+            $stats['total']++;
+            
+            if ($theme['is_premium']) {
+                $stats['premium']++;
+            }
+            
+            switch ($theme['status']) {
+                case 'active':
+                    $stats['active']++;
+                    break;
+                case 'inactive':
+                    $stats['inactive']++;
+                    break;
+                case 'deleted':
+                    $stats['deleted']++;
+                    break;
+            }
+        }
+        
+        return $stats;
     }
 
     /**
@@ -1229,6 +1272,15 @@ class ThemeManager
         }
         
         return null;
+    }
+
+    /**
+     * Check if a premium theme has assets
+     */
+    private function hasPremiumAssets($themeName)
+    {
+        $premiumAssetPath = BASE_PATH . '/public/assets/themes/' . $themeName;
+        return is_dir($premiumAssetPath);
     }
 }
 ?>

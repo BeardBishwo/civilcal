@@ -27,7 +27,12 @@ class PluginController extends Controller
         $activePlugins = array_values(array_filter($plugins, function($p){ return !empty($p['is_active']); }));
         
         // Load the plugins management view
-        include __DIR__ . '/../../Views/admin/plugins/index.php';
+        $data = [
+            'plugins' => $plugins,
+            'activePlugins' => $activePlugins,
+            'page_title' => 'Plugin Management'
+        ];
+        $this->view->render('admin/plugins/index', $data);
     }
 
     public function upload()

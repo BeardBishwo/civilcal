@@ -1,6 +1,0 @@
-Xdebug Installation Summary
-Date: 2025-11-15 01:35:21
-PHP Version: 8.3.16
-Xdebug Status: INSTALLED
-php.ini: C:\laragon\bin\php\php-8.3.16-Win32-vs16-x64\php.ini
-Backup: C:\laragon\bin\php\php-8.3.16-Win32-vs16-x64\php.ini.backup.2025-11-15_01-30-42

@@ -1,27 +1,29 @@
 <?php
+
 namespace App\Controllers\Admin;
 
-use App\Controllers\Controller;
+use App\Core\Controller;
 use App\Core\Database;
 
 class CalculatorController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        
+
         // Check if user is admin
         if (!$this->auth->check() || !$this->auth->isAdmin()) {
             $this->redirect('/login');
         }
     }
-    
+
     public function index()
     {
         $calculators = $this->getAllCalculators();
         $categories = $this->getCalculatorCategories();
-        
+
         // Render the calculators management view with admin layout
-        $this->adminView('admin/calculators/index', [
+        $this->view->render('admin/calculators/index', [
             'currentPage' => 'calculators',
             'calculators' => $calculators,
             'categories' => $categories,
@@ -46,9 +48,14 @@ class CalculatorController extends Controller
             try {
                 $stmt = $this->db->prepare("INSERT INTO calculators (name, category, description, formula, inputs, outputs, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                 $result = $stmt->execute([
-                    $data['name'], $data['category'], $data['description'], 
-                    $data['formula'], $data['inputs'], $data['outputs'], 
-                    $data['status'], $data['created_at']
+                    $data['name'],
+                    $data['category'],
+                    $data['description'],
+                    $data['formula'],
+                    $data['inputs'],
+                    $data['outputs'],
+                    $data['status'],
+                    $data['created_at']
                 ]);
 
                 if ($result) {
@@ -69,7 +76,7 @@ class CalculatorController extends Controller
             $stmt = $this->db->prepare("SELECT * FROM calculators ORDER BY created_at DESC");
             $stmt->execute();
             $calculators = $stmt->fetchAll();
-            
+
             // Add usage_count and handle missing data
             foreach ($calculators as &$calculator) {
                 $calculator['usage_count'] = rand(100, 2000); // Mock data - replace with actual query
@@ -77,7 +84,7 @@ class CalculatorController extends Controller
                     $calculator['created_at'] = date('Y-m-d H:i:s');
                 }
             }
-            
+
             return $calculators;
         } catch (\Exception $e) {
             // Return mock data if database query fails
@@ -116,5 +123,18 @@ class CalculatorController extends Controller
             'management' => 'Project Management'
         ];
     }
+
+    public function list()
+    {
+        $calculators = $this->getAllCalculators();
+        $categories = $this->getCalculatorCategories();
+
+        // Render the calculators list view with admin layout
+        $this->view->render('admin/calculators/list', [
+            'currentPage' => 'calculators',
+            'calculators' => $calculators,
+            'categories' => $categories,
+            'title' => 'Calculators List - Admin Panel'
+        ]);
+    }
 }
-?>

@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Middleware;
 
 use App\Core\Auth;
+use App\Models\User;
 
 class AdminMiddleware
 {
@@ -11,6 +13,7 @@ class AdminMiddleware
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
+<<<<<<< HEAD
         
         // Check if user is authenticated
         $isAuthenticated = false;
@@ -76,9 +79,19 @@ class AdminMiddleware
                 echo '<!DOCTYPE html><html><head><title>401 Unauthorized</title></head><body><h1>401 Unauthorized</h1><p>Authentication required to access admin panel.</p><p><a href="/login">Login</a></p><p style="color:gray;font-size:10px;">AdminMiddleware_v2</p></body></html>';
             }
             exit;
+=======
+
+        // Check if user is authenticated via session
+        $isAuthenticated = $this->checkSessionAuthentication();
+
+        if (!$isAuthenticated) {
+            // Redirect to login if not authenticated
+            $this->redirectToLogin();
+>>>>>>> temp-branch
         }
-        
+
         // Check if user is admin
+<<<<<<< HEAD
         if (!$isAdmin) {
             // Check if this is an API request
             $isApiRequest = (
@@ -94,6 +107,88 @@ class AdminMiddleware
             }
             
             http_response_code(403);
+=======
+        if (!$this->isAdminUser()) {
+            $this->showAccessDenied();
+        }
+
+        return $next($request);
+    }
+
+    /**
+     * Check if user is authenticated via session
+     */
+    private function checkSessionAuthentication()
+    {
+        // Check if user session exists
+        if (empty($_SESSION['user_id']) && empty($_SESSION['user'])) {
+            return false;
+        }
+
+        // Verify user still exists in database
+        $userModel = new User();
+        $userId = $_SESSION['user_id'] ?? ($_SESSION['user']['id'] ?? null);
+
+        if (!$userId) {
+            return false;
+        }
+
+        $user = $userModel->find($userId);
+        if (!$user) {
+            // Clear invalid session
+            unset($_SESSION['user_id'], $_SESSION['user'], $_SESSION['is_admin']);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if authenticated user has admin privileges
+     */
+    private function isAdminUser()
+    {
+        // Check admin status from session
+        $isAdmin = !empty($_SESSION['is_admin']) ||
+            (!empty($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']) ||
+            (!empty($_SESSION['user']['role']) && in_array($_SESSION['user']['role'], ['admin', 'super_admin']));
+
+        return $isAdmin;
+    }
+
+    /**
+     * Redirect to login page
+     */
+    private function redirectToLogin()
+    {
+        $redirectUrl = \app_base_url("/login");
+        if (!empty($_SERVER['REQUEST_URI'])) {
+            $redirectUrl .= "?redirect=" . urlencode($_SERVER['REQUEST_URI']);
+        }
+        header("Location: " . $redirectUrl);
+        http_response_code(302);
+        exit;
+    }
+
+    /**
+     * Show access denied page
+     */
+    private function showAccessDenied()
+    {
+        // Check if this is an API/JSON request
+        $isApiRequest = (
+            (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) ||
+            (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) ||
+            strpos($_SERVER['REQUEST_URI'], '/api/') !== false
+        );
+
+        http_response_code(403);
+
+        if ($isApiRequest) {
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Forbidden - Admin access required']);
+        } else {
+>>>>>>> temp-branch
             echo '
             <!DOCTYPE html>
             <html>
@@ -126,10 +221,7 @@ class AdminMiddleware
                 </div>
             </body>
             </html>';
-            exit;
         }
-
-        return $next($request);
+        exit;
     }
 }
-?>

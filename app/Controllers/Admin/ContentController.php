@@ -2,70 +2,162 @@
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
-use App\Services\ContentService;
+use App\Core\Auth;
 
-class ContentController extends Controller {
-    private $svc;
+class ContentController extends Controller
+{
+    public function index()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
 
-    public function __construct() {
-        parent::__construct();
-        $this->svc = new ContentService();
-        if (!$this->auth->check() || !$this->auth->isAdmin()) { $this->redirect('/login'); }
+        $data = [
+            'user' => $user,
+            'page_title' => 'Content Management - Admin Panel',
+            'currentPage' => 'content'
+        ];
+
+        $this->view->render('admin/content/index', $data);
     }
 
-    public function index() {
-        $pages = $this->svc->allPages();
-        $this->adminView('admin/content/index', ['currentPage'=>'content','pages'=>$pages,'title'=>'Content Management']);
+    public function pages()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
+
+        // Get all pages from the database
+        $pages = $this->getPages();
+        
+        $data = [
+            'user' => $user,
+            'pages' => $pages,
+            'page_title' => 'Manage Pages - Admin Panel',
+            'currentPage' => 'content'
+        ];
+
+        $this->view->render('admin/content/pages', $data);
     }
 
-    public function pages() { $this->index(); }
+    public function menus()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
 
-    public function edit($slug) {
-        $page = $this->svc->getPage($slug);
-        $this->adminView('admin/content/pages', ['currentPage'=>'content','page'=>$page,'mode'=>'edit','title'=>'Edit Page']);
+        // Get all menus from the database
+        $menus = $this->getMenus();
+        
+        $data = [
+            'user' => $user,
+            'menus' => $menus,
+            'page_title' => 'Manage Menus - Admin Panel',
+            'currentPage' => 'content'
+        ];
+
+        $this->view->render('admin/content/menus', $data);
     }
 
-    public function create() {
-        $this->adminView('admin/content/pages', ['currentPage'=>'content','page'=>null,'mode'=>'create','title'=>'Create Page']);
+    public function media()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
+
+        // Get all media files
+        $media = $this->getMedia();
+        
+        $data = [
+            'user' => $user,
+            'media' => $media,
+            'page_title' => 'Media Library - Admin Panel',
+            'currentPage' => 'content'
+        ];
+
+        $this->view->render('admin/content/media', $data);
     }
 
-    public function save() {
-        $title = $_POST['title'] ?? '';
-        $slug = $_POST['slug'] ?? '';
-        $body = $_POST['body'] ?? '';
-        $status = $_POST['status'] ?? 'draft';
-        if ($slug === '') { $slug = strtolower(preg_replace('/[^a-z0-9-]+/','-', $title)); }
-        $page = ['title'=>$title,'slug'=>$slug,'body'=>$body,'status'=>$status,'updated_at'=>date('c')];
-        $this->svc->upsertPage($page);
-        $this->redirect('/admin/content');
+    private function getPages()
+    {
+        // Placeholder - in real implementation, this would query the database
+        return [
+            [
+                'id' => 1,
+                'title' => 'Home',
+                'slug' => 'home',
+                'status' => 'published',
+                'created_at' => '2024-10-15',
+                'author' => 'Admin'
+            ],
+            [
+                'id' => 2,
+                'title' => 'About',
+                'slug' => 'about',
+                'status' => 'published',
+                'created_at' => '2024-10-16',
+                'author' => 'Admin'
+            ],
+            [
+                'id' => 3,
+                'title' => 'Contact',
+                'slug' => 'contact',
+                'status' => 'draft',
+                'created_at' => '2024-10-17',
+                'author' => 'Admin'
+            ]
+        ];
     }
 
-    public function publish() {
-        $slug = $_POST['slug'] ?? '';
-        $page = $this->svc->getPage($slug);
-        if ($page) { $page['status'] = 'published'; $page['updated_at'] = date('c'); $this->svc->upsertPage($page); }
-        $this->redirect('/admin/content');
+    private function getMenus()
+    {
+        // Placeholder - in real implementation, this would query the database
+        return [
+            [
+                'id' => 1,
+                'name' => 'Main Menu',
+                'location' => 'header',
+                'items_count' => 5,
+                'modified_at' => '2024-10-15'
+            ],
+            [
+                'id' => 2,
+                'name' => 'Footer Menu',
+                'location' => 'footer',
+                'items_count' => 3,
+                'modified_at' => '2024-10-14'
+            ]
+        ];
     }
 
-    public function preview($slug) {
-        $page = $this->svc->getPage($slug);
-        if (!$page) { $this->redirect('/admin/content'); return; }
-        $this->view->render('pages/page', ['page'=>$page,'title'=>$page['title']]);
-    }
-
-    public function menus() {
-        $ms = new \App\Services\MenuService();
-        $items = $ms->get('primary');
-        $this->adminView('admin/content/menus', ['currentPage'=>'content','items'=>$items,'title'=>'Menus']);
-    }
-
-    public function saveMenus() {
-        $payload = $_POST['items'] ?? '[]';
-        $items = json_decode($payload, true);
-        if (!is_array($items)) { $items = []; }
-        $ms = new \App\Services\MenuService();
-        $ms->set('primary', $items);
-        $this->redirect('/admin/content/menus');
+    private function getMedia()
+    {
+        // Placeholder - in real implementation, this would scan the media directory
+        return [
+            [
+                'id' => 1,
+                'filename' => 'logo.png',
+                'url' => '/storage/media/logo.png',
+                'type' => 'image/png',
+                'size' => '24.5 KB',
+                'uploaded_at' => '2024-10-15'
+            ],
+            [
+                'id' => 2,
+                'filename' => 'hero-image.jpg',
+                'url' => '/storage/media/hero-image.jpg',
+                'type' => 'image/jpeg',
+                'size' => '128.7 KB',
+                'uploaded_at' => '2024-10-16'
+            ]
+        ];
     }
 }
-?>

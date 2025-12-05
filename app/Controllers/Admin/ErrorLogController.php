@@ -23,7 +23,7 @@ class ErrorLogController extends Controller {
             'performance_data' => $this->getPerformanceData()
         ];
         
-        $this->view('admin/error-logs/index', $data);
+        $this->view->render('admin/error-logs/index', $data);
     }
     
     public function getErrorStats() {
@@ -101,7 +101,7 @@ class ErrorLogController extends Controller {
             $this->redirect('/admin/error-logs');
         }
         
-        $this->view('admin/error-logs/confirm-clear');
+        $this->view->render('admin/error-logs/confirm-clear');
     }
     
     public function exportLogs() {

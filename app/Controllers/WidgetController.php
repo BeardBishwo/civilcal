@@ -45,9 +45,11 @@ class WidgetController extends Controller
                 ]
             ];
             
-            $this->view('admin.widgets.index', $data);
+            // Use the View class's render method to properly use themes/admin layout
+            $this->view->render('admin/widgets/index', $data);
         } catch (\Exception $e) {
-            $this->error('Failed to load widget management: ' . $e->getMessage());
+            flash('error', 'Failed to load widget management: ' . $e->getMessage());
+            $this->redirect('/admin/widgets');
         }
     }
     
@@ -81,7 +83,8 @@ class WidgetController extends Controller
             ]
         ];
         
-        $this->view('admin.widgets.create', $data);
+        // Use the View class's render method to properly use themes/admin layout
+        $this->view->render('admin/widgets/create', $data);
     }
     
     /**
@@ -98,7 +101,8 @@ class WidgetController extends Controller
             $position = (int)($_POST['position'] ?? 0);
             
             if (empty($className)) {
-                $this->error('Widget class is required');
+                flash('error', 'Widget class is required');
+                $this->redirect('/admin/widgets/create');
                 return;
             }
             
@@ -114,19 +118,22 @@ class WidgetController extends Controller
             $widget = $this->widgetManager->createWidget($className, $config);
             
             if (!$widget) {
-                $this->error('Failed to create widget');
+                flash('error', 'Failed to create widget');
+                $this->redirect('/admin/widgets/create');
                 return;
             }
             
             // Save widget
             if ($this->widgetManager->saveWidget($widget)) {
-                $this->success('Widget created successfully');
+                flash('success', 'Widget created successfully');
                 $this->redirect('/admin/widgets');
             } else {
-                $this->error('Failed to save widget');
+                flash('error', 'Failed to save widget');
+                $this->redirect('/admin/widgets/create');
             }
         } catch (\Exception $e) {
-            $this->error('Error creating widget: ' . $e->getMessage());
+            flash('error', 'Error creating widget: ' . $e->getMessage());
+            $this->redirect('/admin/widgets/create');
         }
     }
     
@@ -144,8 +151,9 @@ class WidgetController extends Controller
         $widget = $this->widgetManager->loadWidget($id);
         
         if (!$widget) {
-            $this->error('Widget not found');
+            flash('error', 'Widget not found');
             $this->redirect('/admin/widgets');
+            return;
         }
         
         $data = [
@@ -158,7 +166,8 @@ class WidgetController extends Controller
             ]
         ];
         
-        $this->view('admin.widgets.edit', $data);
+        // Use the View class's render method to properly use themes/admin layout
+        $this->view->render('admin/widgets/edit', $data);
     }
     
     /**
@@ -172,7 +181,8 @@ class WidgetController extends Controller
             $widget = $this->widgetManager->loadWidget($id);
             
             if (!$widget) {
-                $this->error('Widget not found');
+                flash('error', 'Widget not found');
+                $this->redirect('/admin/widgets');
                 return;
             }
             
@@ -197,13 +207,15 @@ class WidgetController extends Controller
             
             // Save widget
             if ($this->widgetManager->saveWidget($widget)) {
-                $this->success('Widget updated successfully');
+                flash('success', 'Widget updated successfully');
                 $this->redirect('/admin/widgets');
             } else {
-                $this->error('Failed to save widget');
+                flash('error', 'Failed to save widget');
+                $this->redirect('/admin/widgets/edit/' . $id);
             }
         } catch (\Exception $e) {
-            $this->error('Error updating widget: ' . $e->getMessage());
+            flash('error', 'Error updating widget: ' . $e->getMessage());
+            $this->redirect('/admin/widgets/edit/' . $id);
         }
     }
     
@@ -215,18 +227,19 @@ class WidgetController extends Controller
     public function delete($id)
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->error('Invalid request method');
+            flash('error', 'Invalid request method');
             $this->redirect('/admin/widgets');
+            return;
         }
         
         try {
             if ($this->widgetManager->deleteWidget($id)) {
-                $this->success('Widget deleted successfully');
+                flash('success', 'Widget deleted successfully');
             } else {
-                $this->error('Failed to delete widget');
+                flash('error', 'Failed to delete widget');
             }
         } catch (\Exception $e) {
-            $this->error('Error deleting widget: ' . $e->getMessage());
+            flash('error', 'Error deleting widget: ' . $e->getMessage());
         }
         
         $this->redirect('/admin/widgets');
@@ -240,28 +253,30 @@ class WidgetController extends Controller
     public function toggle($id)
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->error('Invalid request method');
+            flash('error', 'Invalid request method');
             $this->redirect('/admin/widgets');
+            return;
         }
         
         try {
             $widget = $this->widgetManager->loadWidget($id);
             
             if (!$widget) {
-                $this->error('Widget not found');
+                flash('error', 'Widget not found');
                 $this->redirect('/admin/widgets');
+                return;
             }
             
             $enabled = $widget->isEnabled();
             $action = $enabled ? 'disabled' : 'enabled';
             
             if ($this->widgetManager->setWidgetEnabled($id, !$enabled)) {
-                $this->success("Widget {$action} successfully");
+                flash('success', "Widget {$action} successfully");
             } else {
-                $this->error("Failed to {$action} widget");
+                flash('error', "Failed to {$action} widget");
             }
         } catch (\Exception $e) {
-            $this->error('Error toggling widget: ' . $e->getMessage());
+            flash('error', 'Error toggling widget: ' . $e->getMessage());
         }
         
         $this->redirect('/admin/widgets');
@@ -275,28 +290,30 @@ class WidgetController extends Controller
     public function toggleVisibility($id)
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->error('Invalid request method');
+            flash('error', 'Invalid request method');
             $this->redirect('/admin/widgets');
+            return;
         }
         
         try {
             $widget = $this->widgetManager->loadWidget($id);
             
             if (!$widget) {
-                $this->error('Widget not found');
+                flash('error', 'Widget not found');
                 $this->redirect('/admin/widgets');
+                return;
             }
             
             $visible = $widget->isVisible();
             $action = $visible ? 'hidden' : 'visible';
             
             if ($this->widgetManager->setWidgetVisible($id, !$visible)) {
-                $this->success("Widget set to {$action}");
+                flash('success', "Widget set to {$action}");
             } else {
-                $this->error("Failed to change widget visibility");
+                flash('error', "Failed to change widget visibility");
             }
         } catch (\Exception $e) {
-            $this->error('Error changing widget visibility: ' . $e->getMessage());
+            flash('error', 'Error changing widget visibility: ' . $e->getMessage());
         }
         
         $this->redirect('/admin/widgets');
@@ -308,8 +325,9 @@ class WidgetController extends Controller
     public function reorder()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->error('Invalid request method');
+            flash('error', 'Invalid request method');
             $this->redirect('/admin/widgets');
+            return;
         }
         
         try {
@@ -319,9 +337,9 @@ class WidgetController extends Controller
                 $this->widgetManager->setWidgetPosition($widgetId, (int)$position);
             }
             
-            $this->success('Widget order updated successfully');
+            flash('success', 'Widget order updated successfully');
         } catch (\Exception $e) {
-            $this->error('Error reordering widgets: ' . $e->getMessage());
+            flash('error', 'Error reordering widgets: ' . $e->getMessage());
         }
         
         $this->redirect('/admin/widgets');
@@ -338,8 +356,12 @@ class WidgetController extends Controller
             $widget = $this->widgetManager->loadWidget($id);
             
             if (!$widget) {
-                $this->error('Widget not found');
-                $this->redirect('/admin/widgets');
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Widget not found'
+                ]);
+                return;
             }
             
             $html = $widget->render();
@@ -375,8 +397,9 @@ class WidgetController extends Controller
             $widget = $this->widgetManager->loadWidget($id);
             
             if (!$widget) {
-                $this->error('Widget not found');
+                flash('error', 'Widget not found');
                 $this->redirect('/admin/widgets');
+                return;
             }
             
             $data = [
@@ -389,9 +412,11 @@ class WidgetController extends Controller
                 ]
             ];
             
-            $this->view('admin.widgets.settings', $data);
+            // Use the View class's render method to properly use themes/admin layout
+            $this->view->render('admin/widgets/settings', $data);
         } catch (\Exception $e) {
-            $this->error('Error loading widget settings: ' . $e->getMessage());
+            flash('error', 'Error loading widget settings: ' . $e->getMessage());
+            $this->redirect('/admin/widgets');
         }
     }
     
@@ -406,7 +431,8 @@ class WidgetController extends Controller
             $widget = $this->widgetManager->loadWidget($id);
             
             if (!$widget) {
-                $this->error('Widget not found');
+                flash('error', 'Widget not found');
+                $this->redirect('/admin/widgets');
                 return;
             }
             
@@ -418,13 +444,15 @@ class WidgetController extends Controller
             
             // Save widget with updated settings
             if ($this->widgetManager->saveWidget($widget)) {
-                $this->success('Widget settings updated successfully');
+                flash('success', 'Widget settings updated successfully');
                 $this->redirect('/admin/widgets');
             } else {
-                $this->error('Failed to save widget settings');
+                flash('error', 'Failed to save widget settings');
+                $this->redirect('/admin/widgets/settings/' . $id);
             }
         } catch (\Exception $e) {
-            $this->error('Error updating widget settings: ' . $e->getMessage());
+            flash('error', 'Error updating widget settings: ' . $e->getMessage());
+            $this->redirect('/admin/widgets/settings/' . $id);
         }
     }
     
@@ -435,12 +463,12 @@ class WidgetController extends Controller
     {
         try {
             if ($this->widgetManager->createWidgetTables()) {
-                $this->success('Widget database tables created successfully');
+                flash('success', 'Widget database tables created successfully');
             } else {
-                $this->error('Failed to create widget database tables');
+                flash('error', 'Failed to create widget database tables');
             }
         } catch (\Exception $e) {
-            $this->error('Error creating widget tables: ' . $e->getMessage());
+            flash('error', 'Error creating widget tables: ' . $e->getMessage());
         }
         
         $this->redirect('/admin/widgets');

@@ -1,6 +1,9 @@
 <?php
-// Application Bootstrap
-// This file initializes the Bishwo Calculator application
+
+/**
+ * Bishwo Calculator - Application Bootstrap
+ * Initializes core application components and configuration
+ */
 
 // Define base paths
 define("BASE_PATH", dirname(__DIR__));
@@ -8,6 +11,7 @@ define("APP_PATH", BASE_PATH . "/app");
 define("CONFIG_PATH", BASE_PATH . "/config");
 define("STORAGE_PATH", BASE_PATH . "/storage");
 
+<<<<<<< HEAD
 // Load environment variables from .env file
 if (file_exists(BASE_PATH . '/.env')) {
     $lines = file(BASE_PATH . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -36,20 +40,27 @@ if (file_exists(BASE_PATH . '/.env')) {
             }
         }
     }
+=======
+// Load Composer autoloader (for vendor packages like Google2FA)
+require_once BASE_PATH . '/vendor/autoload.php';
+
+// Load .env file
+if (file_exists(BASE_PATH . '/.env')) {
+    $dotenv = Dotenv\Dotenv::createImmutable(BASE_PATH);
+    $dotenv->load();
+>>>>>>> temp-branch
 }
 
 // Autoloader for App classes
 spl_autoload_register(function ($class) {
     $prefix = "App\\";
-    $base_dir = APP_PATH . "/";
-
     $len = strlen($prefix);
     if (strncmp($prefix, $class, $len) !== 0) {
         return;
     }
 
     $relative_class = substr($class, $len);
-    $file = $base_dir . str_replace("\\", "/", $relative_class) . ".php";
+    $file = APP_PATH . "/" . str_replace("\\", "/", $relative_class) . ".php";
 
     if (file_exists($file)) {
         require $file;
@@ -60,7 +71,7 @@ spl_autoload_register(function ($class) {
 $appConfig = require_once CONFIG_PATH . "/app.php";
 $dbConfig = require_once BASE_PATH . "/app/Config/config.php";
 
-// Define debug constant (config holds under 'app' key)
+// Define debug constant
 $__debug = $appConfig["app"]["debug"] ?? true;
 define("APP_DEBUG", $__debug);
 
@@ -71,7 +82,7 @@ if (!is_dir($__logsDir)) {
 }
 
 // Set error reporting and PHP error logging
-if ($__debug) {
+if (APP_DEBUG) {
     error_reporting(E_ALL);
     ini_set("display_errors", "1");
 } else {
@@ -86,28 +97,21 @@ set_error_handler(function ($errno, $errstr, $errfile, $errline) {
     if (!(error_reporting() & $errno)) {
         return false;
     }
+
     \App\Services\Logger::error($errstr, [
         "type" => $errno,
         "file" => $errfile,
         "line" => $errline,
     ]);
-    return false; // allow PHP's internal handler as well
+    return false;
 });
 
 set_exception_handler(function ($e) {
     \App\Services\Logger::exception($e);
-    if (defined("APP_DEBUG") && APP_DEBUG) {
+
+    if (APP_DEBUG) {
         http_response_code(500);
-        echo "Exception: " .
-            htmlspecialchars($e->getMessage(), ENT_QUOTES, "UTF-8");
-    } else {
-        http_response_code(500);
-        try {
-            $view = new \App\Core\View();
-            $view->render("errors/500", ["title" => "Server Error"]);
-        } catch (\Throwable $t) {
-            echo "An error occurred. Please try again later.";
-        }
+        echo "Exception: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, "UTF-8");
     }
 });
 
@@ -121,19 +125,3 @@ register_shutdown_function(function () {
         ]);
     }
 });
-
-// Load helper functions BEFORE any views are rendered
-require_once APP_PATH . "/Helpers/functions.php";
-
-// Configure and start session
-if (session_status() === PHP_SESSION_NONE) {
-    // Session security configuration - must be set before session_start()
-    @ini_set("session.cookie_httponly", "1");
-    @ini_set("session.use_only_cookies", "1");
-    @ini_set("session.cookie_samesite", "Lax");
-    if (defined("ENVIRONMENT") && ENVIRONMENT === "production") {
-        @ini_set("session.cookie_secure", "1");
-    }
-    @session_start();
-}
-?>
