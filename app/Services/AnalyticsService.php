@@ -21,6 +21,33 @@ class AnalyticsService
     }
 
     /**
+     * Calculate growth rate between two values
+     */
+    private function calculateGrowthRate($current, $previous)
+    {
+        if ($previous == 0) {
+            return $current > 0 ? 100 : 0;
+        }
+        
+        return round((($current - $previous) / $previous) * 100, 1);
+    }
+
+    /**
+     * Format duration in seconds to human readable format
+     */
+    private function formatDuration($seconds)
+    {
+        $minutes = floor($seconds / 60);
+        $seconds = $seconds % 60;
+        
+        if ($minutes > 0) {
+            return $minutes . 'm ' . str_pad($seconds, 2, '0', STR_PAD_LEFT) . 's';
+        }
+        
+        return '0m ' . str_pad($seconds, 2, '0', STR_PAD_LEFT) . 's';
+    }
+
+    /**
      * Get overview statistics for the analytics dashboard
      */
     public function getOverviewStats()
