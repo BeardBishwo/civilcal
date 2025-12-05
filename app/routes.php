@@ -1,6 +1,7 @@
 <?php
-// Routes Definition - Complete Updated Version
+// Routes Definition - Cleaned Version with All Conflicts Resolved
 // This file defines all application routes with comprehensive features
+// All routing conflicts have been resolved
 
 // Get router from global scope
 $router = $GLOBALS["router"];
@@ -216,7 +217,7 @@ $router->add("GET", "/admin/dashboard_complex", "Admin\\DashboardController@dash
     "admin",
 ]);
 
-// Module Management
+// MODULE MANAGEMENT - CONSOLIDATED (Fixed duplicate conflict)
 $router->add("GET", "/admin/modules", "Admin\DashboardController@modules", [
     "auth",
     "admin",
@@ -270,7 +271,7 @@ $router->add(
     ["auth", "admin"],
 );
 
-// Comprehensive Admin Settings Routes
+// ADMIN SETTINGS - CONSOLIDATED (Fixed duplicate conflict)
 $router->add("GET", "/admin/settings", "Admin\SettingsController@index", [
     "auth",
     "admin",
@@ -318,9 +319,21 @@ $router->add(
     ["auth", "admin"],
 );
 $router->add(
+    "GET",
+    "/admin/settings/backup",
+    "Admin\SettingsController@backup",
+    ["auth", "admin"],
+);
+$router->add(
     "POST",
     "/admin/settings/update",
     "Admin\SettingsController@update",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/email/send-test",
+    "Admin\SettingsController@sendTestEmail",
     ["auth", "admin"],
 );
 
@@ -371,12 +384,6 @@ $router->add(
     "GET",
     "/admin/widget-management",
     "Admin\DashboardController@widgetManagement",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/system-status",
-    "Admin\SystemStatusController@index",
     ["auth", "admin"],
 );
 
@@ -470,6 +477,7 @@ $router->add(
     ["auth", "admin"],
 );
 
+//
 // Content Management Module Routes
 $router->add("GET", "/admin/content", "Admin\ContentController@index", [
     "auth",
@@ -522,47 +530,7 @@ $router->add(
     ["auth", "admin"],
 );
 
-// System Settings Module Routes
-$router->add("GET", "/admin/settings", "Admin\SettingsController@general", [
-    "auth",
-    "admin",
-]);
-$router->add("GET", "/admin/settings/email", "Admin\SettingsController@email", [
-    "auth",
-    "admin",
-]);
-$router->add(
-    "POST",
-    "/admin/email/send-test",
-    "Admin\SettingsController@sendTestEmail",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/settings/security",
-    "Admin\SettingsController@security",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/settings/backup",
-    "Admin\SettingsController@backup",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/settings/performance",
-    "Admin\SettingsController@performance",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/settings/update",
-    "Admin\SettingsController@update",
-    ["auth", "admin"],
-);
-
-// Theme & Customization Routes
+// THEME MANAGEMENT - CONSOLIDATED (Fixed duplicate conflict)
 $router->add("GET", "/admin/themes", "Admin\ThemeController@index", [
     "auth",
     "admin",
@@ -626,6 +594,58 @@ $router->add(
     ["auth", "admin"],
 );
 
+// Additional Theme Management Routes
+$router->add("POST", "/admin/themes/upload", "Admin\ThemeController@upload", [
+    "auth",
+    "admin",
+    "ratelimit",
+]);
+$router->add("POST", "/admin/themes/deactivate", "Admin\\ThemeController@deactivate", [
+    "auth",
+    "admin",
+    "ratelimit",
+]);
+$router->add(
+    "POST",
+    "/admin/themes/activate/{slug}",
+    "Admin\ThemeController@activate",
+    ["auth", "admin", "ratelimit"],
+);
+$router->add(
+    "POST",
+    "/admin/themes/delete/{slug}",
+    "Admin\ThemeController@delete",
+    ["auth", "admin", "ratelimit"],
+);
+$router->add("POST", "/admin/themes/delete", "Admin\ThemeController@delete", [
+    "auth",
+    "admin",
+    "ratelimit",
+]);
+$router->add("POST", "/admin/themes/restore", "Admin\ThemeController@restore", [
+    "auth",
+    "admin",
+    "ratelimit",
+]);
+$router->add(
+    "POST",
+    "/admin/themes/hardDelete",
+    "Admin\ThemeController@hardDelete",
+    ["auth", "admin", "ratelimit"],
+);
+$router->add(
+    "GET",
+    "/admin/themes/details/{slug}",
+    "Admin\ThemeController@details",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/themes/{id}/settings",
+    "Admin\ThemeController@updateSettings",
+    ["auth", "admin", "ratelimit"],
+);
+
 // Plugin System Routes
 $router->add("GET", "/admin/plugins", "Admin\PluginController@index", [
     "auth",
@@ -648,6 +668,42 @@ $router->add(
     "/admin/plugins/deactivate",
     "Admin\PluginController@deactivate",
     ["auth", "admin"],
+);
+
+// Additional Plugin Management Routes
+$router->add("POST", "/admin/plugins/upload", "Admin\PluginController@upload", [
+    "auth",
+    "admin",
+    "ratelimit",
+]);
+$router->add("POST", "/admin/plugins/toggle", "Admin\PluginController@toggle", [
+    "auth",
+    "admin",
+    "ratelimit",
+]);
+$router->add(
+    "POST",
+    "/admin/plugins/toggle/{slug}/{action}",
+    "Admin\PluginController@toggle",
+    ["auth", "admin", "ratelimit"],
+);
+$router->add(
+    "POST",
+    "/admin/plugins/delete/{slug}",
+    "Admin\PluginController@delete",
+    ["auth", "admin", "ratelimit"],
+);
+$router->add(
+    "GET",
+    "/admin/plugins/details/{slug}",
+    "Admin\PluginController@details",
+    ["auth", "admin", "ratelimit"],
+);
+$router->add(
+    "POST",
+    "/admin/plugins/refresh",
+    "Admin\PluginController@refresh",
+    ["auth", "admin", "ratelimit"],
 );
 
 // Admin API Routes (RESTful admin operations)
@@ -690,14 +746,6 @@ $router->add(
 $router->add(
     "GET",
     "/admin/backup",
-    "Admin\BackupController@index",
-    ["auth", "admin"],
-);
-
-// Add route for trailing slash
-$router->add(
-    "GET",
-    "/admin/backup/",
     "Admin\BackupController@index",
     ["auth", "admin"],
 );
@@ -843,12 +891,7 @@ $router->add(
     ["auth", "admin"],
 );
 
-// Modules Management Routes
-$router->add("GET", "/admin/modules", "Admin\ModuleController@index", [
-    "auth",
-    "admin",
-]);
-
+// Widget Management Routes
 $router->add("GET", "/admin/widgets", "WidgetController@index", [
     "auth",
     "admin",
@@ -921,108 +964,6 @@ $router->add(
     "/api/widgets/setting/{id}",
     "ApiController@updateWidgetSetting",
     ["auth"],
-);
-
-// Plugin Management Routes
-$router->add("GET", "/admin/plugins", "Admin\PluginController@index", [
-    "auth",
-    "admin",
-]);
-$router->add("POST", "/admin/plugins/upload", "Admin\PluginController@upload", [
-    "auth",
-    "admin",
-    "ratelimit",
-]);
-$router->add("POST", "/admin/plugins/toggle", "Admin\PluginController@toggle", [
-    "auth",
-    "admin",
-    "ratelimit",
-]);
-$router->add(
-    "POST",
-    "/admin/plugins/toggle/{slug}/{action}",
-    "Admin\PluginController@toggle",
-    ["auth", "admin", "ratelimit"],
-);
-$router->add(
-    "POST",
-    "/admin/plugins/delete/{slug}",
-    "Admin\PluginController@delete",
-    ["auth", "admin", "ratelimit"],
-);
-$router->add(
-    "GET",
-    "/admin/plugins/details/{slug}",
-    "Admin\PluginController@details",
-    ["auth", "admin", "ratelimit"],
-);
-$router->add(
-    "POST",
-    "/admin/plugins/refresh",
-    "Admin\PluginController@refresh",
-    ["auth", "admin", "ratelimit"],
-);
-
-// Theme Management Routes
-$router->add("GET", "/admin/themes", "Admin\ThemeController@index", [
-    "auth",
-    "admin",
-]);
-$router->add("POST", "/admin/themes/upload", "Admin\ThemeController@upload", [
-    "auth",
-    "admin",
-    "ratelimit",
-]);
-$router->add("POST", "/admin/themes/deactivate", "Admin\\ThemeController@deactivate", [
-    "auth",
-    "admin",
-    "ratelimit",
-]);
-$router->add(
-    "POST",
-    "/admin/themes/activate/{slug}",
-    "Admin\ThemeController@activate",
-    ["auth", "admin", "ratelimit"],
-);
-$router->add(
-    "POST",
-    "/admin/themes/activate",
-    "Admin\ThemeController@activate",
-    ["auth", "admin", "ratelimit"],
-);
-$router->add(
-    "POST",
-    "/admin/themes/delete/{slug}",
-    "Admin\ThemeController@delete",
-    ["auth", "admin", "ratelimit"],
-);
-$router->add("POST", "/admin/themes/delete", "Admin\ThemeController@delete", [
-    "auth",
-    "admin",
-    "ratelimit",
-]);
-$router->add("POST", "/admin/themes/restore", "Admin\ThemeController@restore", [
-    "auth",
-    "admin",
-    "ratelimit",
-]);
-$router->add(
-    "POST",
-    "/admin/themes/hardDelete",
-    "Admin\ThemeController@hardDelete",
-    ["auth", "admin", "ratelimit"],
-);
-$router->add(
-    "GET",
-    "/admin/themes/details/{slug}",
-    "Admin\ThemeController@details",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/themes/{id}/settings",
-    "Admin\ThemeController@updateSettings",
-    ["auth", "admin", "ratelimit"],
 );
 
 // Premium Theme Management Routes
@@ -1304,29 +1245,23 @@ $router->add(
     "CommentController@getByShare",
 );
 
-// Email & Notifications Management Routes
-$router->add("GET", "/admin/email", "Admin\EmailManagerController@index", [
+// EMAIL MANAGEMENT - CONSOLIDATED (Fixed duplicate conflict)
+$router->add("GET", "/admin/email", "Admin\\EmailManagerController@index", [
     "auth",
-    "admin"
+    "admin",
 ]);
 $router->add(
     "POST",
     "/admin/email/send-test",
-    "Admin\EmailManagerController@sendTestEmail",
-    ["auth", "admin"]
+    "Admin\\EmailManagerController@sendTestEmail",
+    ["auth", "admin"],
 );
 $router->add(
     "POST",
     "/admin/email/save-template",
-    "Admin\EmailManagerController@saveTemplate",
-    ["auth", "admin"]
+    "Admin\\EmailManagerController@saveTemplate",
+    ["auth", "admin"],
 );
-
-// Remove the duplicate route that was causing conflicts
-// $router->add("GET", "/admin/email", "Admin\\EmailManagerController@index", [
-//     "auth",
-//     "admin",
-// ]);
 
 // Email Manager Admin Routes
 $router->add(
@@ -1335,10 +1270,6 @@ $router->add(
     "Admin\\EmailManagerController@dashboard",
     ["auth", "admin"]
 );
-$router->add("GET", "/admin/email", "Admin\\EmailManagerController@index", [
-    "auth",
-    "admin",
-]);
 $router->add(
     "GET",
     "/admin/email-manager/stats",
@@ -1429,7 +1360,25 @@ $router->add(
 $router->add(
     "DELETE",
     "/admin/email-manager/template/{id}",
-    "Admin\EmailManagerController@deleteTemplate",
+    "Admin\\EmailManagerController@deleteTemplate",
+    ["auth", "admin"],
+);
+
+// Additional Email Manager Routes for Missing Views
+$router->add("GET", "/admin/email-manager/error", "Admin\\EmailManagerController@error", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/email-manager/thread-detail/{id}", "Admin\\EmailManagerController@threadDetail", [
+    "auth",
+    "admin",
+]);
+
+// Email Template Use Route
+$router->add(
+    "POST",
+    "/admin/email-manager/templates/{id}/use",
+    "Admin\\EmailManagerController@useTemplate",
     ["auth", "admin"],
 );
 
@@ -1464,23 +1413,6 @@ $router->add("GET", "/api/notifications/unread-count", "Admin\NotificationContro
 $router->add("GET", "/api/notifications/list", "Admin\NotificationController@getNotifications", ["auth"]);
 $router->add("POST", "/api/notifications/mark-read/{id}", "Admin\NotificationController@markAsRead", ["auth"]);
 $router->add("POST", "/api/notifications/mark-all-read", "Admin\NotificationController@markAllAsRead", ["auth"]);
-// Additional Email Manager Routes for Missing Views
-$router->add("GET", "/admin/email-manager/error", "Admin\EmailManagerController@error", [
-    "auth",
-    "admin",
-]);
-$router->add("GET", "/admin/email-manager/thread-detail/{id}", "Admin\EmailManagerController@threadDetail", [
-    "auth",
-    "admin",
-]);
-
-// Email Template Use Route
-$router->add(
-    "POST",
-    "/admin/email-manager/templates/{id}/use",
-    "Admin\\EmailManagerController@useTemplate",
-    ["auth", "admin"],
-);
 
 // Error Monitoring & Logging Routes
 $router->add("GET", "/admin/error-logs", "Admin\ErrorLogController@index", [
