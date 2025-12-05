@@ -1,7 +1,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
 
-BASE_URL = "http://localhost:80/Bishwo_Calculator"
+BASE_URL = "http://localhost:8000"
 AUTH_USERNAME = "uniquebishwo@gmail.com"
 AUTH_PASSWORD = "c9PU7XAsAADYk_A"
 TIMEOUT = 30
@@ -19,6 +19,8 @@ def test_authenticate_using_username_or_email_plus_password():
     }
     try:
         response = requests.post(login_url, json=payload_valid, headers=headers, timeout=TIMEOUT)
+        print(f"Response Status Code: {response.status_code}")
+        print(f"Response Body: {response.text}")
         assert response.status_code == 200, f"Expected 200 OK, got {response.status_code}"
         json_resp = response.json()
         assert isinstance(json_resp, dict) and len(json_resp) > 0, "Response JSON is empty or invalid"

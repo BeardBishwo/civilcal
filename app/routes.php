@@ -101,14 +101,6 @@ $router->add(
 );
 
 // User Routes
-<<<<<<< HEAD
-$router->add('GET', '/profile', 'ProfileController@index', ['auth']);
-$router->add('PUT', '/profile', 'ProfileController@update', ['auth']);
-$router->add('POST', '/profile/update', 'ProfileController@update', ['auth']);
-$router->add('POST', '/profile/change-password', 'ProfileController@changePassword', ['auth']);
-$router->add('GET', '/history', 'ProfileController@history', ['auth']);
-$router->add('POST', '/history/delete/{id}', 'ProfileController@deleteCalculation', ['auth']);
-=======
 $router->add("GET", "/profile", "ProfileController@index", ["auth"]);
 $router->add("POST", "/profile/update", "ProfileController@update", ["auth"]);
 $router->add(
@@ -124,7 +116,6 @@ $router->add(
     "ProfileController@deleteCalculation",
     ["auth"],
 );
->>>>>>> temp-branch
 
 // Extended Profile Management Routes (from original routes.php)
 $router->add("GET", "/user/profile", "ProfileController@index", ["auth"]);
@@ -154,22 +145,6 @@ $router->add(
 );
 
 // Authentication API Routes (for frontend AJAX)
-<<<<<<< HEAD
-$router->add('POST', '/api/login', 'Api\AuthController@login');
-$router->add('POST', '/api/register', 'Api\AuthController@register');
-$router->add('POST', '/api/forgot-password', 'Api\AuthController@forgotPassword');
-$router->add('GET', '/api/logout', 'Api\AuthController@logout');
-$router->add('GET', '/api/check-remember', 'Api\AuthController@checkRememberToken');
-$router->add('GET', '/api/user-status', 'Api\AuthController@userStatus');
-$router->add('GET', '/api/check-username', 'Api\AuthController@checkUsername');
-$router->add('POST', '/api/check-username', 'Api\AuthController@checkUsername');
-$router->add('POST', '/api/resend-verification', 'Api\AuthController@resendVerification');
-$router->add('GET', '/api/location', 'Api\LocationController@getLocation');
-$router->add('GET', '/api/location/status', 'Api\LocationController@getStatus');
-$router->add('GET', '/api/marketing/stats', 'Api\MarketingController@getStats', ['auth', 'admin']);
-$router->add('GET', '/api/marketing/opt-in-users', 'Api\MarketingController@getOptInUsers', ['auth', 'admin']);
-$router->add('POST', '/api/marketing/update-preferences', 'Api\MarketingController@updatePreferences', ['auth']);
-=======
 $router->add("POST", "/api/login", "Api\AuthController@login");
 $router->add("POST", "/api/register", "Api\AuthController@register");
 $router->add(
@@ -185,6 +160,11 @@ $router->add(
 );
 $router->add("GET", "/api/user-status", "Api\AuthController@userStatus");
 $router->add("GET", "/api/check-username", "Api\AuthController@checkUsername");
+$router->add(
+    "POST",
+    "/api/check-username",
+    "Api\AuthController@checkUsername",
+);
 $router->add(
     "POST",
     "/api/resend-verification",
@@ -210,19 +190,6 @@ $router->add(
     "Api\MarketingController@updatePreferences",
     ["auth"],
 );
-
-// Activity Log Routes
-$router->add("GET", "/admin/activity", "Admin\ActivityController@index", [
-    "auth",
-    "admin",
-]);
-$router->add(
-    "GET",
-    "/admin/activity/export",
-    "Admin\ActivityController@export",
-    ["auth", "admin"],
-);
->>>>>>> temp-branch
 
 // Profile API Routes (JSON responses, no CSRF for API routes)
 $router->add('GET', '/api/profile', 'Api\ProfileController@index', ['auth']);
@@ -1614,3 +1581,5 @@ $router->add(
     "Admin\SubscriptionController@createPlan",
     ["auth", "admin"],
 );
+
+?>

@@ -291,15 +291,9 @@ class AuthController extends Controller
         } catch (Exception $e) {
             error_log('Registration error: ' . $e->getMessage());
             
-<<<<<<< HEAD
-            // Check if it's a duplicate entry error
-            if (strpos($e->getMessage(), 'Duplicate entry') !== false || strpos($e->getMessage(), '1062') !== false) {
-                http_response_code(409);
-=======
             // Check if this is a duplicate entry error
             if (strpos($e->getMessage(), 'Duplicate entry') !== false || strpos($e->getMessage(), '1062') !== false) {
                 http_response_code(400);
->>>>>>> temp-branch
                 echo json_encode(['error' => 'Username or email already exists']);
             } else {
                 http_response_code(500);
@@ -493,8 +487,8 @@ class AuthController extends Controller
                 return;
             }
             
-            // Validate that username is a string
-            if (!is_string($input['username'] ?? null)) {
+            // Validate that username is a string (corrected)
+            if (!is_string($username)) {
                 http_response_code(400);
                 echo json_encode(['error' => 'Username must be a string']);
                 return;

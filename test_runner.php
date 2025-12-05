@@ -5,6 +5,11 @@ require_once 'app/bootstrap.php';
 require_once 'app/Controllers/Api/AuthController.php';
 require_once 'app/Models/User.php';
 
+// Turn off output buffering to prevent header errors
+while (ob_get_level()) {
+    ob_end_clean();
+}
+
 // Set up test environment
 session_start();
 $_SESSION = []; // Clear session
@@ -46,10 +51,10 @@ $output = ob_get_clean();
 
 echo "Response: " . $output . "\n";
 $result = json_decode($output, true);
-if (isset($result['success']) && $result['success']) {
+if (is_array($result) && isset($result['success']) && $result['success']) {
     echo "✅ Login with POST data: PASSED\n";
 } else {
-    echo "❌ Login with POST data: FAILED - " . ($result['error'] ?? 'Unknown error') . "\n";
+    echo "❌ Login with POST data: FAILED - " . (isset($result['error']) ? $result['error'] : 'Unknown error') . "\n";
 }
 
 // Test 2: Login with invalid credentials
@@ -65,7 +70,7 @@ $output = ob_get_clean();
 
 echo "Response: " . $output . "\n";
 $result = json_decode($output, true);
-if (isset($result['error']) && strpos($result['error'], 'Invalid username or password') !== false) {
+if (is_array($result) && isset($result['error']) && strpos($result['error'], 'Invalid username or password') !== false) {
     echo "✅ Invalid credentials test: PASSED\n";
 } else {
     echo "❌ Invalid credentials test: FAILED\n";
@@ -82,7 +87,7 @@ $output = ob_get_clean();
 
 echo "Response: " . $output . "\n";
 $result = json_decode($output, true);
-if (isset($result['available']) && $result['available']) {
+if (is_array($result) && isset($result['available']) && $result['available']) {
     echo "✅ Username availability test: PASSED\n";
 } else {
     echo "❌ Username availability test: FAILED\n";

@@ -1,0 +1,12 @@
+[2025-12-05 04:25:47] Auth::login called. Identity: 
+[2025-12-05 04:25:47] Session ID: u45fh7k8v7o3s9gvj9l53m034c
+[2025-12-05 04:25:47] CSRF Check - Posted: 
+[2025-12-05 04:25:47] CSRF Check - Session: aa4bc5be6837f197e0a31ddc020ff5362564c0967538cd30de323495245692c9
+[2025-12-05 04:25:48] Auth::login called. Identity: 
+[2025-12-05 04:25:48] Session ID: phklv6fb8g7gcdjt7uupb01vmp
+[2025-12-05 04:25:48] CSRF Check - Posted: 
+[2025-12-05 04:25:48] CSRF Check - Session: 35c3d3579d0ebd564b471e7c56c73d891eff8d8ed98da4fff525da60ac88c83b
+[2025-12-05 04:25:48] Auth::login called. Identity: 
+[2025-12-05 04:25:48] Session ID: 36cdrh3pi5s9fglpk6lofq9arp
+[2025-12-05 04:25:48] CSRF Check - Posted: 
+[2025-12-05 04:25:48] CSRF Check - Session: 2eda135c6fb5d5a66c2bbb0afe94a6ccfacc8d3e53c79fefb364365f9fa9e0ed

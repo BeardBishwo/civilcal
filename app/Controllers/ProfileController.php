@@ -72,7 +72,6 @@ class ProfileController extends Controller
             'export_requests' => $exportRequests
         ];
 
-<<<<<<< HEAD
         // Return JSON for API requests
         if ($this->expectsJson()) {
             $this->json([
@@ -92,9 +91,6 @@ class ProfileController extends Controller
         }
 
         $this->view('user/profile', $data);
-=======
-        $this->view->render('user/profile', $data);
->>>>>>> temp-branch
     }
 
     /**
