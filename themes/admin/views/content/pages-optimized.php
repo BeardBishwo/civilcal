@@ -357,8 +357,8 @@ $totalViews = array_sum(array_column($pages, 'views'));
     <div class="bulk-actions-content">
         <span class="selected-count"><span id="bulk-count">0</span> selected</span>
         <div class="bulk-buttons">
-            <button class="btn btn-sm btn-success" id="bulk-publish">
-                <i class="fas fa-check"></i>
+            <button class="btn btn-sm btn-success" id="bulk-p<i class="fasublish">
+                 fa-check"></i>
                 Publish
             </button>
             <button class="btn btn-sm btn-warning" id="bulk-draft">
@@ -386,8 +386,8 @@ $totalViews = array_sum(array_column($pages, 'views'));
                 <button class="btn btn-sm btn-outline-primary" onclick="editFromPreview()">
                     <i class="fas fa-edit"></i>
                     Edit
-                </button>
-                <button class="preview-close" onclick="closePreviewModal()">
+                </button class="preview-close>
+                <button" onclick="closePreviewModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -1540,4 +1540,3 @@ function showNotification(message, type = 'info') {
         border: 1px solid currentColor;
     }
 }
-</style>
