@@ -432,14 +432,4 @@ include __DIR__ . '/../layouts/main.php';
             });
         }
     });
-
-    // Function for backup (if called from quick actions)
-    function createBackup() {
-        alert('Backup functionality will be implemented here');
-    }
-
-    // Function for system health check (if called from quick actions)
-    function checkSystemHealth() {
-        alert('System health check will be performed here');
-    }
 </script>
