@@ -86,6 +86,90 @@ class ContentController extends Controller
         $this->view->render('admin/content/media', $data);
     }
 
+    public function create()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
+        
+        $data = [
+            'user' => $user,
+            'page_title' => 'Create New Page - Admin Panel',
+            'currentPage' => 'content',
+            'is_edit' => false,
+            'page' => null
+        ];
+
+        $this->view->render('admin/content/create', $data);
+    }
+
+    public function edit($id)
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
+        
+        // Get page by ID (placeholder logic)
+        $page = $this->getPageById($id);
+        
+        if (!$page) {
+            http_response_code(404);
+            die('Page not found');
+        }
+        
+        $data = [
+            'user' => $user,
+            'page_title' => 'Edit Page - Admin Panel',
+            'currentPage' => 'content',
+            'is_edit' => true,
+            'page' => $page
+        ];
+
+        $this->view->render('admin/content/create', $data);
+    }
+
+    public function save()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
+
+        // Handle page creation/update
+        $title = $_POST['title'] ?? '';
+        $content = $_POST['content'] ?? '';
+        $slug = $_POST['slug'] ?? '';
+        $status = $_POST['status'] ?? 'draft';
+
+        // Placeholder for save logic
+        // In a real implementation, this would save to database
+        
+        // Redirect back to pages list
+        header('Location: ' . app_base_url('admin/content/pages'));
+        exit;
+    }
+
+    public function delete($id)
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
+
+        // Placeholder for delete logic
+        // In a real implementation, this would delete from database
+        
+        // Redirect back to pages list
+        header('Location: ' . app_base_url('admin/content/pages'));
+        exit;
+    }
+
     private function getPages()
     {
         // Placeholder - in real implementation, this would query the database
@@ -159,5 +243,17 @@ class ContentController extends Controller
                 'uploaded_at' => '2024-10-16'
             ]
         ];
+    }
+
+    private function getPageById($id)
+    {
+        // Placeholder - in real implementation, this would query the database
+        $pages = $this->getPages();
+        foreach ($pages as $page) {
+            if ($page['id'] == $id) {
+                return $page;
+            }
+        }
+        return null;
     }
 }

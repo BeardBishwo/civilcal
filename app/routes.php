@@ -487,6 +487,22 @@ $router->add("GET", "/admin/content/pages", "Admin\ContentController@pages", [
     "auth",
     "admin",
 ]);
+$router->add("GET", "/admin/content/pages/create", "Admin\ContentController@create", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/content/pages/edit/{id}", "Admin\ContentController@edit", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/content/pages/save", "Admin\ContentController@save", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/content/pages/delete/{id}", "Admin\ContentController@delete", [
+    "auth",
+    "admin",
+]);
 $router->add("GET", "/admin/content/menus", "Admin\ContentController@menus", [
     "auth",
     "admin",

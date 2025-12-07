@@ -1,0 +1,95 @@
+{"timestamp":"2025-12-07 06:09:04","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:09:04","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:09:04","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:09:04","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:10:13","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:10:13","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:10:13","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:10:13","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:10:19","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:10:19","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:10:19","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:10:19","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:10:24","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:10:24","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:10:25","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:10:25","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:17:13","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:17:13","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:17:13","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:17:13","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:17:18","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:17:18","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:17:18","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:17:18","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:17:20","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:17:20","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:17:20","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:17:20","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:21:16","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:21:16","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:21:16","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:21:16","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:24:15","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:24:15","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:24:15","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:24:15","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:24:34","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:24:34","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:24:34","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:24:34","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:24:40","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:24:40","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:24:40","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:24:40","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:27:07","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:27:07","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:27:07","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:27:07","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:31:08","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:31:08","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:31:08","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:31:08","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:31:11","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:31:11","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:31:11","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:31:11","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:31:15","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:31:15","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:31:15","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:31:15","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:31:18","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:31:18","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:31:18","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:31:18","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:32:05","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:32:05","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:32:05","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:32:06","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:32:08","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:32:08","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:32:08","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:32:08","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:32:14","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:32:14","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:32:14","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:32:14","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:40:04","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:40:04","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:40:04","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:40:04","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:40:06","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:40:06","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:40:06","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:40:06","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:40:53","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:40:53","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:40:53","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:40:53","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:41:08","level":"info","message":"Module provider registered","context":{"module":"Civil"}}
+{"timestamp":"2025-12-07 06:41:08","level":"info","message":"Module provider registered","context":{"module":"Electrical"}}
+{"timestamp":"2025-12-07 06:41:08","level":"info","message":"Module provider registered","context":{"module":"Hvac"}}
+{"timestamp":"2025-12-07 06:41:08","level":"warning","message":"plugin_entry_undefined","context":{"slug":"green-building-tools"}}
+{"timestamp":"2025-12-07 06:41:08","level":"error","message":"Undefined array key \"content\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\content\\create.php","line":169}}
+{"timestamp":"2025-12-07 06:41:08","level":"error","message":"Undefined array key \"content\"","context":{"type":2,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\content\\create.php","line":171}}
+{"timestamp":"2025-12-07 06:41:08","level":"error","message":"htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated","context":{"type":8192,"file":"C:\\laragon\\www\\Bishwo_Calculator\\themes\\admin\\views\\content\\create.php","line":171}}
