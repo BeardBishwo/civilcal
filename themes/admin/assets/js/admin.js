@@ -905,11 +905,8 @@ const AdminApp = {
 
     // AJAX Form Handling
     initAjaxForms() {
-        console.log('AdminApp.initAjaxForms() called');
         document.querySelectorAll('.ajax-form').forEach(form => {
-            console.log('Found ajax-form:', form.id || form.className);
             form.addEventListener('submit', async (e) => {
-                console.log('Ajax form submitted:', e.target.id || e.target.className);
                 e.preventDefault();
 
                 const submitBtn = form.querySelector('[type="submit"]');
@@ -921,27 +918,16 @@ const AdminApp = {
 
                 try {
                     const formData = new FormData(form);
-                    console.log('FormData created, action:', form.action);
-
-                    // Debug: log all form data
-                    for (let [key, value] of formData.entries()) {
-                        console.log('Form data:', key, value);
-                    }
 
                     // Get CSRF token from form data or hidden input
                     const csrfToken = formData.get('csrf_token') || document.querySelector('input[name="csrf_token"]')?.value;
-                    console.log('CSRF token for header:', csrfToken);
 
                     const response = await fetch(form.action, {
                         method: form.method,
                         body: formData
                     });
 
-                    console.log('Response status:', response.status);
-                    console.log('Response headers:', [...response.headers.entries()]);
-
                     const responseText = await response.text();
-                    console.log('Raw response text:', responseText);
 
                     let result;
                     try {
@@ -951,9 +937,6 @@ const AdminApp = {
                         console.error('Response was:', responseText.substring(0, 500));
                         throw new Error('Server returned invalid JSON: ' + responseText.substring(0, 100));
                     }
-
-                    console.log('Parsed result:', result);
-                    console.log('result.success =', result.success, 'type:', typeof result.success);
 
                     if (result.success) {
                         // Show appropriate message based on the result
@@ -972,6 +955,9 @@ const AdminApp = {
 
                         if (result.redirect) {
                             setTimeout(() => window.location.href = result.redirect, 1500);
+                        } else {
+                            // Auto-refresh to ensure UI updates (e.g. sidebar, header)
+                            setTimeout(() => window.location.reload(), 1500);
                         }
                     } else {
                         // Show actual error message from server
