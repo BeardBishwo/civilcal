@@ -14,28 +14,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <meta name="csrf-token" content="<?php echo function_exists('csrf_token') ? csrf_token() : ($_SESSION['csrf_token'] ?? ''); ?>">
     <script>
-    (function(){
-      var meta = document.querySelector('meta[name="csrf-token"]');
-      var token = meta ? meta.getAttribute('content') : '';
-      var origFetch = window.fetch;
-      window.fetch = function(input, init){
-        init = init || {};
-        var method = String(init.method || 'GET').toUpperCase();
-        if (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE'){
-          var headers = init.headers || {};
-          if (typeof Headers !== 'undefined' && headers instanceof Headers){
-            headers.set('X-CSRF-Token', token);
-          } else if (Array.isArray(headers)){
-            headers.push(['X-CSRF-Token', token]);
-          } else {
-            headers['X-CSRF-Token'] = token;
-          }
-          init.headers = headers;
-          if (!init.credentials) init.credentials = 'same-origin';
-        }
-        return origFetch(input, init);
-      };
-    })();
+        (function() {
+            var origFetch = window.fetch;
+            window.fetch = function(input, init) {
+                init = init || {};
+                var method = String(init.method || 'GET').toUpperCase();
+                if (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE') {
+                    // Prefer token from hidden input field (most up-to-date), fallback to meta tag
+                    var inputToken = document.querySelector('input[name="csrf_token"]')?.value;
+                    var metaToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    var token = inputToken || metaToken || '';
+
+                    var headers = init.headers || {};
+                    if (typeof Headers !== 'undefined' && headers instanceof Headers) {
+                        headers.set('X-CSRF-Token', token);
+                    } else if (Array.isArray(headers)) {
+                        headers.push(['X-CSRF-Token', token]);
+                    } else {
+                        headers['X-CSRF-Token'] = token;
+                    }
+                    init.headers = headers;
+                    if (!init.credentials) init.credentials = 'same-origin';
+                }
+                return origFetch(input, init);
+            };
+        })();
     </script>
 
     <!-- Chart.js for analytics -->
@@ -450,34 +453,79 @@
 
         /* Smooth animations */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-5px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(5px);
+            }
         }
 
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
         }
 
         /* Apply animations to notification dropdown */
@@ -501,7 +549,7 @@
         /* Smooth hover effects */
         .notification-item:hover {
             transform: translateX(2px) !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
         }
 
         /* Smooth theme toggle button */
@@ -540,6 +588,7 @@
                 transform: translateX(100%);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -550,6 +599,7 @@
             from {
                 opacity: 1;
             }
+
             to {
                 opacity: 0;
             }
@@ -908,7 +958,7 @@
     <div id="notification-toast" class="notification-toast"></div>
 
     <!-- Admin Scripts -->
-    <script src="<?php echo app_base_url('themes/admin/assets/js/admin.js'); ?>"></script>
+    <script src="<?php echo app_base_url('themes/admin/assets/js/admin.js?v=' . time()); ?>"></script>
     <script src="<?php echo app_base_url('themes/admin/assets/js/notification-fixed.js'); ?>"></script>
     <script src="<?php echo app_base_url('themes/admin/assets/js/theme-toggle.js'); ?>"></script>
 
@@ -992,65 +1042,66 @@
         });
     </script>
 
-<script>
-// Fallback notification click handler
-document.addEventListener("DOMContentLoaded", function() {
-    setTimeout(function() {
-        const btn = document.getElementById("notificationToggle");
-        const dropdown = document.getElementById("notificationDropdown");
+    <script>
+        // Fallback notification click handler
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(function() {
+                const btn = document.getElementById("notificationToggle");
+                const dropdown = document.getElementById("notificationDropdown");
 
-        if (btn && !btn.onclick) {
-            btn.addEventListener("click", function(e) {
-                e.preventDefault();
-                if (dropdown) {
-                    const isVisible = dropdown.classList.contains("show");
-                    dropdown.classList.toggle("show");
-                    console.log("Dropdown toggled: " + (dropdown.classList.contains("show") ? "open" : "closed"));
+                if (btn && !btn.onclick) {
+                    btn.addEventListener("click", function(e) {
+                        e.preventDefault();
+                        if (dropdown) {
+                            const isVisible = dropdown.classList.contains("show");
+                            dropdown.classList.toggle("show");
+                            console.log("Dropdown toggled: " + (dropdown.classList.contains("show") ? "open" : "closed"));
+                        }
+                    });
+                    console.log("✅ Fallback click handler attached");
                 }
-            });
-            console.log("✅ Fallback click handler attached");
-        }
-    }, 500);
-});
-</script>
+            }, 500);
+        });
+    </script>
 
-<!-- Theme Toggle Fallback Initialization -->
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    setTimeout(function() {
-        const themeBtn = document.getElementById("themeToggle");
-        const themeIcon = document.getElementById("themeIcon");
+    <!-- Theme Toggle Fallback Initialization -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(function() {
+                const themeBtn = document.getElementById("themeToggle");
+                const themeIcon = document.getElementById("themeIcon");
 
-        if (themeBtn) {
-            // Ensure button is visible
-            themeBtn.classList.add("fallback-visible");
-            themeBtn.style.display = "inline-block";
-            themeBtn.style.visibility = "visible";
-            themeBtn.style.opacity = "1";
+                if (themeBtn) {
+                    // Ensure button is visible
+                    themeBtn.classList.add("fallback-visible");
+                    themeBtn.style.display = "inline-block";
+                    themeBtn.style.visibility = "visible";
+                    themeBtn.style.opacity = "1";
 
-            // Add basic click handler if no JS loaded
-            if (!themeBtn.onclick) {
-                themeBtn.addEventListener("click", function(e) {
-                    e.preventDefault();
-                    const currentIcon = themeIcon.className;
-                    if (currentIcon.includes("fa-moon")) {
-                        themeIcon.className = "fas fa-sun";
-                        document.documentElement.classList.add("dark-theme");
-                        document.documentElement.classList.remove("light-theme");
-                    } else {
-                        themeIcon.className = "fas fa-moon";
-                        document.documentElement.classList.add("light-theme");
-                        document.documentElement.classList.remove("dark-theme");
+                    // Add basic click handler if no JS loaded
+                    if (!themeBtn.onclick) {
+                        themeBtn.addEventListener("click", function(e) {
+                            e.preventDefault();
+                            const currentIcon = themeIcon.className;
+                            if (currentIcon.includes("fa-moon")) {
+                                themeIcon.className = "fas fa-sun";
+                                document.documentElement.classList.add("dark-theme");
+                                document.documentElement.classList.remove("light-theme");
+                            } else {
+                                themeIcon.className = "fas fa-moon";
+                                document.documentElement.classList.add("light-theme");
+                                document.documentElement.classList.remove("dark-theme");
+                            }
+                            console.log("✅ Fallback theme toggle handler attached");
+                        });
                     }
-                    console.log("✅ Fallback theme toggle handler attached");
-                });
-            }
-            console.log("✅ Theme toggle button initialized");
-        } else {
-            console.error("❌ Theme toggle button not found");
-        }
-    }, 1000);
-});
-</script></body>
+                    console.log("✅ Theme toggle button initialized");
+                } else {
+                    console.error("❌ Theme toggle button not found");
+                }
+            }, 1000);
+        });
+    </script>
+</body>
 
 </html>

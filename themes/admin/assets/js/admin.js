@@ -928,6 +928,10 @@ const AdminApp = {
                         console.log('Form data:', key, value);
                     }
 
+                    // Get CSRF token from form data or hidden input
+                    const csrfToken = formData.get('csrf_token') || document.querySelector('input[name="csrf_token"]')?.value;
+                    console.log('CSRF token for header:', csrfToken);
+
                     const response = await fetch(form.action, {
                         method: form.method,
                         body: formData

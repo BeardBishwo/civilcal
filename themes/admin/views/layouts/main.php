@@ -1,10 +1,12 @@
 <?php
+
 /**
  * Admin Main Layout
  */
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +19,7 @@
         <?php endforeach; ?>
     <?php endif; ?>
 </head>
+
 <body class="admin-body">
     <!-- Admin Header -->
     <header class="admin-header">
@@ -122,6 +125,7 @@
             <script src="<?= $script ?>"></script>
         <?php endforeach; ?>
     <?php endif; ?>
-    <script src="<?= app_base_url('public/assets/js/admin.js') ?>"></script>
+    <script src="<?= app_base_url('public/assets/js/admin.js?v=' . time()) ?>"></script>
 </body>
+
 </html>

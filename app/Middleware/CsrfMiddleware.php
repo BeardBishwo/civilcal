@@ -8,19 +8,15 @@ class CsrfMiddleware
     {
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-            $_SESSION['csrf_expiry'] = time() + 3600; // 1 hour
         }
     }
 
     protected function validToken(?string $token): bool
     {
-        if (empty($_SESSION['csrf_token']) || empty($_SESSION['csrf_expiry'])) {
+        if (empty($_SESSION['csrf_token'])) {
             return false;
         }
-        if (time() > ($_SESSION['csrf_expiry'] ?? 0)) {
-            unset($_SESSION['csrf_token'], $_SESSION['csrf_expiry']);
-            return false;
-        }
+
         return $token && hash_equals($_SESSION['csrf_token'], $token);
     }
 
@@ -33,6 +29,14 @@ class CsrfMiddleware
             $headerToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
             $formToken = $_POST['csrf_token'] ?? null;
             $token = $headerToken ?: $formToken;
+
+
+            // DEBUG: Log token details
+            /*
+            error_log("CSRF DEBUG - Request Method: " . $method);
+            error_log("CSRF DEBUG - Header token: " . ($headerToken ?? 'NULL'));
+            error_log("CSRF DEBUG - Form token: " . ($formToken ?? 'NULL'));
+            */
 
             if (!$this->validToken($token)) {
                 http_response_code(419);

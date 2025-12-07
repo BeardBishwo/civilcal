@@ -1,0 +1,15 @@
+CSRF Log Started
+Array
+(
+    [Time] => 2025-12-07 09:55:16
+    [Submitted_Token] => 2650ef7c275c57c32eb8a4611a116f65
+    [Session_Token] => 49c6e32d18c4462b3b8b6b20b12eeafe8be3986de1e8499bcbc31ca6ef027bea
+    [Session_Expiry] => NULL
+    [Time_Now] => 1765101316
+    [Is_Expired] => NO
+    [Match] => NO
+    [Session_Id] => cis99c3jpbqq3qfv83dn825pje
+    [Session_Status] => 2
+)
+
+

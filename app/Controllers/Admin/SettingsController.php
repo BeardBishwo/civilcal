@@ -213,10 +213,14 @@ class SettingsController extends Controller
             exit;
         }
 
+
+
         // CSRF Token validation
         $csrfToken = $_POST['csrf_token'] ?? '';
         $sessionToken = $_SESSION['csrf_token'] ?? '';
+
         if (empty($csrfToken) || empty($sessionToken) || !hash_equals($sessionToken, $csrfToken)) {
+
             error_log("[SETTINGS_DEBUG] ERROR: Invalid CSRF token");
             error_log("[SETTINGS_DEBUG] Submitted CSRF: $csrfToken");
             error_log("[SETTINGS_DEBUG] Session CSRF: $sessionToken");

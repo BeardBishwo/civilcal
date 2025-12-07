@@ -1,4 +1,5 @@
 <?php
+
 /**
  * General Settings Page - Premium Modern UI/UX Design
  * Features: Beautiful gradients, smooth animations, enhanced spacing, additional fields
@@ -204,13 +205,13 @@
         margin-bottom: 1.5rem;
         animation: slideDown 0.5s ease-out;
     }
-    
+
     /* Logo and Favicon Display Styles */
     .current-logo-display,
     .current-favicon-display {
         text-align: center;
     }
-    
+
     .logo-preview-container,
     .favicon-preview-container {
         display: flex;
@@ -218,12 +219,12 @@
         justify-content: center;
         min-height: 100px;
     }
-    
+
     .favicon-preview-container {
         min-height: 80px;
         min-width: 80px;
     }
-    
+
     .current-logo-display img,
     .current-favicon-display img {
         display: block;
@@ -235,6 +236,7 @@
             opacity: 0;
             transform: translateY(-20px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -246,6 +248,7 @@
             opacity: 0;
             transform: translateY(30px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -401,23 +404,24 @@
 
     /* Responsive button alignment */
     @media (min-width: 768px) {
+
         /* On desktop, align buttons at the same level */
         .form-row {
             align-items: flex-end;
         }
-        
+
         .form-row .form-group {
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             height: 100%;
         }
-        
+
         .form-row .current-logo-display,
         .form-row .current-favicon-display {
             flex-shrink: 0;
         }
-        
+
         /* Make buttons align horizontally at the bottom */
         .form-row .logo-actions,
         .form-row .favicon-actions {
@@ -431,7 +435,7 @@
             flex-direction: column;
             gap: 2rem;
         }
-        
+
         .form-row .form-group {
             width: 100%;
         }
@@ -492,20 +496,21 @@
 
     /* Responsive adjustments */
     @media (max-width: 768px) {
+
         .logo-actions,
         .favicon-actions {
             flex-direction: column;
             gap: 0.75rem;
             align-items: flex-start;
         }
-        
+
         .btn-change,
         .btn-remove {
             width: 100%;
             justify-content: flex-start;
             min-width: auto;
         }
-        
+
         .current-logo-image,
         .current-favicon-image {
             min-height: 150px;
@@ -562,176 +567,185 @@
                 <div class="card-body">
                     <form id="generalSettingsForm" action="<?php echo app_base_url('/admin/settings/update'); ?>" method="POST" enctype="multipart/form-data" class="ajax-form">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
-                    
-                    <div class="form-section">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="site_name" class="form-label">📝 Site Name</label>
-                                <input type="text" class="form-control" 
-                                       id="site_name" 
-                                       name="site_name" 
-                                       value="<?= htmlspecialchars($settings['site_name'] ?? 'Bishwo Calculator') ?>" 
-                                       placeholder="Enter your site name">
-                                <div class="form-text">The name displayed in browser tabs and search results.</div>
-                            </div>
-                        </div>
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="site_description" class="form-label">📄 Site Description</label>
-                                <textarea class="form-control" 
-                                          id="site_description" 
-                                          name="site_description" 
-                                          rows="3" 
-                                          placeholder="Describe your website briefly"><?= htmlspecialchars($settings['site_description'] ?? '') ?></textarea>
-                                <div class="form-text">A brief description for search engines and social sharing.</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Site Branding -->
-                    <div class="section-divider"></div>
-                    <div class="form-section">
-                        <div class="section-title">
-                            <span class="section-title-icon">🎨</span>
-                            Site Branding
-                        </div>
-
-                        <div class="form-row">
+                        <div class="form-section">
                             <div class="form-row">
-                            <div class="form-group">
-                                <label for="site_logo" class="form-label">🖼️ Site Logo</label>
-                                <?php if (!empty($settings['site_logo'])): ?>
-                                <!-- Show current logo directly -->
-                                <div class="current-logo-display mb-3">
-                                    <div class="logo-preview-container p-4 bg-light rounded-3 border border-2 border-primary-subtle shadow-sm">
-                                        <img src="<?= htmlspecialchars(app_base_url($settings['site_logo'])) ?>" alt="Current Logo" class="img-fluid mx-auto d-block" style="max-width: 250px; max-height: 180px; object-fit: contain;">
+                                <div class="form-group">
+                                    <label for="site_name" class="form-label">📝 Site Name</label>
+                                    <input type="text" class="form-control"
+                                        id="site_name"
+                                        name="site_name"
+                                        value="<?= htmlspecialchars($settings['site_name'] ?? 'Bishwo Calculator') ?>"
+                                        placeholder="Enter your site name">
+                                    <div class="form-text">The name displayed in browser tabs and search results.</div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="site_description" class="form-label">📄 Site Description</label>
+                                    <textarea class="form-control"
+                                        id="site_description"
+                                        name="site_description"
+                                        rows="3"
+                                        placeholder="Describe your website briefly"><?= htmlspecialchars($settings['site_description'] ?? '') ?></textarea>
+                                    <div class="form-text">A brief description for search engines and social sharing.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Site Branding -->
+                        <div class="section-divider"></div>
+                        <div class="form-section">
+                            <div class="section-title">
+                                <span class="section-title-icon">🎨</span>
+                                Site Branding
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="site_logo" class="form-label">🖼️ Site Logo</label>
+                                        <?php if (!empty($settings['site_logo'])): ?>
+                                            <!-- Show current logo directly -->
+                                            <div class="current-logo-display mb-3">
+                                                <div class="logo-preview-container p-4 bg-light rounded-3 border border-2 border-primary-subtle shadow-sm">
+                                                    <img src="<?= htmlspecialchars(app_base_url($settings['site_logo'])) ?>" alt="Current Logo" class="img-fluid mx-auto d-block" style="max-width: 250px; max-height: 180px; object-fit: contain;">
+                                                </div>
+                                            </div>
+                                            <div class="logo-actions">
+                                                <button type="button" class="btn-change" onclick="document.getElementById('site_logo').click()">
+                                                    <i class="fas fa-edit"></i><span>Change Logo</span>
+                                                </button>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <!-- File input for logo (always present, hidden when logo exists) -->
+                                        <input type="file"
+                                            class="form-control-file"
+                                            id="site_logo"
+                                            name="site_logo"
+                                            accept="image/*"
+                                            onchange="previewImage(event, 'logoPreview')"
+                                            style="display: none;">
+
+                                        <!-- Preview container (hidden) -->
+                                        <div class="image-preview" id="logoPreview" style="display: none;">
+                                            <img src="" alt="Logo Preview" style="max-width: 100px; max-height: 100px; border-radius: 8px; border: 2px solid #e2e8f0;">
+                                            <button type="button" class="btn-remove" onclick="removeImage('site_logo', 'logoPreview')">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                        <div class="form-text">Upload your site logo. Square format (512x512px) recommended for best display.</div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="favicon" class="form-label">🌟 Favicon</label>
+                                        <?php if (!empty($settings['favicon'])): ?>
+                                            <!-- Show current favicon directly -->
+                                            <div class="current-favicon-display mb-3">
+                                                <div class="favicon-preview-container p-3 bg-light rounded-3 border border-2 border-primary-subtle shadow-sm d-inline-block mx-auto">
+                                                    <img src="<?= htmlspecialchars(app_base_url($settings['favicon'])) ?>" alt="Current Favicon" class="img-fluid mx-auto d-block" style="max-width: 80px; max-height: 80px; object-fit: contain;">
+                                                </div>
+                                            </div>
+                                            <div class="favicon-actions">
+                                                <button type="button" class="btn-change" onclick="document.getElementById('favicon').click()">
+                                                    <i class="fas fa-edit"></i><span>Change Favicon</span>
+                                                </button>
+                                            </div>
+                                            <input type="file"
+                                                class="form-control-file"
+                                                id="favicon"
+                                                name="favicon"
+                                                accept="image/x-icon,image/png"
+                                                onchange="previewImage(event, 'faviconPreview')"
+                                                style="display: none;">
+                                        <?php else: ?>
+                                            <!-- Show upload area when no favicon -->
+                                            <div class="file-upload-container">
+                                                <input type="file"
+                                                    class="form-control-file"
+                                                    id="favicon"
+                                                    name="favicon"
+                                                    accept="image/x-icon,image/png"
+                                                    onchange="previewImage(event, 'faviconPreview')">
+                                                <div class="upload-hint">
+                                                    <i class="fas fa-cloud-upload-alt"></i>
+                                                    <span>Choose a square image (32x32px or 64x64px)</span>
+                                                </div>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="image-preview" id="faviconPreview" style="display: none;">
+                                            <img src="" alt="Favicon Preview" style="max-width: 32px; max-height: 32px; border-radius: 8px; border: 2px solid #e2e8f0;">
+                                            <button type="button" class="btn-remove" onclick="removeImage('favicon', 'faviconPreview')">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                        <div class="form-text">Upload your site favicon. Square format (32x32px or 64x64px) recommended.</div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="logo_text" class="form-label">🔤 Logo Text</label>
+                                        <input type="text" class="form-control"
+                                            id="logo_text"
+                                            name="logo_text"
+                                            value="<?= htmlspecialchars($settings['logo_text'] ?? 'EngiCal Pro') ?>"
+                                            placeholder="EngiCal Pro">
+                                        <div class="form-text">Custom text to display in the header alongside or instead of the logo.</div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="header_style" class="form-label">🎨 Header Style</label>
+                                        <select class="form-select" id="header_style" name="header_style">
+                                            <option value="logo_only" <?php echo ($settings['header_style'] ?? 'logo_text') === 'logo_only' ? 'selected' : ''; ?>>Logo Only</option>
+                                            <option value="text_only" <?php echo ($settings['header_style'] ?? 'logo_text') === 'text_only' ? 'selected' : ''; ?>>Text Only</option>
+                                        </select>
+                                        <div class="form-text">Choose how the header displays: logo only or text only.</div>
                                     </div>
                                 </div>
-                                <div class="logo-actions">
-                                    <button type="button" class="btn-change" onclick="document.getElementById('site_logo').click()">
-                                        <i class="fas fa-edit"></i><span>Change Logo</span>
-                                    </button>
-                                </div>
-                                <?php endif; ?>
-                                
-                                <!-- File input (hidden) -->
-                                <div class="image-preview" id="logoPreview" style="display: none;">
-                                    <img src="" alt="Logo Preview" style="max-width: 100px; max-height: 100px; border-radius: 8px; border: 2px solid #e2e8f0;">
-                                    <button type="button" class="btn-remove" onclick="removeImage('site_logo', 'logoPreview')">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                                <div class="form-text">Upload your site logo. Square format (512x512px) recommended for best display.</div>
                             </div>
-                            
-                            <div class="form-group">
-                                <label for="favicon" class="form-label">🌟 Favicon</label>
-                                <?php if (!empty($settings['favicon'])): ?>
-                                <!-- Show current favicon directly -->
-                                <div class="current-favicon-display mb-3">
-                                    <div class="favicon-preview-container p-3 bg-light rounded-3 border border-2 border-primary-subtle shadow-sm d-inline-block mx-auto">
-                                        <img src="<?= htmlspecialchars(app_base_url($settings['favicon'])) ?>" alt="Current Favicon" class="img-fluid mx-auto d-block" style="max-width: 80px; max-height: 80px; object-fit: contain;">
+
+                            <!-- Additional Site Information -->
+                            <div class="section-divider"></div>
+                            <div class="form-section">
+                                <div class="section-title">
+                                    <span class="section-title-icon">📋</span>
+                                    Additional Information
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="footer_text" class="form-label">📜 Footer Text</label>
+                                        <input type="text" class="form-control"
+                                            id="footer_text"
+                                            name="footer_text"
+                                            value="<?= htmlspecialchars($settings['footer_text'] ?? '') ?>"
+                                            placeholder="Copyright © 2024 Your Company">
+                                        <div class="form-text">Text displayed in your website footer.</div>
                                     </div>
                                 </div>
-                                <div class="favicon-actions">
-                                    <button type="button" class="btn-change" onclick="document.getElementById('favicon').click()">
-                                        <i class="fas fa-edit"></i><span>Change Favicon</span>
-                                    </button>
-                                </div>
-                                <input type="file" 
-                                       class="form-control-file" 
-                                       id="favicon" 
-                                       name="favicon" 
-                                       accept="image/x-icon,image/png"
-                                       onchange="previewImage(event, 'faviconPreview')"
-                                       style="display: none;">
-                                <?php else: ?>
-                                <!-- Show upload area when no favicon -->
-                                <div class="file-upload-container">
-                                    <input type="file" 
-                                           class="form-control-file" 
-                                           id="favicon" 
-                                           name="favicon" 
-                                           accept="image/x-icon,image/png"
-                                           onchange="previewImage(event, 'faviconPreview')">
-                                    <div class="upload-hint">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                        <span>Choose a square image (32x32px or 64x64px)</span>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="support_email" class="form-label">💌 Support Email</label>
+                                        <input type="email" class="form-control"
+                                            id="support_email"
+                                            name="support_email"
+                                            value="<?= htmlspecialchars($settings['support_email'] ?? '') ?>"
+                                            placeholder="support@example.com">
+                                        <div class="form-text">Email address for customer support inquiries.</div>
                                     </div>
                                 </div>
-                                <?php endif; ?>
-                                <div class="image-preview" id="faviconPreview" style="display: none;">
-                                    <img src="" alt="Favicon Preview" style="max-width: 32px; max-height: 32px; border-radius: 8px; border: 2px solid #e2e8f0;">
-                                    <button type="button" class="btn-remove" onclick="removeImage('favicon', 'faviconPreview')">
-                                        <i class="fas fa-times"></i>
-                                    </button>
+
+                                <div class="form-hint">
+                                    💡 <strong>Pro Tip:</strong> Ensure all information is up-to-date and reflects your current business details for better user experience.
                                 </div>
-                                <div class="form-text">Upload your site favicon. Square format (32x32px or 64x64px) recommended.</div>
                             </div>
-                            
-                            <div class="form-group">
-                                <label for="logo_text" class="form-label">🔤 Logo Text</label>
-                                <input type="text" class="form-control" 
-                                       id="logo_text" 
-                                       name="logo_text" 
-                                       value="<?= htmlspecialchars($settings['logo_text'] ?? 'EngiCal Pro') ?>" 
-                                       placeholder="EngiCal Pro">
-                                <div class="form-text">Custom text to display in the header alongside or instead of the logo.</div>
+
+                            <!-- Action Buttons -->
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-save">💾 Save</button>
                             </div>
-                            
-                            <div class="form-group">
-                                <label for="header_style" class="form-label">🎨 Header Style</label>
-                                <select class="form-select" id="header_style" name="header_style">
-                                    <option value="logo_only" <?php echo ($settings['header_style'] ?? 'logo_text') === 'logo_only' ? 'selected' : ''; ?>>Logo Only</option>
-                                    <option value="text_only" <?php echo ($settings['header_style'] ?? 'logo_text') === 'text_only' ? 'selected' : ''; ?>>Text Only</option>
-                                </select>
-                                <div class="form-text">Choose how the header displays: logo only or text only.</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Additional Site Information -->
-                    <div class="section-divider"></div>
-                    <div class="form-section">
-                        <div class="section-title">
-                            <span class="section-title-icon">📋</span>
-                            Additional Information
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="footer_text" class="form-label">📜 Footer Text</label>
-                                <input type="text" class="form-control" 
-                                       id="footer_text" 
-                                       name="footer_text" 
-                                       value="<?= htmlspecialchars($settings['footer_text'] ?? '') ?>" 
-                                       placeholder="Copyright © 2024 Your Company">
-                                <div class="form-text">Text displayed in your website footer.</div>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="support_email" class="form-label">💌 Support Email</label>
-                                <input type="email" class="form-control" 
-                                       id="support_email" 
-                                       name="support_email" 
-                                       value="<?= htmlspecialchars($settings['support_email'] ?? '') ?>" 
-                                       placeholder="support@example.com">
-                                <div class="form-text">Email address for customer support inquiries.</div>
-                            </div>
-                        </div>
-
-                        <div class="form-hint">
-                            💡 <strong>Pro Tip:</strong> Ensure all information is up-to-date and reflects your current business details for better user experience.
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="button-group">
-                        <button type="submit" class="btn btn-save">💾 Save</button>
-                    </div>
                     </form>
                 </div>
             </div>
@@ -751,13 +765,13 @@
                 const img = preview.querySelector('img');
                 img.src = e.target.result;
                 preview.style.display = 'block';
-                
+
                 // Hide the current image display and show preview
                 const currentContainer = preview.closest('.form-group').querySelector('.current-logo-container, .current-favicon-container');
                 if (currentContainer) {
                     currentContainer.style.display = 'none';
                 }
-                
+
                 console.log('Preview updated for:', previewId);
             };
             reader.readAsDataURL(file);
@@ -768,30 +782,30 @@
     function removeImage(inputId, previewId) {
         document.getElementById(inputId).value = '';
         document.getElementById(previewId).style.display = 'none';
-        
+
         // Show current image container again if it exists
         const currentContainer = document.getElementById(previewId).closest('.form-group').querySelector('.current-logo-container, .current-favicon-container');
         if (currentContainer) {
             currentContainer.style.display = 'block';
         }
-        
+
         console.log('Image removed:', inputId);
     }
 
     document.getElementById('generalSettingsForm').addEventListener('submit', function(e) {
         console.log('General settings form submitted');
-        
+
         // Debug: Check if files are being sent
         const logoInput = document.getElementById('site_logo');
         const faviconInput = document.getElementById('favicon');
-        
+
         if (logoInput && logoInput.files.length > 0) {
             console.log('Logo file selected:', logoInput.files[0].name);
         }
         if (faviconInput && faviconInput.files.length > 0) {
             console.log('Favicon file selected:', faviconInput.files[0].name);
         }
-        
+
         // Show FormData contents when form is submitted
         const formData = new FormData(this);
         for (let [key, value] of formData.entries()) {
@@ -809,7 +823,7 @@
         cards.forEach((card, index) => {
             card.style.animationDelay = (index * 0.15) + 's';
         });
-        
+
         console.log('General settings page loaded');
     });
 </script>

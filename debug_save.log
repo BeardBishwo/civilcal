@@ -1,0 +1,7 @@
+Log started
+[2025-12-07 13:02:06] SettingsController::save() - POST keys: csrf_token, site_name, site_description, logo_text, header_style, footer_text, support_email
+[2025-12-07 13:02:06] SettingsController::save() - POST data: {"csrf_token":"5860a7430d148911c861f6a636e286d6b49adc07420d892d810c5112731b8706","site_name":"Bishwo","site_description":"Complete Test Description 1764848726","logo_text":"Civil Cal","header_style":"logo_only","footer_text":"","support_email":"help@civilcal.com"}
+[2025-12-07 14:05:17] SettingsController::save() - POST keys: csrf_token, site_name, site_description, logo_text, header_style, footer_text, support_email
+[2025-12-07 14:05:17] SettingsController::save() - POST data: {"csrf_token":"8c2e4c45bcaebe8761da7427dacd23ffe1baaff32b00f3b98d732de5350bb4de","site_name":"Bishwo","site_description":"Complete Test Description 1764848726","logo_text":"Civil Cal","header_style":"logo_only","footer_text":"","support_email":"help@civilcal.com"}
+[2025-12-07 14:05:30] SettingsController::save() - POST keys: csrf_token, site_name, site_description, logo_text, header_style, footer_text, support_email
+[2025-12-07 14:05:30] SettingsController::save() - POST data: {"csrf_token":"8c2e4c45bcaebe8761da7427dacd23ffe1baaff32b00f3b98d732de5350bb4de","site_name":"Bimal","site_description":"Complete Test Description 1764848726","logo_text":"Civil Cal","header_style":"logo_only","footer_text":"","support_email":"help@civilcal.com"}
