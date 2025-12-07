@@ -1,0 +1,22 @@
+# Ignore large files that shouldn't be in repository
+storage/logs/*.log
+storage/backups/*.zip
+storage/backups/*.tar.gz
+storage/cache/*
+storage/uploads/*
+storage/exports/*
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore environment-specific files
+.env.local
+.env.*.local
