@@ -3,6 +3,6 @@
         <h1><?= htmlspecialchars($page['title'] ?? '') ?></h1>
     </div>
     <div class="content-body">
-        <?= $page['body'] ?? '' ?>
+        <?= $page['content'] ?? '' ?>
     </div>
 </div>

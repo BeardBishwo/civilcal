@@ -13,6 +13,7 @@ $router->add("GET", "/pricing", "HomeController@pricing");
 $router->add("GET", "/about", "HomeController@about");
 $router->add("GET", "/contact", "HomeController@contact");
 $router->add("POST", "/contact", "HomeController@contact");
+$router->add("GET", "/pages/preview/{id}", "HomeController@pagePreview");
 
 // Authentication Routes
 $router->add("GET", "/login", "AuthController@showLogin", ["guest"]);

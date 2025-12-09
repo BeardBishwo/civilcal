@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Core\Controller;
@@ -9,11 +10,11 @@ class HomeController extends Controller
     {
         $user = null; // Simple user check
         $isNepal = false; // Default to false
-        
+
         $stats = $this->getSystemStats();
         $featuredCalculators = $this->getFeaturedCalculators();
         $testimonials = $this->getTestimonials();
-        
+
         // Make the View object available in templates
         $data = [
             'user' => $user,
@@ -23,11 +24,11 @@ class HomeController extends Controller
             'testimonials' => $testimonials,
             'viewHelper' => $this->view // Pass View object to templates
         ];
-        
+
         $this->view->render('index', $data);
     }
 
-    
+
     public function features()
     {
         $this->view->render('home/features', [
@@ -36,11 +37,11 @@ class HomeController extends Controller
         ]);
     }
 
-    
+
     public function pricing()
     {
         $plans = $this->getPricingPlans();
-        
+
         $this->view->render('home/pricing', [
             'user' => null,
             'plans' => $plans,
@@ -48,7 +49,7 @@ class HomeController extends Controller
         ]);
     }
 
-    
+
     public function about()
     {
         $this->view->render('home/about', [
@@ -57,7 +58,7 @@ class HomeController extends Controller
         ]);
     }
 
-    
+
     public function contact()
     {
         if ($_POST) {
@@ -65,14 +66,14 @@ class HomeController extends Controller
             echo json_encode($result);
             return;
         }
-        
+
         $this->view->render('home/contact', [
             'user' => null,
             'viewHelper' => $this->view
         ]);
     }
 
-    
+
     private function getSystemStats()
     {
         return [
@@ -82,7 +83,7 @@ class HomeController extends Controller
             'countries' => 25
         ];
     }
-    
+
     private function getFeaturedCalculators()
     {
         return [
@@ -96,7 +97,7 @@ class HomeController extends Controller
             ],
             [
                 'category' => 'electrical',
-                'tool' => 'load-calculation', 
+                'tool' => 'load-calculation',
                 'name' => 'Electrical Load',
                 'description' => 'Calculate electrical load for buildings',
                 'icon' => 'bi-lightning-charge',
@@ -120,7 +121,7 @@ class HomeController extends Controller
             ]
         ];
     }
-    
+
     private function getTestimonials()
     {
         return [
@@ -150,7 +151,7 @@ class HomeController extends Controller
             ]
         ];
     }
-    
+
     private function getPricingPlans()
     {
         return [
@@ -204,24 +205,24 @@ class HomeController extends Controller
             ]
         ];
     }
-    
+
     private function handleContactForm($data)
     {
         // Validate form data
         $errors = [];
-        
+
         if (empty($data['name'])) {
             $errors[] = 'Name is required';
         }
-        
+
         if (empty($data['email']) || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'Valid email is required';
         }
-        
+
         if (empty($data['message'])) {
             $errors[] = 'Message is required';
         }
-        
+
         if (!empty($errors)) {
             return [
                 'success' => false,
@@ -229,10 +230,10 @@ class HomeController extends Controller
                 'errors' => $errors
             ];
         }
-        
+
         // Send email (implementation would go here)
         $emailSent = $this->sendContactEmail($data);
-        
+
         if ($emailSent) {
             return [
                 'success' => true,
@@ -245,11 +246,32 @@ class HomeController extends Controller
             ];
         }
     }
-    
+
     private function sendContactEmail($data)
     {
         // Email sending implementation
         // This would typically use PHPMailer or similar
         return true; // Simulate success
+    }
+
+    public function pagePreview($id)
+    {
+        $pageModel = new \App\Models\Page();
+        $page = $pageModel->find($id);
+
+        if (!$page) {
+            http_response_code(404);
+            echo "Page not found";
+            return;
+        }
+
+        // Use the 'pages/page' view
+        $this->view->render('pages/page', [
+            'user' => null,
+            'page' => $page,
+            'viewHelper' => $this->view,
+            'page_title' => $page['title'],
+            'meta_description' => $page['meta_description']
+        ]);
     }
 }
