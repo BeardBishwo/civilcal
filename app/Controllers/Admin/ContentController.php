@@ -169,7 +169,8 @@ class ContentController extends Controller
             'page_title' => 'Create New Page - Admin Panel',
             'currentPage' => 'content',
             'is_edit' => false,
-            'page' => null
+            'page' => null,
+            'csrf_token' => $this->generateCsrfToken()
         ];
 
         $this->view->render('admin/content/create', $data);
@@ -195,7 +196,8 @@ class ContentController extends Controller
             'page_title' => 'Edit Page - Admin Panel',
             'currentPage' => 'content',
             'is_edit' => true,
-            'page' => $page
+            'page' => $page,
+            'csrf_token' => $this->generateCsrfToken()
         ];
 
         $this->view->render('admin/content/create', $data);
@@ -209,7 +211,13 @@ class ContentController extends Controller
             die('Access denied');
         }
 
-        // Validate CSRF here preferably
+
+        // Validate CSRF
+        $token = $_POST['csrf_token'] ?? '';
+        if (!$this->validateCsrfToken($token)) {
+            http_response_code(403);
+            die('Invalid CSRF Token');
+        }
 
         $id = $_POST['id'] ?? null;
         $data = [
