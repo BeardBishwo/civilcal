@@ -20,30 +20,22 @@
                         <table class="table table-hover my-0">
                             <thead>
                                 <tr>
-                                    <th>Status</th>
                                     <th>Name</th>
                                     <th class="d-none d-xl-table-cell">Description</th>
                                     <th class="d-none d-xl-table-cell">Category</th>
                                     <th>Calculators</th>
                                     <th class="d-none d-md-table-cell">Version</th>
-                                    <th>Actions</th>
+                                    <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php if (empty($modules)): ?>
                                     <tr>
-                                        <td colspan="7" class="text-center py-4">No modules found.</td>
+                                        <td colspan="6" class="text-center py-4">No modules found.</td>
                                     </tr>
                                 <?php else: ?>
                                     <?php foreach ($modules as $module): ?>
                                         <tr>
-                                            <td>
-                                                <?php if (($module['status'] ?? 'inactive') === 'active'): ?>
-                                                    <span class="badge bg-success">Active</span>
-                                                <?php else: ?>
-                                                    <span class="badge bg-secondary">Inactive</span>
-                                                <?php endif; ?>
-                                            </td>
                                             <td>
                                                 <strong><?php echo htmlspecialchars($module['name']); ?></strong>
                                             </td>
@@ -57,19 +49,19 @@
                                                 <span class="badge bg-primary"><?php echo $module['calculators_count'] ?? 0; ?> calculators</span>
                                             </td>
                                             <td class="d-none d-md-table-cell"><?php echo htmlspecialchars($module['version']); ?></td>
-                                            <td>
+                                            <td class="text-end">
                                                 <div class="btn-group">
                                                     <?php if (($module['status'] ?? 'inactive') === 'active'): ?>
-                                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="toggleModule('<?php echo $module['name']; ?>', 'deactivate')">
-                                                            Deactivate
+                                                        <button type="button" class="btn btn-sm btn-success" onclick="toggleModule('<?php echo $module['name']; ?>', 'deactivate')" title="Click to Deactivate">
+                                                            Active
                                                         </button>
                                                     <?php else: ?>
-                                                        <button type="button" class="btn btn-sm btn-outline-success" onclick="toggleModule('<?php echo $module['name']; ?>', 'activate')">
-                                                            Activate
+                                                        <button type="button" class="btn btn-sm btn-danger" onclick="toggleModule('<?php echo $module['name']; ?>', 'activate')" title="Click to Activate">
+                                                            Inactive
                                                         </button>
                                                     <?php endif; ?>
 
-                                                    <a href="<?php echo get_app_url(); ?>/admin/modules/<?php echo urlencode($module['name']); ?>/settings" class="btn btn-sm btn-outline-primary">
+                                                    <a href="<?php echo get_app_url(); ?>/admin/modules/<?php echo urlencode($module['name']); ?>/settings" class="btn btn-sm btn-outline-primary" title="Settings">
                                                         <i class="align-middle" data-feather="settings"></i>
                                                     </a>
                                                 </div>

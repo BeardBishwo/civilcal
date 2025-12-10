@@ -1,201 +1,136 @@
-<div class="page-header">
-    <div class="page-header-content">
-        <div>
-            <h1 class="page-title"><i class="fas fa-calculator"></i> Calculators Management</h1>
-            <p class="page-description">Manage all calculators, formulas, and categories</p>
-        </div>
-        <div class="page-header-actions">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCalculatorModal">
-                <i class="fas fa-plus-circle"></i> Add Calculator
-            </button>
-            <button class="btn btn-outline-secondary">
-                <i class="fas fa-download"></i> Export List
-            </button>
+<div class="container-fluid p-0">
+    <div class="row mb-2 mb-xl-3">
+        <div class="col-auto d-none d-sm-block">
+            <h3><strong>Calculators</strong> Management</h3>
         </div>
     </div>
-</div>
 
-<!-- Categories Filter -->
-<div class="card">
-    <div class="card-content">
-        <div class="category-filters">
-            <button class="btn btn-primary btn-sm active">All Categories</button>
-            <button class="btn btn-outline-secondary btn-sm">Civil</button>
-            <button class="btn btn-outline-secondary btn-sm">Electrical</button>
-            <button class="btn btn-outline-secondary btn-sm">Structural</button>
-            <button class="btn btn-outline-secondary btn-sm">HVAC</button>
-            <button class="btn btn-outline-secondary btn-sm">Plumbing</button>
+    <!-- Filters Toolbar -->
+    <div class="card mb-3">
+        <div class="card-body p-3">
+            <form action="" method="GET" class="row g-3 align-items-center">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="align-middle" data-feather="search"></i></span>
+                        <input type="text" class="form-control" name="search" placeholder="Search calculators..." value="<?php echo htmlspecialchars($filters['search']); ?>">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="module">
+                        <option value="">All Modules</option>
+                        <?php foreach ($modules as $modName): ?>
+                            <!-- Simple slug generation for filter match -->
+                            <?php $modSlug = strtolower(str_replace(' ', '-', $modName)); ?>
+                            <option value="<?php echo $modSlug; ?>" <?php echo ($filters['module'] === $modSlug) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($modName); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="<?php echo get_app_url(); ?>/admin/calculators" class="btn btn-outline-secondary w-100">Clear</a>
+                </div>
+            </form>
         </div>
     </div>
-</div>
 
-<!-- Calculators Table -->
-<div class="card">
-    <div class="card-header">
-        <h5 class="card-title">
-            <i class="fas fa-table"></i>
-            All Calculators
-        </h5>
-        <div class="card-actions">
-            <input type="text" class="form-control form-control-sm" placeholder="Search calculators..." id="calculatorSearch">
-            <select class="form-select form-select-sm">
-                <option>All Status</option>
-                <option>Active</option>
-                <option>Inactive</option>
-            </select>
-        </div>
-    </div>
-    
-    <div class="card-content" style="padding: 0;">
-        <div class="table-container">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                        <th>Usage</th>
-                        <th>Created</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($calculators as $calculator): ?>
-                        <tr>
-                            <td>
-                                <div class="fw-bold"><?php echo htmlspecialchars($calculator['name']); ?></div>
-                                <small class="text-muted">ID: <?php echo $calculator['id']; ?></small>
-                            </td>
-                            <td>
-                                <span class="badge bg-info"><?php echo htmlspecialchars($categories[$calculator['category']] ?? $calculator['category']); ?></span>
-                            </td>
-                            <td><?php echo htmlspecialchars($calculator['description']); ?></td>
-                            <td>
-                                <span class="badge <?php echo $calculator['status'] == 'active' ? 'bg-success' : 'bg-secondary'; ?>">
-                                    <?php echo ucfirst($calculator['status']); ?>
-                                </span>
-                            </td>
-                            <td>
-                                <div class="text-center">
-                                    <div class="fw-bold"><?php echo number_format($calculator['usage_count']); ?></div>
-                                    <small class="text-muted">uses</small>
-                                </div>
-                            </td>
-                            <td><?php echo date('M j, Y', strtotime($calculator['created_at'])); ?></td>
-                            <td>
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-primary" title="Edit">
-                                        <i class="fas fa-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-outline-info" title="View Formula">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn <?php echo $calculator['status'] == 'active' ? 'btn-outline-warning' : 'btn-outline-success'; ?>" title="<?php echo $calculator['status'] == 'active' ? 'Deactivate' : 'Activate'; ?>">
-                                        <i class="fas <?php echo $calculator['status'] == 'active' ? 'fa-pause' : 'fa-play'; ?>"></i>
-                                    </button>
-                                    <button class="btn btn-outline-danger" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover my-0">
+                            <thead>
+                                <tr>
+                                    <th>Calculator Name</th>
+                                    <th>Module</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($calculators)): ?>
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4">
+                                            <div class="text-muted">No calculators found matching your criteria.</div>
+                                        </td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach ($calculators as $calc): ?>
+                                        <tr>
+                                            <td>
+                                                <strong><?php echo htmlspecialchars($calc['name']); ?></strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary"><?php echo htmlspecialchars($calc['module_name']); ?></span>
+                                            </td>
+                                            <td>
+                                                <?php if ($calc['status'] === 'active'): ?>
+                                                    <span class="badge bg-success">Active</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-danger">Inactive</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="btn-group">
+                                                    <!-- Toggle Button -->
+                                                    <?php if ($calc['status'] === 'active'): ?>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                                onclick="toggleCalculator('<?php echo $calc['unique_id']; ?>', 'deactivate')" 
+                                                                title="Deactivate">
+                                                            <i class="align-middle" data-feather="power"></i>
+                                                        </button>
+                                                    <?php else: ?>
+                                                        <button type="button" class="btn btn-sm btn-outline-success" 
+                                                                onclick="toggleCalculator('<?php echo $calc['unique_id']; ?>', 'activate')" 
+                                                                title="Activate">
+                                                            <i class="align-middle" data-feather="power"></i>
+                                                        </button>
+                                                    <?php endif; ?>
 
-<!-- Add Calculator Modal -->
-<div class="modal fade" id="addCalculatorModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add New Calculator</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="addCalculatorForm">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Calculator Name</label>
-                                <input type="text" class="form-control" name="name" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Category</label>
-                                <select class="form-select" name="category" required>
-                                    <?php foreach ($categories as $key => $value): ?>
-                                        <option value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                                                    <!-- Test Button -->
+                                                    <a href="<?php echo get_app_url() . $calc['url']; ?>" target="_blank" class="btn btn-sm btn-outline-primary ms-2" title="Test Calculator">
+                                                        <i class="align-middle" data-feather="external-link"></i> Test
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" name="description" rows="2" required></textarea>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Formula</label>
-                        <input type="text" class="form-control" name="formula" placeholder="e.g., length * width * height" required>
-                        <small class="form-text text-muted">Enter the mathematical formula using input variables</small>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Input Fields (JSON)</label>
-                                <textarea class="form-control" name="inputs" rows="4" required placeholder='[{"name": "length", "label": "Length", "type": "number", "unit": "m"}]'></textarea>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Output Fields (JSON)</label>
-                                <textarea class="form-control" name="outputs" rows="4" required placeholder='[{"name": "volume", "label": "Volume", "unit": "m³"}]'></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Status</label>
-                        <select class="form-select" name="status" required>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" form="addCalculatorForm" class="btn btn-primary">Add Calculator</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-document.getElementById("addCalculatorForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    fetch("<?php echo app_base_url('/admin/calculators/add'); ?>", {
-        method: "POST",
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert("Error: " + data.message);
-        }
-    });
-});
+    function toggleCalculator(id, action) {
+        // Optimistic UI update or reload? Reload is safer for verify
+        const formData = new FormData();
+        formData.append('id', id);
+        formData.append('action', action);
+
+        fetch('<?php echo get_app_url(); ?>/admin/calculators/toggle', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Request failed');
+        });
+    }
 </script>

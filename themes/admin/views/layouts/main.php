@@ -104,6 +104,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="<?= app_base_url('/admin/calculators') ?>" class="<?= $currentPage == 'calculators_management' ? 'active' : '' ?>">
+                        <i class="fas fa-calculator"></i>
+                        Calculators
+                    </a>
+                </li>
+                <li>
                     <a href="<?= app_base_url('/admin/themes') ?>">
                         <i class="fas fa-palette"></i>
                         Themes

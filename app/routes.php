@@ -447,6 +447,19 @@ $router->add("GET", "/admin/analytics", "Admin\AnalyticsController@overview", [
     "auth",
     "admin",
 ]);
+// ... existing analytics routes ...
+
+// CALCULATORS MANAGEMENT ROUTES
+$router->add("GET", "/admin/calculators", "Admin\CalculatorManagementController@index", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/calculators/toggle", "Admin\CalculatorManagementController@toggle", [
+    "auth",
+    "admin",
+]);
+
+
 $router->add(
     "GET",
     "/admin/analytics/overview",
