@@ -67,8 +67,16 @@ class Router
         }
 
         http_response_code(404);
-        echo "<h1>404 - Page Not Found</h1>";
+        
+        // Try to load custom 404 view
+        $viewPath = BASE_PATH . '/themes/admin/views/errors/404.php';
+        if (file_exists($viewPath)) {
+            require $viewPath;
+        } else {
+            echo "<h1>404 - Page Not Found</h1>";
+        }
     }
+
 
     public function getBasePath()
     {

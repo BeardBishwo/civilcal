@@ -11,6 +11,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $page_title ?? 'Admin Panel' ?> - Bishwo Calculator</title>
+    
+    <!-- SEO Meta Tags -->
+    <?php if (isset($meta['description'])): ?>
+    <meta name="description" content="<?= htmlspecialchars($meta['description']) ?>">
+    <?php endif; ?>
+    <?php if (isset($meta['keywords'])): ?>
+    <meta name="keywords" content="<?= htmlspecialchars($meta['keywords']) ?>">
+    <?php endif; ?>
+    <?php if (isset($meta['robots'])): ?>
+    <meta name="robots" content="<?= htmlspecialchars($meta['robots']) ?>">
+    <?php endif; ?>
+
     <link rel="stylesheet" href="<?= app_base_url('public/assets/css/admin.css') ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <?php if (isset($styles) && is_array($styles)): ?>
