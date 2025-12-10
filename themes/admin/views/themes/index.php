@@ -1,571 +1,513 @@
-<div class="page-header">
-    <div class="page-header-content">
-        <div>
-            <h1 class="page-title"><i class="fas fa-palette"></i> Theme Management</h1>
-            <p class="page-description">Manage and customize the look and feel. Upload, activate, preview and delete themes.</p>
-        </div>
-        <div class="page-header-actions">
-            <button class="btn btn-primary" onclick="document.getElementById('themeUpload').click()">
-                <i class="fas fa-upload"></i> Upload Theme
-            </button>
-            <input type="file" id="themeUpload" style="display:none" accept=".zip">
-        </div>
-    </div>
-</div>
+<?php
+/**
+ * PREMIUM THEMES MANAGEMENT INTERFACE
+ * Matching the design of Pages Management
+ */
 
-<!-- Theme Statistics -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-header">
-            <div class="stat-icon primary">
-                <i class="fas fa-palette"></i>
-            </div>
-        </div>
-        <div class="stat-value"><?php echo $stats['total'] ?? 0; ?></div>
-        <div class="stat-label">Total Themes</div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-header">
-            <div class="stat-icon success">
-                <i class="fas fa-check-circle"></i>
-            </div>
-        </div>
-        <div class="stat-value"><?php echo $stats['active'] ?? 0; ?></div>
-        <div class="stat-label">Active Themes</div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-header">
-            <div class="stat-icon warning">
-                <i class="fas fa-pause-circle"></i>
-            </div>
-        </div>
-        <div class="stat-value"><?php echo ($stats['total'] ?? 0) - ($stats['active'] ?? 0); ?></div>
-        <div class="stat-label">Inactive Themes</div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-header">
-            <div class="stat-icon info">
-                <i class="fas fa-sync-alt"></i>
-            </div>
-        </div>
-        <div class="stat-value"><?php echo $stats['updates'] ?? 0; ?></div>
-        <div class="stat-label">Updates Available</div>
-    </div>
-</div>
+// Calculate stats
+$totalThemes = isset($stats['total']) ? $stats['total'] : count($themes ?? []);
+$activeThemes = isset($stats['active']) ? $stats['active'] : 1;
+$inactiveThemes = isset($stats['inactive']) ? $stats['inactive'] : ($totalThemes - $activeThemes);
+?>
 
-<div class="card">
-    <div class="card-content">
-        <div id="uploadDropZone" class="upload-drop-zone">
-            <i class="fas fa-file-archive"></i>
-            <span>Drag & drop theme ZIP here or click Upload Theme</span>
-        </div>
-        <div id="uploadProgress" class="upload-progress" style="display:none;">
-            <div class="progress-bar">
-                <div id="uploadBar" class="progress-fill"></div>
+<!-- Optimized Admin Wrapper Container -->
+<div class="admin-wrapper-container">
+    <div class="admin-content-wrapper">
+
+        <!-- Compact Page Header -->
+        <div class="compact-header">
+            <div class="header-left">
+                <div class="header-title">
+                    <i class="fas fa-palette"></i>
+                    <h1>Themes</h1>
+                </div>
+                <div class="header-subtitle"><?php echo $totalThemes; ?> themes • <?php echo $activeThemes; ?> active</div>
             </div>
-            <div id="uploadPercent" class="progress-percent">0%</div>
+            <div class="header-actions">
+                <button class="btn btn-primary btn-compact" onclick="document.getElementById('themeUpload').click()">
+                    <i class="fas fa-upload"></i>
+                    <span>Upload Theme</span>
+                </button>
+                <input type="file" id="themeUpload" style="display:none" accept=".zip">
+            </div>
         </div>
-        <div class="toolbar">
+
+        <!-- Compact Stats Cards -->
+        <div class="compact-stats">
+            <div class="stat-item">
+                <div class="stat-icon primary">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value"><?php echo $totalThemes; ?></div>
+                    <div class="stat-label">Total</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value"><?php echo $activeThemes; ?></div>
+                    <div class="stat-label">Active</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon warning">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value"><?php echo $inactiveThemes; ?></div>
+                    <div class="stat-label">Inactive</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon info">
+                    <i class="fas fa-paint-brush"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value"><?php echo isset($activeTheme['name']) ? htmlspecialchars($activeTheme['name']) : 'Default'; ?></div>
+                    <div class="stat-label">Current Theme</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compact Toolbar -->
+        <div class="compact-toolbar">
             <div class="toolbar-left">
-                <input id="themeSearch" class="form-control" placeholder="Search themes by name">
+                <!-- Client-side Search -->
+                <div class="search-compact">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="themeSearch" placeholder="Search themes...">
+                </div>
             </div>
             <div class="toolbar-right">
-                <select id="themeStatusFilter" class="form-control">
-                    <option value="all">All</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                </select>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="themes-grid">
-<?php if (!empty($themes)): ?>
-    <?php foreach ($themes as $theme): ?>
-        <div class="theme-card" data-theme="<?php echo htmlspecialchars($theme['slug'] ?? $theme['id']); ?>" data-status="<?php echo ($theme['is_active'] ?? false) ? 'active' : 'inactive'; ?>">
-            <div class="theme-preview">
-                <?php if (!empty($theme['screenshot'])): ?>
-                    <img src="<?php echo htmlspecialchars($theme['screenshot']); ?>" alt="<?php echo htmlspecialchars($theme['name']); ?>" class="theme-screenshot">
-                <?php else: ?>
-                    <div class="theme-placeholder">
-                        <i class="fas fa-palette fa-3x"></i>
-                    </div>
-                <?php endif; ?>
-            </div>
-            <div class="theme-content">
-                <div class="theme-header">
-                    <h3 class="theme-title"><?php echo htmlspecialchars($theme['name']); ?></h3>
-                    <?php if ($theme['is_active'] ?? false): ?>
-                        <span class="status-badge status-active">Active</span>
-                    <?php else: ?>
-                        <span class="status-badge status-inactive">Inactive</span>
-                    <?php endif; ?>
-                </div>
-                <p class="theme-meta">
-                    v<?php echo htmlspecialchars($theme['version'] ?? '1.0.0'); ?> by <?php echo htmlspecialchars($theme['author'] ?? 'Unknown'); ?>
-                </p>
-                <p class="theme-description"><?php echo htmlspecialchars($theme['description'] ?? 'No description available'); ?></p>
-                <div class="theme-actions">
-                    <button class="btn btn-secondary btn-sm view-theme" data-slug="<?php echo htmlspecialchars($theme['slug'] ?? $theme['id']); ?>">
-                        <i class="fas fa-info-circle"></i> Details
+                <!-- View Toggle -->
+                <div class="view-toggle">
+                    <button class="view-btn" data-view="table">
+                        <i class="fas fa-list"></i>
                     </button>
-                    <a href="<?php echo app_base_url('/admin/themes/' . ($theme['id'] ?? '') . '/preview'); ?>" class="btn btn-secondary btn-sm" target="_blank">
-                        <i class="fas fa-eye"></i> Preview
-                    </a>
-                    <?php if (!($theme['is_active'] ?? false)): ?>
-                        <button class="btn btn-primary btn-sm activate-theme" data-id="<?php echo $theme['id'] ?? ''; ?>">
-                            <i class="fas fa-check"></i> Activate
-                        </button>
-                        <button class="btn btn-danger btn-sm delete-theme" data-id="<?php echo $theme['id'] ?? ''; ?>">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    <?php else: ?>
-                        <button class="btn btn-secondary btn-sm deactivate-theme" data-id="<?php echo $theme['id'] ?? ''; ?>">
-                            <i class="fas fa-stop"></i> Deactivate
-                        </button>
-                    <?php endif; ?>
+                    <button class="view-btn active" data-view="grid">
+                        <i class="fas fa-th-large"></i>
+                    </button>
                 </div>
             </div>
         </div>
-    <?php endforeach; ?>
-<?php else: ?>
-    <div class="empty-state">
-        <div class="empty-icon">
-            <i class="fas fa-palette"></i>
-        </div>
-        <h3>No Themes Found</h3>
-        <p>No themes are currently available. Upload a theme to get started.</p>
-        <button class="btn btn-primary" onclick="document.getElementById('themeUpload').click()">
-            <i class="fas fa-upload"></i> Upload Your First Theme
-        </button>
+
+        <!-- Themes Content -->
+        <?php if (isset($error)): ?>
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+        <?php elseif (empty($themes)): ?>
+            <div class="empty-state">
+                <i class="fas fa-palette"></i>
+                <h3>No themes found</h3>
+                <p>Upload a theme to get started.</p>
+            </div>
+        <?php else: ?>
+            <!-- Table View -->
+            <div class="table-wrapper" id="tableView" style="display: none;">
+                <table class="table-compact" id="themesTable">
+                    <thead>
+                        <tr>
+                            <th class="col-title">Theme Name</th>
+                            <th class="col-author">Author</th>
+                            <th class="col-version">Version</th>
+                            <th class="col-status">Status</th>
+                            <th class="col-actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($themes as $theme): ?>
+                            <tr class="theme-row" data-name="<?php echo strtolower($theme['name'] ?? ''); ?>">
+                                <td>
+                                    <div class="page-info">
+                                        <div class="page-title-compact"><?php echo htmlspecialchars($theme['name'] ?? 'Unknown'); ?></div>
+                                        <div class="page-slug-compact"><?php echo htmlspecialchars($theme['description'] ?? ''); ?></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="author-compact"><?php echo htmlspecialchars($theme['author'] ?? 'Unknown'); ?></div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border"><?php echo htmlspecialchars($theme['version'] ?? '1.0.0'); ?></span>
+                                </td>
+                                <td>
+                                    <?php if (($theme['status'] ?? 'inactive') === 'active'): ?>
+                                        <span class="badge bg-success">Active</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <div class="actions-compact">
+                                        <?php if (($theme['status'] ?? 'inactive') !== 'active'): ?>
+                                            <button class="action-btn-icon edit-btn activate-theme" 
+                                                    data-id="<?php echo $theme['id'] ?? ''; ?>" 
+                                                    title="Activate">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        <?php endif; ?>
+                                        <a href="<?php echo get_app_url(); ?>/admin/themes/customize/<?php echo urlencode($theme['slug'] ?? $theme['name']); ?>" 
+                                           class="action-btn-icon preview-btn" 
+                                           title="Customize">
+                                            <i class="fas fa-paint-brush"></i>
+                                        </a>
+                                        <?php if (($theme['status'] ?? 'inactive') !== 'active'): ?>
+                                            <button class="action-btn-icon delete-btn delete-theme" 
+                                                    data-id="<?php echo $theme['id'] ?? ''; ?>" 
+                                                    title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Grid View -->
+            <div class="grid-wrapper" id="gridView">
+                <div class="themes-grid">
+                    <?php foreach ($themes as $theme): ?>
+                        <div class="theme-card" data-name="<?php echo strtolower($theme['name'] ?? ''); ?>">
+                            <div class="theme-preview">
+                                <?php 
+                                // Check for screenshot
+                                $hasScreenshot = !empty($theme['screenshot']) && file_exists(BASE_PATH . '/public' . $theme['screenshot']);
+                                
+                                if ($hasScreenshot): ?>
+                                    <img src="<?php echo htmlspecialchars($theme['screenshot']); ?>" alt="<?php echo htmlspecialchars($theme['name']); ?>">
+                                <?php else: 
+                                    // Show homepage with theme applied
+                                    $homeUrl = get_app_url() . '/?preview_theme=' . urlencode($theme['slug'] ?? $theme['name']);
+                                ?>
+                                    <iframe src="<?php echo $homeUrl; ?>" 
+                                            class="theme-preview-iframe" 
+                                            scrolling="no"
+                                            onload="this.style.opacity='1'"></iframe>
+                                    <div class="theme-preview-overlay">
+                                        <a href="<?php echo $homeUrl; ?>" target="_blank" class="btn btn-sm btn-light">
+                                            <i class="fas fa-external-link-alt"></i> Full Preview
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if (($theme['status'] ?? 'inactive') === 'active'): ?>
+                                    <div class="theme-badge">
+                                        <span class="badge bg-success">Active</span>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="theme-info">
+                                <h3><?php echo htmlspecialchars($theme['name'] ?? 'Unknown'); ?></h3>
+                                <p class="theme-author">By <?php echo htmlspecialchars($theme['author'] ?? 'Unknown'); ?></p>
+                                <p class="theme-description"><?php echo htmlspecialchars($theme['description'] ?? ''); ?></p>
+                                <div class="theme-meta">
+                                    <span class="theme-version">v<?php echo htmlspecialchars($theme['version'] ?? '1.0.0'); ?></span>
+                                </div>
+                                <div class="theme-actions">
+                                    <?php if (($theme['status'] ?? 'inactive') !== 'active'): ?>
+                                        <button class="btn btn-sm btn-primary activate-theme" data-id="<?php echo $theme['id'] ?? ''; ?>">
+                                            <i class="fas fa-check"></i> Activate
+                                        </button>
+                                    <?php else: ?>
+                                        <button class="btn btn-sm btn-success" disabled>
+                                            <i class="fas fa-check"></i> Active
+                                        </button>
+                                    <?php endif; ?>
+                                    <a href="<?php echo get_app_url(); ?>/admin/themes/customize/<?php echo urlencode($theme['slug'] ?? $theme['name']); ?>" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-paint-brush"></i> Customize
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+
     </div>
-<?php endif; ?>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var meta = document.querySelector('meta[name="csrf-token"]');
-        var csrfToken = meta ? meta.getAttribute('content') : '';
-
-        // Activate Theme
-        document.querySelectorAll('.activate-theme').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = this.dataset.id;
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Activating...';
-
-                const formData = new FormData();
-                formData.append('theme_id', id);
-
-                fetch('<?php echo app_base_url('/admin/themes/activate'); ?>', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-Token': csrfToken
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showToast('Theme activated', 'success');
-                            location.reload();
-                        } else {
-                            showToast('Error: ' + (data.message || 'Activation failed'), 'error');
-                            this.disabled = false;
-                            this.innerHTML = '<i class="fas fa-check"></i> Activate';
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        showToast('Activation failed', 'error');
-                        this.disabled = false;
-                        this.innerHTML = '<i class="fas fa-check"></i> Activate';
-                    });
-            });
-        });
-
-        // Deactivate Theme
-        document.querySelectorAll('.deactivate-theme').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = this.dataset.id;
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deactivating...';
-
-                const formData = new FormData();
-                formData.append('theme_id', id);
-
-                fetch('<?php echo app_base_url('/admin/themes/deactivate'); ?>', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-Token': csrfToken
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showToast('Theme deactivated', 'success');
-                            location.reload();
-                        } else {
-                            showToast('Error: ' + (data.message || 'Deactivation failed'), 'error');
-                            this.disabled = false;
-                            this.innerHTML = '<i class="fas fa-stop"></i> Deactivate';
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        showToast('Deactivation failed', 'error');
-                        this.disabled = false;
-                        this.innerHTML = '<i class="fas fa-stop"></i> Deactivate';
-                    });
-            });
-        });
-
-        // Upload Theme with progress
-        document.getElementById('themeUpload').addEventListener('change', function(e) {
-            if (this.files.length === 0) return;
-            const formData = new FormData();
-            formData.append('theme_zip', this.files[0]);
-            const btn = document.querySelector('button[onclick*="themeUpload"]');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', '<?php echo app_base_url('/admin/themes/upload'); ?>', true);
-            xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
-            xhr.setRequestHeader('X-CSRF-Token', csrfToken);
-            var progress = document.getElementById('uploadProgress');
-            var bar = document.getElementById('uploadBar');
-            var pct = document.getElementById('uploadPercent');
-            progress.style.display = 'block';
-            xhr.upload.onprogress = function(e){ if(e.lengthComputable){ var p = Math.round((e.loaded/e.total)*100); bar.style.width = p+'%'; pct.textContent = p+'%'; } };
-            xhr.onreadystatechange = function(){ if(xhr.readyState===4){ btn.disabled=false; btn.innerHTML=originalText; document.getElementById('themeUpload').value=''; progress.style.display='none'; try{ var data=JSON.parse(xhr.responseText); if(data.success){ showToast('Theme uploaded successfully', 'success'); location.reload(); } else { showToast('Error: ' + (data.message||'Upload failed'), 'error'); } } catch(err){ showToast('Upload failed', 'error'); } } };
-            xhr.send(formData);
-        });
-        var drop = document.getElementById('uploadDropZone');
-        drop.addEventListener('dragover', function(e){ e.preventDefault(); drop.style.background='var(--admin-gray-100)'; });
-        drop.addEventListener('dragleave', function(){ drop.style.background='var(--admin-gray-50)'; });
-        drop.addEventListener('drop', function(e){ e.preventDefault(); drop.style.background='var(--admin-gray-50)'; var files=e.dataTransfer.files; if(!files||files.length===0) return; var file=files[0]; if(!/\.zip$/i.test(file.name)){ showToast('Please drop a .zip file', 'error'); return; } var input=document.getElementById('themeUpload'); input.files=files; var event=new Event('change'); input.dispatchEvent(event); });
-
-        // Delete Theme
-        document.querySelectorAll('.delete-theme').forEach(btn => {
-            btn.addEventListener('click', function(){
-                if(!confirm('Delete this theme?')) return;
-                const id = this.dataset.id;
-                this.disabled = true;
-                const formData = new FormData();
-                formData.append('theme_id', id);
-                fetch('<?php echo app_base_url('/admin/themes/delete'); ?>', {
-                    method: 'POST',
-                    headers: {'X-Requested-With':'XMLHttpRequest','X-CSRF-Token': csrfToken},
-                    body: formData
-                }).then(r=>r.json()).then(data=>{
-                    if(data.success){ showToast('Theme deleted', 'success'); location.reload(); } else { showToast('Error: ' + (data.message||'Delete failed'), 'error'); this.disabled = false; }
-                }).catch(()=>{ showToast('Delete failed', 'error'); this.disabled=false; });
-            });
-        });
-
-        // Details modal
-        document.querySelectorAll('.view-theme').forEach(btn => {
-            btn.addEventListener('click', function(){
-                var key = this.dataset.slug;
-                fetch('<?php echo app_base_url('/admin/themes/details'); ?>/' + encodeURIComponent(key), { method:'GET', headers:{'Accept':'application/json'} })
-                .then(r=>r.json()).then(data=>{ if(data.success){ openDetailsModal(data.data); } else { showToast('Details failed', 'error'); } })
-                .catch(()=>{ showToast('Details failed', 'error'); });
-            });
-        });
-
-        // Search/filter
-        var search = document.getElementById('themeSearch');
-        var status = document.getElementById('themeStatusFilter');
-        function applyFilter(){
-            var q = (search.value||'').toLowerCase();
-            var st = status.value;
-            document.querySelectorAll('.themes-grid .theme-card').forEach(function(card){
-                var name = card.querySelector('.theme-title')?.textContent.toLowerCase() || '';
-                var isActive = card.querySelector('.status-active') !== null;
-                var matchText = !q || name.includes(q);
-                var matchStatus = st==='all' || (st==='active' && isActive) || (st==='inactive' && !isActive);
-                card.style.display = (matchText && matchStatus) ? '' : 'none';
-            });
+// Theme Search
+document.getElementById('themeSearch')?.addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('.theme-row, .theme-card');
+    
+    rows.forEach(row => {
+        const name = row.getAttribute('data-name') || '';
+        if (name.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
         }
-        search.addEventListener('input', applyFilter);
-        status.addEventListener('change', applyFilter);
-        applyFilter();
     });
-</script>
+});
 
-<script>
-function showToast(message, type) {
-    var toast = document.createElement('div');
-    toast.className = 'notification-toast ' + (type === 'success' ? 'success' : 'error') + ' show';
-    toast.innerHTML = '<div class="toast-content"><i class="fas ' + (type==='success'?'fa-check-circle':'fa-times-circle') + '"></i><span>'+message+'</span></div>';
-    document.body.appendChild(toast);
-    setTimeout(function(){ toast.classList.remove('show'); setTimeout(function(){ document.body.removeChild(toast); }, 300); }, 2500);
-}
+// View Toggle
+document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const view = this.getAttribute('data-view');
+        
+        // Update active state
+        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Toggle views
+        if (view === 'grid') {
+            document.getElementById('tableView').style.display = 'none';
+            document.getElementById('gridView').style.display = 'block';
+        } else {
+            document.getElementById('tableView').style.display = 'block';
+            document.getElementById('gridView').style.display = 'none';
+        }
+    });
+});
 
-function openDetailsModal(data){
-    var overlay = document.createElement('div'); 
-    overlay.className = 'modal-overlay';
-    
-    var modal = document.createElement('div'); 
-    modal.className = 'modal-card';
-    
-    var header = document.createElement('div'); 
-    header.className = 'modal-header';
-    
-    var title = document.createElement('div'); 
-    title.className = 'modal-title';
-    title.innerHTML = '<i class="fas fa-info-circle"></i> Theme Details';
-    
-    var closeBtn = document.createElement('button'); 
-    closeBtn.className = 'btn btn-icon';
-    closeBtn.innerHTML = '<i class="fas fa-times"></i>';
-    closeBtn.onclick = function(){ document.body.removeChild(overlay); };
-    
-    header.appendChild(title); 
-    header.appendChild(closeBtn);
-    
-    var content = document.createElement('div'); 
-    content.className = 'modal-content';
-    
-    var html = '<div class="theme-details-grid">';
-    html += '<div class="detail-item"><div class="detail-label">Name</div><div class="detail-value">'+escapeHtml(data.name||'')+'</div></div>';
-    html += '<div class="detail-item"><div class="detail-label">Version</div><div class="detail-value">'+escapeHtml(data.version||'')+'</div></div>';
-    html += '<div class="detail-item"><div class="detail-label">Author</div><div class="detail-value">'+escapeHtml(data.author||'')+'</div></div>';
-    html += '<div class="detail-item"><div class="detail-label">Description</div><div class="detail-value">'+escapeHtml(data.description||'')+'</div></div>';
-    html += '</div>';
-    
-    content.innerHTML = html;
-    modal.appendChild(header); 
-    modal.appendChild(content); 
-    overlay.appendChild(modal); 
-    document.body.appendChild(overlay);
-}
+// Activate Theme
+document.querySelectorAll('.activate-theme').forEach(btn => {
+    btn.addEventListener('click', function() {
+        if (!confirm('Are you sure you want to activate this theme?')) return;
+        
+        const id = this.dataset.id;
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Activating...';
+        
+        const formData = new FormData();
+        formData.append('theme_id', id);
+        
+        fetch('<?php echo app_base_url('/admin/themes/activate'); ?>', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'Failed to activate theme'));
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-check"></i> Activate';
+            }
+        })
+        .catch(error => {
+            alert('Error activating theme');
+            console.error(error);
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-check"></i> Activate';
+        });
+    });
+});
 
-function escapeHtml(s){ 
-    return String(s).replace(/[&<>"']/g,function(c){ 
-        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]); 
-    }); 
-}
+// Delete Theme
+document.querySelectorAll('.delete-theme').forEach(btn => {
+    btn.addEventListener('click', function() {
+        if (!confirm('Are you sure you want to delete this theme? This action cannot be undone.')) return;
+        
+        const id = this.dataset.id;
+        this.disabled = true;
+        
+        const formData = new FormData();
+        formData.append('theme_id', id);
+        
+        fetch('<?php echo app_base_url('/admin/themes/delete'); ?>', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'Failed to delete theme'));
+                this.disabled = false;
+            }
+        })
+        .catch(error => {
+            alert('Error deleting theme');
+            console.error(error);
+            this.disabled = false;
+        });
+    });
+});
+
+// Upload Theme
+document.getElementById('themeUpload')?.addEventListener('change', function(e) {
+    if (this.files.length === 0) return;
+    
+    const formData = new FormData();
+    formData.append('theme_zip', this.files[0]);
+    
+    const btn = document.querySelector('button[onclick*="themeUpload"]');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+    
+    fetch('<?php echo app_base_url('/admin/themes/upload'); ?>', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        document.getElementById('themeUpload').value = '';
+        
+        if (data.success) {
+            alert('Theme uploaded successfully');
+            location.reload();
+        } else {
+            alert('Error: ' + (data.message || 'Upload failed'));
+        }
+    })
+    .catch(error => {
+        alert('Upload failed');
+        console.error(error);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
+});
 </script>
 
 <style>
-/* Theme Management Styles */
+/* Theme Grid Styles */
 .themes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
-    margin-top: 24px;
+    gap: 1.5rem;
+    padding: 1rem 0;
 }
 
 .theme-card {
-    border: 1px solid var(--admin-border);
-    border-radius: 12px;
-    overflow: hidden;
     background: white;
-    transition: var(--transition);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .theme-card:hover {
-    box-shadow: var(--admin-shadow);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .theme-preview {
+    position: relative;
+    width: 100%;
     height: 200px;
-    background: var(--admin-gray-100);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: #f8f9fa;
+    overflow: hidden;
 }
 
-.theme-screenshot {
+.theme-preview img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.theme-placeholder {
-    color: var(--admin-gray-400);
+.theme-preview-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    transform: scale(0.25);
+    transform-origin: top left;
+    width: 400%;
+    height: 400%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
 }
 
-.theme-content {
-    padding: 20px;
-}
-
-.theme-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.theme-title {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--admin-gray-800);
-}
-
-.theme-meta {
-    margin: 0 0 16px 0;
-    color: var(--admin-gray-600);
-    font-size: 14px;
-}
-
-.theme-description {
-    margin: 0 0 16px 0;
-    color: var(--admin-gray-600);
-    line-height: 1.5;
-    font-size: 14px;
-}
-
-.theme-actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.theme-actions .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    padding: 6px 12px;
-}
-
-.upload-drop-zone {
-    border: 2px dashed var(--admin-border);
-    border-radius: 12px;
-    padding: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin: 16px 0;
-    background: var(--admin-gray-50);
-    transition: background 0.2s;
-}
-
-.upload-drop-zone:hover {
-    background: var(--admin-gray-100);
-}
-
-.upload-progress {
-    margin: 16px 0;
-}
-
-.progress-bar {
-    height: 10px;
-    background: var(--admin-gray-200);
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 10px;
-    width: 0%;
-    background: linear-gradient(90deg, var(--admin-primary), var(--admin-primary-dark));
-    transition: width 0.3s;
-}
-
-.progress-percent {
-    margin-top: 6px;
-    font-size: 12px;
-    color: var(--admin-gray-600);
-    text-align: center;
-}
-
-.modal-overlay {
-    position: fixed;
+.theme-preview-overlay {
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     background: rgba(0,0,0,0.5);
-    z-index: 4000;
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
 }
 
-.modal-card {
-    background: white;
-    border-radius: 12px;
-    max-width: 640px;
-    width: 90%;
-    max-height: 80vh;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+.theme-card:hover .theme-preview-overlay {
+    opacity: 1;
 }
 
-.modal-header {
+.theme-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 3rem;
+    color: #dee2e6;
+}
+
+.theme-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.theme-info {
+    padding: 1.25rem;
+}
+
+.theme-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.theme-author {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin: 0 0 0.75rem 0;
+}
+
+.theme-description {
+    color: #495057;
+    font-size: 0.875rem;
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+}
+
+.theme-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid var(--admin-border);
+    margin-bottom: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e9ecef;
 }
 
-.modal-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--admin-gray-800);
+.theme-version {
+    font-size: 0.75rem;
+    color: #6c757d;
 }
 
-.modal-content {
-    padding: 20px;
-    max-height: calc(80vh - 80px);
-    overflow-y: auto;
-}
-
-.theme-details-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-}
-
-.detail-item {
+.theme-actions {
     display: flex;
-    flex-direction: column;
+    gap: 0.5rem;
 }
 
-.detail-label {
-    font-size: 12px;
-    color: var(--admin-gray-500);
-    margin-bottom: 4px;
-    font-weight: 500;
-}
-
-.detail-value {
-    font-size: 14px;
-    color: var(--admin-gray-800);
-}
-
-@media (max-width: 768px) {
-    .themes-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .theme-details-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .theme-actions {
-        flex-direction: column;
-    }
-    
-    .theme-actions .btn {
-        width: 100%;
-        justify-content: center;
-    }
+.theme-actions .btn {
+    flex: 1;
 }
 </style>
