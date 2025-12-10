@@ -22,14 +22,53 @@ class ModuleController extends Controller
 
     public function index()
     {
+        // Prevent browser caching
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+        
         $modules = $this->moduleService->getAllModules();
         $categories = $this->getModuleCategories();
-        $stats = $this->moduleService->getModuleStats();
 
         // If service didn't return modules, fall back to file-based approach
         if (empty($modules)) {
             $modules = $this->getAllModulesFromFileSystem();
+        } else {
+             // Enhance DB modules with display categories AND file system stats
+            $modulesPath = dirname(dirname(dirname(__DIR__))) . '/modules/';
+            
+            foreach ($modules as &$module) {
+            // The 'name' field in DB now contains the directory slug (e.g., 'civil', 'electrical')
+            $key = $module['name'] ?? strtolower(str_replace(' ', '-', $module['name']));
+            $module['category'] = $this->getCategoryFromName($key);
+            
+            // Get actual file system stats for this module
+            $moduleDir = $modulesPath . $key;
+            if (is_dir($moduleDir)) {
+                $fileStats = $this->getModuleStats($moduleDir);
+                $module['calculators_count'] = $fileStats['calculators'];
+                $module['subcategories_count'] = $fileStats['subcategories'];
+                
+                // Set display name
+                $module['display_name'] = ucwords(str_replace(['-', '_'], ' ', $key));
+            } else {
+                // Fallback if directory doesn't exist
+                $module['calculators_count'] = 0;
+                $module['subcategories_count'] = 0;
+            }
+            
+            // Map is_active (database) to status (view)
+            $module['status'] = (isset($module['is_active']) && $module['is_active']) ? 'active' : 'inactive';
+            }
         }
+
+        // Calculate real stats from processed modules
+        $stats = [
+            'total' => count($modules),
+            'active' => count(array_filter($modules, function($m) { return ($m['status'] ?? 'inactive') === 'active'; })),
+            'inactive' => count(array_filter($modules, function($m) { return ($m['status'] ?? 'inactive') === 'inactive'; })),
+            'categories' => count(array_unique(array_column($modules, 'category')))
+        ];
 
         // Prepare data for the view
         $data = [
@@ -114,6 +153,26 @@ class ModuleController extends Controller
             return;
         }
 
+        // Enhance module with display category and file system stats
+        $key = $module['name']; // DB 'name' field contains the directory slug
+        $module['category'] = $this->getCategoryFromName($key);
+        $module['display_name'] = ucwords(str_replace(['-', '_'], ' ', $key));
+        
+        // Get actual file system stats for this module
+        $modulesPath = dirname(dirname(dirname(__DIR__))) . '/modules/';
+        $moduleDir = $modulesPath . $key;
+        if (is_dir($moduleDir)) {
+            $stats = $this->getModuleStats($moduleDir);
+            $module['calculators_count'] = $stats['calculators'];
+            $module['subcategories_count'] = $stats['subcategories'];
+        } else {
+            $module['calculators_count'] = 0;
+            $module['subcategories_count'] = 0;
+        }
+        
+        // Map is_active (database) to status (view)
+        $module['status'] = (isset($module['is_active']) && $module['is_active']) ? 'active' : 'inactive';
+
         $data = [
             'currentPage' => 'modules',
             'module' => $module,
@@ -177,15 +236,17 @@ class ModuleController extends Controller
 
             $fullPath = $modulesPath . $dir;
             if (is_dir($fullPath)) {
-                // Count calculators in module
-                $calcCount = $this->countCalculators($fullPath);
+                // Get detailed stats about this module
+                $stats = $this->getModuleStats($fullPath);
+                
                 $modules[] = [
                     'id' => count($modules) + 1,
                     'name' => ucwords(str_replace(['-', '_'], ' ', $dir)),
                     'slug' => $dir,
                     'description' => $this->getModuleDescription($dir),
                     'status' => 'active', // TODO: Get from settings
-                    'calculators_count' => $calcCount,
+                    'calculators_count' => $stats['calculators'],
+                    'subcategories_count' => $stats['subcategories'],
                     'version' => '1.0.0',
                     'category' => $this->getCategoryFromName($dir)
                 ];
@@ -195,38 +256,81 @@ class ModuleController extends Controller
         return $modules;
     }
 
-    private function countCalculators($modulePath)
+    /**
+     * Count calculators and sub-categories in a module
+     * Returns array with 'calculators' and 'subcategories' counts
+     */
+    private function getModuleStats($modulePath)
     {
-        $count = 0;
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($modulePath, \RecursiveDirectoryIterator::SKIP_DOTS)
-        );
+        $stats = [
+            'calculators' => 0,
+            'subcategories' => 0
+        ];
 
-        foreach ($iterator as $file) {
-            if ($file->isFile() && $file->getExtension() === 'php') {
-                $count++;
+        if (!is_dir($modulePath)) {
+            return $stats;
+        }
+
+        // Scan immediate subdirectories (these are sub-categories)
+        $items = @scandir($modulePath);
+        if ($items === false) {
+            return $stats;
+        }
+
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') continue;
+            
+            $itemPath = $modulePath . '/' . $item;
+            
+            if (is_dir($itemPath)) {
+                // This is a sub-category
+                $stats['subcategories']++;
+                
+                // Count PHP files in this sub-category
+                $files = @scandir($itemPath);
+                if ($files !== false) {
+                    foreach ($files as $file) {
+                        if (pathinfo($file, PATHINFO_EXTENSION) === 'php' && $file !== 'index.php') {
+                            $stats['calculators']++;
+                        }
+                    }
+                }
+            } elseif (pathinfo($item, PATHINFO_EXTENSION) === 'php' && $item !== 'index.php') {
+                // Direct PHP file in module root (also a calculator)
+                $stats['calculators']++;
             }
         }
 
-        return $count;
+        return $stats;
+    }
+
+    /**
+     * Legacy method for backward compatibility
+     */
+    private function countCalculators($modulePath)
+    {
+        $stats = $this->getModuleStats($modulePath);
+        return $stats['calculators'];
     }
 
     private function getCategoryFromName($name)
     {
+        // specific mappings for nicer display
         $categories = [
-            'civil' => 'engineering',
-            'electrical' => 'engineering',
-            'hvac' => 'engineering',
-            'plumbing' => 'engineering',
-            'structural' => 'engineering',
-            'fire' => 'engineering',
-            'estimation' => 'management',
-            'project-management' => 'management',
-            'mep' => 'engineering',
-            'site' => 'engineering'
+            'civil' => 'Civil Engineering',
+            'electrical' => 'Electrical Engineering',
+            'hvac' => 'HVAC & Cooling',
+            'plumbing' => 'Plumbing & Sanitary',
+            'structural' => 'Structural Analysis',
+            'fire' => 'Fire Safety',
+            'estimation' => 'Cost Estimation',
+            'project-management' => 'Project Mgmt',
+            'mep' => 'MEP Systems',
+            'site' => 'Site Operations'
         ];
 
-        return $categories[$name] ?? 'custom';
+        // Default to capitalized name if not in map
+        return $categories[$name] ?? ucwords(str_replace(['-', '_'], ' ', $name));
     }
 
     private function getModuleDescription($name)

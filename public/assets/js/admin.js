@@ -162,7 +162,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // ===== AUTO-DISMISS ALERTS ===== //
     
-    const alerts = document.querySelectorAll('.alert');
+    // Select alerts that are NOT marked as static or permanent
+    const alerts = document.querySelectorAll('.alert:not(.alert-static):not(.alert-permanent)');
     
     alerts.forEach(alert => {
         // Auto-dismiss after 5 seconds
