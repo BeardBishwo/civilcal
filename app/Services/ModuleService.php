@@ -14,57 +14,7 @@ class ModuleService
         $this->moduleModel = new Module();
     }
 
-    /**
-     * Get all modules
-     */
-    public function getAllModules()
-    {
-        try {
-            return $this->moduleModel->getAll();
-        } catch (Exception $e) {
-            error_log('ModuleService getAllModules error: ' . $e->getMessage());
-            return [];
-        }
-    }
 
-    /**
-     * Get active modules only
-     */
-    public function getActiveModules()
-    {
-        try {
-            return $this->moduleModel->getActive();
-        } catch (Exception $e) {
-            error_log('ModuleService getActiveModules error: ' . $e->getMessage());
-            return [];
-        }
-    }
-
-    /**
-     * Find a module by ID
-     */
-    public function getModule($id)
-    {
-        try {
-            return $this->moduleModel->find($id);
-        } catch (Exception $e) {
-            error_log("ModuleService getModule error for ID {$id}: " . $e->getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Find a module by name
-     */
-    public function getModuleByName($name)
-    {
-        try {
-            return $this->moduleModel->findByName($name);
-        } catch (Exception $e) {
-            error_log("ModuleService getModuleByName error for name {$name}: " . $e->getMessage());
-            return null;
-        }
-    }
 
     /**
      * Create a new module
@@ -264,7 +214,7 @@ class ModuleService
             // This is a simplified implementation
             // In a real system, you would validate the package, check dependencies,
             // and properly extract and install the module
-            
+
             // For now, we'll just return a message indicating the process
             return [
                 'success' => true,
@@ -282,13 +232,46 @@ class ModuleService
     /**
      * Update module configuration
      */
+    /**
+     * Get module configuration path
+     */
+    private function getConfigPath()
+    {
+        return BASE_PATH . '/storage/app/modules_config.json';
+    }
+
+    /**
+     * Load all module configurations
+     */
+    private function loadModuleConfig()
+    {
+        $path = $this->getConfigPath();
+        if (!file_exists($path)) {
+            return [];
+        }
+        $content = file_get_contents($path);
+        return json_decode($content, true) ?? [];
+    }
+
+    /**
+     * Save module configuration
+     */
+    private function saveModuleConfig($config)
+    {
+        $path = $this->getConfigPath();
+        $dir = dirname($path);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        file_put_contents($path, json_encode($config, JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * Update module configuration
+     */
     public function updateModuleConfig($moduleId, $config)
     {
-        // In the current Module model, there's no direct configuration field
-        // This could be implemented by storing config as JSON in a field or in a separate table
-        
         try {
-            // For now, we'll just update some data fields if they exist
             $module = $this->moduleModel->find($moduleId);
             if (!$module) {
                 return [
@@ -297,16 +280,122 @@ class ModuleService
                 ];
             }
 
-            // This would require modifying the Module model to support configuration updates
+            // Load existing config
+            $allConfig = $this->loadModuleConfig();
+
+            // Key by module ID (or name if preferred, ID is safer for renames)
+            $moduleKey = 'module_' . $moduleId;
+
+            // Initialize if not exists
+            if (!isset($allConfig[$moduleKey])) {
+                $allConfig[$moduleKey] = [];
+            }
+
+            // Merge new config
+            $allConfig[$moduleKey] = array_merge($allConfig[$moduleKey], $config);
+
+            // Save back
+            $this->saveModuleConfig($allConfig);
+
+            // Update module basic fields in DB if present in config
+            // (e.g. description, status which are in DB)
+            if (isset($config['description'])) {
+                $this->moduleModel->update($moduleId, ['description' => $config['description']]);
+            }
+            if (isset($config['status'])) { // 'active'/'inactive' mapping
+                $isActive = ($config['status'] === 'active') ? 1 : 0;
+                $this->moduleModel->update($moduleId, ['is_active' => $isActive]);
+            }
+
             return [
                 'success' => true,
-                'message' => 'Module configuration would be updated here'
+                'message' => 'Module configuration updated successfully'
             ];
         } catch (Exception $e) {
             return [
                 'success' => false,
                 'message' => 'Module configuration update failed: ' . $e->getMessage()
             ];
+        }
+    }
+
+    /**
+     * Merge config into module data
+     */
+    private function mergeConfigIntoModule($module)
+    {
+        if (!$module) return null;
+
+        $allConfig = $this->loadModuleConfig();
+        $moduleKey = 'module_' . $module['id'];
+
+        if (isset($allConfig[$moduleKey])) {
+            // Merge stored config into module array
+            // Config takes precedence for settings, but DB holds truth for ID/Name
+            $module = array_merge($module, $allConfig[$moduleKey]);
+        }
+        return $module;
+    }
+
+    /**
+     * Get all modules (merged with config)
+     */
+    public function getAllModules()
+    {
+        try {
+            $modules = $this->moduleModel->getAll();
+            foreach ($modules as &$module) {
+                $module = $this->mergeConfigIntoModule($module);
+            }
+            return $modules;
+        } catch (Exception $e) {
+            error_log('ModuleService getAllModules error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get active modules only (merged with config)
+     */
+    public function getActiveModules()
+    {
+        try {
+            $modules = $this->moduleModel->getActive();
+            foreach ($modules as &$module) {
+                $module = $this->mergeConfigIntoModule($module);
+            }
+            return $modules;
+        } catch (Exception $e) {
+            error_log('ModuleService getActiveModules error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Find a module by ID (merged with config)
+     */
+    public function getModule($id)
+    {
+        try {
+            $module = $this->moduleModel->find($id);
+            return $this->mergeConfigIntoModule($module);
+        } catch (Exception $e) {
+            error_log("ModuleService getModule error for ID {$id}: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Find a module by name (merged with config)
+     */
+    public function getModuleByName($name)
+    {
+        try {
+            $module = $this->moduleModel->findByName($name);
+            return $this->mergeConfigIntoModule($module);
+        } catch (Exception $e) {
+            error_log("ModuleService getModuleByName error for name {$name}: " . $e->getMessage());
+            return null;
         }
     }
 }

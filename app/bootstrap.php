@@ -21,8 +21,12 @@ if (file_exists(BASE_PATH . '/app/Helpers/functions.php')) {
 
 // Load .env file
 if (file_exists(BASE_PATH . '/.env')) {
-    $dotenv = Dotenv\Dotenv::createImmutable(BASE_PATH);
-    $dotenv->load();
+    try {
+        $dotenv = Dotenv\Dotenv::createImmutable(BASE_PATH);
+        $dotenv->load();
+    } catch (\Exception $e) {
+        // Silently fail if dotenv cannot be loaded
+    }
 }
 
 // Autoloader for App classes
