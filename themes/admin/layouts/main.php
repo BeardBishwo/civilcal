@@ -7,7 +7,7 @@
     <title><?php echo $page_title ?? 'Admin Dashboard'; ?> - Bishwo Calculator</title>
 
     <!-- Admin Styles -->
-    <link rel="stylesheet" href="<?php echo app_base_url('themes/admin/assets/css/admin.css'); ?>">
+    <link rel="stylesheet" href="<?php echo app_base_url('themes/admin/assets/css/admin.css?v=' . time()); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -609,6 +609,8 @@
 </head>
 
 <body class="admin-body">
+
+
     <!-- Admin Wrapper -->
     <div id="admin-wrapper" class="admin-wrapper">
 

@@ -219,32 +219,32 @@ $router->add("GET", "/admin/dashboard_complex", "Admin\\DashboardController@dash
 ]);
 
 // MODULE MANAGEMENT - CONSOLIDATED (Fixed duplicate conflict)
-$router->add("GET", "/admin/modules", "Admin\DashboardController@modules", [
+$router->add("GET", "/admin/modules", "Admin\ModuleController@index", [
     "auth",
     "admin",
 ]);
 $router->add(
     "POST",
     "/admin/modules/activate",
-    "Admin\DashboardController@activateModule",
+    "Admin\ModuleController@activate",
     ["auth", "admin"],
 );
 $router->add(
     "POST",
     "/admin/modules/deactivate",
-    "Admin\DashboardController@deactivateModule",
+    "Admin\ModuleController@deactivate",
     ["auth", "admin"],
 );
 $router->add(
     "GET",
     "/admin/modules/{module}/settings",
-    "Admin\DashboardController@moduleSettings",
+    "Admin\ModuleController@settings",
     ["auth", "admin"],
 );
 $router->add(
     "POST",
     "/admin/modules/settings/update",
-    "Admin\DashboardController@updateModuleSettings",
+    "Admin\ModuleController@updateSettings",
     ["auth", "admin"],
 );
 
@@ -508,14 +508,26 @@ $router->add("GET", "/admin/content/menus", "Admin\ContentController@menus", [
     "auth",
     "admin",
 ]);
-$router->add("GET", "/admin/content/media", "Admin\ContentController@media", [
+$router->add("GET", "/admin/content/media", "Admin\\ContentController@media", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/content/media/upload", "Admin\\ContentController@uploadMedia", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/content/media/delete/{id}", "Admin\\ContentController@deleteMedia", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/content/media/update/{id}", "Admin\\ContentController@updateMedia", [
     "auth",
     "admin",
 ]);
 $router->add(
     "POST",
     "/admin/content/menus/save",
-    "Admin\ContentController@saveMenus",
+    "Admin\\ContentController@saveMenus",
     ["auth", "admin"],
 );
 $router->add(
@@ -907,6 +919,22 @@ $router->add(
     "Admin\CalculatorController@addCalculator",
     ["auth", "admin"],
 );
+
+// Calculations Management Routes (Found Missing)
+$router->add("GET", "/admin/calculations", "Admin\CalculationsController@index", [
+    "auth",
+    "admin",
+]);
+
+// Audit Logs Routes (Found Missing)
+$router->add("GET", "/admin/audit-logs", "Admin\AuditLogController@index", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/audit-logs/download", "Admin\AuditLogController@download", [
+    "auth",
+    "admin",
+]);
 
 // Widget Management Routes
 $router->add("GET", "/admin/widgets", "WidgetController@index", [

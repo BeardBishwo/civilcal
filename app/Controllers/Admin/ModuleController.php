@@ -47,19 +47,19 @@ class ModuleController extends Controller
     public function activate()
     {
         $moduleName = $_POST['module'] ?? '';
-        
+
         if (empty($moduleName)) {
             echo json_encode(['success' => false, 'message' => 'Module name is required']);
             return;
         }
-        
+
         // Get module by name to get its ID
         $module = $this->moduleService->getModuleByName($moduleName);
         if (!$module) {
             echo json_encode(['success' => false, 'message' => 'Module not found']);
             return;
         }
-        
+
         // Activate module by ID
         $result = $this->moduleService->activateModule($module['id']);
         echo json_encode($result);
@@ -68,27 +68,28 @@ class ModuleController extends Controller
     public function deactivate()
     {
         $moduleName = $_POST['module'] ?? '';
-        
+
         if (empty($moduleName)) {
             echo json_encode(['success' => false, 'message' => 'Module name is required']);
             return;
         }
-        
+
         // Get module by name to get its ID
         $module = $this->moduleService->getModuleByName($moduleName);
         if (!$module) {
             echo json_encode(['success' => false, 'message' => 'Module not found']);
             return;
         }
-        
+
         // Deactivate module by ID
         $result = $this->moduleService->deactivateModule($module['id']);
         echo json_encode($result);
     }
 
-    public function settings($params)
+    public function settings($moduleName)
     {
-        $moduleName = $params['module'] ?? '';
+        // Decode URL parameter if needed (though router usually does this)
+        $moduleName = urldecode($moduleName);
 
         if (empty($moduleName)) {
             $this->redirect('/admin/modules');
@@ -96,6 +97,18 @@ class ModuleController extends Controller
         }
 
         $module = $this->moduleService->getModuleByName($moduleName);
+
+        // Fallback: If not found in DB/Service (because it's file-based only), look in file system
+        if (!$module) {
+            $modules = $this->getAllModulesFromFileSystem();
+            foreach ($modules as $m) {
+                if ($m['name'] === $moduleName) {
+                    $module = $m;
+                    break;
+                }
+            }
+        }
+
         if (!$module) {
             $this->redirect('/admin/modules');
             return;
@@ -113,22 +126,22 @@ class ModuleController extends Controller
     public function updateSettings()
     {
         $moduleName = $_POST['module'] ?? '';
-        
+
         if (empty($moduleName)) {
             echo json_encode(['success' => false, 'message' => 'Module name is required']);
             return;
         }
-        
+
         // Get module by name to get its ID
         $module = $this->moduleService->getModuleByName($moduleName);
         if (!$module) {
             echo json_encode(['success' => false, 'message' => 'Module not found']);
             return;
         }
-        
+
         $settingsData = $_POST['settings'] ?? [];
         $result = $this->moduleService->updateModuleConfig($module['id'], $settingsData);
-        
+
         echo json_encode($result);
     }
 

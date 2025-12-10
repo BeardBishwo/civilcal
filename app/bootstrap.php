@@ -14,6 +14,11 @@ define("STORAGE_PATH", BASE_PATH . "/storage");
 // Load Composer autoloader (for vendor packages like Google2FA)
 require_once BASE_PATH . '/vendor/autoload.php';
 
+// Load application helpers
+if (file_exists(BASE_PATH . '/app/Helpers/functions.php')) {
+    require_once BASE_PATH . '/app/Helpers/functions.php';
+}
+
 // Load .env file
 if (file_exists(BASE_PATH . '/.env')) {
     $dotenv = Dotenv\Dotenv::createImmutable(BASE_PATH);

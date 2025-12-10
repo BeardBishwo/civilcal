@@ -1,0 +1,14 @@
+# Prevent direct PHP execution in uploads directory
+<FilesMatch "\.php$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Allow access to media files
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|pdf|doc|docx|xls|xlsx|zip)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Prevent directory listing
+Options -Indexes

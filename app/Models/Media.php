@@ -80,6 +80,25 @@ class Media
         return false;
     }
 
+    public function update($id, $data)
+    {
+        $setParts = [];
+        $values = [];
+
+        foreach ($data as $key => $value) {
+            $setParts[] = "$key = ?";
+            $values[] = $value;
+        }
+
+        $values[] = $id;
+        $setClause = implode(', ', $setParts);
+
+        $sql = "UPDATE media SET $setClause WHERE id = ?";
+        $stmt = $this->db->getPdo()->prepare($sql);
+
+        return $stmt->execute($values);
+    }
+
     public function delete($id)
     {
         $stmt = $this->db->getPdo()->prepare("DELETE FROM media WHERE id = ?");

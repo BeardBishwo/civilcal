@@ -118,42 +118,49 @@ class ContentController extends Controller
 
     public function media()
     {
-        $user = Auth::user();
-        if (!$user || !$user->is_admin) {
-            http_response_code(403);
-            die('Access denied');
-        }
+        try {
+            $user = Auth::user();
+            if (!$user || !$user->is_admin) {
+                http_response_code(403);
+                $this->logError('Unauthorized media access attempt', ['user_id' => $user->id ?? 'guest']);
+                die('Access denied');
+            }
 
-        $page = $_GET['page'] ?? 1;
-        $filters = [
-            'search' => $_GET['search'] ?? null,
-            'type' => $_GET['type'] ?? null
-        ];
-
-        // Get media using Model
-        $mediaData = $this->mediaModel->getAll($filters, $page, 20);
-
-        // Transform data for view if necessary
-        $media = array_map(function ($item) {
-            return [
-                'id' => $item['id'],
-                'filename' => $item['original_filename'],
-                'url' => app_base_url('/storage/' . $item['file_path']), // Ensure correct path
-                'type' => $item['mime_type'],
-                'size' => $this->formatSize($item['file_size']),
-                'uploaded_at' => $item['created_at']
+            $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+            $filters = [
+                'search' => isset($_GET['search']) ? trim($_GET['search']) : null,
+                'type' => isset($_GET['type']) ? trim($_GET['type']) : null
             ];
-        }, $mediaData['data']);
 
-        $data = [
-            'user' => $user,
-            'media' => $media,
-            'pagination' => $mediaData,
-            'page_title' => 'Media Library - Admin Panel',
-            'currentPage' => 'content'
-        ];
+            // Get media using Model with error handling
+            $mediaData = $this->mediaModel->getAll($filters, $page, 20);
 
-        $this->view->render('admin/content/media', $data);
+            // Transform data for view if necessary
+            $media = array_map(function ($item) {
+                return [
+                    'id' => $item['id'],
+                    'filename' => $item['original_filename'],
+                    'url' => app_base_url('/storage/' . $item['file_path']),
+                    'type' => $item['mime_type'],
+                    'size' => $this->formatSize($item['file_size']),
+                    'uploaded_at' => $item['created_at']
+                ];
+            }, $mediaData['data']);
+
+            $data = [
+                'user' => $user,
+                'media' => $media,
+                'pagination' => $mediaData,
+                'page_title' => 'Media Library - Admin Panel',
+                'currentPage' => 'content'
+            ];
+
+            $this->view->render('admin/content/media', $data);
+        } catch (\Exception $e) {
+            $this->logError('Media page error', ['error' => $e->getMessage()]);
+            http_response_code(500);
+            die('An error occurred while loading the media library.');
+        }
     }
 
     public function create()
@@ -287,6 +294,286 @@ class ContentController extends Controller
         exit;
     }
 
+    public function uploadMedia()
+    {
+        try {
+            $user = Auth::user();
+            if (!$user || !$user->is_admin) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Access denied']);
+                exit;
+            }
+
+            // Validate CSRF token
+            $token = $_POST['csrf_token'] ?? '';
+            if (!$this->validateCsrfToken($token)) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+                exit;
+            }
+
+            // Check if files were uploaded
+            if (!isset($_FILES['files']) || empty($_FILES['files']['name'][0])) {
+                echo json_encode(['success' => false, 'message' => 'No files uploaded']);
+                exit;
+            }
+
+            $uploadedFiles = [];
+            $errors = [];
+            $maxFileSize = 10 * 1024 * 1024; // 10MB - make this configurable later
+
+            // Process each file
+            $fileCount = count($_FILES['files']['name']);
+            for ($i = 0; $i < $fileCount; $i++) {
+                if ($_FILES['files']['error'][$i] !== UPLOAD_ERR_OK) {
+                    $errors[] = $_FILES['files']['name'][$i] . ': Upload error';
+                    continue;
+                }
+
+                $originalFilename = $_FILES['files']['name'][$i];
+                $tmpName = $_FILES['files']['tmp_name'][$i];
+                $fileSize = $_FILES['files']['size'][$i];
+
+                // Sanitize original filename
+                $originalFilename = $this->sanitizeFilename($originalFilename);
+
+                // Validate filename length
+                if (strlen($originalFilename) > 255) {
+                    $errors[] = $originalFilename . ': Filename too long (max 255 characters)';
+                    continue;
+                }
+
+                // Get mime type
+                $mimeType = mime_content_type($tmpName);
+
+                // Validate file type
+                $allowedTypes = [
+                    'image/jpeg',
+                    'image/png',
+                    'image/gif',
+                    'image/webp',
+                    'application/pdf',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'application/vnd.ms-excel',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'application/zip'
+                ];
+
+                if (!in_array($mimeType, $allowedTypes)) {
+                    $errors[] = $originalFilename . ': File type not allowed';
+                    $this->logError('Invalid file type upload attempt', [
+                        'filename' => $originalFilename,
+                        'mime_type' => $mimeType,
+                        'user_id' => $user->id
+                    ]);
+                    continue;
+                }
+
+                // Validate file size
+                if ($fileSize > $maxFileSize) {
+                    $errors[] = $originalFilename . ': File too large (max ' . $this->formatSize($maxFileSize) . ')';
+                    continue;
+                }
+
+                // Determine file type category
+                $fileType = 'other';
+                if (strpos($mimeType, 'image/') === 0) {
+                    $fileType = 'images';
+                } elseif (
+                    strpos($mimeType, 'application/pdf') === 0 ||
+                    strpos($mimeType, 'application/msword') === 0 ||
+                    strpos($mimeType, 'application/vnd.') === 0
+                ) {
+                    $fileType = 'documents';
+                }
+
+                // Generate unique filename
+                $extension = pathinfo($originalFilename, PATHINFO_EXTENSION);
+                $filename = uniqid() . '_' . time() . '.' . strtolower($extension);
+
+                // Create storage path
+                $storagePath = __DIR__ . '/../../../public/storage/media/' . $fileType . '/';
+                if (!is_dir($storagePath)) {
+                    if (!mkdir($storagePath, 0755, true)) {
+                        $errors[] = $originalFilename . ': Failed to create storage directory';
+                        $this->logError('Failed to create storage directory', ['path' => $storagePath]);
+                        continue;
+                    }
+                }
+
+                $filePath = $storagePath . $filename;
+                $relativeFilePath = 'media/' . $fileType . '/' . $filename;
+
+                // Check for duplicate files (by hash)
+                $fileHash = md5_file($tmpName);
+                if ($this->isDuplicateFile($fileHash)) {
+                    $errors[] = $originalFilename . ': Duplicate file already exists';
+                    continue;
+                }
+
+                // Move uploaded file
+                if (move_uploaded_file($tmpName, $filePath)) {
+                    // Save to database
+                    $mediaId = $this->mediaModel->create([
+                        'original_filename' => $originalFilename,
+                        'filename' => $filename,
+                        'file_path' => $relativeFilePath,
+                        'file_size' => $fileSize,
+                        'file_type' => $fileType,
+                        'mime_type' => $mimeType,
+                        'uploaded_by' => $user->id
+                    ]);
+
+                    if ($mediaId) {
+                        $uploadedFiles[] = [
+                            'id' => $mediaId,
+                            'filename' => $originalFilename,
+                            'url' => app_base_url('/storage/' . $relativeFilePath)
+                        ];
+
+                        // Log successful upload
+                        $this->logInfo('Media uploaded', [
+                            'media_id' => $mediaId,
+                            'filename' => $originalFilename,
+                            'user_id' => $user->id
+                        ]);
+                    } else {
+                        // Delete file if database insert failed
+                        if (file_exists($filePath)) {
+                            unlink($filePath);
+                        }
+                        $errors[] = $originalFilename . ': Database error';
+                        $this->logError('Database insert failed for media', ['filename' => $originalFilename]);
+                    }
+                } else {
+                    $errors[] = $originalFilename . ': Failed to save file';
+                    $this->logError('Failed to move uploaded file', [
+                        'filename' => $originalFilename,
+                        'destination' => $filePath
+                    ]);
+                }
+            }
+
+            echo json_encode([
+                'success' => count($uploadedFiles) > 0,
+                'uploaded' => $uploadedFiles,
+                'errors' => $errors,
+                'message' => count($uploadedFiles) . ' file(s) uploaded successfully'
+            ]);
+        } catch (\Exception $e) {
+            $this->logError('Media upload exception', ['error' => $e->getMessage()]);
+            echo json_encode([
+                'success' => false,
+                'message' => 'An unexpected error occurred during upload'
+            ]);
+        }
+        exit;
+    }
+
+    public function deleteMedia($id)
+    {
+        try {
+            $user = Auth::user();
+            if (!$user || !$user->is_admin) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Access denied']);
+                exit;
+            }
+
+            // Validate CSRF token
+            $token = $_POST['csrf_token'] ?? '';
+            if (!$this->validateCsrfToken($token)) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+                exit;
+            }
+
+            // Validate ID
+            if (!is_numeric($id) || $id <= 0) {
+                echo json_encode(['success' => false, 'message' => 'Invalid media ID']);
+                exit;
+            }
+
+            // Get media record
+            $media = $this->mediaModel->find($id);
+            if (!$media) {
+                echo json_encode(['success' => false, 'message' => 'Media not found']);
+                exit;
+            }
+
+            // Delete physical file
+            $filePath = __DIR__ . '/../../../public/storage/' . $media['file_path'];
+            if (file_exists($filePath)) {
+                if (!unlink($filePath)) {
+                    $this->logError('Failed to delete physical file', ['path' => $filePath]);
+                    echo json_encode(['success' => false, 'message' => 'Failed to delete file from storage']);
+                    exit;
+                }
+            }
+
+            // Delete from database
+            if ($this->mediaModel->delete($id)) {
+                $this->logInfo('Media deleted', [
+                    'media_id' => $id,
+                    'filename' => $media['original_filename'],
+                    'user_id' => $user->id
+                ]);
+                echo json_encode(['success' => true, 'message' => 'Media deleted successfully']);
+            } else {
+                $this->logError('Failed to delete media from database', ['media_id' => $id]);
+                echo json_encode(['success' => false, 'message' => 'Failed to delete media from database']);
+            }
+        } catch (\Exception $e) {
+            $this->logError('Media deletion exception', [
+                'media_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            echo json_encode(['success' => false, 'message' => 'An unexpected error occurred']);
+        }
+        exit;
+    }
+
+    public function updateMedia($id)
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            exit;
+        }
+
+        // Validate CSRF token
+        $token = $_POST['csrf_token'] ?? '';
+        if (!$this->validateCsrfToken($token)) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            exit;
+        }
+
+        // Get media record
+        $media = $this->mediaModel->find($id);
+        if (!$media) {
+            echo json_encode(['success' => false, 'message' => 'Media not found']);
+            exit;
+        }
+
+        // Update filename if provided
+        $newFilename = $_POST['filename'] ?? null;
+        if ($newFilename && $newFilename !== $media['original_filename']) {
+            // Sanitize filename
+            $newFilename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $newFilename);
+
+            // Update in database
+            $this->mediaModel->update($id, [
+                'original_filename' => $newFilename
+            ]);
+        }
+
+        echo json_encode(['success' => true, 'message' => 'Media updated successfully']);
+        exit;
+    }
+
     private function formatSize($bytes)
     {
         if ($bytes >= 1073741824) {
@@ -304,5 +591,73 @@ class ContentController extends Controller
         }
 
         return $bytes;
+    }
+
+    /**
+     * Sanitize filename to prevent security issues
+     */
+    private function sanitizeFilename($filename)
+    {
+        // Remove any path components
+        $filename = basename($filename);
+
+        // Remove special characters except dots, dashes, and underscores
+        $filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
+
+        // Remove multiple consecutive underscores
+        $filename = preg_replace('/_+/', '_', $filename);
+
+        // Trim underscores from start and end
+        $filename = trim($filename, '_');
+
+        return $filename;
+    }
+
+    /**
+     * Check if file is duplicate based on hash
+     */
+    private function isDuplicateFile($hash)
+    {
+        // For now, return false - implement hash-based duplicate detection later
+        // This would require adding a hash column to the media table
+        return false;
+    }
+
+    /**
+     * Log error message
+     */
+    private function logError($message, $context = [])
+    {
+        $logFile = __DIR__ . '/../../logs/media_errors.log';
+        $logDir = dirname($logFile);
+
+        if (!is_dir($logDir)) {
+            mkdir($logDir, 0755, true);
+        }
+
+        $timestamp = date('Y-m-d H:i:s');
+        $contextStr = !empty($context) ? json_encode($context) : '';
+        $logMessage = "[$timestamp] ERROR: $message $contextStr" . PHP_EOL;
+
+        error_log($logMessage, 3, $logFile);
+    }
+
+    /**
+     * Log info message
+     */
+    private function logInfo($message, $context = [])
+    {
+        $logFile = __DIR__ . '/../../logs/media_info.log';
+        $logDir = dirname($logFile);
+
+        if (!is_dir($logDir)) {
+            mkdir($logDir, 0755, true);
+        }
+
+        $timestamp = date('Y-m-d H:i:s');
+        $contextStr = !empty($context) ? json_encode($context) : '';
+        $logMessage = "[$timestamp] INFO: $message $contextStr" . PHP_EOL;
+
+        error_log($logMessage, 3, $logFile);
     }
 }
