@@ -1,17 +1,17 @@
--- Performance Indexes for Production
--- Run this to optimize database queries
+-- Performance Indexes for Bishwo Calculator
+-- Run via: php install/apply_indexes.php
 
--- Users Table
-ALTER TABLE `users` ADD INDEX `idx_users_email` (`email`);
-ALTER TABLE `users` ADD INDEX `idx_users_role` (`role`);
+-- Users table
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_role ON users(role);
 
--- Modules Table
-ALTER TABLE `modules` ADD INDEX `idx_modules_slug` (`slug`);
-ALTER TABLE `modules` ADD INDEX `idx_modules_status` (`status`);
+-- Modules table  
+CREATE INDEX idx_modules_name ON modules(name);
+CREATE INDEX idx_modules_is_active ON modules(is_active);
 
--- Pages Table
-ALTER TABLE `pages` ADD INDEX `idx_pages_slug` (`slug`);
-ALTER TABLE `pages` ADD INDEX `idx_pages_status` (`status`);
+-- Pages table
+CREATE INDEX idx_pages_slug ON pages(slug);
+CREATE INDEX idx_pages_status ON pages(status);
 
--- Media Table
-ALTER TABLE `media` ADD INDEX `idx_media_type` (`file_type`);
+-- Settings table
+CREATE INDEX idx_settings_key ON settings(`key`);
