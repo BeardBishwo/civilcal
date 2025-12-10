@@ -828,6 +828,42 @@ $router->add(
     "Admin\BackupController@settings",
     ["auth", "admin"],
 );
+$router->add(
+    "POST",
+    "/admin/backup/cleanup",
+    "Admin\BackupController@cleanup",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/backup/test",
+    "Admin\BackupController@test",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/settings/backup/save",
+    "Admin\BackupController@save",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/settings/advanced/generate-api-key",
+    "Admin\BackupController@generateApiKey",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/backup/restore-from-id/{backupId}",
+    "Admin\BackupController@restoreFromId",
+    ["auth", "admin"],
+);
+$router->add(
+    "DELETE",
+    "/admin/backup/delete/{backupId}",
+    "Admin\BackupController@delete",
+    ["auth", "admin"],
+);
 
 // Debug & Testing Routes
 $router->add("GET", "/admin/debug", "Admin\DebugController@index", [

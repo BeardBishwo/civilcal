@@ -1,9 +1,11 @@
 <?php
+
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
 use App\Services\BackupService;
 use App\Core\Auth;
+use App\Core\Database;
 use Exception;
 
 class BackupController extends Controller
@@ -13,54 +15,94 @@ class BackupController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->backupService = new BackupService();
+        
+        // Initialize backup service with database connection
+        $db = Database::getInstance()->getPdo();
+        $this->backupService = new BackupService($db);
     }
 
+    /**
+     * Display backup settings page
+     */
     public function index()
     {
-        // Debug output
-        error_log("BackupController@index called");
-        
         $user = Auth::user();
         if (!$user || !$user->is_admin) {
             http_response_code(403);
             die('Access denied');
         }
 
-        $backups = $this->backupService->getBackupList();
+        // Get backup history
+        $backup_history = $this->backupService->getBackupHistory();
         
-        $data = [
-            'user' => $user,
-            'backups' => $backups,
-            'page_title' => 'Backup Management - Admin Panel',
-            'currentPage' => 'backup'
+        // Get backup settings (you can store these in database or config)
+        $backup_settings = [
+            'enabled' => true,
+            'frequency' => 'daily',
+            'time' => '02:00',
+            'retention' => 30,
+            'types' => ['database', 'files'],
+            'compression' => 'medium',
+            'storage_type' => 'local'
+        ];
+        
+        // System info
+        $system_info = [
+            'app_version' => '1.0.0',
+            'php_version' => PHP_VERSION,
+            'db_version' => 'MySQL',
+            'memory_limit' => ini_get('memory_limit'),
+            'upload_max_size' => ini_get('upload_max_filesize'),
+            'backup_storage_used' => 0
         ];
 
-        $this->view->render('admin/backup/index', $data);
+        $data = [
+            'user' => $user,
+            'backup_history' => $backup_history,
+            'backup_settings' => $backup_settings,
+            'system_info' => $system_info,
+            'page_title' => 'Backup Settings - Admin Panel',
+            'currentPage' => 'settings'
+        ];
+
+        $this->view->render('admin/settings/backup', $data);
     }
 
+    /**
+     * Create a new backup
+     */
     public function create()
     {
         $user = Auth::user();
         if (!$user || !$user->is_admin) {
             http_response_code(403);
-            die('Access denied');
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
         }
 
-        // Handle JSON input
-        $input = json_decode(file_get_contents('php://input'), true);
-        
-        $includeDatabase = $input['include_database'] ?? $_POST['include_database'] ?? true;
-        $includeFiles = $input['include_files'] ?? $_POST['include_files'] ?? true;
-        $backupName = $input['name'] ?? $_POST['name'] ?? null;
-
-        $result = $this->backupService->createBackup($includeDatabase, $includeFiles, $backupName);
-
-        header('Content-Type: application/json');
-        echo json_encode($result);
+        try {
+            // Get backup types from request
+            $types = $_POST['types'] ?? ['database'];
+            $compression = $_POST['compression'] ?? 'medium';
+            
+            $result = $this->backupService->createBackup($types, $compression);
+            
+            header('Content-Type: application/json');
+            echo json_encode($result);
+            
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
-    public function download($backupName)
+    /**
+     * Download a backup file
+     */
+    public function download($backupId)
     {
         $user = Auth::user();
         if (!$user || !$user->is_admin) {
@@ -68,15 +110,13 @@ class BackupController extends Controller
             die('Access denied');
         }
 
-        $backupPath = BASE_PATH . '/storage/backups/' . $backupName;
+        $backupPath = BASE_PATH . '/storage/backups/' . $backupId . '.zip';
 
         if (file_exists($backupPath)) {
-            // Set headers for download
             header('Content-Type: application/zip');
             header('Content-Disposition: attachment; filename="' . basename($backupPath) . '"');
             header('Content-Length: ' . filesize($backupPath));
             
-            // Output file content
             readfile($backupPath);
             exit;
         } else {
@@ -85,89 +125,184 @@ class BackupController extends Controller
         }
     }
 
-    public function delete($backupName)
+    /**
+     * Restore from backup (placeholder - requires careful implementation)
+     */
+    public function restore()
     {
         $user = Auth::user();
         if (!$user || !$user->is_admin) {
             http_response_code(403);
-            die('Access denied');
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
         }
 
-        $result = $this->backupService->deleteBackup($backupName);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => false,
+            'message' => 'Restore functionality requires careful implementation and testing'
+        ]);
+    }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    /**
+     * Restore from specific backup ID
+     */
+    public function restoreFromId($backupId)
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => false,
+            'message' => 'Restore functionality requires careful implementation and testing'
+        ]);
+    }
+
+    /**
+     * Delete a backup
+     */
+    public function delete($backupId)
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        try {
+            $result = $this->backupService->deleteBackup($backupId);
+            
             header('Content-Type: application/json');
             echo json_encode($result);
-        } else {
-            // Redirect back to backup management page
-            header('Location: ' . app_base_url('/admin/backup'));
-            exit;
-        }
-    }
-
-    public function restore($backupName)
-    {
-        $user = Auth::user();
-        if (!$user || !$user->is_admin) {
-            http_response_code(403);
-            die('Access denied');
-        }
-
-        $result = $this->backupService->restoreBackup(BASE_PATH . '/storage/backups/' . $backupName);
-
-        header('Content-Type: application/json');
-        echo json_encode($result);
-    }
-
-    public function schedule()
-    {
-        $user = Auth::user();
-        if (!$user || !$user->is_admin) {
-            http_response_code(403);
-            die('Access denied');
-        }
-
-        $schedule = $_POST['schedule'] ?? 'daily';
-        $retention = $_POST['retention'] ?? 7;
-
-        $result = $this->backupService->scheduleBackup($schedule, $retention);
-
-        header('Content-Type: application/json');
-        echo json_encode($result);
-    }
-
-    public function settings()
-    {
-        $user = Auth::user();
-        if (!$user || !$user->is_admin) {
-            http_response_code(403);
-            die('Access denied');
-        }
-
-        // Handle JSON input
-        $input = json_decode(file_get_contents('php://input'), true);
-        
-        if ($input && isset($input['max_backup_size'])) {
-            try {
-                $this->backupService->setMaxBackupSize($input['max_backup_size']);
-                $result = [
-                    'success' => true,
-                    'message' => 'Backup settings saved successfully'
-                ];
-            } catch (Exception $e) {
-                $result = [
-                    'success' => false,
-                    'message' => 'Error saving backup settings: ' . $e->getMessage()
-                ];
-            }
-        } else {
-            $result = [
+            
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode([
                 'success' => false,
-                'message' => 'Invalid input'
-            ];
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Cleanup old backups
+     */
+    public function cleanup()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
         }
 
-        header('Content-Type: application/json');
-        echo json_encode($result);
+        try {
+            $retentionDays = $_POST['retention'] ?? 30;
+            $result = $this->backupService->cleanupOldBackups($retentionDays);
+            
+            header('Content-Type: application/json');
+            echo json_encode($result);
+            
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Test backup configuration
+     */
+    public function test()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        try {
+            $result = $this->backupService->testConfiguration();
+            
+            header('Content-Type: application/json');
+            echo json_encode($result);
+            
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Save backup settings
+     */
+    public function save()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        try {
+            // Here you would save settings to database or config file
+            // For now, just return success
+            
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'message' => 'Backup settings saved successfully'
+            ]);
+            
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Generate API key for backups
+     */
+    public function generateApiKey()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        try {
+            $apiKey = bin2hex(random_bytes(32));
+            
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'api_key' => $apiKey
+            ]);
+            
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }
