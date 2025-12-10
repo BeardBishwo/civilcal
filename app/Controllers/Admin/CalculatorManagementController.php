@@ -48,10 +48,19 @@ class CalculatorManagementController extends Controller
         $modules = array_unique(array_column($calculators, 'module_name'));
         sort($modules);
 
+        // Calculate Stats
+        $stats = [
+            'total' => count($calculators),
+            'active' => count(array_filter($calculators, fn($c) => $c['status'] === 'active')),
+            'inactive' => count(array_filter($calculators, fn($c) => $c['status'] !== 'active')),
+            'modules' => count($modules)
+        ];
+
         $data = [
             'currentPage' => 'calculators_management',
             'calculators' => $calculators,
             'modules' => $modules,
+            'stats' => $stats,
             'filters' => ['search' => $search, 'module' => $module],
             'title' => 'Calculators Management - Admin Panel'
         ];
