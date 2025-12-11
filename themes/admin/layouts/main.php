@@ -246,6 +246,67 @@
             color: var(--admin-gray-500);
         }
 
+        /* Notification Dropdown Styles */
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            width: 380px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .notification-dropdown.show {
+            display: block !important;
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+
+        .notification-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--admin-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-header h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--admin-gray-800);
+        }
+
+        .notification-header .view-all {
+            color: var(--admin-primary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .notification-header .view-all:hover {
+            text-decoration: underline;
+        }
+
+        /* Quick actions needs position relative for dropdown positioning */
+        .quick-actions {
+            position: relative;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn.btn-icon {
+            position: relative;
+        }
+
         /* Enhanced Notification Toast Styles */
         .notification-toast {
             position: fixed;
@@ -1298,6 +1359,196 @@
                 }
             }, 500);
         });
+    </script>
+
+    <script>
+        // Enterprise Notification System
+        (function() {
+            let notificationData = [];
+            
+            // Fetch notifications
+            async function fetchNotifications() {
+                try {
+                    const response = await fetch('<?= app_base_url('/notifications') ?>');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        notificationData = data.notifications;
+                        renderNotifications();
+                        updateUnreadCount();
+                    }
+                } catch (error) {
+                    console.error('Error fetching notifications:', error);
+                }
+            }
+
+            // Fetch unread count
+            async function fetchUnreadCount() {
+                try {
+                    const response = await fetch('<?= app_base_url('/notifications/unread-count') ?>');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        updateBadge(data.count);
+                    }
+                } catch (error) {
+                    console.error('Error fetching unread count:', error);
+                }
+            }
+
+            // Render notifications
+            function renderNotifications() {
+                const listEl = document.querySelector('.notification-list');
+                if (!listEl) return;
+
+                if (notificationData.length === 0) {
+                    listEl.innerHTML = '<div class="empty">No notifications</div>';
+                    return;
+                }
+
+                listEl.innerHTML = notificationData.map(notif => `
+                    <div class="notification-item ${notif.is_read == 0 ? 'unread' : ''}" data-id="${notif.id}">
+                        <div class="notification-icon ${getIconClass(notif.type)}">
+                            <i class="fas ${notif.icon || 'fa-bell'}"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">${notif.title}</div>
+                            <div class="notification-message">${notif.message}</div>
+                            <div class="notification-time">${formatTime(notif.created_at)}</div>
+                        </div>
+                        ${notif.is_read == 0 ? '<div class="unread-dot"></div>' : ''}
+                    </div>
+                `).join('');
+
+                // Add click handlers
+                document.querySelectorAll('.notification-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const id = this.dataset.id;
+                        markAsRead(id);
+                    });
+                });
+            }
+
+            // Get icon class based on type
+            function getIconClass(type) {
+                const classes = {
+                    'system': 'icon-system',
+                    'user_action': 'icon-user',
+                    'email': 'icon-email',
+                    'alert': 'icon-alert',
+                    'info': 'icon-info'
+                };
+                return classes[type] || 'icon-info';
+            }
+
+            // Format time
+            function formatTime(timestamp) {
+                const date = new Date(timestamp);
+                const now = new Date();
+                const diff = Math.floor((now - date) / 1000); // seconds
+
+                if (diff < 60) return 'Just now';
+                if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+                if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+                if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+                
+                return date.toLocaleDateString();
+            }
+
+            // Update badge
+            function updateBadge(count) {
+                const badge = document.getElementById('notificationBadge');
+                if (badge) {
+                    badge.textContent = count;
+                    badge.style.display = count > 0 ? 'flex' : 'none';
+                }
+            }
+
+            // Update unread count from current data
+            function updateUnreadCount() {
+                const unreadCount = notificationData.filter(n => n.is_read == 0).length;
+                updateBadge(unreadCount);
+            }
+
+            // Mark as read
+            async function markAsRead(id) {
+                try {
+                    const response = await fetch(`<?= app_base_url('/notifications/') ?>${id}/read`, {
+                        method: 'POST'
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Update local data
+                        const notif = notificationData.find(n => n.id == id);
+                        if (notif) notif.is_read = 1;
+                        renderNotifications();
+                        updateUnreadCount();
+                    }
+                } catch (error) {
+                    console.error('Error marking as read:', error);
+                }
+            }
+
+            // Mark all as read
+            async function markAllAsRead() {
+                try {
+                    const response = await fetch('<?= app_base_url('/notifications/mark-all-read') ?>', {
+                        method: 'POST'
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        notificationData.forEach(n => n.is_read = 1);
+                        renderNotifications();
+                        updateUnreadCount();
+                        showNotification('All notifications marked as read', 'success');
+                    }
+                } catch (error) {
+                    console.error('Error marking all as read:', error);
+                }
+            }
+
+            // Initialize
+            document.addEventListener('DOMContentLoaded', function() {
+                // Fetch initial notifications
+                fetchNotifications();
+
+                // Toggle dropdown
+                const toggleBtn = document.getElementById('notificationToggle');
+                const dropdown = document.getElementById('notificationDropdown');
+                
+                if (toggleBtn && dropdown) {
+                    toggleBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        console.log('Bell clicked, dropdown before:', dropdown.classList.contains('show'));
+                        dropdown.classList.toggle('show');
+                        console.log('Bell clicked, dropdown after:', dropdown.classList.contains('show'));
+                        console.log('Dropdown display:', window.getComputedStyle(dropdown).display);
+                        console.log('Dropdown opacity:', window.getComputedStyle(dropdown).opacity);
+                        if (dropdown.classList.contains('show')) {
+                            fetchNotifications();
+                        }
+                    });
+                }
+
+                // Mark all as read button
+                const markAllBtn = document.getElementById('markAllRead');
+                if (markAllBtn) {
+                    markAllBtn.addEventListener('click', markAllAsRead);
+                }
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (dropdown && !dropdown.contains(e.target) && e.target !== toggleBtn) {
+                        dropdown.classList.remove('show');
+                    }
+                });
+
+                // Poll for new notifications every 30 seconds
+                setInterval(fetchUnreadCount, 30000);
+            });
+        })();
     </script>
 
     <!-- Theme Toggle Fallback Initialization -->

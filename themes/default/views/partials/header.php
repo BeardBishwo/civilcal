@@ -2037,6 +2037,308 @@ if (
                 display: none;
             }
         }
+
+        /* Notification System Styles */
+        .notification-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-btn {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(79, 70, 229, 0.05));
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: #6366f1 !important;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.75rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            min-height: 44px;
+            position: relative;
+            margin-right: 0.5rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .notification-btn:hover {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(79, 70, 229, 0.1));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            color: #4f46e5 !important;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(239, 68, 68, 0.4);
+            animation: bounceIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .notification-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: -10px;
+            width: 360px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            z-index: 1000;
+            overflow: hidden;
+            flex-direction: column;
+            animation: dropdownSlideIn 0.2s ease;
+        }
+
+        .notification-dropdown.active {
+            display: flex;
+        }
+
+        .notification-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(248, 250, 252, 0.5);
+        }
+
+        .notification-header h3 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .mark-all-read {
+            background: none;
+            border: none;
+            color: #6366f1;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .mark-all-read:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .notification-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .notification-item {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            display: flex;
+            gap: 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .notification-item:hover {
+            background: rgba(241, 245, 249, 0.6);
+        }
+
+        .notification-item.unread {
+            background: rgba(238, 242, 255, 0.4);
+        }
+
+        .notification-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #6366f1;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+
+        .bg-info-light { background: #e0f2fe; color: #0ea5e9; }
+        .bg-success-light { background: #dcfce7; color: #22c55e; }
+        .bg-warning-light { background: #fef3c7; color: #f59e0b; }
+        .bg-danger-light { background: #fee2e2; color: #ef4444; }
+
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-message {
+            color: #64748b;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .notification-time {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .notification-footer {
+            padding: 0.75rem;
+            text-align: center;
+            background: rgba(248, 250, 252, 0.5);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .view-all-btn {
+            color: #6366f1;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .view-all-btn:hover {
+            text-decoration: underline;
+        }
+
+        .notification-empty {
+            padding: 2.5rem 1rem;
+            text-align: center;
+            color: #94a3b8;
+        }
+
+        .notification-empty i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Dark Theme Support */
+        body.dark-theme .notification-btn {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            color: #a78bfa !important;
+        }
+
+        body.dark-theme .notification-btn:hover {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(139, 92, 246, 0.15));
+            color: #c084fc !important;
+        }
+
+        body.dark-theme .notification-badge {
+            background: #ef4444;
+            border-color: #1e293b;
+        }
+
+        body.dark-theme .notification-dropdown {
+            background: rgba(15, 23, 42, 0.95);
+            border-color: rgba(148, 163, 184, 0.2);
+        }
+
+        body.dark-theme .notification-header,
+        body.dark-theme .notification-footer {
+            background: rgba(30, 41, 59, 0.5);
+            border-color: rgba(148, 163, 184, 0.1);
+        }
+
+        body.dark-theme .notification-header h3 {
+            color: #e2e8f0;
+        }
+
+        body.dark-theme .notification-item {
+            border-color: rgba(148, 163, 184, 0.1);
+        }
+
+        body.dark-theme .notification-item:hover {
+            background: rgba(30, 41, 59, 0.4);
+        }
+
+        body.dark-theme .notification-item.unread {
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        body.dark-theme .notification-title {
+            color: #e2e8f0;
+        }
+
+        body.dark-theme .notification-message {
+            color: #94a3b8;
+        }
+
+        body.dark-theme .bg-info-light { background: rgba(14, 165, 233, 0.2); color: #38bdf8; }
+        body.dark-theme .bg-success-light { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        body.dark-theme .bg-warning-light { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        body.dark-theme .bg-danger-light { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes dropdownSlideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .notification-btn {
+                width: 36px;
+                height: 36px;
+                padding: 0.5rem;
+                margin-right: 0.25rem;
+            }
+            
+            .notification-dropdown {
+                width: 300px;
+                right: -50px;
+            }
+        }
     </style>
 </head>
 
@@ -2238,7 +2540,33 @@ if (
                         !empty($_SESSION["username"]) ||
                         !empty($_SESSION["full_name"]);
                     if ($is_logged_in): ?>
-                        <div class="profile-dropdown-wrapper">
+                    <!-- Notifications (Only for logged-in users) -->
+                    <?php if ($is_logged_in): ?>
+                        <div class="notification-wrapper has-dropdown" id="notificationWrapper">
+                            <button class="notification-btn" id="notificationToggleBtn" title="Notifications" aria-expanded="false" aria-haspopup="true">
+                                <i class="fas fa-bell"></i>
+                                <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                            </button>
+                            <div class="dropdown notification-dropdown" id="notificationDropdown" role="menu">
+                                <div class="notification-header">
+                                    <h3>Notifications</h3>
+                                    <button class="mark-all-read" id="markAllReadBtn" title="Mark all as read">
+                                        <i class="fas fa-check-double"></i> Mark all read
+                                    </button>
+                                </div>
+                                <div class="notification-list" id="notificationList">
+                                    <div style="padding: 2rem; text-align: center; color: #94a3b8;">
+                                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                    </div>
+                                </div>
+                                <div class="notification-footer">
+                                    <a href="<?php echo app_base_url('/user/notifications'); ?>" class="view-all-btn">View All Notifications</a>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="profile-dropdown-wrapper">
                             <button class="profile-btn" id="profileToggleBtn" title="Profile Menu">
                                 <i class="fas fa-user-circle"></i>
                             </button>
@@ -3102,7 +3430,200 @@ if (
                         max-width: 140px;
                     }
                 }
+
             `;
                 document.head.appendChild(style);
+            })();
+
+            // Notification System Logic
+            (function() {
+                const wrapper = document.getElementById('notificationWrapper');
+                const toggleBtn = document.getElementById('notificationToggleBtn');
+                const dropdown = document.getElementById('notificationDropdown');
+                const badge = document.getElementById('notificationBadge');
+                const list = document.getElementById('notificationList');
+                const markAllBtn = document.getElementById('markAllReadBtn');
+                const baseUrl = '<?php echo app_base_url(''); ?>';
+                let isLoaded = false;
+
+                if (!wrapper || !toggleBtn || !dropdown) return;
+
+                // Toggle dropdown
+                toggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isOpen = dropdown.classList.contains('active');
+                    
+                    // Close others
+                    document.querySelectorAll('.dropdown.open, .dropdown.active').forEach(d => {
+                        if (d !== dropdown) d.classList.remove('active', 'open');
+                    });
+                    document.querySelectorAll('.profile-dropdown.active').forEach(d => d.classList.remove('active'));
+
+                    dropdown.classList.toggle('active');
+                    toggleBtn.setAttribute('aria-expanded', !isOpen);
+
+                    if (!isOpen && !isLoaded) {
+                        fetchNotifications();
+                    }
+                });
+
+                // Close on outside click
+                document.addEventListener('click', function(e) {
+                    if (!wrapper.contains(e.target)) {
+                        dropdown.classList.remove('active');
+                        toggleBtn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                // Mark all as read
+                markAllBtn.addEventListener('click', async function(e) {
+                    e.stopPropagation();
+                    try {
+                        markAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                        const res = await fetch(`${baseUrl}/api/notifications/mark-all-read`, {
+                            method: 'POST'
+                        });
+                        const data = await res.json();
+                        
+                        if (data.success) {
+                            // Update UI
+                            badge.style.display = 'none';
+                            badge.textContent = '0';
+                            // Reload list
+                            fetchNotifications();
+                        }
+                    } catch (err) {
+                        console.error('Failed to mark all read', err);
+                    } finally {
+                        markAllBtn.innerHTML = '<i class="fas fa-check-double"></i> Mark all read';
+                    }
+                });
+
+                // Fetch notifications
+                async function fetchNotifications() {
+                    try {
+                        const res = await fetch(`${baseUrl}/api/notifications/list?limit=10`);
+                        const data = await res.json();
+                        
+                        if (data.success) {
+                            renderNotifications(data.notifications);
+                            updateBadge(data.unread_count);
+                            isLoaded = true;
+                        } else if (data.error === 'Access denied') {
+                             // User logged out or session expired
+                             list.innerHTML = `<div class="notification-empty">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Please login to view notifications</p>
+                            </div>`;
+                        }
+                    } catch (err) {
+                        console.error('Failed to fetch notifications', err);
+                        list.innerHTML = `<div class="notification-empty" style="color: #ef4444;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>Failed to load notifications</p>
+                        </div>`;
+                    }
+                }
+
+                // Initial Badge Count
+                async function checkUnreadCount() {
+                    try {
+                        const res = await fetch(`${baseUrl}/api/notifications/unread-count`);
+                        const data = await res.json();
+                        if (data.success) {
+                            updateBadge(data.unread_count);
+                        }
+                    } catch (err) {
+                        // Silent fail for background check
+                    }
+                }
+
+                function updateBadge(count) {
+                    if (count > 0) {
+                        badge.textContent = count > 99 ? '99+' : count;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+
+                function renderNotifications(notifications) {
+                    if (!notifications || notifications.length === 0) {
+                        list.innerHTML = `<div class="notification-empty">
+                            <i class="far fa-bell" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                            <p>No notifications yet</p>
+                        </div>`;
+                        return;
+                    }
+
+                    list.innerHTML = notifications.map(n => {
+                        const icon = getIconForType(n.type);
+                        const bgClass = getClassForType(n.type);
+                        const timeAgo = getTimeAgo(new Date(n.created_at));
+                        const unreadClass = n.read_at ? '' : 'unread';
+
+                        return `
+                        <div class="notification-item ${unreadClass}" onclick="window.location.href='${n.link || '#'}'">
+                            <div class="notification-icon ${bgClass}">
+                                <i class="${icon}"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-title">${escapeHtml(n.title)}</div>
+                                <div class="notification-message">${escapeHtml(n.message)}</div>
+                                <div class="notification-time">${timeAgo}</div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+                }
+
+                function getIconForType(type) {
+                    switch (type) {
+                        case 'success': return 'fas fa-check-circle';
+                        case 'warning': return 'fas fa-exclamation-triangle';
+                        case 'error': return 'fas fa-times-circle';
+                        case 'info': default: return 'fas fa-info-circle';
+                    }
+                }
+
+                function getClassForType(type) {
+                    switch (type) {
+                        case 'success': return 'bg-success-light';
+                        case 'warning': return 'bg-warning-light';
+                        case 'error': return 'bg-danger-light';
+                        case 'info': default: return 'bg-info-light';
+                    }
+                }
+
+                function getTimeAgo(date) {
+                    const seconds = Math.floor((new Date() - date) / 1000);
+                    let interval = seconds / 31536000;
+                    if (interval > 1) return Math.floor(interval) + " years ago";
+                    interval = seconds / 2592000;
+                    if (interval > 1) return Math.floor(interval) + " months ago";
+                    interval = seconds / 86400;
+                    if (interval > 1) return Math.floor(interval) + " days ago";
+                    interval = seconds / 3600;
+                    if (interval > 1) return Math.floor(interval) + " hours ago";
+                    interval = seconds / 60;
+                    if (interval > 1) return Math.floor(interval) + " minutes ago";
+                    return Math.floor(seconds) + " seconds ago";
+                }
+
+                function escapeHtml(text) {
+                    if (!text) return '';
+                    return text
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;")
+                        .replace(/'/g, "&#039;");
+                }
+
+                // Check unread count on load
+                checkUnreadCount();
+                
+                // Poll every 60 seconds
+                setInterval(checkUnreadCount, 60000);
             })();
         </script>

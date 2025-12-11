@@ -1630,3 +1630,25 @@ $router->add("GET", "/admin/users/permissions", "Admin\\UserManagementController
 $router->add("GET", "/admin/users/bulk", "Admin\\UserManagementController@bulk", ["auth", "admin"]);
 $router->add("POST", "/admin/users/bulk-delete", "Admin\\UserManagementController@bulkDelete", ["auth", "admin"]);
 
+// Notification Routes
+$router->add("GET", "/notifications", "NotificationController@index", ["auth"]);
+$router->add("GET", "/notifications/unread-count", "NotificationController@getUnreadCount", ["auth"]);
+$router->add("POST", "/notifications/{id}/read", "NotificationController@markAsRead", ["auth"]);
+$router->add("POST", "/notifications/mark-all-read", "NotificationController@markAllAsRead", ["auth"]);
+$router->add("DELETE", "/notifications/{id}", "NotificationController@delete", ["auth"]);
+
+// Notification Preferences Routes
+$router->add("GET", "/notifications/preferences", "NotificationPreferencesController@index", ["auth"]);
+$router->add("GET", "/notifications/preferences/get", "NotificationPreferencesController@get", ["auth"]);
+$router->add("POST", "/notifications/preferences/update", "NotificationPreferencesController@update", ["auth"]);
+
+// Admin Notification Management Routes
+$router->add("GET", "/admin/notifications/manage", "Admin\\NotificationManagementController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/notifications/create", "Admin\\NotificationManagementController@create", ["auth", "admin"]);
+$router->add("POST", "/admin/notifications/send", "Admin\\NotificationManagementController@send", ["auth", "admin"]);
+$router->add("POST", "/admin/notifications/broadcast", "Admin\\NotificationManagementController@broadcast", ["auth", "admin"]);
+$router->add("POST", "/admin/notifications/send-to-admins", "Admin\\NotificationManagementController@sendToAdmins", ["auth", "admin"]);
+
+// Notification History Route
+$router->add("GET", "/notifications/history", "NotificationController@history", ["auth"]);
+
