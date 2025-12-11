@@ -375,7 +375,7 @@ class EmailManager
                 </body>
                 </html>
             '
-            ],
+            ,
             'new_account' => '
                 <!DOCTYPE html>
                 <html>
