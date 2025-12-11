@@ -384,7 +384,7 @@ $router->add("GET", "/admin/performance-dashboard", "Admin\\DashboardController@
 $router->add(
     "GET",
     "/admin/widget-management",
-    "Admin\DashboardController@widgetManagement",
+    "WidgetController@index",
     ["auth", "admin"],
 );
 
@@ -997,7 +997,7 @@ $router->add("GET", "/admin/widgets", "WidgetController@index", [
     "auth",
     "admin",
 ]);
-$router->add("GET", "/admin/widgets/settings", "WidgetController@index", [
+$router->add("GET", "/admin/widgets/settings", "WidgetController@globalSettings", [
     "auth",
     "admin",
 ]);

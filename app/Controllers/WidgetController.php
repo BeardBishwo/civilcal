@@ -25,6 +25,23 @@ class WidgetController extends Controller
     }
     
     /**
+     * Global widget settings
+     */
+    public function globalSettings()
+    {
+        $data = [
+            'page_title' => 'Widget Settings',
+            'breadcrumbs' => [
+                ['title' => 'Dashboard', 'url' => '/admin'],
+                ['title' => 'Widgets', 'url' => '/admin/widgets'],
+                ['title' => 'Settings', 'url' => '']
+            ]
+        ];
+        
+        $this->view->render('admin/widgets/global_settings', $data);
+    }
+
+    /**
      * Admin dashboard for widget management
      */
     public function index()

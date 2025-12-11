@@ -208,8 +208,21 @@ class UserManagementController extends Controller
                 'email_verified' => !empty($_POST['email_verified']) ? 1 : 0,
                 'terms_agreed' => !empty($_POST['terms_agreed']) ? 1 : 0,
                 'marketing_emails' => !empty($_POST['marketing_emails']) ? 1 : 0,
-                'send_welcome_email' => !empty($_POST['send_welcome_email']) ? 1 : 0,
+                'send_welcome_email' => 0, // Disable default welcome email, we send a custom one
+                'force_password_change' => 1,
+                'password_generated_at' => date('Y-m-d H:i:s')
             ]);
+
+            // Send Credentials Email
+            try {
+                $emailManager = new EmailManager();
+                $loginUrl = app_base_url('/login');
+                $fullName = $firstName . ' ' . $lastName;
+                $emailManager->sendNewAccountEmail($email, $fullName, $username, $password, $loginUrl);
+            } catch (\Exception $e) {
+                error_log('Failed to send credentials email: ' . $e->getMessage());
+                // Non-blocking error
+            }
 
             if ($isAjax) {
                 echo json_encode([

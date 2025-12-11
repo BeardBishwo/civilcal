@@ -121,7 +121,9 @@ class User
                 'terms_agreed_at' => "ALTER TABLE users ADD COLUMN terms_agreed_at DATETIME NULL AFTER terms_agreed",
                 'marketing_emails' => "ALTER TABLE users ADD COLUMN marketing_emails TINYINT(1) DEFAULT 0 AFTER terms_agreed_at",
                 'privacy_agreed' => "ALTER TABLE users ADD COLUMN privacy_agreed TINYINT(1) DEFAULT 0 AFTER marketing_emails",
-                'privacy_agreed_at' => "ALTER TABLE users ADD COLUMN privacy_agreed_at DATETIME NULL AFTER privacy_agreed"
+                'privacy_agreed_at' => "ALTER TABLE users ADD COLUMN privacy_agreed_at DATETIME NULL AFTER privacy_agreed",
+                'force_password_change' => "ALTER TABLE users ADD COLUMN force_password_change TINYINT(1) DEFAULT 0 AFTER privacy_agreed_at",
+                'password_generated_at' => "ALTER TABLE users ADD COLUMN password_generated_at DATETIME NULL AFTER force_password_change"
             ];
 
             foreach ($requiredColumns as $columnName => $alterSql) {
@@ -403,7 +405,7 @@ class User
         // Fields that can be updated by admin
         $allowedFields = [
             'first_name', 'last_name', 'username', 'email', 
-            'role', 'is_active', 'email_verified', 'marketing_emails'
+            'role', 'is_active', 'email_verified', 'marketing_emails', 'force_password_change'
         ];
 
         $updateFields = [];
