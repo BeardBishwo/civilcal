@@ -1,0 +1,79 @@
+* Host localhost:80 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying [::1]:80...
+* Established connection to localhost (::1 port 80) from ::1 port 53864 
+* using HTTP/1.x
+> POST /Bishwo_Calculator/login HTTP/1.1
+
+> Host: localhost
+
+> User-Agent: curl/8.16.0
+
+> Accept: */*
+
+> Cookie: PHPSESSID=06chc0kgqhofn71f0i5jo3qium
+
+> Content-Length: 35
+
+> Content-Type: application/x-www-form-urlencoded
+
+> 
+
+} [35 bytes data]
+* upload completely sent off: 35 bytes
+< HTTP/1.1 500 Internal Server Error
+
+< Date: Wed, 10 Dec 2025 14:47:34 GMT
+
+< Server: Apache/2.4.62 (Win64) OpenSSL/3.0.15 PHP/8.3.16
+
+< X-Content-Type-Options: nosniff
+
+< X-Frame-Options: DENY
+
+< X-XSS-Protection: 1; mode=block
+
+< X-Powered-By: PHP/8.3.16
+
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+
+< Cache-Control: no-store, no-cache, must-revalidate
+
+< Pragma: no-cache
+
+< X-Frame-Options: SAMEORIGIN
+
+< X-XSS-Protection: 1; mode=block
+
+< X-Content-Type-Options: nosniff
+
+< Content-Security-Policy: default-src 'self'; img-src 'self' data: https: cdn.ckeditor.com; style-src 'self' 'unsafe-inline' https: cdn.ckeditor.com cdnjs.cloudflare.com; script-src 'self' https: 'unsafe-inline' cdn.ckeditor.com cdn.jsdelivr.net; font-src 'self' https: data: cdnjs.cloudflare.com; connect-src 'self' https:; frame-ancestors 'self'
+
+< Referrer-Policy: no-referrer-when-downgrade
+
+< Permissions-Policy: geolocation=(), microphone=(), camera=()
+
+< Access-Control-Allow-Origin: *
+
+< Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+
+< Access-Control-Allow-Headers: Content-Type, X-Requested-With, X-CSRF-Token, Authorization
+
+< Access-Control-Max-Age: 86400
+
+< Content-Length: 29
+
+< Content-Type: text/html; charset=UTF-8
+
+< 
+
+{ [29 bytes data]
+
+100    64  100    29  100    35     58     70 --:--:-- --:--:-- --:--:--   128
+100    64  100    29  100    35     58     70 --:--:-- --:--:-- --:--:--   128
+* Connection #0 to host localhost:80 left intact
+Invalid or missing CSRF token

@@ -442,6 +442,13 @@ $router->add(
     ["auth", "admin"],
 );
 
+$router->add(
+    "POST",
+    "/admin/users/bulk-delete",
+    "Admin\UserManagementController@bulkDelete",
+    ["auth", "admin"],
+);
+
 // Analytics Module Routes
 $router->add("GET", "/admin/analytics", "Admin\AnalyticsController@overview", [
     "auth",
@@ -1610,3 +1617,16 @@ $router->add(
     "Admin\SubscriptionController@createPlan",
     ["auth", "admin"],
 );
+
+// User Management Routes
+$router->add("GET", "/admin/users", "Admin\\UserManagementController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/users/create", "Admin\\UserManagementController@create", ["auth", "admin"]);
+$router->add("POST", "/admin/users/store", "Admin\\UserManagementController@store", ["auth", "admin"]);
+$router->add("GET", "/admin/users/{id}/edit", "Admin\\UserManagementController@edit", ["auth", "admin"]);
+$router->add("POST", "/admin/users/{id}/update", "Admin\\UserManagementController@update", ["auth", "admin"]);
+$router->add("POST", "/admin/users/{id}/delete", "Admin\\UserManagementController@delete", ["auth", "admin"]);
+$router->add("GET", "/admin/users/roles", "Admin\\UserManagementController@roles", ["auth", "admin"]);
+$router->add("GET", "/admin/users/permissions", "Admin\\UserManagementController@permissions", ["auth", "admin"]);
+$router->add("GET", "/admin/users/bulk", "Admin\\UserManagementController@bulk", ["auth", "admin"]);
+$router->add("POST", "/admin/users/bulk-delete", "Admin\\UserManagementController@bulkDelete", ["auth", "admin"]);
+

@@ -10,28 +10,90 @@ class UserManagementController extends Controller
     public function __construct()
     {
         parent::__construct();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         $this->checkAdminAccess();
     }
 
     public function index()
     {
-        // Get all users from database
-        $stmt = $this->db->query("SELECT * FROM users ORDER BY created_at DESC");
+        // Pagination Parameters
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = 15;
+        $offset = ($page - 1) * $perPage;
+
+        // Filter Parameters
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+        $status = isset($_GET['status']) ? $_GET['status'] : '';
+        $role = isset($_GET['role']) ? $_GET['role'] : '';
+
+        // Build Query Conditions
+        $where = [];
+        $params = [];
+
+        if ($search) {
+            $where[] = "(username LIKE ? OR email LIKE ? OR first_name LIKE ? OR last_name LIKE ?)";
+            $params[] = "%$search%";
+            $params[] = "%$search%";
+            $params[] = "%$search%";
+            $params[] = "%$search%";
+        }
+        
+        if ($status !== '') {
+            if ($status === 'active') {
+                 $where[] = "is_active = 1";
+            } elseif ($status === 'inactive') {
+                 $where[] = "is_active = 0";
+            }
+        }
+        
+        if ($role) {
+            $where[] = "role = ?";
+            $params[] = $role;
+        }
+
+        $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        // Get Filtered Count
+        $countSql = "SELECT COUNT(*) FROM users $whereSql";
+        $stmt = $this->db->prepare($countSql);
+        $stmt->execute($params);
+        $totalFiltered = $stmt->fetchColumn();
+        $totalPages = ceil($totalFiltered / $perPage);
+
+        // Get Paginated Data
+        $sql = "SELECT * FROM users $whereSql ORDER BY created_at DESC LIMIT $perPage OFFSET $offset";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
         $users = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        // Get statistics
-        $totalUsers = count($users);
-        $activeUsers = count(array_filter($users, fn($u) => $u['is_active'] ?? true));
-        $adminUsers = count(array_filter($users, fn($u) => ($u['role'] ?? 'user') === 'admin'));
+        // Get Global Statistics (Unfiltered)
+        $statsStmt = $this->db->query("SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active,
+            SUM(CASE WHEN role = 'admin' THEN 1 ELSE 0 END) as admins
+            FROM users");
+        $rawStats = $statsStmt->fetch(\PDO::FETCH_ASSOC);
+
+        $stats = [
+            'total' => $rawStats['total'] ?? 0,
+            'active' => $rawStats['active'] ?? 0,
+            'admins' => $rawStats['admins'] ?? 0,
+            'regular' => ($rawStats['total'] ?? 0) - ($rawStats['admins'] ?? 0)
+        ];
 
         $data = [
             'page_title' => 'User Management',
             'users' => $users,
-            'stats' => [
-                'total' => $totalUsers,
-                'active' => $activeUsers,
-                'admins' => $adminUsers,
-                'regular' => $totalUsers - $adminUsers,
+            'stats' => $stats,
+            'filters' => [
+                'search' => $search,
+                'status' => $status,
+                'role' => $role,
+                'page' => $page,
+                'total_pages' => $totalPages,
+                'total_records' => $totalFiltered
             ]
         ];
 
@@ -200,19 +262,185 @@ class UserManagementController extends Controller
 
     public function update($id)
     {
-        // CSRF validation
-        $submittedToken = $_POST['csrf_token'] ?? '';
-        $sessionToken = $_SESSION['csrf_token'] ?? '';
+        // Check if this is an AJAX request
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
-        if (empty($submittedToken) !== $sessionToken || $submittedToken) {
-            $_SESSION['flash_messages']['error'] = 'Invalid CSRF token';
-            redirect('/admin/users');
-            return;
+        // CSRF validation
+        $submittedToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['csrf_token'] ?? '');
+        $sessionToken = $_SESSION['csrf_token'] ?? '';
+        
+        if (empty($submittedToken) || $submittedToken !== $sessionToken) {
+            if ($isAjax) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+                exit;
+            } else {
+                $_SESSION['flash_messages']['error'] = 'Invalid CSRF token';
+                redirect('/admin/users');
+                return;
+            }
         }
 
-        // Handle user update logic here
-        $_SESSION['flash_messages']['success'] = 'User updated successfully';
-        redirect('/admin/users');
+        try {
+            $userModel = new User();
+            $currentUser = $userModel->find($id);
+
+            if (!$currentUser) {
+                throw new \Exception('User not found');
+            }
+
+            // Prevent modifying own role/status to avoid lockout
+            if ($id == $_SESSION['user_id']) {
+                $role = $currentUser['role']; // Keep existing role
+                $isActive = 1; // Always keep active
+            } else {
+                $role = $_POST['role'] ?? $currentUser['role'];
+                $isActive = isset($_POST['is_active']) ? (int)$_POST['is_active'] : $currentUser['is_active'];
+            }
+
+            $firstName = trim($_POST['first_name'] ?? '');
+            $lastName = trim($_POST['last_name'] ?? '');
+            $username = trim($_POST['username'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            
+            // Validation
+            $errors = [];
+            if (!$firstName) $errors[] = "First name is required";
+            if (!$lastName) $errors[] = "Last name is required";
+            if (!$username) $errors[] = "Username is required";
+            if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Valid email is required";
+
+            // Check uniqueness if changed
+            if ($username !== $currentUser['username'] && $userModel->findByUsername($username)) {
+                $errors[] = "Username already taken";
+            }
+            $existingEmailUser = $userModel->findByEmail($email);
+            if ($existingEmailUser && $existingEmailUser->id != $id) {
+                $errors[] = "Email already taken";
+            }
+
+            if (!empty($errors)) {
+                throw new \Exception(implode(', ', $errors));
+            }
+
+            $updateData = [
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'username' => $username,
+                'email' => $email,
+                'role' => $role,
+                'is_active' => $isActive,
+                'email_verified' => isset($_POST['email_verified']) ? (int)$_POST['email_verified'] : 0,
+                'marketing_emails' => isset($_POST['marketing_emails']) ? (int)$_POST['marketing_emails'] : 0
+            ];
+
+            // Password update (optional)
+            if (!empty($_POST['password'])) {
+                if (strlen($_POST['password']) < 6) {
+                    throw new \Exception("Password must be at least 6 characters");
+                }
+                $updateData['password'] = $_POST['password'];
+            }
+
+            // Account actions (reset password email, etc could go here or separate methods)
+            // For now focused on data update
+
+            $userModel->adminUpdate($id, $updateData);
+
+            if ($isAjax) {
+                echo json_encode(['success' => true, 'message' => 'User updated successfully']);
+                exit;
+            } else {
+                $_SESSION['flash_messages']['success'] = 'User updated successfully';
+                redirect('/admin/users');
+            }
+
+        } catch (\Exception $e) {
+            if ($isAjax) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                exit;
+            } else {
+                $_SESSION['flash_messages']['error'] = $e->getMessage();
+                redirect("/admin/users/$id/edit");
+            }
+        }
+    }
+
+    public function delete($id)
+    {
+        // Check if this is an AJAX request
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
+        // CSRF validation
+        $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['csrf_token'] ?? '');
+        
+        // Also check JSON input if token is missing
+        if (empty($token)) {
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (isset($input['csrf_token'])) {
+                $token = $input['csrf_token'];
+            }
+        }
+
+        $sessionToken = $_SESSION['csrf_token'] ?? '';
+        
+        if (!$token || $token !== $sessionToken) {
+            error_log("Delete User Failed: CSRF Mismatch. Received: '$token', Expected: '$sessionToken'");
+             if ($isAjax) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+                exit;
+            } else {
+                $_SESSION['flash_messages']['error'] = 'Invalid CSRF token';
+                redirect('/admin/users');
+                return;
+            }
+        }
+
+        // Prevent deleting self
+        if ($id == $_SESSION['user_id']) {
+             error_log("Delete User Failed: Attempt to delete self. User ID: $id");
+             if ($isAjax) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Cannot delete yourself']);
+                exit;
+            } else {
+                $_SESSION['flash_messages']['error'] = 'Cannot delete yourself';
+                redirect('/admin/users');
+                return;
+            }
+        }
+
+        try {
+            $stmt = $this->db->prepare("DELETE FROM users WHERE id = ?");
+            $result = $stmt->execute([$id]);
+
+            if ($result) {
+                if ($isAjax) {
+                    echo json_encode(['success' => true, 'message' => 'User deleted successfully']);
+                    exit;
+                } else {
+                    $_SESSION['flash_messages']['success'] = 'User deleted successfully';
+                    redirect('/admin/users');
+                }
+            } else {
+                error_log("Delete User Failed: Database execute returned false for ID $id");
+                throw new \Exception('Database error');
+            }
+        } catch (\Exception $e) {
+            error_log("Delete User Failed: Exception " . $e->getMessage());
+            if ($isAjax) {
+                http_response_code(500);
+                echo json_encode(['success' => false, 'message' => 'Error deleting user: ' . $e->getMessage()]);
+                exit;
+            } else {
+                $_SESSION['flash_messages']['error'] = 'Error deleting user';
+                redirect('/admin/users');
+            }
+        }
     }
 
     public function roles()
@@ -255,6 +483,66 @@ class UserManagementController extends Controller
         ];
 
         $this->view->render('admin/users/permissions', $data);
+    }
+
+    public function bulkDelete()
+    {
+        // Check if this is an AJAX request
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
+        if (!$isAjax) {
+            redirect('/admin/users');
+            exit;
+        }
+
+        // CSRF validation
+        $input = json_decode(file_get_contents('php://input'), true);
+        $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($input['csrf_token'] ?? '');
+        
+        if (!$token || $token !== ($_SESSION['csrf_token'] ?? '')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            exit;
+        }
+
+        $userIds = $input['ids'] ?? [];
+        if (empty($userIds) || !is_array($userIds)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'No users selected']);
+            exit;
+        }
+
+        // Prevent deleting self
+        if (in_array($_SESSION['user_id'], $userIds)) {
+            $userIds = array_diff($userIds, [$_SESSION['user_id']]);
+            if (empty($userIds)) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Cannot delete yourself']);
+                exit;
+            }
+        }
+
+        try {
+            // Convert IDs to parameterized placeholder string
+            $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
+            $sql = "DELETE FROM users WHERE id IN ($placeholders)";
+            $stmt = $this->db->prepare($sql);
+            $result = $stmt->execute(array_values($userIds));
+
+            if ($result) {
+                echo json_encode([
+                    'success' => true, 
+                    'message' => count($userIds) . ' users deleted successfully'
+                ]);
+            } else {
+                throw new \Exception('Database error');
+            }
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Error deleting users']);
+        }
+        exit;
     }
 
     public function bulk()

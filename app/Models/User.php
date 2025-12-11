@@ -398,6 +398,41 @@ class User
         return trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''));
     }
 
+    public function adminUpdate($userId, $data)
+    {
+        // Fields that can be updated by admin
+        $allowedFields = [
+            'first_name', 'last_name', 'username', 'email', 
+            'role', 'is_active', 'email_verified', 'marketing_emails'
+        ];
+
+        $updateFields = [];
+        $values = [];
+
+        // Handle standard fields
+        foreach ($data as $key => $value) {
+            if (in_array($key, $allowedFields)) {
+                $updateFields[] = "$key = ?";
+                $values[] = $value;
+            }
+        }
+
+        // Handle password if provided
+        if (!empty($data['password'])) {
+            $updateFields[] = "password = ?";
+            $values[] = password_hash($data['password'], PASSWORD_BCRYPT);
+        }
+
+        if (empty($updateFields)) return false;
+
+        $values[] = $userId;
+
+        $sql = "UPDATE users SET " . implode(', ', $updateFields) . ", updated_at = NOW() WHERE id = ?";
+        $stmt = $this->db->getPdo()->prepare($sql);
+
+        return $stmt->execute($values);
+    }
+
     public function updateProfile($userId, $data)
     {
         $allowedFields = [
