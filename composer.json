@@ -21,6 +21,7 @@
         "nesbot/carbon": "^2.0",
         "nikic/fast-route": "^1.3",
         "paragonie/random_compat": "^9.99",
+        "paypal/rest-api-sdk-php": "^1.6",
         "phpfastcache/phpfastcache": "^8.0",
         "phpmailer/phpmailer": "^7.0",
         "phpoffice/phpspreadsheet": "^1.29",
