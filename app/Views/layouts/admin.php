@@ -260,7 +260,19 @@
                 </ul>
             </li>
 
-            <li><a href="<?= app_base_url('/admin/settings') ?>"><i class="bi bi-gear"></i><span>Settings</span></a></li>
+            <li class="has-submenu <?php echo strpos($_SERVER['REQUEST_URI'] ?? '', '/admin/settings') !== false ? 'active' : ''; ?>">
+                <a href="#" class="submenu-toggle">
+                    <i class="bi bi-gear"></i>
+                    <span>Settings</span>
+                    <i class="bi bi-chevron-down submenu-arrow"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="<?= app_base_url('/admin/settings') ?>"><i class="bi bi-sliders"></i> General</a></li>
+                    <li><a href="<?= app_base_url('/admin/settings/email') ?>"><i class="bi bi-envelope"></i> Email</a></li>
+                    <li><a href="<?= app_base_url('/admin/settings/security') ?>"><i class="bi bi-shield-check"></i> Security</a></li>
+                    <li><a href="<?= app_base_url('/admin/settings/payments') ?>"><i class="bi bi-credit-card"></i> Payment Gateway</a></li>
+                </ul>
+            </li>
         </ul>
     </aside>
 

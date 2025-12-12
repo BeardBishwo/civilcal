@@ -326,6 +326,18 @@ $router->add(
     ["auth", "admin"],
 );
 $router->add(
+    "GET",
+    "/admin/settings/payments",
+    "Admin\SettingsController@payments",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/settings/payments/update",
+    "Admin\SettingsController@savePayments",
+    ["auth", "admin"],
+);
+$router->add(
     "POST",
     "/admin/settings/update",
     "Admin\SettingsController@update",
@@ -1652,11 +1664,29 @@ $router->add("POST", "/admin/notifications/send-to-admins", "Admin\\Notification
 // Notification History Route
 $router->add("GET", "/notifications/history", "NotificationController@history", ["auth"]);
 
-// Subscription Management Routes
+// Subscription Management Routes (Admin)
 $router->add("GET", "/admin/subscriptions", "Admin\\SubscriptionController@index", ["auth", "admin"]);
 $router->add("GET", "/admin/subscriptions/create", "Admin\\SubscriptionController@createPlanPage", ["auth", "admin"]);
 $router->add("POST", "/admin/subscriptions/store", "Admin\\SubscriptionController@createPlan", ["auth", "admin"]);
 $router->add("GET", "/admin/subscriptions/edit/{id}", "Admin\\SubscriptionController@edit", ["auth", "admin"]);
 $router->add("POST", "/admin/subscriptions/update/{id}", "Admin\\SubscriptionController@update", ["auth", "admin"]);
 
+// User Subscription Routes (Checkout Flow)
+$router->add("GET", "/subscribe/{planId}", "SubscriptionController@checkout", ["auth"]);
+$router->add("POST", "/subscribe/create", "SubscriptionController@create", ["auth"]);
+$router->add("GET", "/subscribe/success", "SubscriptionController@success", ["auth"]);
+$router->add("GET", "/subscribe/cancel", "SubscriptionController@cancel", ["auth"]);
+
+// Webhook Routes (No auth - PayPal calls this)
+$router->add("POST", "/webhooks/paypal", "WebhookController@paypal");
+
+
+
+
+// Payment Gateway Routes
+$router->add('GET', '/payment/checkout/{gateway}', 'PaymentController@checkout', ['auth']);
+$router->add('GET', '/payment/callback/{gateway}', 'PaymentController@callback');
+$router->add('POST', '/payment/webhook/{gateway}', 'PaymentController@webhook');
+$router->add('GET', '/payment/webhook/{gateway}', 'PaymentController@webhook');
+$router->add('GET', '/payment/failed', 'PaymentController@failed');
 

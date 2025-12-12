@@ -115,6 +115,18 @@ class SettingsController extends Controller
         ]);
     }
 
+    public function payments()
+    {
+        $this->requireAdminWithBasicAuth();
+
+        $settings = SettingsService::getAll('payments');
+
+        $this->view->render('admin/settings/payments', [
+            'title' => 'Payment Settings',
+            'settings' => $settings
+        ]);
+    }
+
     private function ensureCsrfToken(): void
     {
         if (session_status() === PHP_SESSION_NONE) {
@@ -179,7 +191,7 @@ class SettingsController extends Controller
         $this->requireAdminWithBasicAuth();
 
         // Get settings grouped by category
-        $groups = ['general', 'appearance', 'email', 'security', 'privacy', 'performance', 'system', 'api'];
+        $groups = ['general', 'appearance', 'email', 'security', 'privacy', 'performance', 'system', 'api', 'payments'];
         $settingsByGroup = [];
 
         foreach ($groups as $group) {
@@ -344,6 +356,89 @@ class SettingsController extends Controller
         exit;
     }
 
+    public function savePayments()
+    {
+        $this->requireAdminWithBasicAuth();
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid request']);
+            exit;
+        }
+
+        // CSRF Token validation
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        $sessionToken = $_SESSION['csrf_token'] ?? '';
+
+        if (empty($csrfToken) || empty($sessionToken) || !hash_equals($sessionToken, $csrfToken)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            exit;
+        }
+
+        try {
+            $updated = 0;
+            $group = 'payments';
+            $gateway = $_POST['gateway'] ?? null;
+
+            // Define checkbox fields per gateway to handle the "unchecked = 0" case logic
+            $gatewayCheckboxes = [
+                'paypal_basic' => ['paypal_basic_enabled'],
+                'paypal_api' => ['paypal_api_enabled'],
+                'stripe' => ['stripe_enabled'],
+                'mollie' => ['mollie_enabled'],
+                'paddle_billing' => ['paddle_billing_enabled'],
+                'paddle_classic' => ['paddle_classic_enabled'],
+                'paystack' => ['paystack_enabled'],
+                'bank_transfer' => ['bank_transfer_enabled']
+            ];
+
+            foreach ($_POST as $key => $value) {
+                if ($key !== 'csrf_token' && $key !== 'gateway' && strpos($key, '_') !== false) {
+                    
+                    // Handle checkboxes (boolean values)
+                    if (SettingsService::set($key, $value, 'string', $group)) {
+                        $updated++;
+                    }
+                }
+            }
+            
+            // Handle Mutual Exclusivity
+            if ($gateway === 'stripe' && isset($_POST['stripe_enabled']) && $_POST['stripe_enabled'] == '1') {
+                SettingsService::set('paystack_enabled', '0', 'string', $group);
+                SettingsService::set('paddle_billing_enabled', '0', 'string', $group);
+                SettingsService::set('paddle_classic_enabled', '0', 'string', $group);
+            }
+            elseif ($gateway === 'paystack' && isset($_POST['paystack_enabled']) && $_POST['paystack_enabled'] == '1') {
+                SettingsService::set('stripe_enabled', '0', 'string', $group);
+            }
+            elseif (($gateway === 'paddle_billing' && isset($_POST['paddle_billing_enabled']) && $_POST['paddle_billing_enabled'] == '1') || 
+                    ($gateway === 'paddle_classic' && isset($_POST['paddle_classic_enabled']) && $_POST['paddle_classic_enabled'] == '1')) {
+                SettingsService::set('stripe_enabled', '0', 'string', $group);
+            }
+
+            echo json_encode([
+                'success' => true,
+                'message' => "Payment settings updated successfully"
+            ]);
+            
+            // Log activity
+             GDPRService::logActivity(
+                $_SESSION['user_id'] ?? null,
+                'setting_updated',
+                'settings',
+                null,
+                "Payment settings updated" . ($gateway ? " for $gateway" : "")
+            );
+
+        } catch (\Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error updating settings: ' . $e->getMessage()
+            ]);
+        }
+        exit;
+    }
+
     public function reset()
     {
         $this->requireAdminWithBasicAuth();
@@ -492,7 +587,16 @@ class SettingsController extends Controller
             'ip_whitelist_enabled',
             'admin_ip_notification',
             'log_failed_logins',
-            'log_admin_activity'
+            'log_failed_logins',
+            'log_admin_activity',
+            'paypal_basic_enabled',
+            'paypal_api_enabled',
+            'stripe_enabled',
+            'mollie_enabled',
+            'paddle_billing_enabled',
+            'paddle_classic_enabled',
+            'paystack_enabled',
+            'bank_transfer_enabled'
         ];
 
         return in_array($key, $checkboxFields);

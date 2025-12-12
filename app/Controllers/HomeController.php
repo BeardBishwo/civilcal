@@ -40,11 +40,23 @@ class HomeController extends Controller
 
     public function pricing()
     {
-        $plans = $this->getPricingPlans();
+        $subscriptionModel = new \App\Models\Subscription();
+        $plans = $subscriptionModel->getAll();
+
+        // Get Enabled Gateways
+        $gateways = [
+            'paypal' => \App\Services\SettingsService::get('paypal_client_id') && \App\Services\SettingsService::get('paypal_secret'), // Basic check, ideally use enabled flag if exists
+            'stripe' => \App\Services\SettingsService::get('stripe_enabled') === '1',
+            'mollie' => \App\Services\SettingsService::get('mollie_enabled') === '1',
+            'paystack' => \App\Services\SettingsService::get('paystack_enabled') === '1',
+            'paddle' => (\App\Services\SettingsService::get('paddle_billing_enabled') === '1' || \App\Services\SettingsService::get('paddle_classic_enabled') === '1'),
+            'bank'   => \App\Services\SettingsService::get('bank_enabled') === '1',
+        ];
 
         $this->view->render('home/pricing', [
             'user' => null,
             'plans' => $plans,
+            'gateways' => $gateways,
             'viewHelper' => $this->view
         ]);
     }

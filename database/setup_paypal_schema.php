@@ -16,7 +16,7 @@ echo "==============================================\n\n";
 
 try {
     // Get database connection
-    $db = Database::getInstance()->getConnection();
+    $db = Database::getInstance()->getPdo();
     
     echo "✓ Database connection established\n\n";
     

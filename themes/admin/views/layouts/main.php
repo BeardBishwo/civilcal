@@ -101,6 +101,7 @@
                         <li><a href="<?= app_base_url('/admin/settings/general') ?>">General</a></li>
                         <li><a href="<?= app_base_url('/admin/settings/email') ?>">Email</a></li>
                         <li><a href="<?= app_base_url('/admin/settings/security') ?>">Security</a></li>
+                        <li><a href="<?= app_base_url('/admin/settings/payments') ?>">Payment Gateway</a></li>
                     </ul>
                 </li>
                 <li>

@@ -1,125 +1,218 @@
-<div class="card">
-    <div class="card-header">
-        <h1 class="card-title"><i class="fas fa-plug"></i> Plugin Management</h1>
-        <div>
-            <button class="btn btn-primary" onclick="document.getElementById('pluginUpload').click()">
-                <i class="fas fa-upload"></i> Upload Plugin
-            </button>
-            <input type="file" id="pluginUpload" style="display:none" accept=".zip">
-        </div>
-    </div>
-    <div class="card-content">
-        <p class="page-description">Extend functionality with plugins. Manage activation, deletion, and uploads.</p>
-        <div id="uploadDropZone" style="border: 2px dashed var(--admin-border); border-radius: 12px; padding: 24px; display: flex; align-items: center; justify-content: center; gap: 12px; margin: 16px 0; background: var(--admin-gray-50);">
-            <i class="fas fa-file-archive" style="color: var(--admin-primary);"></i>
-            <span>Drag & drop plugin ZIP here or click Upload Plugin</span>
-        </div>
-        <div id="uploadProgress" style="display:none; margin-top: 8px;">
-            <div style="height: 10px; background: var(--admin-gray-200); border-radius: 6px; overflow: hidden;">
-                <div id="uploadBar" style="height: 10px; width: 0%; background: linear-gradient(90deg, var(--admin-primary), var(--admin-primary-dark));"></div>
-            </div>
-            <div id="uploadPercent" style="margin-top: 6px; font-size: 12px; color: var(--admin-gray-600);">0%</div>
-        </div>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-header">
-                    <div class="stat-icon success"><i class="fas fa-check"></i></div>
-                    <div class="stat-change positive"><i class="fas fa-arrow-up"></i> Active</div>
-                </div>
-                <div class="stat-value"><?= isset($activePlugins) ? count($activePlugins) : 0 ?></div>
-                <div class="stat-label">Active Plugins</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-header">
-                    <div class="stat-icon info"><i class="fas fa-list"></i></div>
-                    <div class="stat-change"><i class="fas fa-layer-group"></i></div>
-                </div>
-                <div class="stat-value"><?= isset($plugins) ? count($plugins) : 0 ?></div>
-                <div class="stat-label">Total Plugins</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-header">
-                    <div class="stat-icon warning"><i class="fas fa-file-archive"></i></div>
-                    <div class="stat-change"><i class="fas fa-upload"></i></div>
-                </div>
-                <div class="stat-value">ZIP</div>
-                <div class="stat-label">Install via Upload</div>
-            </div>
-        </div>
-        <div style="display:flex; gap:12px; align-items:center; margin: 12px 0;">
-            <input id="pluginSearch" class="form-control" placeholder="Search plugins by name or slug" style="max-width: 320px;">
-            <select id="pluginStatusFilter" class="form-control" style="max-width: 200px;">
-                <option value="all">All</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-            </select>
-        </div>
-    </div>
-</div>
+<?php
+// Plugins Management Interface - Restyled to match Pages UI
+$page_title = 'Plugin Management - Admin Panel';
+$currentPage = 'plugins';
+?>
 
-<div class="table-container" style="margin-top: 20px;">
-    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Plugin Name</th>
-                                <th>Version</th>
-                                <th>Description</th>
-                                <th>Status</th>
-                                <th style="text-align:right;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (!empty($plugins)): ?>
+<!-- Optimized Admin Wrapper Container -->
+<div class="admin-wrapper-container">
+    <div class="admin-content-wrapper">
+
+        <!-- Compact Page Header -->
+        <div class="compact-header">
+            <div class="header-left">
+                <div class="header-title">
+                    <i class="fas fa-plug"></i>
+                    <h1>Plugins</h1>
+                </div>
+                <div class="header-subtitle">Manage and extend functionality</div>
+            </div>
+            <div class="header-actions">
+                <button onclick="document.getElementById('pluginUpload').click()" class="btn btn-primary btn-compact">
+                    <i class="fas fa-upload"></i>
+                    <span>Upload Plugin</span>
+                </button>
+                <input type="file" id="pluginUpload" style="display:none" accept=".zip">
+            </div>
+        </div>
+
+        <!-- Compact Stats Cards -->
+        <?php
+        $totalPlugins = count($plugins ?? []);
+        $activeCount = count($activePlugins ?? []);
+        $inactiveCount = $totalPlugins - $activeCount;
+        ?>
+        <div class="compact-stats">
+            <div class="stat-item">
+                <div class="stat-icon info">
+                    <i class="fas fa-plug"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value"><?php echo $totalPlugins; ?></div>
+                    <div class="stat-label">Total Plugins</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value"><?php echo $activeCount; ?></div>
+                    <div class="stat-label">Active</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon warning">
+                    <i class="fas fa-pause-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value"><?php echo $inactiveCount; ?></div>
+                    <div class="stat-label">Inactive</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Progress Area -->
+        <div id="uploadProgress" style="display:none; padding: 1rem 2rem; border-bottom: 1px solid var(--admin-gray-200);">
+            <div style="height: 10px; background: var(--admin-gray-200); border-radius: 6px; overflow: hidden;">
+                <div id="uploadBar" style="height: 10px; width: 0%; background: linear-gradient(90deg, #667eea, #764ba2);"></div>
+            </div>
+            <div id="uploadPercent" style="margin-top: 6px; font-size: 12px; color: var(--admin-gray-600); text-align: center;">0%</div>
+        </div>
+
+        <!-- Compact Toolbar -->
+        <div class="compact-toolbar">
+            <div class="toolbar-left">
+                <div class="search-compact">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search plugins..." id="pluginSearch">
+                    <button class="search-clear" id="search-clear" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <select id="pluginStatusFilter" class="filter-compact">
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="toolbar-right">
+                <!-- Additional tools if needed -->
+            </div>
+        </div>
+
+        <!-- Plugins Content Area -->
+        <div class="pages-content">
+            <div class="table-container">
+                <?php if (empty($plugins)): ?>
+                    <div class="empty-state-compact">
+                        <i class="fas fa-plug"></i>
+                        <h3>No plugins installed</h3>
+                        <p>Upload a plugin ZIP to get started</p>
+                        <button onclick="document.getElementById('pluginUpload').click()" class="btn btn-primary">
+                            <i class="fas fa-upload"></i>
+                            Upload Plugin
+                        </button>
+                    </div>
+                <?php else: ?>
+                    <div class="table-wrapper">
+                        <table class="table-compact">
+                            <thead>
+                                <tr>
+                                    <th class="col-title">Plugin Name</th>
+                                    <th class="col-status">Version</th>
+                                    <th class="col-status">Status</th>
+                                    <th class="col-description">Description</th>
+                                    <th class="col-actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                 <?php foreach ($plugins as $plugin): ?>
-                                    <tr>
+                                    <tr class="plugin-row">
                                         <td>
-                                            <div class="font-weight-bold"><?= htmlspecialchars($plugin['name'] ?? 'Unknown') ?></div>
-                                            <small class="text-muted"><?= htmlspecialchars($plugin['slug'] ?? '') ?></small>
+                                            <div class="page-info">
+                                                <div class="page-title-compact plugin-name"><?php echo htmlspecialchars($plugin['name'] ?? 'Unknown'); ?></div>
+                                                <div class="page-slug-compact plugin-slug"><?php echo htmlspecialchars($plugin['slug'] ?? ''); ?></div>
+                                            </div>
                                         </td>
-                                        <td><?= htmlspecialchars($plugin['version'] ?? '1.0.0') ?></td>
-                                        <td><?= htmlspecialchars($plugin['description'] ?? '') ?></td>
+                                        <td>
+                                            <span class="time-compact"><?php echo htmlspecialchars($plugin['version'] ?? '1.0.0'); ?></span>
+                                        </td>
                                         <td>
                                             <?php if (!empty($plugin['is_active'])): ?>
-                                                <span class="status-badge status-online">Active</span>
+                                                <span class="status-badge status-active plugin-status-badge">active</span>
                                             <?php else: ?>
-                                                <span class="status-badge status-offline">Inactive</span>
+                                                <span class="status-badge status-inactive plugin-status-badge">inactive</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td style="text-align:right; display:flex; gap:8px; justify-content:flex-end;">
-                                            <button class="btn btn-secondary btn-sm view-plugin" data-slug="<?= htmlspecialchars($plugin['slug']) ?>">
-                                                <i class="fas fa-info-circle"></i> Details
-                                            </button>
-                                            <?php if (!empty($plugin['is_active'])): ?>
-                                                <button class="btn btn-secondary btn-sm toggle-plugin" data-slug="<?= htmlspecialchars($plugin['slug']) ?>" data-action="disable">
-                                                    <i class="fas fa-power-off"></i> Disable
+                                        <td>
+                                            <div class="time-compact">
+                                                <?php echo htmlspecialchars($plugin['description'] ?? ''); ?>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="actions-compact">
+                                                <button class="action-btn-icon info-btn view-plugin" data-slug="<?php echo htmlspecialchars($plugin['slug']); ?>" title="Details">
+                                                    <i class="fas fa-info-circle"></i>
                                                 </button>
-                                            <?php else: ?>
-                                                <button class="btn btn-primary btn-sm toggle-plugin" data-slug="<?= htmlspecialchars($plugin['slug']) ?>" data-action="enable">
-                                                    <i class="fas fa-play"></i> Enable
+                                                <?php if (!empty($plugin['is_active'])): ?>
+                                                    <button class="action-btn-icon warning-btn toggle-plugin" 
+                                                            data-slug="<?php echo htmlspecialchars($plugin['slug']); ?>" 
+                                                            data-action="disable"
+                                                            title="Disable">
+                                                        <i class="fas fa-power-off"></i>
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button class="action-btn-icon primary-btn toggle-plugin" 
+                                                            data-slug="<?php echo htmlspecialchars($plugin['slug']); ?>" 
+                                                            data-action="enable" 
+                                                            title="Enable">
+                                                        <i class="fas fa-play"></i>
+                                                    </button>
+                                                <?php endif; ?>
+                                                <button class="action-btn-icon delete-btn delete-plugin" 
+                                                        data-slug="<?php echo htmlspecialchars($plugin['slug']); ?>" 
+                                                        title="Delete">
+                                                    <i class="fas fa-trash"></i>
                                                 </button>
-                                            <?php endif; ?>
-                                            <button class="btn btn-danger btn-sm delete-plugin" data-slug="<?= htmlspecialchars($plugin['slug']) ?>">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="5" style="text-align:center; padding: 32px; color: var(--admin-gray-600);">
-                                        <i class="fas fa-plug fa-3x mb-3"></i>
-                                        <p>No plugins installed.</p>
-                                    </td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-    </table>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var meta = document.querySelector('meta[name="csrf-token"]');
     var csrfToken = meta ? meta.getAttribute('content') : '';
+    
+    // Search functionality
+    const searchInput = document.getElementById('pluginSearch');
+    const searchClear = document.getElementById('search-clear');
+    const filterSelect = document.getElementById('pluginStatusFilter');
+
+    function applyFilter() {
+        var q = (searchInput.value || '').toLowerCase();
+        var st = filterSelect.value;
+        
+        document.querySelectorAll('.plugin-row').forEach(function(row) {
+            var name = row.querySelector('.plugin-name')?.textContent.toLowerCase() || '';
+            var slug = row.querySelector('.plugin-slug')?.textContent.toLowerCase() || '';
+            var statusText = row.querySelector('.plugin-status-badge')?.textContent.toLowerCase() || '';
+            
+            var matchText = !q || name.includes(q) || slug.includes(q);
+            var matchStatus = st === 'all' || (statusText.includes(st));
+            
+            row.style.display = (matchText && matchStatus) ? '' : 'none';
+        });
+
+        searchClear.style.display = q ? 'block' : 'none';
+    }
+
+    searchInput.addEventListener('input', applyFilter);
+    filterSelect.addEventListener('change', applyFilter);
+    searchClear.addEventListener('click', function() {
+        searchInput.value = '';
+        applyFilter();
+    });
+
     // Upload Plugin
     document.getElementById('pluginUpload').addEventListener('change', function(e) {
         if (this.files.length === 0) return;
@@ -127,18 +220,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData();
         formData.append('plugin_zip', this.files[0]);
         
-        const btn = document.querySelector('button[onclick*="pluginUpload"]');
-        const originalText = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
-        
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', '<?= app_base_url('admin/plugins/upload') ?>', true);
+        xhr.open('POST', '<?php echo app_base_url('admin/plugins/upload'); ?>', true);
         xhr.setRequestHeader('X-CSRF-Token', csrfToken);
         var progress = document.getElementById('uploadProgress');
         var bar = document.getElementById('uploadBar');
         var pct = document.getElementById('uploadPercent');
+        
         progress.style.display = 'block';
+        
         xhr.upload.onprogress = function(e){
             if(e.lengthComputable){
                 var p = Math.round((e.loaded/e.total)*100);
@@ -146,45 +236,44 @@ document.addEventListener('DOMContentLoaded', function() {
                 pct.textContent = p+'%';
             }
         };
+        
         xhr.onreadystatechange = function(){
             if(xhr.readyState === 4){
-                btn.disabled = false;
-                btn.innerHTML = originalText;
                 document.getElementById('pluginUpload').value = '';
-                progress.style.display = 'none';
                 try {
                     var data = JSON.parse(xhr.responseText);
                     if (data.success) {
                         showToast('Plugin uploaded successfully', 'success');
-                        location.reload();
+                        setTimeout(() => location.reload(), 1000);
                     } else {
+                        progress.style.display = 'none';
                         showToast('Error: ' + (data.message || 'Upload failed'), 'error');
                     }
                 } catch(err){
+                    progress.style.display = 'none';
                     showToast('Upload failed', 'error');
                 }
             }
         };
         xhr.send(formData);
     });
-    var drop = document.getElementById('uploadDropZone');
-    drop.addEventListener('dragover', function(e){ e.preventDefault(); drop.style.background = 'var(--admin-gray-100)'; });
-    drop.addEventListener('dragleave', function(e){ drop.style.background = 'var(--admin-gray-50)'; });
-    drop.addEventListener('drop', function(e){ e.preventDefault(); drop.style.background = 'var(--admin-gray-50)'; var files = e.dataTransfer.files; if (!files || files.length===0) return; var file = files[0]; if (!/\.zip$/i.test(file.name)) { showToast('Please drop a .zip file', 'error'); return; } var input = document.getElementById('pluginUpload'); input.files = files; var event = new Event('change'); input.dispatchEvent(event); });
     
     // Toggle Plugin
     document.querySelectorAll('.toggle-plugin').forEach(btn => {
         btn.addEventListener('click', function() {
             const slug = this.dataset.slug;
             const action = this.dataset.action;
+            const icon = this.querySelector('i');
+            const originalClass = icon.className;
             
+            icon.className = 'fas fa-spinner fa-spin';
             this.disabled = true;
             
             const formData = new FormData();
             formData.append('plugin', slug);
             formData.append('action', action);
             
-            fetch('<?= app_base_url('admin/plugins/toggle') ?>', {
+            fetch('<?php echo app_base_url('admin/plugins/toggle'); ?>', {
                 method: 'POST',
                 headers: {'X-CSRF-Token': csrfToken},
                 body: formData
@@ -192,16 +281,18 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showToast('Plugin ' + action + 'd', 'success');
-                    location.reload();
+                    showToast('Plugin ' + action + 'd successfully', 'success');
+                    setTimeout(() => location.reload(), 500);
                 } else {
                     showToast('Error: ' + (data.message || 'Action failed'), 'error');
+                    icon.className = originalClass;
                     this.disabled = false;
                 }
             })
             .catch(err => {
                 console.error(err);
                 showToast('Action failed', 'error');
+                icon.className = originalClass;
                 this.disabled = false;
             });
         });
@@ -210,36 +301,43 @@ document.addEventListener('DOMContentLoaded', function() {
     // Delete Plugin
     document.querySelectorAll('.delete-plugin').forEach(btn => {
         btn.addEventListener('click', function() {
-            if (!confirm('Are you sure you want to delete this plugin?')) return;
+            if (!confirm('Are you sure you want to delete this plugin? This cannot be undone.')) return;
             
             const slug = this.dataset.slug;
+            const icon = this.querySelector('i');
+            
+            icon.className = 'fas fa-spinner fa-spin';
             this.disabled = true;
             
-                fetch('<?= app_base_url('admin/plugins/delete') ?>/' + encodeURIComponent(slug), {
-                    method: 'POST'
-                })
+            fetch('<?php echo app_base_url('admin/plugins/delete'); ?>/' + encodeURIComponent(slug), {
+                method: 'POST',
+                headers: {'X-CSRF-Token': csrfToken}
+            })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showToast('Plugin deleted', 'success');
-                    location.reload();
+                    showToast('Plugin deleted successfully', 'success');
+                    setTimeout(() => location.reload(), 500);
                 } else {
                     showToast('Error: ' + (data.message || 'Delete failed'), 'error');
+                    icon.className = 'fas fa-trash';
                     this.disabled = false;
                 }
             })
             .catch(err => {
                 console.error(err);
                 showToast('Delete failed', 'error');
+                icon.className = 'fas fa-trash';
                 this.disabled = false;
             });
         });
     });
 
+    // View Details
     document.querySelectorAll('.view-plugin').forEach(btn => {
         btn.addEventListener('click', function(){
             var slug = this.dataset.slug;
-            fetch('<?= app_base_url('admin/plugins/details') ?>/' + encodeURIComponent(slug), {
+            fetch('<?php echo app_base_url('admin/plugins/details'); ?>/' + encodeURIComponent(slug), {
                 method: 'GET',
                 headers: {'Accept':'application/json'}
             })
@@ -248,70 +346,64 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(()=>{ showToast('Details failed', 'error'); });
         });
     });
-
-    var search = document.getElementById('pluginSearch');
-    var status = document.getElementById('pluginStatusFilter');
-    function applyFilter(){
-        var q = (search.value||'').toLowerCase();
-        var st = status.value;
-        document.querySelectorAll('table.table tbody tr').forEach(function(row){
-            var name = row.querySelector('td:nth-child(1) .font-weight-bold')?.textContent.toLowerCase() || '';
-            var slug = row.querySelector('td:nth-child(1) small')?.textContent.toLowerCase() || '';
-            var isActive = row.querySelector('.status-online') !== null;
-            var matchText = !q || name.includes(q) || slug.includes(q);
-            var matchStatus = st==='all' || (st==='active' && isActive) || (st==='inactive' && !isActive);
-            row.style.display = (matchText && matchStatus) ? '' : 'none';
-        });
-    }
-    search.addEventListener('input', applyFilter);
-    status.addEventListener('change', applyFilter);
-    applyFilter();
 });
 
 function showToast(message, type) {
     var toast = document.createElement('div');
-    toast.className = 'notification-toast ' + (type === 'success' ? 'success' : 'error') + ' show';
-    toast.innerHTML = '<div style="display:flex; align-items:center; gap:10px;"><i class="fas ' + (type==='success'?'fa-check-circle':'fa-times-circle') + '"></i><span>'+message+'</span></div>';
+    toast.className = `notification-toast notification-${type} show`;
+    toast.style.zIndex = '9999';
+    toast.innerHTML = `
+        <div class="toast-content">
+            <div class="toast-icon"><i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i></div>
+            <div class="toast-message">${message}</div>
+            <button class="toast-close" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+        </div>
+    `;
     document.body.appendChild(toast);
-    setTimeout(function(){ toast.classList.remove('show'); setTimeout(function(){ document.body.removeChild(toast); }, 300); }, 2500);
+    setTimeout(function(){ 
+        toast.classList.remove('show');
+        setTimeout(function(){ if(toast.parentElement) toast.remove(); }, 300); 
+    }, 3000);
 }
 
 function openDetailsModal(data){
     var overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.right = '0';
-    overlay.style.bottom = '0';
-    overlay.style.background = 'rgba(0,0,0,0.5)';
-    overlay.style.zIndex = '4000';
+    overlay.className = 'premium-modal-overlay';
+    
     var modal = document.createElement('div');
-    modal.className = 'card';
-    modal.style.maxWidth = '640px';
-    modal.style.margin = '80px auto';
+    modal.className = 'premium-modal';
+    
     var header = document.createElement('div');
-    header.className = 'card-header';
-    var title = document.createElement('div');
-    title.className = 'card-title';
-    title.innerHTML = '<i class="fas fa-info-circle"></i> Plugin Details';
+    header.className = 'premium-modal-header';
+    header.innerHTML = `
+        <div class="premium-modal-icon"><i class="fas fa-puzzle-piece"></i></div>
+        <h3>Plugin Details</h3>
+    `;
+    
+    var body = document.createElement('div');
+    body.className = 'premium-modal-body';
+    body.innerHTML = `
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+            <div><div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Name</div><div style="font-weight:600;">${escapeHtml(data.name||'')}</div></div>
+            <div><div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Version</div><div style="font-weight:600;">${escapeHtml(data.version||'')}</div></div>
+            <div style="grid-column:1 / -1"><div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Description</div><div>${escapeHtml(data.description||'')}</div></div>
+            <div><div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Slug</div><code style="background:#f3f4f6; padding:2px 6px; border-radius:4px;">${escapeHtml(data.slug||'')}</code></div>
+            <div><div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Author</div><div>${escapeHtml(data.author||'')}</div></div>
+        </div>
+    `;
+    
+    var footer = document.createElement('div');
+    footer.className = 'premium-modal-footer';
+    
     var closeBtn = document.createElement('button');
-    closeBtn.className = 'btn btn-secondary';
-    closeBtn.textContent = 'Close';
-    closeBtn.onclick = function(){ document.body.removeChild(overlay); };
-    header.appendChild(title);
-    header.appendChild(closeBtn);
-    var content = document.createElement('div');
-    content.className = 'card-content';
-    var html = '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">';
-    html += '<div><div class="form-label">Name</div><div>'+escapeHtml(data.name||'')+'</div></div>';
-    html += '<div><div class="form-label">Version</div><div>'+escapeHtml(data.version||'')+'</div></div>';
-    html += '<div style="grid-column:1 / -1"><div class="form-label">Description</div><div>'+escapeHtml(data.description||'')+'</div></div>';
-    html += '<div><div class="form-label">Slug</div><div>'+escapeHtml(data.slug||'')+'</div></div>';
-    html += '<div><div class="form-label">Author</div><div>'+escapeHtml(data.author||'')+'</div></div>';
-    html += '</div>';
-    content.innerHTML = html;
+    closeBtn.className = 'btn-cancel';
+    closeBtn.innerHTML = 'Close';
+    closeBtn.onclick = function(){ overlay.remove(); };
+    
+    footer.appendChild(closeBtn);
     modal.appendChild(header);
-    modal.appendChild(content);
+    modal.appendChild(body);
+    modal.appendChild(footer);
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 }
