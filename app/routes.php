@@ -1652,3 +1652,11 @@ $router->add("POST", "/admin/notifications/send-to-admins", "Admin\\Notification
 // Notification History Route
 $router->add("GET", "/notifications/history", "NotificationController@history", ["auth"]);
 
+// Subscription Management Routes
+$router->add("GET", "/admin/subscriptions", "Admin\\SubscriptionController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/subscriptions/create", "Admin\\SubscriptionController@createPlanPage", ["auth", "admin"]);
+$router->add("POST", "/admin/subscriptions/store", "Admin\\SubscriptionController@createPlan", ["auth", "admin"]);
+$router->add("GET", "/admin/subscriptions/edit/{id}", "Admin\\SubscriptionController@edit", ["auth", "admin"]);
+$router->add("POST", "/admin/subscriptions/update/{id}", "Admin\\SubscriptionController@update", ["auth", "admin"]);
+
+

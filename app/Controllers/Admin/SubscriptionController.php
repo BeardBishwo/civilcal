@@ -22,6 +22,14 @@ class SubscriptionController extends Controller
         ]);
     }
 
+    public function createPlanPage()
+    {
+        // Render the create plan page
+        $this->view->render('admin/subscriptions/create-plan', [
+            'title' => 'Create Subscription Plan'
+        ]);
+    }
+
     public function createPlan()
     {
         if ($_POST) {
@@ -127,6 +135,62 @@ class SubscriptionController extends Controller
     {
         // Database save logic would go here
         return ['success' => true, 'message' => 'Plan created successfully'];
+    }
+
+    public function edit($id)
+    {
+        // Get the plan data
+        $plans = $this->getSubscriptionPlans();
+        $plan = null;
+        
+        foreach ($plans as $p) {
+            if ($p['id'] == $id) {
+                $plan = $p;
+                break;
+            }
+        }
+        
+        if (!$plan) {
+            // Plan not found, redirect to index
+            header('Location: ' . app_base_url('/admin/subscriptions'));
+            exit;
+        }
+        
+        // Render the edit plan page
+        $this->view->render('admin/subscriptions/edit-plan', [
+            'plan' => $plan,
+            'title' => 'Edit Subscription Plan'
+        ]);
+    }
+
+    public function update($id)
+    {
+        if ($_POST) {
+            $data = [
+                'id' => $id,
+                'name' => $_POST['name'],
+                'description' => $_POST['description'],
+                'price_monthly' => $_POST['price_monthly'],
+                'price_yearly' => $_POST['price_yearly'],
+                'features' => $_POST['features'], // Already JSON from frontend
+                'is_active' => isset($_POST['is_active']) ? (int)$_POST['is_active'] : 0,
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+
+            // Update database logic would go here
+            $result = $this->updatePlan($data);
+            
+            echo json_encode($result);
+            return;
+        }
+        
+        echo json_encode(['success' => false, 'message' => 'Invalid request']);
+    }
+
+    private function updatePlan($data)
+    {
+        // Database update logic would go here
+        return ['success' => true, 'message' => 'Plan updated successfully'];
     }
 }
 ?>

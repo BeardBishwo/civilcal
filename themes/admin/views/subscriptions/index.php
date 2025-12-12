@@ -15,10 +15,10 @@
                 <div class="header-subtitle">Manage plans, track revenue, and monitor subscriber activity</div>
             </div>
             <div class="header-actions">
-                <button class="btn btn-primary btn-compact" data-bs-toggle="modal" data-bs-target="#createPlanModal">
+                <a href="<?php echo app_base_url('/admin/subscriptions/create'); ?>" class="btn btn-primary btn-compact">
                     <i class="fas fa-plus"></i>
                     <span>Create New Plan</span>
-                </button>
+                </a>
             </div>
         </div>
 
@@ -166,9 +166,11 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-2">
-                                                    <button class="btn btn-light btn-compact btn-sm" title="Edit">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
+                                                <a href="<?php echo app_base_url('/admin/subscriptions/edit/' . $plan['id']); ?>" 
+                                                   class="btn btn-light btn-compact btn-sm" 
+                                                   title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
                                                     <?php if ($plan['is_active']): ?>
                                                         <button class="btn btn-danger btn-compact btn-sm" title="Disable">
                                                             <i class="fas fa-times"></i>
@@ -270,82 +272,6 @@
     </div>
 </div>
 
-<!-- Create Plan Modal -->
-<div class="modal fade" id="createPlanModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden">
-            <div class="modal-header border-bottom-0 p-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <h5 class="modal-title font-weight-bold text-white">Create New Plan</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4 bg-white">
-                <form id="createPlanForm" class="compact-form">
-                    <!-- Section 1: Basic Info -->
-                    <div class="form-section-container p-3 mb-4 rounded-3 bg-light border border-dashed">
-                        <label class="form-label compact-label mb-3 d-block"><i class="fas fa-info-circle text-muted me-2"></i>Basic Information</label>
-                        <div class="mb-3">
-                            <label class="form-label text-xs text-muted text-uppercase fw-bold mb-1">Plan Name</label>
-                            <input type="text" class="form-control compact-input bg-white" name="name" placeholder="e.g., Professional" required>
-                        </div>
-                        <div class="mb-0">
-                            <label class="form-label text-xs text-muted text-uppercase fw-bold mb-1">Description</label>
-                            <textarea class="form-control compact-input bg-white" name="description" rows="2" placeholder="Brief description..." required></textarea>
-                        </div>
-                    </div>
-                    
-                    <!-- Section 2: Pricing -->
-                    <div class="form-section-container p-3 mb-4 rounded-3 bg-light border border-dashed">
-                        <label class="form-label compact-label mb-3 d-block"><i class="fas fa-coins text-muted me-2"></i>Pricing Configuration</label>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label text-xs text-muted text-uppercase fw-bold mb-1">Monthly</label>
-                                <div class="compact-input-group bg-white">
-                                    <span class="compact-addon-fixed border-0 bg-transparent">$</span>
-                                    <input type="number" class="compact-input-field ps-0" name="price_monthly" step="0.01" min="0" placeholder="0.00" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-xs text-muted text-uppercase fw-bold mb-1">Yearly</label>
-                                <div class="compact-input-group bg-white">
-                                    <span class="compact-addon-fixed border-0 bg-transparent">$</span>
-                                    <input type="number" class="compact-input-field ps-0" name="price_yearly" step="0.01" min="0" placeholder="0.00" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Section 3: Features -->
-                    <div class="form-section-container p-3 mb-4 rounded-3 bg-light border border-dashed">
-                        <label class="form-label compact-label mb-3 d-block"><i class="fas fa-list-check text-muted me-2"></i>Features <span class="text-muted fw-normal ms-1 text-xs">(one per line)</span></label>
-                        <textarea class="form-control compact-input bg-white" name="features" rows="4" placeholder="Unlimited calculations&#10;Priority support&#10;..." required style="font-family: inherit; line-height: 1.6;"></textarea>
-                    </div>
-                    
-                    <!-- Section 4: Status -->
-                    <div class="form-section-container p-3 rounded-3 bg-light border border-dashed d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="stat-icon-sm bg-white border rounded p-2 text-primary">
-                                <i class="fas fa-power-off"></i>
-                            </div>
-                            <div>
-                                <div class="fw-bold text-dark text-sm">Active Status</div>
-                                <div class="text-xs text-muted">Enable plan immediately</div>
-                            </div>
-                        </div>
-                        <div class="form-check form-switch custom-switch m-0">
-                            <input class="form-check-input" type="checkbox" name="is_active" id="isActive" checked style="width: 2.5em; height: 1.25em; cursor: pointer;">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer border-top-0 bg-light p-3">
-                <button type="button" class="btn btn-light btn-compact" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary btn-compact" id="savePlanBtn">
-                    <i class="fas fa-save"></i> Create Plan
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <style>
     /* ========================================
