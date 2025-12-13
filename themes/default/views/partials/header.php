@@ -356,19 +356,17 @@ if (
         }
 
         .header-left {
-            /* Reduced base width so header-middle gains space to the left
-               without growing toward the right section. Keeps logo responsive. */
-            flex: 0 0 160px;
-            max-width: 160px;
-            min-width: 120px;
+            /* Reduced base width */
+            flex: 0 0 auto; /* Allow it to shrink/grow with content */
+            min-width: 80px; /* Minimum width for square logo */
             flex-shrink: 0;
-            /* Center logo horizontally and vertically inside the left area */
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding-left: 0.25rem;
-            padding-right: 0.25rem;
+            justify-content: flex-start; /* Align to left */
+            padding-left: 0 !important; /* User requested 0 left padding */
+            padding-right: 1rem;
             box-sizing: border-box;
+            height: 100%; /* Fill header height */
         }
 
         .logo {
@@ -382,14 +380,21 @@ if (
                             "1.5rem"; ?>;
             color: #2d3748;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 8px 12px;
-            border-radius: <?php echo $site_meta["logo_settings"]["border_radius"] ?? "8px"; ?>;
-            align-items: center;
-            justify-content: flex-start;
-            /* reduced padding-right so middle section doesn't push into header-right at smaller widths */
-            padding-right: 1.2rem;
-            /* Allow dropdowns to overflow the middle area so submenus are visible */
+            padding: 0 !important; /* Remove padding to maximize size */
+            margin: 0 !important;
+            height: 100%; /* Fill parent height */
+            border-radius: <?php echo $site_meta["logo_settings"]["border_radius"] ?? "0"; ?>;
+            justify-content: center;
             overflow: visible;
+        }
+
+        /* Ensure image logos scale correctly */
+        .logo img {
+            height: 100%;
+            width: auto;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
         }
 
         .main-nav ul {
