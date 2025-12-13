@@ -34,6 +34,16 @@ class User
         return $row ? (object) $row : null;
     }
 
+    public static function findById($id)
+    {
+        $db = Database::getInstance();
+        $pdo = $db->getPdo();
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+        return $row ? (object) $row : null;
+    }
+
     public function find($id)
     {
         $stmt = $this->db->getPdo()->prepare("SELECT * FROM users WHERE id = ?");
@@ -577,6 +587,54 @@ class User
         $stmt = $this->db->getPdo()->prepare("UPDATE users SET social_links = ?, updated_at = NOW() WHERE id = ?");
         return $stmt->execute([json_encode($links), $userId]);
     }
+
+    // 2FA Methods
+    public function enableTwoFactor($userId, $secret, $recoveryCodes)
+    {
+        $stmt = $this->db->getPdo()->prepare("
+            UPDATE users 
+            SET two_factor_secret = ?, 
+                two_factor_recovery_codes = ?, 
+                two_factor_enabled = 0, -- Not enabled until confirmed
+                updated_at = NOW() 
+            WHERE id = ?
+        ");
+        return $stmt->execute([$secret, json_encode($recoveryCodes), $userId]);
+    }
+
+    public function confirmTwoFactor($userId)
+    {
+        $stmt = $this->db->getPdo()->prepare("
+            UPDATE users 
+            SET two_factor_enabled = 1, 
+                two_factor_confirmed_at = NOW(), 
+                updated_at = NOW() 
+            WHERE id = ?
+        ");
+        return $stmt->execute([$userId]);
+    }
+
+    public function disableTwoFactor($userId)
+    {
+        $stmt = $this->db->getPdo()->prepare("
+            UPDATE users 
+            SET two_factor_enabled = 0, 
+                two_factor_secret = NULL, 
+                two_factor_recovery_codes = NULL, 
+                two_factor_confirmed_at = NULL, 
+                updated_at = NOW() 
+            WHERE id = ?
+        ");
+        return $stmt->execute([$userId]);
+    }
+
+    public function getTwoFactorData($userId)
+    {
+        $stmt = $this->db->getPdo()->prepare("SELECT two_factor_secret, two_factor_enabled, two_factor_recovery_codes FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        return $stmt->fetch();
+    }
+
 
     // Static methods with pagination
     public static function getAllUsers($filters = [], $page = 1, $perPage = 20)

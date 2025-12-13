@@ -29,6 +29,10 @@ $router->add("POST", "/forgot-password", "AuthController@forgotPassword", [
 $router->add("GET", "/logout", "AuthController@logout"); // No middleware - can be accessed anytime
 $router->add("POST", "/logout", "AuthController@logout"); // No middleware - can be accessed anytime
 
+// Google Auth Routes
+$router->add("GET", "/user/login/google", "AuthController@loginWithGoogle");
+$router->add("GET", "/user/login/google/callback", "AuthController@handleGoogleCallback");
+
 // Calculator Routes (Public)
 $router->add("GET", "/calculators", "CalculatorController@index");
 $router->add("GET", "/calculator/{category}", "CalculatorController@category");
@@ -139,6 +143,11 @@ $router->add("POST", "/profile/password", "ProfileController@changePassword", [
 $router->add("POST", "/profile/delete", "ProfileController@deleteAccount", [
     "auth",
 ]);
+// 2FA Routes
+$router->add("POST", "/profile/2fa/enable", "ProfileController@enableTwoFactor", ["auth"]);
+$router->add("POST", "/profile/2fa/confirm", "ProfileController@confirmTwoFactor", ["auth"]);
+$router->add("POST", "/profile/2fa/disable", "ProfileController@disableTwoFactor", ["auth"]);
+
 $router->add(
     "GET",
     "/profile/avatar/{filename}",
@@ -281,6 +290,18 @@ $router->add(
     "GET",
     "/admin/settings/general",
     "Admin\SettingsController@general",
+    ["auth", "admin"],
+);
+$router->add(
+    "GET",
+    "/admin/settings/google",
+    "Admin\SettingsController@google",
+    ["auth", "admin"],
+);
+$router->add(
+    "GET",
+    "/admin/settings/recaptcha",
+    "Admin\SettingsController@recaptcha",
     ["auth", "admin"],
 );
 $router->add(

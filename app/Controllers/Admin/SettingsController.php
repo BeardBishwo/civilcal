@@ -67,6 +67,30 @@ class SettingsController extends Controller
         ]);
     }
 
+    public function google()
+    {
+        $this->requireAdminWithBasicAuth();
+
+        $settings = SettingsService::getAll('google');
+
+        $this->view->render('admin/settings/google', [
+            'title' => 'Google Login Settings',
+            'settings' => $settings
+        ]);
+    }
+
+    public function recaptcha()
+    {
+        $this->requireAdminWithBasicAuth();
+
+        $settings = SettingsService::getAll('recaptcha');
+
+        $this->view->render('admin/settings/recaptcha', [
+            'title' => 'Recaptcha Settings',
+            'settings' => $settings
+        ]);
+    }
+
     public function email()
     {
         $this->requireAdminWithBasicAuth();
@@ -596,7 +620,10 @@ class SettingsController extends Controller
             'paddle_billing_enabled',
             'paddle_classic_enabled',
             'paystack_enabled',
-            'bank_transfer_enabled'
+            'bank_transfer_enabled',
+            'google_login_enabled',
+            'captcha_on_login',
+            'captcha_on_register'
         ];
 
         return in_array($key, $checkboxFields);

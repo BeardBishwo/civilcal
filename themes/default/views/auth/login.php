@@ -9,7 +9,16 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 $csrf_token = $_SESSION['csrf_token'];
+
+// Captcha Script
+if (\App\Services\SettingsService::get('captcha_on_login') == '1') {
+    $recaptcha = new \App\Services\RecaptchaService();
+    $captchaScript = $recaptcha->getScript();
+} else {
+    $captchaScript = '';
+}
 ?>
+<?php echo $captchaScript; ?>
 
 <style>
     /* Ultra-Premium Login Page Styles */
@@ -710,19 +719,21 @@ $csrf_token = $_SESSION['csrf_token'];
                     <p>Sign in to continue your engineering journey</p>
                 </div>
 
+                <?php if (\App\Services\SettingsService::get('google_login_enabled') == '1'): ?>
                 <!-- Social Login -->
                 <div class="social-login">
-                    <button class="social-btn" type="button" onclick="alert('Google login coming soon!')">
+                    <a href="<?php echo app_base_url('user/login/google'); ?>" class="social-btn" style="text-decoration: none;">
                         <i class="fab fa-google" style="color: #DB4437;"></i>
                         <span>Continue with Google</span>
-                    </button>
+                    </a>
                 </div>
 
                 <div class="divider">
                     <span>or sign in with email</span>
                 </div>
+                <?php endif; ?>
 
-                <form id="loginForm">
+                <form id="loginForm" action="<?php echo app_base_url('login'); ?>" method="POST">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
 
                     <div class="form-group">
@@ -731,7 +742,7 @@ $csrf_token = $_SESSION['csrf_token'];
                             <input 
                                 type="text" 
                                 id="username_email" 
-                                name="username_email" 
+                                name="username" 
                                 class="form-input" 
                                 placeholder="Enter your email or username"
                                 autocomplete="username"
@@ -758,6 +769,12 @@ $csrf_token = $_SESSION['csrf_token'];
                         </div>
                     </div>
 
+                    <!-- Captcha Widget -->
+                    <?php if (\App\Services\SettingsService::get('captcha_on_login') == '1'): 
+                        $recaptcha = new \App\Services\RecaptchaService();
+                        echo $recaptcha->getWidget();
+                    endif; ?>
+
                     <div class="form-options">
                         <div class="checkbox-wrapper">
                             <input type="checkbox" id="remember_me" name="remember_me">
@@ -768,6 +785,13 @@ $csrf_token = $_SESSION['csrf_token'];
                         </a>
                     </div>
 
+                    <?php if (isset($error)): ?>
+                        <div class="result-message error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <?php echo htmlspecialchars($error); ?>
+                        </div>
+                    <?php endif; ?>
+                    
                     <div id="loginResult" class="result-message" style="display: none;"></div>
 
                     <button type="submit" class="ultra-btn" id="loginBtn">
@@ -777,7 +801,7 @@ $csrf_token = $_SESSION['csrf_token'];
                         </span>
                         <span class="btn-loading">
                             <i class="fas fa-spinner"></i>
-                            <span>Signing In...</span>
+                            <span> Signing In...</span>
                         </span>
                     </button>
 
@@ -866,13 +890,13 @@ async function handleLoginSubmission(e) {
     try {
         const formData = new FormData(form);
         const payload = {
-            username_email: formData.get('username_email'),
+            username_email: formData.get('username'),
             password: formData.get('password'),
             remember_me: formData.get('remember_me') ? 1 : 0,
             csrf_token: formData.get('csrf_token')
         };
         
-        const response = await fetch('<?php echo app_base_url('api/login'); ?>', {
+        const response = await fetch('<?php echo app_base_url('login'); ?>', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

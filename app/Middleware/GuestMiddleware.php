@@ -12,7 +12,7 @@ class GuestMiddleware {
                 $scriptDir = substr($scriptDir, 0, -7);
             }
             $basePath = ($scriptDir === '/' || $scriptDir === '') ? '' : $scriptDir;
-            header('Location: ' . $basePath . '/dashboard');
+            header('Location: ' . $basePath . '/');
             exit;
         }
         return $next($request);

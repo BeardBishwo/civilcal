@@ -36,15 +36,14 @@ class ProfileController extends Controller
             $this->redirect('/dashboard');
         }
 
-        // Get 2FA status (with error handling)
-        $twoFactorStatus = null;
-        try {
-            $twoFactorService = new \App\Services\TwoFactorAuthService();
-            $twoFactorStatus = $twoFactorService->getStatus($userId);
-        } catch (\Exception $e) {
-            error_log('2FA Status Error: ' . $e->getMessage());
-            $twoFactorStatus = ['enabled' => false, 'confirmed_at' => null, 'recovery_codes_remaining' => 0];
-        }
+        // Get 2FA status
+        $twoFactorData = $this->userModel->getTwoFactorData($userId);
+        $twoFactorStatus = [
+            'enabled' => $twoFactorData['two_factor_enabled'] ?? false,
+            'confirmed_at' => $twoFactorData['two_factor_confirmed_at'] ?? null,
+            // Decode recovery codes to count them if needed, or just default to 8 initially
+            'recovery_codes_remaining' => 0 
+        ];
         
         // Get export requests (with error handling)
         $exportRequests = [];
@@ -97,6 +96,56 @@ class ProfileController extends Controller
                     $this->userModel->setSocialLinksAttribute($userId, $socialLinks);
                     unset($data['social_links']);
                 }
+            }
+
+            // Get current user for validation
+            $currentUser = $this->userModel->find($userId);
+            $coreUpdates = [];
+
+            // Validate Username
+            if (isset($data['username'])) {
+                $username = trim($data['username']);
+                if (strlen($username) < 3) {
+                    $this->json(['error' => "Username must be at least 3 characters"], 400);
+                    return;
+                }
+                if ($username !== $currentUser['username']) {
+                    $existing = User::findByUsername($username);
+                    if ($existing && $existing->id != $userId) {
+                        $this->json(['error' => "Username is already taken"], 400);
+                        return;
+                    }
+                    $coreUpdates['username'] = $username;
+                }
+            }
+
+            // Validate Email
+            if (isset($data['email'])) {
+                $email = trim($data['email']);
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $this->json(['error' => "Invalid email format"], 400);
+                    return;
+                }
+                if ($email !== $currentUser['email']) {
+                    $existing = $this->userModel->findByEmail($email);
+                    if ($existing && $existing->id != $userId) {
+                        $this->json(['error' => "Email is already registered"], 400);
+                        return;
+                    }
+                    $coreUpdates['email'] = $email;
+                    // Reset verification
+                    $coreUpdates['email_verified'] = 0;
+                    $coreUpdates['email_verified_at'] = null;
+                }
+            }
+            
+            // Allow First/Last Name in core updates as well (if User model separates them)
+            if (isset($data['first_name'])) $coreUpdates['first_name'] = $data['first_name'];
+            if (isset($data['last_name'])) $coreUpdates['last_name'] = $data['last_name'];
+
+            // Update core fields if any
+            if (!empty($coreUpdates)) {
+                $this->userModel->adminUpdate($userId, $coreUpdates);
             }
             
             $success = $this->userModel->updateProfile($userId, $data);
@@ -429,9 +478,13 @@ class ProfileController extends Controller
             }
             
             // Filter allowed fields
-            $allowedFields = ['first_name', 'last_name', 'company', 'phone', 'bio'];
+            // Filter allowed fields
+            $allowedFields = ['first_name', 'last_name', 'company', 'phone', 'bio', 'username', 'email'];
             $updateData = [];
             
+            // Get current user data to check for changes
+            $currentUser = $this->userModel->find($userId);
+
             foreach ($allowedFields as $field) {
                 if (isset($data[$field])) {
                     // Validate data types
@@ -450,6 +503,45 @@ class ProfileController extends Controller
                             $this->json(['error' => "Field '$field' exceeds maximum length"], 400);
                             return;
                         }
+
+                        // Special handling for username
+                        if ($field === 'username') {
+                            if (strlen($value) < 3) {
+                                http_response_code(400);
+                                $this->json(['error' => "Username must be at least 3 characters"], 400);
+                                return;
+                            }
+                            // Check uniqueness
+                            if ($value !== $currentUser['username']) {
+                                $existing = User::findByUsername($value);
+                                if ($existing && $existing->id != $userId) {
+                                    http_response_code(400);
+                                    $this->json(['error' => "Username is already taken"], 400);
+                                    return;
+                                }
+                            }
+                        }
+
+                        // Special handling for email
+                        if ($field === 'email') {
+                            if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                                http_response_code(400);
+                                $this->json(['error' => "Invalid email format"], 400);
+                                return;
+                            }
+                            // Check uniqueness
+                            if ($value !== $currentUser['email']) {
+                                $existing = $this->userModel->findByEmail($value);
+                                if ($existing && $existing->id != $userId) {
+                                    http_response_code(400);
+                                    $this->json(['error' => "Email is already registered"], 400);
+                                    return;
+                                }
+                                // If email changed, reset verification
+                                $updateData['email_verified'] = 0;
+                                $updateData['email_verified_at'] = null;
+                            }
+                        }
                         
                         $updateData[$field] = $value;
                     } else {
@@ -466,8 +558,22 @@ class ProfileController extends Controller
             
             // Update profile
             $success = $this->userModel->updateProfile($userId, $updateData);
+            // Also need to update core fields via adminUpdate if updateProfile doesn't handle them
+            // The User model separates these. Let's check User::updateProfile vs adminUpdate.
+            // User::updateProfile only allows specific fields. I need to update User model or use adminUpdate logic here.
+            // Actually, best to use adminUpdate for core fields (email, username) and updateProfile for others.
+            // OR simpler: modify updateProfile in User model to allow these fields? No, separate concerns.
+            // Let's call adminUpdate for core fields if present.
             
-            if ($success) {
+            $coreFields = ['username', 'email', 'first_name', 'last_name'];
+            $coreData = array_intersect_key($updateData, array_flip($coreFields));
+            if (!empty($coreData)) {
+                $this->userModel->adminUpdate($userId, $coreData);
+            }
+            // Remove core fields from updateData before passing to updateProfile to avoid double work/errors?
+            // Actually `updateProfile` filters its own fields. So it's safe to pass all.
+            
+            if ($success || !empty($coreData)) { // Success if either worked
                 // Get updated user data
                 $user = $this->userModel->find($userId);
                 unset($user['password']);
@@ -509,11 +615,15 @@ class ProfileController extends Controller
         return $_SERVER['REQUEST_METHOD'] === 'POST';
     }
 
-    /**
-     * Get request data
-     */
     private function getRequestData()
     {
+        $input = file_get_contents('php://input');
+        if ($input) {
+            $json = json_decode($input, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return array_merge($_POST, $json);
+            }
+        }
         return $_POST;
     }
 
@@ -546,6 +656,142 @@ class ProfileController extends Controller
     /**
      * Resize uploaded image
      */
+    /**
+     * Enable 2FA (Start Process)
+     */
+    public function enableTwoFactor()
+    {
+        try {
+            if (!$this->isPostRequest()) {
+                throw new Exception('Invalid request method');
+            }
+
+            $userId = $this->getCurrentUserId();
+            $data = $this->getRequestData();
+
+            // Verify password first
+            $currentPassword = $data['password'] ?? '';
+            $user = $this->userModel->find($userId);
+            if (!$user || !password_verify($currentPassword, $user['password'])) {
+                $this->json(['error' => 'Incorrect password'], 401);
+                return;
+            }
+
+            // Generate Schema
+            $google2fa = new \PragmaRX\Google2FA\Google2FA();
+            $secret = $google2fa->generateSecretKey();
+            
+            // Generate QR Code URL
+            // Ensure app name is set
+            $appName = 'Bishwo Calculator';
+            $qrCodeUrl = $google2fa->getQRCodeUrl(
+                $appName,
+                $user['email'],
+                $secret
+            );
+            
+            // Backup codes
+            $recoveryCodes = [];
+            for ($i = 0; $i < 8; $i++) {
+                $recoveryCodes[] = bin2hex(random_bytes(5));
+            }
+
+            // Save secret (but not enabled yet)
+            $this->userModel->enableTwoFactor($userId, $secret, $recoveryCodes);
+            
+            // Return secret and QR URL for frontend to display
+            // We'll use a QR code library or simple API in production, but for now passing the data
+            $this->json([
+                'success' => true,
+                'secret' => $secret,
+                'qr_code_url' => $qrCodeUrl,
+                'recovery_codes' => $recoveryCodes
+            ]);
+
+        } catch (Exception $e) {
+            $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Confirm and Activate 2FA
+     */
+    public function confirmTwoFactor()
+    {
+        try {
+            if (!$this->isPostRequest()) {
+                throw new Exception('Invalid request method');
+            }
+
+            $userId = $this->getCurrentUserId();
+            $data = $this->getRequestData();
+            $code = $data['code'] ?? '';
+
+            if (empty($code)) {
+                $this->json(['error' => 'Code is required'], 400);
+                return;
+            }
+
+            // Get user secret
+            $twoFactorData = $this->userModel->getTwoFactorData($userId);
+            if (!$twoFactorData || empty($twoFactorData['two_factor_secret'])) {
+                 $this->json(['error' => '2FA setup not initiated'], 400);
+                 return;
+            }
+
+            $google2fa = new \PragmaRX\Google2FA\Google2FA();
+            $valid = $google2fa->verifyKey($twoFactorData['two_factor_secret'], $code);
+
+            if ($valid) {
+                // Activate
+                $this->userModel->confirmTwoFactor($userId);
+                
+                $this->json([
+                    'success' => true, 
+                    'message' => 'Two-factor authentication verified and enabled!'
+                ]);
+            } else {
+                $this->json(['error' => 'Invalid verification code'], 400);
+            }
+
+        } catch (Exception $e) {
+            $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Disable 2FA
+     */
+    public function disableTwoFactor()
+    {
+        try {
+            if (!$this->isPostRequest()) {
+                throw new Exception('Invalid request method');
+            }
+
+            $userId = $this->getCurrentUserId();
+            $data = $this->getRequestData();
+            $password = $data['password'] ?? '';
+
+            // Verify password
+            $user = $this->userModel->find($userId);
+            if (!$user || !password_verify($password, $user['password'])) {
+                $this->json(['error' => 'Incorrect password'], 401);
+                return;
+            }
+
+            $this->userModel->disableTwoFactor($userId);
+
+            $this->json([
+                'success' => true,
+                'message' => 'Two-factor authentication has been disabled.'
+            ]);
+
+        } catch (Exception $e) {
+            $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
     private function resizeImage($imagePath, $maxWidth, $maxHeight)
     {
         $imageInfo = getimagesize($imagePath);
