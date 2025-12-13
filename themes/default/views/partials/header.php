@@ -3628,3 +3628,5 @@ if (
                 setInterval(checkUnreadCount, 60000);
             })();
         </script>
+    <!-- Main Content Wrapper -->
+    <main class="main-content">
