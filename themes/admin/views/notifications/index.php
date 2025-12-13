@@ -540,7 +540,8 @@ $page_title = $page_title ?? 'Notifications - Admin Panel';
 $currentPage = $currentPage ?? 'notifications';
 
 // Include the layout
-include __DIR__ . '/../layouts/main.php';
+// Include the layout
+include BASE_PATH . '/themes/admin/layouts/main.php';
 
 // Add the beautiful CSS link after the layout
 echo '<link rel="stylesheet" href="' . app_base_url('themes/admin/assets/css/notifications-beautiful.css') . '">';

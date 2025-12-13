@@ -1,10 +1,19 @@
 <!DOCTYPE html>
+<?php
+$site_meta = get_site_meta();
+$logo = $site_meta['logo'] ?? '';
+$favicon = $site_meta['favicon'] ?? '';
+$site_name = $site_meta['title'] ?? 'Admin Panel';
+?>
 <html lang="en" class="admin-theme">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title ?? 'Admin Dashboard'; ?> - Bishwo Calculator</title>
+    <title><?php echo $page_title ?? 'Admin Dashboard'; ?> - <?php echo htmlspecialchars($site_name); ?></title>
+    <?php if (!empty($favicon)): ?>
+    <link rel="icon" type="image/x-icon" href="<?php echo htmlspecialchars($favicon); ?>">
+    <?php endif; ?>
 
     <!-- Admin Styles -->
     <link rel="stylesheet" href="<?php echo app_base_url('themes/admin/assets/css/admin.css?v=' . time()); ?>">
@@ -860,8 +869,14 @@
         <aside id="admin-sidebar" class="admin-sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    <i class="sidebar-logo-icon fas fa-calculator"></i>
-                    <span class="logo-text"><?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Admin Panel')); ?></span>
+                    <a href="<?php echo app_base_url('admin'); ?>" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+                        <?php if (!empty($logo)): ?>
+                            <img src="<?php echo htmlspecialchars($logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" class="sidebar-logo-img" style="max-height: 35px; max-width: 100%;">
+                        <?php else: ?>
+                            <i class="sidebar-logo-icon fas fa-calculator"></i>
+                        <?php endif; ?>
+                        <span class="logo-text"><?php echo htmlspecialchars($site_name); ?></span>
+                    </a>
                 </div>
                 <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
                     <i class="fas fa-bars"></i>
