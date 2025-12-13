@@ -200,12 +200,13 @@ $csrf_token = \App\Services\Security::generateCsrfToken();
         margin-bottom: 30px;
     }
 
-    .form-label {
+    #forgotForm .form-label {
         display: block;
-        font-weight: 600;
-        color: #334155;
-        margin-bottom: 10px;
-        font-size: 0.95rem;
+        font-weight: 700;
+        color: #0f172a !important; /* Override global header styles */
+        margin-bottom: 12px;
+        font-size: 0.875rem;
+        letter-spacing: 0.3px;
     }
 
     .input-group {

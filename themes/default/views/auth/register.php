@@ -310,10 +310,10 @@ $specialties = [
         margin-bottom: 24px;
     }
 
-    .form-label {
+    #registerForm .form-label {
         display: block;
         font-weight: 700;
-        color: #0f172a;
+        color: #0f172a !important; /* Override global header styles */
         margin-bottom: 12px;
         font-size: 0.875rem;
         letter-spacing: 0.3px;
