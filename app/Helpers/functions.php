@@ -2,59 +2,27 @@
 require_once __DIR__ . "/../Config/config.php";
 
 // Initialize secure session
+// Initialize secure session
 function init_secure_session()
 {
-    if (session_status() === PHP_SESSION_ACTIVE) {
-        return;
-    }
-
-    // Only set session name before starting
-    session_name("EngiCalSecureSess");
-
-    // Only set cookie params if we can (no output yet)
-    if (!headers_sent()) {
-        session_set_cookie_params([
-            "lifetime" => 0,
-            "path" => APP_BASE . "/",
-            "domain" => $_SERVER["HTTP_HOST"] ?? "",
-            "secure" => REQUIRE_HTTPS,
-            "httponly" => true,
-            "samesite" => "Lax",
-        ]);
-    }
-
-    session_start();
-
-    // Mitigate session fixation
-    if (empty($_SESSION["init"])) {
-        session_regenerate_id(true);
-        $_SESSION["init"] = true;
-    }
+    \App\Services\Security::startSession();
 }
-
-//// More secure CSRF token storage
-//function csrf_token() {
-//    if (!isset($_SESSION['csrf_token'])) {
-//        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-//        $_SESSION['csrf_expiry'] = time() + 1800; // 30 min expiry
-//    }
-//    return $_SESSION['csrf_token'];
-//}
-////
 
 // CSRF helpers
 function csrf_token()
 {
-    if (!isset($_SESSION["_csrf_token"])) {
-        $_SESSION["_csrf_token"] = bin2hex(random_bytes(16));
-    }
-    return $_SESSION["_csrf_token"];
+    return \App\Services\Security::generateCsrfToken();
 }
 
 function verify_csrf($token)
 {
-    return isset($_SESSION["_csrf_token"]) &&
-        hash_equals($_SESSION["_csrf_token"], (string) $token);
+    return \App\Services\Security::validateCsrfToken($token);
+}
+
+// HTML Entity Helper
+function e($string)
+{
+    return \App\Services\Security::sanitize($string);
 }
 
 // Admin session helper
@@ -395,4 +363,10 @@ function sanitize_text_field($value)
     return $value;
 }
 
+if (!function_exists('csrf_field')) {
+    function csrf_field()
+    {
+        return '<input type="hidden" name="csrf_token" value="' . csrf_token() . '">';
+    }
+}
 ?>

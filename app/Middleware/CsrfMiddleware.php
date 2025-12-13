@@ -6,18 +6,12 @@ class CsrfMiddleware
 {
     protected function ensureToken()
     {
-        if (empty($_SESSION['csrf_token'])) {
-            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        }
+        \App\Services\Security::generateCsrfToken();
     }
 
     protected function validToken(?string $token): bool
     {
-        if (empty($_SESSION['csrf_token'])) {
-            return false;
-        }
-
-        return $token && hash_equals($_SESSION['csrf_token'], $token);
+        return \App\Services\Security::validateCsrfToken($token);
     }
 
     public function handle($request, $next)
@@ -38,7 +32,12 @@ class CsrfMiddleware
             error_log("CSRF DEBUG - Form token: " . ($formToken ?? 'NULL'));
             */
 
-            if (!$this->validToken($token)) {
+            // Let the security service handle detailed validation checks inside validateCsrfToken
+            // But here we need to manually pass the found token from headers/post if we want to be explicit,
+            // OR just let Security::validateCsrfToken(null) find it itself.
+            // Current middleware logic extracts it manually.
+            
+            if (!\App\Services\Security::validateCsrfToken($token)) {
                 http_response_code(419);
                 // Always return JSON for AJAX forms (admin panel uses class="ajax-form")
                 // Check for XMLHttpRequest header or admin routes in addition to API routes
@@ -63,8 +62,9 @@ class CsrfMiddleware
         }
 
         // Expose token for front-end via header
-        if (!headers_sent() && !empty($_SESSION['csrf_token'])) {
-            header('X-CSRF-Token: ' . $_SESSION['csrf_token']);
+        if (!headers_sent()) {
+            $token = \App\Services\Security::generateCsrfToken(); // Ensure one exists
+            header('X-CSRF-Token: ' . $token);
         }
 
         return $next($request);

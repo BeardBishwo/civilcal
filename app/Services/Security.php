@@ -1,37 +1,119 @@
 <?php
+
+namespace App\Services;
+
 class Security {
     private static array $rateLimit = [];
     
     /**
+     * Start a secure session
+     */
+    public static function startSession(): void {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            return;
+        }
+
+        // Set session name
+        session_name("BishwoCalSecureSess");
+
+        // Set secure cookie params
+        if (!headers_sent()) {
+            $secure = defined('REQUIRE_HTTPS') ? REQUIRE_HTTPS : true;
+            $domain = $_SERVER['HTTP_HOST'] ?? '';
+            // Remove port from domain if present
+            if (strpos($domain, ':') !== false) {
+                $domain = parse_url('http://' . $domain, PHP_URL_HOST);
+            }
+            
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path' => '/', // Use root path to avoid fragmentation
+                'domain' => $domain,
+                'secure' => $secure,
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ]);
+        }
+
+        session_start();
+
+        // Prevent Session Fixation (init check)
+        if (!isset($_SESSION['initiated'])) {
+            session_regenerate_id(true);
+            $_SESSION['initiated'] = true;
+        }
+    }
+
+    /**
+     * Set standard security headers
+     */
+    public static function setSecureHeaders(): void {
+        if (headers_sent()) {
+            return;
+        }
+        
+        // Prevent clickjacking
+        header('X-Frame-Options: SAMEORIGIN');
+        // Block MIME sniffing
+        header('X-Content-Type-Options: nosniff');
+        // Enable XSS filtering (mostly legacy, but good for defense-in-depth)
+        header('X-XSS-Protection: 1; mode=block');
+        // Control referrer information
+        header('Referrer-Policy: strict-origin-when-cross-origin');
+        // Enforce HTTPS HSTS (if valid cert)
+        // header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+    }
+
+    /**
      * Check CSRF token from either POST data or X-CSRF-Token header
      */
     public static function validateCsrfToken(string $token = null): bool {
-        if (!isset($_SESSION['csrf_token']) || !isset($_SESSION['csrf_expiry'])) {
+        // Ensure session is started
+        if (session_status() === PHP_SESSION_NONE) {
+            self::startSession();
+        }
+
+        if (!isset($_SESSION['csrf_token'])) {
             return false;
         }
 
         // Check if token has expired
-        if (time() > $_SESSION['csrf_expiry']) {
-            unset($_SESSION['csrf_token'], $_SESSION['csrf_expiry']);
+        if (isset($_SESSION['csrf_expiry']) && time() > $_SESSION['csrf_expiry']) {
+            // Expired, but we don't clear generic token immediately to avoid UX fail on concurrent tabs
+            // Ideally we rotate. For now, strict fail.
             return false;
         }
 
         $token = $token ?? $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
-        return $token && hash_equals($_SESSION['csrf_token'], $token);
+        
+        if (empty($token) || !is_string($token)) {
+            return false;
+        }
+
+        return hash_equals($_SESSION['csrf_token'], $token);
     }
 
     /**
      * Generate a new CSRF token and store in session
      */
     public static function generateCsrfToken(): string {
-        if (isset($_SESSION['csrf_token']) && isset($_SESSION['csrf_expiry']) && time() < $_SESSION['csrf_expiry']) {
-            return $_SESSION['csrf_token'];
+        // Ensure session is started
+        if (session_status() === PHP_SESSION_NONE) {
+            self::startSession();
         }
 
-        $token = bin2hex(random_bytes(32));
-        $_SESSION['csrf_token'] = $token;
-        $_SESSION['csrf_expiry'] = time() + CSRF_EXPIRY;
-        return $token;
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            $_SESSION['csrf_expiry'] = time() + 3600; // 1 hour
+        } else {
+            // Check expiry and rotate if needed
+             if (isset($_SESSION['csrf_expiry']) && time() > $_SESSION['csrf_expiry']) {
+                $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+                $_SESSION['csrf_expiry'] = time() + 3600;
+             }
+        }
+
+        return $_SESSION['csrf_token'];
     }
 
     /**
@@ -39,8 +121,10 @@ class Security {
      */
     public static function checkRateLimit(string $action, string $identifier = ''): bool {
         $key = $action . ':' . ($identifier ?: self::getClientIdentifier());
-        $limit = RATE_LIMIT_MAX_REQUESTS[$action] ?? 1000;
-        $window = RATE_LIMIT_WINDOW;
+        $limit = defined('RATE_LIMIT_MAX_REQUESTS') && isset(RATE_LIMIT_MAX_REQUESTS[$action]) 
+            ? RATE_LIMIT_MAX_REQUESTS[$action] 
+            : 1000;
+        $window = defined('RATE_LIMIT_WINDOW') ? RATE_LIMIT_WINDOW : 3600;
         
         $now = time();
         
@@ -79,14 +163,15 @@ class Security {
         }
         
         // Fallback to IP + user agent
-        return md5($_SERVER['REMOTE_ADDR'] . ($_SERVER['HTTP_USER_AGENT'] ?? ''));
+        return md5(($_SERVER['REMOTE_ADDR'] ?? '') . ($_SERVER['HTTP_USER_AGENT'] ?? ''));
     }
 
     /**
      * Enforce HTTPS in production
      */
     public static function enforceHttps(): void {
-        if (REQUIRE_HTTPS && !isset($_SERVER['HTTPS'])) {
+        $requireHttps = defined('REQUIRE_HTTPS') ? REQUIRE_HTTPS : true;
+        if ($requireHttps && !isset($_SERVER['HTTPS']) && ($_SERVER['SERVER_NAME'] !== 'localhost')) {
             $redirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
             header('Location: ' . $redirect, true, 301);
             exit;
@@ -119,9 +204,10 @@ class Security {
      * Verify that the current user has a verified email
      */
     public static function requireVerifiedEmail(): void {
+        self::startSession();
         if (!isset($_SESSION['user_id']) || !isset($_SESSION['email_verified']) || !$_SESSION['email_verified']) {
             http_response_code(403);
-            if ($_SERVER['HTTP_ACCEPT'] === 'application/json') {
+            if (isset($_SERVER['HTTP_ACCEPT']) && $_SERVER['HTTP_ACCEPT'] === 'application/json') {
                 exit(json_encode(['error' => 'Email verification required']));
             }
             exit('Email verification required');
@@ -132,6 +218,7 @@ class Security {
      * Check tenant access for the current user
      */
     public static function checkTenantAccess(int $tenantId): bool {
+        self::startSession();
         if (!isset($_SESSION['user_id']) || !isset($_SESSION['tenant_id'])) {
             return false;
         }
@@ -145,7 +232,7 @@ class Security {
     public static function requireTenantAccess(int $tenantId): void {
         if (!self::checkTenantAccess($tenantId)) {
             http_response_code(403);
-            if ($_SERVER['HTTP_ACCEPT'] === 'application/json') {
+            if (isset($_SERVER['HTTP_ACCEPT']) && $_SERVER['HTTP_ACCEPT'] === 'application/json') {
                 exit(json_encode(['error' => 'Access denied']));
             }
             exit('Access denied');
@@ -159,7 +246,7 @@ class Security {
         $logEntry = [
             'timestamp' => date('Y-m-d H:i:s'),
             'event' => $event,
-            'ip' => $_SERVER['REMOTE_ADDR'],
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0',
             'user_id' => $_SESSION['user_id'] ?? null,
             'tenant_id' => $_SESSION['tenant_id'] ?? null,
             'details' => $details

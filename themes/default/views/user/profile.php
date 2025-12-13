@@ -13,6 +13,7 @@ $pageTitle = $page_title ?? 'User Profile';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($pageTitle); ?> - Bishwo Calculator</title>
+    <meta name="csrf-token" content="<?php echo csrf_token(); ?>">
     
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -573,6 +574,7 @@ $pageTitle = $page_title ?? 'User Profile';
         </div>
         
         <form id="profileForm" enctype="multipart/form-data">
+            <?php if (function_exists('csrf_field')) csrf_field(); else echo '<input type="hidden" name="csrf_token" value="' . csrf_token() . '">'; ?>
             <!-- Tab 1: Profile Info -->
             <div class="tab-content active" id="tab-profile">
                 <div class="card">
@@ -881,6 +883,9 @@ $pageTitle = $page_title ?? 'User Profile';
                 const baseUrl = window.location.origin + '/Bishwo_Calculator';
                 const response = await fetch(baseUrl + '/user/profile/update', {
                     method: 'POST',
+                    headers: {
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
                     body: formData,
                     credentials: 'include'
                 });
@@ -911,7 +916,10 @@ $pageTitle = $page_title ?? 'User Profile';
                 const baseUrl = window.location.origin + '/Bishwo_Calculator';
                 const response = await fetch(baseUrl + '/2fa/disable', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
                     body: new URLSearchParams({password}),
                     credentials: 'include'
                 });
@@ -940,7 +948,10 @@ $pageTitle = $page_title ?? 'User Profile';
                 const baseUrl = window.location.origin + '/Bishwo_Calculator';
                 const response = await fetch(baseUrl + '/2fa/recovery-codes/regenerate', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
                     body: new URLSearchParams({password}),
                     credentials: 'include'
                 });
@@ -969,6 +980,9 @@ $pageTitle = $page_title ?? 'User Profile';
                 const baseUrl = window.location.origin + '/Bishwo_Calculator';
                 const response = await fetch(baseUrl + '/data-export/request', {
                     method: 'POST',
+                    headers: {
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
                     credentials: 'include'
                 });
                 

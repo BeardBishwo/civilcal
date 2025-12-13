@@ -82,6 +82,8 @@ if (getenv('APP_URL')) {
 // Security settings
 define('REQUIRE_HTTPS', false);
 define('CSRF_EXPIRY', 7200); // 2 hours
+define('RATE_LIMIT_MAX_REQUESTS', 60);
+define('RATE_LIMIT_WINDOW', 60);
 
 // Helper to get environment variable safely
 if (!function_exists('env')) {
@@ -109,6 +111,7 @@ define('DB_PASS', env('DB_PASS') ?: env('DB_PASSWORD') ?: '');
 define('ADMIN_USER', 'admin');
 define('ADMIN_PASS', 'password');
 define('ADMIN_EMAIL', 'admin@newsbishwo.com');
+define('MAIL_TO', ADMIN_EMAIL);
 
 // Error reporting
 if (ENVIRONMENT === 'development') {

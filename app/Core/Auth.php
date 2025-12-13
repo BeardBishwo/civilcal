@@ -8,9 +8,7 @@ class Auth
 {
     public static function check()
     {
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
+        \App\Services\Security::startSession();
 
         if (!empty($_SESSION['user_id'])) {
             // Get role from session, or from user array if available
@@ -74,11 +72,10 @@ class Auth
      */
     public static function login($identity, $password)
     {
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
+        \App\Services\Security::startSession();
 
         $logFile = __DIR__ . '/../../storage/logs/auth_debug.log';
+
         file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "Auth::login called for identity: " . $identity . "\n", FILE_APPEND);
 
         // Use User model to find user by email or username

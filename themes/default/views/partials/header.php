@@ -143,6 +143,7 @@ if (
     <title><?php echo $title_safe; ?></title>
     <meta name="description" content="<?php echo $desc_safe; ?>">
     <link rel="manifest" href="<?php echo app_base_url("manifest.json"); ?>">
+    <meta name="csrf-token" content="<?php echo csrf_token(); ?>">
     <meta name="theme-color" content="#667eea">
     <link rel="icon" href="<?php echo htmlspecialchars($favicon); ?>">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>

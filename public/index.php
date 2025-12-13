@@ -12,9 +12,10 @@ $bootstrapPath = dirname(__DIR__) . '/app/bootstrap.php';
 require_once $bootstrapPath;
 
 // Start session (if not already started by bootstrap)
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Start session safely
+\App\Services\Security::startSession();
+\App\Services\Security::setSecureHeaders();
+
 
 // Initialize router
 $router = new \App\Core\Router();
