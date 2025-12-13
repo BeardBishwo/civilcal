@@ -1,7 +1,6 @@
 <?php
 $page_title = 'Reset Password - EngiCal Pro';
 require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
-require_once dirname(__DIR__, 4) . '/app/Services/Security.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -12,7 +11,8 @@ $token = $_GET['token'] ?? '';
 $token_valid = false;
 $token_error = '';
 $user_email = '';
-
+$csrf_token = \App\Services\Security::generateCsrfToken();
+?>
 if (empty($token)) {
     $token_error = 'No reset token provided';
 } else {
