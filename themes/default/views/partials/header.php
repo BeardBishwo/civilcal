@@ -378,7 +378,8 @@ if (
             font-size: <?php echo $site_meta["logo_settings"]["text_size"] ??
                             "1.5rem"; ?>;
             color: #2d3748;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #2d3748;
+            /* transition removed */
             padding: 0 !important; /* Remove padding to maximize size */
             margin: 0 !important;
             height: 100%; /* Fill parent height */
