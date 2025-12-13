@@ -673,64 +673,91 @@ $pageTitle = $page_title ?? 'User Profile';
                             </button>
                         </div>
                         
-                        <div class="form-group form-grid-full">
-                            <h3 style="color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 20px; margin-top: 30px;">Two-Factor Authentication</h3>
-                        </div>
-
-                        <div id="2fa-status-section" class="form-group form-grid-full">
-                            <?php if (!empty($two_factor_status['enabled'])): ?>
-                                <div class="alert alert-success">
-                                    <i class="fas fa-shield-check"></i> Two-factor authentication is <strong>ENABLED</strong> on your account.
-                                </div>
-                                <button type="button" class="btn-danger" style="margin-top: 10px;" onclick="showDisableTwoFactor()">
-                                    <i class="fas fa-lock-open"></i> Disable 2FA
-                                </button>
-                                <div id="disable-2fa-form" style="display:none; margin-top: 15px;">
-                                    <label>Confirm Password to Disable:</label>
-                                    <input type="password" class="form-input" id="disable_2fa_password" placeholder="Enter password" style="margin-bottom: 10px;">
-                                    <button type="button" class="btn-danger" onclick="disableTwoFactor()">Confirm Disable</button>
-                                </div>
-                            <?php else: ?>
-                                <div class="alert alert-warning">
-                                    <i class="fas fa-exclamation-triangle"></i> Two-factor authentication is currently <strong>DISABLED</strong>.
-                                </div>
-                                <p>Add an extra layer of security to your account by enabling 2FA.</p>
-                                <button type="button" class="btn-save" style="margin-top: 10px;" onclick="startTwoFactorSetup()">
-                                    <i class="fas fa-qrcode"></i> Setup 2FA
-                                </button>
+                        <!-- Two-Factor Authentication Section -->
+                        <div class="form-group form-grid-full" style="margin-top: 40px;">
+                            <div style="background: #1e293b; border-radius: 12px; padding: 30px; border: 1px solid #334155;">
+                                <h3 style="color: #f1f5f9; margin: 0 0 20px 0; font-size: 1.25rem; font-weight: 600;">Two factor authentication</h3>
                                 
-                                <!-- Setup UI (Initially Hidden) -->
-                                <div id="2fa-setup-container" style="display:none; margin-top: 20px; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; background: #f8fafc;">
-                                    <h4 style="color: #1e293b; margin-bottom: 15px;">📱 Step 1: Scan QR Code</h4>
-                                    <p style="color: #64748b; margin-bottom: 15px;">Scan this QR code with your authenticator app (Google Authenticator, Authy, Microsoft Authenticator, etc).</p>
-                                    <div id="qr-code-display" style="margin: 15px 0; background: white; padding: 15px; display: inline-block; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
-                                    <p style="color: #64748b; margin: 15px 0;">Or enter this secret key manually: <strong id="secret-key-display" style="font-family: 'Courier New', monospace; background: #e2e8f0; padding: 4px 8px; border-radius: 4px; color: #1e293b; font-size: 14px;"></strong></p>
-                                    
-                                    <hr style="margin: 25px 0; border: 0; border-top: 1px solid #e2e8f0;">
-                                    
-                                    <h4 style="color: #1e293b; margin-bottom: 15px;">🔑 Step 2: Save Backup Codes</h4>
-                                    <div class="alert alert-warning" style="margin-bottom: 15px;">
-                                        <i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> Save these backup codes in a safe place. You can use them to access your account if you lose your phone.
-                                    </div>
-                                    <div id="backup-codes-display" style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-family: 'Courier New', monospace; font-size: 13px; color: #1e293b;"></div>
-                                    </div>
-                                    <button type="button" class="btn-save" onclick="copyBackupCodes()" style="margin-bottom: 20px;">
-                                        <i class="fas fa-copy"></i> Copy Backup Codes
-                                    </button>
-                                    
-                                    <hr style="margin: 25px 0; border: 0; border-top: 1px solid #e2e8f0;">
-                                    
-                                    <h4 style="color: #1e293b; margin-bottom: 15px;">✅ Step 3: Verify Code</h4>
-                                    <div class="form-group">
-                                        <label>Enter 6-digit Code from your app</label>
-                                        <input type="text" class="form-input" id="verify_code_input" placeholder="000000" maxlength="6" style="width: 200px; font-family: 'Courier New', monospace; font-size: 18px; letter-spacing: 3px; text-align: center;">
-                                    </div>
-                                    <button type="button" class="btn-save" onclick="confirmTwoFactor()">
-                                        <i class="fas fa-shield-check"></i> Verify & Activate 2FA
-                                    </button>
+                                <div id="2fa-status-container">
+                                    <?php if (!empty($two_factor_status['enabled'])): ?>
+                                        <!-- 2FA Enabled State -->
+                                        <div style="margin-bottom: 20px;">
+                                            <p style="color: #10b981; font-weight: 600; margin: 0 0 15px 0;">
+                                                <i class="fas fa-check-circle"></i> Two-factor authentication is enabled.
+                                            </p>
+                                            <p style="color: #94a3b8; margin: 0 0 20px 0; line-height: 1.6;">
+                                                Your account is protected with two-factor authentication. You'll need your authenticator app to sign in.
+                                            </p>
+                                        </div>
+                                        <button type="button" class="btn-danger" onclick="showDisable2FA()" style="background: #ef4444; padding: 10px 20px; border-radius: 8px;">
+                                            Disable
+                                        </button>
+                                        
+                                        <!-- Disable Form (Hidden) -->
+                                        <div id="disable-2fa-container" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid #334155;">
+                                            <p style="color: #f1f5f9; margin: 0 0 15px 0; font-weight: 500;">Confirm your password to disable 2FA:</p>
+                                            <input type="password" class="form-input" id="disable_2fa_password" placeholder="Enter your password" style="margin-bottom: 15px; background: #0f172a; border: 1px solid #334155; color: #f1f5f9;">
+                                            <div style="display: flex; gap: 10px;">
+                                                <button type="button" class="btn-danger" onclick="confirmDisable2FA()">Confirm Disable</button>
+                                                <button type="button" onclick="hideDisable2FA()" style="background: #475569; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Cancel</button>
+                                            </div>
+                                        </div>
+                                    <?php else: ?>
+                                        <!-- 2FA Disabled State -->
+                                        <div id="2fa-disabled-view">
+                                            <p style="color: #f1f5f9; font-weight: 600; margin: 0 0 15px 0;">
+                                                You have not enabled two factor authentication.
+                                            </p>
+                                            <p style="color: #94a3b8; margin: 0 0 25px 0; line-height: 1.6;">
+                                                When two factor authentication is enabled, you will be prompted for a secure, random token during authentication. You may retrieve this token from your phone's Google Authenticator application.
+                                            </p>
+                                            <button type="button" onclick="start2FASetup()" style="background: #6366f1; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                                                Enable
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Setup Container (Hidden Initially) -->
+                                        <div id="2fa-setup-view" style="display: none;">
+                                            <!-- QR Code Step -->
+                                            <div style="padding: 20px; background: #0f172a; border-radius: 8px; margin-bottom: 20px;">
+                                                <p style="color: #f1f5f9; margin: 0 0 15px 0; font-weight: 500;">Scan this QR code with your authenticator app:</p>
+                                                <div id="qr-code-container" style="background: white; padding: 15px; border-radius: 8px; display: inline-block; margin-bottom: 15px;"></div>
+                                                <p style="color: #94a3b8; margin: 0; font-size: 0.875rem;">
+                                                    Secret key: <code id="secret-key-text" style="background: #1e293b; padding: 4px 8px; border-radius: 4px; color: #10b981; font-family: 'Courier New', monospace;"></code>
+                                                </p>
+                                            </div>
+                                            
+                                            <!-- Backup Codes -->
+                                            <div style="padding: 20px; background: #0f172a; border-radius: 8px; margin-bottom: 20px;">
+                                                <p style="color: #f1f5f9; margin: 0 0 10px 0; font-weight: 500;">
+                                                    <i class="fas fa-key" style="color: #f59e0b;"></i> Backup Recovery Codes
+                                                </p>
+                                                <p style="color: #94a3b8; margin: 0 0 15px 0; font-size: 0.875rem;">
+                                                    Save these codes in a secure place. Each can be used once if you lose access to your authenticator.
+                                                </p>
+                                                <div id="backup-codes-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 15px; font-family: 'Courier New', monospace; font-size: 0.875rem;"></div>
+                                                <button type="button" onclick="copyBackupCodes()" style="background: #475569; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.875rem; cursor: pointer;">
+                                                    <i class="fas fa-copy"></i> Copy Codes
+                                                </button>
+                                            </div>
+                                            
+                                            <!-- Verification Input -->
+                                            <div style="padding: 20px; background: #0f172a; border-radius: 8px; margin-bottom: 20px;">
+                                                <p style="color: #f1f5f9; margin: 0 0 15px 0; font-weight: 500;">Enter the 6-digit code from your app:</p>
+                                                <input type="text" id="verify-2fa-code" placeholder="000000" maxlength="6" class="form-input" style="background: #1e293b; border: 1px solid #334155; color: #f1f5f9; font-family: 'Courier New', monospace; font-size: 1.25rem; text-align: center; letter-spacing: 0.5em; margin-bottom: 15px; width: 200px;">
+                                                <div style="display: flex; gap: 10px;">
+                                                    <button type="button" onclick="verify2FACode()" style="background: #10b981; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 500; cursor: pointer;">
+                                                        Verify & Enable
+                                                    </button>
+                                                    <button type="button" onclick="cancel2FASetup()" style="background: #475569; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
-                            <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -906,9 +933,9 @@ $pageTitle = $page_title ?? 'User Profile';
             }
         }
         
-        // 2FA Functions
-        async function startTwoFactorSetup() {
-            const pwd = prompt("Please confirm your password to start 2FA setup:");
+        // 2FA Functions - New Minimal UI
+        async function start2FASetup() {
+            const pwd = prompt("Please confirm your password to enable 2FA:");
             if (!pwd) return;
 
             try {
@@ -923,15 +950,19 @@ $pageTitle = $page_title ?? 'User Profile';
                     // Store backup codes globally
                     window.currentBackupCodes = result.recovery_codes || [];
                     
-                    document.getElementById('2fa-setup-container').style.display = 'block';
-                    document.getElementById('qr-code-display').innerHTML = `<img src="${result.qr_code_url}" alt="QR Code" style="max-width: 200px;" />`;
-                    document.getElementById('secret-key-display').innerText = result.secret;
+                    // Hide disabled view, show setup view
+                    document.getElementById('2fa-disabled-view').style.display = 'none';
+                    document.getElementById('2fa-setup-view').style.display = 'block';
                     
-                    // Display backup codes
-                    const backupCodesContainer = document.querySelector('#backup-codes-display > div');
-                    if (backupCodesContainer && window.currentBackupCodes.length > 0) {
-                        backupCodesContainer.innerHTML = window.currentBackupCodes.map((code, index) => 
-                            `<div style="padding: 8px; background: #f1f5f9; border-radius: 4px;">${index + 1}. ${code}</div>`
+                    // Display QR code
+                    document.getElementById('qr-code-container').innerHTML = `<img src="${result.qr_code_url}" alt="QR Code" style="max-width: 200px;" />`;
+                    document.getElementById('secret-key-text').innerText = result.secret;
+                    
+                    // Display backup codes in grid
+                    const backupCodesGrid = document.getElementById('backup-codes-grid');
+                    if (backupCodesGrid && window.currentBackupCodes.length > 0) {
+                        backupCodesGrid.innerHTML = window.currentBackupCodes.map((code, index) => 
+                            `<div style="padding: 8px; background: #1e293b; border-radius: 4px; color: #10b981;">${index + 1}. ${code}</div>`
                         ).join('');
                     }
                 } else {
@@ -943,9 +974,12 @@ $pageTitle = $page_title ?? 'User Profile';
             }
         }
 
-        async function confirmTwoFactor() {
-            const code = document.getElementById('verify_code_input').value;
-            if (!code) { alert('Please enter code'); return; }
+        async function verify2FACode() {
+            const code = document.getElementById('verify-2fa-code').value;
+            if (!code) { 
+                alert('Please enter the 6-digit code'); 
+                return; 
+            }
             
             try {
                 const response = await fetch('/Bishwo_Calculator/profile/2fa/confirm', {
@@ -956,10 +990,10 @@ $pageTitle = $page_title ?? 'User Profile';
                 const result = await response.json();
                 
                 if (result.success) {
-                    alert('2FA Enabled Successfully!');
+                    alert('✅ 2FA Enabled Successfully!');
                     location.reload();
                 } else {
-                    alert(result.error || 'Verification failed');
+                    alert(result.error || 'Invalid verification code');
                 }
             } catch (e) {
                 console.error(e);
@@ -967,13 +1001,27 @@ $pageTitle = $page_title ?? 'User Profile';
             }
         }
         
-        function showDisableTwoFactor() {
-            document.getElementById('disable-2fa-form').style.display = 'block';
+        function cancel2FASetup() {
+            document.getElementById('2fa-setup-view').style.display = 'none';
+            document.getElementById('2fa-disabled-view').style.display = 'block';
+            document.getElementById('verify-2fa-code').value = '';
+        }
+        
+        function showDisable2FA() {
+            document.getElementById('disable-2fa-container').style.display = 'block';
+        }
+        
+        function hideDisable2FA() {
+            document.getElementById('disable-2fa-container').style.display = 'none';
+            document.getElementById('disable_2fa_password').value = '';
         }
 
-        async function disableTwoFactor() {
+        async function confirmDisable2FA() {
             const pwd = document.getElementById('disable_2fa_password').value;
-            if (!pwd) { alert('Password required'); return; }
+            if (!pwd) { 
+                alert('Password required'); 
+                return; 
+            }
             
             if(!confirm('Are you sure you want to disable 2FA? This will make your account less secure.')) return;
 
