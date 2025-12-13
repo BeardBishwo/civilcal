@@ -867,18 +867,20 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
 
         <!-- Sidebar -->
         <aside id="admin-sidebar" class="admin-sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">
-                    <a href="<?php echo app_base_url('admin'); ?>" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+            <div class="sidebar-header" style="padding: 0; display: flex; align-items: stretch; height: 70px;">
+                <div class="sidebar-logo" style="flex: 1; padding: 0; margin: 0; display: flex; justify-content: center; align-items: center; background: transparent;">
+                    <a href="<?php echo app_base_url('admin'); ?>" style="text-decoration: none; color: inherit; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
                         <?php if (!empty($logo)): ?>
-                            <img src="<?php echo htmlspecialchars($logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" class="sidebar-logo-img" style="max-height: 35px; max-width: 100%;">
+                            <img src="<?php echo htmlspecialchars($logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" class="sidebar-logo-img" style="height: 100%; width: auto; max-width: 100%; object-fit: contain; padding: 5px;">
                         <?php else: ?>
-                            <i class="sidebar-logo-icon fas fa-calculator"></i>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="sidebar-logo-icon fas fa-calculator"></i>
+                                <span class="logo-text"><?php echo htmlspecialchars($site_name); ?></span>
+                            </div>
                         <?php endif; ?>
-                        <span class="logo-text"><?php echo htmlspecialchars($site_name); ?></span>
                     </a>
                 </div>
-                <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
+                <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar" style="margin-right: 15px; height: 100%; display: flex; align-items: center; background: transparent; border: none; color: inherit; cursor: pointer;">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
