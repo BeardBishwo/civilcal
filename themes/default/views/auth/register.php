@@ -1,12 +1,11 @@
 <?php
 $page_title = 'Create Account - EngiCal Pro';
 require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
-require_once dirname(__DIR__, 4) . '/app/Services/Security.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-$csrf_token = Security::generateCsrfToken();
+$csrf_token = \App\Services\Security::generateCsrfToken();
 ?>
 
 <div class="auth-container">
