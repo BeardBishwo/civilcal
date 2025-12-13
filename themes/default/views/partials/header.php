@@ -362,9 +362,8 @@ if (
             flex-shrink: 0;
             display: flex;
             align-items: center;
-            justify-content: flex-start; /* Align to left */
-            padding-left: 0 !important; /* User requested 0 left padding */
-            padding-right: 1rem;
+            justify-content: center; /* Center horizontally */
+            padding: 0 !important; /* Remove all padding for true centering */
             box-sizing: border-box;
             height: 100%; /* Fill header height */
         }
