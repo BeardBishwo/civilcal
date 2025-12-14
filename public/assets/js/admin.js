@@ -237,7 +237,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window.confirmAction = function(message, callback) {
         if (typeof showConfirmModal === 'function') {
             showConfirmModal('Confirmation', message, callback);
-        } else if (confirm(message)) {
+        } else {
+            console.warn('showConfirmModal not defined. Action confirmed by default for: ' + message);
             callback();
         }
     };

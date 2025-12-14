@@ -116,7 +116,7 @@ $page_title = 'Widget Management - Bishwo Calculator';
                                         <i class="fas fa-eye text-info"></i>
                                     </a>
                                 </div>
-                                <form method="post" action="<?php echo app_base_url('/admin/widgets/delete/'); ?><?php echo $widget->getId(); ?>" onsubmit="return confirm('Are you sure you want to delete this widget?')">
+                                <form method="post" action="<?php echo app_base_url('/admin/widgets/delete/'); ?><?php echo $widget->getId(); ?>" onsubmit="event.preventDefault(); const form = this; showConfirmModal('Delete Widget', 'Are you sure you want to delete this widget?', function() { form.submit(); });">
                                     <button type="submit" class="action-btn-icon delete-btn" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </button>

@@ -623,6 +623,8 @@ $regularUsers = $stats['regular'] ?? ($totalUsers - $adminUsers);
     });
 </script>
 
+<style>
+
 
     /* ========================================
    OPTIMIZED ADMIN WRAPPER CONTAINER
