@@ -221,21 +221,21 @@ function toggleMessage(index) {
 }
 
 async function clearLogs() {
-    if (!confirm("Are you sure you want to clear all error logs?")) return;
-    
-    try {
-        const response = await fetch("<?= app_base_url('/admin/debug/clear-logs') ?>", { method: "POST" });
-        const result = await response.json();
-        
-        if (result.success) {
-            if(window.AdminApp) AdminApp.showNotification("Logs cleared", "success");
-            setTimeout(() => window.location.reload(), 1000);
-        } else {
-            if(window.AdminApp) AdminApp.showNotification("Failed to clear logs", "error");
+    showConfirmModal('Clear Logs', "Are you sure you want to clear all error logs?", async () => {
+        try {
+            const response = await fetch("<?= app_base_url('/admin/debug/clear-logs') ?>", { method: "POST" });
+            const result = await response.json();
+            
+            if (result.success) {
+                showNotification("Logs cleared", "success");
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showNotification("Failed to clear logs", "error");
+            }
+        } catch (e) {
+            showNotification("Network error", "error");
         }
-    } catch (e) {
-        if(window.AdminApp) AdminApp.showNotification("Network error", "error");
-    }
+    });
 }
 
 function downloadLogs() {

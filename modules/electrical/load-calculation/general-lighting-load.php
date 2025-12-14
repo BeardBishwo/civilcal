@@ -162,6 +162,7 @@
             opacity: 0.9;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -261,7 +262,7 @@
             const continuousLoad = document.getElementById('continuous-load').value;
 
             if (isNaN(area) || isNaN(loadDensity) || isNaN(demandFactor)) {
-                alert('Please enter valid numbers.');
+                showNotification('Please enter valid numbers.', 'info');
                 return;
             }
             
@@ -319,5 +320,6 @@
             localStorage.setItem('recentLightingLoadCalculations', JSON.stringify(recent));
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

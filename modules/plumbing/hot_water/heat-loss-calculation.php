@@ -113,6 +113,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             border-radius: 8px;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -363,6 +364,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         // Show pipe section by default
         document.getElementById('pipe-section').style.display = 'block';
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

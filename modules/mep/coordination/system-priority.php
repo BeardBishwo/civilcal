@@ -178,6 +178,7 @@ $db = new Database();
         .risk-medium { color: #ffc107; }
         .risk-low { color: #28a745; }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include '../../../themes/default/views/partials/header.php'; ?>
@@ -609,14 +610,15 @@ $db = new Database();
         
         function exportAnalysis() {
             // Simulate exporting analysis
-            alert('Exporting system priority analysis...');
+            showNotification('Exporting system priority analysis...', 'info');
         }
         
         function generateReport() {
             // Simulate generating report
-            alert('Generating comprehensive priority analysis report...');
+            showNotification('Generating comprehensive priority analysis report...', 'info');
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

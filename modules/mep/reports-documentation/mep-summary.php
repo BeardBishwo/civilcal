@@ -604,6 +604,7 @@ function saveReport($data, $project_id) {
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include '../../../themes/default/views/partials/header.php'; ?>
@@ -726,12 +727,12 @@ function saveReport($data, $project_id) {
                 if (data.success) {
                     displayReportResults(data.results);
                 } else {
-                    alert('Error generating report: ' + data.error);
+                    showNotification('Error generating report: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error generating report');
+                showNotification('Error generating report', 'danger');
             });
         }
         
@@ -746,14 +747,14 @@ function saveReport($data, $project_id) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Report exported to PDF successfully!');
+                    showNotification('Report exported to PDF successfully!', 'info');
                 } else {
-                    alert('Error exporting report: ' + data.error);
+                    showNotification('Error exporting report: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error exporting report');
+                showNotification('Error exporting report', 'danger');
             });
         }
         
@@ -859,6 +860,7 @@ function saveReport($data, $project_id) {
             generateReport();
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

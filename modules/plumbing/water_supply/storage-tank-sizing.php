@@ -391,7 +391,7 @@ function calculateTankSize() {
     const tankType = document.getElementById('tankType').value;
     
     if (!dailyDemand || dailyDemand <= 0) {
-        alert('Please enter a valid daily demand value');
+        showNotification('Please enter a valid daily demand value', 'info');
         return;
     }
     

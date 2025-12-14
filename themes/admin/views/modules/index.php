@@ -254,29 +254,32 @@ $uniqueCategories = count(array_unique(array_column($modules, 'category')));
     }
 
     function toggleModule(moduleName, action) {
-        if (!confirm('Are you sure you want to ' + action + ' this module?')) {
-            return;
-        }
+        showConfirmModal(
+            action.charAt(0).toUpperCase() + action.slice(1) + ' Module',
+            'Are you sure you want to ' + action + ' this module?',
+            () => {
+                const formData = new FormData();
+                formData.append('module', moduleName);
 
-        const formData = new FormData();
-        formData.append('module', moduleName);
-
-        fetch('<?php echo get_app_url(); ?>/admin/modules/' + action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Error: ' + (data.message || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while communicating with the server.');
-            });
+                fetch('<?php echo get_app_url(); ?>/admin/modules/' + action, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification('Module ' + action + 'd successfully', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showNotification('Error: ' + (data.message || 'Unknown error'), 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('An error occurred while communicating with the server.', 'error');
+                    });
+            }
+        );
     }
 
     // Simple Client-side Filter

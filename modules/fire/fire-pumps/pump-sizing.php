@@ -118,6 +118,7 @@
             background: #4b5563;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="calculator-container">
@@ -358,5 +359,6 @@
         // Set default date to today
         document.getElementById('flowTestDate').valueAsDate = new Date();
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

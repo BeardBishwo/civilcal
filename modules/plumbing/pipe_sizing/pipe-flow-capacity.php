@@ -124,6 +124,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             background: rgba(255, 255, 255, 0.05);
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -232,7 +233,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             const material = document.getElementById('pipeMaterial').value;
             
             if (!diameter || !velocity) {
-                alert('Please enter all required values');
+                showNotification('Please enter all required values', 'info');
                 return;
             }
             
@@ -321,6 +322,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         document.getElementById('reference-section').style.display = 'block';
         displayRecent();
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

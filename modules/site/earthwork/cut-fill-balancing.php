@@ -307,6 +307,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -586,5 +587,6 @@
             // Display recent calculations if needed
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

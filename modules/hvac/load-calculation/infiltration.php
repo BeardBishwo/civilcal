@@ -207,6 +207,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -296,7 +297,7 @@
             const tempDiff = parseFloat(document.getElementById('infilTempDiff').value);
             
             if (!volume || !ach || !tempDiff) {
-                alert('Please enter all values');
+                showNotification('Please enter all values', 'info');
                 return;
             }
             
@@ -323,5 +324,6 @@
             saveCalculation('Infiltration', `${volume}m³ @ ${ach}ACH → ${infiltrationWatts.toFixed(0)}W`);
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

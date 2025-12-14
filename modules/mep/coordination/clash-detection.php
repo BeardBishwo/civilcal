@@ -145,6 +145,7 @@ $db = new Database();
         .usage-warning { color: #ffc107; }
         .usage-critical { color: #dc3545; }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include '../../../themes/default/views/partials/header.php'; ?>
@@ -437,19 +438,20 @@ $db = new Database();
         
         function viewDetails(clashId) {
             // Simulate viewing clash details
-            alert(`Viewing detailed information for Clash #${clashId}`);
+            showNotification(`Viewing detailed information for Clash #${clashId}`, 'info');
         }
         
         function exportResults() {
             // Simulate exporting results
-            alert('Exporting clash detection results...');
+            showNotification('Exporting clash detection results...', 'info');
         }
         
         function generateReport() {
             // Simulate generating report
-            alert('Generating comprehensive clash detection report...');
+            showNotification('Generating comprehensive clash detection report...', 'info');
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

@@ -262,33 +262,31 @@ function deleteAccount() {
         return;
     }
 
-    if (!confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.')) {
-        return;
-    }
+    showConfirmModal('Delete Account', 'Are you absolutely sure you want to delete your account? This action cannot be undone.', () => {
+        toggleLoading(deleteBtn, loading, true);
 
-    toggleLoading(deleteBtn, loading, true);
-
-    fetch('/profile/delete', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAlert('Account deleted successfully. Redirecting...', 'success');
-                setTimeout(() => {
-                    window.location.href = data.redirect || '/';
-                }, 2000);
-            } else {
+        fetch('/profile/delete', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Account deleted successfully. Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = data.redirect || '/';
+                    }, 2000);
+                } else {
+                    toggleLoading(deleteBtn, loading, false);
+                    showAlert(data.error || 'Failed to delete account', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Account deletion error:', error);
                 toggleLoading(deleteBtn, loading, false);
-                showAlert(data.error || 'Failed to delete account', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Account deletion error:', error);
-            toggleLoading(deleteBtn, loading, false);
-            showAlert('An error occurred while deleting account', 'error');
-        });
+                showAlert('An error occurred while deleting account', 'error');
+            });
+    });
 }
 
 /**

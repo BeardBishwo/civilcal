@@ -390,14 +390,15 @@ document.getElementById('bulkMarkRead').addEventListener('click', async function
     location.reload();
 });
 
-document.getElementById('bulkDelete').addEventListener('click', async function() {
-    if (!confirm('Delete selected notifications?')) return;
-    const ids = Array.from(document.querySelectorAll('.notification-checkbox:checked')).map(cb => cb.value);
-    // Implement bulk delete
-    for (const id of ids) {
-        await deleteNotification(id);
-    }
-    location.reload();
+document.getElementById('bulkDelete').addEventListener('click', function() {
+    showConfirmModal('Bulk Delete', 'Delete selected notifications?', async () => {
+        const ids = Array.from(document.querySelectorAll('.notification-checkbox:checked')).map(cb => cb.value);
+        // Implement bulk delete
+        for (const id of ids) {
+            await deleteNotification(id, true); // Pass true to skip inner confirmation
+        }
+        location.reload();
+    });
 });
 
 // Filters
@@ -424,10 +425,14 @@ async function markAsRead(id) {
     await fetch(`<?= app_base_url('/notifications/') ?>${id}/read`, { method: 'POST' });
 }
 
-async function deleteNotification(id) {
-    if (!confirm('Delete this notification?')) return;
-    await fetch(`<?= app_base_url('/notifications/') ?>${id}`, { method: 'DELETE' });
-    location.reload();
+function deleteNotification(id, skipConfirm = false) {
+    if (skipConfirm) {
+        return fetch(`<?= app_base_url('/notifications/') ?>${id}`, { method: 'DELETE' });
+    }
+    showConfirmModal('Delete Notification', 'Delete this notification?', async () => {
+        await fetch(`<?= app_base_url('/notifications/') ?>${id}`, { method: 'DELETE' });
+        location.reload();
+    });
 }
 
 function goToPage(page) {

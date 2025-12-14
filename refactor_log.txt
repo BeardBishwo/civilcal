@@ -1,0 +1,311 @@
+Replaced 1 alerts in brick-quantity.php
+Saved changes to brick-quantity.php
+Replaced 1 alerts in mortar-ratio.php
+Saved changes to mortar-ratio.php
+Replaced 1 alerts in plastering-estimator.php
+Saved changes to plastering-estimator.php
+Replaced 1 alerts in concrete-mix.php
+Saved changes to concrete-mix.php
+Replaced 1 alerts in concrete-strength.php
+Saved changes to concrete-strength.php
+Replaced 1 alerts in concrete-volume.php
+Saved changes to concrete-volume.php
+Replaced 1 alerts in rebar-calculation.php
+Saved changes to rebar-calculation.php
+Replaced 1 alerts in cut-and-fill-volume.php
+Saved changes to cut-and-fill-volume.php
+Replaced 1 alerts in excavation-volume.php
+Saved changes to excavation-volume.php
+Replaced 1 alerts in slope-calculation.php
+Saved changes to slope-calculation.php
+Replaced 1 alerts in beam-load-capacity.php
+Saved changes to beam-load-capacity.php
+Replaced 1 alerts in column-design.php
+Saved changes to column-design.php
+Replaced 1 alerts in foundation-design.php
+Saved changes to foundation-design.php
+Replaced 1 alerts in slab-design.php
+Saved changes to slab-design.php
+Replaced 1 alerts in cable-tray-sizing.php
+Saved changes to cable-tray-sizing.php
+Saved changes to conduit-fill-calculation.php
+Replaced 1 alerts in entrance-service-sizing.php
+Saved changes to entrance-service-sizing.php
+Replaced 1 alerts in junction-box-sizing.php
+Saved changes to junction-box-sizing.php
+Replaced 1 alerts in arc-flash-boundary.php
+Saved changes to arc-flash-boundary.php
+Replaced 1 alerts in battery-load-bank-sizing.php
+Saved changes to battery-load-bank-sizing.php
+Replaced 1 alerts in demand-load-calculation.php
+Saved changes to demand-load-calculation.php
+Saved changes to feeder-sizing.php
+Replaced 1 alerts in general-lighting-load.php
+Saved changes to general-lighting-load.php
+Replaced 1 alerts in motor-full-load-amps.php
+Saved changes to motor-full-load-amps.php
+Replaced 1 alerts in ocpd-sizing.php
+Saved changes to ocpd-sizing.php
+Replaced 1 alerts in panel-schedule.php
+Saved changes to panel-schedule.php
+Replaced 1 alerts in receptacle-load.php
+Saved changes to receptacle-load.php
+Replaced 1 alerts in available-fault-current.php
+Saved changes to available-fault-current.php
+Replaced 1 alerts in ground-conductor-sizing.php
+Saved changes to ground-conductor-sizing.php
+Replaced 2 alerts in power-factor-correction.php
+Saved changes to power-factor-correction.php
+Replaced 1 alerts in single-phase-voltage-drop.php
+Saved changes to single-phase-voltage-drop.php
+Replaced 1 alerts in three-phase-voltage-drop.php
+Saved changes to three-phase-voltage-drop.php
+Replaced 1 alerts in voltage-drop-sizing.php
+Saved changes to voltage-drop-sizing.php
+Replaced 2 alerts in voltage-regulation.php
+Saved changes to voltage-regulation.php
+Replaced 1 alerts in motor-circuit-wire-sizing.php
+Saved changes to motor-circuit-wire-sizing.php
+Replaced 1 alerts in motor-circuit-wiring.php
+Saved changes to motor-circuit-wiring.php
+Replaced 1 alerts in transformer-kva-sizing.php
+Saved changes to transformer-kva-sizing.php
+Replaced 1 alerts in wire-ampacity.php
+Saved changes to wire-ampacity.php
+Replaced 1 alerts in wire-size-by-current.php
+Saved changes to wire-size-by-current.php
+Saved changes to concrete-materials.php
+Saved changes to masonry-materials.php
+Saved changes to paint-materials.php
+Saved changes to plaster-materials.php
+Saved changes to tile-materials.php
+Saved changes to brickwork-quantity.php
+Saved changes to concrete-quantity.php
+Saved changes to flooring-quantity.php
+Saved changes to formwork-quantity.php
+Saved changes to paint-quantity.php
+Saved changes to plaster-quantity.php
+Saved changes to rebar-quantity.php
+Saved changes to driver-power.php
+Saved changes to jockey-pump.php
+Saved changes to pump-sizing.php
+Saved changes to commodity-classification.php
+Saved changes to design-density.php
+Saved changes to occupancy-assessment.php
+Replaced 1 alerts in hazen-williams.php
+Saved changes to hazen-williams.php
+Saved changes to index.php
+Replaced 1 alerts in discharge-calculations.php
+Saved changes to discharge-calculations.php
+Replaced 1 alerts in pipe-sizing.php
+Saved changes to pipe-sizing.php
+Replaced 1 alerts in sprinkler-layout.php
+Saved changes to sprinkler-layout.php
+Saved changes to hose-demand.php
+Saved changes to pressure-calculations.php
+Saved changes to standpipe-classification.php
+Replaced 1 alerts in equivalent-duct.php
+Saved changes to equivalent-duct.php
+Replaced 1 alerts in fitting-loss.php
+Saved changes to fitting-loss.php
+Replaced 1 alerts in grille-sizing.php
+WARNING: found confirm() in grille-sizing.php - manual check required.
+Saved changes to grille-sizing.php
+Replaced 1 alerts in pressure-drop.php
+Saved changes to pressure-drop.php
+Replaced 1 alerts in velocity-sizing.php
+Saved changes to velocity-sizing.php
+Replaced 1 alerts in co2-emissions.php
+Saved changes to co2-emissions.php
+Replaced 1 alerts in energy-consumption.php
+Saved changes to energy-consumption.php
+Replaced 2 alerts in insulation-savings.php
+Saved changes to insulation-savings.php
+Replaced 2 alerts in payback-period.php
+Saved changes to payback-period.php
+Replaced 2 alerts in ac-sizing.php
+Saved changes to ac-sizing.php
+Replaced 2 alerts in chiller-sizing.php
+Saved changes to chiller-sizing.php
+Replaced 2 alerts in furnace-sizing.php
+Saved changes to furnace-sizing.php
+Replaced 2 alerts in pump-sizing.php
+Saved changes to pump-sizing.php
+Replaced 1 alerts in cooling-load.php
+Saved changes to cooling-load.php
+Replaced 1 alerts in heating-load.php
+Saved changes to heating-load.php
+Replaced 1 alerts in infiltration.php
+Saved changes to infiltration.php
+Replaced 1 alerts in ventilation.php
+Saved changes to ventilation.php
+Replaced 3 alerts in air-properties.php
+WARNING: found confirm() in air-properties.php - manual check required.
+Saved changes to air-properties.php
+Replaced 1 alerts in cooling-load-psych.php
+WARNING: found confirm() in cooling-load-psych.php - manual check required.
+Saved changes to cooling-load-psych.php
+Replaced 3 alerts in enthalpy.php
+WARNING: found confirm() in enthalpy.php - manual check required.
+Saved changes to enthalpy.php
+Replaced 2 alerts in sensible-heat-ratio.php
+Saved changes to sensible-heat-ratio.php
+Replaced 1 alerts in bim-export.php
+Saved changes to bim-export.php
+Replaced 2 alerts in clash-detection.php
+Saved changes to clash-detection.php
+Saved changes to coordination-map.php
+Replaced 3 alerts in space-allocation.php
+Saved changes to space-allocation.php
+Replaced 2 alerts in system-priority.php
+Saved changes to system-priority.php
+Replaced 2 alerts in cost-optimization.php
+Saved changes to cost-optimization.php
+Replaced 3 alerts in cost-summary.php
+Saved changes to cost-summary.php
+Replaced 6 alerts in material-takeoff.php
+Saved changes to material-takeoff.php
+Replaced 13 alerts in vendor-pricing.php
+WARNING: found confirm() in vendor-pricing.php - manual check required.
+Saved changes to vendor-pricing.php
+Replaced 14 alerts in api-endpoints.php
+WARNING: found confirm() in api-endpoints.php - manual check required.
+Saved changes to api-endpoints.php
+Replaced 1 alerts in input-validator.php
+Saved changes to input-validator.php
+Replaced 6 alerts in material-database.php
+WARNING: found confirm() in material-database.php - manual check required.
+Saved changes to material-database.php
+Replaced 1 alerts in mep-config.php
+WARNING: found confirm() in mep-config.php - manual check required.
+Saved changes to mep-config.php
+Replaced 2 alerts in permissions.php
+WARNING: found confirm() in permissions.php - manual check required.
+Saved changes to permissions.php
+Replaced 8 alerts in unit-converter.php
+Saved changes to unit-converter.php
+WARNING: found confirm() in mep-electrical-summary.php - manual check required.
+Replaced 2 alerts in energy-consumption.php
+Saved changes to energy-consumption.php
+Saved changes to green-rating.php
+Replaced 2 alerts in solar-system.php
+Saved changes to solar-system.php
+Replaced 2 alerts in fire-hydrant-system.php
+Saved changes to fire-hydrant-system.php
+Replaced 2 alerts in bim-integration.php
+Saved changes to bim-integration.php
+Saved changes to project-sharing.php
+Saved changes to chilled-water-piping.php
+Saved changes to equipment-database.php
+Saved changes to hvac-duct-sizing.php
+Replaced 2 alerts in plumbing-fixture-count.php
+Saved changes to plumbing-fixture-count.php
+Replaced 2 alerts in pump-selection.php
+Saved changes to pump-selection.php
+WARNING: found confirm() in water-supply.php - manual check required.
+Replaced 3 alerts in clash-detection-report.php
+Saved changes to clash-detection-report.php
+Replaced 3 alerts in equipment-schedule.php
+Saved changes to equipment-schedule.php
+Replaced 3 alerts in load-summary.php
+Saved changes to load-summary.php
+Replaced 3 alerts in mep-summary.php
+Saved changes to mep-summary.php
+Replaced 5 alerts in pdf-export.php
+Saved changes to pdf-export.php
+Replaced 2 alerts in drainage-pipe-sizing.php
+Saved changes to drainage-pipe-sizing.php
+Replaced 1 alerts in grease-trap-sizing.php
+Saved changes to grease-trap-sizing.php
+Replaced 1 alerts in soil-stack-sizing.php
+Saved changes to soil-stack-sizing.php
+Replaced 2 alerts in storm-drainage.php
+Saved changes to storm-drainage.php
+Replaced 1 alerts in trap-sizing.php
+Saved changes to trap-sizing.php
+Replaced 1 alerts in vent-pipe-sizing.php
+Saved changes to vent-pipe-sizing.php
+Replaced 2 alerts in fixture-unit-calculation.php
+Saved changes to fixture-unit-calculation.php
+Replaced 1 alerts in shower-sizing.php
+Saved changes to shower-sizing.php
+Replaced 2 alerts in sink-sizing.php
+Saved changes to sink-sizing.php
+Replaced 2 alerts in toilet-flow.php
+Saved changes to toilet-flow.php
+Saved changes to heat-loss-calculation.php
+Replaced 1 alerts in recirculation-loop.php
+Saved changes to recirculation-loop.php
+Replaced 1 alerts in safety-valve.php
+Saved changes to safety-valve.php
+Replaced 3 alerts in storage-tank-sizing.php
+Saved changes to storage-tank-sizing.php
+Replaced 1 alerts in water-heater-sizing.php
+Saved changes to water-heater-sizing.php
+Replaced 1 alerts in expansion-loop-sizing.php
+Saved changes to expansion-loop-sizing.php
+Replaced 1 alerts in gas-pipe-sizing.php
+Saved changes to gas-pipe-sizing.php
+Replaced 1 alerts in pipe-flow-capacity.php
+Saved changes to pipe-flow-capacity.php
+Replaced 1 alerts in water-pipe-sizing.php
+Saved changes to water-pipe-sizing.php
+Replaced 1 alerts in downpipe-sizing.php
+Saved changes to downpipe-sizing.php
+Replaced 1 alerts in gutter-sizing.php
+Saved changes to gutter-sizing.php
+Replaced 3 alerts in pervious-area.php
+Saved changes to pervious-area.php
+Replaced 1 alerts in stormwater-storage.php
+Saved changes to stormwater-storage.php
+Replaced 3 alerts in cold-water-demand.php
+Saved changes to cold-water-demand.php
+Replaced 1 alerts in hot-water-demand.php
+Saved changes to hot-water-demand.php
+Replaced 1 alerts in pressure-loss.php
+Saved changes to pressure-loss.php
+Replaced 1 alerts in pump-sizing.php
+Saved changes to pump-sizing.php
+Replaced 1 alerts in storage-tank-sizing.php
+Saved changes to storage-tank-sizing.php
+Replaced 2 alerts in water-demand-calculation.php
+Saved changes to water-demand-calculation.php
+Replaced 1 alerts in water-hammer-calculation.php
+Saved changes to water-hammer-calculation.php
+Saved changes to placement-rate.php
+Replaced 1 alerts in temperature-control.php
+Saved changes to temperature-control.php
+Saved changes to testing-requirements.php
+Saved changes to yardage-adjustments.php
+Saved changes to cut-fill-balancing.php
+Replaced 1 alerts in equipment-production.php
+Saved changes to equipment-production.php
+Saved changes to slope-paving.php
+Replaced 1 alerts in swelling-shrink.php
+Saved changes to swelling-shrink.php
+Replaced 1 alerts in swelling-shrinkage.php
+Saved changes to swelling-shrinkage.php
+Replaced 1 alerts in cost-productivity.php
+Saved changes to cost-productivity.php
+Replaced 2 alerts in equipment-utilization.php
+Saved changes to equipment-utilization.php
+Replaced 2 alerts in labor-productivity.php
+Saved changes to labor-productivity.php
+Replaced 2 alerts in schedule-compression.php
+Saved changes to schedule-compression.php
+Replaced 2 alerts in crane-setup.php
+Saved changes to crane-setup.php
+Replaced 2 alerts in evacuation-planning.php
+Saved changes to evacuation-planning.php
+Replaced 2 alerts in fall-protection.php
+Saved changes to fall-protection.php
+Replaced 2 alerts in trench-safety.php
+Saved changes to trench-safety.php
+Replaced 1 alerts in batter-boards.php
+Saved changes to batter-boards.php
+Replaced 1 alerts in grade-rod.php
+Saved changes to grade-rod.php
+Replaced 1 alerts in horizontal-curve-staking.php
+Saved changes to horizontal-curve-staking.php
+Replaced 1 alerts in slope-staking.php
+Saved changes to slope-staking.php

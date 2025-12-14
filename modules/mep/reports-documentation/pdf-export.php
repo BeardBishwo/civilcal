@@ -659,6 +659,7 @@ function getExportTemplates() {
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include AEC_ROOT . '/themes/default/views/partials/header.php'; ?>
@@ -858,7 +859,8 @@ function getExportTemplates() {
             const previewWindow = window.open('', '_blank', 'width=800,height=600');
             previewWindow.document.write(`
                 <html>
-                    <head><title>PDF Preview</title></head>
+                    <head><title>PDF Preview</title><link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
+</head>
                     <body style="font-family: Arial; padding: 20px;">
                         <h2>PDF Report Preview</h2>
                         <p><strong>Template:</strong> ${formData.get('template') || 'Standard'}</p>
@@ -868,7 +870,8 @@ function getExportTemplates() {
                         <p><strong>Include Images:</strong> ${formData.get('include_images') ? 'Yes' : 'No'}</p>
                         <hr>
                         <p><em>This is a preview of the PDF content. Actual PDF would contain formatted charts, graphs, and professional layout.</em></p>
-                    </body>
+                    <script src="../../../public/assets/js/global-notifications.js"></script>
+</body>
                 </html>
             `);
         }
@@ -886,15 +889,15 @@ function getExportTemplates() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('PDF generated successfully: ' + data.filename);
+                    showNotification('PDF generated successfully: ' + data.filename);
                     location.reload();
                 } else {
-                    alert('Error generating PDF: ' + data.error);
+                    showNotification('Error generating PDF: ' + data.error, 'danger');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error generating PDF');
+                showNotification('Error generating PDF', 'danger');
             });
         });
         
@@ -904,7 +907,7 @@ function getExportTemplates() {
             const formData = new FormData(this);
             
             if (!formData.get('project_ids')) {
-                alert('Please enter project IDs');
+                showNotification('Please enter project IDs', 'info');
                 return;
             }
             
@@ -915,15 +918,15 @@ function getExportTemplates() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(`Bulk export completed! Generated ${data.count} reports.`);
+                    showNotification(`Bulk export completed! Generated ${data.count} reports.`, 'success');
                     location.reload();
                 } else {
-                    alert('Bulk export failed: ' + data.error);
+                    showNotification('Bulk export failed: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error in bulk export');
+                showNotification('Error in bulk export', 'danger');
             });
         });
         
@@ -940,18 +943,19 @@ function getExportTemplates() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Export scheduled successfully!');
+                    showNotification('Export scheduled successfully!', 'info');
                     location.reload();
                 } else {
-                    alert('Error scheduling export: ' + data.error);
+                    showNotification('Error scheduling export: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error scheduling export');
+                showNotification('Error scheduling export', 'danger');
             });
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

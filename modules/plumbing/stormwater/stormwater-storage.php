@@ -130,6 +130,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             border: 1px solid var(--accent);
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -266,7 +267,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             const retentionPercent = parseFloat(document.getElementById('retentionVolume').value);
             
             if (!catchmentArea || catchmentArea <= 0) {
-                alert('Please enter catchment area');
+                showNotification('Please enter catchment area', 'info');
                 return;
             }
             
@@ -446,6 +447,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         document.getElementById('catchment-section').style.display = 'block';
         displayRecent();
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

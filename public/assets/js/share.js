@@ -411,25 +411,23 @@ class ShareSystem {
      * Delete a comment
      */
     async deleteComment(commentId) {
-        if (!confirm('Are you sure you want to delete this comment? This action cannot be undone.')) {
-            return;
-        }
+        showConfirmModal('Delete Comment', 'Are you sure you want to delete this comment? This action cannot be undone.', async () => {
+            try {
+                const response = await fetch(`/api/comments/${commentId}`, {
+                    method: 'DELETE'
+                });
 
-        try {
-            const response = await fetch(`/api/comments/${commentId}`, {
-                method: 'DELETE'
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                this.loadComments(); // Reload comments
-            } else {
-                throw new Error(data.message);
+                const data = await response.json();
+                if (data.success) {
+                    this.loadComments(); // Reload comments
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Error deleting comment:', error);
+                this.showAlert('Failed to delete comment. Please try again.', 'danger');
             }
-        } catch (error) {
-            console.error('Error deleting comment:', error);
-            this.showAlert('Failed to delete comment. Please try again.', 'danger');
-        }
+        });
     }
 
     /**

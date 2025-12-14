@@ -138,7 +138,6 @@ $module = $data['module'];
     </div>
 </div>
 
-<script>
     document.getElementById('moduleSettingsForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -156,19 +155,14 @@ $module = $data['module'];
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Show premium toast (if available) or simple alert
-                   if(window.showToast) {
-                       window.showToast('Settings saved successfully!');
-                   } else {
-                       alert('Settings saved successfully!');
-                   }
+                    showNotification('Settings saved successfully!', 'success');
                 } else {
-                    alert('Error: ' + (data.message || 'Unknown error'));
+                    showNotification('Error: ' + (data.message || 'Unknown error'), 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while saving settings.');
+                showNotification('An error occurred while saving settings.', 'error');
             })
             .finally(() => {
                 btn.disabled = false;

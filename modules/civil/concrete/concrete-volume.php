@@ -44,7 +44,7 @@ require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
         const depth = parseFloat(document.getElementById('depth').value);
 
         if (isNaN(length) || isNaN(width) || isNaN(depth)) {
-            alert('Please enter valid numbers.');
+            showNotification('Please enter valid numbers.', 'info');
             return;
         }
         

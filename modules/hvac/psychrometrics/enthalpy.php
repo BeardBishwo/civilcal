@@ -180,6 +180,7 @@ if (session_status() == PHP_SESSION_NONE) {
             margin: 0 1rem;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="calculator-container">
@@ -370,7 +371,7 @@ if (session_status() == PHP_SESSION_NONE) {
             const mode = document.getElementById('enthalpyMode').value;
             
             if (!dryBulb || !pressure) {
-                alert('Please enter dry bulb temperature and pressure');
+                showNotification('Please enter dry bulb temperature and pressure', 'info');
                 return;
             }
             
@@ -378,14 +379,14 @@ if (session_status() == PHP_SESSION_NONE) {
             
             if (mode === 'db-wb') {
                 if (!wetBulb) {
-                    alert('Please enter wet bulb temperature');
+                    showNotification('Please enter wet bulb temperature', 'info');
                     return;
                 }
                 result = calculateEnthalpyFromDB_WB(dryBulb, wetBulb, pressure);
             } else {
                 const additional = parseFloat(document.getElementById('enthalpyAdditionalValue').value);
                 if (!additional) {
-                    alert('Please enter the additional value');
+                    showNotification('Please enter the additional value', 'info');
                     return;
                 }
                 if (mode === 'db-rh') {
@@ -578,10 +579,11 @@ if (session_status() == PHP_SESSION_NONE) {
         }
         
         function clearEnthalpyHistory() {
-            if (confirm('Clear all calculation history?')) {
+            showConfirmModal('Clear History', 'Are you sure you want to clear all calculation history?', function() {
                 localStorage.removeItem('hvacEnthalpyHistory');
                 loadEnthalpyCalculationHistory();
-            }
+                showNotification('History cleared', 'success');
+            });
         }
         
         function updateEnthalpyAdditionalInput() {
@@ -614,5 +616,6 @@ if (session_status() == PHP_SESSION_NONE) {
             document.getElementById('enthalpyMode').addEventListener('change', updateEnthalpyAdditionalInput);
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

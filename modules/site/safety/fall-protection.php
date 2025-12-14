@@ -201,6 +201,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -339,7 +340,7 @@ function calculateFallProtection() {
     const clearanceHeight = parseFloat(document.getElementById('clearanceHeight').value) || 0;
     
     if (!workHeight || !surfaceType || !systemType) {
-        alert('Please fill in all required fields');
+        showNotification('Please fill in all required fields', 'info');
         return;
     }
     
@@ -477,7 +478,7 @@ function saveCalculation() {
     }
     
     saveToLocalStorage('saved_calculations', calculationData);
-    alert('Calculation saved successfully!');
+    showNotification('Calculation saved successfully!', 'info');
 }
 
 function saveToLocalStorage(key, data) {
@@ -508,5 +509,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

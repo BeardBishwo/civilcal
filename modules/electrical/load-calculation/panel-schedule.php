@@ -188,6 +188,7 @@
             opacity: 0.9;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -394,7 +395,7 @@
             if (isNaN(lighting) || isNaN(receptacles) || isNaN(appliances) || 
                 isNaN(motors) || isNaN(voltage) || isNaN(phase) || 
                 isNaN(diversity) || isNaN(continuousPercent)) {
-                alert('Please enter valid numbers.');
+                showNotification('Please enter valid numbers.', 'info');
                 return;
             }
             
@@ -466,5 +467,6 @@
             localStorage.setItem('recentPanelScheduleCalculations', JSON.stringify(recent));
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

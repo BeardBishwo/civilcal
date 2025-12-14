@@ -134,6 +134,7 @@ if ($_POST) {
         .btn { background: #17a2b8; color: white; padding: 12px 30px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
         .highlight { background: #e7f3ff; padding: 10px; border-radius: 4px; border-left: 4px solid #007bff; }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include '../../../themes/default/views/partials/header.php'; ?>
@@ -235,6 +236,7 @@ if ($_POST) {
             </div>
         <?php endif; ?>
     </div>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

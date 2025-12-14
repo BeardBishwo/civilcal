@@ -403,6 +403,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container-fluid py-4">
@@ -515,7 +516,7 @@
             const interval = parseFloat(document.getElementById('stationInterval').value);
             
             if (!radius || !deflection) {
-                alert('Please enter radius and deflection angle');
+                showNotification('Please enter radius and deflection angle', 'info');
                 return;
             }
             
@@ -675,7 +676,7 @@
                     break;
             }
             
-            alert(message);
+            showNotification(message, 'info');
         }
 
         function saveCalculation(type, calculation) {
@@ -721,5 +722,6 @@
             }
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

@@ -1381,8 +1381,14 @@ window.showToast = function (type = 'info', titleOrMessage = '', message = '') {
             return;
         }
 
-        // Last resort: alert
-        alert(text || (type + ' notification'));
+        // Check for global showNotification
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(text, type);
+            return;
+        }
+
+        // Last resort: Log to console instead of alert
+        console.warn('Toast fallback:', text);
     } catch (e) {
         console.error('showToast error:', e);
     }

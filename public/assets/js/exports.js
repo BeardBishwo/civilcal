@@ -367,30 +367,28 @@ function generateEditTemplateForm(templateId, config) {
 function handleDeleteTemplate(event) {
     const templateId = event.currentTarget.getAttribute('data-template-id');
 
-    if (!confirm('Are you sure you want to delete this template? This action cannot be undone.')) {
-        return;
-    }
-
-    fetch(`/user/exports/delete-template/${templateId}`, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAlert('Template deleted successfully', 'success');
-                // Remove template from DOM
-                event.currentTarget.closest('.template-item').remove();
-            } else {
-                showAlert('Failed to delete template: ' + data.message, 'danger');
-            }
-        })
-        .catch(error => {
-            console.error('Error deleting template:', error);
-            showAlert('Failed to delete template', 'danger');
-        });
+    showConfirmModal('Delete Template', 'Are you sure you want to delete this template? This action cannot be undone.', () => {
+        fetch(`/user/exports/delete-template/${templateId}`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Template deleted successfully', 'success');
+                    // Remove template from DOM
+                    event.currentTarget.closest('.template-item').remove();
+                } else {
+                    showAlert('Failed to delete template: ' + data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting template:', error);
+                showAlert('Failed to delete template', 'danger');
+            });
+    });
 }
 
 /**

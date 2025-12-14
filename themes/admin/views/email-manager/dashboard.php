@@ -414,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('composeEmailBtn').addEventListener('click', function(e) {
         e.preventDefault();
         // This would open a modal or redirect to compose page
-        alert('Compose email functionality would be implemented here');
+        showNotification('Compose email functionality would be implemented here', 'info');
     });
 });
 </script>

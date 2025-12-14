@@ -243,15 +243,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 try {
                     var data = JSON.parse(xhr.responseText);
                     if (data.success) {
-                        showToast('Plugin uploaded successfully', 'success');
+                        showNotification('Plugin uploaded successfully', 'success');
                         setTimeout(() => location.reload(), 1000);
                     } else {
                         progress.style.display = 'none';
-                        showToast('Error: ' + (data.message || 'Upload failed'), 'error');
+                        showNotification('Error: ' + (data.message || 'Upload failed'), 'error');
                     }
                 } catch(err){
                     progress.style.display = 'none';
-                    showToast('Upload failed', 'error');
+                    showNotification('Upload failed', 'error');
                 }
             }
         };
@@ -281,17 +281,17 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showToast('Plugin ' + action + 'd successfully', 'success');
+                    showNotification('Plugin ' + action + 'd successfully', 'success');
                     setTimeout(() => location.reload(), 500);
                 } else {
-                    showToast('Error: ' + (data.message || 'Action failed'), 'error');
+                    showNotification('Error: ' + (data.message || 'Action failed'), 'error');
                     icon.className = originalClass;
                     this.disabled = false;
                 }
             })
             .catch(err => {
                 console.error(err);
-                showToast('Action failed', 'error');
+                showNotification('Action failed', 'error');
                 icon.className = originalClass;
                 this.disabled = false;
             });
@@ -299,36 +299,36 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Delete Plugin
+    // Confirm Delete Plugin
     document.querySelectorAll('.delete-plugin').forEach(btn => {
         btn.addEventListener('click', function() {
-            if (!confirm('Are you sure you want to delete this plugin? This cannot be undone.')) return;
-            
             const slug = this.dataset.slug;
-            const icon = this.querySelector('i');
-            
-            icon.className = 'fas fa-spinner fa-spin';
-            this.disabled = true;
-            
-            fetch('<?php echo app_base_url('admin/plugins/delete'); ?>/' + encodeURIComponent(slug), {
-                method: 'POST',
-                headers: {'X-CSRF-Token': csrfToken}
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showToast('Plugin deleted successfully', 'success');
-                    setTimeout(() => location.reload(), 500);
-                } else {
-                    showToast('Error: ' + (data.message || 'Delete failed'), 'error');
+            showConfirmModal('Delete Plugin', 'Are you sure you want to delete this plugin? This cannot be undone.', () => {
+                const icon = this.querySelector('i');
+                icon.className = 'fas fa-spinner fa-spin';
+                this.disabled = true;
+                
+                fetch('<?php echo app_base_url('admin/plugins/delete'); ?>/' + encodeURIComponent(slug), {
+                    method: 'POST',
+                    headers: {'X-CSRF-Token': csrfToken}
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Plugin deleted successfully', 'success');
+                        setTimeout(() => location.reload(), 500);
+                    } else {
+                        showNotification('Error: ' + (data.message || 'Delete failed'), 'error');
+                        icon.className = 'fas fa-trash';
+                        this.disabled = false;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showNotification('Delete failed', 'error');
                     icon.className = 'fas fa-trash';
                     this.disabled = false;
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                showToast('Delete failed', 'error');
-                icon.className = 'fas fa-trash';
-                this.disabled = false;
+                });
             });
         });
     });
@@ -342,29 +342,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {'Accept':'application/json'}
             })
             .then(r=>r.json())
-            .then(data=>{ if(data.success){ openDetailsModal(data.data); } else { showToast('Details failed', 'error'); } })
-            .catch(()=>{ showToast('Details failed', 'error'); });
+            .then(data=>{ if(data.success){ openDetailsModal(data.data); } else { showNotification('Details failed', 'error'); } })
+            .catch(()=>{ showNotification('Details failed', 'error'); });
         });
     });
 });
-
-function showToast(message, type) {
-    var toast = document.createElement('div');
-    toast.className = `notification-toast notification-${type} show`;
-    toast.style.zIndex = '9999';
-    toast.innerHTML = `
-        <div class="toast-content">
-            <div class="toast-icon"><i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i></div>
-            <div class="toast-message">${message}</div>
-            <button class="toast-close" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
-        </div>
-    `;
-    document.body.appendChild(toast);
-    setTimeout(function(){ 
-        toast.classList.remove('show');
-        setTimeout(function(){ if(toast.parentElement) toast.remove(); }, 300); 
-    }, 3000);
-}
 
 function openDetailsModal(data){
     var overlay = document.createElement('div');

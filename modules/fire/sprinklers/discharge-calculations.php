@@ -163,6 +163,7 @@
             color: var(--dark);
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -240,7 +241,7 @@
             const designArea = parseFloat(document.getElementById('design-area').value);
 
             if (isNaN(pressure)) {
-                alert('Please enter valid pressure value.');
+                showNotification('Please enter valid pressure value.', 'info');
                 return;
             }
             
@@ -286,5 +287,6 @@
             document.getElementById('result-area').style.display = 'block';
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

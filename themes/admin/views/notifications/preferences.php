@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     resetBtn.addEventListener('click', function() {
-        if (confirm('Are you sure you want to reset to default preferences?')) {
+        showConfirmModal('Reset Preferences', 'Are you sure you want to reset to default preferences?', () => {
             document.getElementById('email_notifications').checked = true;
             document.getElementById('email_frequency').value = 'instant';
             document.getElementById('push_notifications').checked = true;
@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('user_action_notifications').checked = true;
             document.getElementById('quiet_hours_start').value = '';
             document.getElementById('quiet_hours_end').value = '';
-        }
+        });
     });
 });
 </script>

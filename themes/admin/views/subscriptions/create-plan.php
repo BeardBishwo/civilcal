@@ -979,7 +979,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         if (features.length === 0) {
-            alert('Please add at least one feature to the plan.');
+            showNotification('Please add at least one feature to the plan.', 'warning');
             return;
         }
         
@@ -1008,35 +1008,6 @@ document.addEventListener('DOMContentLoaded', function() {
             showNotification('An error occurred while creating the plan.', 'error');
         });
     });
-    
-    function showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            background: ${type === 'success' ? '#48bb78' : '#ef4444'};
-            color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
-        `;
-        notification.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                <span>${message}</span>
-            </div>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
     
     // Add initial feature
     addFeatureBtn.click();

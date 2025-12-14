@@ -774,6 +774,7 @@ $budget_comparison = $_SESSION['budget_comparison'] ?? null;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="summary-container">
@@ -1052,21 +1053,21 @@ $budget_comparison = $_SESSION['budget_comparison'] ?? null;
         
         function exportToPDF() {
             // PDF export functionality
-            alert('PDF export functionality will be implemented with a PDF library');
+            showNotification('PDF export functionality will be implemented with a PDF library', 'info');
         }
         
         function exportToExcel() {
             // Excel export functionality  
-            alert('Excel export functionality will be implemented with Excel library');
+            showNotification('Excel export functionality will be implemented with Excel library', 'info');
         }
         
         function loadSummary(summaryId) {
             // Load saved summary
-            alert('Load summary functionality for ID: ' + summaryId);
+            showNotification('Load summary functionality for ID: ' + summaryId);
         }
         
         // Sync project selection between forms
-        document.getElementById('project_id').addEventListener('change', function() {
+        document.getElementById('project_id', 'info').addEventListener('change', function() {
             document.getElementById('budget_project_id').value = this.value;
         });
         
@@ -1074,6 +1075,7 @@ $budget_comparison = $_SESSION['budget_comparison'] ?? null;
             document.getElementById('project_id').value = this.value;
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

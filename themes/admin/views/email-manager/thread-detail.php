@@ -273,18 +273,18 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 // Show success message
-                alert('Reply sent successfully!');
+                showNotification('Reply sent successfully!', 'success');
                 // Clear form
                 this.reset();
                 // Reload page to show new message
                 location.reload();
             } else {
-                alert('Error: ' + (data.error || 'Failed to send reply'));
+                showNotification('Error: ' + (data.error || 'Failed to send reply'), 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while sending the reply');
+            showNotification('An error occurred while sending the reply', 'error');
         });
     });
     

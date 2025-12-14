@@ -178,6 +178,7 @@
             opacity: 0.9;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -324,12 +325,12 @@
             const loadType = document.getElementById('load-type').value;
 
             if (isNaN(sourceVoltage) || isNaN(loadVoltage)) {
-                alert('Please enter valid voltages.');
+                showNotification('Please enter valid voltages.', 'info');
                 return;
             }
             
             if (loadVoltage === 0) {
-                alert('Load voltage cannot be zero.');
+                showNotification('Load voltage cannot be zero.', 'info');
                 return;
             }
             
@@ -395,5 +396,6 @@
             localStorage.setItem('recentVoltageRegulationCalculations', JSON.stringify(recent));
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

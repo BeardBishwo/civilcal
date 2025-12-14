@@ -128,6 +128,7 @@
             text-decoration: underline;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -170,7 +171,7 @@
             const densityFactor = parseFloat(document.getElementById('density-factor').value);
 
             if (isNaN(originalVolume) || isNaN(densityFactor)) {
-                alert('Please enter valid numbers.');
+                showNotification('Please enter valid numbers.', 'info');
                 return;
             }
             
@@ -193,5 +194,6 @@
             document.getElementById('result-area').style.display = 'block';
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

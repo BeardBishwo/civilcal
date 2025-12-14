@@ -142,16 +142,16 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('<?php echo !empty($template) ? 'Template updated' : 'Template created'; ?> successfully!');
+                showNotification('<?php echo !empty($template) ? 'Template updated' : 'Template created'; ?> successfully!', 'success');
                 window.location.href = '<?php echo app_base_url('/admin/email-manager/templates'); ?>';
             } else {
                 const errorMessage = data.errors ? Object.values(data.errors).join('\n') : (data.error || 'An error occurred');
-                alert('Error:\n' + errorMessage);
+                showNotification('Error: ' + errorMessage, 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while saving the template');
+            showNotification('An error occurred while saving the template', 'error');
         });
     });
     

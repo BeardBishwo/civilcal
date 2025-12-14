@@ -180,6 +180,7 @@
             opacity: 0.9;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -370,7 +371,7 @@
             const wireMaterial = document.getElementById('wire-material').value;
 
             if (isNaN(hp) || isNaN(efficiency) || isNaN(pf)) {
-                alert('Please enter valid numbers.');
+                showNotification('Please enter valid numbers.', 'info');
                 return;
             }
             
@@ -519,5 +520,6 @@
             localStorage.setItem('recentMotorCalculations', JSON.stringify(recent));
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

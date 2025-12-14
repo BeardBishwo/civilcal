@@ -639,7 +639,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
         // You would ideally show a toast notification here
-        alert("Copied to clipboard!");
+        showNotification("Copied to clipboard!", "success");
     }, (err) => {
         console.error('Could not copy text: ', err);
     });

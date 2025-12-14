@@ -276,26 +276,29 @@ $autoBackupEnabled = $backup_settings['enabled'] ?? false;
 
 <script>
 function createBackupNow() {
-    if (!confirm('Are you sure you want to create a backup now? This may take several minutes.')) return;
-    
-    fetch('<?= app_base_url('/admin/backup/create') ?>', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-Token': '<?= csrf_token() ?>'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Backup creation started successfully');
-            setTimeout(() => location.reload(), 2000);
-        } else {
-            alert('Failed to start backup: ' + (data.message || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        alert('Error starting backup');
-        console.error(error);
+    showConfirmModal('Create Backup', 'Are you sure you want to create a backup now? This may take several minutes.', () => {
+        showLoading('Creating backup...');
+        fetch('<?= app_base_url('/admin/backup/create') ?>', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-Token': '<?= csrf_token() ?>'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.success) {
+                showNotification('Backup creation started successfully', 'success');
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                showNotification('Failed to start backup: ' + (data.message || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            showNotification('Error starting backup', 'error');
+            console.error(error);
+        });
     });
 }
 
@@ -305,26 +308,31 @@ function restoreBackup() {
     input.accept = '.zip,.gz';
     input.onchange = function(e) {
         const file = e.target.files[0];
-        if (file && confirm('Are you sure you want to restore from this backup? This will overwrite current data.')) {
-            const formData = new FormData();
-            formData.append('backup_file', file);
-            
-            fetch('<?= app_base_url('/admin/backup/restore') ?>', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Backup restored successfully');
-                    setTimeout(() => location.reload(), 3000);
-                } else {
-                    alert('Failed to restore backup: ' + (data.message || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                alert('Error restoring backup');
-                console.error(error);
+        if (file) {
+            showConfirmModal('Restore Backup', 'Are you sure you want to restore from this backup? This will overwrite current data.', () => {
+                const formData = new FormData();
+                formData.append('backup_file', file);
+                
+                showLoading('Restoring backup...');
+                fetch('<?= app_base_url('/admin/backup/restore') ?>', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        showNotification('Backup restored successfully', 'success');
+                        setTimeout(() => location.reload(), 3000);
+                    } else {
+                        showNotification('Failed to restore backup: ' + (data.message || 'Unknown error'), 'error');
+                    }
+                })
+                .catch(error => {
+                    hideLoading();
+                    showNotification('Error restoring backup', 'error');
+                    console.error(error);
+                });
             });
         }
     };
@@ -336,66 +344,71 @@ function downloadBackup(backupId) {
 }
 
 function restoreFromBackup(backupId) {
-    if (!confirm('Are you sure you want to restore from this backup? This will overwrite current data and cannot be undone.')) return;
-    
-    fetch(`<?= app_base_url('/admin/backup/restore-from-id') ?>/${backupId}`, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-Token': '<?= csrf_token() ?>'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Backup restored successfully');
-            setTimeout(() => location.reload(), 3000);
-        } else {
-            alert('Failed to restore backup: ' + (data.message || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        alert('Error restoring backup');
-        console.error(error);
+    showConfirmModal('Restore Backup', 'Are you sure you want to restore from this backup? This will overwrite current data and cannot be undone.', () => {
+        showLoading('Restoring backup...');
+        fetch(`<?= app_base_url('/admin/backup/restore-from-id') ?>/${backupId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-Token': '<?= csrf_token() ?>'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.success) {
+                showNotification('Backup restored successfully', 'success');
+                setTimeout(() => location.reload(), 3000);
+            } else {
+                showNotification('Failed to restore backup: ' + (data.message || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            showNotification('Error restoring backup', 'error');
+            console.error(error);
+        });
     });
 }
 
 function deleteBackup(backupId) {
-    if (!confirm('Are you sure you want to delete this backup? This action cannot be undone.')) return;
-    
-    fetch(`<?= app_base_url('/admin/backup/delete') ?>/${backupId}`, {
-        method: 'DELETE',
-        headers: {
-            'X-CSRF-Token': '<?= csrf_token() ?>'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Backup deleted successfully');
-            setTimeout(() => location.reload(), 1000);
-        } else {
-            alert('Failed to delete backup');
-        }
+    showConfirmModal('Delete Backup', 'Are you sure you want to delete this backup? This action cannot be undone.', () => {
+        fetch(`<?= app_base_url('/admin/backup/delete') ?>/${backupId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-Token': '<?= csrf_token() ?>'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Backup deleted successfully', 'success');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showNotification('Failed to delete backup', 'error');
+            }
+        });
     });
 }
 
 function cleanupOldBackups() {
-    if (!confirm('Are you sure you want to delete old backups? This will remove backups older than the retention period.')) return;
-    
-    fetch('<?= app_base_url('/admin/backup/cleanup') ?>', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-Token': '<?= csrf_token() ?>'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(`Cleaned up ${data.deleted_count || 0} old backups`);
-            setTimeout(() => location.reload(), 1000);
-        } else {
-            alert('Failed to cleanup old backups');
-        }
+    showConfirmModal('Cleanup Backups', 'Are you sure you want to delete old backups? This will remove backups older than the retention period.', () => {
+        showLoading('Cleaning up...');
+        fetch('<?= app_base_url('/admin/backup/cleanup') ?>', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-Token': '<?= csrf_token() ?>'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.success) {
+                showNotification(`Cleaned up ${data.deleted_count || 0} old backups`, 'success');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showNotification('Failed to cleanup old backups', 'error');
+            }
+        });
     });
 }
 
@@ -404,6 +417,7 @@ function refreshBackupHistory() {
 }
 
 function testBackupConfiguration() {
+    showLoading('Testing configuration...');
     fetch('<?= app_base_url('/admin/backup/test') ?>', {
         method: 'POST',
         headers: {
@@ -412,14 +426,16 @@ function testBackupConfiguration() {
     })
     .then(response => response.json())
     .then(data => {
+        hideLoading();
         if (data.success) {
-            alert('Backup configuration test passed');
+            showNotification('Backup configuration test passed', 'success');
         } else {
-            alert('Backup configuration test failed: ' + (data.message || 'Unknown error'));
+            showNotification('Backup configuration test failed: ' + (data.message || 'Unknown error'), 'error');
         }
     })
     .catch(error => {
-        alert('Error testing backup configuration');
+        hideLoading();
+        showNotification('Error testing backup configuration', 'error');
         console.error(error);
     });
 }

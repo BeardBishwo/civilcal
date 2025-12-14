@@ -119,7 +119,7 @@ $role_stats = $role_stats ?? [];
         // Implement role editing functionality
         // console.log('Edit role:', roleKey);
         // Placeholder for now
-        alert('Edit functionality for ' + roleKey + ' coming soon.');
+        showNotification('Edit functionality for ' + roleKey + ' coming soon.', 'info');
     }
 </script>
 

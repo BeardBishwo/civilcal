@@ -129,12 +129,12 @@ function calculateSHR() {
     const latent = parseFloat(document.getElementById('latentHeat').value);
     
     if (!sensible || !latent) {
-        alert('Please enter both sensible and latent heat values');
+        showNotification('Please enter both sensible and latent heat values', 'info');
         return;
     }
     
     if (sensible < 0 || latent < 0) {
-        alert('Heat values must be positive');
+        showNotification('Heat values must be positive', 'info');
         return;
     }
     
@@ -307,7 +307,7 @@ function showReference(type) {
             break;
     }
     
-    alert(message);
+    showNotification(message, 'info');
 }
 
 // Utility functions

@@ -207,6 +207,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -291,7 +292,7 @@
             const height = parseFloat(document.getElementById('rectHeight').value);
             
             if (!width || !height) {
-                alert('Please enter both width and height');
+                showNotification('Please enter both width and height', 'info');
                 return;
             }
             
@@ -319,5 +320,6 @@
             saveCalculation('Equivalent Duct', `${width}"×${height}" → ${equivalentRound.toFixed(1)}" round`);
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

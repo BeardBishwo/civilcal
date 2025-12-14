@@ -198,6 +198,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -298,7 +299,7 @@
             const airChanges = parseFloat(document.getElementById('airChanges').value);
             
             if (!area) {
-                alert('Please enter area');
+                showNotification('Please enter area', 'info');
                 return;
             }
             
@@ -353,5 +354,6 @@
             saveCalculation('Ventilation', `${area}m² ${spaceType} → ${Math.max(totalVentilation, airChangesCFM).toFixed(0)} CFM`);
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

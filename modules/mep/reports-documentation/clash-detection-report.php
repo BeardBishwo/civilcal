@@ -879,6 +879,7 @@ function exportClashData($data) {
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include '../../../themes/default/views/partials/header.php'; ?>
@@ -975,12 +976,12 @@ function exportClashData($data) {
                 if (data.success) {
                     displayClashResults(data.results);
                 } else {
-                    alert('Error analyzing clashes: ' + data.error);
+                    showNotification('Error analyzing clashes: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error analyzing clashes');
+                showNotification('Error analyzing clashes', 'danger');
             });
         }
         
@@ -995,14 +996,14 @@ function exportClashData($data) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Clash data exported successfully!');
+                    showNotification('Clash data exported successfully!', 'info');
                 } else {
-                    alert('Error exporting data: ' + data.error);
+                    showNotification('Error exporting data: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error exporting data');
+                showNotification('Error exporting data', 'danger');
             });
         }
         
@@ -1118,6 +1119,7 @@ function exportClashData($data) {
             analyzeClashes();
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

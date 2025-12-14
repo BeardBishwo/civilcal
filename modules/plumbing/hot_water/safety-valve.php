@@ -116,6 +116,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             color: var(--accent);
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -201,7 +202,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             const heaterRating = parseFloat(document.getElementById('heaterRating').value);
             
             if (!capacity || capacity <= 0) {
-                alert('Please enter a valid heater capacity');
+                showNotification('Please enter a valid heater capacity', 'info');
                 return;
             }
             
@@ -358,6 +359,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         // Load recent calculations on page load
         displayRecent();
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

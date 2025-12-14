@@ -322,6 +322,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: auto;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -535,5 +536,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById('primer_coverage_group').style.display = this.checked ? 'block' : 'none';
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

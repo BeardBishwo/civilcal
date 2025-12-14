@@ -662,42 +662,71 @@ class ProfileController extends Controller
     public function enableTwoFactor()
     {
         try {
+            error_log("2FA Enable: Starting process");
+            
             if (!$this->isPostRequest()) {
                 throw new Exception('Invalid request method');
             }
 
             $userId = $this->getCurrentUserId();
+            error_log("2FA Enable: User ID: " . $userId);
+            
             $data = $this->getRequestData();
 
             // Verify password first
             $currentPassword = $data['password'] ?? '';
+            if (empty($currentPassword)) {
+                error_log("2FA Enable: No password provided");
+                $this->json(['error' => 'Password is required'], 400);
+                return;
+            }
+            
             $user = $this->userModel->find($userId);
-            if (!$user || !password_verify($currentPassword, $user['password'])) {
+            if (!$user) {
+                error_log("2FA Enable: User not found");
+                $this->json(['error' => 'User not found'], 404);
+                return;
+            }
+            
+            if (!password_verify($currentPassword, $user['password'])) {
+                error_log("2FA Enable: Incorrect password");
                 $this->json(['error' => 'Incorrect password'], 401);
                 return;
             }
 
-            // Generate Schema
+            error_log("2FA Enable: Password verified, generating secret");
+            
+            // Check if Google2FA class exists
+            if (!class_exists('\\PragmaRX\\Google2FA\\Google2FA')) {
+                error_log("2FA Enable: Google2FA class not found");
+                $this->json(['error' => 'Google2FA library not installed'], 500);
+                return;
+            }
+            
+            // Generate Secret
             $google2fa = new \PragmaRX\Google2FA\Google2FA();
             $secret = $google2fa->generateSecretKey();
+            error_log("2FA Enable: Secret generated");
             
             // Generate QR Code URL
-            // Ensure app name is set
             $appName = 'Bishwo Calculator';
             $qrCodeUrl = $google2fa->getQRCodeUrl(
                 $appName,
                 $user['email'],
                 $secret
             );
+            error_log("2FA Enable: QR URL generated");
             
             // Backup codes
             $recoveryCodes = [];
             for ($i = 0; $i < 8; $i++) {
                 $recoveryCodes[] = bin2hex(random_bytes(5));
             }
+            error_log("2FA Enable: Recovery codes generated");
 
             // Save secret (but not enabled yet)
             $this->userModel->enableTwoFactor($userId, $secret, $recoveryCodes);
+            error_log("2FA Enable: Data saved to database");
             
             // Return secret and QR URL for frontend to display
             // We'll use a QR code library or simple API in production, but for now passing the data
@@ -709,7 +738,13 @@ class ProfileController extends Controller
             ]);
 
         } catch (Exception $e) {
+            error_log("2FA Enable Error: " . $e->getMessage());
+            error_log("2FA Enable Stack: " . $e->getTraceAsString());
             $this->json(['error' => $e->getMessage()], 500);
+        } catch (\Throwable $e) {
+            error_log("2FA Enable Fatal Error: " . $e->getMessage());
+            error_log("2FA Enable Fatal Stack: " . $e->getTraceAsString());
+            $this->json(['error' => 'An unexpected error occurred: ' . $e->getMessage()], 500);
         }
     }
 

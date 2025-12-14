@@ -355,6 +355,7 @@
             border-bottom: none;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -524,12 +525,12 @@
             const energyCost = parseFloat(document.getElementById('energyCost').value) || 0.10;
             
             if (!area || !currentR || !newR || !heatingDD) {
-                alert('Please enter all required values (area, current R, new R, heating degree days)');
+                showNotification('Please enter all required values (area, current R, new R, heating degree days)', 'info');
                 return;
             }
             
             if (newR <= currentR) {
-                alert('New R-value must be greater than current R-value');
+                showNotification('New R-value must be greater than current R-value', 'info');
                 return;
             }
             
@@ -672,5 +673,6 @@
             localStorage.setItem('hvacEnergyHistory', JSON.stringify(history));
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

@@ -592,40 +592,23 @@ function editFromPreview() {
 
 // Action functions
 function togglePageStatus(pageId) {
-    if (confirm('Are you sure you want to change this page\'s status?')) {
+    showConfirmModal('Toggle Status', 'Are you sure you want to change this page\'s status?', () => {
         // Implement status toggle logic
         console.log('Toggle status for page:', pageId);
         // Show success message
         showNotification('Page status updated successfully', 'success');
-    }
+    });
 }
 
 function deletePage(pageId, pageTitle) {
-    if (confirm(`Are you sure you want to delete "${pageTitle}"? This action cannot be undone.`)) {
+    showConfirmModal('Delete Page', `Are you sure you want to delete "${pageTitle}"? This action cannot be undone.`, () => {
         // Implement delete logic
         console.log('Delete page:', pageId);
         showNotification('Page deleted successfully', 'success');
-    }
+    });
 }
 
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-            <span>${message}</span>
-        </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => notification.classList.add('visible'), 10);
-    setTimeout(() => {
-        notification.classList.remove('visible');
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
+
 </script>
 
 <style>

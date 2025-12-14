@@ -401,7 +401,7 @@ function showActivityTab(tabName) {
 }
 
 function clearSystemCache() {
-    if (confirm('Are you sure you want to clear the system cache?')) {
+    showConfirmModal('Clear Cache', 'Are you sure you want to clear the system cache?', () => {
         fetch('<?= app_base_url('/admin/cache/clear') ?>', {
             method: 'POST',
             headers: {
@@ -416,18 +416,18 @@ function clearSystemCache() {
                 showNotification('Failed to clear cache', 'error');
             }
         });
-    }
+    });
 }
 
 function restartServices() {
-    if (confirm('Are you sure you want to restart system services? This may temporarily interrupt service.')) {
+    showConfirmModal('Restart Services', 'Are you sure you want to restart system services? This may temporarily interrupt service.', () => {
         showNotification('Restarting services...', 'info');
         // Implementation would depend on your specific services
-    }
+    });
 }
 
 function optimizeDatabase() {
-    if (confirm('Are you sure you want to optimize the database? This may take some time.')) {
+    showConfirmModal('Optimize Database', 'Are you sure you want to optimize the database? This may take some time.', () => {
         fetch('<?= app_base_url('/admin/database/optimize') ?>', {
             method: 'POST',
             headers: {
@@ -442,7 +442,7 @@ function optimizeDatabase() {
                 showNotification('Database optimization failed', 'error');
             }
         });
-    }
+    });
 }
 
 function checkUpdates() {
@@ -451,7 +451,7 @@ function checkUpdates() {
 }
 
 function runBackup() {
-    if (confirm('Are you sure you want to run a backup now?')) {
+    showConfirmModal('Run Backup', 'Are you sure you want to run a backup now?', () => {
         fetch('<?= app_base_url('/admin/backup/run') ?>', {
             method: 'POST',
             headers: {
@@ -466,7 +466,7 @@ function runBackup() {
                 showNotification('Failed to start backup', 'error');
             }
         });
-    }
+    });
 }
 
 function viewDetailedLogs() {

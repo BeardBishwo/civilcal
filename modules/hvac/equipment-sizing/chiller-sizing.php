@@ -152,12 +152,12 @@ function calculateChillerSize() {
     const efficiency = document.getElementById('chillerEfficiency').value;
     
     if (!chillerLoad) {
-        alert('Please enter chiller load');
+        showNotification('Please enter chiller load', 'info');
         return;
     }
     
     if (chillerLoad <= 0) {
-        alert('Chiller load must be positive');
+        showNotification('Chiller load must be positive', 'info');
         return;
     }
     
@@ -368,7 +368,7 @@ function showReference(type) {
             break;
     }
     
-    alert(message);
+    showNotification(message, 'info');
 }
 
 // Utility functions

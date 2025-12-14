@@ -318,15 +318,15 @@ function updateUser() {
     })
     .then(response => {
         if (response.ok) {
-            alert('User updated successfully!');
-            window.location.href = '<?= app_base_url('/admin/users') ?>';
+            showNotification('User updated successfully!', 'success');
+            setTimeout(() => window.location.href = '<?= app_base_url('/admin/users') ?>', 1000);
         } else {
             throw new Error('Failed to update user');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error updating user: ' + error.message);
+        showNotification('Error updating user: ' + error.message, 'error');
     })
     .finally(() => {
         // Reset button state
@@ -336,8 +336,8 @@ function updateUser() {
 }
 
 function deleteUser(userId) {
-    if (confirm('Are you absolutely sure you want to delete this user? This action cannot be undone.')) {
-        if (confirm('This will permanently delete the user account and all associated data. Are you sure?')) {
+    showConfirmModal('Delete User', 'Are you absolutely sure you want to delete this user? This action cannot be undone.', () => {
+        showConfirmModal('Confirm Deletion', 'This will permanently delete the user account and all associated data. Are you sure?', () => {
             fetch(`<?= app_base_url('/admin/users/') ?>${userId}/delete`, {
                 method: 'POST',
                 headers: {
@@ -347,18 +347,18 @@ function deleteUser(userId) {
             })
             .then(response => {
                 if (response.ok) {
-                    alert('User deleted successfully!');
-                    window.location.href = '<?= app_base_url('/admin/users') ?>';
+                    showNotification('User deleted successfully!', 'success');
+                    setTimeout(() => window.location.href = '<?= app_base_url('/admin/users') ?>', 1000);
                 } else {
                     throw new Error('Failed to delete user');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error deleting user: ' + error.message);
+                showNotification('Error deleting user: ' + error.message, 'error');
             });
-        }
-    }
+        });
+    });
 }
 
 function showPreviewModal(content) {

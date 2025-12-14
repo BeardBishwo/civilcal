@@ -783,6 +783,7 @@ function getSpecificationTemplate($category) {
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include '../../../themes/default/views/partials/header.php'; ?>
@@ -1216,7 +1217,7 @@ function getSpecificationTemplate($category) {
         }
         
         function deleteMaterial(materialId) {
-            if (confirm('Are you sure you want to delete this material?')) {
+            showConfirmModal('Delete Material', 'Are you sure you want to delete this material?', function() {
                 const formData = new FormData();
                 formData.append('action', 'delete_material');
                 formData.append('material_id', materialId);
@@ -1230,14 +1231,14 @@ function getSpecificationTemplate($category) {
                     if (data.success) {
                         location.reload();
                     } else {
-                        alert('Error deleting material: ' + data.error);
+                        showNotification('Error deleting material: ' + data.error);
                     }
                 });
-            }
+            });
         }
         
         function viewDetails(materialId) {
-            window.open(`material-database.php?action=view_details&id=${materialId}`, '_blank');
+            window.open(`material-database.php?action=view_details&id=${materialId}`, '_blank', 'info');
         }
         
         function closeModal() {
@@ -1252,7 +1253,7 @@ function getSpecificationTemplate($category) {
             const importData = document.getElementById('import-data').value;
             
             if (!importData.trim()) {
-                alert('Please enter data to import');
+                showNotification('Please enter data to import', 'info');
                 return;
             }
             
@@ -1267,15 +1268,15 @@ function getSpecificationTemplate($category) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(`Successfully imported ${data.count} materials`);
+                    showNotification(`Successfully imported ${data.count} materials`, 'success');
                     location.reload();
                 } else {
-                    alert('Error importing materials: ' + data.error);
+                    showNotification('Error importing materials: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error importing materials');
+                showNotification('Error importing materials', 'danger');
             });
         }
         
@@ -1290,15 +1291,15 @@ function getSpecificationTemplate($category) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(`Exported ${data.count} materials. File: ${data.filename}`);
+                    showNotification(`Exported ${data.count} materials. File: ${data.filename}`, 'success');
                     // Download link would be generated here
                 } else {
-                    alert('Error exporting materials: ' + data.error);
+                    showNotification('Error exporting materials: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error exporting materials');
+                showNotification('Error exporting materials', 'danger');
             });
         }
         
@@ -1315,16 +1316,16 @@ function getSpecificationTemplate($category) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Material saved successfully!');
+                    showNotification('Material saved successfully!', 'info');
                     closeModal();
                     location.reload();
                 } else {
-                    alert('Error saving material: ' + data.error);
+                    showNotification('Error saving material: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error saving material');
+                showNotification('Error saving material', 'danger');
             });
         });
         
@@ -1336,6 +1337,7 @@ function getSpecificationTemplate($category) {
             }
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

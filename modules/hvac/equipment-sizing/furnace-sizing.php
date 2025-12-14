@@ -148,12 +148,12 @@ function calculateFurnaceSize() {
     const fuelType = document.getElementById('fuelType').value;
 
     if (!heatingLoad) {
-        alert('Please enter heating load');
+        showNotification('Please enter heating load', 'info');
         return;
     }
 
     if (heatingLoad <= 0) {
-        alert('Heating load must be positive');
+        showNotification('Heating load must be positive', 'info');
         return;
     }
 
@@ -370,7 +370,7 @@ function showReference(type) {
             break;
     }
 
-    alert(message);
+    showNotification(message, 'info');
 }
 
 // Utility functions

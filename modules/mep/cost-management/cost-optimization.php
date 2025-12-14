@@ -851,6 +851,7 @@ $recommendations = $_SESSION['cost_recommendations'] ?? null;
             color: #721c24;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="optimization-container">
@@ -1040,7 +1041,7 @@ $recommendations = $_SESSION['cost_recommendations'] ?? null;
         function generateRecommendations() {
             const projectId = document.getElementById('project_id').value;
             if (!projectId) {
-                alert('Please select a project first.');
+                showNotification('Please select a project first.', 'info');
                 return;
             }
             
@@ -1056,9 +1057,10 @@ $recommendations = $_SESSION['cost_recommendations'] ?? null;
         }
         
         function exportAnalysis() {
-            alert('Export functionality will be implemented with report generation');
+            showNotification('Export functionality will be implemented with report generation', 'info');
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

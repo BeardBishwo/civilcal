@@ -113,6 +113,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             border-radius: 8px;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -247,7 +248,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             const offsets = parseInt(document.getElementById('offsetCount').value);
             
             if (!area || !height) {
-                alert('Please enter catchment area and pipe height');
+                showNotification('Please enter catchment area and pipe height', 'info');
                 return;
             }
             
@@ -413,6 +414,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         document.getElementById('flow-section').style.display = 'block';
         displayRecent();
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

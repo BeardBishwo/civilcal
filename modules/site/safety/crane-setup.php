@@ -178,6 +178,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -364,7 +365,7 @@
             const environmental = document.getElementById('environmental').value;
             
             if (!craneCapacity || !craneType || !loadWeight || !loadRadius) {
-                alert('Please fill in all required fields');
+                showNotification('Please fill in all required fields', 'info');
                 return;
             }
             
@@ -532,7 +533,7 @@
             }
             
             saveToLocalStorage('saved_calculations', calculationData);
-            alert('Calculation saved successfully!');
+            showNotification('Calculation saved successfully!', 'info');
         }
 
         // Load saved data on page load
@@ -540,5 +541,6 @@
             loadFromLocalStorage('crane_setup');
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

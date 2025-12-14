@@ -1,0 +1,343 @@
+/**
+ * Global Notification & Modal Styles
+ * Consistent, premium UI components for the entire application
+ */
+
+/* ========================================
+   GLOBAL MODAL OVERLAY
+   ======================================== */
+
+.global-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  animation: fadeIn 0.2s ease;
+}
+
+.global-modal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 480px;
+  width: 90%;
+  animation: slideUp 0.3s ease;
+  overflow: hidden;
+}
+
+/* ========================================
+   MODAL HEADER
+   ======================================== */
+
+.global-modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.global-modal-header.success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.global-modal-header.error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.global-modal-header.warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.global-modal-header.info {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.global-modal-icon {
+  font-size: 32px;
+  opacity: 0.9;
+}
+
+.global-modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* ========================================
+   MODAL BODY
+   ======================================== */
+
+.global-modal-body {
+  padding: 32px 24px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.global-modal-body p {
+  margin: 0 0 16px 0;
+}
+
+.global-modal-body p:last-child {
+  margin-bottom: 0;
+}
+
+.global-modal-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 15px;
+  margin-top: 16px;
+  transition: all 0.2s ease;
+}
+
+.global-modal-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* ========================================
+   MODAL FOOTER
+   ======================================== */
+
+.global-modal-footer {
+  padding: 20px 24px;
+  background: #f9fafb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.global-modal-footer button {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-cancel {
+  background: white;
+  color: #6b7280;
+  border: 1px solid #d1d5db !important;
+}
+
+.btn-cancel:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af !important;
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.btn-confirm:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* ========================================
+   GLOBAL NOTIFICATIONS
+   ======================================== */
+
+.global-notification {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 100000;
+  min-width: 320px;
+  max-width: 480px;
+  transform: translateX(500px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.global-notification.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.global-notification i {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.global-notification.success {
+  border-left: 4px solid #10b981;
+}
+
+.global-notification.success i {
+  color: #10b981;
+}
+
+.global-notification.error {
+  border-left: 4px solid #ef4444;
+}
+
+.global-notification.error i {
+  color: #ef4444;
+}
+
+.global-notification.warning {
+  border-left: 4px solid #f59e0b;
+}
+
+.global-notification.warning i {
+  color: #f59e0b;
+}
+
+.global-notification.info {
+  border-left: 4px solid #3b82f6;
+}
+
+.global-notification.info i {
+  color: #3b82f6;
+}
+
+.global-notification span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  flex: 1;
+}
+
+/* ========================================
+   LOADING OVERLAY
+   ======================================== */
+
+.global-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99998;
+  animation: fadeIn 0.2s ease;
+}
+
+.global-loading-spinner {
+  text-align: center;
+  color: white;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+.global-loading-spinner p {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 640px) {
+  .global-modal {
+    max-width: 95%;
+  }
+
+  .global-notification {
+    right: 12px;
+    left: 12px;
+    min-width: auto;
+  }
+
+  .global-modal-header {
+    padding: 20px;
+  }
+
+  .global-modal-body {
+    padding: 24px 20px;
+  }
+
+  .global-modal-footer {
+    padding: 16px 20px;
+    flex-direction: column-reverse;
+  }
+
+  .global-modal-footer button {
+    width: 100%;
+    justify-content: center;
+  }
+}

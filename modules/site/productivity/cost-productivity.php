@@ -228,6 +228,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -460,7 +461,7 @@
             const changeOrders = parseInt(document.getElementById('change_orders').value) || 0;
 
             if (dailyCost === 0 || productionRate === 0) {
-                alert('Please enter valid daily cost and production rate values.');
+                showNotification('Please enter valid daily cost and production rate values.', 'info');
                 return;
             }
 
@@ -569,5 +570,6 @@
             localStorage.setItem('calculationHistory', JSON.stringify(history));
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

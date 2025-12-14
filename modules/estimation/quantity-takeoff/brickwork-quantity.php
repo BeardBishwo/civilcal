@@ -252,6 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-decoration: underline;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -350,5 +351,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <a href="../../../index.php" class="back-link"><i class="fas fa-arrow-left"></i> Back to Toolkit</a>
     </div>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

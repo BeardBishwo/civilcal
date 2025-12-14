@@ -128,6 +128,7 @@
             text-decoration: underline;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -165,7 +166,7 @@
             const length = parseFloat(document.getElementById('length').value);
 
             if (isNaN(cutArea) || isNaN(fillArea) || isNaN(length)) {
-                alert('Please enter valid numbers.');
+                showNotification('Please enter valid numbers.', 'info');
                 return;
             }
             
@@ -177,5 +178,6 @@
             document.getElementById('result-area').style.display = 'block';
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

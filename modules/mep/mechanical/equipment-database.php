@@ -124,6 +124,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'compare') {
         .comparison-table th, .comparison-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
         .comparison-table th { background: #007bff; color: white; }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include AEC_ROOT . '/themes/default/views/partials/header.php'; ?>
@@ -320,6 +321,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'compare') {
             document.querySelector('.search-section form').submit();
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

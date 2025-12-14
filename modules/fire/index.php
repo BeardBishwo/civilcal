@@ -182,6 +182,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="main-container">
@@ -496,5 +497,6 @@
             Results should be verified by qualified fire protection engineers.
         </div>
     </div>
+<script src="../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

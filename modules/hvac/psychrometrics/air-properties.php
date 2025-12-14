@@ -180,6 +180,7 @@ if (session_status() == PHP_SESSION_NONE) {
             color: rgba(255, 255, 255, 0.8);
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="calculator-container">
@@ -344,7 +345,7 @@ if (session_status() == PHP_SESSION_NONE) {
             const mode = document.getElementById('calculationMode').value;
             
             if (!dryBulb || !pressure) {
-                alert('Please enter dry bulb temperature and pressure');
+                showNotification('Please enter dry bulb temperature and pressure', 'info');
                 return;
             }
             
@@ -352,14 +353,14 @@ if (session_status() == PHP_SESSION_NONE) {
             
             if (mode === 'db-rh') {
                 if (!rh) {
-                    alert('Please enter relative humidity');
+                    showNotification('Please enter relative humidity', 'info');
                     return;
                 }
                 result = calculateFromDB_RH(dryBulb, rh, pressure);
             } else {
                 const additional = parseFloat(document.getElementById('additionalValue').value);
                 if (!additional) {
-                    alert('Please enter the additional value');
+                    showNotification('Please enter the additional value', 'info');
                     return;
                 }
                 if (mode === 'db-wb') {
@@ -517,12 +518,8 @@ if (session_status() == PHP_SESSION_NONE) {
             // Relative humidity
             const rh = (ea / es) * 100;
             
-            // Other properties
-            const h = 1.006 * dryBulb + W * (2501 + 1.86 * dryBulb);
-            const v = 0.287 * (dryBulb + 273.15) * (1 + 1.6078 * W) / pressure;
-            const density = 1 / v;
+            // Wet bulb calculation
             const wetBulb = calculateWetBulb(dryBulb, rh, pressure);
-            const internalEnergy = 0.718 * dryBulb + W * 2501;
             
             return {
                 temperature: dryBulb,
@@ -611,10 +608,11 @@ if (session_status() == PHP_SESSION_NONE) {
         }
         
         function clearHistory() {
-            if (confirm('Clear all calculation history?')) {
+            showConfirmModal('Clear History', 'Are you sure you want to clear all calculation history?', function() {
                 localStorage.removeItem('hvacAirPropertiesHistory');
                 loadCalculationHistory();
-            }
+                showNotification('History cleared', 'success');
+            });
         }
         
         function updateAdditionalInput() {
@@ -645,5 +643,6 @@ if (session_status() == PHP_SESSION_NONE) {
             document.getElementById('calculationMode').addEventListener('change', updateAdditionalInput);
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

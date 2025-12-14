@@ -170,6 +170,7 @@
             opacity: 0.9;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -370,7 +371,7 @@
             const conductors = parseInt(document.getElementById('conductors').value);
 
             if (isNaN(loadCurrent) || isNaN(ambientTemp) || isNaN(conductors)) {
-                alert('Please enter valid numbers.');
+                showNotification('Please enter valid numbers.', 'info');
                 return;
             }
             
@@ -445,5 +446,6 @@
             localStorage.setItem('recentOCPDCalculations', JSON.stringify(recent));
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

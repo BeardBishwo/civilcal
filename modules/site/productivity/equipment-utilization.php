@@ -231,6 +231,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -418,7 +419,7 @@
             const downtimeHours = parseFloat(document.getElementById('downtimeHours').value);
             
             if (!equipmentType || !purchaseCost || !expectedLife || !dailyOperatingCost || !availableDays) {
-                alert('Please fill in all required fields');
+                showNotification('Please fill in all required fields', 'info');
                 return;
             }
             
@@ -567,7 +568,7 @@
             }
             
             saveToLocalStorage('saved_calculations', calculationData);
-            alert('Calculation saved successfully!');
+            showNotification('Calculation saved successfully!', 'info');
         }
 
         // Load saved data on page load
@@ -575,5 +576,6 @@
             loadFromLocalStorage('equipment_utilization');
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

@@ -482,7 +482,7 @@ function calculateHotWaterDemand() {
     const tempRise = parseInt(document.getElementById('tempRise').value) || 80;
     
     if (!buildingType || occupants <= 0) {
-        alert('Please enter building type and number of occupants');
+        showNotification('Please enter building type and number of occupants', 'info');
         return;
     }
     

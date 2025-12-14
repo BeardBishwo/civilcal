@@ -145,6 +145,7 @@
             margin: 2px 0;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="calculator-container">
@@ -466,5 +467,6 @@
             document.getElementById('results').style.display = 'block';
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

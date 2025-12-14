@@ -488,12 +488,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const body = requestBody.value;
         
         if (!url) {
-            alert('Please select an endpoint');
+            showNotification('Please select an endpoint', 'error');
             return;
         }
         
         if (!apiKey) {
-            alert('Please enter your API key');
+            showNotification('Please enter your API key', 'error');
             return;
         }
         

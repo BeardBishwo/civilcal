@@ -1144,6 +1144,7 @@ function generateTakeoffCSV($takeoff) {
             font-weight: bold;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="takeoff-container">
@@ -1273,18 +1274,18 @@ function generateTakeoffCSV($takeoff) {
                 if (data.success) {
                     displayTakeoffResults(data);
                 } else {
-                    alert('Error: ' + data.error);
+                    showNotification('Error: ' + data.error);
                 }
             })
             .catch(error => {
-                document.getElementById('loading').style.display = 'none';
-                alert('Error: ' + error.message);
+                document.getElementById('loading', 'info').style.display = 'none';
+                showNotification('Error: ' + error.message);
             });
         }
         
         function displayTakeoffResults(data) {
             // Update summary
-            document.getElementById('totalCost').textContent = '$' + data.total_cost.toLocaleString();
+            document.getElementById('totalCost', 'info').textContent = '$' + data.total_cost.toLocaleString();
             document.getElementById('totalItems').textContent = data.takeoff_items.length;
             document.getElementById('costPerSqm').textContent = '$' + (data.total_cost / data.area).toFixed(0) + '/sq.m';
             document.getElementById('projectArea').textContent = data.area + ' sq.m';
@@ -1384,7 +1385,7 @@ function generateTakeoffCSV($takeoff) {
         
         function saveTakeoff() {
             if (!window.currentTakeoffData) {
-                alert('No takeoff data to save');
+                showNotification('No takeoff data to save', 'info');
                 return;
             }
             
@@ -1405,19 +1406,19 @@ function generateTakeoffCSV($takeoff) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Material takeoff saved successfully!');
+                    showNotification('Material takeoff saved successfully!', 'info');
                 } else {
-                    alert('Error saving takeoff: ' + data.error);
+                    showNotification('Error saving takeoff: ' + data.error);
                 }
             })
             .catch(error => {
-                alert('Error: ' + error.message);
+                showNotification('Error: ' + error.message, 'danger');
             });
         }
         
         function exportTakeoff(format) {
             if (!window.currentTakeoffData) {
-                alert('No takeoff data to export');
+                showNotification('No takeoff data to export', 'info');
                 return;
             }
             
@@ -1435,18 +1436,18 @@ function generateTakeoffCSV($takeoff) {
                 if (data.success) {
                     handleExport(data, format);
                 } else {
-                    alert('Error exporting takeoff: ' + data.error);
+                    showNotification('Error exporting takeoff: ' + data.error);
                 }
             })
             .catch(error => {
-                alert('Error: ' + error.message);
+                showNotification('Error: ' + error.message, 'danger');
             });
         }
         
         function handleExport(data, format) {
             switch (format) {
                 case 'pdf':
-                    const printWindow = window.open('', '_blank');
+                    const printWindow = window.open('', '_blank', 'info');
                     printWindow.document.write(data.html);
                     printWindow.document.close();
                     printWindow.print();
@@ -1471,6 +1472,7 @@ function generateTakeoffCSV($takeoff) {
             }
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

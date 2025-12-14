@@ -113,6 +113,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             border-radius: 8px;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -270,7 +271,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             const slope = parseFloat(document.getElementById('gutterSlope').value);
             
             if (!length || !width) {
-                alert('Please enter roof dimensions');
+                showNotification('Please enter roof dimensions', 'info');
                 return;
             }
             
@@ -403,6 +404,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         document.getElementById('roof-section').style.display = 'block';
         displayRecent();
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

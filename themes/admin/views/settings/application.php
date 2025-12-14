@@ -210,9 +210,7 @@ if (!class_exists('App\\Services\\SettingsService')) {
     </div>
 </div>
 
-<!-- Toast Container -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090">
-</div>
+
 
 <style>
 :root {
@@ -378,13 +376,13 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(res => res.json())
         .then(data => {
-            showToast(data.success ? 'success' : 'danger', data.message || (data.success ? 'Saved!' : 'Error'));
+            showNotification(data.message || (data.success ? 'Saved!' : 'Error'), data.success ? 'success' : 'error');
             if (data.success) {
                 confettiEffect();
                 setTimeout(() => location.reload(), 2000);
             }
         })
-        .catch(err => showToast('danger', 'Save failed'))
+        .catch(err => showNotification('Save failed', 'error'))
         .finally(() => {
             btn.disabled = false;
             btn.innerHTML = originalText;
@@ -392,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     resetBtn.addEventListener('click', function() {
-        if (confirm('Reset ALL settings to defaults?')) {
+        showConfirmModal('Reset Settings', 'Are you sure you want to reset ALL settings to defaults?', () => {
             fetch(app_base_url('/admin/settings/reset'), {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -400,35 +398,21 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(res => res.json())
             .then(data => {
-                showToast(data.success ? 'warning' : 'danger', data.message);
+                showNotification(data.message, data.success ? 'warning' : 'error');
                 if (data.success) location.reload();
             });
-        }
+        });
     });
 
     previewBtn.addEventListener('click', () => {
-        showToast('info', 'Preview mode: Changes saved live!');
+        showNotification('Preview mode: Changes saved live!', 'info');
     });
 
     testBtn.addEventListener('click', () => {
-        showToast('success', 'All systems nominal! 🚀');
+        showNotification('All systems nominal! 🚀', 'success');
     });
 
-    function showToast(type, message) {
-        const toast = document.createElement('div');
-        toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'danger' ? 'danger' : type === 'warning' ? 'warning' : 'info'} border-0`;
-        toast.role = 'alert';
-        toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        `;
-        document.querySelector('.toast-container').appendChild(toast);
-        const bsToast = new bootstrap.Toast(toast);
-        bsToast.show();
-        toast.addEventListener('hidden.bs.toast', () => toast.remove());
-    }
+
 
     function confettiEffect() {
         // Simple confetti using canvas

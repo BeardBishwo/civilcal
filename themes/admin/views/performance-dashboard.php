@@ -315,7 +315,7 @@ function exportPerformanceReport() {
 }
 
 function applyRecommendation(recommendationId) {
-    if (confirm('Are you sure you want to apply this recommendation?')) {
+    showConfirmModal('Apply Recommendation', 'Are you sure you want to apply this recommendation?', () => {
         fetch('<?= app_base_url('/admin/performance/apply-recommendation') ?>', {
             method: 'POST',
             headers: {
@@ -333,7 +333,7 @@ function applyRecommendation(recommendationId) {
                 showNotification('Failed to apply recommendation', 'error');
             }
         });
-    }
+    });
 }
 </script>
 

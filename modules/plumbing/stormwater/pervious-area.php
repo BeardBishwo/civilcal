@@ -120,6 +120,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             margin-bottom: 1rem;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -250,7 +251,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             const area = parseFloat(document.getElementById('surfaceArea').value);
             
             if (!type || !area || area <= 0) {
-                alert('Please select a surface type and enter valid area');
+                showNotification('Please select a surface type and enter valid area', 'info');
                 return;
             }
             
@@ -287,12 +288,12 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             const soilType = document.getElementById('soilType').value;
             
             if (!totalArea || totalArea <= 0) {
-                alert('Please enter total site area');
+                showNotification('Please enter total site area', 'info');
                 return;
             }
             
             if (addedSurfaces.length === 0) {
-                alert('Please add at least one surface area');
+                showNotification('Please add at least one surface area', 'info');
                 return;
             }
             
@@ -415,6 +416,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         document.getElementById('site-section').style.display = 'block';
         displayRecent();
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

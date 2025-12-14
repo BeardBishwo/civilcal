@@ -119,9 +119,9 @@ function setupBulkActions() {
                 return;
             }
 
-            if (confirm(`Are you sure you want to delete ${selectedIds.length} calculation(s)?`)) {
+            showConfirmModal('Delete Calculations', `Are you sure you want to delete ${selectedIds.length} calculation(s)?`, () => {
                 performBulkDelete(selectedIds);
-            }
+            });
         });
     }
 
@@ -325,26 +325,13 @@ function displayRecentCalculations(calculations) {
     console.log('Recent calculations:', calculations);
 }
 
-function showNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
-    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    notification.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-
-    // Add to page
-    document.body.appendChild(notification);
-
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.remove();
-        }
-    }, 5000);
+// Redundant showNotification removed - using global function
+// If HistoryManager needs to export it, we can assign the global one
+if (typeof window.showNotification === 'undefined') {
+    // Fallback if global not loaded
+    window.showNotification = function(message, type = 'info') {
+        console.log(`[${type.toUpperCase()}] ${message}`);
+    }
 }
 
 // Utility functions for export functionality
@@ -383,5 +370,5 @@ document.addEventListener('DOMContentLoaded', function() {
 window.HistoryManager = {
     toggleFavorite,
     exportHistory,
-    showNotification
+    showNotification: window.showNotification
 };

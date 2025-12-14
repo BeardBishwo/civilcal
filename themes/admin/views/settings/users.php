@@ -642,7 +642,7 @@ $page_title = 'User Settings - Admin Panel';
         // Form submission handler
         document.getElementById('settingsForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('User settings saved successfully!');
+            showNotification('User settings saved successfully!', 'success');
             // In a real implementation, this would submit to the server
         });
         
@@ -656,10 +656,11 @@ $page_title = 'User Settings - Admin Panel';
                     this.classList.add('active');
                     
                     // In a real implementation, this would load the actual page
-                    alert('Navigation to: ' + this.textContent.trim());
+                    showNotification('Navigation to: ' + this.textContent.trim(), 'info');
                 });
             });
         });
     </script>
+    <script src="<?= app_base_url('/public/assets/js/global-notifications.js') ?>"></script>
 </body>
 </html>

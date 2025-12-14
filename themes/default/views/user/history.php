@@ -19,6 +19,7 @@ $searchTerm = $searchTerm ?? '';
     <title><?= htmlspecialchars($pageTitle) ?> - Bishwo Calculator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="<?php echo app_base_url('/assets/css/global-notifications.css'); ?>" rel="stylesheet">
     <link href="/public/assets/css/history.css" rel="stylesheet">
 </head>
 <body>
@@ -217,9 +218,8 @@ $searchTerm = $searchTerm ?? '';
                                                title="View Details">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="/history/delete/<?= $item['id'] ?>" 
-                                               class="btn btn-sm btn-outline-danger" 
-                                               onclick="return confirm('Are you sure you want to delete this calculation?')"
+                                               class="btn btn-sm btn-outline-danger delete-calc-btn" 
+                                               data-id="<?= $item['id'] ?>"
                                                title="Delete">
                                                 <i class="fas fa-trash"></i>
                                             </a>
@@ -292,6 +292,27 @@ $searchTerm = $searchTerm ?? '';
     <?php include __DIR__ . '/../partials/footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo app_base_url('/assets/js/global-notifications.js'); ?>"></script>
     <script src="/public/assets/js/history.js"></script>
+    <script>
+        // Handle delete with confirmation modal
+        document.querySelectorAll('.delete-calc-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const calcId = this.dataset.id;
+                showConfirmModal(
+                    'Delete Calculation',
+                    'Are you sure you want to delete this calculation? This action cannot be undone.',
+                    () => {
+                        window.location.href = `/history/delete/${calcId}`;
+                    },
+                    {
+                        confirmText: 'Delete',
+                        icon: 'fa-trash'
+                    }
+                );
+            });
+        });
+    </script>
 </body>
 </html>

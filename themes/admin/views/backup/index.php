@@ -193,13 +193,13 @@ async function createBackup() {
         const result = await response.json();
         
         if (result.success) {
-            showMessage("Backup created successfully: " + result.path, "success");
+            showNotification("Backup created successfully: " + result.path, "success");
             refreshBackupList();
         } else {
-            showMessage("Error: " + result.message, "error");
+            showNotification("Error: " + result.message, "error");
         }
     } catch (error) {
-        showMessage("Error creating backup: " + error.message, "error");
+        showNotification("Error creating backup: " + error.message, "error");
     } finally {
         backupInProgress = false;
         createBtn.innerHTML = originalText;
@@ -208,48 +208,52 @@ async function createBackup() {
 }
 
 async function deleteBackup(backupName) {
-    if (!confirm("Are you sure you want to delete this backup? This action cannot be undone.")) {
-        return;
-    }
-    
-    try {
-        const response = await fetch("' . app_base_url('/admin/backup/delete/') . '" + encodeURIComponent(backupName), {
-            method: "POST"
-        });
+    showConfirmModal(
+        \'Delete Backup\',
+        \'Are you sure you want to delete this backup? This action cannot be undone.\',
+        async () => {
+            try {
+                const response = await fetch("' . app_base_url('/admin/backup/delete/') . '" + encodeURIComponent(backupName), {
+                    method: "POST"
+                });
 
-        const result = await response.json();
-        
-        if (result.success) {
-            showMessage("Backup deleted successfully", "success");
-            refreshBackupList();
-        } else {
-            showMessage("Error: " + result.message, "error");
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification("Backup deleted successfully", "success");
+                    refreshBackupList();
+                } else {
+                    showNotification("Error: " + result.message, "error");
+                }
+            } catch (error) {
+                showNotification("Error deleting backup: " + error.message, "error");
+            }
         }
-    } catch (error) {
-        showMessage("Error deleting backup: " + error.message, "error");
-    }
+    );
 }
 
 async function restoreBackup(backupName) {
-    if (!confirm("Are you sure you want to restore from this backup? This will overwrite current data.")) {
-        return;
-    }
-    
-    try {
-        const response = await fetch("' . app_base_url('/admin/backup/restore/') . '" + encodeURIComponent(backupName), {
-            method: "POST"
-        });
+    showConfirmModal(
+        \'Restore Backup\',
+        \'Are you sure you want to restore from this backup? This will overwrite current data.\',
+        async () => {
+            try {
+                const response = await fetch("' . app_base_url('/admin/backup/restore/') . '" + encodeURIComponent(backupName), {
+                    method: "POST"
+                });
 
-        const result = await response.json();
-        
-        if (result.success) {
-            showMessage("Backup restored successfully", "success");
-        } else {
-            showMessage("Error: " + result.message, "error");
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification("Backup restored successfully", "success");
+                } else {
+                    showNotification("Error: " + result.message, "error");
+                }
+            } catch (error) {
+                showNotification("Error restoring backup: " + error.message, "error");
+            }
         }
-    } catch (error) {
-        showMessage("Error restoring backup: " + error.message, "error");
-    }
+    );
 }
 
 async function scheduleBackup() {
@@ -268,12 +272,12 @@ async function scheduleBackup() {
         const result = await response.json();
         
         if (result.success) {
-            showMessage("Backup scheduled successfully", "success");
+            showNotification("Backup scheduled successfully", "success");
         } else {
-            showMessage("Error: " + result.message, "error");
+            showNotification("Error: " + result.message, "error");
         }
     } catch (error) {
-        showMessage("Error scheduling backup: " + error.message, "error");
+        showNotification("Error scheduling backup: " + error.message, "error");
     }
 }
 
@@ -283,7 +287,7 @@ async function saveBackupSettings() {
         
         // Validate input
         if (isNaN(maxSize) || maxSize < 100 || maxSize > 10240) {
-            showMessage("Please enter a valid maximum backup size between 100 and 10240 MB", "error");
+            showNotification("Please enter a valid maximum backup size between 100 and 10240 MB", "error");
             return;
         }
         
@@ -299,12 +303,12 @@ async function saveBackupSettings() {
         const result = await response.json();
         
         if (result.success) {
-            showMessage(result.message, "success");
+            showNotification(result.message, "success");
         } else {
-            showMessage("Error: " + result.message, "error");
+            showNotification("Error: " + result.message, "error");
         }
     } catch (error) {
-        showMessage("Error saving backup settings: " + error.message, "error");
+        showNotification("Error saving backup settings: " + error.message, "error");
     }
 }
 
@@ -316,34 +320,11 @@ async function refreshBackupList() {
         // Simple refresh - in a real app you would fetch JSON and update the table
         location.reload();
     } catch (error) {
-        showMessage("Error refreshing backup list: " + error.message, "error");
+        showNotification("Error refreshing backup list: " + error.message, "error");
     }
 }
 
-function showMessage(message, type) {
-    // Create a temporary message element
-    const messageEl = document.createElement("div");
-    messageEl.className = "alert alert-" + type;
-    messageEl.textContent = message;
-    messageEl.style.cssText = "position:fixed; top:20px; right:20px; padding:15px; border-radius:5px; z-index:9999;";
-    
-    if (type === "success") {
-        messageEl.style.backgroundColor = "#d4edda";
-        messageEl.style.color = "#155724";
-        messageEl.style.border = "1px solid #c3e6cb";
-    } else {
-        messageEl.style.backgroundColor = "#f8d7da";
-        messageEl.style.color = "#721c24";
-        messageEl.style.border = "1px solid #f5c6cb";
-    }
-    
-    document.body.appendChild(messageEl);
-    
-    // Remove after 5 seconds
-    setTimeout(() => {
-        document.body.removeChild(messageEl);
-    }, 5000);
-}
+
 </script>
 
 <style>
@@ -384,27 +365,7 @@ function showMessage(message, type) {
     opacity: 0.5;
 }
 
-.alert {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px;
-    border-radius: 5px;
-    z-index: 9999;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
 
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
 </style>
 ';
 

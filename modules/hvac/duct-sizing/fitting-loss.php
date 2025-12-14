@@ -206,6 +206,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -307,7 +308,7 @@
             const count = parseFloat(document.getElementById('ductFittingCount').value);
             
             if (!velocity) {
-                alert('Please enter velocity');
+                showNotification('Please enter velocity', 'info');
                 return;
             }
             
@@ -353,5 +354,6 @@
             saveCalculation('Duct Fitting Loss', `${fittingName} × ${count} → ${totalLoss.toFixed(4)}" WC`);
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

@@ -153,6 +153,7 @@
             text-decoration: underline;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -310,7 +311,7 @@
             const distance = parseFloat(document.getElementById('distance').value);
 
             if (isNaN(current) || isNaN(voltage) || isNaN(ambientTemp)) {
-                alert('Please enter valid numbers.');
+                showNotification('Please enter valid numbers.', 'info');
                 return;
             }
             
@@ -414,5 +415,6 @@
             localStorage.setItem('recentWireCalculations', JSON.stringify(recent));
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

@@ -163,6 +163,7 @@
             color: var(--dark);
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -244,7 +245,7 @@
             const maxSpacing = parseFloat(document.getElementById('max-spacing').value);
 
             if (isNaN(length) || isNaN(width)) {
-                alert('Please enter valid room dimensions.');
+                showNotification('Please enter valid room dimensions.', 'info');
                 return;
             }
             
@@ -308,5 +309,6 @@
             document.getElementById('result-area').style.display = 'block';
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

@@ -377,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form submission
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        alert('Theme creation functionality would be implemented here. This is a frontend preview only.');
+        showNotification('Theme creation functionality would be implemented here. This is a frontend preview only.', 'info');
     });
 });
 </script>

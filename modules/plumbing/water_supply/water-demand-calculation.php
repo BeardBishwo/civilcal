@@ -445,7 +445,7 @@ function calculateWaterDemand() {
     const diversityFactor = parseFloat(document.getElementById('diversityFactor').value) || 0.5;
     
     if (!buildingType) {
-        alert('Please select a building type');
+        showNotification('Please select a building type', 'info');
         return;
     }
     
@@ -469,7 +469,7 @@ function calculateWaterDemand() {
         totalDemand = totalFixtureUnits * 100; // Average 100L per WUFU per day
         calculationMethod = `${totalFixtureUnits} WUFU × 100 L/WUFU/day`;
     } else {
-        alert('Please enter valid data for the selected calculation method');
+        showNotification('Please enter valid data for the selected calculation method', 'info');
         return;
     }
     

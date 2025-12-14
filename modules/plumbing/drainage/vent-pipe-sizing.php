@@ -113,6 +113,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             border-radius: 8px;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -257,7 +258,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             const stackHeight = parseFloat(document.getElementById('stackHeight').value) || 0;
             
             if (!drainSize || !fixtureUnits || !ventLength) {
-                alert('Please fill in all required fields');
+                showNotification('Please fill in all required fields', 'info');
                 return;
             }
             
@@ -377,6 +378,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         document.getElementById('drain-section').style.display = 'block';
         displayRecent();
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

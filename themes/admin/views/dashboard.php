@@ -515,13 +515,13 @@
 <script>
     // System health check simulation
     function checkSystemHealth() {
-        alert('System health check running...\nAll services are operational.');
+        showNotification('System health check running... All services are operational.', 'success');
     }
     
     // Backup simulation
     function createBackup() {
-        if(confirm('Start system backup?')) {
-            alert('Backup started in background.');
-        }
+        showConfirmModal('Start Backup', 'Start system backup?', () => {
+             showNotification('Backup started in background.', 'info');
+        });
     }
 </script>

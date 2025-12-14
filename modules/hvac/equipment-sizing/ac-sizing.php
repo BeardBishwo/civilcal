@@ -146,12 +146,12 @@ function calculateACSize() {
     const safetyFactor = parseFloat(document.getElementById('acSafetyFactor').value) || 15;
     
     if (!coolingLoad) {
-        alert('Please enter cooling load');
+        showNotification('Please enter cooling load', 'info');
         return;
     }
     
     if (coolingLoad <= 0) {
-        alert('Cooling load must be positive');
+        showNotification('Cooling load must be positive', 'info');
         return;
     }
     
@@ -361,7 +361,7 @@ function showReference(type) {
             break;
     }
     
-    alert(message);
+    showNotification(message, 'info');
 }
 
 // Utility functions

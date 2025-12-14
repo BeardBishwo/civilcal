@@ -968,7 +968,7 @@ if (!isset($_POST['action'])) {
             saveConfiguration(category, key, value);
             $('#editValueModal').modal('hide');
         } catch (e) {
-            alert('Invalid JSON: ' + e.message);
+            showNotification('Invalid JSON: ' + e.message);
         }
     }
     
@@ -977,7 +977,7 @@ if (!isset($_POST['action'])) {
         const input = document.getElementById(`config_${key}`);
         let value;
         
-        if (input.hasAttribute('readonly')) {
+        if (input.hasAttribute('readonly', 'info')) {
             // This is a complex value, should have been edited via modal
             return;
         } else {
@@ -1347,7 +1347,7 @@ if (!isset($_POST['action'])) {
             return;
         }
         
-        if (confirm(`Are you sure you want to reset the ${category} category to defaults?`)) {
+        showConfirmModal('Reset Category', `Are you sure you want to reset the ${category} category to defaults?`, function() {
             const formData = new FormData();
             formData.append('action', 'reset_category');
             formData.append('category', category);
@@ -1368,12 +1368,12 @@ if (!isset($_POST['action'])) {
             .catch(error => {
                 showAlert('Error: ' + error.message, 'danger');
             });
-        }
+        });
     }
     
     // Reset all configuration
     function resetAll() {
-        if (confirm('Are you sure you want to reset ALL configuration to defaults? This cannot be undone!')) {
+        showConfirmModal('Reset All', 'Are you sure you want to reset ALL configuration to defaults? This cannot be undone!', function() {
             const formData = new FormData();
             formData.append('action', 'reset_category'); // Use reset_category without category param
             
@@ -1394,7 +1394,7 @@ if (!isset($_POST['action'])) {
             .catch(error => {
                 showAlert('Error: ' + error.message, 'danger');
             });
-        }
+        });
     }
     
     // Show alert message

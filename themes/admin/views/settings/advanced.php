@@ -344,34 +344,34 @@ function saveAdvancedSettings() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Advanced settings saved successfully');
+            showNotification('Advanced settings saved successfully', 'success');
         } else {
-            alert('Failed to save settings: ' + (data.message || 'Unknown error'));
+            showNotification('Failed to save settings: ' + (data.message || 'Unknown error'), 'error');
         }
     })
     .catch(error => {
-        alert('Error saving settings');
+        showNotification('Error saving settings', 'error');
         console.error(error);
     });
 }
 
 function resetToDefaults() {
-    if (!confirm('Are you sure you want to reset all advanced settings to their default values? This action cannot be undone.')) return;
-    
-    fetch('<?= app_base_url('/admin/settings/advanced/reset') ?>', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-Token': '<?= csrf_token() ?>'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Settings reset to defaults');
-            setTimeout(() => location.reload(), 1000);
-        } else {
-            alert('Failed to reset settings');
-        }
+    showConfirmModal('Reset Settings', 'Are you sure you want to reset all advanced settings to their default values? This action cannot be undone.', () => {
+        fetch('<?= app_base_url('/admin/settings/advanced/reset') ?>', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-Token': '<?= csrf_token() ?>'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Settings reset to defaults', 'success');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showNotification('Failed to reset settings', 'error');
+            }
+        });
     });
 }
 
@@ -386,9 +386,9 @@ function generateApiKey() {
     .then(data => {
         if (data.success) {
             document.querySelector('input[name="api_key"]').value = data.api_key;
-            alert('New API key generated');
+            showNotification('New API key generated', 'success');
         } else {
-            alert('Failed to generate API key');
+            showNotification('Failed to generate API key', 'error');
         }
     });
 }
@@ -398,26 +398,26 @@ function viewSystemLogs() {
 }
 
 function clearSystemLogs() {
-    if (!confirm('Are you sure you want to clear all system logs? This action cannot be undone.')) return;
-    
-    fetch('<?= app_base_url('/admin/logs/clear') ?>', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-Token': '<?= csrf_token() ?>'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('System logs cleared successfully');
-        } else {
-            alert('Failed to clear logs');
-        }
+    showConfirmModal('Clear Logs', 'Are you sure you want to clear all system logs? This action cannot be undone.', () => {
+        fetch('<?= app_base_url('/admin/logs/clear') ?>', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-Token': '<?= csrf_token() ?>'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('System logs cleared successfully', 'success');
+            } else {
+                showNotification('Failed to clear logs', 'error');
+            }
+        });
     });
 }
 
 function runDiagnostics() {
-    alert('Running system diagnostics...');
+    showNotification('Running system diagnostics...', 'info');
     
     fetch('<?= app_base_url('/admin/diagnostics/run') ?>', {
         method: 'POST',
@@ -428,10 +428,10 @@ function runDiagnostics() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Diagnostics completed successfully');
+            showNotification('Diagnostics completed successfully', 'success');
             window.open('<?= app_base_url('/admin/diagnostics/results') ?>', '_blank');
         } else {
-            alert('Diagnostics failed: ' + (data.message || 'Unknown error'));
+            showNotification('Diagnostics failed: ' + (data.message || 'Unknown error'), 'error');
         }
     });
 }

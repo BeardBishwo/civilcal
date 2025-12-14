@@ -150,12 +150,12 @@ function calculatePumpPower() {
     const fluidType = document.getElementById('fluidType').value;
     
     if (!flowRate || !totalHead) {
-        alert('Please enter flow rate and total head');
+        showNotification('Please enter flow rate and total head', 'info');
         return;
     }
     
     if (flowRate <= 0 || totalHead <= 0) {
-        alert('Flow rate and head must be positive');
+        showNotification('Flow rate and head must be positive', 'info');
         return;
     }
     
@@ -363,7 +363,7 @@ function showReference(type) {
             break;
     }
     
-    alert(message);
+    showNotification(message, 'info');
 }
 
 // Utility functions

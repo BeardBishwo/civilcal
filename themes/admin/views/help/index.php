@@ -302,7 +302,7 @@ $content .= '
 <script>
 // Clear logs
 document.getElementById("clearLogs").addEventListener("click", function() {
-    if (confirm("Are you sure you want to clear all system logs? This action cannot be undone.")) {
+    showConfirmModal("Clear Logs", "Are you sure you want to clear all system logs? This action cannot be undone.", () => {
         const headers1 = { "X-Requested-With": "XMLHttpRequest" };
         const csrfMeta1 = document.querySelector("meta[name=\"csrf-token\"]");
         const csrf1 = csrfMeta1 ? csrfMeta1.getAttribute("content") : null;
@@ -314,12 +314,14 @@ document.getElementById("clearLogs").addEventListener("click", function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert("Logs cleared successfully!");
+                showNotification("Logs cleared successfully!", "success");
                 location.reload();
             } else {
-                alert("Error: " + data.message);
+                showNotification("Error: " + data.message, "error");
             }
         });
+    });
+});
 
 // Export system logs
 document.getElementById("exportLogs").addEventListener("click", function() {
@@ -332,13 +334,15 @@ document.getElementById("exportLogs").addEventListener("click", function() {
         .then(d => {
             if (d.success) {
                 const msg = d.message + (d.filename ? " ("+d.filename+")" : "");
-                if (d.download_url && confirm(msg + "\nDownload now?")) {
-                    window.location = d.download_url;
-                } else {
-                    alert(msg + (d.path ? "\nSaved: " + d.path : ""));
+                showNotification(msg + (d.path ? "\nSaved: " + d.path : ""), "success");
+                
+                if (d.download_url) {
+                    showConfirmModal("Download Logs", "Download now?", () => {
+                        window.location = d.download_url;
+                    });
                 }
             } else {
-                alert("Error: " + d.message);
+                showNotification("Error: " + d.message, "error");
             }
         });
 });
@@ -347,7 +351,7 @@ document.getElementById("exportLogs").addEventListener("click", function() {
 
 // Create backup
 document.getElementById("createBackup").addEventListener("click", function() {
-    if (confirm("Create a system backup? This may take a few minutes.")) {
+    showConfirmModal("Create Backup", "Create a system backup? This may take a few minutes.", () => {
         const headers2 = { "X-Requested-With": "XMLHttpRequest" };
         const csrfMeta2 = document.querySelector("meta[name=\"csrf-token\"]");
         const csrf2 = csrfMeta2 ? csrfMeta2.getAttribute("content") : null;
@@ -360,16 +364,18 @@ document.getElementById("createBackup").addEventListener("click", function() {
         .then(data => {
             if (data.success) {
                 const msg = "Backup created successfully!" + (data.filename ? " ("+data.filename+")" : "");
-                if (data.download_url && confirm(msg + "\nDownload now?")) {
-                    window.location = data.download_url;
-                } else {
-                    alert(msg + (data.path ? "\nSaved: " + data.path : ""));
+                showNotification(msg + (data.path ? "\nSaved: " + data.path : ""), "success");
+
+                if (data.download_url) {
+                    showConfirmModal("Download Backup", "Download now?", () => {
+                        window.location = data.download_url;
+                    });
                 }
             } else {
-                alert("Error: " + data.message);
+                showNotification("Error: " + data.message, "error");
             }
         });
-    }
+    });
 });
 
 // Export themes
@@ -383,13 +389,15 @@ document.getElementById("exportThemes").addEventListener("click", function() {
         .then(d => {
             if (d.success) {
                 const msg = d.message + (d.filename ? " ("+d.filename+")" : "");
-                if (d.download_url && confirm(msg + "\nDownload now?")) {
-                    window.location = d.download_url;
-                } else {
-                    alert(msg + (d.path ? "\nSaved: " + d.path : ""));
+                showNotification(msg + (d.path ? "\nSaved: " + d.path : ""), "success");
+                
+                if (d.download_url) {
+                    showConfirmModal("Download Themes", "Download now?", () => {
+                        window.location = d.download_url;
+                    });
                 }
             } else {
-                alert("Error: " + d.message);
+                showNotification("Error: " + d.message, "error");
             }
         });
 });
@@ -405,13 +413,15 @@ document.getElementById("exportPlugins").addEventListener("click", function() {
         .then(d => {
             if (d.success) {
                 const msg = d.message + (d.filename ? " ("+d.filename+")" : "");
-                if (d.download_url && confirm(msg + "\nDownload now?")) {
-                    window.location = d.download_url;
-                } else {
-                    alert(msg + (d.path ? "\nSaved: " + d.path : ""));
+                showNotification(msg + (d.path ? "\nSaved: " + d.path : ""), "success");
+                
+                if (d.download_url) {
+                    showConfirmModal("Download Plugins", "Download now?", () => {
+                        window.location = d.download_url;
+                    });
                 }
             } else {
-                alert("Error: " + d.message);
+                showNotification("Error: " + d.message, "error");
             }
         });
 });

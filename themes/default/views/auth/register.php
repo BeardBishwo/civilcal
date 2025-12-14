@@ -1237,7 +1237,7 @@ function validateStep(step) {
     if (step === 2) {
         const specialties = document.querySelectorAll('input[name="engineer_roles[]"]:checked');
         if (specialties.length === 0) {
-            alert('Please select at least one engineering specialty');
+            showNotification('Please select at least one engineering specialty', 'error');
             return false;
         }
     }

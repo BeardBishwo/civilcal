@@ -144,7 +144,7 @@ function sendTestEmail() {
     const testResult = document.getElementById('testResult');
     
     if (!testEmail) {
-        alert('Please enter a test email address');
+        showNotification('Please enter a test email address', 'warning');
         return;
     }
     
@@ -196,14 +196,14 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Settings saved successfully!');
+                showNotification('Settings saved successfully!', 'success');
             } else {
-                alert('Error: ' + (data.error || 'Failed to save settings'));
+                showNotification('Error: ' + (data.error || 'Failed to save settings'), 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while saving the settings');
+            showNotification('An error occurred while saving the settings', 'error');
         });
     });
     

@@ -233,8 +233,11 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     // Confirm dialog
+    // Confirm dialog
     window.confirmAction = function(message, callback) {
-        if (confirm(message)) {
+        if (typeof showConfirmModal === 'function') {
+            showConfirmModal('Confirmation', message, callback);
+        } else if (confirm(message)) {
             callback();
         }
     };

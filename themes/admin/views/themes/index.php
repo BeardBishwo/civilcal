@@ -272,37 +272,37 @@ document.querySelectorAll('.view-btn').forEach(btn => {
 // Activate Theme
 document.querySelectorAll('.activate-theme').forEach(btn => {
     btn.addEventListener('click', function() {
-        if (!confirm('Are you sure you want to activate this theme?')) return;
-        
-        const id = this.dataset.id;
-        this.disabled = true;
-        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Activating...';
-        
-        const formData = new FormData();
-        formData.append('theme_id', id);
-        
-        fetch('<?php echo app_base_url('/admin/themes/activate'); ?>', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error: ' + (data.message || 'Failed to activate theme'));
+        showConfirmModal('Activate Theme', 'Are you sure you want to activate this theme?', () => {
+            const id = this.dataset.id;
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Activating...';
+            
+            const formData = new FormData();
+            formData.append('theme_id', id);
+            
+            fetch('<?php echo app_base_url('/admin/themes/activate'); ?>', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    showNotification('Error: ' + (data.message || 'Failed to activate theme'), 'error');
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-check"></i> Activate';
+                }
+            })
+            .catch(error => {
+                showNotification('Error activating theme', 'error');
+                console.error(error);
                 this.disabled = false;
                 this.innerHTML = '<i class="fas fa-check"></i> Activate';
-            }
-        })
-        .catch(error => {
-            alert('Error activating theme');
-            console.error(error);
-            this.disabled = false;
-            this.innerHTML = '<i class="fas fa-check"></i> Activate';
+            });
         });
     });
 });
@@ -310,34 +310,34 @@ document.querySelectorAll('.activate-theme').forEach(btn => {
 // Delete Theme
 document.querySelectorAll('.delete-theme').forEach(btn => {
     btn.addEventListener('click', function() {
-        if (!confirm('Are you sure you want to delete this theme? This action cannot be undone.')) return;
-        
-        const id = this.dataset.id;
-        this.disabled = true;
-        
-        const formData = new FormData();
-        formData.append('theme_id', id);
-        
-        fetch('<?php echo app_base_url('/admin/themes/delete'); ?>', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error: ' + (data.message || 'Failed to delete theme'));
+        showConfirmModal('Delete Theme', 'Are you sure you want to delete this theme? This action cannot be undone.', () => {
+            const id = this.dataset.id;
+            this.disabled = true;
+            
+            const formData = new FormData();
+            formData.append('theme_id', id);
+            
+            fetch('<?php echo app_base_url('/admin/themes/delete'); ?>', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    showNotification('Error: ' + (data.message || 'Failed to delete theme'), 'error');
+                    this.disabled = false;
+                }
+            })
+            .catch(error => {
+                showNotification('Error deleting theme', 'error');
+                console.error(error);
                 this.disabled = false;
-            }
-        })
-        .catch(error => {
-            alert('Error deleting theme');
-            console.error(error);
-            this.disabled = false;
+            });
         });
     });
 });
@@ -368,14 +368,14 @@ document.getElementById('themeUpload')?.addEventListener('change', function(e) {
         document.getElementById('themeUpload').value = '';
         
         if (data.success) {
-            alert('Theme uploaded successfully');
+            showNotification('Theme uploaded successfully', 'success');
             location.reload();
         } else {
-            alert('Error: ' + (data.message || 'Upload failed'));
+            showNotification('Error: ' + (data.message || 'Upload failed'), 'error');
         }
     })
     .catch(error => {
-        alert('Upload failed');
+        showNotification('Upload failed', 'error');
         console.error(error);
         btn.disabled = false;
         btn.innerHTML = originalText;

@@ -612,6 +612,7 @@ function getCategories() {
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include AEC_ROOT . '/themes/default/views/partials/header.php'; ?>
@@ -874,18 +875,18 @@ function getCategories() {
                         conversion_details: data.conversion_details
                     };
                 } else {
-                    alert('Conversion error: ' + (data.error || 'Unknown error'));
+                    showNotification('Conversion error: ' + (data.error || 'Unknown error', 'info'));
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error performing conversion');
+                showNotification('Error performing conversion', 'info');
             });
         }
         
         function saveConversion() {
             if (!lastConversion) {
-                alert('Please perform a conversion first');
+                showNotification('Please perform a conversion first', 'info');
                 return;
             }
             
@@ -907,12 +908,12 @@ function getCategories() {
                 if (data.success) {
                     location.reload();
                 } else {
-                    alert('Error saving conversion');
+                    showNotification('Error saving conversion', 'info');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error saving conversion');
+                showNotification('Error saving conversion', 'info');
             });
         }
         
@@ -920,7 +921,7 @@ function getCategories() {
             const batchData = document.getElementById('batch-input').value;
             
             if (!batchData.trim()) {
-                alert('Please enter batch conversion data');
+                showNotification('Please enter batch conversion data', 'info');
                 return;
             }
             
@@ -937,12 +938,12 @@ function getCategories() {
                 if (data.results) {
                     displayBatchResults(data.results);
                 } else {
-                    alert('Batch conversion error: ' + (data.error || 'Unknown error'));
+                    showNotification('Batch conversion error: ' + (data.error || 'Unknown error', 'info'));
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error performing batch conversion');
+                showNotification('Error performing batch conversion', 'info');
             });
         }
         
@@ -978,6 +979,7 @@ function getCategories() {
             }
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

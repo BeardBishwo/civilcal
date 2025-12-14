@@ -198,6 +198,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -286,7 +287,7 @@
             const construction = document.getElementById('buildingConstruction').value;
             
             if (!volume || !tempDiff) {
-                alert('Please enter room volume and temperature difference');
+                showNotification('Please enter room volume and temperature difference', 'info');
                 return;
             }
             
@@ -323,5 +324,6 @@
             saveCalculation('Heating Load', `${volume}m³ → ${heatingLoad.toFixed(0)}W`);
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

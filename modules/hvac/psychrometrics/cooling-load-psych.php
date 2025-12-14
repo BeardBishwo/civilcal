@@ -200,6 +200,7 @@ if (session_status() == PHP_SESSION_NONE) {
             color: #0d6efd;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="calculator-container">
@@ -427,7 +428,7 @@ if (session_status() == PHP_SESSION_NONE) {
             const pressure = parseFloat(document.getElementById('coolingPressure').value);
             
             if (!airFlow || !enteringDB || !enteringWB || !leavingDB || !leavingWB || !pressure) {
-                alert('Please enter all required values');
+                showNotification('Please enter all required values', 'info');
                 return;
             }
             
@@ -566,10 +567,11 @@ if (session_status() == PHP_SESSION_NONE) {
         }
         
         function clearCoolingLoadPsychHistory() {
-            if (confirm('Clear all calculation history?')) {
+            showConfirmModal('Clear History', 'Are you sure you want to clear all calculation history?', function() {
                 localStorage.removeItem('hvacCoolingLoadPsychHistory');
                 loadCoolingLoadPsychHistory();
-            }
+                showNotification('History cleared', 'success');
+            });
         }
         
         // Initialize page
@@ -577,5 +579,6 @@ if (session_status() == PHP_SESSION_NONE) {
             loadCoolingLoadPsychHistory();
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

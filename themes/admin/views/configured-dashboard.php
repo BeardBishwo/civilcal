@@ -188,8 +188,10 @@ function createWidgetElement(widgetData) {
 
 function removeWidget(widgetId) {
     const widget = document.querySelector(`.dashboard-widget[data-widget-id="${widgetId}"]`);
-    if (widget && confirm('Are you sure you want to remove this widget?')) {
-        widget.remove();
+    if (widget) {
+        showConfirmModal('Remove Widget', 'Are you sure you want to remove this widget?', () => {
+             widget.remove();
+        });
     }
 }
 
@@ -235,7 +237,7 @@ function saveDashboardConfig() {
 }
 
 function resetToDefault() {
-    if (confirm('Are you sure you want to reset to the default dashboard configuration?')) {
+    showConfirmModal('Reset Dashboard', 'Are you sure you want to reset to the default dashboard configuration?', () => {
         fetch('<?= app_base_url('/admin/dashboard/reset-config') ?>', {
             method: 'POST',
             headers: {
@@ -250,7 +252,7 @@ function resetToDefault() {
                 showNotification('Failed to reset configuration', 'error');
             }
         });
-    }
+    });
 }
 </script>
 

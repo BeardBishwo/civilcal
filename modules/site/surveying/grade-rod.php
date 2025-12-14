@@ -381,6 +381,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container-fluid py-4">
@@ -492,7 +493,7 @@
             const benchmarkElev = parseFloat(document.getElementById('benchmarkElev').value);
             
             if (!instrumentHt || !rodReading || !benchmarkElev) {
-                alert('Please enter all values');
+                showNotification('Please enter all values', 'info');
                 return;
             }
             
@@ -614,7 +615,7 @@
                     break;
             }
             
-            alert(message);
+            showNotification(message, 'info');
         }
 
         function saveCalculation(type, calculation) {
@@ -660,5 +661,6 @@
             }
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

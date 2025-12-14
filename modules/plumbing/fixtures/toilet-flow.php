@@ -113,6 +113,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             border-radius: 8px;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -245,7 +246,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             if (type === 'custom') {
                 volume = parseFloat(document.getElementById('flushVolume').value);
                 if (!volume) {
-                    alert('Please enter custom flush volume');
+                    showNotification('Please enter custom flush volume', 'info');
                     return;
                 }
             } else {
@@ -253,7 +254,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             }
             
             if (!flushes) {
-                alert('Please enter number of flushes per day');
+                showNotification('Please enter number of flushes per day', 'info');
                 return;
             }
             
@@ -363,6 +364,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         document.getElementById('usage-section').style.display = 'block';
         displayRecent();
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

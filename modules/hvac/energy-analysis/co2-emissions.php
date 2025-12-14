@@ -343,6 +343,7 @@
             border-bottom: none;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -495,7 +496,7 @@
             const buildingType = document.getElementById('buildingType').value;
             
             if (!energy) {
-                alert('Please enter annual energy consumption');
+                showNotification('Please enter annual energy consumption', 'info');
                 return;
             }
             
@@ -620,5 +621,6 @@
             localStorage.setItem('hvacEnergyHistory', JSON.stringify(history));
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

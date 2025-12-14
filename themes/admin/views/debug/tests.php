@@ -182,11 +182,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     refreshTableFromResults(data.results);
                 } else {
-                    if(window.AdminApp) AdminApp.showNotification('Error running test', 'error');
+                    showNotification('Error running test', 'error');
                 }
             })
             .catch(err => {
-                if(window.AdminApp) AdminApp.showNotification('Network error occurred', 'error');
+                showNotification('Network error occurred', 'error');
             })
             .finally(() => {
                 this.disabled = false;
@@ -215,13 +215,13 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 refreshTableFromResults(data.results);
-                if(window.AdminApp) AdminApp.showNotification('All tests completed', 'success');
+                showNotification('All tests completed', 'success');
             } else {
-                if(window.AdminApp) AdminApp.showNotification('Error running tests', 'error');
+                showNotification('Error running tests', 'error');
             }
         })
         .catch(err => {
-            if(window.AdminApp) AdminApp.showNotification('Network error occurred', 'error');
+            showNotification('Network error occurred', 'error');
         })
         .finally(() => {
             btn.disabled = false;

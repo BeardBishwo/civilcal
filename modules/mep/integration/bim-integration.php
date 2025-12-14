@@ -518,6 +518,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .sync-processing { background-color: #fff3cd; color: #856404; }
         .sync-failed { background-color: #f8d7da; color: #721c24; }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container-fluid py-4">
@@ -811,12 +812,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const projectId = document.getElementById('projectId').value;
             
             if (!fileInput.files[0]) {
-                alert('Please select a file');
+                showNotification('Please select a file', 'info');
                 return;
             }
             
             if (!projectId) {
-                alert('Please select a project');
+                showNotification('Please select a project', 'info');
                 return;
             }
 
@@ -826,7 +827,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             formData.append('project_id', projectId);
             formData.append('model_type', modelType);
 
-            showAlert('Importing BIM model...', 'info');
+            showNotification('Importing BIM model...', 'info');
             
             setTimeout(() => {
                 fetch('bim-integration.php', {
@@ -836,16 +837,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        showAlert('BIM model imported successfully!', 'success');
+                        showNotification('BIM model imported successfully!', 'success');
                         bootstrap.Modal.getInstance(document.getElementById('importModal')).hide();
                         loadModels();
                     } else {
-                        showAlert('Error importing model: ' + data.message, 'danger');
+                        showNotification('Error importing model: ' + data.message, 'danger');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showAlert('Error importing model', 'danger');
+                    showNotification('Error importing model', 'danger');
                 });
             }, 2000);
         }
@@ -1025,80 +1026,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         function exportModel() {
             if (!currentModelId) return;
             
-            const formats = ['IFC', 'CSV', 'JSON'];
-            const format = prompt('Export format (IFC, CSV, JSON):', 'IFC');
-            
-            if (formats.includes(format.toUpperCase())) {
-                const formData = new FormData();
-                formData.append('action', 'export_model');
-                formData.append('model_id', currentModelId);
-                formData.append('format', format.toUpperCase());
+            showPrompt('Export Model', 'Export format (IFC, CSV, JSON):', (format) => {
+                if (format) {
+                    const formats = ['IFC', 'CSV', 'JSON'];
+                    if (formats.includes(format.toUpperCase())) {
+                        const formData = new FormData();
+                        formData.append('action', 'export_model');
+                        formData.append('model_id', currentModelId);
+                        formData.append('format', format.toUpperCase());
 
-                fetch('bim-integration.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showAlert('Model exported successfully!', 'success');
-                    } else {
-                        showAlert('Error exporting model: ' + data.message, 'danger');
+                        fetch('bim-integration.php', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showNotification('Model exported successfully!', 'success');
+                            } else {
+                                showNotification('Error exporting model: ' + data.message, 'danger');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showNotification('Error exporting model', 'danger');
+                        });
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showAlert('Error exporting model', 'danger');
-                });
-            }
+                }
+            }, { defaultValue: 'IFC' });
         }
 
         function syncModel() {
             if (!currentModelId) return;
             
-            const software = prompt('Sync with software (revit, autocad, navisworks):', 'revit');
-            
-            if (software) {
-                const formData = new FormData();
-                formData.append('action', 'sync_software');
-                formData.append('model_id', currentModelId);
-                formData.append('software', software.toLowerCase());
+            showPrompt('Sync Model', 'Sync with software (revit, autocad, navisworks):', (software) => {
+                if (software) {
+                    const formData = new FormData();
+                    formData.append('action', 'sync_software');
+                    formData.append('model_id', currentModelId);
+                    formData.append('software', software.toLowerCase());
 
-                fetch('bim-integration.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showAlert('Model synchronized successfully!', 'success');
-                    } else {
-                        showAlert('Error syncing model: ' + data.message, 'danger');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showAlert('Error syncing model', 'danger');
-                });
-            }
-        }
-
-        function showAlert(message, type) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-            alertDiv.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            document.body.appendChild(alertDiv);
-            
-            setTimeout(() => {
-                if (alertDiv.parentNode) {
-                    alertDiv.parentNode.removeChild(alertDiv);
+                    fetch('bim-integration.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification('Model synchronized successfully!', 'success');
+                        } else {
+                            showNotification('Error syncing model: ' + data.message, 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('Error syncing model', 'danger');
+                    });
                 }
-            }, 5000);
+            }, { defaultValue: 'revit' });
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

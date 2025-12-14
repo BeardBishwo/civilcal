@@ -201,6 +201,7 @@
             background: rgba(240, 147, 251, 0.5);
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -603,5 +604,6 @@
             addWireEntry();
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

@@ -1298,7 +1298,7 @@ if (!isset($_POST['action'])) {
         const permissions = document.getElementById('permissions').value;
         
         if (!name) {
-            alert('Please enter a key name');
+            showNotification('Please enter a key name', 'info');
             return;
         }
         
@@ -1318,17 +1318,17 @@ if (!isset($_POST['action'])) {
                 document.getElementById('newKeyDisplay').style.display = 'block';
                 document.getElementById('createKeyForm').style.display = 'none';
             } else {
-                alert('Error creating API key: ' + (data.error || 'Unknown error'));
+                showNotification('Error creating API key: ' + (data.error || 'Unknown error', 'info'));
             }
         })
         .catch(error => {
-            alert('Error: ' + error.message);
+            showNotification('Error: ' + error.message);
         });
     }
     
     function listAPIKeys() {
         const formData = new FormData();
-        formData.append('action', 'list_api_keys');
+        formData.append('action', 'list_api_keys', 'info');
         
         fetch(window.location.href, {
             method: 'POST',
@@ -1340,11 +1340,11 @@ if (!isset($_POST['action'])) {
                 displayKeysList(data.data.api_keys);
                 $('#keysListModal').modal('show');
             } else {
-                alert('Error loading API keys: ' + (data.error || 'Unknown error'));
+                showNotification('Error loading API keys: ' + (data.error || 'Unknown error', 'info'));
             }
         })
         .catch(error => {
-            alert('Error: ' + error.message);
+            showNotification('Error: ' + error.message);
         });
     }
     
@@ -1369,11 +1369,11 @@ if (!isset($_POST['action'])) {
         });
         
         html += '</tbody></table></div>';
-        document.getElementById('keysListContent').innerHTML = html;
+        document.getElementById('keysListContent', 'info').innerHTML = html;
     }
     
     function revokeKey(keyId) {
-        if (confirm('Are you sure you want to revoke this API key?')) {
+        showConfirmModal('Revoke API Key', 'Are you sure you want to revoke this API key?', function() {
             const formData = new FormData();
             formData.append('action', 'revoke_api_key');
             formData.append('key_id', keyId);
@@ -1385,21 +1385,21 @@ if (!isset($_POST['action'])) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('API key revoked successfully');
+                    showNotification('API key revoked successfully', 'info');
                     listAPIKeys(); // Refresh list
                 } else {
-                    alert('Error: ' + (data.error || 'Unknown error'));
+                    showNotification('Error: ' + (data.error || 'Unknown error', 'info'));
                 }
             })
             .catch(error => {
-                alert('Error: ' + error.message);
+                showNotification('Error: ' + error.message);
             });
-        }
+        });
     }
     
     function showUsageStats() {
         const formData = new FormData();
-        formData.append('action', 'get_usage_stats');
+        formData.append('action', 'get_usage_stats', 'info');
         
         fetch(window.location.href, {
             method: 'POST',
@@ -1411,11 +1411,11 @@ if (!isset($_POST['action'])) {
                 displayUsageStats(data.data.usage_stats);
                 $('#usageModal').modal('show');
             } else {
-                alert('Error loading usage statistics: ' + (data.error || 'Unknown error'));
+                showNotification('Error loading usage statistics: ' + (data.error || 'Unknown error', 'info'));
             }
         })
         .catch(error => {
-            alert('Error: ' + error.message);
+            showNotification('Error: ' + error.message);
         });
     }
     
@@ -1446,7 +1446,7 @@ if (!isset($_POST['action'])) {
             }, 100);
         }
         
-        document.getElementById('usageStatsContent').innerHTML = html;
+        document.getElementById('usageStatsContent', 'info').innerHTML = html;
     }
     
     function createUsageChart(stats) {
@@ -1493,7 +1493,7 @@ if (!isset($_POST['action'])) {
         const method = document.getElementById('testMethod').value;
         
         if (!endpoint) {
-            alert('Please enter an endpoint URL');
+            showNotification('Please enter an endpoint URL', 'info');
             return;
         }
         
@@ -1511,11 +1511,11 @@ if (!isset($_POST['action'])) {
             if (data.success) {
                 displayTestResults(data.data);
             } else {
-                alert('Test failed: ' + (data.error || 'Unknown error'));
+                showNotification('Test failed: ' + (data.error || 'Unknown error', 'info'));
             }
         })
         .catch(error => {
-            alert('Error: ' + error.message);
+            showNotification('Error: ' + error.message);
         });
     }
     
@@ -1535,12 +1535,12 @@ if (!isset($_POST['action'])) {
             </div>
         `;
         
-        document.getElementById('testOutput').innerHTML = html;
+        document.getElementById('testOutput', 'info').innerHTML = html;
         document.getElementById('testResults').style.display = 'block';
     }
     
     function createTables() {
-        if (confirm('This will create the necessary database tables for the API. Continue?')) {
+        showConfirmModal('Create Tables', 'This will create the necessary database tables for the API. Continue?', function() {
             const formData = new FormData();
             formData.append('action', 'create_tables');
             
@@ -1551,15 +1551,15 @@ if (!isset($_POST['action'])) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message);
+                    showNotification(data.message, 'success');
                 } else {
-                    alert('Error: ' + (data.error || 'Unknown error'));
+                    showNotification('Error: ' + (data.error || 'Unknown error', 'info'));
                 }
             })
             .catch(error => {
-                alert('Error: ' + error.message);
+                showNotification('Error: ' + error.message, 'danger');
             });
-        }
+        });
     }
     </script>
     

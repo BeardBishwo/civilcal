@@ -846,6 +846,7 @@ function saveGreenRatingProject($data, $project_id) {
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include '../../../themes/default/views/partials/header.php'; ?>
@@ -1305,6 +1306,7 @@ function saveGreenRatingProject($data, $project_id) {
             event.target.classList.add('active');
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

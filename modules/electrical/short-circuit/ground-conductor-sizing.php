@@ -162,6 +162,7 @@
             opacity: 0.9;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -359,7 +360,7 @@
             const insulation = document.getElementById('insulation-type').value;
 
             if (isNaN(current)) {
-                alert('Please enter a valid current.');
+                showNotification('Please enter a valid current.', 'info');
                 return;
             }
             
@@ -432,5 +433,6 @@
             localStorage.setItem('recentGroundConductorCalculations', JSON.stringify(recent));
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

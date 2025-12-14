@@ -272,7 +272,7 @@ function bulkOperation(operation) {
     const selectedUsers = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
     
     if (selectedUsers.length === 0) {
-        alert('Please select at least one user for bulk operations.');
+        showNotification('Please select at least one user for bulk operations.', 'warning');
         return;
     }
     
@@ -283,12 +283,10 @@ function bulkOperation(operation) {
         'export': `Are you sure you want to export data for ${selectedUsers.length} users?`
     };
     
-    if (!confirm(confirmMessages[operation])) {
-        return;
-    }
-    
-    // Implement bulk operation logic here
-    console.log(`Bulk ${operation} operation for users:`, selectedUsers);
-    alert(`${operation.charAt(0).toUpperCase() + operation.slice(1)} operation would be performed on ${selectedUsers.length} users.`);
+    showConfirmModal('Bulk Operation', confirmMessages[operation], () => {
+        // Implement bulk operation logic here
+        console.log(`Bulk ${operation} operation for users:`, selectedUsers);
+        showNotification(`${operation.charAt(0).toUpperCase() + operation.slice(1)} operation simulated on ${selectedUsers.length} users.`, 'info');
+    });
 }
 </script>

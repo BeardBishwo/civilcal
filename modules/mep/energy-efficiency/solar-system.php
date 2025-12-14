@@ -971,6 +971,7 @@ function saveSolarProject($data, $project_id) {
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include '../../../themes/default/views/partials/header.php'; ?>
@@ -1136,12 +1137,12 @@ function saveSolarProject($data, $project_id) {
                 if (data.success) {
                     displayResults(data.results);
                 } else {
-                    alert('Error calculating solar system: ' + data.error);
+                    showNotification('Error calculating solar system: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error calculating solar system');
+                showNotification('Error calculating solar system', 'danger');
             });
         }
         
@@ -1158,12 +1159,12 @@ function saveSolarProject($data, $project_id) {
                 if (data.success) {
                     displayOptimizationResults(data.results);
                 } else {
-                    alert('Error optimizing system: ' + data.error);
+                    showNotification('Error optimizing system: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error optimizing system');
+                showNotification('Error optimizing system', 'danger');
             });
         }
         
@@ -1350,6 +1351,7 @@ function saveSolarProject($data, $project_id) {
             });
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

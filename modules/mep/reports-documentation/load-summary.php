@@ -743,6 +743,7 @@ function exportLoadData($data) {
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include '../../../themes/default/views/partials/header.php'; ?>
@@ -863,12 +864,12 @@ function exportLoadData($data) {
                 if (data.success) {
                     displayLoadResults(data.results);
                 } else {
-                    alert('Error calculating loads: ' + data.error);
+                    showNotification('Error calculating loads: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error calculating loads');
+                showNotification('Error calculating loads', 'danger');
             });
         }
         
@@ -883,14 +884,14 @@ function exportLoadData($data) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Load data exported successfully!');
+                    showNotification('Load data exported successfully!', 'info');
                 } else {
-                    alert('Error exporting data: ' + data.error);
+                    showNotification('Error exporting data: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error exporting data');
+                showNotification('Error exporting data', 'danger');
             });
         }
         
@@ -1067,6 +1068,7 @@ function exportLoadData($data) {
             calculateLoads();
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

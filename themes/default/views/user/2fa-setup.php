@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enable Two-Factor Authentication - Bishwo Calculator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo app_base_url('/assets/css/global-notifications.css'); ?>">
     <style>
         * {
             margin: 0;
@@ -375,7 +376,7 @@
         function copySecret() {
             const secretKey = document.getElementById('secretKey').textContent;
             navigator.clipboard.writeText(secretKey).then(() => {
-                alert('✓ Secret key copied to clipboard!');
+                showNotification('Secret key copied to clipboard!', 'success');
             });
         }
         
@@ -397,7 +398,7 @@
             
             // Validate code
             if (code.length !== 6) {
-                alert('Please enter a 6-digit code');
+                showNotification('Please enter a 6-digit code', 'error');
                 return;
             }
             
@@ -418,26 +419,32 @@
                 if (data.success) {
                     // Show recovery codes
                     const codes = data.recovery_codes.join('\n');
-                    alert('✓ 2FA Enabled Successfully!\n\n' +
-                          'IMPORTANT: Save these recovery codes in a secure location:\n\n' +
-                          codes + '\n\n' +
-                          'You can use these codes to access your account if you lose your device.');
+                    showAlert(
+                        '2FA Enabled Successfully!',
+                        '<strong>IMPORTANT:</strong> Save these recovery codes in a secure location:<br><br>' +
+                        '<div style="font-family: monospace; background: #f3f4f6; padding: 1rem; border-radius: 4px; margin: 1rem 0;">' +
+                        codes.replace(/\n/g, '<br>') +
+                        '</div>' +
+                        'You can use these codes to access your account if you lose your device.',
+                        'success'
+                    );
                     
                     window.location.href = baseUrl + '/user/profile';
                 } else {
-                    alert('Error: ' + (data.error || 'Failed to enable 2FA'));
+                    showNotification('Error: ' + (data.error || 'Failed to enable 2FA'), 'error');
                     btn.disabled = false;
                     btnText.textContent = 'Enable 2FA';
                     spinner.style.display = 'none';
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error: Failed to enable 2FA. Please try again.');
+                showNotification('Failed to enable 2FA. Please try again.', 'error');
                 btn.disabled = false;
                 btnText.textContent = 'Enable 2FA';
                 spinner.style.display = 'none';
             }
         });
     </script>
+    <script src="<?php echo app_base_url('/assets/js/global-notifications.js'); ?>"></script>
 </body>
 </html>

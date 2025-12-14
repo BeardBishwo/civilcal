@@ -268,6 +268,7 @@ $db = new Database();
         .status-revision { background: #fff3cd; color: #856404; }
         .status-obsolete { background: #f8d7da; color: #721c24; }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include '../../../themes/default/views/partials/header.php'; ?>
@@ -647,7 +648,7 @@ $db = new Database();
             e.preventDefault();
             
             if (!selectedFormat) {
-                alert('Please select an export format first');
+                showNotification('Please select an export format first', 'info');
                 return;
             }
             
@@ -707,7 +708,7 @@ $db = new Database();
                 if (progress >= 100) {
                     clearInterval(progressInterval);
                     setTimeout(() => {
-                        alert(`Model exported successfully as ${selectedFormat.toUpperCase()} format!`);
+                        showNotification(`Model exported successfully as ${selectedFormat.toUpperCase(, 'success')} format!`);
                     }, 500);
                 }
             }, 800);
@@ -723,6 +724,7 @@ $db = new Database();
         // Set default export date to today
         document.getElementById('exportDate').value = new Date().toISOString().split('T')[0];
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

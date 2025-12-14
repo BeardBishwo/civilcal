@@ -210,6 +210,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -307,7 +308,7 @@
             const aspectRatio = parseFloat(document.getElementById('aspectRatio').value);
             
             if (!airFlow || !velocity) {
-                alert('Please enter air flow and velocity');
+                showNotification('Please enter air flow and velocity', 'info');
                 return;
             }
             
@@ -348,5 +349,6 @@
             saveCalculation('Duct Sizing', `${airFlow}CFM @ ${velocity}FPM → ${width.toFixed(0)}"×${height.toFixed(0)}"`);
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

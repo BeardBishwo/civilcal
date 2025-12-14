@@ -148,6 +148,7 @@ if (
     <link rel="icon" href="<?php echo htmlspecialchars($favicon); ?>">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo app_base_url('public/assets/css/global-notifications.css'); ?>">
     <?php
     // Load CSS files via ThemeManager proxy to ensure correct URL resolution
     // for both Laragon (document root c:\laragon\www) and built-in server (document root public/)
@@ -2961,7 +2962,7 @@ if (
                 if (favoritesItem) {
                     favoritesItem.addEventListener('click', function(e) {
                         e.preventDefault();
-                        alert('Favorites feature coming soon!');
+                        showNotification('Favorites feature coming soon!', 'info');
                     });
                 }
             })();

@@ -713,12 +713,12 @@ function loadSavedConfiguration() {
     const saved = localStorage.getItem('mep_electrical_summary');
     if (saved) {
         const config = JSON.parse(saved);
-        if (confirm('Load saved configuration from ' + new Date(config.timestamp).toLocaleString() + '?')) {
+        showConfirmModal('Load Configuration', 'Load saved configuration from ' + new Date(config.timestamp).toLocaleString() + '?', function() {
             document.querySelector('input[name="project_name"]').value = config.project_name;
             document.querySelector('select[name="building_type"]').value = config.building_type;
             document.querySelector('input[name="total_area"]').value = config.total_area;
             document.querySelector('form').submit();
-        }
+        });
     }
 }
 

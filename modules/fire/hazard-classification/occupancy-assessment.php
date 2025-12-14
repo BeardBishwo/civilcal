@@ -12,6 +12,7 @@ if (!defined('ACCESS_ALLOWED')) {
     <title>Occupancy Assessment - Fire Protection Toolkit</title>
     <link rel="stylesheet" href="../../assets/css/fire.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="fire-container">
@@ -629,5 +630,6 @@ if (!defined('ACCESS_ALLOWED')) {
             transition: transform 0.2s ease;
         }
     </style>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

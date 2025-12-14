@@ -827,6 +827,7 @@ function searchMaterials($query, $db) {
             flex: 1;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="vendor-container">
@@ -1088,16 +1089,16 @@ function searchMaterials($query, $db) {
                     currentVendors = data.vendors;
                     displayVendors();
                 } else {
-                    alert('Error loading vendors: ' + data.error);
+                    showNotification('Error loading vendors: ' + data.error);
                 }
             })
             .catch(error => {
-                alert('Error: ' + error.message);
+                showNotification('Error: ' + error.message, 'error');
             });
         }
         
         function displayVendors() {
-            const grid = document.getElementById('vendorGrid');
+            const grid = document.getElementById('vendorGrid', 'info');
             grid.innerHTML = '';
             
             currentVendors.forEach(vendor => {
@@ -1137,16 +1138,16 @@ function searchMaterials($query, $db) {
                 if (data.success) {
                     displayVendorMaterials(vendor, data.materials);
                 } else {
-                    alert('Error loading materials: ' + data.error);
+                    showNotification('Error loading materials: ' + data.error);
                 }
             })
             .catch(error => {
-                alert('Error: ' + error.message);
+                showNotification('Error: ' + error.message, 'error');
             });
         }
         
         function displayVendorMaterials(vendor, materials) {
-            const modal = document.getElementById('materialModal');
+            const modal = document.getElementById('materialModal', 'info');
             const modalTitle = document.getElementById('materialModalTitle');
             const materialVendorId = document.getElementById('materialVendorId');
             
@@ -1301,7 +1302,7 @@ function searchMaterials($query, $db) {
         function comparePrices() {
             const query = document.getElementById('comparisonSearch').value.trim();
             if (!query) {
-                alert('Please enter a material name to compare prices');
+                showNotification('Please enter a material name to compare prices', 'info');
                 return;
             }
             
@@ -1317,16 +1318,16 @@ function searchMaterials($query, $db) {
                 if (data.success) {
                     displayPriceComparison(data.comparisons);
                 } else {
-                    alert('Error comparing prices: ' + data.error);
+                    showNotification('Error comparing prices: ' + data.error);
                 }
             })
             .catch(error => {
-                alert('Error: ' + error.message);
+                showNotification('Error: ' + error.message, 'error');
             });
         }
         
         function displayPriceComparison(comparisons) {
-            const resultsDiv = document.getElementById('comparisonResults');
+            const resultsDiv = document.getElementById('comparisonResults', 'info');
             
             if (comparisons.length === 0) {
                 resultsDiv.innerHTML = '<p>No prices found for this material.</p>';
@@ -1362,7 +1363,7 @@ function searchMaterials($query, $db) {
         
         function generatePO(vendorId, materialName, price, unit) {
             // This would open a PO generation form with the selected material
-            alert(`Generate PO for ${materialName} from vendor ${vendorId} at $${price}/${unit}`);
+            showNotification(`Generate PO for ${materialName} from vendor ${vendorId} at $${price}/${unit}`, 'info');
         }
         
         function openVendorModal(vendorId = null) {
@@ -1421,20 +1422,20 @@ function searchMaterials($query, $db) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Vendor saved successfully!');
+                    showNotification('Vendor saved successfully!', 'info');
                     closeVendorModal();
                     loadVendors();
                 } else {
-                    alert('Error saving vendor: ' + data.error);
+                    showNotification('Error saving vendor: ' + data.error);
                 }
             })
             .catch(error => {
-                alert('Error: ' + error.message);
+                showNotification('Error: ' + error.message, 'error');
             });
         }
         
         function saveMaterialPrice() {
-            const formData = new FormData(document.getElementById('materialForm'));
+            const formData = new FormData(document.getElementById('materialForm', 'info'));
             const priceId = formData.get('price_id');
             
             const action = priceId ? 'update_material_price' : 'add_material_price';
@@ -1447,17 +1448,17 @@ function searchMaterials($query, $db) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Material price saved successfully!');
+                    showNotification('Material price saved successfully!', 'info');
                     closeMaterialModal();
                     if (document.getElementById('materials').classList.contains('active')) {
                         loadAllMaterials();
                     }
                 } else {
-                    alert('Error saving material price: ' + data.error);
+                    showNotification('Error saving material price: ' + data.error);
                 }
             })
             .catch(error => {
-                alert('Error: ' + error.message);
+                showNotification('Error: ' + error.message, 'error');
             });
         }
         
@@ -1468,11 +1469,11 @@ function searchMaterials($query, $db) {
         function editMaterialPrice(priceId) {
             // Load material price data and open modal in edit mode
             openMaterialModal();
-            document.getElementById('materialPriceId').value = priceId;
+            document.getElementById('materialPriceId', 'info').value = priceId;
         }
         
         function deleteVendor(vendorId) {
-            if (confirm('Are you sure you want to delete this vendor?')) {
+            showConfirmModal('Delete Vendor', 'Are you sure you want to delete this vendor?', function() {
                 fetch('', {
                     method: 'POST',
                     body: new URLSearchParams({
@@ -1483,20 +1484,20 @@ function searchMaterials($query, $db) {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Vendor deleted successfully!');
+                        showNotification('Vendor deleted successfully!', 'success');
                         loadVendors();
                     } else {
-                        alert('Error deleting vendor: ' + data.error);
+                        showNotification('Error deleting vendor: ' + data.error, 'error');
                     }
                 })
                 .catch(error => {
-                    alert('Error: ' + error.message);
+                    showNotification('Error: ' + error.message, 'error');
                 });
-            }
+            });
         }
         
         function deleteMaterialPrice(priceId) {
-            if (confirm('Are you sure you want to delete this material price?')) {
+            showConfirmModal('Delete Material Price', 'Are you sure you want to delete this material price?', function() {
                 fetch('', {
                     method: 'POST',
                     body: new URLSearchParams({
@@ -1507,20 +1508,20 @@ function searchMaterials($query, $db) {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Material price deleted successfully!');
+                        showNotification('Material price deleted successfully!', 'success');
                         loadAllMaterials();
                     } else {
-                        alert('Error deleting material price: ' + data.error);
+                        showNotification('Error deleting material price: ' + data.error, 'error');
                     }
                 })
                 .catch(error => {
-                    alert('Error: ' + error.message);
+                    showNotification('Error: ' + error.message, 'error');
                 });
-            }
+            });
         }
         
         function closeVendorModal() {
-            document.getElementById('vendorModal').style.display = 'none';
+            document.getElementById('vendorModal', 'info').style.display = 'none';
         }
         
         function closeMaterialModal() {
@@ -1538,7 +1539,7 @@ function searchMaterials($query, $db) {
         }
         
         function generateNewPO() {
-            alert('Purchase order generation feature coming soon!');
+            showNotification('Purchase order generation feature coming soon!', 'info');
         }
         
         // Close modals when clicking outside
@@ -1554,6 +1555,7 @@ function searchMaterials($query, $db) {
             }
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

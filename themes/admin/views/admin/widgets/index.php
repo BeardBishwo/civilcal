@@ -116,8 +116,8 @@ $page_title = 'Widget Management - Bishwo Calculator';
                                         <i class="fas fa-eye text-info"></i>
                                     </a>
                                 </div>
-                                <form method="post" action="<?php echo app_base_url('/admin/widgets/delete/'); ?><?php echo $widget->getId(); ?>" onsubmit="return confirm('Are you sure you want to delete this widget?')">
-                                    <button type="submit" class="action-btn-icon delete-btn" title="Delete">
+                                <form method="post" action="<?php echo app_base_url('/admin/widgets/delete/'); ?><?php echo $widget->getId(); ?>" id="delete-widget-<?php echo $widget->getId(); ?>">
+                                    <button type="button" class="action-btn-icon delete-btn" title="Delete" onclick="deleteWidget('<?php echo $widget->getId(); ?>')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
@@ -430,6 +430,7 @@ $page_title = 'Widget Management - Bishwo Calculator';
     .description-truncate {
         display: -webkit-box;
         -webkit-line-clamp: 2;
+        line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
         min-height: 2.4em;
@@ -501,3 +502,11 @@ $page_title = 'Widget Management - Bishwo Calculator';
         }
     }
 </style>
+
+<script>
+    function deleteWidget(id) {
+        showConfirmModal('Delete Widget', 'Are you sure you want to delete this widget?', () => {
+            document.getElementById('delete-widget-' + id).submit();
+        });
+    }
+</script>

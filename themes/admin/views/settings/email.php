@@ -380,12 +380,12 @@
                 // Now send test email
                 sendTestEmail();
             } else {
-                alert('❌ Failed to save settings: ' + data.message);
+                showNotification('Failed to save settings: ' + data.message, 'error');
             }
         })
         .catch(error => {
             console.error('Error saving settings:', error);
-            alert('⚠️ Error saving settings. Attempting to send test email anyway...');
+            showNotification('Error saving settings. Attempting to send test email anyway...', 'warning');
             sendTestEmail();
         });
     });
@@ -393,51 +393,49 @@
     function sendTestEmail() {
         const testEmail = document.getElementById('test_email').value;
         if (!testEmail) {
-            alert('📧 Please enter a test email address');
+            showNotification('Please enter a test email address', 'warning');
             return;
         }
         
-        if (!confirm('📧 Send a test email to ' + testEmail + ' to verify SMTP settings?')) {
-            return;
-        }
+        showConfirmModal('Send Test Email', 'Send a test email to ' + testEmail + ' to verify SMTP settings?', () => {
+            const button = document.getElementById('sendTestEmail');
+            button.disabled = true;
+            button.textContent = '⏳ Sending...';
 
-        const button = document.getElementById('sendTestEmail');
-        button.disabled = true;
-        button.textContent = '⏳ Sending...';
-
-        fetch('<?php echo app_base_url("/admin/email/send-test"); ?>', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': document.querySelector('input[name="csrf_token"]').value
-            },
-            body: JSON.stringify({test_email: testEmail})
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('HTTP ' + response.status);
-            }
-            return response.json();
-        })
-        .then(data => {
-            button.disabled = false;
-            button.textContent = '🧪 Send Test Email';
-            
-            if (data.success) {
-                console.log('✅ Success:', data.message);
-                const message = data.message || 'Test email sent successfully!';
-                alert('✅ ' + message);
-            } else {
-                console.log('❌ Error:', data.message);
-                const message = data.message || 'Failed to send test email';
-                alert('❌ ' + message);
-            }
-        })
-        .catch(error => {
-            button.disabled = false;
-            button.textContent = '🧪 Send Test Email';
-            console.error('Error:', error);
-            alert('⚠️ Error: ' + error.message);
+            fetch('<?php echo app_base_url("/admin/email/send-test"); ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': document.querySelector('input[name="csrf_token"]').value
+                },
+                body: JSON.stringify({test_email: testEmail})
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                button.disabled = false;
+                button.textContent = '🧪 Send Test Email';
+                
+                if (data.success) {
+                    console.log('✅ Success:', data.message);
+                    const message = data.message || 'Test email sent successfully!';
+                    showNotification(message, 'success');
+                } else {
+                    console.log('❌ Error:', data.message);
+                    const message = data.message || 'Failed to send test email';
+                    showNotification(message, 'error');
+                }
+            })
+            .catch(error => {
+                button.disabled = false;
+                button.textContent = '🧪 Send Test Email';
+                console.error('Error:', error);
+                showNotification('Error: ' + error.message, 'error');
+            });
         });
     }
 

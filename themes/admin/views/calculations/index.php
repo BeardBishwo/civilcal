@@ -205,31 +205,31 @@ document.getElementById('calculatorFilter')?.addEventListener('change', function
 // View calculation details
 function viewCalculation(id) {
     // Implement view details functionality
-    alert('View calculation details for ID: ' + id);
+    showNotification('View calculation details for ID: ' + id, 'info');
 }
 
 // Delete calculation
 function deleteCalculation(id) {
-    if (!confirm('Are you sure you want to delete this calculation record?')) return;
-    
-    fetch('<?php echo get_app_url(); ?>/admin/calculations/delete', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: id })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert('Error: ' + (data.message || 'Failed to delete calculation'));
-        }
-    })
-    .catch(error => {
-        alert('Error deleting calculation');
-        console.error(error);
+    showConfirmModal('Delete Calculation', 'Are you sure you want to delete this calculation record?', () => {
+        fetch('<?php echo get_app_url(); ?>/admin/calculations/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                showNotification('Error: ' + (data.message || 'Failed to delete calculation'), 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Error deleting calculation', 'error');
+            console.error(error);
+        });
     });
 }
 

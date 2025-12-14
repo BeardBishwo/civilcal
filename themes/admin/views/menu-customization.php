@@ -325,9 +325,11 @@ function addMenuItemToMenu(menuKey) {
 
 function removeMenuItem(menuKey) {
     const menuItem = document.querySelector(`#current-menu [data-key="${menuKey}"]`);
-    if (menuItem && confirm('Are you sure you want to remove this menu item?')) {
-        menuItem.remove();
-        updatePreview();
+    if (menuItem) {
+        showConfirmModal('Remove Item', 'Are you sure you want to remove this menu item?', () => {
+            menuItem.remove();
+            updatePreview();
+        });
     }
 }
 
@@ -380,9 +382,9 @@ function collapseAll() {
 }
 
 function resetToDefault() {
-    if (confirm('Are you sure you want to reset to the default menu configuration? This will overwrite your current settings.')) {
+    showConfirmModal('Reset Menu', 'Are you sure you want to reset to the default menu configuration? This will overwrite your current settings.', () => {
         loadDefaultMenu();
-    }
+    });
 }
 
 function loadDefaultMenu() {

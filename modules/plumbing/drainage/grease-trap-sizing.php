@@ -113,6 +113,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             border-radius: 8px;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -241,7 +242,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             const hasDisposal = document.getElementById('wasteFoodDisposal').value === 'yes';
             
             if (!mealCount || !hours || (!sinks && !dishwashers)) {
-                alert('Please fill in all required fields');
+                showNotification('Please fill in all required fields', 'info');
                 return;
             }
             
@@ -362,6 +363,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         document.getElementById('kitchen-section').style.display = 'block';
         displayRecent();
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

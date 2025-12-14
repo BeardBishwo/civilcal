@@ -311,6 +311,7 @@
             left: 0;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -430,7 +431,7 @@
             const discountRate = parseFloat(document.getElementById('discountRate').value) / 100;
             
             if (!initialCost || !annualSavings) {
-                alert('Please enter both initial cost and annual savings');
+                showNotification('Please enter both initial cost and annual savings', 'info');
                 return;
             }
             
@@ -438,7 +439,7 @@
             const netAnnualSavings = annualSavings - maintenanceCost;
             
             if (netAnnualSavings <= 0) {
-                alert('Net annual savings must be greater than zero');
+                showNotification('Net annual savings must be greater than zero', 'info');
                 return;
             }
             
@@ -556,5 +557,6 @@
             localStorage.setItem('hvacEnergyHistory', JSON.stringify(history));
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

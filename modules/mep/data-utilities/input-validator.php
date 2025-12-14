@@ -832,7 +832,7 @@ if (!isset($_POST['action'])) {
                         <div class="form-group">
                             <label>Input Data (JSON format)</label>
                             <textarea class="form-control" id="sanitize_input" rows="4" 
-                                      placeholder='{"name": "<script>alert('xss')</script>", "email": "test@domain.com"}'></textarea>
+                                      placeholder='{"name": "<script>showNotification('xss', 'info')</script>", "email": "test@domain.com"}'></textarea>
                         </div>
                         
                         <div class="btn-group" role="group">

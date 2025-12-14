@@ -19,6 +19,8 @@ $pageTitle = $page_title ?? 'User Profile';
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Global Notification System -->
+    <link rel="stylesheet" href="<?php echo app_base_url('/assets/css/global-notifications.css'); ?>">
     
     <style>
         /* ===== ULTRA-PREMIUM PROFILE UI ===== */
@@ -855,13 +857,13 @@ $pageTitle = $page_title ?? 'User Profile';
                 const result = await response.json();
                 
                 if (response.ok) {
-                    alert('Profile updated successfully!');
-                    location.reload();
+                    showNotification('Profile updated successfully!', 'success');
+                    setTimeout(() => location.reload(), 1000);
                 } else {
-                    alert('Error: ' + (result.error || 'Update failed'));
+                    showNotification('Error: ' + (result.error || 'Update failed'), 'error');
                 }
             } catch (err) {
-                alert('Network error occurred.');
+                showNotification('Network error occurred.', 'error');
             } finally {
                 btn.disabled = false;
                 spinner.style.display = 'none';
@@ -870,14 +872,31 @@ $pageTitle = $page_title ?? 'User Profile';
 
         // Delete Account
         function confirmDelete() {
-            if (confirm('Are you ABSOLUTELY SURE? This action cannot be undone.')) {
-                // Redirect to delete handler or show modal
-                const password = prompt("Please enter your password to confirm:");
-                if(password) {
-                   // Call delete API
-                   alert("Feature placeholder: Delete account request sent.");
+            showConfirmModal(
+                'Delete Account',
+                'Are you <strong>ABSOLUTELY SURE</strong>? This action cannot be undone and will permanently delete all your data.',
+                () => {
+                    showPrompt(
+                        'Confirm Password',
+                        'Please enter your password to confirm account deletion:',
+                        (password) => {
+                            if(password) {
+                                // Call delete API
+                                showNotification('Account deletion request sent.', 'info');
+                            }
+                        },
+                        {
+                            inputType: 'password',
+                            placeholder: 'Enter your password',
+                            confirmText: 'Delete Account'
+                        }
+                    );
+                },
+                {
+                    confirmText: 'Continue',
+                    icon: 'fa-exclamation-triangle'
                 }
-            }
+            );
         }
         // Update Password Function
         async function updatePassword() {
@@ -886,12 +905,12 @@ $pageTitle = $page_title ?? 'User Profile';
             const confirm = document.getElementById('confirm_password').value;
             
             if (!current || !newPass || !confirm) {
-                alert('Please fill in all password fields');
+                showNotification('Please fill in all password fields', 'error');
                 return;
             }
             
             if (newPass !== confirm) {
-                alert('New passwords do not match');
+                showNotification('New passwords do not match', 'error');
                 return;
             }
             
@@ -917,16 +936,16 @@ $pageTitle = $page_title ?? 'User Profile';
                 const result = await response.json();
                 
                 if (result.success) {
-                    alert('Password updated successfully');
+                    showNotification('Password updated successfully', 'success');
                     document.getElementById('current_password').value = '';
                     document.getElementById('new_password').value = '';
                     document.getElementById('confirm_password').value = '';
                 } else {
-                    alert(result.error || 'Failed to update password');
+                    showNotification(result.error || 'Failed to update password', 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred while updating password');
+                showNotification('An error occurred while updating password', 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
@@ -935,7 +954,10 @@ $pageTitle = $page_title ?? 'User Profile';
         
         // 2FA Functions - New Minimal UI
         async function start2FASetup() {
-            const pwd = prompt("Please confirm your password to enable 2FA:");
+            showPrompt(
+                'Enable Two-Factor Authentication',
+                'Please confirm your password to continue:',
+                async (pwd) => {
             if (!pwd) return;
 
             try {
@@ -966,18 +988,25 @@ $pageTitle = $page_title ?? 'User Profile';
                         ).join('');
                     }
                 } else {
-                    alert(result.error || 'Failed to start setup');
+                    showNotification(result.error || 'Failed to start setup', 'error');
                 }
             } catch (e) {
                 console.error(e);
-                alert('Error starting 2FA setup');
+                showNotification('Error starting 2FA setup', 'error');
             }
+                },
+                {
+                    inputType: 'password',
+                    placeholder: 'Enter your password',
+                    confirmText: 'Continue'
+                }
+            );
         }
 
         async function verify2FACode() {
             const code = document.getElementById('verify-2fa-code').value;
             if (!code) { 
-                alert('Please enter the 6-digit code'); 
+                showNotification('Please enter the 6-digit code', 'error'); 
                 return; 
             }
             
@@ -990,14 +1019,14 @@ $pageTitle = $page_title ?? 'User Profile';
                 const result = await response.json();
                 
                 if (result.success) {
-                    alert('✅ 2FA Enabled Successfully!');
+                    showNotification('2FA Enabled Successfully!', 'success');
                     location.reload();
                 } else {
-                    alert(result.error || 'Invalid verification code');
+                    showNotification(result.error || 'Invalid verification code', 'error');
                 }
             } catch (e) {
                 console.error(e);
-                alert('Error verifying code');
+                showNotification('Error verifying code', 'error');
             }
         }
         
@@ -1007,49 +1036,64 @@ $pageTitle = $page_title ?? 'User Profile';
             document.getElementById('verify-2fa-code').value = '';
         }
         
+        
         function showDisable2FA() {
-            document.getElementById('disable-2fa-container').style.display = 'block';
+            showConfirmModal(
+                'Disable Two-Factor Authentication',
+                'Are you sure you want to disable 2FA? This will make your account less secure.',
+                () => {
+                    showPrompt(
+                        'Confirm Password',
+                        'Please enter your password to disable 2FA:',
+                        async (pwd) => {
+                            if (!pwd) {
+                                showNotification('Password is required', 'error');
+                                return;
+                            }
+                            
+                            try {
+                                const response = await fetch('/Bishwo_Calculator/profile/2fa/disable', {
+                                    method: 'POST',
+                                    headers: {'Content-Type': 'application/json'},
+                                    body: JSON.stringify({ password: pwd })
+                                });
+                                const result = await response.json();
+                                
+                                if (result.success) {
+                                    showNotification('2FA has been disabled', 'success');
+                                    setTimeout(() => location.reload(), 1000);
+                                } else {
+                                    showNotification(result.error || 'Failed to disable', 'error');
+                                }
+                            } catch (e) {
+                                console.error(e);
+                                showNotification('Error disabling 2FA', 'error');
+                            }
+                        },
+                        {
+                            inputType: 'password',
+                            placeholder: 'Enter your password',
+                            confirmText: 'Disable 2FA'
+                        }
+                    );
+                },
+                {
+                    confirmText: 'Continue',
+                    icon: 'fa-shield-alt'
+                }
+            );
         }
         
         function hideDisable2FA() {
-            document.getElementById('disable-2fa-container').style.display = 'none';
-            document.getElementById('disable_2fa_password').value = '';
+            // No longer needed with modal approach
         }
-
-        async function confirmDisable2FA() {
-            const pwd = document.getElementById('disable_2fa_password').value;
-            if (!pwd) { 
-                alert('Password required'); 
-                return; 
-            }
-            
-            if(!confirm('Are you sure you want to disable 2FA? This will make your account less secure.')) return;
-
-            try {
-                const response = await fetch('/Bishwo_Calculator/profile/2fa/disable', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ password: pwd })
-                });
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('2FA Disabled.');
-                    location.reload();
-                } else {
-                    alert(result.error || 'Failed to disable');
-                }
-            } catch (e) {
-                console.error(e);
-                alert('Error disabling 2FA');
-            }
-        }
+        
         
         function copyBackupCodes() {
             const codes = window.currentBackupCodes || [];
             const codesText = codes.map((code, index) => `${index + 1}. ${code}`).join('\n');
             navigator.clipboard.writeText(codesText).then(() => {
-                alert('✅ Backup codes copied to clipboard! Save them in a secure location.');
+                showNotification('Backup codes copied to clipboard! Save them in a secure location.', 'success');
             }).catch(err => {
                 const textarea = document.createElement('textarea');
                 textarea.value = codesText;
@@ -1057,9 +1101,12 @@ $pageTitle = $page_title ?? 'User Profile';
                 textarea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textarea);
-                alert('✅ Backup codes copied to clipboard! Save them in a secure location.');
+                showNotification('Backup codes copied to clipboard! Save them in a secure location.', 'success');
             });
         }
     </script>
+    
+    <!-- Global Notification System -->
+    <script src="<?php echo app_base_url('/assets/js/global-notifications.js'); ?>"></script>
 </body>
 </html>

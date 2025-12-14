@@ -128,6 +128,7 @@
             text-decoration: underline;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -170,7 +171,7 @@
             const liveLoad = parseFloat(document.getElementById('live-load').value);
 
             if (isNaN(length) || isNaN(width) || isNaN(thickness) || isNaN(liveLoad)) {
-                alert('Please enter valid numbers.');
+                showNotification('Please enter valid numbers.', 'info');
                 return;
             }
             
@@ -182,5 +183,6 @@
             document.getElementById('result-area').style.display = 'block';
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

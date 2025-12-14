@@ -240,11 +240,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     // Reload the page to reflect changes
                     location.reload();
                 } else {
-                    alert('Error: ' + result.message);
+                    showNotification('Error: ' + result.message, 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred while processing your request.');
+                showNotification('An error occurred while processing your request.', 'error');
             }
         });
     });
@@ -257,7 +257,7 @@ function refreshModules() {
 
 // Install module function
 function installModule() {
-    alert('Module installation functionality would go here in a real implementation.');
+    showNotification('Module installation functionality would go here in a real implementation.', 'info');
 }
 
 // Filter modules function

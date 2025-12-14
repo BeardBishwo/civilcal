@@ -221,12 +221,12 @@ async function runAllTests() {
         
         if (result.success) {
             displayTestResults(result.results);
-            if(window.AdminApp) AdminApp.showNotification("All tests completed", "success");
+            showNotification("All tests completed", "success");
         } else {
-            if(window.AdminApp) AdminApp.showNotification("Test execution failed", "error");
+            showNotification("Test execution failed", "error");
         }
     } catch (error) {
-        if(window.AdminApp) AdminApp.showNotification("Network error during testing", "error");
+        showNotification("Network error during testing", "error");
     } finally {
         button.disabled = false;
         button.innerHTML = originalContent;
@@ -278,25 +278,23 @@ function refreshTests() {
 }
 
 async function clearErrorLogs() {
-    if (!confirm("Are you sure you want to clear all error logs?")) {
-        return;
-    }
-    
-    try {
-        const response = await fetch("<?= app_base_url('/admin/debug/clear-logs') ?>", {
-            method: "POST"
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            if(window.AdminApp) AdminApp.showNotification("Error logs cleared", "success");
-            location.reload();
-        } else {
-            if(window.AdminApp) AdminApp.showNotification("Failed to clear logs", "error");
+    showConfirmModal('Clear Logs', "Are you sure you want to clear all error logs?", async () => {
+        try {
+            const response = await fetch("<?= app_base_url('/admin/debug/clear-logs') ?>", {
+                method: "POST"
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showNotification("Error logs cleared", "success");
+                location.reload();
+            } else {
+                showNotification("Failed to clear logs", "error");
+            }
+        } catch (error) {
+            showNotification("Network error", "error");
         }
-    } catch (error) {
-        if(window.AdminApp) AdminApp.showNotification("Network error", "error");
-    }
+    });
 }
 </script>

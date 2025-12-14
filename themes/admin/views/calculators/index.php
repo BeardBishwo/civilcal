@@ -266,27 +266,27 @@ $totalModules = $stats['modules'];
     }
 
     function toggleCalculator(id, action) {
-        if (!confirm('Are you sure you want to ' + action + ' this calculator?')) return;
+        showConfirmModal(action.charAt(0).toUpperCase() + action.slice(1) + ' Calculator', 'Are you sure you want to ' + action + ' this calculator?', () => {
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('action', action);
 
-        const formData = new FormData();
-        formData.append('id', id);
-        formData.append('action', action);
-
-        fetch('<?php echo get_app_url(); ?>/admin/calculators/toggle', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error: ' + (data.message || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Request failed');
+            fetch('<?php echo get_app_url(); ?>/admin/calculators/toggle', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    showNotification('Error: ' + (data.message || 'Unknown error'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Request failed', 'error');
+            });
         });
     }
 </script>

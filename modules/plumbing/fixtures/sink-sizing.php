@@ -124,6 +124,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             background: rgba(255, 255, 255, 0.05);
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -278,7 +279,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             if (sinkType === 'custom') {
                 flowRate = parseFloat(document.getElementById('customFlow').value);
                 if (!flowRate) {
-                    alert('Please enter a custom flow rate');
+                    showNotification('Please enter a custom flow rate', 'info');
                     return;
                 }
             } else {
@@ -291,7 +292,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             if (velocityType === 'custom') {
                 velocity = parseFloat(document.getElementById('customVelocity').value);
                 if (!velocity) {
-                    alert('Please enter a custom velocity');
+                    showNotification('Please enter a custom velocity', 'info');
                     return;
                 }
             } else {
@@ -418,6 +419,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         displayRecent();
         updateSizeTable(6); // Initialize with lavatory sink flow
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

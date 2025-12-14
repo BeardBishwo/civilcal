@@ -198,6 +198,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -307,7 +308,7 @@
             const lightingLoad = parseFloat(document.getElementById('lightingLoad').value) || 0;
             
             if (!area) {
-                alert('Please enter room area');
+                showNotification('Please enter room area', 'info');
                 return;
             }
             
@@ -350,5 +351,6 @@
             saveCalculation('Cooling Load', `${area}m² ${roomType} → ${tons.toFixed(2)} tons`);
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

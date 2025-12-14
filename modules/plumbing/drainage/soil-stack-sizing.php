@@ -97,6 +97,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             margin-bottom: 1rem;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -196,7 +197,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             }
             
             if (totalFU === 0) {
-                alert('Please enter fixture units for at least one floor');
+                showNotification('Please enter fixture units for at least one floor', 'info');
                 return;
             }
             
@@ -282,6 +283,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         // Load recent calculations on page load
         displayRecent();
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

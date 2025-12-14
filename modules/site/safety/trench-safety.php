@@ -223,6 +223,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -484,7 +485,7 @@ function calculateTrenchSafety() {
     
     // Validate required fields
     if (!soilType || !trenchDepth || !trenchWidth || !protectionMethod || !duration) {
-        alert('Please fill in all required fields');
+        showNotification('Please fill in all required fields', 'info');
         return;
     }
     
@@ -589,7 +590,7 @@ function saveCalculation(calculation) {
     const savedCalculations = JSON.parse(localStorage.getItem('saved_calculations') || '[]');
     savedCalculations.push(calculation);
     localStorage.setItem('saved_calculations', JSON.stringify(savedCalculations));
-    alert('Calculation saved successfully!');
+    showNotification('Calculation saved successfully!', 'info');
 }
 
 function loadCalculations(key) {
@@ -616,5 +617,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

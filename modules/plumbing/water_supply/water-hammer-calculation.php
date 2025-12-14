@@ -386,7 +386,7 @@ function calculateWaterHammer() {
     const allowableSurge = parseFloat(document.getElementById('allowableSurge').value) || 10;
     
     if (!velocity || !length || !closureTime) {
-        alert('Please enter velocity, pipe length, and valve closure time');
+        showNotification('Please enter velocity, pipe length, and valve closure time', 'info');
         return;
     }
     

@@ -126,7 +126,7 @@ function calculateVolumeChange() {
     const operation = document.getElementById('earthworkOp').value;
     
     if (!bankVolume) {
-        alert('Please enter bank volume');
+        showNotification('Please enter bank volume', 'info');
         return;
     }
     
@@ -275,7 +275,7 @@ function showReference(type) {
             break;
     }
     
-    alert(message);
+    showNotification(message, 'info');
 }
 
 function saveCalculation(type, calculation) {

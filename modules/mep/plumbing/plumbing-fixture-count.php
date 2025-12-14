@@ -439,14 +439,14 @@ function saveCalculation() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Calculation saved successfully!');
+            showNotification('Calculation saved successfully!', 'info');
         } else {
-            alert('Error saving calculation: ' + data.message);
+            showNotification('Error saving calculation: ' + data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error saving calculation');
+        showNotification('Error saving calculation', 'danger');
     });
 }
 

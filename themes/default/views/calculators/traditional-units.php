@@ -164,7 +164,7 @@
             const toUnit = document.getElementById('to-unit').value;
             
             if (!value || !fromUnit || !toUnit) {
-                alert('Please fill in all fields');
+                showNotification('Please fill in all fields', 'warning');
                 return;
             }
             
@@ -189,12 +189,12 @@
                         </div>`;
                     document.getElementById('results-section').style.display = 'block';
                 } else {
-                    alert('Error: ' + data.error);
+                    showNotification('Error: ' + data.error, 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred during conversion');
+                showNotification('An error occurred during conversion', 'error');
             });
         }
         
@@ -203,7 +203,7 @@
             const fromUnit = document.getElementById('from-unit').value;
             
             if (!value || !fromUnit) {
-                alert('Please enter a value and select a unit');
+                showNotification('Please enter a value and select a unit', 'warning');
                 return;
             }
             
@@ -248,12 +248,12 @@
                     document.getElementById('conversions-list').innerHTML = html;
                     document.getElementById('all-conversions-section').style.display = 'block';
                 } else {
-                    alert('Error: ' + data.error);
+                    showNotification('Error: ' + data.error, 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while getting conversions');
+                showNotification('An error occurred while getting conversions', 'error');
             });
         }
         

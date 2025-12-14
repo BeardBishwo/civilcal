@@ -223,8 +223,8 @@ $page_title = $page_title ?? 'Create New User';
             .then(response => {
                 if (response.ok) {
                     updateSaveStatus('saved');
-                    alert('User created successfully!');
-                    window.location.href = '<?= app_base_url('/admin/users') ?>';
+                    showNotification('User created successfully!', 'success');
+                    setTimeout(() => window.location.href = '<?= app_base_url('/admin/users') ?>', 1000);
                 } else {
                     throw new Error('Failed to create user');
                 }
@@ -232,7 +232,7 @@ $page_title = $page_title ?? 'Create New User';
             .catch(error => {
                 console.error('Error:', error);
                 updateSaveStatus('error');
-                alert('Error creating user: ' + error.message);
+                showNotification('Error creating user: ' + error.message, 'error');
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             });

@@ -645,7 +645,7 @@ $page_title = 'API Settings - Admin Panel';
         // Form submission handler
         document.getElementById('settingsForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('API settings saved successfully!');
+            showNotification('API settings saved successfully!', 'success');
             // In a real implementation, this would submit to the server
         });
         
@@ -659,7 +659,7 @@ $page_title = 'API Settings - Admin Panel';
                     this.classList.add('active');
                     
                     // In a real implementation, this would load the actual page
-                    alert('Navigation to: ' + this.textContent.trim());
+                    showNotification('Navigation to: ' + this.textContent.trim(), 'info');
                 });
             });
         });

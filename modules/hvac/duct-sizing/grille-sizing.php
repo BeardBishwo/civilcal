@@ -172,6 +172,7 @@ if (session_status() == PHP_SESSION_NONE) {
             margin-bottom: 0;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="calculator-container">
@@ -325,7 +326,7 @@ if (session_status() == PHP_SESSION_NONE) {
             const freeAreaPercent = parseFloat(document.getElementById('freeAreaPercent').value);
             
             if (!airFlow || !faceVelocity) {
-                alert('Please enter air flow and face velocity');
+                showNotification('Please enter air flow and face velocity', 'info');
                 return;
             }
             
@@ -464,10 +465,11 @@ if (session_status() == PHP_SESSION_NONE) {
         }
         
         function clearHistory() {
-            if (confirm('Clear all calculation history?')) {
+            showConfirmModal('Clear History', 'Are you sure you want to clear all calculation history?', function() {
                 localStorage.removeItem('hvacGrilleSizingHistory');
                 loadCalculationHistory();
-            }
+                showNotification('History cleared', 'success');
+            });
         }
         
         // Initialize page
@@ -475,5 +477,6 @@ if (session_status() == PHP_SESSION_NONE) {
             loadCalculationHistory();
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

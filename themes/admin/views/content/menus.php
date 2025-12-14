@@ -642,19 +642,19 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
 
     // Action functions
     function toggleMenuStatus(menuId) {
-        if (confirm('Are you sure you want to change this menu\'s status?')) {
+        showConfirmModal('Toggle Status', 'Are you sure you want to change this menu\'s status?', () => {
             // Implement status toggle logic
             console.log('Toggle status for menu:', menuId);
             showNotification('Menu status updated successfully', 'success');
-        }
+        });
     }
 
     function deleteMenu(menuId, menuName) {
-        if (confirm(`Are you sure you want to delete "${menuName}"? This action cannot be undone.`)) {
+        showConfirmModal('Delete Menu', `Are you sure you want to delete "${menuName}"? This action cannot be undone.`, () => {
             // Implement delete logic
             console.log('Delete menu:', menuId);
             showNotification('Menu deleted successfully', 'success');
-        }
+        });
     }
 
     function assignMenuToLocation(location, menuId) {
@@ -663,24 +663,7 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
         showNotification(`Menu assigned to ${location} location`, 'success');
     }
 
-    function showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-            <span>${message}</span>
-        </div>
-    `;
 
-        document.body.appendChild(notification);
-
-        setTimeout(() => notification.classList.add('visible'), 10);
-        setTimeout(() => {
-            notification.classList.remove('visible');
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
 
     function getCurrentPreviewId() {
         const iframe = document.getElementById('preview-iframe');

@@ -70,6 +70,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -179,7 +180,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             if (calculationType === 'fixtureUnits') {
                 const fu = parseInt(document.getElementById('fixtureUnits').value);
                 if (!fu) {
-                    alert('Please enter the number of fixture units');
+                    showNotification('Please enter the number of fixture units', 'info');
                     return;
                 }
                 flow = convertFUtoFlow(fu);
@@ -188,7 +189,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
                 const flowRate = parseFloat(document.getElementById('flowRate').value);
                 const flowUnit = document.getElementById('flowUnit').value;
                 if (!flowRate) {
-                    alert('Please enter the flow rate');
+                    showNotification('Please enter the flow rate', 'info');
                     return;
                 }
                 flow = flowUnit === 'gpm' ? flowRate * 0.0631 : flowRate; // Convert GPM to L/s
@@ -278,6 +279,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         // Load recent calculations on page load
         displayRecent();
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

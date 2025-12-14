@@ -535,7 +535,7 @@ function calculatePressureLoss() {
     const minRequiredPressure = parseFloat(document.getElementById('minRequiredPressure').value) || 0;
     
     if (!pipeMaterial || !pipeDiameter || pipeLength <= 0 || flowRate <= 0) {
-        alert('Please enter pipe material, diameter, length, and flow rate');
+        showNotification('Please enter pipe material, diameter, length, and flow rate', 'info');
         return;
     }
     

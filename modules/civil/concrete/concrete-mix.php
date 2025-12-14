@@ -128,6 +128,7 @@
             text-decoration: underline;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -164,7 +165,7 @@
             const grade = document.getElementById('grade').value;
 
             if (isNaN(volume)) {
-                alert('Please enter a valid volume.');
+                showNotification('Please enter a valid volume.', 'info');
                 return;
             }
             
@@ -186,5 +187,6 @@
             document.getElementById('result-area').style.display = 'block';
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

@@ -411,7 +411,7 @@ function calculatePumpSize() {
     const fluidTemp = parseFloat(document.getElementById('fluidTemp').value) || 20;
     
     if (!flowRate || !totalHead) {
-        alert('Please enter flow rate and total head');
+        showNotification('Please enter flow rate and total head', 'info');
         return;
     }
     

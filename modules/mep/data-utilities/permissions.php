@@ -454,6 +454,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 1.5rem;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container-fluid py-4">
@@ -621,14 +622,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     displayPermissions(data.data);
                     updateGrantedCount(data.data);
                 } else {
-                    alert('Error loading permissions: ' + data.message);
+                    showNotification('Error loading permissions: ' + data.message);
                 }
             })
             .catch(error => console.error('Error:', error));
         }
 
         function loadAllPermissions() {
-            document.getElementById('userSelect').value = '';
+            document.getElementById('userSelect', 'info').value = '';
             const formData = new FormData();
             formData.append('action', 'get_permissions');
 
@@ -641,14 +642,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (data.success) {
                     displayAllPermissions(data.data);
                 } else {
-                    alert('Error loading permissions: ' + data.message);
+                    showNotification('Error loading permissions: ' + data.message);
                 }
             })
             .catch(error => console.error('Error:', error));
         }
 
         function displayPermissions(permissions) {
-            const container = document.getElementById('permissionsContainer');
+            const container = document.getElementById('permissionsContainer', 'info');
             const userId = document.getElementById('userSelect').value;
             
             // Group by category
@@ -784,29 +785,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function revokePermission(userId, permissionId) {
-            if (!confirm('Are you sure you want to revoke this permission?')) return;
+            showConfirmModal('Revoke Permission', 'Are you sure you want to revoke this permission?', function() {
+                const formData = new FormData();
+                formData.append('action', 'revoke_permission');
+                formData.append('user_id', userId);
+                formData.append('permission_id', permissionId);
 
-            const formData = new FormData();
-            formData.append('action', 'revoke_permission');
-            formData.append('user_id', userId);
-            formData.append('permission_id', permissionId);
-
-            fetch('permissions.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    loadUserPermissions();
-                    showAlert('Permission revoked successfully', 'success');
-                } else {
-                    showAlert('Error revoking permission: ' + data.message, 'danger');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('Error revoking permission', 'danger');
+                fetch('permissions.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadUserPermissions();
+                        showAlert('Permission revoked successfully', 'success');
+                    } else {
+                        showAlert('Error revoking permission: ' + data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('Error revoking permission', 'danger');
+                });
             });
         }
 
@@ -869,50 +870,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function initializePermissions() {
-            if (!confirm('This will create default system permissions. Continue?')) return;
+            showConfirmModal('Initialize Permissions', 'This will create default system permissions. Continue?', function() {
+                const formData = new FormData();
+                formData.append('action', 'initialize_permissions');
 
-            const formData = new FormData();
-            formData.append('action', 'initialize_permissions');
-
-            fetch('permissions.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showAlert('Default permissions initialized successfully', 'success');
-                    loadStatistics();
-                    if (document.getElementById('userSelect').value) {
-                        loadUserPermissions();
+                fetch('permissions.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('Default permissions initialized successfully', 'success');
+                        loadStatistics();
+                        if (document.getElementById('userSelect').value) {
+                            loadUserPermissions();
+                        }
+                    } else {
+                        showAlert('Error initializing permissions: ' + data.message, 'danger');
                     }
-                } else {
-                    showAlert('Error initializing permissions: ' + data.message, 'danger');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('Error initializing permissions', 'danger');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('Error initializing permissions', 'danger');
+                });
             });
         }
 
         function showAlert(message, type) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-            alertDiv.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             `;
-            document.body.appendChild(alertDiv);
             
+            // Insert alert before stats container
+            const statsContainer = document.getElementById('statsContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.innerHTML = alertHtml;
+            statsContainer.parentNode.insertBefore(alertDiv, statsContainer);
+            
+            // Auto dismiss after 3 seconds
             setTimeout(() => {
-                if (alertDiv.parentNode) {
-                    alertDiv.parentNode.removeChild(alertDiv);
-                }
-            }, 5000);
+                const bsAlert = new bootstrap.Alert(alertDiv.querySelector('.alert'));
+                bsAlert.close();
+                setTimeout(() => alertDiv.remove(), 200);
+            }, 3000);
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
-

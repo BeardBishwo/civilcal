@@ -176,6 +176,7 @@
             padding-bottom: 0.5rem;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -561,5 +562,6 @@
             localStorage.setItem('recentFeederCalculations', JSON.stringify(recent));
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

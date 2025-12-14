@@ -618,7 +618,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 // Show success message
-                alert('Plan created successfully!');
+                showNotification('Plan created successfully!', 'success');
                 // Close modal
                 if(typeof bootstrap !== 'undefined') {
                     bootstrap.Modal.getInstance(document.getElementById('createPlanModal')).hide();
@@ -626,17 +626,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Fallback for no bootstrap object
                     document.getElementById('createPlanModal').classList.remove('show');
                     document.body.classList.remove('modal-open');
-                    document.querySelector('.modal-backdrop').remove();
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) backdrop.remove();
                 }
                 // Reload page to show new plan
                 location.reload();
             } else {
-                alert('Error: ' + (data.message || 'Unknown error'));
+                showNotification('Error: ' + (data.message || 'Unknown error'), 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while creating the plan.');
+            showNotification('An error occurred while creating the plan.', 'error');
         });
     });
 });

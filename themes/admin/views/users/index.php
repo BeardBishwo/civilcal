@@ -400,34 +400,40 @@ $regularUsers = $stats['regular'] ?? ($totalUsers - $adminUsers);
             const checkedBoxes = document.querySelectorAll('.page-checkbox:checked');
             if (checkedBoxes.length === 0) return;
 
-            if (confirm(`Are you sure you want to delete ${checkedBoxes.length} users?`)) {
-                const ids = Array.from(checkedBoxes).map(cb => cb.value);
-                
-                fetch('<?= app_base_url('/admin/users/bulk-delete') ?>', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-Token': '<?php echo $this->csrfToken(); ?>',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({ 
-                        ids: ids,
-                        csrf_token: '<?php echo $this->csrfToken(); ?>'
+            showConfirmModal(
+                'Bulk Delete Users',
+                `Are you sure you want to delete <strong>${checkedBoxes.length} users</strong>? This action cannot be undone.`,
+                () => {
+                    const ids = Array.from(checkedBoxes).map(cb => cb.value);
+                    
+                    const token = getCsrfToken();
+                    fetch('<?= app_base_url('/admin/users/bulk-delete') ?>', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': token,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ 
+                            ids: ids,
+                            csrf_token: token
+                        })
                     })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert(data.message || 'Error deleting users');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred');
-                });
-            }
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification(`${ids.length} users deleted successfully`, 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showNotification(data.message || 'Error deleting users', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('An error occurred while deleting users', 'error');
+                    });
+                }
+            );
         });
 
         document.addEventListener('change', function(e) {
@@ -504,55 +510,7 @@ $regularUsers = $stats['regular'] ?? ($totalUsers - $adminUsers);
         return meta ? meta.getAttribute('content') : '';
     }
 
-    function showConfirmModal(title, message, onConfirm) {
-        const modal = document.createElement('div');
-        modal.className = 'premium-modal-overlay';
-        modal.innerHTML = `
-            <div class="premium-modal">
-                <div class="premium-modal-header">
-                    <i class="fas fa-exclamation-triangle premium-modal-icon"></i>
-                    <h3>${title}</h3>
-                </div>
-                <div class="premium-modal-body">
-                    <p>${message}</p>
-                </div>
-                <div class="premium-modal-footer">
-                    <button class="btn-cancel" onclick="this.closest('.premium-modal-overlay').remove()">
-                        <i class="fas fa-times"></i> Cancel
-                    </button>
-                    <button class="btn-confirm">
-                        <i class="fas fa-check"></i> Confirm
-                    </button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        
-        modal.querySelector('.btn-confirm').onclick = () => {
-            modal.remove();
-            onConfirm();
-        };
-        
-        modal.onclick = (e) => {
-            if (e.target === modal) modal.remove();
-        };
-    }
 
-    function showNotification(message, type = 'success') {
-        const notification = document.createElement('div');
-        notification.className = `premium-notification ${type}`;
-        notification.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-            <span>${message}</span>
-        `;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => notification.classList.add('show'), 10);
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
 
     function deleteUser(userId, userName) {
         showConfirmModal(
@@ -665,177 +623,6 @@ $regularUsers = $stats['regular'] ?? ($totalUsers - $adminUsers);
     });
 </script>
 
-<style>
-    /* Premium Modal Styles */
-    .premium-modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(4px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-        animation: fadeIn 0.2s ease;
-    }
-
-    .premium-modal {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        max-width: 480px;
-        width: 90%;
-        animation: slideUp 0.3s ease;
-        overflow: hidden;
-    }
-
-    .premium-modal-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 24px;
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-
-    .premium-modal-icon {
-        font-size: 32px;
-        opacity: 0.9;
-    }
-
-    .premium-modal-header h3 {
-        margin: 0;
-        font-size: 20px;
-        font-weight: 600;
-    }
-
-    .premium-modal-body {
-        padding: 32px 24px;
-        font-size: 15px;
-        line-height: 1.6;
-        color: #374151;
-    }
-
-    .premium-modal-body p {
-        margin: 0;
-    }
-
-    .premium-modal-footer {
-        padding: 20px 24px;
-        background: #f9fafb;
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        border-top: 1px solid #e5e7eb;
-    }
-
-    .premium-modal-footer button {
-        padding: 10px 24px;
-        border-radius: 8px;
-        border: none;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btn-cancel {
-        background: white;
-        color: #6b7280;
-        border: 1px solid #d1d5db !important;
-    }
-
-    .btn-cancel:hover {
-        background: #f3f4f6;
-        border-color: #9ca3af !important;
-    }
-
-    .btn-confirm {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: white;
-    }
-
-    .btn-confirm:hover {
-        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-    }
-
-    /* Premium Notification Styles */
-    .premium-notification {
-        position: fixed;
-        top: 24px;
-        right: 24px;
-        background: white;
-        padding: 16px 24px;
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        z-index: 10001;
-        min-width: 320px;
-        transform: translateX(400px);
-        opacity: 0;
-        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-
-    .premium-notification.show {
-        transform: translateX(0);
-        opacity: 1;
-    }
-
-    .premium-notification i {
-        font-size: 20px;
-    }
-
-    .premium-notification.success {
-        border-left: 4px solid #10b981;
-    }
-
-    .premium-notification.success i {
-        color: #10b981;
-    }
-
-    .premium-notification.error {
-        border-left: 4px solid #ef4444;
-    }
-
-    .premium-notification.error i {
-        color: #ef4444;
-    }
-
-    .premium-notification span {
-        font-size: 14px;
-        font-weight: 500;
-        color: #374151;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-
-    @keyframes slideUp {
-        from {
-            transform: translateY(20px);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
 
     /* ========================================
    OPTIMIZED ADMIN WRAPPER CONTAINER

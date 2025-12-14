@@ -287,6 +287,7 @@
             left: 0;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -398,7 +399,7 @@
             const cost = parseFloat(document.getElementById('electricityCost').value);
             
             if (!power || !dailyHours || !daysWeek || !cost) {
-                alert('Please enter all required values');
+                showNotification('Please enter all required values', 'info');
                 return;
             }
             
@@ -493,5 +494,6 @@
             localStorage.setItem('hvacEnergyHistory', JSON.stringify(history));
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

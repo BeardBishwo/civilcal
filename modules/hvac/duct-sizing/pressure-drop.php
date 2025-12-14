@@ -206,6 +206,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -310,7 +311,7 @@
             const ductType = document.getElementById('ductType').value;
             
             if (!airFlow || !ductSize || !ductLength) {
-                alert('Please enter all values');
+                showNotification('Please enter all values', 'info');
                 return;
             }
             
@@ -348,5 +349,6 @@
             saveCalculation('Duct Pressure', `${airFlow}CFM in ${ductSize}" → ${pressureDrop}" WC drop`);
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

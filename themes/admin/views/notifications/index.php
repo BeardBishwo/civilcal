@@ -186,63 +186,59 @@ async function markAsRead(notificationId) {
 }
 
 async function markAllAsRead() {
-    if (!confirm("Are you sure you want to mark all notifications as read?")) {
-        return;
-    }
-    
-    try {
-        const response = await fetch("' . app_base_url('/admin/notifications/mark-all-read') . '", {
-            method: "POST"
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            // Remove unread class from all notifications
-            document.querySelectorAll(".notification-item.notification-unread").forEach(item => {
-                item.classList.remove("notification-unread");
+    showConfirmModal(\'Mark All Read\', "Are you sure you want to mark all notifications as read?", async () => {
+        try {
+            const response = await fetch("' . app_base_url('/admin/notifications/mark-all-read') . '", {
+                method: "POST"
             });
             
-            // Update the unread count in the header
-            updateUnreadCount(-999); // Reset to 0
+            const result = await response.json();
+            
+            if (result.success) {
+                // Remove unread class from all notifications
+                document.querySelectorAll(".notification-item.notification-unread").forEach(item => {
+                    item.classList.remove("notification-unread");
+                });
+                
+                // Update the unread count in the header
+                updateUnreadCount(-999); // Reset to 0
+            }
+        } catch (error) {
+            console.error("Error marking all notifications as read:", error);
         }
-    } catch (error) {
-        console.error("Error marking all notifications as read:", error);
-    }
+    });
 }
 
 async function dismissNotification(notificationId) {
-    if (!confirm("Are you sure you want to delete this notification?")) {
-        return;
-    }
-    
-    try {
-        const response = await fetch("' . app_base_url('/admin/notifications/delete/') . '" + notificationId, {
-            method: "DELETE"
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            // Remove the notification from the DOM
-            const notification = document.querySelector(`[data-id="${notificationId}"]`);
-            if (notification) {
-                notification.remove();
-                
-                // Update the unread count in the header
-                if (notification.classList.contains("notification-unread")) {
-                    updateUnreadCount(-1);
-                }
-                
-                // Show empty state if no notifications remain
-                if (document.querySelectorAll(".notification-item").length === 0) {
-                    showEmptyState();
+    showConfirmModal(\'Delete Notification\', "Are you sure you want to delete this notification?", async () => {
+        try {
+            const response = await fetch("' . app_base_url('/admin/notifications/delete/') . '" + notificationId, {
+                method: "DELETE"
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Remove the notification from the DOM
+                const notification = document.querySelector(`[data-id="${notificationId}"]`);
+                if (notification) {
+                    notification.remove();
+                    
+                    // Update the unread count in the header
+                    if (notification.classList.contains("notification-unread")) {
+                        updateUnreadCount(-1);
+                    }
+                    
+                    // Show empty state if no notifications remain
+                    if (document.querySelectorAll(".notification-item").length === 0) {
+                        showEmptyState();
+                    }
                 }
             }
+        } catch (error) {
+            console.error("Error dismissing notification:", error);
         }
-    } catch (error) {
-        console.error("Error dismissing notification:", error);
-    }
+    });
 }
 
 async function refreshNotifications() {

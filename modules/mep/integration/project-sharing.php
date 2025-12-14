@@ -335,7 +335,8 @@ class ProjectSharing {
                 th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
                 th { background-color: #f2f2f2; }
             </style>
-        </head>
+        <link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
+</head>
         <body>
             <div class='header'>
                 <h1>MEP Coordination Project Report</h1>
@@ -358,7 +359,8 @@ class ProjectSharing {
                 <h3>MEP Systems Data</h3>
                 <pre>" . json_encode($projectData, JSON_PRETTY_PRINT) . "</pre>
             </div>
-        </body>
+        <script src="../../../public/assets/js/global-notifications.js"></script>
+</body>
         </html>";
         
         return $html;

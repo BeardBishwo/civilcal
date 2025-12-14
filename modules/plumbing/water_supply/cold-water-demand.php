@@ -111,6 +111,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             margin-bottom: 1rem;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -238,7 +239,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             const quantity = parseInt(document.getElementById('quantity').value) || 1;
             
             if (!type) {
-                alert('Please select a fixture type');
+                showNotification('Please select a fixture type', 'info');
                 return;
             }
             
@@ -272,12 +273,12 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             const occupants = parseInt(document.getElementById('occupants').value);
             
             if (!occupants || occupants <= 0) {
-                alert('Please enter the number of occupants');
+                showNotification('Please enter the number of occupants', 'info');
                 return;
             }
             
             if (fixtures.length === 0) {
-                alert('Please add at least one fixture');
+                showNotification('Please add at least one fixture', 'info');
                 return;
             }
             
@@ -378,6 +379,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         // Load recent calculations on page load
         displayRecent();
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

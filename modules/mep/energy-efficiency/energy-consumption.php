@@ -692,6 +692,7 @@ function saveEnergyProject($data, $project_id) {
             }
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include '../../../themes/default/views/partials/header.php'; ?>
@@ -892,12 +893,12 @@ function saveEnergyProject($data, $project_id) {
                 if (data.success) {
                     displayResults(data.results);
                 } else {
-                    alert('Error calculating energy consumption: ' + data.error);
+                    showNotification('Error calculating energy consumption: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error calculating energy consumption');
+                showNotification('Error calculating energy consumption', 'danger');
             });
         }
         
@@ -914,12 +915,12 @@ function saveEnergyProject($data, $project_id) {
                 if (data.success) {
                     displayOptimizationResults(data.results);
                 } else {
-                    alert('Error optimizing systems: ' + data.error);
+                    showNotification('Error optimizing systems: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error optimizing systems');
+                showNotification('Error optimizing systems', 'danger');
             });
         }
         
@@ -1078,6 +1079,7 @@ function saveEnergyProject($data, $project_id) {
             });
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

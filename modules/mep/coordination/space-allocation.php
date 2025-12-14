@@ -234,6 +234,7 @@ $db = new Database();
         .impact-medium { background: #fff3cd; color: #856404; }
         .impact-high { background: #f8d7da; color: #721c24; }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <?php include '../../../themes/default/views/partials/header.php'; ?>
@@ -652,16 +653,16 @@ $db = new Database();
         
         function optimizeSpace() {
             // Simulate space optimization
-            alert('Running space optimization algorithm...');
+            showNotification('Running space optimization algorithm...', 'info');
             
             setTimeout(() => {
-                alert('Optimization complete! Space efficiency improved by 8%');
+                showNotification('Optimization complete! Space efficiency improved by 8%', 'info');
             }, 1500);
         }
         
         function generateReport() {
             // Simulate report generation
-            alert('Generating comprehensive space allocation report...');
+            showNotification('Generating comprehensive space allocation report...', 'info');
         }
         
         // Auto-calculate building height
@@ -677,6 +678,7 @@ $db = new Database();
             document.getElementById('buildingHeight').value = height;
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

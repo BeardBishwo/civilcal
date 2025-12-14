@@ -134,35 +134,33 @@ class SettingsManager {
     }
 
     resetSettings() {
-        if (!confirm('Are you sure you want to reset all settings to default values?')) {
-            return;
-        }
+        showConfirmModal('Reset Settings', 'Are you sure you want to reset all settings to default values?', () => {
+            this.showLoading('Resetting settings...');
 
-        this.showLoading('Resetting settings...');
-
-        fetch(window.APP_BASE_URL + 'admin/settings/reset', {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ group: this.currentGroup })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                this.showNotification('Settings reset successfully!', 'success');
-                setTimeout(() => location.reload(), 1000);
-            } else {
-                this.showNotification(data.message || 'Failed to reset settings', 'error');
-            }
-        })
-        .catch(error => {
-            this.showNotification('An error occurred', 'error');
-            console.error(error);
-        })
-        .finally(() => {
-            this.hideLoading();
+            fetch(window.APP_BASE_URL + 'admin/settings/reset', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ group: this.currentGroup })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Settings reset successfully!', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showNotification(data.message || 'Failed to reset settings', 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('An error occurred', 'error');
+                console.error(error);
+            })
+            .finally(() => {
+                this.hideLoading();
+            });
         });
     }
 

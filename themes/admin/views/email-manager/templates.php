@@ -436,7 +436,7 @@
 
 <script>
 function deleteTemplate(templateId) {
-    if (confirm('Are you sure you want to delete this template? This action cannot be undone.')) {
+    showConfirmModal('Delete Template', 'Are you sure you want to delete this template? This action cannot be undone.', () => {
         fetch('<?php echo app_base_url('/admin/email-manager/template/'); ?>' + templateId + '/delete', {
             method: 'POST',
             headers: {
@@ -447,18 +447,17 @@ function deleteTemplate(templateId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Not using default alert, could improve this later
-                alert('Template deleted successfully!');
+                showNotification('Template deleted successfully!', 'success');
                 location.reload();
             } else {
-                alert('Error: ' + (data.error || 'Failed to delete template'));
+                showNotification('Error: ' + (data.error || 'Failed to delete template'), 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while deleting the template');
+            showNotification('An error occurred while deleting the template', 'error');
         });
-    }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {

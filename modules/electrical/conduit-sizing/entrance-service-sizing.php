@@ -162,6 +162,7 @@
             opacity: 0.9;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -324,7 +325,7 @@
 
             if (isNaN(livingArea) || isNaN(appliances) || isNaN(cookingKW) || 
                 isNaN(hvacKW) || isNaN(additionalKW) || isNaN(serviceCapacity)) {
-                alert('Please enter valid numbers.');
+                showNotification('Please enter valid numbers.', 'info');
                 return;
             }
             
@@ -401,5 +402,6 @@
             localStorage.setItem('recentServiceCalculations', JSON.stringify(recent));
         }
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>

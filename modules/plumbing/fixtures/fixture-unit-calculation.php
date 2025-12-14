@@ -168,6 +168,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             background: rgba(255, 255, 255, 0.05);
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -340,7 +341,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             const quantity = parseInt(document.getElementById('quantity').value) || 1;
             
             if (checkboxes.length === 0) {
-                alert('Please select at least one fixture');
+                showNotification('Please select at least one fixture', 'info');
                 return;
             }
 
@@ -382,7 +383,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
             const totalFU = parseFloat(totalFUText.replace(' FU', '')) || 0;
             
             if (totalFU === 0) {
-                alert('Please calculate fixture units first');
+                showNotification('Please calculate fixture units first', 'info');
                 return;
             }
 
@@ -470,6 +471,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         document.getElementById('reference-table-section').style.display = 'block';
         displayRecent();
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
 

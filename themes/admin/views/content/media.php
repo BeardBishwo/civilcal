@@ -240,15 +240,15 @@ $totalSize = 0; // Would need raw bytes to calculate accurately
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showNotification('success', data.message);
+                    showNotification(data.message, 'success');
                     setTimeout(() => window.location.reload(), 1000);
                 } else {
-                    showNotification('error', data.message || 'Upload failed');
+                    showNotification(data.message || 'Upload failed', 'error');
                 }
             })
             .catch(error => {
                 console.error('Upload error:', error);
-                showNotification('error', 'Upload failed. Please try again.');
+                showNotification('Upload failed. Please try again.', 'error');
             })
             .finally(() => {
                 uploadBtns.forEach(btn => {
@@ -264,30 +264,32 @@ $totalSize = 0; // Would need raw bytes to calculate accurately
     }
 
     function confirmDelete(filename, mediaId) {
-        if (!confirm(`Are you sure you want to delete "${filename}"?`)) {
-            return;
-        }
+        showConfirmModal(
+            'Delete Media',
+            `Are you sure you want to delete "${filename}"?`,
+            () => {
+                const formData = new FormData();
+                formData.append('csrf_token', csrfToken);
 
-        const formData = new FormData();
-        formData.append('csrf_token', csrfToken);
-
-        fetch(`<?php echo app_base_url('admin/content/media/delete/'); ?>${mediaId}`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification('success', data.message);
-                    setTimeout(() => window.location.reload(), 500);
-                } else {
-                    showNotification('error', data.message || 'Delete failed');
-                }
-            })
-            .catch(error => {
-                console.error('Delete error:', error);
-                showNotification('error', 'Delete failed. Please try again.');
-            });
+                fetch(`<?php echo app_base_url('admin/content/media/delete/'); ?>${mediaId}`, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification(data.message, 'success');
+                            setTimeout(() => window.location.reload(), 500);
+                        } else {
+                            showNotification(data.message || 'Delete failed', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Delete error:', error);
+                        showNotification('Delete failed. Please try again.', 'error');
+                    });
+            }
+        );
     }
 
     // Debounced Search
@@ -310,31 +312,4 @@ $totalSize = 0; // Would need raw bytes to calculate accurately
         });
     }
 
-    function showNotification(type, message) {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type === 'success' ? 'success' : 'error'}`; // Match new CSS class names if possible
-        // Or ensure .notification class handles it. Pages.php used .notification-info/success
-
-        // Use the structure from pages.php CSS
-        notification.innerHTML = `
-            <div class="notification-content">
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                <span>${message}</span>
-            </div>
-        `;
-
-        // Add style to ensure it floats (if not already handled by common CSS)
-        // But we added .notification styles to admin.css now!
-
-        document.body.appendChild(notification);
-
-        // Trigger generic "visible" class
-        setTimeout(() => notification.classList.add('visible'), 10);
-
-        setTimeout(() => {
-            notification.classList.remove('visible');
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
 </script>

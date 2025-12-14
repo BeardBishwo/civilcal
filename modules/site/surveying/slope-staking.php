@@ -128,6 +128,7 @@
             text-decoration: underline;
         }
     </style>
+<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
 </head>
 <body>
     <div class="container">
@@ -173,7 +174,7 @@
             const groundElev = parseFloat(document.getElementById('ground-elev').value);
 
             if (isNaN(slopeRatio) || isNaN(gradeElev) || isNaN(groundElev)) {
-                alert('Please enter valid numbers.');
+                showNotification('Please enter valid numbers.', 'info');
                 return;
             }
             
@@ -196,5 +197,6 @@
             document.getElementById('result-area').style.display = 'block';
         });
     </script>
+<script src="../../../public/assets/js/global-notifications.js"></script>
 </body>
 </html>
