@@ -1,6 +1,6 @@
 <?php
 /**
- * Beautiful Bishwo Calculator Installer
+ * Professional Engineering Calculator Installer
  * Modern Installation Experience with Auto-Deletion
  */
 
@@ -15,7 +15,7 @@ if (file_exists(__DIR__ . '/../storage/install.lock')) {
 
 // Installation steps
 $steps = [
-    'welcome' => ['title' => 'Welcome', 'icon' => 'fas fa-heart', 'desc' => 'Welcome to Bishwo Calculator'],
+    'welcome' => ['title' => 'Welcome', 'icon' => 'fas fa-heart', 'desc' => 'Welcome to the Professional Engineering Calculator'],
     'requirements' => ['title' => 'Requirements', 'icon' => 'fas fa-server', 'desc' => 'System compatibility check'],
     'database' => ['title' => 'Database', 'icon' => 'fas fa-database', 'desc' => 'Configure database connection'],
     'admin' => ['title' => 'Admin User', 'icon' => 'fas fa-user-shield', 'desc' => 'Create administrator account'],
@@ -117,8 +117,8 @@ function getAppBaseUrl() {
     // Fallback detection for common subdirectory setups if basePath is still empty
     if (empty($basePath) && isset($_SERVER['REQUEST_URI'])) {
         $uri = $_SERVER['REQUEST_URI'];
-        if (strpos($uri, '/Bishwo_Calculator/') === 0) {
-            $basePath = '/Bishwo_Calculator';
+        if (strpos($uri, '/' . basename(dirname(__DIR__)) . '/') === 0) {
+            $basePath = '/' . basename(dirname(__DIR__));
         }
     }
     
@@ -363,7 +363,7 @@ function deleteInstallFolder() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bishwo Calculator - Installation</title>
+    <title>Engineering Calculator Pro - Installation</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -516,7 +516,6 @@ function deleteInstallFolder() {
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             border-radius: 3px;
             transition: width 0.5s ease;
-            width: <?php echo (($currentIndex + 1) / count($steps)) * 100; ?>%;
         }
         
         .installer-content {
@@ -749,7 +748,7 @@ function deleteInstallFolder() {
             <div class="installer-logo">
                 <i class="fas fa-calculator"></i>
             </div>
-            <h1 class="installer-title">Bishwo Calculator</h1>
+            <h1 class="installer-title">Engineering Calculator Pro</h1>
             <p class="installer-subtitle">Professional Engineering Calculator Installation</p>
         </div>
         
@@ -777,7 +776,7 @@ function deleteInstallFolder() {
                 <?php endforeach; ?>
             </div>
             <div class="progress-bar">
-                <div class="progress-fill"></div>
+                <div class="progress-fill" style="width: <?php echo (($currentIndex + 1) / count($steps)) * 100; ?>%"></div>
             </div>
         </div>
         

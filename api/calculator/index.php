@@ -17,7 +17,7 @@ $requestUri = $_SERVER['REQUEST_URI'];
 
 // Try multiple base path patterns
 $basePaths = [
-    '/bishwo_calculator/calculator/',
+    '/' . basename(dirname(__DIR__, 2)) . '/calculator/',
     '/calculator/',
     '/api/calculator/'
 ];

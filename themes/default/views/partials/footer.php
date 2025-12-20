@@ -8,8 +8,8 @@ if ($show_footer): ?>
     <hr class="footer-separator">
     <footer class="site-footer">
         <div class="container">
-            <p>&copy; <?php echo date('Y'); ?> Bishwo. All Rights Reserved.</p>
-            <p>Made with <i class="fas fa-heart"></i> in 🇳🇵 Nepal by BeardBishwo</p>
+            <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro')); ?>. All Rights Reserved.</p>
+            <p>Professional Tools for Modern Engineering</p>
         </div>
     </footer>
 <?php endif; ?>

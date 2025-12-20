@@ -21,8 +21,8 @@
             <div class="form-group">
                 <label class="form-label">Database Name</label>
                 <input type="text" name="db_name" class="form-control" 
-                       value="<?php echo htmlspecialchars($_SESSION['db_config']['db_name'] ?? 'bishwo_calculator'); ?>" 
-                       placeholder="bishwo_calculator" required>
+                       value="<?php echo htmlspecialchars($_SESSION['db_config']['db_name'] ?? 'calculator'); ?>" 
+                       placeholder="calculator" required>
             </div>
         </div>
         

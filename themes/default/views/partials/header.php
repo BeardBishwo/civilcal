@@ -41,7 +41,7 @@ $desc_safe = htmlspecialchars(
     $site_meta["description"] ?? "Professional Engineering Calculators Suite",
 );
 $logo = $site_meta["logo"] ?? app_base_url("public/theme-assets.php?path=default/assets/images/logo.png");
-$logo_text = $site_meta["logo_text"] ?? (\App\Services\SettingsService::get('site_name', 'Bishwo Calculator') ?: 'Bishwo Calculator');
+$logo_text = $site_meta["logo_text"] ?? (\App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro') ?: 'Calc Pro');
 $header_style = $site_meta["header_style"] ?? "logo_only";
 $favicon = $site_meta["favicon"] ?? app_base_url("themes/default/assets/images/favicon.png");
 
@@ -2772,17 +2772,8 @@ if (
                 }
 
                 function loadPopularCalculators() {
-                    const currentPath = window.location.pathname;
-                    let baseUrl = '';
-
-                    // Detect if we're in a subdirectory
-                    if (currentPath.includes('/Bishwo_Calculator/')) {
-                        baseUrl = '/Bishwo_Calculator';
-                    } else if (currentPath.includes('/bishwo_calculator/')) {
-                        baseUrl = '/bishwo_calculator';
-                    } else if (currentPath.includes('/aec-calculator/')) {
-                        baseUrl = '/aec-calculator';
-                    }
+                    // Use globally defined appConfig if available, otherwise fallback to root
+                    let baseUrl = (window.appConfig && window.appConfig.baseUrl) ? window.appConfig.baseUrl.replace(/\/$/, '') : '';
 
                     console.log('Loading popular calculators from:', `${baseUrl}/api/search.php`);
 
@@ -2888,17 +2879,8 @@ if (
                     }
                     debounceTimer = setTimeout(() => {
                         // Use dynamic base URL to avoid path issues
-                        const currentPath = window.location.pathname;
-                        let baseUrl = '';
-
-                        // Detect if we're in a subdirectory
-                        if (currentPath.includes('/Bishwo_Calculator/')) {
-                            baseUrl = '/Bishwo_Calculator';
-                        } else if (currentPath.includes('/bishwo_calculator/')) {
-                            baseUrl = '/bishwo_calculator';
-                        } else if (currentPath.includes('/aec-calculator/')) {
-                            baseUrl = '/aec-calculator';
-                        }
+                        // Use globally defined appConfig if available, otherwise fallback to root
+                        let baseUrl = (window.appConfig && window.appConfig.baseUrl) ? window.appConfig.baseUrl.replace(/\/$/, '') : '';
 
                         console.log('Search API URL:', `${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`);
                         fetch(`${baseUrl}/api/search.php?q=${encodeURIComponent(q)}`)

@@ -47,7 +47,7 @@ class EnhancedDatabase
         // Fallback to environment variables
         $this->config = [
             'host' => getenv('DB_HOST') ?: 'localhost',
-            'database' => getenv('DB_DATABASE') ?: 'bishwo_calculator',
+            'database' => getenv('DB_DATABASE') ?: '',
             'username' => getenv('DB_USERNAME') ?: 'root',
             'password' => getenv('DB_PASSWORD') ?: '',
             'charset' => 'utf8mb4',
@@ -66,7 +66,7 @@ class EnhancedDatabase
                 if (is_array($config)) {
                     return [
                         'host' => $config['host'] ?? 'localhost',
-                        'database' => $config['database'] ?? 'bishwo_calculator',
+                        'database' => $config['database'] ?? '',
                         'username' => $config['username'] ?? $config['user'] ?? 'root',
                         'password' => $config['password'] ?? '',
                         'charset' => $config['charset'] ?? 'utf8mb4',
@@ -82,14 +82,14 @@ class EnhancedDatabase
 
                 return [
                     'host' => defined('DB_HOST') ? DB_HOST : 'localhost',
-                    'database' => defined('DB_NAME') ? DB_NAME : 'bishwo_calculator',
+                    'database' => defined('DB_NAME') ? DB_NAME : '',
                     'username' => defined('DB_USER') ? DB_USER : 'root',
                     'password' => defined('DB_PASS') ? DB_PASS : '',
                     'charset' => 'utf8mb4',
                     'port' => 3306
                 ];
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Failed to parse config file {$configPath}: " . $e->getMessage());
         }
 
@@ -394,7 +394,7 @@ class EnhancedDatabase
                 'message' => 'Database connection successful',
                 'stats' => $stats
             ];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return [
                 'success' => false,
                 'error' => $e->getMessage()

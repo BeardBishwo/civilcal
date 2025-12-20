@@ -575,7 +575,7 @@
                                     <input type="text" class="form-control"
                                         id="site_name"
                                         name="site_name"
-                                        value="<?= htmlspecialchars($settings['site_name'] ?? 'Bishwo Calculator') ?>"
+                                        value="<?= htmlspecialchars($settings['site_name'] ?? 'Engineering Calculator Pro') ?>"
                                         placeholder="Enter your site name">
                                     <div class="form-text">The name displayed in browser tabs and search results.</div>
                                 </div>

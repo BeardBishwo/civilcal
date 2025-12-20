@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Dashboard - Bishwo Calculator';
+$page_title = 'Dashboard - Engineering Calculator Pro';
 ?>
 
 <div class="container">

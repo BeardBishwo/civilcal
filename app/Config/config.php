@@ -38,7 +38,7 @@ if (!defined('ENVIRONMENT')) {
 }
 
 // App configuration
-define('APP_NAME', 'Bishwo Calculator');
+define('APP_NAME', env('APP_NAME', 'Engineering Calculator Pro'));
 
 // Auto-detect base path for flexible installation (main domain, subdomain, or subfolder)
 // Check if APP_BASE is defined in environment
@@ -67,14 +67,8 @@ if (getenv('APP_BASE')) {
         }
     }
 
-    // Ultimate fallback for Bishwo_Calculator project
-    if (empty($scriptDir) && (
-        strpos($_SERVER['REQUEST_URI'] ?? '', '/Bishwo_Calculator') === 0 ||
-        (defined('BASE_PATH') && strpos(str_replace('\\', '/', BASE_PATH), 'Bishwo_Calculator') !== false)
-    )) {
-        $scriptDir = '/Bishwo_Calculator';
-    }
-
+    // For generic setup, we rely on dirname($_SERVER['SCRIPT_NAME'])
+    // which is already calculated as $scriptDir above.
     define('APP_BASE', $scriptDir);
 }
 
@@ -111,14 +105,14 @@ if (!function_exists('env')) {
 // Database configuration
 // Using environment variables with fallbacks
 define('DB_HOST', env('DB_HOST', '127.0.0.1'));
-define('DB_NAME', env('DB_NAME') ?: env('DB_DATABASE') ?: 'bishwo_calculator');
+define('DB_NAME', env('DB_NAME') ?: env('DB_DATABASE') ?: '');
 define('DB_USER', env('DB_USER') ?: env('DB_USERNAME') ?: 'root');
 define('DB_PASS', env('DB_PASS') ?: env('DB_PASSWORD') ?: '');
 
 // Admin settings
-define('ADMIN_USER', 'admin');
-define('ADMIN_PASS', 'password');
-define('ADMIN_EMAIL', 'admin@newsbishwo.com');
+define('ADMIN_USER', env('ADMIN_USER', 'admin'));
+define('ADMIN_PASS', env('ADMIN_PASS', 'password'));
+define('ADMIN_EMAIL', env('ADMIN_EMAIL', 'admin@example.com'));
 define('MAIL_TO', ADMIN_EMAIL);
 
 // Error reporting

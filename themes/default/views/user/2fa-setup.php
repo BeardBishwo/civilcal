@@ -371,7 +371,7 @@
     </div>
     
     <script>
-        const baseUrl = window.location.origin + (window.appConfig ? window.appConfig.baseUrl : '/Bishwo_Calculator');
+        const baseUrl = window.location.origin + (window.appConfig ? window.appConfig.baseUrl : '');
         
         function copySecret() {
             const secretKey = document.getElementById('secretKey').textContent;

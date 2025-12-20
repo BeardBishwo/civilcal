@@ -1,6 +1,6 @@
 class CreateUsersTable {
     public function up() {
-        $pdo = new PDO("mysql:host=localhost;dbname=bishwo_calculator", "root", "");
+        $pdo = new PDO("mysql:host=localhost;dbname=calculator", "root", "");
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
         $sql = "CREATE TABLE IF NOT EXISTS users (

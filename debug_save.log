@@ -1,0 +1,4 @@
+[2025-12-20 12:03:34] SettingsController::save() - POST keys: csrf_token, site_name, site_description, logo_text, header_style, footer_text, support_email
+[2025-12-20 12:03:34] SettingsController::save() - POST data: {"csrf_token":"e18725c602ffef7d4ebab76b9d415cab7d604f866da37e7ef7d6de06e717cc2b","site_name":"Civil Cal","site_description":"Civil Cal","logo_text":"Engineering Calculator Pro","header_style":"text_only","footer_text":"Civil Cal","support_email":"help@civilcal.com"}
+[2025-12-20 12:04:53] SettingsController::save() - POST keys: csrf_token, site_name, site_description, logo_text, header_style, footer_text, support_email
+[2025-12-20 12:04:53] SettingsController::save() - POST data: {"csrf_token":"f57268105ce64ed868636f631b6d6d7a5090a0570a944a4db4213d23ad6b30b9","site_name":"Civil Cal","site_description":"Civil Cal","logo_text":"Engineering Calculator Pro","header_style":"logo_only","footer_text":"Civil Cal","support_email":"help@civilcal.com"}

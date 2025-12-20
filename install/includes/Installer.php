@@ -398,7 +398,7 @@ class Installer {
                             <strong>Database Host:</strong> <code>localhost</code>
                         </div>
                         <div class="setting-item">
-                            <strong>Database Name:</strong> <code>bishwo_calculator</code> (or your choice)
+                            <strong>Database Name:</strong> <code>calculator</code> (or your choice)
                         </div>
                         <div class="setting-item">
                             <strong>Database Username:</strong> <code>root</code>

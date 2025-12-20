@@ -6,7 +6,7 @@
  * Database-driven theme management with backup and security features
  * 
  * @version 2.0.0
- * @author Bishwo Calculator Team
+ * @author Engineering Calculator Team
  * @package App\Services
  */
 
@@ -111,8 +111,8 @@ class ThemeManager
         return [
             'name' => 'Default Theme',
             'version' => '1.0.0',
-            'description' => 'Default theme for Bishwo Calculator',
-            'author' => 'Bishwo Calculator',
+            'description' => 'Default professional theme',
+            'author' => defined('APP_NAME') ? APP_NAME : 'Engineering Calculator',
             'styles' => [
                 'css/theme.css',
                 'css/header.css',

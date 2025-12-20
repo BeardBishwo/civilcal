@@ -199,9 +199,9 @@ CREATE TABLE IF NOT EXISTS `settings` (
 
 -- Insert default settings
 INSERT IGNORE INTO `settings` (`setting_key`, `setting_value`, `setting_type`, `setting_group`, `description`) VALUES
-('site_name', 'Bishwo Calculator', 'string', 'general', 'Website name'),
+('site_name', 'Engineering Calculator Pro', 'string', 'general', 'Website name'),
 ('site_description', 'Professional Engineering Calculator Platform', 'string', 'general', 'Website description'),
-('site_url', 'http://localhost', 'string', 'general', 'Website URL'),
+('site_url', '', 'string', 'general', 'Website URL'),
 ('contact_email', 'admin@example.com', 'string', 'general', 'Administrator email'),
 ('default_language', 'en', 'string', 'general', 'Default language'),
 ('timezone', 'Asia/Kathmandu', 'string', 'general', 'System timezone'),

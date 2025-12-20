@@ -1,7 +1,35 @@
 <?php
-require_once __DIR__ . "/../Config/config.php";
 
-// Initialize secure session
+/**
+ * Get value from environment or return default
+ */
+if (!function_exists('env')) {
+    function env($key, $default = null)
+    {
+        $value = getenv($key);
+        if ($value === false) {
+            return $default;
+        }
+        
+        switch (strtolower($value)) {
+            case 'true':
+            case '(true)':
+                return true;
+            case 'false':
+            case '(false)':
+                return false;
+            case 'empty':
+            case '(empty)':
+                return '';
+            case 'null':
+            case '(null)':
+                return null;
+        }
+        
+        return $value;
+    }
+}
+
 // Initialize secure session
 function init_secure_session()
 {
@@ -111,7 +139,7 @@ function app_base_url($path = "")
 function get_site_meta(): array
 {
     $defaults = [
-        "title" => "AEC Engineering Calculator",
+        "title" => "Engineering Calculator Pro",
         "description" =>
             "Professional engineering calculators for civil, electrical, HVAC, plumbing and fire protection.",
         "keywords" =>

@@ -141,9 +141,9 @@ class CreateCompleteSystemTables {
         
         // Insert default settings
         $defaultSettings = [
-            ['site_name', 'Bishwo Calculator', 'string', 'general', 'Website name'],
+            ['site_name', 'Engineering Calculator Pro', 'string', 'general', 'Website name'],
             ['site_description', 'Professional Engineering Calculators', 'string', 'general', 'Website description'],
-            ['site_url', 'http://localhost/bishwo_calculator', 'string', 'general', 'Website URL'],
+            ['site_url', 'http://localhost/', 'string', 'general', 'Website URL'],
             ['admin_email', 'admin@bishwocalculator.com', 'string', 'general', 'Administrator email'],
             ['timezone', 'Asia/Kathmandu', 'string', 'general', 'System timezone'],
             ['items_per_page', '20', 'integer', 'general', 'Items per page in lists'],

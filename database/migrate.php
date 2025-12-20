@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../app/bootstrap.php';
 
 echo "=======================================================\n";
-echo "     Bishwo Calculator - Production Database Setup     \n";
+echo "     Engineering Calculator - Production Setup         \n";
 echo "=======================================================\n\n";
 
 echo "Starting database migrations...\n\n";
@@ -99,7 +99,7 @@ try {
         echo "=======================================================\n";
         echo "👤 Username: admin\n";
         echo "🔑 Password: admin123\n";
-        echo "📧 Email: admin@bishwocalculator.com\n";
+        echo "📧 Email: admin@example.com\n";
         echo "🔐 Role: Administrator\n\n";
         
         echo "⚠️  IMPORTANT SECURITY NOTES:\n";
@@ -109,8 +109,7 @@ try {
         echo "   • Configure SMTP settings for production\n\n";
         
         echo "🌐 ADMIN PANEL ACCESS:\n";
-        echo "   URL: http://yourdomain.com/admin\n";
-        echo "   Or: http://localhost/bishwo_calculator/admin\n\n";
+        echo "   URL: http://yourdomain.com/admin\n\n";
         
         echo "📋 NEXT STEPS FOR PRODUCTION:\n";
         echo "   1. Update database configuration\n";
@@ -120,7 +119,7 @@ try {
         echo "   5. Set up regular backups\n";
         echo "   6. Configure monitoring and logging\n\n";
         
-        echo "✅ Bishwo Calculator is ready for deployment!\n";
+        echo "✅ Engineering Calculator Pro is ready for deployment!\n";
         
     } else {
         echo "⚠️  Some migrations failed. Please check the errors above.\n";
