@@ -2,6 +2,7 @@
  * Bishwo Calculator - Fixed Notification System
  * Single-click functionality with improved error handling
  * Fixed initialization conflicts and real-time polling
+ * Consistently uses window.appConfig for dynamic base URLs
  */
 
 class NotificationSystem {
@@ -32,8 +33,8 @@ class NotificationSystem {
 
         // Configuration
         this.config = {
-            apiBase: '/api/notifications',
-            debugMode: false
+            apiBase: (window.appConfig ? window.appConfig.baseUrl : '') + '/api/notifications',
+            debugMode: true
         };
 
         // Initialize the system
@@ -129,7 +130,7 @@ class NotificationSystem {
         this.elements.toggle.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            this.log('🔔 Notification button clicked');
+            this.log('Bell clicked - Toggling dropdown');
             this.toggleDropdown();
         });
 
@@ -193,11 +194,8 @@ class NotificationSystem {
         this.elements.dropdown.classList.add('show');
         this.elements.dropdown.style.display = 'block';
 
-        // Load notifications if not already loaded
-        if (!this.elements.dropdown.dataset.loaded) {
-            this.fetchNotifications();
-            this.elements.dropdown.dataset.loaded = 'true';
-        }
+        // Load notifications every time it's opened to ensure fresh data
+        this.fetchNotifications();
 
         this.log('🔔 Notification dropdown opened');
     }
@@ -224,11 +222,6 @@ class NotificationSystem {
 
         this.log('🕒 Starting notification polling...');
 
-        // Initial fetch with small delay
-        setTimeout(() => {
-            this.fetchUnreadCount();
-        }, 2000);
-
         // Regular polling
         this.state.pollingTimer = setInterval(() => {
             this.fetchUnreadCount();
@@ -242,14 +235,11 @@ class NotificationSystem {
         try {
             this.log('📊 Fetching unread notification count...');
 
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
-
             const response = await fetch(`${this.config.apiBase}/unread-count`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-Token': csrfToken
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 credentials: 'same-origin'
             });
@@ -303,7 +293,10 @@ class NotificationSystem {
             }, delay);
         } else {
             this.error('Max retries reached for notification polling');
-            this.showNotificationToast('Connection lost. Retrying...', 'error');
+            // Only show toast if it's a persistent failure
+            if (this.state.retryCount === this.state.maxRetries + 1) {
+                this.showNotificationToast('Notification server connection issues. Retrying...', 'warning');
+            }
         }
     }
 
@@ -322,18 +315,15 @@ class NotificationSystem {
         try {
             this.log('📋 Fetching notification list...');
 
-            const url = new URL(`${this.config.apiBase}/list`);
+            const url = new URL(`${this.config.apiBase}/list`, window.location.origin);
             url.searchParams.append('unread_only', 'true');
             url.searchParams.append('limit', '10');
-
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
             const response = await fetch(url.toString(), {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-Token': csrfToken
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 credentials: 'same-origin'
             });
@@ -357,12 +347,43 @@ class NotificationSystem {
             this.error('Failed to load notifications:', error);
             this.showErrorState(`
                 Failed to load notifications.
-                <button onclick="window.notificationSystem.fetchNotifications()" class="btn btn-sm btn-primary">
+                <button onclick="notificationSystem.fetchNotifications()" class="btn btn-sm btn-primary">
                     <i class="fas fa-refresh"></i> Retry
                 </button>
             `);
         } finally {
             this.state.isLoading = false;
+        }
+    }
+
+    /**
+     * Mark individual notification as read
+     */
+    async markAsRead(notificationId) {
+        try {
+            this.log(`📝 Marking notification ${notificationId} as read...`);
+
+            const response = await fetch(`${this.config.apiBase}/mark-read/${notificationId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to mark notification as read');
+            }
+
+            this.log(`✅ Notification ${notificationId} marked as read`);
+            return true;
+
+        } catch (error) {
+            this.error('Error marking notification as read:', error);
+            return false;
         }
     }
 
@@ -391,7 +412,7 @@ class NotificationSystem {
                 this.renderNotifications();
 
                 this.showNotificationToast('All notifications marked as read.', 'success');
-                this.closeDropdown();
+                setTimeout(() => this.closeDropdown(), 1500);
             } else {
                 throw new Error(data.message || 'Failed to mark all as read');
             }
@@ -457,8 +478,8 @@ class NotificationSystem {
 
         if (this.state.notifications.length === 0) {
             this.elements.list.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-bell-slash"></i>
+                <div class="empty-state" style="text-align: center; padding: 20px; color: var(--admin-gray-500);">
+                    <i class="fas fa-bell-slash" style="font-size: 24px; display: block; margin-bottom: 10px;"></i>
                     <span>No new notifications</span>
                 </div>
             `;
@@ -466,16 +487,16 @@ class NotificationSystem {
         }
 
         const notificationHTML = this.state.notifications.map(notification => `
-            <div class="notification-item ${notification.is_read ? '' : 'unread'}" data-id="${notification.id}">
-                <div class="notification-icon">
+            <div class="notification-item ${notification.is_read ? '' : 'unread'}" data-id="${notification.id}" style="cursor: pointer; padding: 12px 16px; border-bottom: 1px solid var(--admin-border); transition: background 0.2s;">
+                <div class="notification-icon" style="margin-right: 12px; color: var(--admin-primary);">
                     <i class="fas ${this.getNotificationIcon(notification.type)}"></i>
                 </div>
-                <div class="notification-content">
-                    <div class="notification-header">
-                        <h4 class="notification-title">${this.escapeHtml(notification.title)}</h4>
-                        <span class="notification-time">${this.formatTimeAgo(notification.created_at)}</span>
+                <div class="notification-content" style="flex: 1;">
+                    <div class="notification-header" style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <h4 class="notification-title" style="margin: 0; font-size: 14px; font-weight: 600;">${this.escapeHtml(notification.title)}</h4>
+                        <span class="notification-time" style="font-size: 11px; color: var(--admin-gray-500);">${this.formatTimeAgo(notification.created_at)}</span>
                     </div>
-                    <div class="notification-message">${this.escapeHtml(notification.message)}</div>
+                    <div class="notification-message" style="font-size: 13px; color: var(--admin-gray-700); line-height: 1.4;">${this.escapeHtml(notification.message)}</div>
                 </div>
             </div>
         `).join('');
@@ -486,13 +507,16 @@ class NotificationSystem {
         this.elements.list.querySelectorAll('.notification-item').forEach(item => {
             item.addEventListener('click', async () => {
                 const notificationId = item.getAttribute('data-id');
-                if (!item.classList.contains('unread')) return;
-
-                // Mark as read
-                const success = await this.markAsRead(notificationId);
-                if (success) {
-                    item.classList.remove('unread');
-                    this.updateBadge(this.state.unreadCount - 1);
+                
+                // If it's a link notification, it might have an action URL
+                // For now just mark as read
+                
+                if (item.classList.contains('unread')) {
+                    const success = await this.markAsRead(notificationId);
+                    if (success) {
+                        item.classList.remove('unread');
+                        this.updateBadge(Math.max(0, this.state.unreadCount - 1));
+                    }
                 }
             });
         });
@@ -506,15 +530,17 @@ class NotificationSystem {
 
         this.elements.toast.className = `notification-toast notification-${type} show`;
         this.elements.toast.innerHTML = `
-            <div class="toast-content">
-                <i class="toast-icon fas ${this.getNotificationIcon(type)}"></i>
-                <span class="toast-message">${this.escapeHtml(message)}</span>
-                <button class="toast-close" onclick="this.parentElement.parentElement.classList.remove('show')">&times;</button>
+            <div class="toast-content" style="display: flex; align-items: center; padding: 12px 16px;">
+                <i class="toast-icon fas ${this.getNotificationIcon(type)}" style="margin-right: 10px;"></i>
+                <span class="toast-message" style="flex: 1;">${this.escapeHtml(message)}</span>
+                <button class="toast-close" onclick="this.parentElement.parentElement.classList.remove('show')" style="background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
             </div>
         `;
 
         setTimeout(() => {
-            this.elements.toast.classList.remove('show');
+            if (this.elements.toast) {
+                this.elements.toast.classList.remove('show');
+            }
         }, 5000);
     }
 
@@ -536,6 +562,7 @@ class NotificationSystem {
      * Format time ago
      */
     formatTimeAgo(dateString) {
+        if (!dateString) return '';
         const now = new Date();
         const date = new Date(dateString);
         const diffInSeconds = Math.floor((now - date) / 1000);
@@ -550,6 +577,7 @@ class NotificationSystem {
      * Escape HTML
      */
     escapeHtml(text) {
+        if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
@@ -572,13 +600,7 @@ class NotificationSystem {
     }
 }
 
-// Initialize the notification system
-const notificationSystem = new NotificationSystem();
-
-// Make it globally available for debugging
-window.notificationSystem = notificationSystem;
-
-// Fallback initialization for older browsers
+// Initialize the notification system once DOM is ready
 if (typeof window.notificationSystem === 'undefined') {
     window.notificationSystem = new NotificationSystem();
 }

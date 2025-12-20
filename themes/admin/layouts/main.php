@@ -24,16 +24,23 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <meta name="csrf-token" content="<?php echo function_exists('csrf_token') ? csrf_token() : ($_SESSION['csrf_token'] ?? ''); ?>">
     <script>
+        window.appConfig = {
+            baseUrl: '<?php echo app_base_url(); ?>',
+            apiBase: '<?php echo app_base_url('api'); ?>',
+            csrfToken: '<?php echo function_exists('csrf_token') ? csrf_token() : ($_SESSION['csrf_token'] ?? ''); ?>'
+        };
+
         (function() {
             var origFetch = window.fetch;
             window.fetch = function(input, init) {
                 init = init || {};
                 var method = String(init.method || 'GET').toUpperCase();
                 if (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE') {
-                    // Prefer token from hidden input field (most up-to-date), fallback to meta tag
+                    // Prefer token from hidden input field (most up-to-date), fallback to appConfig or meta tag
                     var inputToken = document.querySelector('input[name="csrf_token"]')?.value;
+                    var configToken = window.appConfig.csrfToken;
                     var metaToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-                    var token = inputToken || metaToken || '';
+                    var token = inputToken || configToken || metaToken || '';
 
                     var headers = init.headers || {};
                     if (typeof Headers !== 'undefined' && headers instanceof Headers) {
@@ -1200,195 +1207,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
         });
     </script>
 
-    <script>
-        // Enterprise Notification System
-        (function() {
-            let notificationData = [];
-            
-            // Fetch notifications
-            async function fetchNotifications() {
-                try {
-                    const response = await fetch('<?= app_base_url('/api/notifications') ?>');
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        notificationData = data.notifications;
-                        renderNotifications();
-                        updateUnreadCount();
-                    }
-                } catch (error) {
-                    console.error('Error fetching notifications:', error);
-                }
-            }
 
-            // Fetch unread count
-            async function fetchUnreadCount() {
-                try {
-                    const response = await fetch('<?= app_base_url('/api/notifications/unread-count') ?>');
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        updateBadge(data.count);
-                    }
-                } catch (error) {
-                    console.error('Error fetching unread count:', error);
-                }
-            }
-
-            // Render notifications
-            function renderNotifications() {
-                const listEl = document.querySelector('.notification-list');
-                if (!listEl) return;
-
-                if (notificationData.length === 0) {
-                    listEl.innerHTML = '<div class="empty">No notifications</div>';
-                    return;
-                }
-
-                listEl.innerHTML = notificationData.map(notif => `
-                    <div class="notification-item ${notif.is_read == 0 ? 'unread' : ''}" data-id="${notif.id}">
-                        <div class="notification-icon ${getIconClass(notif.type)}">
-                            <i class="fas ${notif.icon || 'fa-bell'}"></i>
-                        </div>
-                        <div class="notification-content">
-                            <div class="notification-title">${notif.title}</div>
-                            <div class="notification-message">${notif.message}</div>
-                            <div class="notification-time">${formatTime(notif.created_at)}</div>
-                        </div>
-                        ${notif.is_read == 0 ? '<div class="unread-dot"></div>' : ''}
-                    </div>
-                `).join('');
-
-                // Add click handlers
-                document.querySelectorAll('.notification-item').forEach(item => {
-                    item.addEventListener('click', function() {
-                        const id = this.dataset.id;
-                        markAsRead(id);
-                    });
-                });
-            }
-
-            // Get icon class based on type
-            function getIconClass(type) {
-                const classes = {
-                    'system': 'icon-system',
-                    'user_action': 'icon-user',
-                    'email': 'icon-email',
-                    'alert': 'icon-alert',
-                    'info': 'icon-info'
-                };
-                return classes[type] || 'icon-info';
-            }
-
-            // Format time
-            function formatTime(timestamp) {
-                const date = new Date(timestamp);
-                const now = new Date();
-                const diff = Math.floor((now - date) / 1000); // seconds
-
-                if (diff < 60) return 'Just now';
-                if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
-                if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
-                if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
-                
-                return date.toLocaleDateString();
-            }
-
-            // Update badge
-            function updateBadge(count) {
-                const badge = document.getElementById('notificationBadge');
-                if (badge) {
-                    badge.textContent = count;
-                    badge.style.display = count > 0 ? 'flex' : 'none';
-                }
-            }
-
-            // Update unread count from current data
-            function updateUnreadCount() {
-                const unreadCount = notificationData.filter(n => n.is_read == 0).length;
-                updateBadge(unreadCount);
-            }
-
-            // Mark as read
-            async function markAsRead(id) {
-                try {
-                    const response = await fetch(`<?= app_base_url('/api/notifications/') ?>${id}/read`, {
-                        method: 'POST'
-                    });
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        // Update local data
-                        const notif = notificationData.find(n => n.id == id);
-                        if (notif) notif.is_read = 1;
-                        renderNotifications();
-                        updateUnreadCount();
-                    }
-                } catch (error) {
-                    console.error('Error marking as read:', error);
-                }
-            }
-
-            // Mark all as read
-            async function markAllAsRead() {
-                try {
-                    const response = await fetch('<?= app_base_url('/api/notifications/mark-all-read') ?>', {
-                        method: 'POST'
-                    });
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        notificationData.forEach(n => n.is_read = 1);
-                        renderNotifications();
-                        updateUnreadCount();
-                        showNotification('All notifications marked as read', 'success');
-                    }
-                } catch (error) {
-                    console.error('Error marking all as read:', error);
-                }
-            }
-
-            // Initialize
-            document.addEventListener('DOMContentLoaded', function() {
-                // Fetch initial notifications
-                fetchNotifications();
-
-                // Toggle dropdown
-                const toggleBtn = document.getElementById('notificationToggle');
-                const dropdown = document.getElementById('notificationDropdown');
-                
-                if (toggleBtn && dropdown) {
-                    toggleBtn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        console.log('Bell clicked, dropdown before:', dropdown.classList.contains('show'));
-                        dropdown.classList.toggle('show');
-                        console.log('Bell clicked, dropdown after:', dropdown.classList.contains('show'));
-                        console.log('Dropdown display:', window.getComputedStyle(dropdown).display);
-                        console.log('Dropdown opacity:', window.getComputedStyle(dropdown).opacity);
-                        if (dropdown.classList.contains('show')) {
-                            fetchNotifications();
-                        }
-                    });
-                }
-
-                // Mark all as read button
-                const markAllBtn = document.getElementById('markAllRead');
-                if (markAllBtn) {
-                    markAllBtn.addEventListener('click', markAllAsRead);
-                }
-
-                // Close dropdown when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (dropdown && !dropdown.contains(e.target) && e.target !== toggleBtn) {
-                        dropdown.classList.remove('show');
-                    }
-                });
-
-                // Poll for new notifications every 30 seconds
-                setInterval(fetchUnreadCount, 30000);
-            });
-        })();
-    </script>
     
     <!-- Global Notifications System -->
     <script src="<?php echo app_base_url('public/assets/js/global-notifications.js'); ?>"></script>
