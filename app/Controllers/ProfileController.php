@@ -328,7 +328,7 @@ class ProfileController extends Controller
                 $this->json([
                     'success' => true,
                     'message' => 'Account deleted successfully.',
-                    'redirect' => '/'
+                    'redirect' => app_base_url('/')
                 ]);
             } else {
                 throw new Exception('Failed to delete account');

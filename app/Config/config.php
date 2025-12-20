@@ -45,30 +45,45 @@ define('APP_NAME', env('APP_NAME', 'Engineering Calculator Pro'));
 if (getenv('APP_BASE')) {
     define('APP_BASE', getenv('APP_BASE'));
 } else {
-    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
-    $scriptDir = dirname($scriptName);
-
-    // Remove /public suffix if present (since app uses public directory)
-    if (substr($scriptDir, -7) === '/public') {
-        $scriptDir = substr($scriptDir, 0, -7);
+    // Unified robust base path detection
+    $basePath = str_replace('\\', '/', defined('BASE_PATH') ? BASE_PATH : __DIR__ . '/../..');
+    $docRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? '');
+    
+    // Normalize for comparison (handle case-insensitivity on Windows)
+    $compareBase = $basePath;
+    $compareDoc = $docRoot;
+    
+    // Check if running on Windows
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        $compareBase = strtolower($basePath);
+        $compareDoc = strtolower($docRoot);
     }
+    
+    // First try: Physical path comparison (most reliable for subfolders)
+    // We use the string length of the document root to slice the base path
+    if (!empty($compareDoc) && strpos($compareBase, $compareDoc) === 0) {
+        $scriptDir = substr($basePath, strlen($docRoot));
+    } else {
+        // Fallback: SCRIPT_NAME method
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
+        $scriptDir = str_replace('\\', '/', dirname($scriptName));
 
-    // Normalize root path to empty string
-    if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
-        $scriptDir = '';
-    }
-
-    // For Laragon setup, ensure we have the correct base path
-    if (empty($scriptDir) && defined('BASE_PATH')) {
-        $basePath = str_replace('\\', '/', BASE_PATH);
-        $docRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? '');
-        if (!empty($docRoot) && strpos($basePath, $docRoot) === 0) {
-            $scriptDir = str_replace($docRoot, '', $basePath);
+        // Remove /public suffix if present
+        if (substr($scriptDir, -7) === '/public') {
+            $scriptDir = substr($scriptDir, 0, -7);
         }
     }
 
-    // For generic setup, we rely on dirname($_SERVER['SCRIPT_NAME'])
-    // which is already calculated as $scriptDir above.
+    // Ensure leading slash if not empty
+    if ($scriptDir && substr($scriptDir, 0, 1) !== '/') {
+        $scriptDir = '/' . $scriptDir;
+    }
+
+    // Normalize root path to empty string
+    if ($scriptDir === '/' || $scriptDir === '/.') {
+        $scriptDir = '';
+    }
+
     define('APP_BASE', $scriptDir);
 }
 

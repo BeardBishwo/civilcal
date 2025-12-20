@@ -41,8 +41,8 @@ class EmailManagerController extends Controller
             'templateStats' => $templateStats,
             'page_title' => 'Email Manager Dashboard',
             'breadcrumbs' => [
-                ['title' => 'Dashboard', 'url' => '/admin'],
-                ['title' => 'Email Manager', 'url' => '/admin/email-manager']
+                ['title' => 'Dashboard', 'url' => app_base_url('/admin')],
+                ['title' => 'Email Manager', 'url' => app_base_url('/admin/email-manager')]
             ]
         ];
         
@@ -159,9 +159,9 @@ class EmailManagerController extends Controller
             'filters' => $filters,
             'page_title' => 'Email Threads',
             'breadcrumbs' => [
-                ['title' => 'Dashboard', 'url' => '/admin'],
-                ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
-                ['title' => 'Threads', 'url' => '/admin/email-manager/threads']
+                ['title' => 'Dashboard', 'url' => app_base_url('/admin')],
+                ['title' => 'Email Manager', 'url' => app_base_url('/admin/email-manager')],
+                ['title' => 'Threads', 'url' => app_base_url('/admin/email-manager/threads')]
             ]
         ];
         
@@ -184,8 +184,8 @@ class EmailManagerController extends Controller
                 'message' => 'Thread not found',
                 'page_title' => 'Error',
                 'breadcrumbs' => [
-                    ['title' => 'Dashboard', 'url' => '/admin'],
-                    ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
+                    ['title' => 'Dashboard', 'url' => app_base_url('/admin')],
+                    ['title' => 'Email Manager', 'url' => app_base_url('/admin/email-manager')],
                     ['title' => 'Error', 'url' => '']
                 ]
             ];
@@ -204,9 +204,9 @@ class EmailManagerController extends Controller
             'templates' => $templates,
             'page_title' => 'Thread: ' . $thread['subject'],
             'breadcrumbs' => [
-                ['title' => 'Dashboard', 'url' => '/admin'],
-                ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
-                ['title' => 'Threads', 'url' => '/admin/email-manager/threads'],
+                ['title' => 'Dashboard', 'url' => app_base_url('/admin')],
+                ['title' => 'Email Manager', 'url' => app_base_url('/admin/email-manager')],
+                ['title' => 'Threads', 'url' => app_base_url('/admin/email-manager/threads')],
                 ['title' => 'View Thread', 'url' => '']
             ]
         ];
@@ -394,9 +394,9 @@ class EmailManagerController extends Controller
             'templateTypes' => $this->emailTemplate->getTemplateTypes(),
             'page_title' => 'Email Templates',
             'breadcrumbs' => [
-                ['title' => 'Dashboard', 'url' => '/admin'],
-                ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
-                ['title' => 'Templates', 'url' => '/admin/email-manager/templates']
+                ['title' => 'Dashboard', 'url' => app_base_url('/admin')],
+                ['title' => 'Email Manager', 'url' => app_base_url('/admin/email-manager')],
+                ['title' => 'Templates', 'url' => app_base_url('/admin/email-manager/templates')]
             ]
         ];
         
@@ -449,9 +449,9 @@ class EmailManagerController extends Controller
             'templateTypes' => $this->emailTemplate->getTemplateTypes(),
             'page_title' => 'Create Email Template',
             'breadcrumbs' => [
-                ['title' => 'Dashboard', 'url' => '/admin'],
-                ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
-                ['title' => 'Templates', 'url' => '/admin/email-manager/templates'],
+                ['title' => 'Dashboard', 'url' => app_base_url('/admin')],
+                ['title' => 'Email Manager', 'url' => app_base_url('/admin/email-manager')],
+                ['title' => 'Templates', 'url' => app_base_url('/admin/email-manager/templates')],
                 ['title' => 'Create Template', 'url' => '']
             ]
         ];
@@ -469,8 +469,8 @@ class EmailManagerController extends Controller
                 'message' => 'Template not found',
                 'page_title' => 'Error',
                 'breadcrumbs' => [
-                    ['title' => 'Dashboard', 'url' => '/admin'],
-                    ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
+                    ['title' => 'Dashboard', 'url' => app_base_url('/admin')],
+                    ['title' => 'Email Manager', 'url' => app_base_url('/admin/email-manager')],
                     ['title' => 'Error', 'url' => '']
                 ]
             ];
@@ -521,9 +521,9 @@ class EmailManagerController extends Controller
             'templateTypes' => $this->emailTemplate->getTemplateTypes(),
             'page_title' => 'Edit Email Template',
             'breadcrumbs' => [
-                ['title' => 'Dashboard', 'url' => '/admin'],
-                ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
-                ['title' => 'Templates', 'url' => '/admin/email-manager/templates'],
+                ['title' => 'Dashboard', 'url' => app_base_url('/admin')],
+                ['title' => 'Email Manager', 'url' => app_base_url('/admin/email-manager')],
+                ['title' => 'Templates', 'url' => app_base_url('/admin/email-manager/templates')],
                 ['title' => 'Edit Template', 'url' => '']
             ]
         ];
@@ -624,8 +624,8 @@ class EmailManagerController extends Controller
             'message' => 'An error occurred',
             'page_title' => 'Email Manager Error',
             'breadcrumbs' => [
-                ['title' => 'Dashboard', 'url' => '/admin'],
-                ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
+                ['title' => 'Dashboard', 'url' => app_base_url('/admin')],
+                ['title' => 'Email Manager', 'url' => app_base_url('/admin/email-manager')],
                 ['title' => 'Error', 'url' => '']
             ]
         ];
@@ -660,9 +660,9 @@ class EmailManagerController extends Controller
             'settings' => $settings,
             'page_title' => 'Email Settings',
             'breadcrumbs' => [
-                ['title' => 'Dashboard', 'url' => '/admin'],
-                ['title' => 'Email Manager', 'url' => '/admin/email-manager'],
-                ['title' => 'Settings', 'url' => '/admin/email-manager/settings']
+                ['title' => 'Dashboard', 'url' => app_base_url('/admin')],
+                ['title' => 'Email Manager', 'url' => app_base_url('/admin/email-manager')],
+                ['title' => 'Settings', 'url' => app_base_url('/admin/email-manager/settings')]
             ]
         ];
         
@@ -703,7 +703,7 @@ class EmailManagerController extends Controller
             $_SESSION['error'] = 'Error: ' . $e->getMessage();
         }
 
-        header('Location: /admin/email-manager/settings');
+        header('Location: ' . app_base_url('/admin/email-manager/settings'));
         exit;
         exit;
     }

@@ -184,7 +184,7 @@ class TwoFactorController extends Controller
             $this->json([
                 'success' => true,
                 'message' => '2FA verification successful',
-                'redirect' => '/dashboard'
+                'redirect' => app_base_url('/dashboard')
             ]);
             
         } catch (Exception $e) {

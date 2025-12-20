@@ -225,7 +225,7 @@ class UserManagementController extends Controller
                 echo json_encode([
                     'success' => true,
                     'message' => 'User created successfully!',
-                    'redirect' => '/admin/users/' . $userId . '/edit'
+                    'redirect' => app_base_url('/admin/users/' . $userId . '/edit')
                 ]);
                 exit;
             } else {

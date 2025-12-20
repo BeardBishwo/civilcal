@@ -96,7 +96,7 @@ class AnalyticsController extends Controller
         }
 
         if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
-            header('Location: /login');
+            header('Location: ' . app_base_url('/login'));
             exit;
         }
     }

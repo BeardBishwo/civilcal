@@ -283,7 +283,7 @@ class AuthController extends Controller
             ]);
 
             if ($userId) {
-                header('Location: /login?registered=1');
+                header('Location: ' . app_base_url('/login?registered=1'));
                 exit;
             } else {
                 throw new Exception('Registration failed.');
