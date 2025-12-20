@@ -182,28 +182,32 @@ CREATE TABLE IF NOT EXISTS `media` (
   FOREIGN KEY (`uploaded_by`) REFERENCES `users`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Site settings table
-CREATE TABLE IF NOT EXISTS `site_settings` (
+-- Settings table
+CREATE TABLE IF NOT EXISTS `settings` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `setting_key` varchar(100) NOT NULL,
+  `setting_key` varchar(255) NOT NULL,
   `setting_value` longtext DEFAULT NULL,
-  `setting_type` varchar(50) DEFAULT 'string',
+  `setting_type` enum('string','boolean','integer','json') DEFAULT 'string',
+  `setting_group` varchar(100) DEFAULT 'general',
+  `description` text DEFAULT NULL,
+  `is_public` tinyint(1) DEFAULT 0,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `setting_key` (`setting_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insert default settings
-INSERT IGNORE INTO `site_settings` (`setting_key`, `setting_value`, `setting_type`) VALUES
-('site_name', 'Bishwo Calculator', 'string'),
-('site_description', 'Professional Engineering Calculator Platform', 'string'),
-('site_url', 'http://localhost', 'string'),
-('contact_email', 'admin@example.com', 'string'),
-('default_language', 'en', 'string'),
-('timezone', 'UTC', 'string'),
-('enable_registration', '1', 'boolean'),
-('enable_analytics', '1', 'boolean'),
-('auto_delete_installer', '0', 'boolean');
+INSERT IGNORE INTO `settings` (`setting_key`, `setting_value`, `setting_type`, `setting_group`, `description`) VALUES
+('site_name', 'Bishwo Calculator', 'string', 'general', 'Website name'),
+('site_description', 'Professional Engineering Calculator Platform', 'string', 'general', 'Website description'),
+('site_url', 'http://localhost', 'string', 'general', 'Website URL'),
+('contact_email', 'admin@example.com', 'string', 'general', 'Administrator email'),
+('default_language', 'en', 'string', 'general', 'Default language'),
+('timezone', 'Asia/Kathmandu', 'string', 'general', 'System timezone'),
+('enable_registration', '1', 'boolean', 'security', 'Allow user registration'),
+('enable_analytics', '1', 'boolean', 'system', 'Enable analytics tracking'),
+('auto_delete_installer', '0', 'boolean', 'system', 'Auto delete installer after success');
 
 -- Insert default active modules
 INSERT IGNORE INTO `admin_modules` (`name`, `version`, `is_active`) VALUES

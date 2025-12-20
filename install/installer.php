@@ -224,8 +224,11 @@ function finishInstallation() {
             $dbConfig['db_pass']
         );
         
-        // Create tables
+        // Create tables (Base Schema)
         createDatabaseTables($pdo);
+        
+        // Run migrations (Feature Tables & Updates)
+        runDatabaseMigrations($pdo);
         
         // Insert admin user
         insertAdminUser($pdo);
@@ -242,6 +245,69 @@ function finishInstallation() {
 function createDatabaseTables($pdo) {
     $sql = file_get_contents(__DIR__ . '/database.sql');
     $pdo->exec($sql);
+}
+
+function runDatabaseMigrations($pdo) {
+    $migrationsDir = __DIR__ . '/../database/migrations';
+    if (!is_dir($migrationsDir)) {
+        return;
+    }
+    
+    // Get all migration files (.php and .sql)
+    $migrationFiles = glob($migrationsDir . '/*.{php,sql}', GLOB_BRACE);
+    sort($migrationFiles);
+    
+    // Create migrations table if it doesn't exist
+    $pdo->exec("CREATE TABLE IF NOT EXISTS migrations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        migration VARCHAR(255) NOT NULL,
+        batch INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+    
+    // Get executed migrations
+    $executed = $pdo->query("SELECT migration FROM migrations")->fetchAll(PDO::FETCH_COLUMN);
+    
+    // Run new migrations
+    foreach ($migrationFiles as $file) {
+        $migrationName = basename($file);
+        $extension = pathinfo($file, PATHINFO_EXTENSION);
+        
+        if (!in_array($migrationName, $executed)) {
+            try {
+                if ($extension === 'sql') {
+                    $sql = file_get_contents($file);
+                    $pdo->exec($sql);
+                } else {
+                    // Include the file and check for class structure
+                    $content = file_get_contents($file);
+                    
+                    // Check if it's a class-based migration
+                    if (preg_match('/class\s+(\w+).*?\{/', $content, $matches)) {
+                        $className = $matches[1];
+                        include_once $file;
+                        
+                        if (class_exists($className)) {
+                            $migration = new $className();
+                            if (method_exists($migration, 'up')) {
+                                $migration->up($pdo);
+                            }
+                        }
+                    } else {
+                        // Handle legacy migration format (just execute SQL)
+                        eval('?>' . $content);
+                    }
+                }
+                
+                // Record migration as executed
+                $pdo->prepare("INSERT INTO migrations (migration, batch) VALUES (?, 1)")
+                    ->execute([$migrationName]);
+                    
+            } catch (Exception $e) {
+                error_log("Migration error for $migrationName: " . $e->getMessage());
+            }
+        }
+    }
 }
 
 function insertAdminUser($pdo) {
@@ -388,7 +454,7 @@ function deleteInstallFolder() {
             position: relative;
             flex: 1;
         }
-        
+
         .step-circle {
             width: 48px;
             height: 48px;
