@@ -137,6 +137,7 @@ $pageTitle = $page_title ?? 'User Profile';
             font-weight: 800;
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #dc2626 100%);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             margin: 0;
         }
@@ -849,7 +850,7 @@ $pageTitle = $page_title ?? 'User Profile';
 
             try {
                 // Use hardcoded path for reliability in this environment
-                const response = await fetch('/Bishwo_Calculator/profile/update', {
+                const response = await fetch(window.appConfig.baseUrl + '/profile/update', {
                     method: 'POST',
                     body: formData
                 });
@@ -921,7 +922,7 @@ $pageTitle = $page_title ?? 'User Profile';
             
             try {
                 // Use hardcoded path for reliability
-                const response = await fetch('/Bishwo_Calculator/profile/password', {
+                const response = await fetch(window.appConfig.baseUrl + '/profile/password', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -961,7 +962,7 @@ $pageTitle = $page_title ?? 'User Profile';
             if (!pwd) return;
 
             try {
-                const response = await fetch('/Bishwo_Calculator/profile/2fa/enable', {
+                const response = await fetch(window.appConfig.baseUrl + '/profile/2fa/enable', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ password: pwd })
@@ -1011,7 +1012,7 @@ $pageTitle = $page_title ?? 'User Profile';
             }
             
             try {
-                const response = await fetch('/Bishwo_Calculator/profile/2fa/confirm', {
+                const response = await fetch(window.appConfig.baseUrl + '/profile/2fa/confirm', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ code: code })
@@ -1052,7 +1053,7 @@ $pageTitle = $page_title ?? 'User Profile';
                             }
                             
                             try {
-                                const response = await fetch('/Bishwo_Calculator/profile/2fa/disable', {
+                                const response = await fetch(window.appConfig.baseUrl + '/profile/2fa/disable', {
                                     method: 'POST',
                                     headers: {'Content-Type': 'application/json'},
                                     body: JSON.stringify({ password: pwd })

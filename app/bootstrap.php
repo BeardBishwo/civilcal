@@ -105,3 +105,17 @@ register_shutdown_function(function () {
         ]);
     }
 });
+
+// Check if application is installed
+$lockFile = STORAGE_PATH . '/install.lock';
+$installedLockFile = STORAGE_PATH . '/installed.lock';
+$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+$isInstallRoute = strpos($requestUri, '/install') !== false;
+
+if (!file_exists($lockFile) && !file_exists($installedLockFile) && !$isInstallRoute) {
+    // Only redirect if we are not already in the installer
+    // Using app_base_url if available, otherwise fallback
+    $redirectUrl = function_exists('app_base_url') ? app_base_url('/install/index.php') : '/install/index.php';
+    header('Location: ' . $redirectUrl);
+    exit;
+}

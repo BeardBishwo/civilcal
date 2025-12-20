@@ -231,7 +231,7 @@ function sanitize_input($input) {
     <!-- Logo Preview -->
     <div class="preview-card">
         <div class="logo-preview" id="logoPreview">
-            <img src="<?php echo htmlspecialchars($site_meta['logo'] ?? '/bishwo_calculator/assets/icons/icon-192.png'); ?>" 
+            <img src="<?php echo htmlspecialchars($site_meta['logo'] ?? app_base_url('assets/icons/icon-192.png')); ?>" 
                  alt="Logo" id="previewImage">
             <span id="previewText"><?php echo htmlspecialchars($site_meta['logo_text'] ?? (\App\Services\SettingsService::get('site_name', 'Bishwo Calculator') ?: 'Bishwo Calculator')); ?></span>
         </div>
@@ -441,7 +441,7 @@ function sanitize_input($input) {
     }
     
     function resetPreview() {
-        document.getElementById('logo_url').value = '/bishwo_calculator/assets/icons/icon-192.png';
+        document.getElementById('logo_url').value = "<?php echo app_base_url('assets/icons/icon-192.png'); ?>";
         document.getElementById('logo_text').value = 'EngiCal Pro';
         document.getElementById('header_style').value = 'logo_text';
         updatePreview();
