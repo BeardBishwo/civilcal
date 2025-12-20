@@ -4,6 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Core\Controller;
 use App\Models\User;
+use App\Services\EmailManager;
 
 class UserManagementController extends Controller
 {
@@ -143,7 +144,6 @@ class UserManagementController extends Controller
             $username = trim($_POST['username'] ?? '');
             $email = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
-            $confirm = $_POST['password_confirmation'] ?? '';
             $role = $_POST['role'] ?? '';
 
             $errors = [];
@@ -162,9 +162,6 @@ class UserManagementController extends Controller
             }
             if (!$password || strlen($password) < 6) {
                 $errors[] = 'Password must be at least 6 characters.';
-            }
-            if ($password !== $confirm) {
-                $errors[] = 'Passwords do not match.';
             }
             if (!$role) {
                 $errors[] = 'Role selection is required.';

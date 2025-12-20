@@ -1,11 +1,10 @@
 <?php
+namespace App\Services;
 
 /**
  * Enhanced Email System for EngiCal Pro
  * Supports both PHPMailer and PHP mail() with admin-configurable settings
  */
-
-require_once __DIR__ . '/../../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -136,6 +135,24 @@ class EmailManager
         $body = $this->getTemplate('password_reset', [
             'full_name' => $fullName,
             'reset_link' => $resetLink,
+            'site_name' => 'EngiCal Pro'
+        ]);
+
+        return $this->sendEmail($email, $subject, $body);
+    }
+
+    /**
+     * Send new account credentials email
+     */
+    public function sendNewAccountEmail($email, $fullName, $username, $password, $loginUrl)
+    {
+        $subject = "Your New Account Credentials - EngiCal Pro";
+
+        $body = $this->getTemplate('new_account', [
+            'full_name' => $fullName,
+            'username' => $username,
+            'password' => $password,
+            'login_url' => $loginUrl,
             'site_name' => 'EngiCal Pro'
         ]);
 

@@ -217,16 +217,19 @@ $page_title = $page_title ?? 'Create New User';
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-CSRF-Token': document.querySelector('input[name="csrf_token"]').value
+                    'X-CSRF-Token': document.querySelector('input[name="csrf_token"]').value,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
                 }
             })
-            .then(response => {
-                if (response.ok) {
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
                     updateSaveStatus('saved');
-                    showNotification('User created successfully!', 'success');
-                    setTimeout(() => window.location.href = '<?= app_base_url('/admin/users') ?>', 1000);
+                    showNotification(data.message || 'User created successfully!', 'success');
+                    setTimeout(() => window.location.href = data.redirect || '<?= app_base_url('/admin/users') ?>', 1000);
                 } else {
-                    throw new Error('Failed to create user');
+                    throw new Error(data.message || 'Failed to create user');
                 }
             })
             .catch(error => {

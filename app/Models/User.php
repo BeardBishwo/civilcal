@@ -59,8 +59,9 @@ class User
         $stmt = $this->db->getPdo()->prepare("
             INSERT INTO users (
                 username, email, password, first_name, last_name, company, phone, role,
-                email_verified, is_active, terms_agreed, terms_agreed_at, marketing_emails
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                email_verified, is_active, terms_agreed, terms_agreed_at, marketing_emails,
+                created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
         ");
 
         $emailVerified = !empty($data['email_verified']) ? 1 : 0;
