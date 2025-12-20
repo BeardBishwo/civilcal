@@ -41,7 +41,7 @@ class CsrfMiddleware
                 http_response_code(419);
                 // Always return JSON for AJAX forms (admin panel uses class="ajax-form")
                 // Check for XMLHttpRequest header or admin routes in addition to API routes
-                // NOTE: URI includes base path like /Bishwo_Calculator/admin/... so use strpos instead of stripos === 0
+                // NOTE: URI includes base path like /admin/... so use strpos
                 $uri = $request['uri'] ?? '';
                 $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
                 $isAdminRoute = strpos($uri, '/admin') !== false;

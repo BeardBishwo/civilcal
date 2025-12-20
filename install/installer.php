@@ -103,16 +103,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
  * Get the base URL for the application
  */
 function getAppBaseUrl() {
-    // Determine base path from REQUEST_URI
-    $scriptPath = dirname($_SERVER['SCRIPT_NAME']); // /install or /Bishwo_Calculator/install
-    $basePath = dirname($scriptPath); // / or /Bishwo_Calculator
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/install/installer.php';
+    $scriptDir = dirname($scriptName);
     
-    // Clean up the base path
-    if ($basePath === '/' || $basePath === '\\') {
+    // If we are in /install or /Bishwo_Calculator/install, go up one level
+    $basePath = dirname($scriptDir);
+    
+    // Normalize root path to empty string
+    if ($basePath === '/' || $basePath === '\\' || $basePath === '.') {
         $basePath = '';
     }
     
-    return $basePath;
+    // Fallback detection for common subdirectory setups if basePath is still empty
+    if (empty($basePath) && isset($_SERVER['REQUEST_URI'])) {
+        $uri = $_SERVER['REQUEST_URI'];
+        if (strpos($uri, '/Bishwo_Calculator/') === 0) {
+            $basePath = '/Bishwo_Calculator';
+        }
+    }
+    
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    
+    return $protocol . '://' . $host . $basePath;
 }
 
 function checkSystemRequirements() {

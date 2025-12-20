@@ -56,7 +56,7 @@ class AuthController extends Controller
             }
 
             // Redirect to homepage
-            header('Location: /Bishwo_Calculator/');
+            header('Location: ' . app_base_url());
             exit;
         } catch (Exception $e) {
             echo "Logout Error: " . $e->getMessage();
@@ -239,7 +239,7 @@ class AuthController extends Controller
             exit;
         }
 
-        header('Location: /');
+        header('Location: ' . app_base_url());
         exit;
     }
 
