@@ -4,8 +4,8 @@
  * Shows a confirmation message after successful logout
  */
 
-$pageTitle = 'Logged Out - Civil Calculator';
-$metaDescription = 'You have been successfully logged out of Civil Calculator.';
+$pageTitle = 'Logged Out - ' . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
+$metaDescription = 'You have been successfully logged out of ' . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro') . '.';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -194,7 +194,7 @@ $metaDescription = 'You have been successfully logged out of Civil Calculator.';
                     You have been safely logged out of your account.
                 <?php endif; ?>
                 <br>
-                Thank you for using Civil Calculator!
+                Thank you for using <?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro')); ?>!
             </p>
             
             <div class="logout-actions">

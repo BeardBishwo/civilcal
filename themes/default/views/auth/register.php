@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Create Account - Civil Cal';
+$page_title = 'Create Account - ' . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
 require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -809,7 +809,7 @@ $specialties = [
                     <i class="fas fa-user-plus"></i>
                 </div>
                 <h1>Create Account</h1>
-                <p>Join thousands of engineers using Civil Calculator</p>
+                <p>Join thousands of engineers using <?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro')); ?></p>
             </div>
 
             <!-- Progress Indicator -->

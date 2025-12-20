@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Reset Password - Civil Calculator';
+$page_title = 'Reset Password - ' . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
 require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -679,7 +679,7 @@ $csrf_token = \App\Services\Security::generateCsrfToken();
                         </h4>
                         <ul>
                             <li>Reset links expire after 1 hour</li>
-                            <li>Only use official Civil Calculator emails</li>
+                            <li>Only use official <?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro')); ?> emails</li>
                             <li>Never share your reset link</li>
                             <li>Contact support if you didn't request reset</li>
                         </ul>

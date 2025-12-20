@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Email Verification - EngiCal Pro';
+$page_title = 'Email Verification - ' . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
 require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
 require_once dirname(__DIR__, 4) . '/app/Services/Security.php';
 
@@ -61,7 +61,7 @@ if (empty($token)) {
                     $stmt->execute([$verification_data['id']]);
 
                     // Log email verification
-                    Security::logSecurityEvent('email_verified', [
+                    \App\Services\Security::logSecurityEvent('email_verified', [
                         'user_id' => $verification_data['user_id'],
                         'email' => $verification_data['email'],
                         'token' => $token,
@@ -115,7 +115,7 @@ if (empty($token)) {
     }
 }
 
-$csrf_token = Security::generateCsrfToken();
+$csrf_token = \App\Services\Security::generateCsrfToken();
 ?>
 
 <div class="auth-container">
@@ -124,7 +124,7 @@ $csrf_token = Security::generateCsrfToken();
         <div class="auth-header">
             <?php if ($verification_status === 'success'): ?>
                 <h1><i class="fas fa-check-circle"></i> Email Verified!</h1>
-                <p class="auth-subtitle">Welcome to EngiCal Pro - Your email has been confirmed</p>
+                <p class="auth-subtitle">Welcome to <?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro')); ?> - Your email has been confirmed</p>
             <?php elseif ($verification_status === 'already'): ?>
                 <h1><i class="fas fa-info-circle"></i> Already Verified</h1>
                 <p class="auth-subtitle">Your email address is already verified</p>
@@ -146,7 +146,7 @@ $csrf_token = Security::generateCsrfToken();
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <h2>Email Successfully Verified!</h2>
-                    <p>Thank you for verifying your email address. Your EngiCal Pro account is now fully activated.</p>
+                    <p>Thank you for verifying your email address. Your <?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro')); ?> account is now fully activated.</p>
                     
                     <?php if (!empty($user_email)): ?>
                     <div class="account-info">

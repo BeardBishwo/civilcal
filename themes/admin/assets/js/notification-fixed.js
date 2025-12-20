@@ -1,5 +1,5 @@
 /**
- * Bishwo Calculator - Fixed Notification System
+ * Engineering Calculator Pro - Fixed Notification System
  * Single-click functionality with improved error handling
  * Fixed initialization conflicts and real-time polling
  * Consistently uses window.appConfig for dynamic base URLs

@@ -1,5 +1,5 @@
 /**
- * Bishwo Calculator - Theme Toggle System
+ * Engineering Calculator Pro - Theme Toggle System
  * Dark/Light theme switching with localStorage persistence
  */
 
@@ -21,7 +21,7 @@ class ThemeToggle {
 
         // Configuration
         this.config = {
-            storageKey: 'bishwo_admin_theme',
+            storageKey: 'engicalc_admin_theme',
             defaultTheme: 'light',
             transitionDuration: 300,
             debugMode: true

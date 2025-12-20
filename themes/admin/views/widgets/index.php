@@ -1,6 +1,6 @@
 <?php
 // Remove the ob_start() and header inclusion since we're using the themes/admin layout
-$page_title = 'Widget Management - Bishwo Calculator';
+$page_title = 'Widget Management - ' . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
 ?>
 
 <!-- Optimized Admin Wrapper Container -->
@@ -14,7 +14,7 @@ $page_title = 'Widget Management - Bishwo Calculator';
                     <i class="fas fa-cube"></i>
                     <h1>Widget Management</h1>
                 </div>
-                <div class="header-subtitle">Manage widgets for the Bishwo Calculator system</div>
+                <div class="header-subtitle">Manage widgets for the system</div>
             </div>
             <div class="header-actions">
                 <a href="<?php echo app_base_url('/admin/widgets/setup'); ?>" class="btn btn-secondary btn-compact" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); margin-right: 0.5rem;">

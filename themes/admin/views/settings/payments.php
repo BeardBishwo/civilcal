@@ -252,7 +252,7 @@
 
                             <div class="form-group">
                                 <label class="form-label" for="paypal_email">PayPal Email</label>
-                                <input type="email" class="form-control" id="paypal_email" name="paypal_email" value="<?= htmlspecialchars($settings['paypal_email'] ?? '') ?>" placeholder="bishwonathfgfg@gmail.com">
+                                <input type="email" class="form-control" id="paypal_email" name="paypal_email" value="<?= htmlspecialchars($settings['paypal_email'] ?? '') ?>" placeholder="paypal@example.com">
                                 <div class="form-text">Payments will be sent to this address. Please make sure that you enable IPN and enable notification.</div>
                             </div>
 

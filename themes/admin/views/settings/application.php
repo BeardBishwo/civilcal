@@ -74,7 +74,7 @@ if (!class_exists('App\\Services\\SettingsService')) {
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Application Name</label>
                                     <input type="text" class="form-control enhanced-input" id="app_name" name="app_name" 
-                                           value="<?= htmlspecialchars(\App\Services\SettingsService::get('app_name', 'Bishwo Calculator')) ?>" 
+                                           value="<?= htmlspecialchars(\App\Services\SettingsService::get('app_name', 'Engineering Calculator Pro')) ?>" 
                                            data-tooltip="Displayed across the app">
                                 </div>
                                 <div class="col-md-6">

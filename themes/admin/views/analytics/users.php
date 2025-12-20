@@ -1,6 +1,6 @@
 <?php
 // Remove the ob_start() and header inclusion since we're using the themes/admin layout
-$page_title = 'User Analytics - Bishwo Calculator';
+$page_title = 'User Analytics - ' . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
 // Remove the require_once for header.php
 ?>
 

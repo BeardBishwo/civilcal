@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Analytics Overview - Bishwo Calculator';
+$page_title = 'Analytics Overview - ' . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
 
 $overviewStats = $stats ?? [];
 $chartData = $charts['daily_calculations'] ?? [];

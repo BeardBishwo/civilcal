@@ -250,11 +250,14 @@ function sanitize_input($input) {
                            placeholder="/path/to/your/logo.png">
                 </div>
                 
-                <div class="form-group">
-                    <label for="logo_text">Logo Text</label>
-                    <input type="text" id="logo_text" name="logo_text" 
-                           value="<?php echo htmlspecialchars($site_meta['logo_text'] ?? (\App\Services\SettingsService::get('site_name', 'Bishwo Calculator') ?: 'Bishwo Calculator')); ?>"
-                           placeholder="Your Site Name">
+                <div class="form-group mb-4">
+                    <label for="logo_text" class="form-label">Logo Text</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-font"></i></span>
+                        <input type="text" class="form-control" id="logo_text" name="logo_text" 
+                               value="<?php echo htmlspecialchars($site_meta['logo_text'] ?? (\App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro') ?: 'Engineering Calculator Pro')); ?>"
+                               placeholder="Your Site Name">
+                    </div>
                 </div>
                 
                 <div class="form-group">

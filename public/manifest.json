@@ -1,6 +1,6 @@
 {
-  "name": "EngiCal Pro - Engineering Calculator",
-  "short_name": "EngiCal Pro",
+  "name": "Engineering Calculator Pro",
+  "short_name": "EngCalc Pro",
   "description": "Professional Engineering Calculators Suite - Advanced tools for Civil, Electrical, HVAC, Plumbing, and Fire Protection calculations",
   "start_url": "/",
   "display": "standalone",

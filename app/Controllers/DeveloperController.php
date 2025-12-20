@@ -21,7 +21,7 @@ class DeveloperController extends Controller
     public function index()
     {
         $data = [
-            'title' => 'API Reference for Developers - Engineering Calculator API',
+            'title' => 'API Reference for Developers - ' . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro'),
             'description' => 'Complete API documentation for integrating engineering calculations into your applications',
             'category' => 'developer',
             'page_title' => 'API Reference for Developers',
@@ -79,7 +79,7 @@ class DeveloperController extends Controller
         $data = [
             'title' => $categoryInfo['name'] . ' API - Developer Documentation',
             'description' => 'API documentation for ' . $categoryInfo['name'],
-            'category' => 'developer',
+            'section' => 'developer',
             'page_title' => $categoryInfo['name'] . ' API',
             'category' => $categoryInfo,
             'endpoints' => $this->getEndpointsByCategory($category)
@@ -202,12 +202,12 @@ class DeveloperController extends Controller
                 [
                     'title' => 'Get API Key',
                     'description' => 'Sign up and generate your API key from the developer dashboard',
-                    'code' => 'curl -X POST https://api.engicalc.com/auth/register \\\n  -H "Content-Type: application/json" \\\n  -d \'{"email": "your@email.com", "password": "secure_password"}\''
+                    'code' => 'curl -X POST https://api.example.com/auth/register \\\n  -H "Content-Type: application/json" \\\n  -d \'{"email": "your@email.com", "password": "secure_password"}\''
                 ],
                 [
                     'title' => 'Make First Request',
                     'description' => 'Test your API key with a simple calculation request',
-                    'code' => 'curl -X POST https://api.engicalc.com/v1/calculations/concrete/volume \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d \'{"length": 10, "width": 5, "height": 0.2, "unit": "m"}\''
+                    'code' => 'curl -X POST https://api.example.com/v1/calculations/concrete/volume \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d \'{"length": 10, "width": 5, "height": 0.2, "unit": "m"}\''
                 ],
                 [
                     'title' => 'Handle Response',
@@ -256,15 +256,15 @@ class DeveloperController extends Controller
         return [
             'javascript' => [
                 'name' => 'JavaScript/Node.js',
-                'code' => 'const response = await fetch(\'https://api.engicalc.com/v1/calculations/concrete/volume\', {\n  method: \'POST\',\n  headers: {\n    \'Authorization\': \'Bearer YOUR_API_KEY\',\n    \'Content-Type\': \'application/json\'\n  },\n  body: JSON.stringify({\n    length: 10,\n    width: 5,\n    height: 0.2,\n    unit: \'m\'\n  })\n});\n\nconst result = await response.json();\nconsole.log(result);'
+                'code' => 'const response = await fetch(\'https://api.example.com/v1/calculations/concrete/volume\', {\n  method: \'POST\',\n  headers: {\n    \'Authorization\': \'Bearer YOUR_API_KEY\',\n    \'Content-Type\': \'application/json\'\n  },\n  body: JSON.stringify({\n    length: 10,\n    width: 5,\n    height: 0.2,\n    unit: \'m\'\n  })\n});\n\nconst result = await response.json();\nconsole.log(result);'
             ],
             'python' => [
                 'name' => 'Python',
-                'code' => 'import requests\n\nurl = "https://api.engicalc.com/v1/calculations/concrete/volume"\nheaders = {\n    "Authorization": "Bearer YOUR_API_KEY",\n    "Content-Type": "application/json"\n}\ndata = {\n    "length": 10,\n    "width": 5,\n    "height": 0.2,\n    "unit": "m"\n}\n\nresponse = requests.post(url, headers=headers, json=data)\nresult = response.json()\nprint(result)'
+                'code' => 'import requests\n\nurl = "https://api.example.com/v1/calculations/concrete/volume"\nheaders = {\n    "Authorization": "Bearer YOUR_API_KEY",\n    "Content-Type": "application/json"\n}\ndata = {\n    "length": 10,\n    "width": 5,\n    "height": 0.2,\n    "unit": "m"\n}\n\nresponse = requests.post(url, headers=headers, json=data)\nresult = response.json()\nprint(result)'
             ],
             'php' => [
                 'name' => 'PHP',
-                'code' => '<?php\n$url = "https://api.engicalc.com/v1/calculations/concrete/volume";\n$headers = [\n    "Authorization: Bearer YOUR_API_KEY",\n    "Content-Type: application/json"\n];\n$data = json_encode([\n    "length" => 10,\n    "width" => 5,\n    "height" => 0.2,\n    "unit" => "m"\n]);\n\n$ch = curl_init();\ncurl_setopt($ch, CURLOPT_URL, $url);\ncurl_setopt($ch, CURLOPT_POST, true);\ncurl_setopt($ch, CURLOPT_POSTFIELDS, $data);\ncurl_setopt($ch, CURLOPT_HTTPHEADER, $headers);\ncurl_setopt($ch, CURLOPT_RETURNTRANSFER, true);\n\n$result = curl_exec($ch);\ncurl_close($ch);\n\necho $result;\n?>'
+                'code' => '<?php\n$url = "https://api.example.com/v1/calculations/concrete/volume";\n$headers = [\n    "Authorization: Bearer YOUR_API_KEY",\n    "Content-Type: application/json"\n];\n$data = json_encode([\n    "length" => 10,\n    "width" => 5,\n    "height" => 0.2,\n    "unit" => "m"\n]);\n\n$ch = curl_init();\ncurl_setopt($ch, CURLOPT_URL, $url);\ncurl_setopt($ch, CURLOPT_POST, true);\ncurl_setopt($ch, CURLOPT_POSTFIELDS, $data);\ncurl_setopt($ch, CURLOPT_HTTPHEADER, $headers);\ncurl_setopt($ch, CURLOPT_RETURNTRANSFER, true);\n\n$result = curl_exec($ch);\ncurl_close($ch);\n\necho $result;\n?>'
             ]
         ];
     }
@@ -364,7 +364,7 @@ class DeveloperController extends Controller
     private function getEndpointCodeExamples($endpoint)
     {
         return [
-            'curl' => 'curl -X POST https://api.engicalc.com/v1/calculations/concrete/volume \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d \'{"length": 10, "width": 5, "height": 0.2, "unit": "m"}\'',
+            'curl' => 'curl -X POST https://api.example.com/v1/calculations/concrete/volume \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d \'{"length": 10, "width": 5, "height": 0.2, "unit": "m"}\'',
             'javascript' => 'const result = await engicalc.calculations.concrete.volume({\n  length: 10,\n  width: 5,\n  height: 0.2,\n  unit: "m"\n});',
             'python' => 'result = client.calculations.concrete.volume(\n    length=10,\n    width=5,\n    height=0.2,\n    unit="m"\n)'
         ];
@@ -398,8 +398,8 @@ class DeveloperController extends Controller
                 'language' => 'Python',
                 'version' => '1.8.2',
                 'description' => 'Python SDK for data science and engineering applications',
-                'install_command' => 'pip install engicalc-python',
-                'github_url' => 'https://github.com/engicalc/python-sdk',
+                'install_command' => 'pip install vendor-python',
+                'github_url' => 'https://github.com/vendor/python-sdk',
                 'documentation' => $this->getPythonSdkDocs()
             ]
         ];

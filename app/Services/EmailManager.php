@@ -36,9 +36,9 @@ class EmailManager
             'smtp_username' => '',
             'smtp_password' => '',
             'smtp_encryption' => 'tls',
-            'from_email' => 'noreply@engicalpro.com',
-            'from_name' => 'EngiCal Pro',
-            'reply_to' => 'support@engicalpro.com'
+            'from_email' => 'noreply@example.com',
+            'from_name' => \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro'),
+            'reply_to' => 'support@example.com'
         ];
 
         // Load from database if available
@@ -112,12 +112,12 @@ class EmailManager
     {
         $verificationLink = app_base_url("verify.php?token={$verificationToken}");
 
-        $subject = "Verify Your Email - EngiCal Pro";
+        $subject = "Verify Your Email - " . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
 
         $body = $this->getTemplate('email_verification', [
             'full_name' => $fullName,
             'verification_link' => $verificationLink,
-            'site_name' => 'EngiCal Pro'
+            'site_name' => \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro')
         ]);
 
         return $this->sendEmail($email, $subject, $body);
@@ -130,12 +130,12 @@ class EmailManager
     {
         $resetLink = app_base_url("reset.php?token={$resetToken}");
 
-        $subject = "Password Reset - EngiCal Pro";
+        $subject = "Password Reset - " . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
 
         $body = $this->getTemplate('password_reset', [
             'full_name' => $fullName,
             'reset_link' => $resetLink,
-            'site_name' => 'EngiCal Pro'
+            'site_name' => \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro')
         ]);
 
         return $this->sendEmail($email, $subject, $body);
@@ -146,14 +146,14 @@ class EmailManager
      */
     public function sendNewAccountEmail($email, $fullName, $username, $password, $loginUrl)
     {
-        $subject = "Your New Account Credentials - EngiCal Pro";
+        $subject = "Your New Account Credentials - " . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
 
         $body = $this->getTemplate('new_account', [
             'full_name' => $fullName,
             'username' => $username,
             'password' => $password,
             'login_url' => $loginUrl,
-            'site_name' => 'EngiCal Pro'
+            'site_name' => \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro')
         ]);
 
         return $this->sendEmail($email, $subject, $body);
@@ -164,12 +164,12 @@ class EmailManager
      */
     public function sendWelcomeEmail($email, $fullName, $username)
     {
-        $subject = "Welcome to EngiCal Pro!";
+        $subject = "Welcome to " . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro') . "!";
 
         $body = $this->getTemplate('welcome', [
             'full_name' => $fullName,
             'username' => $username,
-            'site_name' => 'EngiCal Pro',
+            'site_name' => \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro'),
             'login_url' => app_base_url('login.php')
         ]);
 
@@ -276,23 +276,23 @@ class EmailManager
                 <body>
                     <div class="container">
                         <div class="header">
-                            <h1>🔧 EngiCal Pro</h1>
+                            <h1>🔧 {{site_name}}</h1>
                             <p>Professional Engineering Calculations</p>
                         </div>
                         <div class="content">
                             <h2>Verify Your Email Address</h2>
                             <p>Hello {{full_name}},</p>
-                            <p>Thank you for signing up with EngiCal Pro! To complete your registration and start using our professional engineering calculation tools, please verify your email address.</p>
+                            <p>Thank you for signing up with {{site_name}}! To complete your registration and start using our professional engineering calculation tools, please verify your email address.</p>
                             <div style="text-align: center;">
                                 <a href="{{verification_link}}" class="button">Verify Email Address</a>
                             </div>
                             <p>If the button doesn\'t work, copy and paste this link into your browser:</p>
                             <p><a href="{{verification_link}}">{{verification_link}}</a></p>
                             <p>This verification link will expire in 24 hours for security purposes.</p>
-                            <p>If you didn\'t create an account with EngiCal Pro, please ignore this email.</p>
+                            <p>If you didn\'t create an account with {{site_name}}, please ignore this email.</p>
                         </div>
                         <div class="footer">
-                            <p>&copy; 2025 EngiCal Pro. All rights reserved.</p>
+                            <p>&copy; {{current_year}} {{site_name}}. All rights reserved.</p>
                             <p>Professional Engineering Calculations | Building Excellence Through Technology</p>
                         </div>
                     </div>
@@ -445,6 +445,9 @@ class EmailManager
         ];
 
         $template = $templates[$templateName] ?? '';
+
+        // Add current year to variables
+        $variables['current_year'] = date('Y');
 
         // Replace variables in template
         foreach ($variables as $key => $value) {

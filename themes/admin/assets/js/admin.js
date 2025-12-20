@@ -1,5 +1,5 @@
 /**
- * Bishwo Calculator Admin JavaScript
+ * Engineering Calculator Pro Admin JavaScript
  * Beautiful, Interactive Admin Interface
  */
 

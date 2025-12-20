@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Dashboard - Engineering Calculator Pro';
+$page_title = 'Dashboard - ' . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
 ?>
 
 <div class="container">

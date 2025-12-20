@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Sign In - Civil Cal';
+$page_title = 'Sign In - ' . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
 require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -680,7 +680,7 @@ if (\App\Services\SettingsService::get('captcha_on_login') == '1') {
             <div class="illustration-content">
                 <div class="brand-logo">
                     <i class="fas fa-calculator"></i>
-                    <span>Civil Cal</span>
+                    <span><?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro')); ?></span>
                 </div>
                 <p class="brand-tagline">
                     The most powerful engineering calculation platform trusted by professionals worldwide

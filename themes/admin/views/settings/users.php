@@ -1,7 +1,7 @@
 <?php
 /**
  * Users Settings Page
- * Fixed version that works with current Bishwo Calculator setup
+ * Fixed version that works with current system setup
  */
 
 // Security check
