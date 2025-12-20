@@ -110,7 +110,7 @@ $page_title = $page_title ?? 'Create New User';
                                 <label class="form-label required" for="role">Role</label>
                                 <select id="role" name="role" class="form-control-modern" required>
                                     <option value="">Select a role...</option>
-                                    <option value="user">Regular User</option>
+                                    <option value="user" selected>Regular User</option>
                                     <option value="engineer">Engineer</option>
                                     <option value="admin">Administrator</option>
                                 </select>

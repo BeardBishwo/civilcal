@@ -1208,7 +1208,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
             // Fetch notifications
             async function fetchNotifications() {
                 try {
-                    const response = await fetch('<?= app_base_url('/notifications') ?>');
+                    const response = await fetch('<?= app_base_url('/api/notifications') ?>');
                     const data = await response.json();
                     
                     if (data.success) {
@@ -1224,7 +1224,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
             // Fetch unread count
             async function fetchUnreadCount() {
                 try {
-                    const response = await fetch('<?= app_base_url('/notifications/unread-count') ?>');
+                    const response = await fetch('<?= app_base_url('/api/notifications/unread-count') ?>');
                     const data = await response.json();
                     
                     if (data.success) {
@@ -1312,7 +1312,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
             // Mark as read
             async function markAsRead(id) {
                 try {
-                    const response = await fetch(`<?= app_base_url('/notifications/') ?>${id}/read`, {
+                    const response = await fetch(`<?= app_base_url('/api/notifications/') ?>${id}/read`, {
                         method: 'POST'
                     });
                     const data = await response.json();
@@ -1332,7 +1332,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
             // Mark all as read
             async function markAllAsRead() {
                 try {
-                    const response = await fetch('<?= app_base_url('/notifications/mark-all-read') ?>', {
+                    const response = await fetch('<?= app_base_url('/api/notifications/mark-all-read') ?>', {
                         method: 'POST'
                     });
                     const data = await response.json();

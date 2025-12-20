@@ -67,6 +67,14 @@ if (getenv('APP_BASE')) {
         }
     }
 
+    // Ultimate fallback for Bishwo_Calculator project
+    if (empty($scriptDir) && (
+        strpos($_SERVER['REQUEST_URI'] ?? '', '/Bishwo_Calculator') === 0 ||
+        (defined('BASE_PATH') && strpos(str_replace('\\', '/', BASE_PATH), 'Bishwo_Calculator') !== false)
+    )) {
+        $scriptDir = '/Bishwo_Calculator';
+    }
+
     define('APP_BASE', $scriptDir);
 }
 
