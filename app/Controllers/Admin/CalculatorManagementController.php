@@ -154,6 +154,17 @@ class CalculatorManagementController extends Controller
             }
         }
         
+        // Manually inject Nepali Calculator (Special Case)
+        $calculators[] = [
+            'unique_id' => 'country.nepali-land',
+            'name' => 'Nepali Land Converter',
+            'slug' => 'nepali-land',
+            'module_name' => 'Country Calculator',
+            'module_slug' => 'country',
+            'path' => 'calculators/nepali.php',
+            'url' => '/nepali',
+        ];
+
         usort($calculators, function($a, $b) {
             if ($a['module_name'] === $b['module_name']) {
                 return strcmp($a['name'], $b['name']);

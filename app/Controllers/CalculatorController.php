@@ -372,6 +372,16 @@ class CalculatorController extends Controller
 
     public function traditionalUnits()
     {
+        // Check Status
+        $statusFile = BASE_PATH . '/storage/app/calculators_status.json';
+        if (file_exists($statusFile)) {
+            $config = json_decode(file_get_contents($statusFile), true);
+            if (isset($config['country.nepali-land']) && $config['country.nepali-land'] === 'inactive') {
+                $this->notFound(); // Or show a maintenance page
+                return;
+            }
+        }
+
         $this->view->render('calculators/nepali', [
             'title' => 'Nepali Unit Calculator',
             'description' => 'Professional conversion between traditional Nepali land measurement units.',
