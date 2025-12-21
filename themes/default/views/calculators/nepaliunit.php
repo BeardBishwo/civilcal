@@ -544,16 +544,20 @@
         .copy-toast {
             position: fixed;
             bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--accent);
-            color: #fff;
+            right: 2rem;
+            left: auto;
+            transform: translateY(100px);
+            background: rgba(24, 24, 27, 0.85); /* Semi-transparent dark */
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-subtle);
+            border-left: 3px solid var(--accent);
+            color: var(--text-primary);
             padding: 0.75rem 1.5rem;
-            border-radius: 100px;
+            border-radius: 8px;
             font-weight: 600;
             font-size: 0.85rem;
             letter-spacing: 0.05em;
-            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             z-index: 1000;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
@@ -562,8 +566,12 @@
             gap: 0.75rem;
         }
 
+        .copy-toast i {
+            color: var(--accent);
+        }
+
         .copy-toast.active {
-            transform: translateX(-50%) translateY(0);
+            transform: translateY(0);
         }
 
         /* --- Empty State --- */
@@ -848,6 +856,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update Glance Values
         updateGlance();
+
+        // Trigger Resize on All Inputs
+        dashboardInputs.forEach(input => resizeInput(input));
     }
 
     function updateGlance() {
@@ -972,6 +983,22 @@ document.addEventListener('DOMContentLoaded', function() {
         dashboardInputs.forEach(input => input.value = '0');
     });
 
+    // Dynamic Font Scaling
+    function resizeInput(input) {
+        const len = input.value.length;
+        if (input.closest('.hero-slot')) {
+            if (len > 15) input.style.fontSize = '1.1rem';
+            else if (len > 12) input.style.fontSize = '1.35rem';
+            else if (len > 10) input.style.fontSize = '1.55rem';
+            else input.style.fontSize = '1.75rem';
+        } else {
+            // Matrix Nodes
+            if (len > 12) input.style.fontSize = '0.9rem';
+            else if (len > 9) input.style.fontSize = '1.05rem';
+            else input.style.fontSize = '1.25rem';
+        }
+    }
+
     // Input Focus/Blur (Auto-clear 0)
     dashboardInputs.forEach(input => {
         input.addEventListener('focus', function() {
@@ -981,11 +1008,19 @@ document.addEventListener('DOMContentLoaded', function() {
         input.addEventListener('blur', function() {
             if (this.value === '') this.value = '0';
         });
+
+        // Add Input Listener for resizing
+        input.addEventListener('input', function() {
+            resizeInput(this);
+        });
     });
 
     // Initial Sync
     document.getElementById('analysis-view').classList.remove('d-none');
     document.getElementById('hero-row').classList.add('active');
     syncAll('init');
+
+    // Initial Resize
+    dashboardInputs.forEach(input => resizeInput(input));
 });
 </script>
