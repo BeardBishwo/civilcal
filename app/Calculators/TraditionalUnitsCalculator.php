@@ -177,6 +177,14 @@ class TraditionalUnitsCalculator
                     $outputValue = $sqFeetValue * 0.092903;
                     $outputUnitName = 'Square Meters';
                     break;
+                case 'sq_mm':
+                    $outputValue = $sqFeetValue * 92903.04;
+                    $outputUnitName = 'Square Millimeters';
+                    break;
+                case 'sq_in':
+                    $outputValue = $sqFeetValue * 144;
+                    $outputUnitName = 'Square Inches';
+                    break;
                 case 'sq_yard':
                     $outputValue = $sqFeetValue * 0.111111;
                     $outputUnitName = 'Square Yards';
@@ -305,6 +313,8 @@ class TraditionalUnitsCalculator
         return [
             'sq_feet' => 'Square Feet',
             'sq_meter' => 'Square Meters',
+            'sq_mm' => 'Square Millimeters',
+            'sq_in' => 'Square Inches',
             'sq_yard' => 'Square Yards',
             'acre' => 'Acres',
             'hectare' => 'Hectares'
