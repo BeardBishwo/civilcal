@@ -565,7 +565,7 @@
             <form id="pro-calc-form" class="control-group">
                 <div>
                     <span class="label-mono">01. Analysis Value</span>
-                    <input type="number" id="value" name="value" class="input-field" step="any" value="1" required autofocus>
+                    <input type="number" id="value" name="value" class="input-field" step="any" value="0" required autofocus>
                 </div>
 
                 <div>
@@ -616,13 +616,7 @@
         </aside>
 
         <main class="main-console">
-            <div id="initial-view" class="empty-state">
-                <i class="fas fa-bolt"></i>
-                <h3>Pink Precision Ready</h3>
-                <p>Execute analysis to view multi-pane results.</p>
-            </div>
-
-            <div id="analysis-view" class="d-none">
+            <div id="analysis-view">
                 <div id="hero-row" class="hero-row">
                     <div id="hero-slot-sqm" class="hero-slot">
                         <span class="label">Metric Area</span>
@@ -745,6 +739,12 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('pro-calc-form');
+    
+    // Trigger initial computation
+    setTimeout(() => {
+        performAnalysis();
+    }, 100);
+
     // --- Glance Cards Interactivity ---
     const glanceData = {
         hilly: {
@@ -788,7 +788,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const fromUnitSelect = document.getElementById('from_unit');
     const toUnitSelect = document.getElementById('to_unit');
     
-    const initialView = document.getElementById('initial-view');
     const analysisView = document.getElementById('analysis-view');
     const heroRow = document.getElementById('hero-row');
     const heroSqmVal = document.querySelector('#hero-slot-sqm .value');
@@ -841,8 +840,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const toUnit = toUnitSelect.value;
 
         if (isNaN(value)) {
-            analysisView.classList.add('d-none');
-            initialView.classList.remove('d-none');
             return;
         }
 
@@ -859,7 +856,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
 
             if (data.success) {
-                initialView.classList.add('d-none');
                 analysisView.classList.remove('d-none');
                 heroRow.classList.add('active');
 
