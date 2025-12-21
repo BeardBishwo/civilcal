@@ -169,11 +169,25 @@
         }
 
         .dash-header .brand {
+            display: none;
+        }
+
+        .btn-clear {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-subtle);
             color: var(--accent);
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
         }
 
         .hero-row {
@@ -628,9 +642,9 @@
         <main class="main-console">
             <div class="dash-header">
                 <div>
-                    <span class="brand">Pink Precision Toolkit</span>
                     <h1>Nepali Unit Calculator</h1>
                 </div>
+                <button id="btn-clear" class="btn-clear">CLEAR DATA</button>
             </div>
             <div id="analysis-view" class="pink-precision-view">
                 <div id="hero-row" class="hero-row">
@@ -793,22 +807,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function syncAll(sourceId) {
+        const hillyGroup = ['dash-ropani', 'dash-aana', 'dash-paisa', 'dash-daam'];
+        const teraiGroup = ['dash-bigha', 'dash-kattha', 'dash-dhur'];
+        
+        const isHillySource = hillyGroup.includes(sourceId);
+        const isTeraiSource = teraiGroup.includes(sourceId);
+
         // Update Hero Slots
         if (sourceId !== 'hero-val-sqm') document.getElementById('hero-val-sqm').value = format(currentSqFt / UNITS.sq_meter);
         if (sourceId !== 'hero-val-sqft') document.getElementById('hero-val-sqft').value = format(currentSqFt);
         
-        // Update Matrix - Hilly
-        if (sourceId !== 'dash-ropani') document.getElementById('dash-ropani').value = format(currentSqFt / UNITS.ropani);
-        if (sourceId !== 'dash-aana') document.getElementById('dash-aana').value = format(currentSqFt / UNITS.aana);
-        if (sourceId !== 'dash-paisa') document.getElementById('dash-paisa').value = format(currentSqFt / UNITS.paisa);
-        if (sourceId !== 'dash-daam') document.getElementById('dash-daam').value = format(currentSqFt / UNITS.daam);
+        // Update Matrix - Hilly (Skip if Hilly is the source)
+        if (!isHillySource) {
+            if (sourceId !== 'dash-ropani') document.getElementById('dash-ropani').value = format(currentSqFt / UNITS.ropani);
+            if (sourceId !== 'dash-aana') document.getElementById('dash-aana').value = format(currentSqFt / UNITS.aana);
+            if (sourceId !== 'dash-paisa') document.getElementById('dash-paisa').value = format(currentSqFt / UNITS.paisa);
+            if (sourceId !== 'dash-daam') document.getElementById('dash-daam').value = format(currentSqFt / UNITS.daam);
+        }
 
-        // Update Matrix - Terai
-        if (sourceId !== 'dash-bigha') document.getElementById('dash-bigha').value = format(currentSqFt / UNITS.bigha);
-        if (sourceId !== 'dash-kattha') document.getElementById('dash-kattha').value = format(currentSqFt / UNITS.kattha);
-        if (sourceId !== 'dash-dhur') document.getElementById('dash-dhur').value = format(currentSqFt / UNITS.dhur);
+        // Update Matrix - Terai (Skip if Terai is the source)
+        if (!isTeraiSource) {
+            if (sourceId !== 'dash-bigha') document.getElementById('dash-bigha').value = format(currentSqFt / UNITS.bigha);
+            if (sourceId !== 'dash-kattha') document.getElementById('dash-kattha').value = format(currentSqFt / UNITS.kattha);
+            if (sourceId !== 'dash-dhur') document.getElementById('dash-dhur').value = format(currentSqFt / UNITS.dhur);
+        }
 
-        // Update Standards
+        // Update Standards (Always sync)
         if (sourceId !== 'dash-sq_meter') document.getElementById('dash-sq_meter').value = format(currentSqFt / UNITS.sq_meter);
         if (sourceId !== 'dash-sq_mm') document.getElementById('dash-sq_mm').value = format(currentSqFt / UNITS.sq_mm);
         if (sourceId !== 'dash-hectare') document.getElementById('dash-hectare').value = format(currentSqFt / UNITS.hectare);
@@ -938,6 +962,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const d = (rem / UNITS.dhur).toFixed(2);
         return `${b} Bigha, ${k} Kattha, ${d} Dhur`;
     }
+
+    // Clear Data
+    document.getElementById('btn-clear').addEventListener('click', () => {
+        currentSqFt = 0;
+        syncAll('clear');
+        
+        // Explicitly set all to 0 ensuring clean slate
+        dashboardInputs.forEach(input => input.value = '0');
+    });
+
+    // Input Focus/Blur (Auto-clear 0)
+    dashboardInputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            if (this.value === '0') this.value = '';
+        });
+        
+        input.addEventListener('blur', function() {
+            if (this.value === '') this.value = '0';
+        });
+    });
 
     // Initial Sync
     document.getElementById('analysis-view').classList.remove('d-none');
