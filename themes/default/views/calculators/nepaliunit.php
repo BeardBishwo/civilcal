@@ -145,57 +145,79 @@
         /* --- Main Console --- */
         .main-console {
             background: var(--bg-deep);
-            padding: 2rem 2.5rem;
+            padding: 1.5rem 2.5rem; /* Reduced vertical padding */
             overflow-y: auto;
             position: relative;
         }
 
-        .hero-result {
-            margin-bottom: 2rem;
+        .hero-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 1.25rem; /* Reduced margin */
             opacity: 0;
             transform: translateY(15px);
             transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            cursor: pointer;
         }
 
-        .hero-result.active {
+        .hero-row.active {
             opacity: 1;
             transform: translateY(0);
         }
-        
-        .hero-result:hover .value {
-            color: var(--accent);
+
+        .hero-slot {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1rem 1.25rem; /* Compact vertical padding */
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem; /* Tighter gap */
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            justify-content: center;
         }
 
-        .hero-result .label {
-            color: var(--accent);
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            margin-bottom: 0.5rem;
-            display: block;
+        .hero-slot:hover {
+            border-color: var(--accent);
+            background: var(--bg-card);
+            transform: translateY(-2px);
         }
 
-        .hero-result .value {
-            font-family: var(--font-mono);
-            font-size: 4rem; /* Compact Hero */
+        .hero-slot .label {
+            color: var(--accent);
             font-weight: 700;
-            line-height: 1.1;
-            letter-spacing: -0.04em;
-            transition: color 0.2s ease;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
         }
 
-        .hero-result .unit {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            margin-left: 0.75rem;
-            font-weight: 400;
+        .hero-slot .value {
+            font-family: var(--font-mono);
+            font-size: 1.75rem; /* Big and Clear kept */
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.02em;
+            word-break: break-all;
+            line-height: 1.1;
+        }
+
+        .hero-slot .unit {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        .hero-slot.highlight {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
         }
 
         /* --- Matrix Sections --- */
         .matrix-section {
-            margin-bottom: 1.5rem; /* Compact sections */
+            margin-bottom: 0.85rem; /* Aggressively reduced margin */
         }
 
         .matrix-header {
@@ -204,7 +226,7 @@
             text-transform: uppercase;
             letter-spacing: 0.15em;
             font-weight: 600;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem; /* Reduced margin */
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -219,18 +241,18 @@
 
         .unit-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 0.75rem;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem; /* Tighter gap */
         }
 
         .unit-node {
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
             border-radius: 10px;
-            padding: 0.85rem 1rem;
+            padding: 0.75rem 1rem; /* Compact padding */
             display: flex;
             flex-direction: column;
-            gap: 0.3rem;
+            gap: 0.25rem;
             transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
@@ -250,15 +272,17 @@
 
         .unit-node .val {
             font-family: var(--font-mono);
-            font-size: 1.15rem;
+            font-size: 1.25rem; /* Big and Clear kept */
             font-weight: 700;
+            word-break: break-all;
+            line-height: 1.2;
         }
 
         .unit-node .sys {
             font-size: 0.6rem;
             color: var(--accent);
             background: rgba(236, 72, 153, 0.1);
-            padding: 1px 6px;
+            padding: 1px 7px;
             border-radius: 4px;
             width: fit-content;
             font-weight: 700;
@@ -268,12 +292,12 @@
 
         /* --- Information Strip --- */
         .info-strip {
-            margin-top: 2rem;
+            margin-top: 2rem; /* Reduced from 3rem */
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1.25rem;
+            gap: 1.5rem;
             border-top: 1px solid var(--border-subtle);
-            padding-top: 1.5rem;
+            padding: 1.5rem 0; /* Reduced padding */
         }
 
         .info-card {
@@ -283,14 +307,14 @@
 
         .info-card h4 {
             color: var(--accent);
-            font-size: 0.9rem;
-            margin-bottom: 0.4rem;
+            font-size: 0.95rem; /* Restored clarity */
+            margin-bottom: 0.5rem;
             font-weight: 700;
         }
 
         .info-card p {
             color: var(--text-secondary);
-            font-size: 0.8rem;
+            font-size: 0.85rem; /* Restored clarity */
             margin: 0;
             line-height: 1.5;
         }
@@ -370,7 +394,11 @@
             }
             .info-strip { grid-template-columns: 1fr; gap: 1rem; }
             .pink-precision-wrapper { height: auto; overflow: visible; }
-            .hero-result .value { font-size: 2.2rem; }
+            .hero-row { gap: 0.5rem; margin-bottom: 1.25rem; }
+            .hero-slot { padding: 0.75rem 0.5rem; border-radius: 8px; }
+            .hero-slot .label { font-size: 0.5rem; margin-bottom: 0.2rem; }
+            .hero-slot .value { font-size: 1rem; }
+            .hero-slot .unit { font-size: 0.55rem; }
             .unit-grid { 
                 grid-template-columns: 1fr !important; /* Force 1 column strictly */
                 gap: 0.75rem;
@@ -457,11 +485,21 @@
             </div>
 
             <div id="analysis-view" class="d-none">
-                <div id="hero-output" class="hero-result" title="Click to copy value">
-                    <span class="label">Live Computation</span>
-                    <div>
-                        <span id="result-val" class="value text-white">0.00</span>
-                        <span id="result-unit" class="unit">Units</span>
+                <div id="hero-row" class="hero-row">
+                    <div id="hero-slot-sqm" class="hero-slot">
+                        <span class="label">Metric Area</span>
+                        <span class="value">0.00</span>
+                        <span class="unit">Square Meters</span>
+                    </div>
+                    <div id="hero-slot-sqft" class="hero-slot">
+                        <span class="label">Imperial Area</span>
+                        <span class="value">0.00</span>
+                        <span class="unit">Square Feet</span>
+                    </div>
+                    <div id="hero-slot-cross" class="hero-slot highlight" title="Click to copy full breakdown">
+                        <span class="label">Cross System</span>
+                        <span class="value">0.00</span>
+                        <span class="unit">Target Unit</span>
                     </div>
                 </div>
 
@@ -522,9 +560,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const initialView = document.getElementById('initial-view');
     const analysisView = document.getElementById('analysis-view');
-    const heroOutput = document.getElementById('hero-output');
-    const resultVal = document.getElementById('result-val');
-    const resultUnit = document.getElementById('result-unit');
+    const heroRow = document.getElementById('hero-row');
+    const heroSqmVal = document.querySelector('#hero-slot-sqm .value');
+    const heroSqftVal = document.querySelector('#hero-slot-sqft .value');
+    const heroCrossVal = document.querySelector('#hero-slot-cross .value');
+    const heroCrossUnit = document.querySelector('#hero-slot-cross .unit');
+    const heroCrossLabel = document.querySelector('#hero-slot-cross .label');
+    
     const hillyGrid = document.getElementById('hilly-grid');
     const teraiGrid = document.getElementById('terai-grid');
     const metricGrid = document.getElementById('metric-grid');
@@ -532,10 +574,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const copyToast = document.getElementById('copy-toast');
 
     let debounceTimer;
+    let currentCrossBreakdown = '';
 
     function copyToClipboard(text) {
-        const cleanText = text.replace(/,/g, '');
-        navigator.clipboard.writeText(cleanText).then(() => {
+        navigator.clipboard.writeText(text).then(() => {
             copyToast.classList.add('active');
             setTimeout(() => copyToast.classList.remove('active'), 1500);
         });
@@ -552,7 +594,11 @@ document.addEventListener('DOMContentLoaded', function() {
     inputVal.addEventListener('input', debounceCompute);
     fromUnitSelect.addEventListener('change', performAnalysis);
     toUnitSelect.addEventListener('change', performAnalysis);
-    heroOutput.addEventListener('click', () => copyToClipboard(resultVal.innerText));
+    
+    // Hero Slot Listeners
+    document.getElementById('hero-slot-sqm').addEventListener('click', () => copyToClipboard(heroSqmVal.innerText));
+    document.getElementById('hero-slot-sqft').addEventListener('click', () => copyToClipboard(heroSqftVal.innerText));
+    document.getElementById('hero-slot-cross').addEventListener('click', () => copyToClipboard(currentCrossBreakdown));
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -583,34 +629,36 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
 
             if (data.success) {
-                let outVal = '0';
-                let outUnit = toUnit;
-
-                if (data.conversions.traditional && data.conversions.traditional[toUnit]) {
-                    outVal = data.conversions.traditional[toUnit].output_value;
-                    outUnit = data.conversions.traditional[toUnit].output_unit_name;
-                } else {
-                    const directRes = await fetch('<?php echo app_base_url('/api/nepali-unit/convert'); ?>', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                        },
-                        body: JSON.stringify({ value, from_unit: fromUnit, to_unit: toUnit })
-                    });
-                    const directData = await directRes.json();
-                    if(directData.success) {
-                        outVal = directData.output_value;
-                        outUnit = directData.output_unit_name;
-                    }
-                }
-
                 initialView.classList.add('d-none');
                 analysisView.classList.remove('d-none');
+                heroRow.classList.add('active');
+
+                const baseSqFeet = data.conversions.metric.sq_feet_value;
+                const baseSqm = baseSqFeet * 0.092903;
+
+                // Update Hero Slots
+                heroSqmVal.innerText = formatNumber(baseSqm);
+                heroSqftVal.innerText = formatNumber(baseSqFeet);
+
+                // Determine Cross System
+                const hillyUnits = ['ropani', 'aana', 'paisa', 'daam'];
+                const isHillyInput = hillyUnits.includes(fromUnit);
                 
-                resultVal.innerText = formatNumber(outVal);
-                resultUnit.innerText = outUnit;
-                heroOutput.classList.add('active');
+                if (isHillyInput) {
+                    // Show Bigha System in Cross
+                    const bighaVal = baseSqFeet / 72900;
+                    heroCrossVal.innerText = formatNumber(bighaVal);
+                    heroCrossUnit.innerText = 'Bigha (Terai)';
+                    heroCrossLabel.innerText = 'Terai Conversion';
+                    currentCrossBreakdown = getHierarchyString(baseSqFeet, 'terai');
+                } else {
+                    // Show Ropani System in Cross
+                    const ropaniVal = baseSqFeet / 5476;
+                    heroCrossVal.innerText = formatNumber(ropaniVal);
+                    heroCrossUnit.innerText = 'Ropani (Hilly)';
+                    heroCrossLabel.innerText = 'Hilly Conversion';
+                    currentCrossBreakdown = getHierarchyString(baseSqFeet, 'hilly');
+                }
 
                 // Clear
                 hillyGrid.innerHTML = '';
@@ -622,21 +670,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     Object.entries(data.conversions.traditional).forEach(([key, info]) => {
                         const system = info.system || 'hilly';
                         const grid = system === 'hilly' ? hillyGrid : teraiGrid;
-                        if(key !== 'sq_feet') addMatrixNode(grid, info.output_unit_name, info.output_value, key === fromUnit);
+                        const breakdown = system === 'hilly' ? getHierarchyString(baseSqFeet, 'hilly') : getHierarchyString(baseSqFeet, 'terai');
+                        
+                        if(key !== 'sq_feet') addMatrixNode(grid, info.output_unit_name, info.output_value, key === fromUnit, breakdown);
                     });
                 }
                 
                 if (data.conversions.metric) {
-                    const baseSqFt = data.conversions.metric.sq_feet_value;
                     // Metric Standards
-                    addMatrixNode(metricGrid, 'Sq. Meters', baseSqFt * 0.092903, false);
-                    addMatrixNode(metricGrid, 'Sq. mm', baseSqFt * 92903.04, false);
-                    addMatrixNode(metricGrid, 'Hectares', baseSqFt / 107639, false);
+                    addMatrixNode(metricGrid, 'Sq. Meters', baseSqm, false, baseSqm.toString());
+                    addMatrixNode(metricGrid, 'Sq. mm', baseSqFeet * 92903.04, false, (baseSqFeet * 92903.04).toString());
+                    addMatrixNode(metricGrid, 'Hectares', baseSqFeet / 107639, false, (baseSqFeet / 107639).toString());
                     
                     // Imperial Standards
-                    addMatrixNode(imperialGrid, 'Sq. Feet', baseSqFt, false);
-                    addMatrixNode(imperialGrid, 'Sq. Inches', baseSqFt * 144, false);
-                    addMatrixNode(imperialGrid, 'Acres', baseSqFt / 43560, false);
+                    addMatrixNode(imperialGrid, 'Sq. Feet', baseSqFeet, false, baseSqFeet.toString());
+                    addMatrixNode(imperialGrid, 'Sq. Inches', baseSqFeet * 144, false, (baseSqFeet * 144).toString());
+                    addMatrixNode(imperialGrid, 'Acres', baseSqFeet / 43560, false, (baseSqFeet / 43560).toString());
                 }
             }
         } catch (error) {
@@ -644,18 +693,41 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function addMatrixNode(container, name, val, isSource) {
+    function getHierarchyString(sqFt, system) {
+        if (system === 'hilly') {
+            let rem = sqFt;
+            const ropani = Math.floor(rem / 5476);
+            rem %= 5476;
+            const aana = Math.floor(rem / 342.25);
+            rem %= 342.25;
+            const paisa = Math.floor(rem / 85.5625);
+            rem %= 85.5625;
+            const daam = (rem / 21.390625).toFixed(2);
+            return `${ropani} Ropani, ${aana} Aana, ${paisa} Paisa, ${daam} Daam`;
+        } else {
+            let rem = sqFt;
+            const bigha = Math.floor(rem / 72900);
+            rem %= 72900;
+            const kattha = Math.floor(rem / 3645);
+            rem %= 3645;
+            const dhur = (rem / 182.25).toFixed(2);
+            return `${bigha} Bigha, ${kattha} Kattha, ${dhur} Dhur`;
+        }
+    }
+
+    function addMatrixNode(container, name, val, isSource, breakdown) {
         const node = document.createElement('div');
         node.className = `unit-node ${isSource ? 'highlight' : ''}`;
         node.innerHTML = `<span class="sys">${name}</span><span class="val">${formatNumber(val)}</span>`;
-        node.addEventListener('click', () => copyToClipboard(val.toString()));
+        node.addEventListener('click', () => copyToClipboard(breakdown || val.toString()));
         container.appendChild(node);
     }
 
     function formatNumber(num) {
         const n = parseFloat(num);
         if (n === 0) return '0.00';
-        if (n < 0.0001) return n.toExponential(4);
+        if (isNaN(n)) return '0.00';
+        if (n < 0.0001 && n > 0) return n.toExponential(4);
         return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
     }
 
