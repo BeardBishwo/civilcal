@@ -314,9 +314,147 @@
 
         .info-card p {
             color: var(--text-secondary);
-            font-size: 0.85rem; /* Restored clarity */
+            text-align: center;
+        }
+
+        /* --- Glance Cards --- */
+        .glance-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .glance-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-top: 3px solid var(--accent);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .glance-header {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .glance-header h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
             margin: 0;
-            line-height: 1.5;
+        }
+
+        .glance-header span {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        .glance-selector-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 0.85rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .glance-selector-box .unit-label {
+            position: relative;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            font-family: var(--font-mono);
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            max-width: 65%; /* Constrain width to prevent overlap */
+        }
+
+        .glance-selector-box .equiv-text {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            white-space: nowrap;
+            margin-left: 1rem;
+            flex-shrink: 0;
+            text-align: right;
+            flex-grow: 1;
+        }
+
+        .glance-select {
+            appearance: none;
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            font-family: inherit;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding-right: 1.5rem;
+            width: 100%;
+            outline: none;
+            z-index: 2;
+        }
+
+        .custom-chevron {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--accent);
+            font-size: 0.8rem;
+            opacity: 0.8;
+            z-index: 1;
+        }
+
+        .glance-values {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .glance-val-node {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .glance-val-node .v {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            transition: all 0.2s ease;
+        }
+
+        .glance-val-node .v.blurred {
+            filter: blur(4px);
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .glance-val-node .l {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 992px) {
+            .glance-section {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* --- Toast Notification --- */
@@ -540,6 +678,59 @@
                         <p>338.63 sq. m</p>
                     </div>
                 </div>
+
+                <div class="glance-section">
+                    <!-- Hilly Card -->
+                    <div class="glance-card" data-region="hilly">
+                        <div class="glance-header">
+                            <h3>Hilly Area Conversion</h3>
+                        </div>
+                        <div class="glance-selector-box">
+                            <div class="unit-label">
+                                <select class="glance-select" data-region="hilly">
+                                    <option value="ropani" selected>1 Ropani</option>
+                                    <option value="aana">1 Aana</option>
+                                    <option value="paisa">1 Paisa</option>
+                                    <option value="daam">1 Daam</option>
+                                </select>
+                                <i class="fas fa-chevron-down custom-chevron"></i>
+                            </div>
+                            <div class="equiv-text">is equivalent to:</div>
+                        </div>
+                        <div class="glance-values" id="glance-hilly-values">
+                            <div class="glance-val-node"><span class="v" data-unit="aana">16</span><span class="l">Aana</span></div>
+                            <div class="glance-val-node"><span class="v" data-unit="paisa">64</span><span class="l">Paisa</span></div>
+                            <div class="glance-val-node"><span class="v" data-unit="daam">256</span><span class="l">Daam</span></div>
+                            <div class="glance-val-node"><span class="v" data-unit="sqm">508.72</span><span class="l">Sq. Mtr</span></div>
+                            <div class="glance-val-node"><span class="v" data-unit="sqft">5476</span><span class="l">Sq. Feet</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Terai Card -->
+                    <div class="glance-card" data-region="terai">
+                        <div class="glance-header">
+                            <h3>Terai Area Conversion</h3>
+                        </div>
+                        <div class="glance-selector-box">
+                            <div class="unit-label">
+                                <select class="glance-select" data-region="terai">
+                                    <option value="bigha" selected>1 Bigha</option>
+                                    <option value="kattha">1 Kattha</option>
+                                    <option value="dhur">1 Dhur</option>
+                                </select>
+                                <i class="fas fa-chevron-down custom-chevron"></i>
+                            </div>
+                            <div class="equiv-text">is equivalent to:</div>
+                        </div>
+                        <div class="glance-values" id="glance-terai-values">
+                            <div class="glance-val-node"><span class="v" data-unit="kattha">20</span><span class="l">Kattha</span></div>
+                            <div class="glance-val-node"><span class="v" data-unit="dhur">400</span><span class="l">Dhur</span></div>
+                            <div class="glance-val-node"><span class="v" data-unit="sqm">6772.63</span><span class="l">Sq. Mtr</span></div>
+                            <div class="glance-val-node"><span class="v" data-unit="sqft">72900</span><span class="l">Sq. Feet</span></div>
+                            <div class="glance-val-node"><span class="v" data-unit="ropani">13.31</span><span class="l">Ropani</span></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -554,7 +745,46 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('pro-calc-form');
-    const inputVal = document.getElementById('value');
+    // --- Glance Cards Interactivity ---
+    const glanceData = {
+        hilly: {
+            ropani: { aana: "16", paisa: "64", daam: "256", sqm: "508.72", sqft: "5476" },
+            aana: { aana: "1", paisa: "4", daam: "16", sqm: "31.80", sqft: "342.25" },
+            paisa: { aana: "0.25", paisa: "1", daam: "4", sqm: "7.95", sqft: "85.56" },
+            daam: { aana: "0.06", paisa: "0.25", daam: "1", sqm: "1.99", sqft: "21.39" }
+        },
+        terai: {
+            bigha: { kattha: "20", dhur: "400", sqm: "6772.63", sqft: "72900", ropani: "13.31" },
+            kattha: { kattha: "1", dhur: "20", sqm: "338.63", sqft: "3645", ropani: "0.67" },
+            dhur: { kattha: "0.05", dhur: "1", sqm: "16.93", sqft: "182.25", ropani: "0.03" }
+        }
+    };
+
+    document.querySelectorAll('.glance-select').forEach(select => {
+        select.addEventListener('change', (e) => {
+            const region = e.target.dataset.region;
+            const unit = e.target.value;
+            const values = glanceData[region][unit];
+            const containerId = `glance-${region}-values`;
+            const container = document.getElementById(containerId);
+
+            if (container && values) {
+                Object.entries(values).forEach(([key, val]) => {
+                    const span = container.querySelector(`span[data-unit="${key}"]`);
+                    if (span) {
+                        span.classList.add('blurred');
+                        setTimeout(() => {
+                            span.textContent = val;
+                            span.classList.remove('blurred');
+                        }, 150);
+                    }
+                });
+            }
+        });
+    });
+
+    // Handle Computation
+    const queryInput = document.getElementById('value'); // Renamed from inputVal to queryInput
     const fromUnitSelect = document.getElementById('from_unit');
     const toUnitSelect = document.getElementById('to_unit');
     
@@ -591,7 +821,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Auto-compute Listeners
-    inputVal.addEventListener('input', debounceCompute);
+    queryInput.addEventListener('input', debounceCompute);
     fromUnitSelect.addEventListener('change', performAnalysis);
     toUnitSelect.addEventListener('change', performAnalysis);
     
@@ -606,7 +836,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     async function performAnalysis() {
-        const value = parseFloat(inputVal.value);
+        const value = parseFloat(queryInput.value);
         const fromUnit = fromUnitSelect.value;
         const toUnit = toUnitSelect.value;
 
