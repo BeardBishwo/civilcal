@@ -71,32 +71,32 @@ $router->add(
     ["auth"],
 );
 
-// Traditional Units Calculator Routes
+// Nepali Unit Calculator Routes
 $router->add(
     "GET",
-    "/calculators/traditional-units",
+    "/nepaliunit",
     "CalculatorController@traditionalUnits",
 );
 $router->add(
     "GET",
-    "/calculators/traditional-units/protected",
+    "/nepaliunit/protected",
     "CalculatorController@traditionalUnits",
     ["auth"],
 );
 $router->add(
     "POST",
-    "/api/traditional-units/convert",
+    "/api/nepali-unit/convert",
     "ApiController@traditionalUnitsConvert",
 );
 $router->add(
     "POST",
-    "/api/traditional-units/convert/protected",
+    "/api/nepali-unit/convert/protected",
     "ApiController@traditionalUnitsConvert",
     ["auth"],
 );
 $router->add(
     "POST",
-    "/api/traditional-units/all-conversions",
+    "/api/nepali-unit/all-conversions",
     "ApiController@traditionalUnitsAllConversions",
 );
 $router->add(
@@ -414,12 +414,6 @@ $router->add("GET", "/admin/performance-dashboard", "Admin\\DashboardController@
     "auth",
     "admin",
 ]);
-$router->add(
-    "GET",
-    "/admin/widget-management",
-    "WidgetController@index",
-    ["auth", "admin"],
-);
 
 // User Management Module Routes
 $router->add("GET", "/admin/users", "Admin\UserManagementController@index", [
@@ -1025,80 +1019,7 @@ $router->add("GET", "/admin/audit-logs/download", "Admin\AuditLogController@down
     "admin",
 ]);
 
-// Widget Management Routes
-$router->add("GET", "/admin/widgets", "WidgetController@index", [
-    "auth",
-    "admin",
-]);
-$router->add("GET", "/admin/widgets/settings", "WidgetController@globalSettings", [
-    "auth",
-    "admin",
-]);
-$router->add("GET", "/admin/widgets/create", "WidgetController@create", [
-    "auth",
-    "admin",
-]);
-$router->add("POST", "/admin/widgets/create", "WidgetController@create", [
-    "auth",
-    "admin",
-]);
-$router->add("GET", "/admin/widgets/edit/{id}", "WidgetController@edit", [
-    "auth",
-    "admin",
-]);
-$router->add("POST", "/admin/widgets/edit/{id}", "WidgetController@edit", [
-    "auth",
-    "admin",
-]);
-$router->add("POST", "/admin/widgets/delete/{id}", "WidgetController@delete", [
-    "auth",
-    "admin",
-]);
-$router->add("POST", "/admin/widgets/toggle/{id}", "WidgetController@toggle", [
-    "auth",
-    "admin",
-]);
-$router->add(
-    "POST",
-    "/admin/widgets/toggle-visibility/{id}",
-    "WidgetController@toggleVisibility",
-    ["auth", "admin"],
-);
-$router->add("POST", "/admin/widgets/reorder", "WidgetController@reorder", [
-    "auth",
-    "admin",
-]);
-$router->add("GET", "/admin/widgets/preview/{id}", "WidgetController@preview", [
-    "auth",
-    "admin",
-]);
-$router->add(
-    "GET",
-    "/admin/widgets/settings/{id}",
-    "WidgetController@settings",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/widgets/settings/{id}",
-    "WidgetController@settings",
-    ["auth", "admin"],
-);
-$router->add("GET", "/admin/widgets/setup", "WidgetController@setup", [
-    "auth",
-    "admin",
-]);
 
-// Widget API Routes
-$router->add("GET", "/api/widgets/render", "ApiController@renderWidgets", [
-    "auth",
-]);
-$router->add(
-    "POST",
-    "/api/widgets/setting/{id}",
-    "ApiController@updateWidgetSetting",
-    ["auth"],
-);
 
 // Premium Theme Management Routes
 $router->add(

@@ -195,6 +195,46 @@ class ApiController extends Controller
         return null;
     }
     
+    public function traditionalUnitsConvert()
+    {
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($input['value']) || !isset($input['from_unit']) || !isset($input['to_unit'])) {
+            $this->jsonError('Missing required parameters: value, from_unit, to_unit');
+            return;
+        }
+        
+        $calculator = new \App\Calculators\TraditionalUnitsCalculator();
+        $metricUnits = $calculator->getMetricUnits();
+        
+        if (isset($metricUnits[$input['to_unit']])) {
+            $result = $calculator->convertToMetric((float)$input['value'], $input['from_unit'], $input['to_unit']);
+        } else {
+            $result = $calculator->convertBetweenUnits((float)$input['value'], $input['from_unit'], $input['to_unit']);
+        }
+        
+        echo json_encode($result);
+    }
+    
+    public function traditionalUnitsAllConversions()
+    {
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($input['value']) || !isset($input['from_unit'])) {
+            $this->jsonError('Missing required parameters: value, from_unit');
+            return;
+        }
+        
+        $calculator = new \App\Calculators\TraditionalUnitsCalculator();
+        $result = $calculator->getAllConversions(
+            (float)$input['value'], 
+            $input['from_unit'], 
+            $input['metric_unit'] ?? 'sq_feet'
+        );
+        
+        echo json_encode($result);
+    }
+
     private function jsonError($message, $code = 400)
     {
         http_response_code($code);

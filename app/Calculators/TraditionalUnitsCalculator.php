@@ -28,62 +28,66 @@ class TraditionalUnitsCalculator
      */
     private function initializeTraditionalUnits(): void
     {
+        // Base unit for internal calculation will be Square Feet
         $this->traditionalUnits = [
-            'dhur' => [
-                'name' => 'Dhur',
-                'name_nepali' => 'धुर',
-                'conversion_to_daam' => 1,
-                'metric_unit' => 'sq_feet',
-                'metric_conversion' => 1.93,
-                'order' => 1
-            ],
+            // Hilly Region Units (Ropani system)
             'daam' => [
                 'name' => 'Daam',
                 'name_nepali' => 'दाम',
-                'conversion_to_daam' => 1,
-                'metric_unit' => 'sq_feet',
-                'metric_conversion' => 1.93,
-                'order' => 2
+                'sq_feet' => 21.390625,
+                'system' => 'hilly',
+                'order' => 1
             ],
             'paisa' => [
                 'name' => 'Paisa',
                 'name_nepali' => 'पैसा',
-                'conversion_to_daam' => 4,
-                'metric_unit' => 'sq_feet',
-                'metric_conversion' => 7.72,
-                'order' => 3
+                'sq_feet' => 85.5625,
+                'system' => 'hilly',
+                'order' => 2
             ],
             'aana' => [
                 'name' => 'Aana',
                 'name_nepali' => 'आना',
-                'conversion_to_daam' => 16,
-                'metric_unit' => 'sq_feet',
-                'metric_conversion' => 30.89,
-                'order' => 4
-            ],
-            'kattha' => [
-                'name' => 'Kattha',
-                'name_nepali' => 'कठ्ठा',
-                'conversion_to_daam' => 20,
-                'metric_unit' => 'sq_feet',
-                'metric_conversion' => 38.61,
-                'order' => 5
-            ],
-            'bigha' => [
-                'name' => 'Bigha',
-                'name_nepali' => 'बिघा',
-                'conversion_to_daam' => 400,
-                'metric_unit' => 'sq_feet',
-                'metric_conversion' => 729.35,
-                'order' => 6
+                'sq_feet' => 342.25,
+                'system' => 'hilly',
+                'order' => 3
             ],
             'ropani' => [
                 'name' => 'Ropani',
                 'name_nepali' => 'रोपनी',
-                'conversion_to_daam' => 512,
-                'metric_unit' => 'sq_feet',
-                'metric_conversion' => 988.16,
+                'sq_feet' => 5476,
+                'system' => 'hilly',
+                'order' => 4
+            ],
+            // Terai Region Units (Bigha system)
+            'dhur' => [
+                'name' => 'Dhur',
+                'name_nepali' => 'धुर',
+                'sq_feet' => 182.25,
+                'system' => 'terai',
+                'order' => 5
+            ],
+            'kattha' => [
+                'name' => 'Kattha',
+                'name_nepali' => 'कठ्ठा',
+                'sq_feet' => 3645,
+                'system' => 'terai',
+                'order' => 6
+            ],
+            'bigha' => [
+                'name' => 'Bigha',
+                'name_nepali' => 'बिघा',
+                'sq_feet' => 72900,
+                'system' => 'terai',
                 'order' => 7
+            ],
+            // Metric units for reference
+            'sq_feet' => [
+                'name' => 'Square Feet',
+                'name_nepali' => 'वर्ग फिट',
+                'sq_feet' => 1,
+                'system' => 'metric',
+                'order' => 8
             ]
         ];
     }
@@ -121,11 +125,11 @@ class TraditionalUnitsCalculator
                 ];
             }
 
-            // Convert to base unit (daam)
-            $daamValue = $inputValue * $this->traditionalUnits[$fromUnit]['conversion_to_daam'];
+            // Convert to Square Feet first
+            $sqFeetValue = $inputValue * $this->traditionalUnits[$fromUnit]['sq_feet'];
             
-            // Convert from base unit to target unit
-            $outputValue = $daamValue / $this->traditionalUnits[$toUnit]['conversion_to_daam'];
+            // Convert from Square Feet to target unit
+            $outputValue = $sqFeetValue / $this->traditionalUnits[$toUnit]['sq_feet'];
             
             return [
                 'success' => true,
@@ -137,7 +141,8 @@ class TraditionalUnitsCalculator
                 'output_unit' => $toUnit,
                 'output_unit_name' => $this->traditionalUnits[$toUnit]['name'],
                 'output_unit_name_nepali' => $this->traditionalUnits[$toUnit]['name_nepali'],
-                'base_unit_value' => $daamValue
+                'system' => $this->traditionalUnits[$toUnit]['system'] ?? 'hilly',
+                'sq_feet_value' => $sqFeetValue
             ];
         } catch (\Exception $e) {
             return [
@@ -160,11 +165,35 @@ class TraditionalUnitsCalculator
                 ];
             }
 
-            // Convert to base unit first
-            $daamValue = $inputValue * $this->traditionalUnits[$fromUnit]['conversion_to_daam'];
+            // Convert to Square Feet first
+            $sqFeetValue = $inputValue * $this->traditionalUnits[$fromUnit]['sq_feet'];
             
-            // Convert to metric unit
-            $metricValue = $daamValue * $this->traditionalUnits[$fromUnit]['metric_conversion'];
+            // Handle target metric units based on Square Feet
+            $outputValue = $sqFeetValue;
+            $outputUnitName = 'Square Feet';
+            
+            switch ($metricUnit) {
+                case 'sq_meter':
+                    $outputValue = $sqFeetValue * 0.092903;
+                    $outputUnitName = 'Square Meters';
+                    break;
+                case 'sq_yard':
+                    $outputValue = $sqFeetValue * 0.111111;
+                    $outputUnitName = 'Square Yards';
+                    break;
+                case 'acre':
+                    $outputValue = $sqFeetValue / 43560;
+                    $outputUnitName = 'Acres';
+                    break;
+                case 'hectare':
+                    $outputValue = $sqFeetValue / 107639;
+                    $outputUnitName = 'Hectares';
+                    break;
+                default: // sq_feet
+                    $outputValue = $sqFeetValue;
+                    $outputUnitName = 'Square Feet';
+                    break;
+            }
             
             return [
                 'success' => true,
@@ -172,10 +201,10 @@ class TraditionalUnitsCalculator
                 'input_unit' => $fromUnit,
                 'input_unit_name' => $this->traditionalUnits[$fromUnit]['name'],
                 'input_unit_name_nepali' => $this->traditionalUnits[$fromUnit]['name_nepali'],
-                'output_value' => round($metricValue, 6),
+                'output_value' => round($outputValue, 6),
                 'output_unit' => $metricUnit,
-                'output_unit_name' => $this->getMetricUnitName($metricUnit),
-                'base_unit_value' => $daamValue
+                'output_unit_name' => $outputUnitName,
+                'sq_feet_value' => $sqFeetValue
             ];
         } catch (\Exception $e) {
             return [
@@ -198,11 +227,11 @@ class TraditionalUnitsCalculator
                 ];
             }
 
-            // Convert metric to base unit
-            $daamValue = $metricValue / $this->traditionalUnits[$toUnit]['metric_conversion'];
+            // Value is already in metric (sq_feet)
+            $sqFeetValue = $metricValue;
             
             // Convert to target traditional unit
-            $traditionalValue = $daamValue / $this->traditionalUnits[$toUnit]['conversion_to_daam'];
+            $traditionalValue = $sqFeetValue / $this->traditionalUnits[$toUnit]['sq_feet'];
             
             return [
                 'success' => true,
@@ -213,7 +242,7 @@ class TraditionalUnitsCalculator
                 'output_unit' => $toUnit,
                 'output_unit_name' => $this->traditionalUnits[$toUnit]['name'],
                 'output_unit_name_nepali' => $this->traditionalUnits[$toUnit]['name_nepali'],
-                'base_unit_value' => $daamValue
+                'sq_feet_value' => $sqFeetValue
             ];
         } catch (\Exception $e) {
             return [
@@ -229,6 +258,7 @@ class TraditionalUnitsCalculator
     public function getAllConversions(float $inputValue, string $fromUnit, string $metricUnit = 'sq_feet'): array
     {
         $result = [
+            'success' => true,
             'input_value' => $inputValue,
             'input_unit' => $fromUnit,
             'conversions' => []

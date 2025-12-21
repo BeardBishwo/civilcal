@@ -370,6 +370,15 @@ class CalculatorController extends Controller
         return null;
     }
 
+    public function traditionalUnits()
+    {
+        $this->view->render('calculators/nepaliunit', [
+            'title' => 'Nepali Unit Calculator',
+            'description' => 'Professional conversion between traditional Nepali land measurement units.',
+            'page_title' => 'Nepali Unit Calculator - Engineering Toolkit Pro'
+        ]);
+    }
+
     private function notFound()
     {
         http_response_code(404);

@@ -877,19 +877,6 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                         </a>
                     </li>
 
-                    <!-- Widgets -->
-                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/widgets') !== false ? 'active' : ''; ?>">
-                        <a href="<?php echo app_base_url('admin/widgets'); ?>" class="nav-link">
-                            <i class="nav-icon fas fa-th-large"></i>
-                            <span class="nav-text">Widgets</span>
-                            <i class="nav-arrow fas fa-chevron-right"></i>
-                        </a>
-                        <ul class="nav-submenu">
-                            <li><a href="<?php echo app_base_url('admin/widgets'); ?>">All Widgets</a></li>
-                            <li><a href="<?php echo app_base_url('admin/widgets/create'); ?>">Add Widget</a></li>
-                            <li><a href="<?php echo app_base_url('admin/widgets/settings'); ?>">Settings</a></li>
-                        </ul>
-                    </li>
 
                     <!-- Activity Logs -->
                     <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/activity') !== false ? 'active' : ''; ?>">
