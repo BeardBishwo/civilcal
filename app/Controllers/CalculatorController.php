@@ -372,7 +372,7 @@ class CalculatorController extends Controller
 
     public function traditionalUnits()
     {
-        $this->view->render('calculators/nepaliunit', [
+        $this->view->render('calculators/nepali', [
             'title' => 'Nepali Unit Calculator',
             'description' => 'Professional conversion between traditional Nepali land measurement units.',
             'page_title' => 'Nepali Unit Calculator - Engineering Toolkit Pro'

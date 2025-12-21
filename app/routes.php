@@ -74,29 +74,29 @@ $router->add(
 // Nepali Unit Calculator Routes
 $router->add(
     "GET",
-    "/nepaliunit",
+    "/nepali",
     "CalculatorController@traditionalUnits",
 );
 $router->add(
     "GET",
-    "/nepaliunit/protected",
+    "/nepali/protected",
     "CalculatorController@traditionalUnits",
     ["auth"],
 );
 $router->add(
     "POST",
-    "/api/nepali-unit/convert",
+    "/api/nepali/convert",
     "ApiController@traditionalUnitsConvert",
 );
 $router->add(
     "POST",
-    "/api/nepali-unit/convert/protected",
+    "/api/nepali/convert/protected",
     "ApiController@traditionalUnitsConvert",
     ["auth"],
 );
 $router->add(
     "POST",
-    "/api/nepali-unit/all-conversions",
+    "/api/nepali/all-conversions",
     "ApiController@traditionalUnitsAllConversions",
 );
 $router->add(
