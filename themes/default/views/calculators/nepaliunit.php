@@ -33,8 +33,7 @@
 
         /* --- Workspace Layout --- */
         .workspace {
-            display: grid;
-            grid-template-columns: 320px 1fr;
+            display: block;
             width: 100%;
             height: 100vh;
             overflow: hidden;
@@ -116,6 +115,8 @@
             width: 100%;
             cursor: pointer;
             appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 0.85rem center;
@@ -145,9 +146,34 @@
         /* --- Main Console --- */
         .main-console {
             background: var(--bg-deep);
-            padding: 1.5rem 2.5rem; /* Reduced vertical padding */
+            padding: 2rem 4rem;
+            height: 100vh;
             overflow-y: auto;
             position: relative;
+        }
+
+        .dash-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 1rem;
+        }
+
+        .dash-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: #fff;
+        }
+
+        .dash-header .brand {
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
 
         .hero-row {
@@ -290,6 +316,47 @@
             letter-spacing: 0.05em;
         }
 
+        /* --- Dashboard Inputs --- */
+        .dash-input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            outline: none;
+            transition: color 0.2s ease;
+        }
+
+        .dash-input:focus {
+            color: var(--accent);
+        }
+
+        .hero-slot .dash-input {
+            font-size: 1.75rem;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .unit-node .dash-input {
+            font-size: 1.25rem;
+            line-height: 1.2;
+        }
+
+        /* Hide arrows/spinners */
+        .dash-input::-webkit-outer-spin-button,
+        .dash-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 0;
+        }
+        .dash-input[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
         /* --- Information Strip --- */
         .info-strip {
             margin-top: 2rem; /* Reduced from 3rem */
@@ -392,6 +459,8 @@
 
         .glance-select {
             appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
             background: transparent;
             border: none;
             color: var(--accent);
@@ -556,103 +625,67 @@
     </style>
 
     <div class="workspace">
-        <aside class="sidebar">
-            <div class="brand-sec">
-                <span>Pink Precision Toolkit</span>
-                <h1>Nepali Unit</h1>
-            </div>
-
-            <form id="pro-calc-form" class="control-group">
-                <div>
-                    <span class="label-mono">01. Analysis Value</span>
-                    <input type="number" id="value" name="value" class="input-field" step="any" value="0" required autofocus>
-                </div>
-
-                <div>
-                    <span class="label-mono">02. Reference Unit</span>
-                    <select id="from_unit" name="from_unit" class="select-field" required>
-                        <optgroup label="Hilly Area (Ropani System)">
-                            <option value="ropani" selected>Ropani</option>
-                            <option value="aana">Aana</option>
-                            <option value="paisa">Paisa</option>
-                            <option value="daam">Daam</option>
-                        </optgroup>
-                        <optgroup label="Terai Area (Bigha System)">
-                            <option value="bigha">Bigha</option>
-                            <option value="kattha">Kattha</option>
-                            <option value="dhur">Dhur</option>
-                        </optgroup>
-                    </select>
-                </div>
-
-                <div>
-                    <span class="label-mono">03. Target Objective</span>
-                    <select id="to_unit" name="to_unit" class="select-field" required>
-                        <optgroup label="Metric Standard">
-                            <option value="sq_meter" selected>Square Meters (m²)</option>
-                            <option value="sq_mm">Square Millimeters (mm²)</option>
-                            <option value="hectare">Hectares</option>
-                        </optgroup>
-                        <optgroup label="Imperial Standard">
-                            <option value="sq_feet">Square Feet (sq.ft)</option>
-                            <option value="sq_in">Square Inches (sq.in)</option>
-                            <option value="acre">Acres</option>
-                        </optgroup>
-                        <optgroup label="Traditional Native">
-                            <option value="ropani">Ropani</option>
-                            <option value="bigha">Bigha</option>
-                        </optgroup>
-                    </select>
-                </div>
-
-                <div class="d-md-none">
-                    <button type="submit" class="btn-action w-100">
-                        Run Computation
-                    </button>
-                </div>
-            </form>
-
-            <!-- Removed footer hint -->
-        </aside>
-
         <main class="main-console">
-            <div id="analysis-view">
+            <div class="dash-header">
+                <div>
+                    <span class="brand">Pink Precision Toolkit</span>
+                    <h1>Nepali Unit Calculator</h1>
+                </div>
+            </div>
+            <div id="analysis-view" class="pink-precision-view">
                 <div id="hero-row" class="hero-row">
                     <div id="hero-slot-sqm" class="hero-slot">
                         <span class="label">Metric Area</span>
-                        <span class="value">0.00</span>
+                        <input type="number" step="any" class="dash-input" id="hero-val-sqm" value="0">
                         <span class="unit">Square Meters</span>
                     </div>
                     <div id="hero-slot-sqft" class="hero-slot">
                         <span class="label">Imperial Area</span>
-                        <span class="value">0.00</span>
+                        <input type="number" step="any" class="dash-input" id="hero-val-sqft" value="0">
                         <span class="unit">Square Feet</span>
                     </div>
                     <div id="hero-slot-cross" class="hero-slot highlight" title="Click to copy full breakdown">
                         <span class="label">Cross System</span>
-                        <span class="value">0.00</span>
+                        <input type="number" step="any" class="dash-input" id="hero-val-cross" value="0">
                         <span class="unit">Target Unit</span>
                     </div>
                 </div>
 
                 <div id="hilly-section" class="matrix-section">
                     <div class="matrix-header">Hilly Region (Ropani)</div>
-                    <div id="hilly-grid" class="unit-grid"></div>
+                    <div id="hilly-grid" class="unit-grid">
+                        <div class="unit-node" data-unit="ropani"><span class="sys">Ropani</span><input type="number" step="any" class="dash-input" id="dash-ropani" value="0"></div>
+                        <div class="unit-node" data-unit="aana"><span class="sys">Aana</span><input type="number" step="any" class="dash-input" id="dash-aana" value="0"></div>
+                        <div class="unit-node" data-unit="paisa"><span class="sys">Paisa</span><input type="number" step="any" class="dash-input" id="dash-paisa" value="0"></div>
+                        <div class="unit-node" data-unit="daam"><span class="sys">Daam</span><input type="number" step="any" class="dash-input" id="dash-daam" value="0"></div>
+                    </div>
                 </div>
 
                 <div id="terai-section" class="matrix-section">
                     <div class="matrix-header">Terai Region (Bigha)</div>
-                    <div id="terai-grid" class="unit-grid"></div>
+                    <div id="terai-grid" class="unit-grid">
+                        <div class="unit-node" data-unit="bigha"><span class="sys">Bigha</span><input type="number" step="any" class="dash-input" id="dash-bigha" value="0"></div>
+                        <div class="unit-node" data-unit="kattha"><span class="sys">Kattha</span><input type="number" step="any" class="dash-input" id="dash-kattha" value="0"></div>
+                        <div class="unit-node" data-unit="dhur"><span class="sys">Dhur</span><input type="number" step="any" class="dash-input" id="dash-dhur" value="0"></div>
+                    </div>
                 </div>
 
                 <div id="metric-section" class="matrix-section">
                     <div class="matrix-header">Metric Standards</div>
-                    <div id="metric-grid" class="unit-grid"></div>
+                    <div id="metric-grid" class="unit-grid">
+                        <div class="unit-node" data-unit="sq_meter"><span class="sys">Sq. Meters</span><input type="number" step="any" class="dash-input" id="dash-sq_meter" value="0"></div>
+                        <div class="unit-node" data-unit="sq_mm"><span class="sys">Sq. mm</span><input type="number" step="any" class="dash-input" id="dash-sq_mm" value="0"></div>
+                        <div class="unit-node" data-unit="hectare"><span class="sys">Hectares</span><input type="number" step="any" class="dash-input" id="dash-hectare" value="0"></div>
+                    </div>
                 </div>
 
                 <div id="imperial-section" class="matrix-section">
                     <div class="matrix-header">Imperial Standards</div>
-                    <div id="imperial-grid" class="unit-grid"></div>
+                    <div id="imperial-grid" class="unit-grid">
+                        <div class="unit-node" data-unit="sq_feet"><span class="sys">Sq. Feet</span><input type="number" step="any" class="dash-input" id="dash-sq_feet" value="0"></div>
+                        <div class="unit-node" data-unit="sq_in"><span class="sys">Sq. Inches</span><input type="number" step="any" class="dash-input" id="dash-sq_in" value="0"></div>
+                        <div class="unit-node" data-unit="acre"><span class="sys">Acres</span><input type="number" step="any" class="dash-input" id="dash-acre" value="0"></div>
+                    </div>
                 </div>
 
                 <div class="info-strip">
@@ -738,226 +771,177 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('pro-calc-form');
-    
-    // Trigger initial computation
-    setTimeout(() => {
-        performAnalysis();
-    }, 100);
-
-    // --- Glance Cards Interactivity ---
-    const glanceData = {
-        hilly: {
-            ropani: { aana: "16", paisa: "64", daam: "256", sqm: "508.72", sqft: "5476" },
-            aana: { aana: "1", paisa: "4", daam: "16", sqm: "31.80", sqft: "342.25" },
-            paisa: { aana: "0.25", paisa: "1", daam: "4", sqm: "7.95", sqft: "85.56" },
-            daam: { aana: "0.06", paisa: "0.25", daam: "1", sqm: "1.99", sqft: "21.39" }
-        },
-        terai: {
-            bigha: { kattha: "20", dhur: "400", sqm: "6772.63", sqft: "72900", ropani: "13.31" },
-            kattha: { kattha: "1", dhur: "20", sqm: "338.63", sqft: "3645", ropani: "0.67" },
-            dhur: { kattha: "0.05", dhur: "1", sqm: "16.93", sqft: "182.25", ropani: "0.03" }
-        }
+    // Constants (Sq. Feet)
+    const UNITS = {
+        ropani: 5476, aana: 342.25, paisa: 85.5625, daam: 21.390625,
+        bigha: 72900, kattha: 3645, dhur: 182.25,
+        sq_meter: 10.7639104, sq_mm: 0.000107639104, hectare: 107639.104,
+        sq_feet: 1, sq_in: 0.00694444, acre: 43560
     };
 
-    document.querySelectorAll('.glance-select').forEach(select => {
-        select.addEventListener('change', (e) => {
-            const region = e.target.dataset.region;
-            const unit = e.target.value;
-            const values = glanceData[region][unit];
-            const containerId = `glance-${region}-values`;
-            const container = document.getElementById(containerId);
+    const dashboardInputs = document.querySelectorAll('.dash-input');
+    const crossUnitLabel = document.querySelector('#hero-slot-cross .unit');
+    const crossSystemLabel = document.querySelector('#hero-slot-cross .label');
+    const copyToast = document.getElementById('copy-toast');
 
-            if (container && values) {
-                Object.entries(values).forEach(([key, val]) => {
-                    const span = container.querySelector(`span[data-unit="${key}"]`);
-                    if (span) {
-                        span.classList.add('blurred');
-                        setTimeout(() => {
-                            span.textContent = val;
-                            span.classList.remove('blurred');
-                        }, 150);
-                    }
+    let currentSqFt = 0;
+    let crossTargetUnit = 'bigha'; // Default cross target
+
+    function format(val) {
+        if (val === 0) return '0';
+        return parseFloat(val.toFixed(6)).toString();
+    }
+
+    function syncAll(sourceId) {
+        // Update Hero Slots
+        if (sourceId !== 'hero-val-sqm') document.getElementById('hero-val-sqm').value = format(currentSqFt / UNITS.sq_meter);
+        if (sourceId !== 'hero-val-sqft') document.getElementById('hero-val-sqft').value = format(currentSqFt);
+        
+        // Update Matrix - Hilly
+        if (sourceId !== 'dash-ropani') document.getElementById('dash-ropani').value = format(currentSqFt / UNITS.ropani);
+        if (sourceId !== 'dash-aana') document.getElementById('dash-aana').value = format(currentSqFt / UNITS.aana);
+        if (sourceId !== 'dash-paisa') document.getElementById('dash-paisa').value = format(currentSqFt / UNITS.paisa);
+        if (sourceId !== 'dash-daam') document.getElementById('dash-daam').value = format(currentSqFt / UNITS.daam);
+
+        // Update Matrix - Terai
+        if (sourceId !== 'dash-bigha') document.getElementById('dash-bigha').value = format(currentSqFt / UNITS.bigha);
+        if (sourceId !== 'dash-kattha') document.getElementById('dash-kattha').value = format(currentSqFt / UNITS.kattha);
+        if (sourceId !== 'dash-dhur') document.getElementById('dash-dhur').value = format(currentSqFt / UNITS.dhur);
+
+        // Update Standards
+        if (sourceId !== 'dash-sq_meter') document.getElementById('dash-sq_meter').value = format(currentSqFt / UNITS.sq_meter);
+        if (sourceId !== 'dash-sq_mm') document.getElementById('dash-sq_mm').value = format(currentSqFt / UNITS.sq_mm);
+        if (sourceId !== 'dash-hectare') document.getElementById('dash-hectare').value = format(currentSqFt / UNITS.hectare);
+        if (sourceId !== 'dash-sq_feet') document.getElementById('dash-sq_feet').value = format(currentSqFt / UNITS.sq_feet);
+        if (sourceId !== 'dash-sq_in') document.getElementById('dash-sq_in').value = format(currentSqFt / UNITS.sq_in);
+        if (sourceId !== 'dash-acre') document.getElementById('dash-acre').value = format(currentSqFt / UNITS.acre);
+
+        // Update Cross Hero
+        const targetVal = currentSqFt / UNITS[crossTargetUnit];
+        if (sourceId !== 'hero-val-cross') document.getElementById('hero-val-cross').value = format(targetVal);
+        crossUnitLabel.innerText = crossTargetUnit.charAt(0).toUpperCase() + crossTargetUnit.slice(1);
+        crossSystemLabel.innerText = crossTargetUnit === 'bigha' ? 'Terai Conversion' : 'Hilly Conversion';
+
+        // Update Glance Values
+        updateGlance();
+    }
+
+    function updateGlance() {
+        // Hilly Glance
+        const hillySel = document.querySelector('.glance-select[data-region="hilly"]');
+        const hillyUnit = hillySel.value;
+        const hBase = UNITS[hillyUnit];
+        const hContainer = document.getElementById('glance-hilly-values');
+        hContainer.querySelector('[data-unit="aana"]').innerText = format(hBase / UNITS.aana);
+        hContainer.querySelector('[data-unit="paisa"]').innerText = format(hBase / UNITS.paisa);
+        hContainer.querySelector('[data-unit="daam"]').innerText = format(hBase / UNITS.daam);
+        hContainer.querySelector('[data-unit="sqm"]').innerText = format(hBase / UNITS.sq_meter);
+        hContainer.querySelector('[data-unit="sqft"]').innerText = format(hBase / UNITS.sq_feet);
+
+        // Terai Glance
+        const teraiSel = document.querySelector('.glance-select[data-region="terai"]');
+        const teraiUnit = teraiSel.value;
+        const tBase = UNITS[teraiUnit];
+        const tContainer = document.getElementById('glance-terai-values');
+        tContainer.querySelector('[data-unit="kattha"]').innerText = format(tBase / UNITS.kattha);
+        tContainer.querySelector('[data-unit="dhur"]').innerText = format(tBase / UNITS.dhur);
+        tContainer.querySelector('[data-unit="sqm"]').innerText = format(tBase / UNITS.sq_meter);
+        tContainer.querySelector('[data-unit="sqft"]').innerText = format(tBase / UNITS.sq_feet);
+        tContainer.querySelector('[data-unit="ropani"]').innerText = format(tBase / UNITS.ropani);
+    }
+
+    // Dashboard Input Listeners
+    dashboardInputs.forEach(input => {
+        input.addEventListener('input', (e) => {
+            const id = e.target.id;
+            const val = parseFloat(e.target.value) || 0;
+            
+            if (id.startsWith('dash-')) {
+                const unit = id.replace('dash-', '');
+                
+                // Special handling for compound Hilly
+                if (['ropani', 'aana', 'paisa', 'daam'].includes(unit)) {
+                    currentSqFt = 
+                        (parseFloat(document.getElementById('dash-ropani').value) || 0) * UNITS.ropani +
+                        (parseFloat(document.getElementById('dash-aana').value) || 0) * UNITS.aana +
+                        (parseFloat(document.getElementById('dash-paisa').value) || 0) * UNITS.paisa +
+                        (parseFloat(document.getElementById('dash-daam').value) || 0) * UNITS.daam;
+                    crossTargetUnit = 'bigha';
+                } 
+                // Special handling for compound Terai
+                else if (['bigha', 'kattha', 'dhur'].includes(unit)) {
+                    currentSqFt = 
+                        (parseFloat(document.getElementById('dash-bigha').value) || 0) * UNITS.bigha +
+                        (parseFloat(document.getElementById('dash-kattha').value) || 0) * UNITS.kattha +
+                        (parseFloat(document.getElementById('dash-dhur').value) || 0) * UNITS.dhur;
+                    crossTargetUnit = 'ropani';
+                }
+                else {
+                    currentSqFt = val * UNITS[unit];
+                }
+            } else if (id === 'hero-val-sqm') {
+                currentSqFt = val * UNITS.sq_meter;
+            } else if (id === 'hero-val-sqft') {
+                currentSqFt = val * UNITS.sq_feet;
+            } else if (id === 'hero-val-cross') {
+                currentSqFt = val * UNITS[crossTargetUnit];
+            }
+            
+            syncAll(id);
+        });
+    });
+
+    // Glance Listeners
+    document.querySelectorAll('.glance-select').forEach(sel => {
+        sel.addEventListener('change', updateGlance);
+    });
+
+    // Node Clicks -> Copy Breakdown
+    document.querySelectorAll('.unit-node, .hero-slot').forEach(node => {
+        node.addEventListener('click', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            
+            let text = '';
+            if (node.id === 'hero-slot-cross') {
+                text = crossTargetUnit === 'bigha' ? getTeraiBreakdown(currentSqFt) : getHillyBreakdown(currentSqFt);
+            } else if (node.closest('.matrix-section')?.id === 'hilly-section') {
+                text = getHillyBreakdown(currentSqFt);
+            } else if (node.closest('.matrix-section')?.id === 'terai-section') {
+                text = getTeraiBreakdown(currentSqFt);
+            } else {
+                const input = node.querySelector('input');
+                text = input ? input.value : '';
+            }
+            
+            if (text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    copyToast.classList.add('active');
+                    setTimeout(() => copyToast.classList.remove('active'), 1500);
                 });
             }
         });
     });
 
-    // Handle Computation
-    const queryInput = document.getElementById('value'); // Renamed from inputVal to queryInput
-    const fromUnitSelect = document.getElementById('from_unit');
-    const toUnitSelect = document.getElementById('to_unit');
-    
-    const analysisView = document.getElementById('analysis-view');
-    const heroRow = document.getElementById('hero-row');
-    const heroSqmVal = document.querySelector('#hero-slot-sqm .value');
-    const heroSqftVal = document.querySelector('#hero-slot-sqft .value');
-    const heroCrossVal = document.querySelector('#hero-slot-cross .value');
-    const heroCrossUnit = document.querySelector('#hero-slot-cross .unit');
-    const heroCrossLabel = document.querySelector('#hero-slot-cross .label');
-    
-    const hillyGrid = document.getElementById('hilly-grid');
-    const teraiGrid = document.getElementById('terai-grid');
-    const metricGrid = document.getElementById('metric-grid');
-    const imperialGrid = document.getElementById('imperial-grid');
-    const copyToast = document.getElementById('copy-toast');
-
-    let debounceTimer;
-    let currentCrossBreakdown = '';
-
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            copyToast.classList.add('active');
-            setTimeout(() => copyToast.classList.remove('active'), 1500);
-        });
+    function getHillyBreakdown(sqFt) {
+        let rem = sqFt;
+        const r = Math.floor(rem / UNITS.ropani); rem %= UNITS.ropani;
+        const a = Math.floor(rem / UNITS.aana); rem %= UNITS.aana;
+        const p = Math.floor(rem / UNITS.paisa); rem %= UNITS.paisa;
+        const d = (rem / UNITS.daam).toFixed(2);
+        return `${r} Ropani, ${a} Aana, ${p} Paisa, ${d} Daam`;
     }
 
-    function debounceCompute() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            performAnalysis();
-        }, 150); // Blazing fast 150ms debounce
+    function getTeraiBreakdown(sqFt) {
+        let rem = sqFt;
+        const b = Math.floor(rem / UNITS.bigha); rem %= UNITS.bigha;
+        const k = Math.floor(rem / UNITS.kattha); rem %= UNITS.kattha;
+        const d = (rem / UNITS.dhur).toFixed(2);
+        return `${b} Bigha, ${k} Kattha, ${d} Dhur`;
     }
 
-    // Auto-compute Listeners
-    queryInput.addEventListener('input', debounceCompute);
-    fromUnitSelect.addEventListener('change', performAnalysis);
-    toUnitSelect.addEventListener('change', performAnalysis);
-    
-    // Hero Slot Listeners
-    document.getElementById('hero-slot-sqm').addEventListener('click', () => copyToClipboard(heroSqmVal.innerText));
-    document.getElementById('hero-slot-sqft').addEventListener('click', () => copyToClipboard(heroSqftVal.innerText));
-    document.getElementById('hero-slot-cross').addEventListener('click', () => copyToClipboard(currentCrossBreakdown));
-
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        performAnalysis();
-    });
-
-    async function performAnalysis() {
-        const value = parseFloat(queryInput.value);
-        const fromUnit = fromUnitSelect.value;
-        const toUnit = toUnitSelect.value;
-
-        if (isNaN(value)) {
-            return;
-        }
-
-        try {
-            const response = await fetch('<?php echo app_base_url('/api/nepali-unit/all-conversions'); ?>', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ value, from_unit: fromUnit, metric_unit: toUnit })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                analysisView.classList.remove('d-none');
-                heroRow.classList.add('active');
-
-                const baseSqFeet = data.conversions.metric.sq_feet_value;
-                const baseSqm = baseSqFeet * 0.092903;
-
-                // Update Hero Slots
-                heroSqmVal.innerText = formatNumber(baseSqm);
-                heroSqftVal.innerText = formatNumber(baseSqFeet);
-
-                // Determine Cross System
-                const hillyUnits = ['ropani', 'aana', 'paisa', 'daam'];
-                const isHillyInput = hillyUnits.includes(fromUnit);
-                
-                if (isHillyInput) {
-                    // Show Bigha System in Cross
-                    const bighaVal = baseSqFeet / 72900;
-                    heroCrossVal.innerText = formatNumber(bighaVal);
-                    heroCrossUnit.innerText = 'Bigha (Terai)';
-                    heroCrossLabel.innerText = 'Terai Conversion';
-                    currentCrossBreakdown = getHierarchyString(baseSqFeet, 'terai');
-                } else {
-                    // Show Ropani System in Cross
-                    const ropaniVal = baseSqFeet / 5476;
-                    heroCrossVal.innerText = formatNumber(ropaniVal);
-                    heroCrossUnit.innerText = 'Ropani (Hilly)';
-                    heroCrossLabel.innerText = 'Hilly Conversion';
-                    currentCrossBreakdown = getHierarchyString(baseSqFeet, 'hilly');
-                }
-
-                // Clear
-                hillyGrid.innerHTML = '';
-                teraiGrid.innerHTML = '';
-                metricGrid.innerHTML = '';
-                imperialGrid.innerHTML = '';
-                
-                if (data.conversions.traditional) {
-                    Object.entries(data.conversions.traditional).forEach(([key, info]) => {
-                        const system = info.system || 'hilly';
-                        const grid = system === 'hilly' ? hillyGrid : teraiGrid;
-                        const breakdown = system === 'hilly' ? getHierarchyString(baseSqFeet, 'hilly') : getHierarchyString(baseSqFeet, 'terai');
-                        
-                        if(key !== 'sq_feet') addMatrixNode(grid, info.output_unit_name, info.output_value, key === fromUnit, breakdown);
-                    });
-                }
-                
-                if (data.conversions.metric) {
-                    // Metric Standards
-                    addMatrixNode(metricGrid, 'Sq. Meters', baseSqm, false, baseSqm.toString());
-                    addMatrixNode(metricGrid, 'Sq. mm', baseSqFeet * 92903.04, false, (baseSqFeet * 92903.04).toString());
-                    addMatrixNode(metricGrid, 'Hectares', baseSqFeet / 107639, false, (baseSqFeet / 107639).toString());
-                    
-                    // Imperial Standards
-                    addMatrixNode(imperialGrid, 'Sq. Feet', baseSqFeet, false, baseSqFeet.toString());
-                    addMatrixNode(imperialGrid, 'Sq. Inches', baseSqFeet * 144, false, (baseSqFeet * 144).toString());
-                    addMatrixNode(imperialGrid, 'Acres', baseSqFeet / 43560, false, (baseSqFeet / 43560).toString());
-                }
-            }
-        } catch (error) {
-            console.error('Computation error:', error);
-        }
-    }
-
-    function getHierarchyString(sqFt, system) {
-        if (system === 'hilly') {
-            let rem = sqFt;
-            const ropani = Math.floor(rem / 5476);
-            rem %= 5476;
-            const aana = Math.floor(rem / 342.25);
-            rem %= 342.25;
-            const paisa = Math.floor(rem / 85.5625);
-            rem %= 85.5625;
-            const daam = (rem / 21.390625).toFixed(2);
-            return `${ropani} Ropani, ${aana} Aana, ${paisa} Paisa, ${daam} Daam`;
-        } else {
-            let rem = sqFt;
-            const bigha = Math.floor(rem / 72900);
-            rem %= 72900;
-            const kattha = Math.floor(rem / 3645);
-            rem %= 3645;
-            const dhur = (rem / 182.25).toFixed(2);
-            return `${bigha} Bigha, ${kattha} Kattha, ${dhur} Dhur`;
-        }
-    }
-
-    function addMatrixNode(container, name, val, isSource, breakdown) {
-        const node = document.createElement('div');
-        node.className = `unit-node ${isSource ? 'highlight' : ''}`;
-        node.innerHTML = `<span class="sys">${name}</span><span class="val">${formatNumber(val)}</span>`;
-        node.addEventListener('click', () => copyToClipboard(breakdown || val.toString()));
-        container.appendChild(node);
-    }
-
-    function formatNumber(num) {
-        const n = parseFloat(num);
-        if (n === 0) return '0.00';
-        if (isNaN(n)) return '0.00';
-        if (n < 0.0001 && n > 0) return n.toExponential(4);
-        return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
-    }
-
-    // Initial compute
-    performAnalysis();
+    // Initial Sync
+    document.getElementById('analysis-view').classList.remove('d-none');
+    document.getElementById('hero-row').classList.add('active');
+    syncAll('init');
 });
 </script>
