@@ -377,8 +377,8 @@ class CalculatorController extends Controller
         if (file_exists($statusFile)) {
             $config = json_decode(file_get_contents($statusFile), true);
             if (isset($config['country.nepali-land']) && $config['country.nepali-land'] === 'inactive') {
-                $this->notFound(); // Or show a maintenance page
-                return;
+                header('Location: ' . app_base_url('/'));
+                exit;
             }
         }
 
