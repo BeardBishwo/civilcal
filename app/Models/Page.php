@@ -67,7 +67,8 @@ class Page
     {
         $sql = "
             SELECT p.*, 
-                   CONCAT(u.first_name, ' ', u.last_name) as author_name
+                   CONCAT(u.first_name, ' ', u.last_name) as author_name,
+                   u.username as author_username
             FROM pages p
             LEFT JOIN users u ON p.author_id = u.id
             WHERE p.id = ?

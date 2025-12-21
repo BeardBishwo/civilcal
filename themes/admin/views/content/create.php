@@ -156,7 +156,7 @@ $pageData = $page ?? [
                             <div class="form-group-modern">
                                 <label class="form-label">Author</label>
                                 <div class="readonly-value">
-                                    <i class="fas fa-user-circle"></i> <?php echo htmlspecialchars($pageData['author']); ?>
+                                    <i class="fas fa-user-circle"></i> <?php echo htmlspecialchars(strtoupper(!empty($pageData['author_username']) ? $pageData['author_username'] : (!empty($pageData['author']) ? $pageData['author'] : 'ADMIN'))); ?>
                                 </div>
                             </div>
                         </div>
