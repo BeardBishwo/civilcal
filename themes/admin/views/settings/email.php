@@ -353,7 +353,7 @@
                 <!-- Test Email Input -->
                 <div class="form-group" style="margin-top: 1rem;">
                     <label for="test_email" class="form-label">Test Email Address</label>
-                    <input type="email" class="form-control" id="test_email" name="test_email" placeholder="admin@example.com" value="<?= htmlspecialchars($_SESSION['user']['email'] ?? '') ?>">
+                    <input type="email" class="form-control" id="test_email" name="test_email" placeholder="admin@example.com" value="<?= htmlspecialchars($settings['test_email'] ?? $_SESSION['user']['email'] ?? '') ?>">
                     <div class="form-text">Enter the email address where you want to receive the test email.</div>
                 </div>
             </div>
