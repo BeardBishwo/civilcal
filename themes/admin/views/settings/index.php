@@ -358,11 +358,11 @@ function renderSettingField($key, $setting) {
                             'icon' => 'fa-clipboard-list',
                             'description' => 'System logging configuration'
                         ],
-                        'backup' => [
+                        /* 'backup' => [
                             'title' => 'Backup',
                             'icon' => 'fa-download',
                             'description' => 'Backup and restore settings'
-                        ]
+                        ] */
                     ]); ?>
                 </div>
                 
