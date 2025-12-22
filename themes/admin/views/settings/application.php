@@ -57,10 +57,16 @@ if (!class_exists('App\\Services\\SettingsService')) {
                     <i class="bi bi-speedometer2"></i> Performance
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="advanced-tab" data-bs-toggle="tab" data-bs-target="#advanced" type="button" role="tab">
+                    <i class="bi bi-gear"></i> Advanced
+                </button>
+            </li>
         </ul>
 
         <form id="applicationSettingsForm">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+            <input type="hidden" name="setting_group" value="application">
 
             <div class="tab-content" id="settingsTabContent">
                 <!-- General Tab -->
@@ -188,9 +194,37 @@ if (!class_exists('App\\Services\\SettingsService')) {
                         </div>
                     </div>
                 </div>
-            </div>
-        </form>
-    </div>
+
+                <!-- Advanced Tab -->
+                <div class="tab-pane fade" id="advanced" role="tabpanel">
+                    <form id="advancedSettingsForm" action="<?= app_base_url('/admin/settings/advanced/update') ?>" method="POST">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+                        <input type="hidden" name="setting_group" value="advanced">
+                        <div class="glass-card primary-card">
+                            <div class="glass-header">
+                                <i class="bi bi-gear"></i> Advanced Settings
+                            </div>
+                            <div class="glass-body">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Custom Header Code</label>
+                                        <textarea class="form-control enhanced-textarea" id="custom_header_code" name="custom_header_code" rows="6"><?= htmlspecialchars(\App\Services\SettingsService::get('custom_header_code', '')) ?></textarea>
+                                        <div class="form-text">HTML/JS to be inserted in the &lt;head&gt; section.</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Custom Footer Code</label>
+                                        <textarea class="form-control enhanced-textarea" id="custom_footer_code" name="custom_footer_code" rows="6"><?= htmlspecialchars(\App\Services\SettingsService::get('custom_footer_code', '')) ?></textarea>
+                                        <div class="form-text">HTML/JS to be inserted before the closing &lt;/body&gt; tag.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                </div> <!-- End Tab Content -->
+            </form>
+        </div> <!-- End col-lg-9 -->
     <div class="col-lg-3">
         <div class="sticky-sidebar">
             <div class="glass-card preview-panel">
@@ -370,9 +404,18 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.disabled = true;
         btn.innerHTML = '<i class="bi bi-hourglass-split spinner"></i> Saving...';
 
-        fetch(app_base_url('/admin/settings/update'), {
+        // Determine which form to submit based on the active tab
+        const currentActiveTabId = localStorage.getItem('activeSettingsTab') || 'general';
+        let targetForm = document.getElementById(currentActiveTabId + 'SettingsForm');
+        if (!targetForm) { // Fallback to applicationSettingsForm if specific form not found
+            targetForm = form;
+        }
+        
+        const targetFormData = new FormData(targetForm);
+        
+        fetch(targetForm.action, {
             method: 'POST',
-            body: formData
+            body: targetFormData
         })
         .then(res => res.json())
         .then(data => {
@@ -391,10 +434,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     resetBtn.addEventListener('click', function() {
         showConfirmModal('Reset Settings', 'Are you sure you want to reset ALL settings to defaults?', () => {
+            const currentActiveTabId = localStorage.getItem('activeSettingsTab') || 'application';
             fetch(app_base_url('/admin/settings/reset'), {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({group: 'application'})
+                body: JSON.stringify({group: currentActiveTabId}) // Use the active tab's ID as the group
             })
             .then(res => res.json())
             .then(data => {

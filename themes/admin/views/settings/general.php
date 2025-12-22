@@ -565,7 +565,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form id="generalSettingsForm" action="<?php echo app_base_url('/admin/settings/update'); ?>" method="POST" enctype="multipart/form-data" class="ajax-form">
+                    <form action="<?php echo app_base_url('/admin/settings/update'); ?>" method="POST" class="settings-form ajax-form" id="generalSettingsForm" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                         <input type="hidden" name="setting_group" value="general">
 
@@ -717,12 +717,12 @@
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="footer_text" class="form-label">📜 Footer Text</label>
-                                        <input type="text" class="form-control"
+                                        <textarea class="form-control"
                                             id="footer_text"
                                             name="footer_text"
-                                            value="<?= htmlspecialchars($settings['footer_text'] ?? '') ?>"
-                                            placeholder="Copyright © 2024 Your Company">
-                                        <div class="form-text">Text displayed in your website footer.</div>
+                                            rows="3"
+                                            placeholder="&lt;p&gt;&amp;copy; {year} Civil Cal Premium. All Rights Reserved.&lt;/p&gt;"><?= htmlspecialchars($settings['footer_text'] ?? '') ?></textarea>
+                                        <div class="form-text">Text displayed in your website footer. You can use <strong>{year}</strong> for the current year and HTML tags for links or styling.</div>
                                     </div>
                                 </div>
 

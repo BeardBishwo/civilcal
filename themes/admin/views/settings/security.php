@@ -306,9 +306,43 @@
             <p>Protect your system with advanced security configurations</p>
         </div>
 
-        <form action="<?php echo app_base_url('/admin/settings/update'); ?>" method="POST" class="security-form ajax-form" id="securitySettingsForm">
+        <form action="<?= app_base_url('/admin/settings/update'); ?>" method="POST" class="security-form ajax-form" id="securitySettingsForm">
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
             <input type="hidden" name="setting_group" value="security">
+
+        <!-- Global Protections Section -->
+        <div class="security-section">
+            <div class="section-header" style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);">
+                <span class="section-icon">🛡️</span>
+                <div class="section-title-group">
+                    <h2>Global Protections</h2>
+                    <p>Core security mechanisms and headers</p>
+                </div>
+            </div>
+            <div class="section-body">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="csrf_protection" name="csrf_protection" value="1" <?= ($settings['csrf_protection'] ?? '1') == '1' ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="csrf_protection">Enable CSRF Protection</label>
+                    <div class="form-text">Protect against Cross-Site Request Forgery. <strong>Warning:</strong> Disabling this significantly reduces security.</div>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="security_headers" name="security_headers" value="1" <?= ($settings['security_headers'] ?? '1') == '1' ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="security_headers">Send Advanced Security Headers</label>
+                    <div class="form-text">Automatically send HSTS, CSP, X-Frame-Options, etc. to protect against XSS and clickjacking.</div>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="rate_limiting" name="rate_limiting" value="1" <?= ($settings['rate_limiting'] ?? '1') == '1' ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="rate_limiting">Enable Global Rate Limiting</label>
+                    <div class="form-text">Prevent brute-force attacks and resource exhaustion by limiting requests per IP.</div>
+                </div>
+            </div>
+        </div>
 
         <!-- Authentication Section -->
         <div class="security-section">
@@ -319,12 +353,11 @@
                     <p>Two-factor authentication and access verification</p>
                 </div>
             </div>
-
             <div class="section-body">
                 <div class="form-check">
                     <input type="checkbox" class="form-check-input" id="enable_2fa" name="enable_2fa" value="1" <?= ($settings['enable_2fa'] ?? '0') == '1' ? 'checked' : '' ?>>
                     <label class="form-check-label" for="enable_2fa">Enable Two-Factor Authentication (2FA)</label>
-                    <div class="form-text">Require 2FA for all admin accounts. Adds extra security layer to prevent unauthorized access.</div>
+                    <div class="form-text">Require 2FA for all admin accounts. Adds extra security layer.</div>
                 </div>
 
                 <div class="settings-divider"></div>
@@ -332,7 +365,7 @@
                 <div class="form-check">
                     <input type="checkbox" class="form-check-input" id="force_https" name="force_https" value="1" <?= ($settings['force_https'] ?? '0') == '1' ? 'checked' : '' ?>>
                     <label class="form-check-label" for="force_https">Force HTTPS Connection</label>
-                    <div class="form-text">Redirect all HTTP traffic to HTTPS for encrypted communications.</div>
+                    <div class="form-text">Redirect all HTTP traffic to HTTPS.</div>
                 </div>
             </div>
         </div>

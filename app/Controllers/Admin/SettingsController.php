@@ -112,30 +112,12 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function performance()
-    {
-        $this->requireAdminWithBasicAuth();
-
-        $this->view->render('admin/settings/performance', [
-            'title' => 'Performance Settings'
-        ]);
-    }
-
     public function advanced()
     {
         $this->requireAdminWithBasicAuth();
 
-        $this->view->render('admin/settings/advanced', [
+        $this->view->render('admin/settings/application', [
             'title' => 'Advanced Settings'
-        ]);
-    }
-
-    public function backup()
-    {
-        $this->requireAdminWithBasicAuth();
-
-        $this->view->render('admin/settings/backup', [
-            'title' => 'Backup Settings'
         ]);
     }
 
@@ -237,87 +219,60 @@ class SettingsController extends Controller
         // Set JSON header first to ensure proper response format
         header('Content-Type: application/json');
 
-        // Enhanced debugging - write to server error log
-        error_log("[SETTINGS_DEBUG] save() method called at " . date('Y-m-d H:i:s'));
-        error_log("[SETTINGS_DEBUG] REQUEST_METHOD: " . $_SERVER['REQUEST_METHOD']);
-        error_log("[SETTINGS_DEBUG] REQUEST_URI: " . $_SERVER['REQUEST_URI']);
-        error_log("[SETTINGS_DEBUG] User: " . ($_SESSION['user']['username'] ?? 'unknown'));
-
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            error_log("[SETTINGS_DEBUG] ERROR: Invalid request method");
             echo json_encode(['success' => false, 'message' => 'Invalid request']);
             exit;
         }
 
-
-
         // CSRF Token validation
         if (!\App\Services\Security::validateCsrfToken()) {
-            error_log("[SETTINGS_DEBUG] ERROR: Invalid CSRF token");
             echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
             exit;
         }
 
         try {
-            // Log raw POST data for debugging
-            error_log("[SETTINGS_DEBUG] Raw POST data: " . json_encode($_POST));
-            error_log("[SETTINGS_DEBUG] FILES data: " . json_encode($_FILES));
             $updated = 0;
+            $settingGroup = $_POST['setting_group'] ?? 'general';
 
-            // DEBUG: Log what we receive to a specific file
-            $logFile = __DIR__ . '/../../../debug_save.log';
-            file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "SettingsController::save() - POST keys: " . implode(', ', array_keys($_POST)) . "\n", FILE_APPEND);
-            file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "SettingsController::save() - POST data: " . json_encode($_POST) . "\n", FILE_APPEND);
+            // Handle Checkboxes: If a checkbox is NOT in $_POST, it should be set to '0'
+            $checkboxFields = $this->getCheckboxFields();
+            foreach ($checkboxFields as $key) {
+                if (!isset($_POST[$key])) {
+                    if ($this->isFieldInGroup($key, $settingGroup)) {
+                        if (SettingsService::set($key, '0', 'string', $settingGroup)) {
+                            $updated++;
+                        }
+                    }
+                }
+            }
 
             // Exclude specific POST keys that are NOT settings
             $excludedKeys = ['csrf_token', 'gateway', 'submit', 'setting_group'];
             
-            // Get setting group from POST or default to 'general'
-            $settingGroup = $_POST['setting_group'] ?? 'general';
-
             foreach ($_POST as $key => $value) {
-                // Remove underscore check to allow keys like 'favicon'
                 if (!in_array($key, $excludedKeys)) {
-                    error_log("[SETTINGS_DEBUG] Processing setting: $key = $value (Group: $settingGroup)");
-
-                    // Handle file uploads for image/file type settings (legacy support within loop)
+                    // Handle file uploads
                     if (isset($_FILES[$key]) && $_FILES[$key]['error'] === UPLOAD_ERR_OK) {
-                        error_log("[SETTINGS_DEBUG] Handling file upload for: $key");
                         $value = $this->handleFileUpload($_FILES[$key]);
-                        error_log("[SETTINGS_DEBUG] File upload result for $key: " . ($value ?: 'FAILED'));
                     }
 
                     // Handle checkboxes (boolean values)
-                    // Note: If it's a checkbox but NOT in $_POST, this loop won't see it.
-                    // The isCheckboxField() logic is better handled outside for unsets, 
-                    // or we handle the 'on' value here.
-                    if ($value === 'on' || $this->isCheckboxField($key)) {
-                        if ($value === 'on') $value = '1';
-                        error_log("[SETTINGS_DEBUG] Checkbox/Boolean field $key processed as: $value");
+                    if ($value === 'on') {
+                        $value = '1';
                     }
 
-                    try {
-                        // Pass the group to set()
-                        $setResult = SettingsService::set($key, $value, 'string', $settingGroup);
-                        error_log("[SETTINGS_DEBUG] SettingsService::set($key, $value, 'string', $settingGroup) result: " . ($setResult ? 'SUCCESS' : 'FAILED'));
-
-                        if ($setResult) {
-                            $updated++;
-                            // Log the change
-                            GDPRService::logActivity(
-                                $_SESSION['user_id'] ?? null,
-                                'setting_updated',
-                                'settings',
-                                null,
-                                "Setting $key updated (Group: $settingGroup)",
-                                null, // Avoiding double fetch for performance in mass update
-                                json_encode(['key' => $key, 'value' => $value, 'group' => $settingGroup])
-                            );
-                        } else {
-                            error_log("[SETTINGS_DEBUG] SettingsService::set() returned false for key: $key");
-                        }
-                    } catch (\Exception $e) {
-                        error_log("[SETTINGS_DEBUG] Exception in SettingsService::set() for key $key: " . $e->getMessage());
+                    if (SettingsService::set($key, $value, 'string', $settingGroup)) {
+                        $updated++;
+                        // Log the change
+                        GDPRService::logActivity(
+                            $_SESSION['user_id'] ?? null,
+                            'setting_updated',
+                            'settings',
+                            null,
+                            "Setting $key updated (Group: $settingGroup)",
+                            null,
+                            json_encode(['key' => $key, 'value' => $value, 'group' => $settingGroup])
+                        );
                     }
                 }
             }
@@ -327,60 +282,31 @@ class SettingsController extends Controller
             foreach ($fileFields as $field) {
                 if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
                     $uploadedPath = $this->handleFileUpload($_FILES[$field]);
-                    if ($uploadedPath && SettingsService::set($field, $uploadedPath)) {
+                    if ($uploadedPath && SettingsService::set($field, $uploadedPath, 'string', $settingGroup)) {
                         $updated++;
-
-                        // Log the change
-                        GDPRService::logActivity(
-                            $_SESSION['user_id'] ?? null,
-                            'setting_updated',
-                            'settings',
-                            null,
-                            "Setting $field updated via file upload",
-                            json_encode(['old_value' => SettingsService::get($field)]),
-                            json_encode(['key' => $field, 'value' => $uploadedPath])
-                        );
                     }
                 }
 
                 // Handle removal of current images
                 $removeField = 'remove_' . $field;
                 if (isset($_POST[$removeField]) && $_POST[$removeField] == '1') {
-                    // Remove the current image
-                    $currentValue = SettingsService::get($field, '');
-                    if ($currentValue && SettingsService::set($field, '')) {
+                    if (SettingsService::set($field, '', 'string', $settingGroup)) {
                         $updated++;
-
-                        // Log the removal
-                        GDPRService::logActivity(
-                            $_SESSION['user_id'] ?? null,
-                            'setting_updated',
-                            'settings',
-                            null,
-                            "Setting $field removed (cleared)",
-                            json_encode(['old_value' => $currentValue, 'new_value' => '']),
-                            json_encode(['key' => $field])
-                        );
                     }
                 }
             }
 
-            if ($updated > 0) {
-                echo json_encode([
-                    'success' => true,
-                    'message' => "$updated settings updated successfully"
-                ]);
-            } else {
-                echo json_encode([
-                    'success' => true,
-                    'message' => "No changes were made to the settings"
-                ]);
-            }
-        } catch (\Exception $e) {
+            // Clear settings cache to ensure next read gets fresh data
+            SettingsService::clearCache();
+
             echo json_encode([
-                'success' => false,
-                'message' => 'Error updating settings: ' . $e->getMessage()
+                'success' => true,
+                'message' => 'Settings updated successfully',
+                'updated_count' => $updated
             ]);
+
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
         }
         exit;
     }
@@ -406,22 +332,18 @@ class SettingsController extends Controller
             $group = 'payments';
             $gateway = $_POST['gateway'] ?? null;
 
-            // Define checkbox fields per gateway to handle the "unchecked = 0" case logic
-            $gatewayCheckboxes = [
-                'paypal_basic' => ['paypal_basic_enabled'],
-                'paypal_api' => ['paypal_api_enabled'],
-                'stripe' => ['stripe_enabled'],
-                'mollie' => ['mollie_enabled'],
-                'paddle_billing' => ['paddle_billing_enabled'],
-                'paddle_classic' => ['paddle_classic_enabled'],
-                'paystack' => ['paystack_enabled'],
-                'bank_transfer' => ['bank_transfer_enabled']
-            ];
+            // Handle Checkboxes first (those NOT in $_POST)
+            $checkboxFields = $this->getCheckboxFields();
+            foreach ($checkboxFields as $key) {
+                if ($this->isFieldInGroup($key, $group) && !isset($_POST[$key])) {
+                    if (SettingsService::set($key, '0', 'string', $group)) {
+                        $updated++;
+                    }
+                }
+            }
 
             foreach ($_POST as $key => $value) {
                 if ($key !== 'csrf_token' && $key !== 'gateway' && strpos($key, '_') !== false) {
-                    
-                    // Handle checkboxes (boolean values)
                     if (SettingsService::set($key, $value, 'string', $group)) {
                         $updated++;
                     }
@@ -442,6 +364,9 @@ class SettingsController extends Controller
                 SettingsService::set('stripe_enabled', '0', 'string', $group);
             }
 
+            // Clear settings cache
+            SettingsService::clearCache();
+
             echo json_encode([
                 'success' => true,
                 'message' => "Payment settings updated successfully"
@@ -459,7 +384,7 @@ class SettingsController extends Controller
         } catch (\Exception $e) {
             echo json_encode([
                 'success' => false,
-                'message' => 'Error updating settings: ' . $e->getMessage()
+                'message' => 'Error: ' . $e->getMessage()
             ]);
         }
         exit;
@@ -572,12 +497,45 @@ class SettingsController extends Controller
     private function handleFileUpload($file)
     {
         $uploadDir = __DIR__ . '/../../../public/uploads/settings/';
+        
+        // Allowed extensions and mime types
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'ico'];
+        $allowedMimeTypes = [
+            'image/jpeg', 
+            'image/png', 
+            'image/gif', 
+            'image/x-icon', 
+            'image/vnd.microsoft.icon',
+            'image/ico'
+        ];
+        $maxSize = 2 * 1024 * 1024; // 2MB
 
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
 
-        $filename = time() . '_' . basename($file['name']);
+        // Validate size
+        if ($file['size'] > $maxSize) {
+            throw new \Exception('File is too large (max 2MB)');
+        }
+
+        // Validate extension
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($extension, $allowedExtensions)) {
+            throw new \Exception('Invalid file extension. Allowed: ' . implode(', ', $allowedExtensions));
+        }
+
+        // Validate mime-type
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+
+        if (!in_array($mimeType, $allowedMimeTypes)) {
+            throw new \Exception('Invalid file type. Only standard image formats are allowed.');
+        }
+
+        // Generate a clean, unique filename
+        $filename = md5(time() . '_' . $file['name']) . '.' . $extension;
         $filepath = $uploadDir . $filename;
 
         if (move_uploaded_file($file['tmp_name'], $filepath)) {
@@ -588,47 +546,114 @@ class SettingsController extends Controller
         return null;
     }
 
-    private function isCheckboxField($key)
+    /**
+     * Get all known checkbox fields across the application
+     */
+    private function getCheckboxFields()
     {
-        $checkboxFields = [
+        return [
+            // General/Auth
             'enable_registration',
             'require_email_verification',
-            'enable_2fa',
-            'enable_captcha',
             'enable_cookie_consent',
             'enable_analytics',
-            'enable_cache',
-            'enable_minification',
-            'enable_compression',
-            'enable_lazy_loading',
             'maintenance_mode',
-            'debug_mode',
-            'enable_error_logging',
-            'enable_api',
-            'require_api_key',
             'enable_dark_mode',
-            'smtp_enabled',
             'require_strong_password',
+            
+            // Security
+            'enable_2fa',
             'force_https',
             'ip_whitelist_enabled',
             'admin_ip_notification',
             'log_failed_logins',
-            'log_failed_logins',
             'log_admin_activity',
+            'csrf_protection',
+            'security_headers',
+            'rate_limiting',
+            
+            // Email
+            'smtp_enabled',
+            
+            // Advanced / Performance
+            'cache_enabled',
+            'enable_cache', // legacy variation
+            'compression_enabled',
+            'enable_compression', // legacy variation
+            'enable_minification',
+            'enable_lazy_loading',
+            
+            // Debug
+            'debug_mode',
+            'error_logging',
+            'enable_error_logging', // legacy variation
+            'query_debug',
+            'performance_monitoring',
+            
+            // API
+            'api_enabled',
+            'enable_api', // legacy variation
+            'require_api_key',
+            'api_debug',
+            'oauth_enabled',
+            'cors_enabled',
+            'webhook_enabled',
+            
+            // Payments
             'paypal_basic_enabled',
             'paypal_api_enabled',
+            'paypal_sandbox_mode',
             'stripe_enabled',
             'mollie_enabled',
             'paddle_billing_enabled',
             'paddle_classic_enabled',
             'paystack_enabled',
             'bank_transfer_enabled',
+            
+            // Other
             'google_login_enabled',
             'captcha_on_login',
-            'captcha_on_register'
+            'captcha_on_register',
+            'enable_captcha',
+            
+            // User Settings
+            'allow_registration',
+            'email_verification',
+            'auto_approve_users',
+            'user_roles_enabled'
         ];
+    }
 
-        return in_array($key, $checkboxFields);
+    /**
+     * Checks if a field key is in a specific settings group
+     * This helps avoid setting '0' for checkboxes that aren't even on the current page
+     */
+    private function isFieldInGroup($key, $group)
+    {
+        $groups = [
+        'general' => ['site_name', 'site_description', 'site_logo', 'favicon', 'contact_email', 'contact_address', 'contact_phone', 'default_language', 'default_timezone', 'facebook_url', 'twitter_url', 'instagram_url', 'linkedin_url', 'enable_registration', 'require_email_verification', 'maintenance_mode', 'enable_dark_mode'],
+        'email' => ['smtp_enabled', 'smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_encryption', 'from_email', 'from_name'],
+        'security' => ['enable_2fa', 'force_https', 'password_min_length', 'password_complexity', 'session_timeout', 'max_login_attempts', 'ip_whitelist_enabled', 'ip_whitelist', 'admin_ip_notification', 'log_failed_logins', 'log_admin_activity', 'log_retention_days', 'csrf_protection', 'security_headers', 'rate_limiting'],
+        'advanced' => ['custom_header_code', 'custom_footer_code', 'cache_enabled', 'compression_enabled', 'enable_minification', 'enable_lazy_loading', 'debug_mode', 'error_logging', 'query_debug', 'performance_monitoring', 'api_enabled', 'require_api_key'],
+        'performance' => ['cache_enabled', 'compression_enabled', 'enable_minification', 'enable_lazy_loading'],
+        'system' => ['debug_mode', 'error_logging', 'query_debug', 'performance_monitoring'],
+        'api' => ['api_enabled', 'api_rate_limit', 'api_timeout', 'api_key_expiry', 'oauth_enabled', 'cors_enabled', 'cors_origins', 'webhook_enabled', 'webhook_timeout', 'api_documentation', 'api_version', 'api_debug', 'require_api_key'],
+        'payments' => ['paypal_basic_enabled', 'paypal_email', 'paypal_api_enabled', 'paypal_client_id', 'paypal_client_secret', 'paypal_sandbox_mode', 'stripe_enabled', 'stripe_checkout_type', 'stripe_publishable_key', 'stripe_secret_key', 'stripe_webhook_secret', 'mollie_enabled', 'mollie_api_key', 'paddle_billing_enabled', 'paddle_client_token', 'paddle_api_key', 'paddle_webhook_secret', 'paddle_classic_enabled', 'paddle_vendor_id', 'paddle_classic_api_key', 'paddle_public_key', 'paddle_monthly_plan_id', 'paddle_yearly_plan_id', 'paystack_enabled', 'paystack_secret_key', 'paystack_public_key', 'bank_transfer_enabled', 'bank_info'],
+        'google' => ['google_login_enabled', 'google_client_id', 'google_client_secret'],
+        'recaptcha' => ['captcha_provider', 'recaptcha_site_key', 'recaptcha_secret_key', 'captcha_on_login', 'captcha_on_register', 'enable_captcha'],
+        'user' => ['allow_registration', 'email_verification', 'auto_approve_users', 'password_min_length', 'password_complexity', 'session_timeout', 'max_login_attempts', 'lockout_duration', 'profile_visibility', 'user_roles_enabled']
+    ];
+
+    if (!isset($groups[$group])) {
+            return false;
+        }
+
+        return in_array($key, $groups[$group]);
+    }
+
+    private function isCheckboxField($key)
+    {
+        return in_array($key, $this->getCheckboxFields());
     }
 
     /**
@@ -876,10 +901,6 @@ class SettingsController extends Controller
             ]);
         }
     }
-    /**
-     * Save advanced settings
-     * Handles mixed settings from multiple groups (performance, security, debug, api)
-     */
     public function saveAdvanced() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
@@ -895,6 +916,7 @@ class SettingsController extends Controller
         $settings = $_POST;
         $updated = 0;
         $errors = 0;
+        $settingGroup = 'advanced'; // Default group for advanced settings
 
         // Map settings to their specific groups
         $groupMap = [
@@ -929,23 +951,30 @@ class SettingsController extends Controller
             'cors_origins' => 'api'
         ];
 
-        // Process known settings
+        // Handle Checkboxes first (those NOT in $_POST)
+        foreach ($groupMap as $key => $targetGroup) {
+            if ($this->isCheckboxField($key) && !isset($settings[$key])) {
+                if (\App\Services\SettingsService::set($key, '0', 'string', $targetGroup)) {
+                    $updated++;
+                }
+            }
+        }
+
+        // Process settings in POST
         foreach ($settings as $key => $value) {
             if (isset($groupMap[$key])) {
-                $group = $groupMap[$key];
+                $targetGroup = $groupMap[$key];
                 
-                // Handle booleans (checkboxes sent as '1' or '0')
-                if ($value === '1' || $value === '0') {
-                    // Normalize to what SettingsService expects if needed, or keep as is
-                }
-
-                if (\App\Services\SettingsService::set($key, $value, 'string', $group)) {
+                if (\App\Services\SettingsService::set($key, $value, 'string', $targetGroup)) {
                     $updated++;
                 } else {
                     $errors++;
                 }
             }
         }
+
+        // Clear settings cache
+        \App\Services\SettingsService::clearCache();
 
         // Log activity
         if ($updated > 0) {
@@ -960,7 +989,7 @@ class SettingsController extends Controller
 
         header('Content-Type: application/json');
         echo json_encode([
-            'success' => $updated > 0 || $errors === 0, // Success if no errors, even if nothing updated (unchanged)
+            'success' => $updated > 0 || $errors === 0,
             'message' => "Settings saved successfully. Updated: $updated",
             'updated' => $updated
         ]);

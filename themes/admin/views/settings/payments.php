@@ -233,6 +233,7 @@
                 <div class="card-body">
                     <form action="<?php echo app_base_url('/admin/settings/payments/update'); ?>" method="POST" class="ajax-form">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                        <input type="hidden" name="setting_group" value="payments">
                         <input type="hidden" name="gateway" value="paypal_basic">
                         <input type="hidden" name="paypal_basic_enabled" value="0"> <!-- Default 0 if unchecked -->
 
@@ -269,6 +270,50 @@
                         <button type="submit" class="btn btn-save">Save Settings</button>
                     </form>
                 </div>
+            <!-- PayPal Smart Checkout (API) -->
+            <div class="settings-card">
+                <div class="card-header-simple">
+                    <h2>Paypal Smart Checkout (API)</h2>
+                </div>
+                <div class="card-body">
+                    <form action="<?php echo app_base_url('/admin/settings/payments/update'); ?>" method="POST" class="ajax-form">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                        <input type="hidden" name="setting_group" value="payments">
+                        <input type="hidden" name="gateway" value="paypal_api">
+                        <input type="hidden" name="paypal_api_enabled" value="0">
+
+                        <div class="toggle-switch-group">
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="paypal_api_enabled" value="1" <?= ($settings['paypal_api_enabled'] ?? '') == '1' ? 'checked' : '' ?> class="gateway-toggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="toggle-label">Enable</span>
+                        </div>
+                        <p class="form-text mb-3" style="margin-top: -1rem; margin-bottom: 1.5rem !important;">Advanced PayPal integration with Smart Buttons.</p>
+                        
+                        <div class="gateway-settings">
+                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label class="form-label" for="paypal_client_id">Client ID</label>
+                                    <input type="text" class="form-control" id="paypal_client_id" name="paypal_client_id" value="<?= htmlspecialchars($settings['paypal_client_id'] ?? '') ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="paypal_client_secret">Client Secret</label>
+                                    <input type="password" class="form-control" id="paypal_client_secret" name="paypal_client_secret" value="<?= htmlspecialchars($settings['paypal_client_secret'] ?? '') ?>">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="form-check form-switch" style="margin-top: 0.5rem;">
+                                    <input class="form-check-input" type="checkbox" id="paypal_sandbox_mode" name="paypal_sandbox_mode" value="1" <?= ($settings['paypal_sandbox_mode'] ?? '0') == '1' ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="paypal_sandbox_mode">Sandbox Mode</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-save">Save Settings</button>
+                    </form>
+                </div>
             </div>
 
             <!-- Stripe -->
@@ -280,6 +325,7 @@
                 <div class="card-body">
                     <form action="<?php echo app_base_url('/admin/settings/payments/update'); ?>" method="POST" class="ajax-form">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                        <input type="hidden" name="setting_group" value="payments">
                         <input type="hidden" name="gateway" value="stripe">
                         <input type="hidden" name="stripe_enabled" value="0">
 
@@ -347,6 +393,7 @@
                 <div class="card-body">
                      <form action="<?php echo app_base_url('/admin/settings/payments/update'); ?>" method="POST" class="ajax-form">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                        <input type="hidden" name="setting_group" value="payments">
                         <input type="hidden" name="gateway" value="mollie">
                         <input type="hidden" name="mollie_enabled" value="0">
 
@@ -380,6 +427,7 @@
                 <div class="card-body">
                     <form action="<?php echo app_base_url('/admin/settings/payments/update'); ?>" method="POST" class="ajax-form">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                        <input type="hidden" name="setting_group" value="payments">
                          <input type="hidden" name="gateway" value="paypal_api">
                          <input type="hidden" name="paypal_api_enabled" value="0">
 
@@ -419,6 +467,7 @@
                 <div class="card-body">
                     <form action="<?php echo app_base_url('/admin/settings/payments/update'); ?>" method="POST" class="ajax-form">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                        <input type="hidden" name="setting_group" value="payments">
                         <input type="hidden" name="gateway" value="paddle_billing">
                         <input type="hidden" name="paddle_billing_enabled" value="0">
 

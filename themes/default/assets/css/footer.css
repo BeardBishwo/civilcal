@@ -1,44 +1,43 @@
 /* Footer styles to match index.php footer */
 
 .footer-separator {
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    /* remove large vertical margins so footer hugs the content above */
-    margin: 0 0 24px 0;
-    border: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ff69b4, transparent);
+  /* remove large vertical margins so footer hugs the content above */
+  margin: 0 0 24px 0;
+  border: 0;
 }
 
 .site-footer {
-    text-align: center;
-    color: var(--light);
-    /* enforce zero top padding so footer sits flush with preceding content */
-    padding: 0 0 0rem 0 !important;
+  text-align: center;
+  color: var(--light);
+  /* enforce zero top padding so footer sits flush with preceding content */
+  padding: 0 0 0rem 0 !important;
 }
 
 .site-footer .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    /* remove any top padding inherited from global .container rules */
-    padding: 10 1rem !important;
-    padding-top: 0 !important;
-    margin-top: 0 !important;
+  max-width: 1200px;
+  margin: 0 auto;
+  /* remove any top padding inherited from global .container rules */
+  padding: 10 1rem !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
 }
 
 .site-footer p {
-    margin: 0.5rem 0;
-    color: var(--light);
+  margin: 0.5rem 0;
+  color: var(--light);
 }
 
 .site-footer i.fas.fa-heart {
-    color: var(--accent);
-    margin: 0 0.25rem;
+  color: #ff4d4d;
+  margin: 0 0.25rem;
 }
-
 
 /* Responsive Design */
 
 @media (max-width: 768px) {
-    .site-footer .container {
-        padding: 0 1rem;
-    }
+  .site-footer .container {
+    padding: 0 1rem;
+  }
 }

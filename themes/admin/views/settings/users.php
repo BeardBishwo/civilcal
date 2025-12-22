@@ -14,32 +14,32 @@ if (!isset($container)) {
     $container = \App\Core\Container::create();
 }
 
-// Get current user settings (mock data for demonstration)
+// Get current user settings from database
 $user_settings = [
     'allow_registration' => [
         'label' => 'Allow User Registration',
-        'value' => true,
+        'value' => \App\Services\SettingsService::get('allow_registration', '1') == '1',
         'type' => 'checkbox',
         'required' => false,
         'description' => 'Allow new users to register accounts'
     ],
     'email_verification' => [
         'label' => 'Email Verification Required',
-        'value' => true,
+        'value' => \App\Services\SettingsService::get('email_verification', '1') == '1',
         'type' => 'checkbox',
         'required' => false,
         'description' => 'Require email verification for new accounts'
     ],
     'auto_approve_users' => [
         'label' => 'Auto-approve New Users',
-        'value' => false,
+        'value' => \App\Services\SettingsService::get('auto_approve_users', '0') == '1',
         'type' => 'checkbox',
         'required' => false,
         'description' => 'Automatically approve new user registrations'
     ],
     'password_min_length' => [
         'label' => 'Minimum Password Length',
-        'value' => '8',
+        'value' => \App\Services\SettingsService::get('password_min_length', '8'),
         'type' => 'number',
         'required' => true,
         'description' => 'Minimum characters required for passwords',
@@ -48,7 +48,7 @@ $user_settings = [
     ],
     'password_complexity' => [
         'label' => 'Password Complexity',
-        'value' => 'medium',
+        'value' => \App\Services\SettingsService::get('password_complexity', 'medium'),
         'type' => 'select',
         'options' => [
             'none' => 'No Requirements',
@@ -61,7 +61,7 @@ $user_settings = [
     ],
     'session_timeout' => [
         'label' => 'Session Timeout (minutes)',
-        'value' => '120',
+        'value' => \App\Services\SettingsService::get('session_timeout', '120'),
         'type' => 'number',
         'required' => true,
         'description' => 'How long user sessions remain active',
@@ -70,7 +70,7 @@ $user_settings = [
     ],
     'max_login_attempts' => [
         'label' => 'Max Login Attempts',
-        'value' => '5',
+        'value' => \App\Services\SettingsService::get('max_login_attempts', '5'),
         'type' => 'number',
         'required' => true,
         'description' => 'Maximum failed login attempts before lockout',
@@ -79,7 +79,7 @@ $user_settings = [
     ],
     'lockout_duration' => [
         'label' => 'Account Lockout Duration (minutes)',
-        'value' => '30',
+        'value' => \App\Services\SettingsService::get('lockout_duration', '30'),
         'type' => 'number',
         'required' => true,
         'description' => 'How long accounts stay locked after failed attempts',
@@ -88,7 +88,7 @@ $user_settings = [
     ],
     'profile_visibility' => [
         'label' => 'Default Profile Visibility',
-        'value' => 'private',
+        'value' => \App\Services\SettingsService::get('profile_visibility', 'private'),
         'type' => 'select',
         'options' => [
             'public' => 'Public (visible to everyone)',
@@ -100,11 +100,11 @@ $user_settings = [
     ],
     'user_roles_enabled' => [
         'label' => 'Enable User Roles',
-        'value' => true,
+        'value' => \App\Services\SettingsService::get('user_roles_enabled', '0') == '1',
         'type' => 'checkbox',
         'required' => false,
         'description' => 'Enable advanced user role management'
-    ]
+    ],
 ];
 
 $current_section = 'users';
@@ -567,8 +567,9 @@ $page_title = 'User Settings - Admin Panel';
             </div>
             
             <!-- Settings Form -->
-            <form id="settingsForm" method="POST" action="#">
-                <input type="hidden" name="section" value="users">
+            <form id="settingsForm" method="POST" action="<?= app_base_url('/admin/settings/update') ?>">
+                <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                <input type="hidden" name="setting_group" value="user">
                 
                 <div class="settings-card">
                     <h3>User Management</h3>
@@ -580,11 +581,11 @@ $page_title = 'User Settings - Admin Panel';
                             </label>
                             
                             <?php if (($setting['type'] ?? 'text') === 'textarea'): ?>
-                                <textarea name="settings[<?php echo $key; ?>]" 
+                                <textarea name="<?php echo $key; ?>" 
                                           class="form-input form-textarea"
                                           <?php echo ($setting['required'] ?? false) ? 'required' : ''; ?>><?php echo htmlspecialchars($setting['value'] ?? ''); ?></textarea>
                             <?php elseif (($setting['type'] ?? 'text') === 'select'): ?>
-                                <select name="settings[<?php echo $key; ?>]" 
+                                <select name="<?php echo $key; ?>" 
                                         class="form-input form-select"
                                         <?php echo ($setting['required'] ?? false) ? 'required' : ''; ?>>
                                     <?php foreach ($setting['options'] ?? [] as $optKey => $optLabel): ?>
@@ -596,7 +597,7 @@ $page_title = 'User Settings - Admin Panel';
                             <?php elseif (($setting['type'] ?? 'text') === 'checkbox'): ?>
                                 <label class="form-checkbox-container">
                                     <input type="checkbox" 
-                                           name="settings[<?php echo $key; ?>]" 
+                                           name="<?php echo $key; ?>" 
                                            value="1" 
                                            class="form-checkbox"
                                            <?php echo ($setting['value'] ?? false) ? 'checked' : ''; ?>>
@@ -604,7 +605,7 @@ $page_title = 'User Settings - Admin Panel';
                                 </label>
                             <?php elseif (($setting['type'] ?? 'text') === 'number'): ?>
                                 <input type="number" 
-                                       name="settings[<?php echo $key; ?>]" 
+                                       name="<?php echo $key; ?>" 
                                        value="<?= htmlspecialchars($setting['value'] ?? ''); ?>" 
                                        class="form-input"
                                        <?php echo ($setting['required'] ?? false) ? 'required' : ''; ?>
@@ -612,7 +613,7 @@ $page_title = 'User Settings - Admin Panel';
                                        <?php if (isset($setting['max'])): ?>max="<?= htmlspecialchars($setting['max']); ?>"<?php endif; ?>>
                             <?php else: ?>
                                 <input type="<?= htmlspecialchars($setting['type'] ?? 'text'); ?>" 
-                                       name="settings[<?php echo $key; ?>]" 
+                                       name="<?php echo $key; ?>" 
                                        value="<?= htmlspecialchars($setting['value'] ?? ''); ?>" 
                                        class="form-input"
                                        <?php echo ($setting['required'] ?? false) ? 'required' : ''; ?>>
@@ -642,8 +643,40 @@ $page_title = 'User Settings - Admin Panel';
         // Form submission handler
         document.getElementById('settingsForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            showNotification('User settings saved successfully!', 'success');
-            // In a real implementation, this would submit to the server
+            
+            const form = this;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnHtml = submitBtn.innerHTML;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message || 'Settings saved successfully!', 'success');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showNotification(data.message || 'Error saving settings', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred while saving', 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnHtml;
+            });
         });
         
         // Sidebar navigation (basic functionality)

@@ -27,10 +27,28 @@ class RateLimitMiddleware {
     }
 
     public function handle($request, $next) {
-        // Default limits: 60 req/min for admin POSTs, 120 for GETs
+        // Check if global rate limiting is enabled
+        $rateLimitEnabled = \App\Services\SettingsService::get('rate_limiting', '1') === '1';
+        if (!$rateLimitEnabled) {
+            return $next($request);
+        }
+
         $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
-        $limit = ($method === 'GET') ? 120 : 60;
+
+        // Check if API is enabled
+        $apiEnabled = \App\Services\SettingsService::get('api_enabled', '1') === '1';
+        if (!$apiEnabled && (strpos($uri, '/api') === 0 || strpos($uri, '/api/') === 0)) {
+            http_response_code(403);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'API is currently disabled']);
+            return;
+        }
+
+        // Get limits from settings or defaults
+        $baseLimit = (int)\App\Services\SettingsService::get('api_rate_limit', 60);
+        $limit = ($method === 'GET') ? $baseLimit * 2 : $baseLimit;
+
         // Tighten for plugin admin endpoints
         if (strpos($uri, '/admin/plugins') === 0) {
             $limit = ($method === 'GET') ? 60 : 30;

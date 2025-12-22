@@ -48,13 +48,64 @@ class Security {
 
         session_start();
 
-        // Prevent Session Fixation (init check)
-        if (!isset($_SESSION['initiated'])) {
-            session_regenerate_id(true);
-            $_SESSION['initiated'] = true;
-        }
+    // Track activity for session timeout
+    if (isset($_SESSION['user_id'])) {
+        self::enforceSessionTimeout();
+        $_SESSION['last_activity'] = time();
     }
 
+    // Prevent Session Fixation (init check)
+    if (!isset($_SESSION['initiated'])) {
+        session_regenerate_id(true);
+        $_SESSION['initiated'] = true;
+    }
+}
+
+/**
+ * Enforce session timeout based on settings
+ */
+public static function enforceSessionTimeout(): void {
+    if (!isset($_SESSION['last_activity'])) {
+        $_SESSION['last_activity'] = time();
+        return;
+    }
+
+    $timeoutMinutes = (int)SettingsService::get('session_timeout', '120');
+    $timeoutSeconds = $timeoutMinutes * 60;
+
+    if (time() - $_SESSION['last_activity'] > $timeoutSeconds) {
+        // Session expired
+        session_unset();
+        session_destroy();
+        
+        // Redirect if it's a web request
+        if (!self::isApiRequest()) {
+            $scriptName = $_SERVER['SCRIPT_NAME'];
+            $basePath = dirname(dirname($scriptName));
+            if ($basePath === '/' || $basePath === '\\') {
+                $basePath = '';
+            }
+            header('Location: ' . $basePath . '/login?timeout=1');
+            exit;
+        } else {
+            header('Content-Type: application/json');
+            http_response_code(401);
+            echo json_encode(['success' => false, 'error' => 'Session expired']);
+            exit;
+        }
+    }
+}
+
+/**
+ * Check if current request is an API request
+ */
+private static function isApiRequest(): bool {
+    return (
+        (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) ||
+        (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) ||
+        (isset($_SERVER['REQUEST_URI']) && (strpos($_SERVER['REQUEST_URI'], '/api/') !== false || strpos($_SERVER['REQUEST_URI'], '/admin/') !== false))
+    );
+}
     /**
      * Set standard security headers
      */
@@ -82,6 +133,12 @@ class Security {
      * Check CSRF token from either POST data or X-CSRF-Token header
      */
     public static function validateCsrfToken(string $token = null): bool {
+        // Check if CSRF protection is globally enabled
+        $csrfEnabled = \App\Services\SettingsService::get('csrf_protection', '1') === '1';
+        if (!$csrfEnabled) {
+            return true;
+        }
+
         // Ensure session is started
         if (session_status() === PHP_SESSION_NONE) {
             self::startSession();
@@ -204,8 +261,29 @@ class Security {
     }
 
     /**
-     * Clean and validate input
+     * Validate password based on security settings
      */
+    public static function validatePassword(string $password): array {
+        $minLength = (int)SettingsService::get('password_min_length', '8');
+        $complexity = SettingsService::get('password_complexity', 'low');
+
+        if (strlen($password) < $minLength) {
+            return ['valid' => false, 'error' => "Password must be at least {$minLength} characters long."];
+        }
+
+        if ($complexity === 'medium') {
+            if (!preg_match('/[A-Z]/', $password) || !preg_match('/[0-9]/', $password)) {
+                return ['valid' => false, 'error' => 'Password must contain at least one uppercase letter and one number.'];
+            }
+        } elseif ($complexity === 'high') {
+            if (!preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[^A-Za-z0-9]/', $password)) {
+                return ['valid' => false, 'error' => 'Password must contain uppercase, lowercase, numbers, and special characters.'];
+            }
+        }
+
+        return ['valid' => true];
+    }
+
     public static function sanitize($input) {
         if (is_array($input)) {
             return array_map([self::class, 'sanitize'], $input);

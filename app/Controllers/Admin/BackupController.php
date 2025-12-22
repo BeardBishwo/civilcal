@@ -35,15 +35,17 @@ class BackupController extends Controller
         // Get backup history
         $backup_history = $this->backupService->getBackupHistory();
         
-        // Get backup settings (you can store these in database or config)
+        // Get backup settings from SettingsService
+        $settings = \App\Services\SettingsService::getAll('backup');
+        
         $backup_settings = [
-            'enabled' => true,
-            'frequency' => 'daily',
-            'time' => '02:00',
-            'retention' => 30,
-            'types' => ['database', 'files'],
-            'compression' => 'medium',
-            'storage_type' => 'local'
+            'enabled' => ($settings['backup_enabled'] ?? '0') == '1',
+            'frequency' => $settings['backup_frequency'] ?? 'daily',
+            'time' => $settings['backup_time'] ?? '02:00',
+            'retention' => (int)($settings['backup_retention'] ?? 30),
+            'types' => isset($settings['backup_types']) ? (is_array($settings['backup_types']) ? $settings['backup_types'] : explode(',', $settings['backup_types'])) : ['database'],
+            'compression' => $settings['backup_compression'] ?? 'medium',
+            'storage_type' => $settings['backup_storage_type'] ?? 'local'
         ];
         
         // System info
@@ -77,6 +79,12 @@ class BackupController extends Controller
         if (!$user || !$user->is_admin) {
             http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        // CSRF Token validation
+        if (!\App\Services\Security::validateCsrfToken()) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
             return;
         }
 
@@ -175,6 +183,12 @@ class BackupController extends Controller
             return;
         }
 
+        // CSRF Token validation
+        if (!\App\Services\Security::validateCsrfToken()) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            return;
+        }
+
         try {
             $result = $this->backupService->deleteBackup($backupId);
             
@@ -199,6 +213,12 @@ class BackupController extends Controller
         if (!$user || !$user->is_admin) {
             http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        // CSRF Token validation
+        if (!\App\Services\Security::validateCsrfToken()) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
             return;
         }
 
@@ -257,14 +277,54 @@ class BackupController extends Controller
             return;
         }
 
+        // CSRF Token validation
+        if (!\App\Services\Security::validateCsrfToken()) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            return;
+        }
+
         try {
-            // Here you would save settings to database or config file
-            // For now, just return success
+            $group = 'backup';
+            $updated = 0;
+
+            // Handle checkbox (backup_enabled)
+            $backup_enabled = isset($_POST['backup_enabled']) ? '1' : '0';
+            if (\App\Services\SettingsService::set('backup_enabled', $backup_enabled, 'string', $group)) {
+                $updated++;
+            }
+
+            // Define fields to save
+            $fields = [
+                'backup_frequency',
+                'backup_time',
+                'backup_retention',
+                'backup_compression',
+                'backup_storage_type'
+            ];
+
+            foreach ($fields as $field) {
+                if (isset($_POST[$field])) {
+                    if (\App\Services\SettingsService::set($field, $_POST[$field], 'string', $group)) {
+                        $updated++;
+                    }
+                }
+            }
+
+            // Handle backup types (array)
+            if (isset($_POST['backup_types'])) {
+                $types = is_array($_POST['backup_types']) ? implode(',', $_POST['backup_types']) : $_POST['backup_types'];
+                if (\App\Services\SettingsService::set('backup_types', $types, 'string', $group)) {
+                    $updated++;
+                }
+            }
+
+            \App\Services\SettingsService::clearCache();
             
             header('Content-Type: application/json');
             echo json_encode([
                 'success' => true,
-                'message' => 'Backup settings saved successfully'
+                'message' => 'Backup settings saved successfully',
+                'updated' => $updated
             ]);
             
         } catch (Exception $e) {

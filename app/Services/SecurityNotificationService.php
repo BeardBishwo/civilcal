@@ -39,9 +39,12 @@ class SecurityNotificationService
                 $userModel = new User();
                 $user = $userModel->find($userId);
                 
-                // Only notify for admin users
+                // Only notify for admin users if setting is enabled
                 if ($user && ($user['role'] === 'admin' || $user['role'] === 'super_admin')) {
-                    $this->sendSecurityNotification($user, $ipAddress);
+                    $notifyEnabled = \App\Services\SettingsService::get('admin_ip_notification', '0') === '1';
+                    if ($notifyEnabled) {
+                        $this->sendSecurityNotification($user, $ipAddress);
+                    }
                 }
                 
                 // Record this IP address for the user
@@ -136,8 +139,8 @@ class SecurityNotificationService
             $body = $this->generateNotificationEmail($user, $ipAddress, $locationInfo);
             
             // Send email using EmailManager
-            if (class_exists('EmailManager')) {
-                $emailManager = new \EmailManager();
+            if (class_exists('\App\Services\EmailManager')) {
+                $emailManager = new \App\Services\EmailManager();
                 $emailManager->sendEmail($adminEmail, $subject, $body);
             } else {
                 // Fallback to basic mail function

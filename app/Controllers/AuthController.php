@@ -17,6 +17,10 @@ class AuthController extends Controller
 
     public function showRegister()
     {
+        if (\App\Services\SettingsService::get('allow_registration', '1') !== '1') {
+            header('Location: ' . app_base_url('/login?error=registration_disabled'));
+            exit;
+        }
         $this->view->render('auth/register');
     }
 
@@ -106,12 +110,47 @@ class AuthController extends Controller
             // Find user by username or email
             $user = User::findByUsername($username);
 
-            if ($user && password_verify($password, $user->password)) {
-                $this->createUserSession($user, $rememberMe, $isJson);
+            if ($user) {
+                // Check for account lockout
+                if (!empty($user->lockout_until) && strtotime($user->lockout_until) > time()) {
+                    $waitMinutes = ceil((strtotime($user->lockout_until) - time()) / 60);
+                    throw new Exception("Account is temporarily locked due to too many failed login attempts. Please try again in {$waitMinutes} minutes.");
+                }
+
+                if (password_verify($password, $user->password)) {
+                    // Reset failed logins
+                    $userModel = new User();
+                    $userModel->updateLastLogin($user->id);
+
+                    // Check if 2FA is required
+                    $global2fa = \App\Services\SettingsService::get('enable_2fa', '0') === '1';
+                    if ($global2fa && !empty($user->two_factor_enabled) && !empty($user->two_factor_secret)) {
+                        // Start 2FA session
+                        $_SESSION['2fa_pending_user_id'] = $user->id;
+                        $_SESSION['2fa_pending_remember'] = $rememberMe;
+                        
+                        if ($isJson) {
+                            echo json_encode(['success' => true, 'redirect' => app_base_url('/login/2fa')]);
+                            return;
+                        }
+                        header('Location: ' . app_base_url('/login/2fa'));
+                        exit;
+                    }
+
+                    $this->createUserSession($user, $rememberMe, $isJson);
+                    return;
+                } else {  
+                    // Increment failed logins
+                    $userModel = new User();
+                    $maxAttempts = (int)\App\Services\SettingsService::get('max_login_attempts', '5');
+                    $lockoutDuration = (int)\App\Services\SettingsService::get('lockout_duration', '30'); // in minutes
+                    $userModel->incrementFailedLogins($user->id, $maxAttempts, $lockoutDuration * 60);
+                    
+                    throw new Exception('Invalid credentials.');
+                }
             } else {
                 throw new Exception('Invalid credentials.');
             }
-
         } catch (Exception $e) {
             if (isset($isJson) && $isJson) {
                 header('Content-Type: application/json');
@@ -120,6 +159,90 @@ class AuthController extends Controller
             }
             $this->view->render('auth/login', ['error' => $e->getMessage(), 'username' => $username]);
         }
+    }
+
+    /**
+     * Show 2FA Verification Page
+     */
+    public function show2FA()
+    {
+        if (!isset($_SESSION['2fa_pending_user_id'])) {
+            header('Location: ' . app_base_url('/login'));
+            exit;
+        }
+
+        $this->view->render('auth/2fa-verify');
+    }
+
+    /**
+     * Verify 2FA Code
+     */
+    public function verify2FA()
+    {
+        try {
+            if (!isset($_SESSION['2fa_pending_user_id'])) {
+                throw new Exception('Login session expired.');
+            }
+
+            $userId = $_SESSION['2fa_pending_user_id'];
+            $rememberMe = $_SESSION['2fa_pending_remember'] ?? false;
+            $code = $_POST['code'] ?? '';
+
+            if (empty($code)) {
+                throw new Exception('Verification code is required.');
+            }
+
+            $userModel = new User();
+            $user = $userModel->findById($userId);
+
+            if (!$user || empty($user->two_factor_secret)) {
+                throw new Exception('Two-factor authentication not configured.');
+            }
+
+            // Check if Google2FA class exists
+            if (!class_exists('\\PragmaRX\\Google2FA\\Google2FA')) {
+                throw new Exception('2FA Service unavailable.');
+            }
+
+            $google2fa = new \PragmaRX\Google2FA\Google2FA();
+            $valid = $google2fa->verifyKey($user->two_factor_secret, $code);
+
+            // Check recovery codes if TOTP fails
+            if (!$valid && !empty($user->two_factor_recovery_codes)) {
+                $recoveryCodes = json_decode($user->two_factor_recovery_codes, true);
+                if (is_array($recoveryCodes) && in_array($code, $recoveryCodes)) {
+                    $valid = true;
+                    // Remove used recovery code
+                    $recoveryCodes = array_diff($recoveryCodes, [$code]);
+                    // Update user (we need a method for this or use direct update)
+                    $this->updateRecoveryCodes($userId, $recoveryCodes);
+                }
+            }
+
+            if ($valid) {
+                // Clear 2FA session
+                unset($_SESSION['2fa_pending_user_id']);
+                unset($_SESSION['2fa_pending_remember']);
+
+                // Complete login
+                $this->createUserSession($user, $rememberMe);
+            } else {
+                throw new Exception('Invalid verification code.');
+            }
+
+        } catch (Exception $e) {
+            $this->view->render('auth/2fa-verify', ['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Helper to update recovery codes
+     */
+    private function updateRecoveryCodes($userId, $codes)
+    {
+        $db = Database::getInstance();
+        $stmt = $db->getPdo()->prepare("UPDATE users SET two_factor_recovery_codes = ? WHERE id = ?");
+        $stmt->execute([json_encode(array_values($codes)), $userId]);
     }
 
     public function loginWithGoogle()
@@ -254,6 +377,10 @@ class AuthController extends Controller
 
     public function register()
     {
+        if (\App\Services\SettingsService::get('allow_registration', '1') !== '1') {
+            throw new Exception('Registration is currently disabled.');
+        }
+
         $username = $_POST['username'] ?? '';
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
@@ -275,11 +402,16 @@ class AuthController extends Controller
             }
 
             // Basic validation
-            if (empty($username) || empty($email) || empty($password)) {
-                throw new Exception('All fields are required.');
-            }
+        if (empty($username) || empty($email) || empty($password)) {
+            throw new Exception('All fields are required.');
+        }
 
-            $userModel = new User();
+        $passwordValidation = \App\Services\Security::validatePassword($password);
+        if (!$passwordValidation['valid']) {
+            throw new Exception($passwordValidation['error']);
+        }
+
+        $userModel = new User();
             
             // Check existence
             if ($userModel->findByUsername($username)) {

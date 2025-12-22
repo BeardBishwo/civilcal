@@ -134,7 +134,9 @@ class User
                 'privacy_agreed' => "ALTER TABLE users ADD COLUMN privacy_agreed TINYINT(1) DEFAULT 0 AFTER marketing_emails",
                 'privacy_agreed_at' => "ALTER TABLE users ADD COLUMN privacy_agreed_at DATETIME NULL AFTER privacy_agreed",
                 'force_password_change' => "ALTER TABLE users ADD COLUMN force_password_change TINYINT(1) DEFAULT 0 AFTER privacy_agreed_at",
-                'password_generated_at' => "ALTER TABLE users ADD COLUMN password_generated_at DATETIME NULL AFTER force_password_change"
+                'password_generated_at' => "ALTER TABLE users ADD COLUMN password_generated_at DATETIME NULL AFTER force_password_change",
+                'failed_logins' => "ALTER TABLE users ADD COLUMN failed_logins TINYINT(3) DEFAULT 0 AFTER password_generated_at",
+                'lockout_until' => "ALTER TABLE users ADD COLUMN lockout_until DATETIME NULL AFTER failed_logins"
             ];
 
             foreach ($requiredColumns as $columnName => $alterSql) {
@@ -228,8 +230,8 @@ class User
 
     public function updateLastLogin($userId, $deviceInfo = null, $locationInfo = null)
     {
-        // Update basic login info
-        $stmt = $this->db->getPdo()->prepare("UPDATE users SET last_login = NOW(), login_count = login_count + 1, updated_at = NOW() WHERE id = ?");
+        // Update basic login info and reset failed attempts
+        $stmt = $this->db->getPdo()->prepare("UPDATE users SET last_login = NOW(), login_count = login_count + 1, failed_logins = 0, lockout_until = NULL, updated_at = NOW() WHERE id = ?");
         $result = $stmt->execute([$userId]);
 
         // Log device and location info for ads targeting (if provided)
@@ -238,6 +240,28 @@ class User
         }
 
         return $result;
+    }
+
+    /**
+     * Increment failed login attempts
+     */
+    public function incrementFailedLogins($userId, $maxAttempts, $lockoutSeconds)
+    {
+        $pdo = $this->db->getPdo();
+        
+        // Get current attempts
+        $stmt = $pdo->prepare("SELECT failed_logins FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $currentRow = $stmt->fetch();
+        $attempts = ($currentRow['failed_logins'] ?? 0) + 1;
+        
+        $lockoutUntil = null;
+        if ($attempts >= $maxAttempts) {
+            $lockoutUntil = date('Y-m-d H:i:s', time() + $lockoutSeconds);
+        }
+        
+        $stmt = $pdo->prepare("UPDATE users SET failed_logins = ?, lockout_until = ?, updated_at = NOW() WHERE id = ?");
+        return $stmt->execute([$attempts, $lockoutUntil, $userId]);
     }
 
     /**
@@ -554,6 +578,11 @@ class User
         $user = $this->find($this->id);
         if (!$user || !password_verify($currentPassword, $user['password'])) {
             return ['success' => false, 'message' => 'Current password is incorrect'];
+        }
+
+        $passwordValidation = \App\Services\Security::validatePassword($newPassword);
+        if (!$passwordValidation['valid']) {
+            return ['success' => false, 'message' => $passwordValidation['error']];
         }
 
         $result = $this->changePassword($this->id, $newPassword);

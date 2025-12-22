@@ -41,7 +41,7 @@ $desc_safe = htmlspecialchars(
     $site_meta["description"] ?? "Professional Engineering Calculators Suite",
 );
 $logo = $site_meta["logo"] ?? app_base_url("public/theme-assets.php?path=default/assets/images/logo.png");
-$logo_text = $site_meta["logo_text"] ?? (\App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro') ?: 'Calc Pro');
+$logo_text = $site_meta["logo_text"] ?? (\App\Services\SettingsService::get('site_name', 'Civil Cal') ?: 'Civil Cal');
 $header_style = $site_meta["header_style"] ?? "logo_only";
 $favicon = $site_meta["favicon"] ?? app_base_url("themes/default/assets/images/favicon.png");
 
@@ -1514,46 +1514,6 @@ if (
                 opacity: 1;
                 transform: translateY(0) scale(1);
             }
-        }
-
-        .search-modal .modal-input {
-            width: 100%;
-            padding: 1.25rem 1.5rem;
-            font-size: 1.1rem;
-            border: 2px solid rgba(102, 126, 234, 0.2);
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-            margin-bottom: 1.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Animated gradient border effect */
-        .search-modal .modal-input::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c, #10b981, #3b82f6, #667eea);
-            background-size: 400% 400%;
-            border-radius: 14px;
-            z-index: -1;
-            animation: gradientBorder 3s ease infinite;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            transform: translateY(-20px) scale(0.95);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
         }
 
         .search-modal .modal-input {

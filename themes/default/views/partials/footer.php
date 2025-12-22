@@ -8,8 +8,16 @@ if ($show_footer): ?>
     <hr class="footer-separator">
     <footer class="site-footer">
         <div class="container">
-            <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro')); ?>. All Rights Reserved.</p>
-            <p><?php echo htmlspecialchars(\App\Services\SettingsService::get('footer_text', 'Professional Tools for Modern Engineering')); ?></p>
+            <?php 
+            $footer_text = \App\Services\SettingsService::get('footer_text');
+            if (!empty($footer_text)) {
+                $footer_text = str_replace('{year}', date('Y'), $footer_text);
+                echo $footer_text; 
+            } else {
+            ?>
+                <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Civil Cal')); ?>. All Rights Reserved.</p>
+                <p>Professional Tools for Modern Engineering</p>
+            <?php } ?>
         </div>
     </footer>
 <?php endif; ?>

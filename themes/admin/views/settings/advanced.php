@@ -336,6 +336,7 @@ function saveAdvancedSettings() {
     });
     
     formData.append('csrf_token', '<?= csrf_token() ?>');
+    formData.append('setting_group', 'advanced');
     
     fetch('<?= app_base_url('/admin/settings/advanced/save') ?>', {
         method: 'POST',

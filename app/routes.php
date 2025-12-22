@@ -16,8 +16,9 @@ $router->add("POST", "/contact", "HomeController@contact");
 $router->add("GET", "/pages/preview/{id}", "HomeController@pagePreview");
 
 // Authentication Routes
-$router->add("GET", "/login", "AuthController@showLogin", ["guest"]);
 $router->add("POST", "/login", "AuthController@login", ["guest"]);
+$router->add("GET", "/login/2fa", "AuthController@show2FA", ["guest"]);
+$router->add("POST", "/login/2fa", "AuthController@verify2FA", ["guest"]);
 $router->add("GET", "/register", "AuthController@showRegister", ["guest"]);
 $router->add("POST", "/register", "AuthController@register", ["guest"]);
 $router->add("GET", "/forgot-password", "AuthController@showForgotPassword", [
@@ -349,7 +350,13 @@ $router->add(
 $router->add(
     "GET",
     "/admin/settings/backup",
-    "Admin\SettingsController@backup",
+    "Admin\BackupController@index",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/settings/backup",
+    "Admin\BackupController@save",
     ["auth", "admin"],
 );
 $router->add(

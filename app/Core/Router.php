@@ -15,17 +15,26 @@ class Router
         'cors' => '\App\Middleware\CorsMiddleware',
         'csrf' => '\App\Middleware\CsrfMiddleware',
         'security' => '\App\Middleware\SecurityMiddleware',
-        'ratelimit' => '\App\Middleware\RateLimitMiddleware'
+        'ratelimit' => '\App\Middleware\RateLimitMiddleware',
+        'maintenance' => '\App\Middleware\MaintenanceMiddleware'
     ];
 
     public function add($method, $uri, $controller, $middleware = [])
     {
         $mw = $middleware;
+        if (!in_array('maintenance', $mw, true)) {
+            $mw[] = 'maintenance';
+        }
         if (!in_array('security', $mw, true)) {
             $mw[] = 'security';
         }
-        if (stripos($uri, '/api') === 0 && !in_array('cors', $mw, true)) {
-            $mw[] = 'cors';
+        if (stripos($uri, '/api') === 0) {
+            if (!in_array('cors', $mw, true)) {
+                $mw[] = 'cors';
+            }
+            if (!in_array('ratelimit', $mw, true)) {
+                $mw[] = 'ratelimit';
+            }
         }
         if (strtoupper($method) !== 'OPTIONS' && !in_array('cors', $mw, true)) {
             $mw[] = 'cors';
