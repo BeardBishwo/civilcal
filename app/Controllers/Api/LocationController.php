@@ -3,7 +3,7 @@
 namespace App\Controllers\Api;
 
 use App\Core\Controller;
-use App\Services\GeoLocationService;
+use App\Services\GeolocationService;
 use Exception;
 
 class LocationController extends Controller
@@ -18,7 +18,7 @@ class LocationController extends Controller
         header('Access-Control-Allow-Methods: GET');
         
         try {
-            $geoService = new GeoLocationService();
+            $geoService = new GeolocationService();
             $location = $geoService->getLocationDetails();
             
             echo json_encode([
@@ -51,7 +51,7 @@ class LocationController extends Controller
         header('Content-Type: application/json');
         
         try {
-            $geoService = new GeoLocationService();
+            $geoService = new GeolocationService();
             $status = $geoService->getStatus();
             
             echo json_encode([
