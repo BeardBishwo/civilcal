@@ -172,6 +172,45 @@ div.contact-card .form-label {
     cursor: not-allowed;
 }
 
+.report-cta-card {
+    background: linear-gradient(135deg, #1e293b, #334155);
+    border-radius: 16px;
+    padding: 2rem;
+    color: white;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.report-cta-card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.report-cta-card p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 1.5rem;
+}
+
+.btn-report-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #667eea;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-report-cta:hover {
+    background: #5a67d8;
+    transform: translateY(-2px);
+}
+
 .info-card {
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
     border-radius: 16px;
@@ -509,6 +548,14 @@ div.contact-card .form-label {
                     <h4>Expert Team</h4>
                     <p>Professional support staff</p>
                 </div>
+            </div>
+
+            <div class="report-cta-card">
+                <h3><i class="fas fa-bug"></i> Found a Bug?</h3>
+                <p>If you noticed an incorrect calculation or a technical issue, please use our dedicated reporting tool for a faster fix.</p>
+                <a href="<?= app_base_url('/report') ?>" class="btn-report-cta">
+                    <i class="fas fa-flag"></i> Report Issue
+                </a>
             </div>
         </div>
     </div>

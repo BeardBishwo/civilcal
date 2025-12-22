@@ -27,8 +27,8 @@ class EmailThread {
     
     public function create($data) {
         $stmt = $this->db->getPdo()->prepare("
-            INSERT INTO email_threads (user_id, from_email, from_name, subject, message, category, priority) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO email_threads (user_id, from_email, from_name, subject, message, category, priority, calculator_url, screenshot_path) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         
         return $stmt->execute([
@@ -38,7 +38,9 @@ class EmailThread {
             $data['subject'],
             $data['message'],
             $data['category'] ?? 'general',
-            $data['priority'] ?? 'medium'
+            $data['priority'] ?? 'medium',
+            $data['calculator_url'] ?? null,
+            $data['screenshot_path'] ?? null
         ]);
     }
     
