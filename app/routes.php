@@ -938,6 +938,12 @@ $router->add(
     "Admin\DebugController@clearLogs",
     ["auth", "admin", "csrf"],
 );
+$router->add(
+    "GET",
+    "/admin/debug/download-logs",
+    "Admin\DebugController@downloadLogs",
+    ["auth", "admin"]
+);
 
 // API Routes (Enhanced)
 $router->add("POST", "/api/calculate", "ApiController@calculate");

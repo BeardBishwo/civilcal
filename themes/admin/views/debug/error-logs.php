@@ -223,7 +223,14 @@ function toggleMessage(index) {
 async function clearLogs() {
     showConfirmModal('Clear Logs', "Are you sure you want to clear all error logs?", async () => {
         try {
-            const response = await fetch("<?= app_base_url('/admin/debug/clear-logs') ?>", { method: "POST" });
+            const csrfToken = '<?= csrf_token() ?>';
+            const response = await fetch("<?= app_base_url('/admin/debug/clear-logs') ?>", { 
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `csrf_token=${encodeURIComponent(csrfToken)}`
+            });
             const result = await response.json();
             
             if (result.success) {

@@ -5,14 +5,14 @@ namespace App\Controllers\Admin;
 use App\Core\Controller;
 use App\Core\AdminModuleManager;
 use App\Models\User;
-use App\Services\GeoLocationService;
+use App\Services\GeolocationService;
 use App\Services\InstallerService;
 use Exception;
 
 /**
  * Debug Controller - System Testing & Monitoring
  */
-class DebugController extends Controller
+class DebugController extends \App\Core\Controller
 {
     public function __construct()
     {
@@ -85,8 +85,8 @@ class DebugController extends Controller
         }
 
         if (empty($_SESSION['csrf_token'])) {
-            if (class_exists('Security')) {
-                \Security::generateCsrfToken();
+            if (class_exists('\App\Services\Security')) {
+                \App\Services\Security::generateCsrfToken();
             } else {
                 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                 $_SESSION['csrf_expiry'] = time() + 3600;
@@ -110,6 +110,12 @@ class DebugController extends Controller
      */
     public function clearLogs()
     {
+        // CSRF Check
+        if (!verify_csrf($_POST['csrf_token'] ?? '')) {
+            $this->json(['success' => false, 'error' => 'Invalid CSRF token']);
+            return;
+        }
+
         try {
             $logDir = __DIR__ . '/../../storage/logs';
             $cleared = 0;
@@ -144,6 +150,12 @@ class DebugController extends Controller
     public function liveErrors()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // CSRF Check
+            if (!verify_csrf($_POST['csrf_token'] ?? '')) {
+                $this->json(['success' => false, 'error' => 'Invalid CSRF token']);
+                return;
+            }
+
             $since = $_POST['since'] ?? date('Y-m-d H:i:s', strtotime('-5 minutes'));
             $errors = $this->getErrorsSince($since);
 
@@ -160,6 +172,36 @@ class DebugController extends Controller
         ];
 
         $this->view->render('admin/debug/live-monitor', $data);
+    }
+
+    /**
+     * Download current error log
+     */
+    public function downloadLogs()
+    {
+        $logDir = __DIR__ . '/../../storage/logs';
+        $logFile = $logDir . '/' . date('Y-m-d') . '.log';
+
+        if (!file_exists($logFile)) {
+            // Log the error and show notification instead of simple exit
+            error_log("Attempted download of non-existent log: " . $logFile);
+            header("Location: " . app_base_url('/admin/debug/error-logs?error=no_log_found'));
+            exit;
+        }
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="' . basename($logFile) . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($logFile));
+        
+        // Clear output buffer to avoid any extra characters
+        if (ob_get_level()) ob_end_clean();
+        
+        readfile($logFile);
+        exit;
     }
 
     /**
@@ -409,7 +451,7 @@ class DebugController extends Controller
             'File Permissions' => $this->testFilePermissions(),
             'Module System' => $this->testModuleSystem(),
             'User Authentication' => $this->testUserAuth(),
-            'GeoLocation Service' => $this->testGeoLocation(),
+            'Geolocation Service' => $this->testGeolocation(),
             'Installer Service' => $this->testInstallerService(),
             'Admin Panel' => $this->testAdminPanel()
         ];
@@ -541,22 +583,22 @@ class DebugController extends Controller
     }
 
     /**
-     * Test GeoLocation service
+     * Test Geolocation service
      */
-    private function testGeoLocation()
+    private function testGeolocation()
     {
         try {
-            $geoService = new GeoLocationService();
+            $geoService = new GeolocationService();
             $status = $geoService->getStatus();
 
             return [
                 'status' => 'pass',
-                'messages' => ['GeoLocation service initialized']
+                'messages' => ['Geolocation service initialized']
             ];
         } catch (Exception $e) {
             return [
                 'status' => 'warning',
-                'messages' => ['GeoLocation warning: ' . $e->getMessage()]
+                'messages' => ['Geolocation warning: ' . $e->getMessage()]
             ];
         }
     }

@@ -95,12 +95,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function poll() {
         if (!isPolling) return;
 
+        const csrfToken = '<?= csrf_token() ?>';
         fetch('<?= app_base_url('/admin/debug/live-errors') ?>', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `since=${lastCheck}`
+                body: `since=${lastCheck}&csrf_token=${encodeURIComponent(csrfToken)}`
             })
             .then(response => response.json())
             .then(data => {

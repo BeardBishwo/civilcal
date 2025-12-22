@@ -281,7 +281,11 @@ async function clearErrorLogs() {
     showConfirmModal('Clear Logs', "Are you sure you want to clear all error logs?", async () => {
         try {
             const response = await fetch("<?= app_base_url('/admin/debug/clear-logs') ?>", {
-                method: "POST"
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `csrf_token=${encodeURIComponent(csrfToken)}`
             });
             
             const result = await response.json();

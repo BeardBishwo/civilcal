@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'Database Connection': 'database',
         'Module System': 'modules',
         'User Authentication': 'auth',
-        'GeoLocation Service': 'services',
+        'Geolocation Service': 'services',
         'Installer Service': 'services',
         'File Permissions': 'files'
     };
