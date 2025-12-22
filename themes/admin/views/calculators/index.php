@@ -148,10 +148,17 @@ $totalModules = $stats['modules'];
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class="status-badge status-<?php echo ($calc['status'] === 'active') ? 'published' : 'draft'; ?>">
-                                                    <i class="fas fa-<?php echo ($calc['status'] === 'active') ? 'check-circle' : 'power-off'; ?>"></i>
-                                                    <?php echo ucfirst($calc['status']); ?>
-                                                </span>
+                                                <?php if ($calc['status'] === 'module_disabled'): ?>
+                                                    <span class="status-badge status-locked" title="Parent module is disabled">
+                                                        <i class="fas fa-lock"></i>
+                                                        Module Disabled
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="status-badge status-<?php echo ($calc['status'] === 'active') ? 'published' : 'draft'; ?>">
+                                                        <i class="fas fa-<?php echo ($calc['status'] === 'active') ? 'check-circle' : 'power-off'; ?>"></i>
+                                                        <?php echo ucfirst($calc['status']); ?>
+                                                    </span>
+                                                <?php endif; ?>
                                             </td>
                                             <td>
                                                 <div class="date-compact">
@@ -161,7 +168,11 @@ $totalModules = $stats['modules'];
                                             <td>
                                                 <div class="actions-compact">
                                                      <!-- Toggle Button -->
-                                                    <?php if ($calc['status'] === 'active'): ?>
+                                                    <?php if ($calc['status'] === 'module_disabled'): ?>
+                                                        <button class="action-btn-icon" disabled title="Parent module is disabled. Enable it in Modules.">
+                                                            <i class="fas fa-lock"></i>
+                                                        </button>
+                                                    <?php elseif ($calc['status'] === 'active'): ?>
                                                         <button class="action-btn-icon delete-btn" 
                                                                 onclick="toggleCalculator('<?php echo $calc['unique_id']; ?>', 'deactivate')" 
                                                                 title="Deactivate">
@@ -204,9 +215,15 @@ $totalModules = $stats['modules'];
                                 <div class="page-card-compact">
                                     <div class="card-header-compact">
                                         <div class="card-status">
-                                            <span class="status-badge status-<?php echo ($calc['status'] === 'active') ? 'published' : 'draft'; ?>">
-                                                <i class="fas fa-<?php echo ($calc['status'] === 'active') ? 'check-circle' : 'power-off'; ?>"></i>
-                                            </span>
+                                            <?php if ($calc['status'] === 'module_disabled'): ?>
+                                                <span class="status-badge status-locked" title="Parent module is disabled">
+                                                    <i class="fas fa-lock"></i>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="status-badge status-<?php echo ($calc['status'] === 'active') ? 'published' : 'draft'; ?>">
+                                                    <i class="fas fa-<?php echo ($calc['status'] === 'active') ? 'check-circle' : 'power-off'; ?>"></i>
+                                                </span>
+                                            <?php endif; ?>
                                             <small class="ms-2 text-muted"><?php echo htmlspecialchars($calc['module_name']); ?></small>
                                         </div>
                                         <div class="card-actions">
@@ -225,7 +242,11 @@ $totalModules = $stats['modules'];
                                         </div>
                                     </div>
                                     <div class="card-footer-compact">
-                                         <?php if ($calc['status'] === 'active'): ?>
+                                         <?php if ($calc['status'] === 'module_disabled'): ?>
+                                            <button class="btn btn-sm btn-outline-secondary w-100" disabled>
+                                                <i class="fas fa-lock"></i> Module Disabled
+                                            </button>
+                                        <?php elseif ($calc['status'] === 'active'): ?>
                                             <button class="btn btn-sm btn-outline-danger w-100" onclick="toggleCalculator('<?php echo $calc['unique_id']; ?>', 'deactivate')">
                                                 <i class="fas fa-power-off"></i> Deactivate
                                             </button>
@@ -568,6 +589,7 @@ $totalModules = $stats['modules'];
     }
     .status-published { background: rgba(72, 187, 120, 0.1); color: #48bb78; }
     .status-draft { background: rgba(237, 137, 54, 0.1); color: #ed8936; } /* Used for Inactive */
+    .status-locked { background: rgba(107, 114, 128, 0.1); color: #6b7280; border: 1px dashed #6b7280; }
 
     .author-compact {
         display: flex; text-align: left; align-items: center; gap: 0.375rem; 

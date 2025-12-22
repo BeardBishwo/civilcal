@@ -372,7 +372,15 @@ class CalculatorController extends Controller
 
     public function traditionalUnits()
     {
-        // Check Status
+        // Check Module Status First
+        $moduleService = new \App\Services\ModuleService();
+        $module = $moduleService->getModuleByName('country');
+        if (!$module || !$module['is_active']) {
+            header('Location: ' . app_base_url('/'));
+            exit;
+        }
+
+        // Check Individual Calculator Status
         $statusFile = BASE_PATH . '/storage/app/calculators_status.json';
         if (file_exists($statusFile)) {
             $config = json_decode(file_get_contents($statusFile), true);

@@ -27,19 +27,40 @@ class ModuleController extends Controller
         header('Pragma: no-cache');
         header('Expires: 0');
         
+        $modulesFromDb = $this->moduleService->getAllModules();
+        $modulesFromFile = $this->getAllModulesFromFileSystem();
+        
+        // Sync missing modules to DB
+        foreach ($modulesFromFile as $fModule) {
+            $exists = false;
+            foreach ($modulesFromDb as $dbModule) {
+                if ($dbModule['name'] === $fModule['slug']) {
+                    $exists = true;
+                    break;
+                }
+            }
+            
+            if (!$exists) {
+                // Add missing module to DB
+                $this->moduleService->createModule([
+                    'name' => $fModule['slug'],
+                    'description' => $fModule['description'],
+                    'category' => $fModule['category'],
+                    'is_active' => 1
+                ]);
+            }
+        }
+        
+        // Re-fetch all from DB (now including newly added ones)
         $modules = $this->moduleService->getAllModules();
         $categories = $this->getModuleCategories();
 
-        // If service didn't return modules, fall back to file-based approach
-        if (empty($modules)) {
-            $modules = $this->getAllModulesFromFileSystem();
-        } else {
-             // Enhance DB modules with display categories AND file system stats
-            $modulesPath = dirname(dirname(dirname(__DIR__))) . '/modules/';
-            
-            foreach ($modules as &$module) {
+        // Enhance DB modules with display categories AND file system stats
+        $modulesPath = dirname(dirname(dirname(__DIR__))) . '/modules/';
+        
+        foreach ($modules as &$module) {
             // The 'name' field in DB now contains the directory slug (e.g., 'civil', 'electrical')
-            $key = $module['name'] ?? strtolower(str_replace(' ', '-', $module['name']));
+            $key = $module['name'];
             $module['category'] = $this->getCategoryFromName($key);
             
             // Get actual file system stats for this module
@@ -55,11 +76,11 @@ class ModuleController extends Controller
                 // Fallback if directory doesn't exist
                 $module['calculators_count'] = 0;
                 $module['subcategories_count'] = 0;
+                $module['display_name'] = ucwords(str_replace(['-', '_'], ' ', $key));
             }
             
             // Map is_active (database) to status (view)
             $module['status'] = (isset($module['is_active']) && $module['is_active']) ? 'active' : 'inactive';
-            }
         }
 
         // Calculate real stats from processed modules

@@ -20,12 +20,26 @@ class CalculatorManagementController extends Controller
     {
         $calculators = $this->scanCalculators();
         $statusConfig = $this->loadStatusConfig();
+        
+        // Get module statuses for cascaded control
+        $moduleService = new \App\Services\ModuleService();
+        $dbModules = $moduleService->getAllModules();
+        $moduleStatuses = [];
+        foreach ($dbModules as $m) {
+            $moduleStatuses[$m['name']] = (isset($m['is_active']) && $m['is_active']) ? 'active' : 'inactive';
+        }
 
         // Apply Status
         foreach ($calculators as &$calc) {
-            // Default to Active if not in config
-            $status = $statusConfig[$calc['unique_id']] ?? 'active';
-            $calc['status'] = $status;
+            $moduleStatus = $moduleStatuses[$calc['module_slug']] ?? 'active';
+            
+            if ($moduleStatus === 'inactive') {
+                $calc['status'] = 'module_disabled';
+            } else {
+                // Default to Active if not in config
+                $status = $statusConfig[$calc['unique_id']] ?? 'active';
+                $calc['status'] = $status;
+            }
         }
         unset($calc);
 
@@ -52,7 +66,7 @@ class CalculatorManagementController extends Controller
         $stats = [
             'total' => count($calculators),
             'active' => count(array_filter($calculators, fn($c) => $c['status'] === 'active')),
-            'inactive' => count(array_filter($calculators, fn($c) => $c['status'] !== 'active')),
+            'inactive' => count(array_filter($calculators, fn($c) => $c['status'] === 'inactive' || $c['status'] === 'module_disabled')),
             'modules' => count($modules)
         ];
 
@@ -139,7 +153,15 @@ class CalculatorManagementController extends Controller
                     $uniqueId = $moduleSlug . '.' . $calculatorSlug;
                     
                     $moduleName = ucwords(str_replace(['-', '_'], ' ', $moduleSlug));
-                    $calculatorName = ucwords(str_replace(['-', '_'], ' ', $calculatorSlug));
+                    
+                    // Special Case for Nepali Land Converter
+                    if ($uniqueId === 'country.nepali-land') {
+                        $calculatorName = 'Nepali Land Converter';
+                        $url = '/nepali';
+                    } else {
+                        $calculatorName = ucwords(str_replace(['-', '_'], ' ', $calculatorSlug));
+                        $url = "/calculator/{$moduleSlug}/{$calculatorSlug}";
+                    }
 
                     $calculators[] = [
                         'unique_id' => $uniqueId,
@@ -148,22 +170,11 @@ class CalculatorManagementController extends Controller
                         'module_name' => $moduleName,
                         'module_slug' => $moduleSlug,
                         'path' => $relativePath,
-                        'url' => "/calculator/{$moduleSlug}/{$calculatorSlug}",
+                        'url' => $url,
                     ];
                 }
             }
         }
-        
-        // Manually inject Nepali Calculator (Special Case)
-        $calculators[] = [
-            'unique_id' => 'country.nepali-land',
-            'name' => 'Nepali Land Converter',
-            'slug' => 'nepali-land',
-            'module_name' => 'Country Calculator',
-            'module_slug' => 'country',
-            'path' => 'calculators/nepali.php',
-            'url' => '/nepali',
-        ];
 
         usort($calculators, function($a, $b) {
             if ($a['module_name'] === $b['module_name']) {
