@@ -23,9 +23,9 @@ try {
     $templates = [
         [
             'name' => 'Welcome Message',
-            'subject' => 'Welcome to Bishwo Calculator',
+            'subject' => 'Welcome to {{site_name}}',
             'content' => '<p>Hello {{user_name}},</p>
-<p>Welcome to Bishwo Calculator! We are thrilled to have you on board.</p>
+<p>Welcome to {{site_name}}! We are thrilled to have you on board.</p>
 <p>Our platform provides advanced engineering calculation tools to help you with:</p>
 <ul>
     <li>Civil Engineering calculations</li>
@@ -34,7 +34,7 @@ try {
     <li>And much more!</li>
 </ul>
 <p>If you have any questions, feel free to reach out to our support team.</p>
-<p>Best regards,<br>Bishwo Calculator Team</p>',
+<p>Best regards,<br>{{site_name}} Team</p>',
             'category' => 'general',
             'description' => 'Welcome email sent to new users',
             'variables' => json_encode(['user_name']),
@@ -44,7 +44,7 @@ try {
             'name' => 'Support Inquiry Response',
             'subject' => 'Re: {{inquiry_subject}}',
             'content' => '<p>Hello {{user_name}},</p>
-<p>Thank you for contacting Bishwo Calculator support.</p>
+<p>Thank you for contacting {{site_name}} support.</p>
 <p>We have received your inquiry regarding: <strong>{{inquiry_subject}}</strong></p>
 <p>Our support team is reviewing your request and will get back to you within 24 hours.</p>
 <p>Reference Number: #{{ticket_id}}</p>
@@ -62,7 +62,7 @@ try {
 <p><strong>Issue:</strong> {{issue_description}}</p>
 <p><strong>Resolution:</strong> {{resolution_details}}</p>
 <p>If you have any further questions or if the issue persists, please don\'t hesitate to reopen this ticket or create a new one.</p>
-<p>Thank you for using Bishwo Calculator!</p>
+<p>Thank you for using {{site_name}}!</p>
 <p>Best regards,<br>Support Team</p>',
             'category' => 'support',
             'description' => 'Email sent when a support ticket is resolved',

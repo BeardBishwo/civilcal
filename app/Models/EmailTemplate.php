@@ -211,7 +211,14 @@ class EmailTemplate {
         $content = $template['content'];
         $subject = $template['subject'];
 
-        foreach ($variables as $key => $value) {
+        // Auto-inject system variables from site settings
+        $systemVariables = $this->getSystemVariables();
+        
+        // Merge system variables with user-provided variables
+        // User variables take precedence over system variables
+        $allVariables = array_merge($systemVariables, $variables);
+
+        foreach ($allVariables as $key => $value) {
             $content = str_replace("{{$key}}", $value, $content);
             $subject = str_replace("{{$key}}", $value, $subject);
         }
@@ -220,6 +227,37 @@ class EmailTemplate {
             'subject' => $subject,
             'content' => $content
         ];
+    }
+
+    /**
+     * Get system variables from site settings
+     */
+    private function getSystemVariables() {
+        $variables = [
+            'current_year' => date('Y'),
+            'current_date' => date('F j, Y'),
+            'current_time' => date('g:i A'),
+        ];
+
+        // Load site settings
+        try {
+            $stmt = $this->db->getPdo()->query("SELECT setting_key, setting_value FROM site_settings WHERE setting_key IN ('site_name', 'site_tagline', 'company_name', 'support_email', 'support_phone', 'site_logo')");
+            
+            while ($row = $stmt->fetch()) {
+                // Remove 'site_' prefix for cleaner variable names
+                $key = str_replace('site_', '', $row['setting_key']);
+                $variables[$key] = $row['setting_value'];
+                
+                // Also keep original key for compatibility
+                $variables[$row['setting_key']] = $row['setting_value'];
+            }
+        } catch (Exception $e) {
+            // If settings can't be loaded, use defaults
+            $variables['site_name'] = 'Bishwo Calculator';
+            $variables['name'] = 'Bishwo Calculator';
+        }
+
+        return $variables;
     }
 
     /**
@@ -347,7 +385,11 @@ class EmailTemplate {
      * Process template content string with variables
      */
     public function processTemplateContent($content, $variables = []) {
-        foreach ($variables as $key => $value) {
+        // Auto-inject system variables
+        $systemVariables = $this->getSystemVariables();
+        $allVariables = array_merge($systemVariables, $variables);
+        
+        foreach ($allVariables as $key => $value) {
             $content = str_replace("{{$key}}", $value, $content);
         }
         return $content;
