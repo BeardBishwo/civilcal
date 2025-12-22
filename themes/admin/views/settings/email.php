@@ -313,9 +313,9 @@
                     <div class="form-group">
                         <label for="smtp_encryption" class="form-label">Encryption Type</label>
                         <select class="form-select" id="smtp_encryption" name="smtp_encryption">
-                            <option value="tls" <?= ($settings['smtp_encryption'] ?? '') == 'tls' ? 'selected' : '' ?>>TLS (Recommended)</option>
-                            <option value="ssl" <?= ($settings['smtp_encryption'] ?? '') == 'ssl' ? 'selected' : '' ?>>SSL</option>
-                            <option value="none" <?= ($settings['smtp_encryption'] ?? '') == 'none' ? 'selected' : '' ?>>None</option>
+                            <option value="tls" <?= ($settings['smtp_encryption'] ?? '') == 'tls' ? 'selected' : '' ?>>TLS (Recommended / 587)</option>
+                            <option value="ssl" <?= ($settings['smtp_encryption'] ?? '') == 'ssl' ? 'selected' : '' ?>>SSL (465)</option>
+                            <option value="none" <?= ($settings['smtp_encryption'] ?? '') == 'none' ? 'selected' : '' ?>>None (25)</option>
                         </select>
                     </div>
                 </div>

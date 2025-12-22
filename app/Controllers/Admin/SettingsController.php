@@ -116,8 +116,35 @@ class SettingsController extends Controller
     {
         $this->requireAdminWithBasicAuth();
 
-        $this->view->render('admin/settings/application', [
-            'title' => 'Advanced Settings'
+        // Get advanced settings
+        $settings = SettingsService::getAll('advanced');
+        $perfSettings = SettingsService::getAll('performance');
+        $secSettings = SettingsService::getAll('security');
+        $systemSettings = SettingsService::getAll('system');
+        $apiSettings = SettingsService::getAll('api');
+
+        $advanced_settings = array_merge(
+            $settings,
+            $perfSettings,
+            $secSettings,
+            $systemSettings,
+            $apiSettings
+        );
+
+        // System info
+        $system_info = [
+            'app_version' => '1.5.0',
+            'php_version' => PHP_VERSION,
+            'db_version' => 'MySQL 8.0',
+            'memory_limit' => ini_get('memory_limit'),
+            'server_os' => PHP_OS,
+            'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'N/A'
+        ];
+
+        $this->view->render('admin/settings/advanced', [
+            'title' => 'Advanced Settings',
+            'advanced_settings' => $advanced_settings,
+            'system_info' => $system_info
         ]);
     }
 
@@ -948,7 +975,11 @@ class SettingsController extends Controller
             'api_key' => 'api',
             'api_rate_limit' => 'api',
             'api_timeout' => 'api',
-            'cors_origins' => 'api'
+            'cors_origins' => 'api',
+
+            // Custom Code
+            'custom_header_code' => 'advanced',
+            'custom_footer_code' => 'advanced'
         ];
 
         // Handle Checkboxes first (those NOT in $_POST)

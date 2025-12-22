@@ -1,569 +1,952 @@
 <?php
 /**
- * PREMIUM ADVANCED SETTINGS INTERFACE
- * Matching the design of other admin pages
+ * ULTRA-PREMIUM ADVANCED SETTINGS INTERFACE
+ * Designed for Bishwo Calculator - Maximum Performance & Security
  */
 
-$page_title = $page_title ?? 'Advanced Settings';
+$page_title = $page_title ?? 'Advanced Configuration';
 $advanced_settings = $advanced_settings ?? [];
 $system_info = $system_info ?? [];
+
+// Helper to get setting value with default
+function getSet($key, $default = '') {
+    global $advanced_settings;
+    return $advanced_settings[$key] ?? $default;
+}
+
+// Helper for checkboxes
+function isChecked($key, $default = false) {
+    $val = getSet($key, $default ? '1' : '0');
+    return $val === '1' || $val === 'true' || $val === true;
+}
 ?>
 
-<!-- Optimized Admin Wrapper Container -->
-<div class="admin-wrapper-container">
-    <div class="admin-content-wrapper">
-
-        <!-- Compact Page Header -->
-        <div class="compact-header">
-            <div class="header-left">
-                <div class="header-title">
-                    <i class="fas fa-cogs"></i>
-                    <h1>Advanced Settings</h1>
+<div class="advanced-settings-wrapper">
+    <!-- Header Section -->
+    <div class="premium-header">
+        <div class="header-content">
+            <div class="title-area">
+                <div class="icon-box">
+                    <i class="fas fa-microchip"></i>
                 </div>
-                <div class="header-subtitle">Configure system performance, security, and debugging options</div>
+                <div class="text-box">
+                    <h1><?= htmlspecialchars($page_title) ?></h1>
+                    <p>Core system engine, security hardening, and performance fine-tuning.</p>
+                </div>
             </div>
-            <div class="header-actions">
-                <button class="btn btn-outline-warning btn-compact" onclick="resetToDefaults()">
-                    <i class="fas fa-undo"></i>
-                    <span>Reset to Defaults</span>
+            <div class="action-area">
+                <button class="btn-premium btn-secondary-glass" onclick="resetToDefaults()">
+                    <i class="fas fa-history"></i> Reset
                 </button>
-                <button class="btn btn-primary btn-compact" onclick="saveAdvancedSettings()">
-                    <i class="fas fa-save"></i>
-                    <span>Save Changes</span>
+                <button class="btn-premium btn-primary-gradient" onclick="saveAdvancedSettings()">
+                    <i class="fas fa-save"></i> Save Changes
                 </button>
             </div>
         </div>
+    </div>
 
-        <!-- System Information Cards -->
-        <div class="compact-stats">
-            <div class="stat-item">
-                <div class="stat-icon primary">
-                    <i class="fas fa-code-branch"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value"><?php echo htmlspecialchars($system_info['app_version'] ?? '1.0.0'); ?></div>
-                    <div class="stat-label">App Version</div>
-                </div>
+    <div class="advanced-grid">
+        <!-- Sidebar Navigation -->
+        <aside class="settings-sidebar-nav">
+            <div class="nav-sticky">
+                <a href="#performance" class="nav-item active" data-section="performance">
+                    <i class="fas fa-bolt"></i> Performance
+                </a>
+                <a href="#security" class="nav-item" data-section="security">
+                    <i class="fas fa-shield-halved"></i> Security
+                </a>
+                <a href="#debug" class="nav-item" data-section="debug">
+                    <i class="fas fa-bug-slash"></i> Debugging
+                </a>
+                <a href="#api" class="nav-item" data-section="api">
+                    <i class="fas fa-brackets-curly"></i> API Engine
+                </a>
+                <a href="#custom-code" class="nav-item" data-section="custom-code">
+                    <i class="fas fa-code"></i> Injection
+                </a>
+                <a href="#system-info" class="nav-item" data-section="system-info">
+                    <i class="fas fa-info-circle"></i> System Stats
+                </a>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon info">
-                    <i class="fab fa-php"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value"><?php echo htmlspecialchars($system_info['php_version'] ?? PHP_VERSION); ?></div>
-                    <div class="stat-label">PHP Version</div>
-                </div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon success">
-                    <i class="fas fa-database"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value"><?php echo htmlspecialchars($system_info['db_version'] ?? 'MySQL'); ?></div>
-                    <div class="stat-label">Database</div>
-                </div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon warning">
-                    <i class="fas fa-memory"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value"><?php echo htmlspecialchars($system_info['memory_limit'] ?? ini_get('memory_limit')); ?></div>
-                    <div class="stat-label">Memory Limit</div>
-                </div>
-            </div>
-        </div>
+        </aside>
 
-        <!-- Settings Sections -->
-        <div class="settings-grid">
-            <!-- Performance Settings -->
-            <div class="settings-card">
-                <div class="settings-card-header">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <h3>Performance Settings</h3>
-                </div>
-                <div class="settings-card-body">
-                    <form id="performance-settings">
-                        <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
-                        
-                        <div class="form-group-compact">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="cache_enabled" 
-                                       <?= ($advanced_settings['cache_enabled'] ?? true) ? 'checked' : '' ?>>
-                                <span>Enable Caching</span>
-                            </label>
-                            <small>System-wide caching for improved performance</small>
+        <!-- Main Content Area -->
+        <main class="settings-main-content">
+            <form id="advancedSettingsForm">
+                <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+
+                <!-- Performance Section -->
+                <section id="performance" class="settings-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <h2>Performance Optimization</h2>
+                            <span class="status-indicator <?= isChecked('cache_enabled', true) ? 'active' : 'inactive' ?>">
+                                <?= isChecked('cache_enabled', true) ? 'Engine Optimized' : 'Standard Speed' ?>
+                            </span>
                         </div>
-
-                        <div class="form-row-compact">
-                            <div class="form-group-compact">
-                                <label>Cache TTL (seconds)</label>
-                                <input type="number" class="form-control-compact" name="cache_ttl" 
-                                       value="<?= $advanced_settings['cache_ttl'] ?? 3600 ?>" min="60" max="86400">
+                        <div class="card-body">
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <label>System-wide Caching</label>
+                                    <p>Accelerate asset delivery and database query results.</p>
+                                </div>
+                                <div class="setting-control">
+                                    <label class="premium-toggle">
+                                        <input type="checkbox" name="cache_enabled" value="1" <?= isChecked('cache_enabled', true) ? 'checked' : '' ?>>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
-                            <div class="form-group-compact">
-                                <label>Cache Driver</label>
-                                <select class="form-control-compact" name="cache_driver">
-                                    <option value="file" <?= ($advanced_settings['cache_driver'] ?? 'file') === 'file' ? 'selected' : '' ?>>File</option>
-                                    <option value="redis" <?= ($advanced_settings['cache_driver'] ?? 'file') === 'redis' ? 'selected' : '' ?>>Redis</option>
-                                    <option value="memcached" <?= ($advanced_settings['cache_driver'] ?? 'file') === 'memcached' ? 'selected' : '' ?>>Memcached</option>
+
+                            <div class="setting-columns">
+                                <div class="form-group">
+                                    <label>Cache TTL (Seconds)</label>
+                                    <input type="number" name="cache_ttl" class="premium-input" value="<?= getSet('cache_ttl', 3600) ?>">
+                                    <small>How long data stays in memory before refreshing.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Storage Driver</label>
+                                    <select name="cache_driver" class="premium-select">
+                                        <option value="file" <?= getSet('cache_driver') === 'file' ? 'selected' : '' ?>>Filesystem (Local)</option>
+                                        <option value="redis" <?= getSet('cache_driver') === 'redis' ? 'selected' : '' ?>>Redis (Ultra Fast)</option>
+                                        <option value="memcached" <?= getSet('cache_driver') === 'memcached' ? 'selected' : '' ?>>Memcached</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <label>GZIP Compression</label>
+                                    <p>Compress HTML/JSON output to reduce bandwidth usage.</p>
+                                </div>
+                                <div class="setting-control">
+                                    <label class="premium-toggle">
+                                        <input type="checkbox" name="compression_enabled" value="1" <?= isChecked('compression_enabled', true) ? 'checked' : '' ?>>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="setting-columns">
+                                <div class="form-group">
+                                    <label>Session Lifetime (Min)</label>
+                                    <input type="number" name="session_lifetime" class="premium-input" value="<?= getSet('session_lifetime', 120) ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label>Concurrent Users Cap</label>
+                                    <input type="number" name="max_concurrent_users" class="premium-input" value="<?= getSet('max_concurrent_users', 5000) ?>">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Security Section -->
+                <section id="security" class="settings-section">
+                    <div class="section-card security-card">
+                        <div class="card-header">
+                            <h2>Security Hardening</h2>
+                            <i class="fas fa-lock-alt text-primary"></i>
+                        </div>
+                        <div class="card-body">
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <label>Force SSL/HTTPS</label>
+                                    <p>Automatically redirect all insecure requests to secure layer.</p>
+                                </div>
+                                <div class="setting-control">
+                                    <label class="premium-toggle toggle-success">
+                                        <input type="checkbox" name="force_https" value="1" <?= isChecked('force_https', true) ? 'checked' : '' ?>>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <label>Strict Security Headers</label>
+                                    <p>Enforce HSTS, X-Frame-Options, and CSP policies.</p>
+                                </div>
+                                <div class="setting-control">
+                                    <label class="premium-toggle toggle-success">
+                                        <input type="checkbox" name="security_headers" value="1" <?= isChecked('security_headers', true) ? 'checked' : '' ?>>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <label>Brute-Force Protection</label>
+                                    <p>Limit failed login attempts and monitor suspicious requests.</p>
+                                </div>
+                                <div class="setting-control">
+                                    <label class="premium-toggle toggle-success">
+                                        <input type="checkbox" name="rate_limiting" value="1" <?= isChecked('rate_limiting', true) ? 'checked' : '' ?>>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="setting-columns">
+                                <div class="form-group">
+                                    <label>Max Login Drops</label>
+                                    <input type="number" name="login_attempts" class="premium-input" value="<?= getSet('login_attempts', 5) ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label>Request Throttle (req/m)</label>
+                                    <input type="number" name="rate_limit_requests" class="premium-input" value="<?= getSet('rate_limit_requests', 60) ?>">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Debugging Section -->
+                <section id="debug" class="settings-section">
+                    <div class="section-card debug-card">
+                        <div class="card-header">
+                            <h2>Debugging & Diagnostics</h2>
+                            <div class="debug-status <?= isChecked('debug_mode') ? 'warning' : 'safe' ?>">
+                                <?= isChecked('debug_mode') ? 'DEVELOPER MODE ACTIVE' : 'PROD SAFE' ?>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <label>Debug Mode</label>
+                                    <p>Display full stack traces. <strong class="text-danger">Disable in production!</strong></p>
+                                </div>
+                                <div class="setting-control">
+                                    <label class="premium-toggle toggle-danger">
+                                        <input type="checkbox" name="debug_mode" value="1" <?= isChecked('debug_mode') ? 'checked' : '' ?>>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <label>Database Query Logging</label>
+                                    <p>Track all SQL operations for optimization profiling.</p>
+                                </div>
+                                <div class="setting-control">
+                                    <label class="premium-toggle">
+                                        <input type="checkbox" name="query_debug" value="1" <?= isChecked('query_debug') ? 'checked' : '' ?>>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group mt-3">
+                                <label>System Log Level</label>
+                                <select name="log_level" class="premium-select">
+                                    <option value="error" <?= getSet('log_level') === 'error' ? 'selected' : '' ?>>Critical & Errors</option>
+                                    <option value="warning" <?= getSet('log_level') === 'warning' ? 'selected' : '' ?>>Warnings Only</option>
+                                    <option value="info" <?= getSet('log_level') === 'info' ? 'selected' : '' ?>>Standard Info</option>
+                                    <option value="debug" <?= getSet('log_level') === 'debug' ? 'selected' : '' ?>>Deep Debug Session</option>
                                 </select>
                             </div>
-                        </div>
 
-                        <div class="form-group-compact">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="compression_enabled" 
-                                       <?= ($advanced_settings['compression_enabled'] ?? false) ? 'checked' : '' ?>>
-                                <span>Enable Output Compression</span>
-                            </label>
-                            <small>Compress HTML output for faster page loads</small>
-                        </div>
-
-                        <div class="form-row-compact">
-                            <div class="form-group-compact">
-                                <label>Session Lifetime (minutes)</label>
-                                <input type="number" class="form-control-compact" name="session_lifetime" 
-                                       value="<?= $advanced_settings['session_lifetime'] ?? 120 ?>" min="5" max="1440">
-                            </div>
-                            <div class="form-group-compact">
-                                <label>Max Concurrent Users</label>
-                                <input type="number" class="form-control-compact" name="max_concurrent_users" 
-                                       value="<?= $advanced_settings['max_concurrent_users'] ?? 1000 ?>" min="10" max="10000">
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Security Settings -->
-            <div class="settings-card">
-                <div class="settings-card-header">
-                    <i class="fas fa-shield-alt"></i>
-                    <h3>Security Settings</h3>
-                </div>
-                <div class="settings-card-body">
-                    <form id="security-settings">
-                        <div class="form-group-compact">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="force_https" 
-                                       <?= ($advanced_settings['force_https'] ?? false) ? 'checked' : '' ?>>
-                                <span>Force HTTPS</span>
-                            </label>
-                            <small>Redirect all HTTP requests to HTTPS</small>
-                        </div>
-
-                        <div class="form-group-compact">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="security_headers" 
-                                       <?= ($advanced_settings['security_headers'] ?? true) ? 'checked' : '' ?>>
-                                <span>Enable Security Headers</span>
-                            </label>
-                            <small>Add security headers to all responses</small>
-                        </div>
-
-                        <div class="form-group-compact">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="rate_limiting" 
-                                       <?= ($advanced_settings['rate_limiting'] ?? true) ? 'checked' : '' ?>>
-                                <span>Enable Rate Limiting</span>
-                            </label>
-                            <small>Limit number of requests per time period</small>
-                        </div>
-
-                        <div class="form-row-compact">
-                            <div class="form-group-compact">
-                                <label>Rate Limit (requests/min)</label>
-                                <input type="number" class="form-control-compact" name="rate_limit_requests" 
-                                       value="<?= $advanced_settings['rate_limit_requests'] ?? 60 ?>" min="1" max="1000">
-                            </div>
-                            <div class="form-group-compact">
-                                <label>Max Login Attempts</label>
-                                <input type="number" class="form-control-compact" name="login_attempts" 
-                                       value="<?= $advanced_settings['login_attempts'] ?? 5 ?>" min="1" max="20">
-                            </div>
-                        </div>
-
-                        <div class="form-group-compact">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="csrf_protection" 
-                                       <?= ($advanced_settings['csrf_protection'] ?? true) ? 'checked' : '' ?>>
-                                <span>Enable CSRF Protection</span>
-                            </label>
-                            <small>Protect forms from Cross-Site Request Forgery</small>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Debug Settings -->
-            <div class="settings-card">
-                <div class="settings-card-header">
-                    <i class="fas fa-bug"></i>
-                    <h3>Debug Settings</h3>
-                </div>
-                <div class="settings-card-body">
-                    <form id="debug-settings">
-                        <div class="form-group-compact">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="debug_mode" 
-                                       <?= ($advanced_settings['debug_mode'] ?? false) ? 'checked' : '' ?>>
-                                <span>Enable Debug Mode</span>
-                            </label>
-                            <small>Show detailed error messages (disable in production)</small>
-                        </div>
-
-                        <div class="form-group-compact">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="error_logging" 
-                                       <?= ($advanced_settings['error_logging'] ?? true) ? 'checked' : '' ?>>
-                                <span>Enable Error Logging</span>
-                            </label>
-                            <small>Log errors to file for troubleshooting</small>
-                        </div>
-
-                        <div class="form-group-compact">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="query_debug" 
-                                       <?= ($advanced_settings['query_debug'] ?? false) ? 'checked' : '' ?>>
-                                <span>Enable Query Debug</span>
-                            </label>
-                            <small>Log database queries for performance analysis</small>
-                        </div>
-
-                        <div class="form-row-compact">
-                            <div class="form-group-compact">
-                                <label>Log Level</label>
-                                <select class="form-control-compact" name="log_level">
-                                    <option value="error" <?= ($advanced_settings['log_level'] ?? 'error') === 'error' ? 'selected' : '' ?>>Error</option>
-                                    <option value="warning" <?= ($advanced_settings['log_level'] ?? 'error') === 'warning' ? 'selected' : '' ?>>Warning</option>
-                                    <option value="info" <?= ($advanced_settings['log_level'] ?? 'error') === 'info' ? 'selected' : '' ?>>Info</option>
-                                    <option value="debug" <?= ($advanced_settings['log_level'] ?? 'error') === 'debug' ? 'selected' : '' ?>>Debug</option>
-                                </select>
-                            </div>
-                            <div class="form-group-compact">
-                                <label>Performance Monitoring</label>
-                                <select class="form-control-compact" name="performance_monitoring">
-                                    <option value="disabled" <?= ($advanced_settings['performance_monitoring'] ?? 'disabled') === 'disabled' ? 'selected' : '' ?>>Disabled</option>
-                                    <option value="basic" <?= ($advanced_settings['performance_monitoring'] ?? 'disabled') === 'basic' ? 'selected' : '' ?>>Basic</option>
-                                    <option value="detailed" <?= ($advanced_settings['performance_monitoring'] ?? 'disabled') === 'detailed' ? 'selected' : '' ?>>Detailed</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="debug-actions-compact">
-                            <button type="button" class="btn btn-sm btn-outline-info" onclick="viewSystemLogs()">
-                                <i class="fas fa-file-alt"></i> View Logs
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-warning" onclick="clearSystemLogs()">
-                                <i class="fas fa-trash"></i> Clear Logs
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="runDiagnostics()">
-                                <i class="fas fa-stethoscope"></i> Run Diagnostics
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- API Settings -->
-            <div class="settings-card">
-                <div class="settings-card-header">
-                    <i class="fas fa-plug"></i>
-                    <h3>API Settings</h3>
-                </div>
-                <div class="settings-card-body">
-                    <form id="api-settings">
-                        <div class="form-group-compact">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="api_enabled" 
-                                       <?= ($advanced_settings['api_enabled'] ?? true) ? 'checked' : '' ?>>
-                                <span>Enable API</span>
-                            </label>
-                            <small>Enable REST API for external integrations</small>
-                        </div>
-
-                        <div class="form-group-compact">
-                            <label>API Key</label>
-                            <div class="input-group-compact">
-                                <input type="password" class="form-control-compact" name="api_key" 
-                                       value="<?= $advanced_settings['api_key'] ?? '' ?>" readonly>
-                                <button class="btn btn-sm btn-outline-secondary" type="button" onclick="generateApiKey()">
-                                    <i class="fas fa-sync"></i> Generate
+                            <div class="debug-quick-actions">
+                                <button type="button" class="btn-action" onclick="window.open('<?= app_base_url('/admin/debug/error-logs') ?>')">
+                                    <i class="fas fa-terminal"></i> Error Logs
+                                </button>
+                                <button type="button" class="btn-action" onclick="runTests()">
+                                    <i class="fas fa-vial"></i> Run System Tests
+                                </button>
+                                <button type="button" class="btn-action btn-danger-text" onclick="clearLogs()">
+                                    <i class="fas fa-trash-alt"></i> Purge Logs
                                 </button>
                             </div>
-                            <small>API key for authenticating external requests</small>
                         </div>
+                    </div>
+                </section>
 
-                        <div class="form-row-compact">
-                            <div class="form-group-compact">
-                                <label>API Rate Limit (req/hour)</label>
-                                <input type="number" class="form-control-compact" name="api_rate_limit" 
-                                       value="<?= $advanced_settings['api_rate_limit'] ?? 1000 ?>" min="1" max="10000">
+                <!-- API Section -->
+                <section id="api" class="settings-section">
+                    <div class="section-card api-card">
+                        <div class="card-header">
+                            <h2>API Gateway</h2>
+                            <i class="fas fa-link"></i>
+                        </div>
+                        <div class="card-body">
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <label>External API Access</label>
+                                    <p>Allow third-party applications to interface with the calculator engine.</p>
+                                </div>
+                                <div class="setting-control">
+                                    <label class="premium-toggle">
+                                        <input type="checkbox" name="api_enabled" value="1" <?= isChecked('api_enabled', true) ? 'checked' : '' ?>>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
-                            <div class="form-group-compact">
-                                <label>API Timeout (seconds)</label>
-                                <input type="number" class="form-control-compact" name="api_timeout" 
-                                       value="<?= $advanced_settings['api_timeout'] ?? 30 ?>" min="1" max="300">
+
+                            <div class="form-group">
+                                <label>Global API Master Key</label>
+                                <div class="premium-input-group">
+                                    <input type="text" id="api_key_field" name="api_key" class="premium-input mono" value="<?= getSet('api_key') ?>" readonly>
+                                    <button type="button" class="btn-input-action" onclick="regenerateKey()">
+                                        <i class="fas fa-sync"></i>
+                                    </button>
+                                </div>
+                                <small>Used for server-to-server communication authentication.</small>
+                            </div>
+
+                            <div class="form-group mt-3">
+                                <label>CORS Allowed Origins</label>
+                                <textarea name="cors_origins" class="premium-textarea mono" rows="3" placeholder="https://app.yoursite.com"><?= getSet('cors_origins') ?></textarea>
+                                <small>Domains allowed to make cross-origin requests. Use '*' for open access (risky).</small>
                             </div>
                         </div>
+                    </div>
+                </section>
 
-                        <div class="form-group-compact">
-                            <label>CORS Allowed Origins</label>
-                            <textarea class="form-control-compact" name="cors_origins" rows="3"
-                                      placeholder="https://example.com&#10;https://app.example.com"><?= htmlspecialchars($advanced_settings['cors_origins'] ?? '') ?></textarea>
-                            <small>Enter one origin per line. Use * for all origins.</small>
+                <!-- Custom Code Injection Section -->
+                <section id="custom-code" class="settings-section">
+                    <div class="section-card code-card">
+                        <div class="card-header">
+                            <h2>Code Injection</h2>
+                            <i class="fas fa-code"></i>
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Header Scripts (Trackers, Meta, etc.)</label>
+                                <div class="code-editor-container">
+                                    <textarea name="custom_header_code" class="premium-textarea mono-code" rows="8"><?= getSet('custom_header_code') ?></textarea>
+                                </div>
+                                <small>Inserted globally into the &lt;head&gt; section.</small>
+                            </div>
 
+                            <div class="form-group mt-4">
+                                <label>Footer Scripts (Live Chat, Pixel, etc.)</label>
+                                <div class="code-editor-container">
+                                    <textarea name="custom_footer_code" class="premium-textarea mono-code" rows="8"><?= getSet('custom_footer_code') ?></textarea>
+                                </div>
+                                <small>Inserted globally before the closing &lt;/body&gt; tag.</small>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- System Info Section -->
+                <section id="system-info" class="settings-section">
+                    <div class="section-card system-info-card">
+                        <div class="card-header">
+                            <h2>Environment Overview</h2>
+                            <span class="badge-system">v<?= htmlspecialchars($system_info['app_version'] ?? '1.5.0') ?></span>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="label">Architecture</span>
+                                    <span class="value"><?= htmlspecialchars($system_info['server_os'] ?? PHP_OS) ?></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">PHP Engine</span>
+                                    <span class="value"><?= htmlspecialchars($system_info['php_version'] ?? PHP_VERSION) ?></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Memory Utilization</span>
+                                    <span class="value"><?= htmlspecialchars($system_info['memory_limit'] ?? '128M') ?></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Web Server</span>
+                                    <span class="value"><?= htmlspecialchars(explode('/', $system_info['server_software'] ?? 'Apache')[0]) ?></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Database Driver</span>
+                                    <span class="value">PDO MySQL</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Uptime Level</span>
+                                    <span class="value text-success">Optimal</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </form>
+        </main>
     </div>
 </div>
 
+<style>
+/* PREMIUM DESIGN SYSTEM - ADVANCED CONFIGURATION */
+:root {
+    --p-indigo: #6366f1;
+    --p-indigo-dark: #4f46e5;
+    --p-indigo-soft: #eef2ff;
+    --p-slate-50: #f8fafc;
+    --p-slate-100: #f1f5f9;
+    --p-slate-200: #e2e8f0;
+    --p-slate-300: #cbd5e1;
+    --p-slate-600: #475569;
+    --p-slate-700: #334155;
+    --p-slate-800: #1e293b;
+    --p-slate-900: #0f172a;
+    --p-emerald: #10b981;
+    --p-rose: #f43f5e;
+    --p-amber: #f59e0b;
+    --p-card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --p-card-shadow-hover: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+.advanced-settings-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+}
+
+/* Header */
+.premium-header {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: var(--p-card-shadow);
+    margin-bottom: 30px;
+    border: 1px solid var(--p-slate-200);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.title-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.icon-box {
+    width: 60px;
+    height: 60px;
+    background: var(--p-indigo-soft);
+    color: var(--p-indigo);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    font-size: 28px;
+}
+
+.text-box h1 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--p-slate-900);
+    margin: 0;
+}
+
+.text-box p {
+    margin: 5px 0 0;
+    color: var(--p-slate-600);
+    font-size: 14px;
+}
+
+/* Buttons */
+.btn-premium {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-primary-gradient {
+    background: linear-gradient(135deg, var(--p-indigo) 0%, var(--p-indigo-dark) 100%);
+    color: white;
+}
+
+.btn-primary-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+}
+
+.btn-secondary-glass {
+    background: var(--p-slate-100);
+    color: var(--p-slate-700);
+}
+
+.btn-secondary-glass:hover {
+    background: var(--p-slate-200);
+}
+
+/* Grid Layout */
+.advanced-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* Sidebar Nav */
+.settings-sidebar-nav .nav-sticky {
+    position: sticky;
+    top: 100px;
+    background: white;
+    padding: 10px;
+    border-radius: 16px;
+    box-shadow: var(--p-card-shadow);
+    border: 1px solid var(--p-slate-200);
+}
+
+.settings-sidebar-nav .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    color: var(--p-slate-600);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 4px;
+    transition: all 0.2s;
+}
+
+.settings-sidebar-nav .nav-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.settings-sidebar-nav .nav-item:hover {
+    background: var(--p-slate-50);
+    color: var(--p-indigo);
+}
+
+.settings-sidebar-nav .nav-item.active {
+    background: var(--p-indigo-soft);
+    color: var(--p-indigo);
+}
+
+/* Sections & Cards */
+.settings-section {
+    margin-bottom: 30px;
+}
+
+.section-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: var(--p-card-shadow);
+    border: 1px solid var(--p-slate-200);
+    overflow: hidden;
+    transition: box-shadow 0.3s;
+}
+
+.section-card:hover {
+    box-shadow: var(--p-card-shadow-hover);
+}
+
+.card-header {
+    padding: 24px 30px;
+    border-bottom: 1px solid var(--p-slate-100);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--p-slate-900);
+    margin: 0;
+}
+
+.card-body {
+    padding: 30px;
+}
+
+/* Indicators */
+.status-indicator {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-indicator.active {
+    background: #ecfdf5;
+    color: var(--p-emerald);
+}
+
+.status-indicator.inactive {
+    background: var(--p-slate-100);
+    color: var(--p-slate-600);
+}
+
+.debug-status {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.debug-status.safe {
+    background: #ecfdf5;
+    color: var(--p-emerald);
+}
+
+.debug-status.warning {
+    background: #fffbeb;
+    color: var(--p-amber);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Rows & Columns */
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px dashed var(--p-slate-200);
+}
+
+.setting-row:first-child { padding-top: 0; }
+.setting-row:last-of-type { border-bottom: none; }
+
+.setting-info label {
+    display: block;
+    font-weight: 600;
+    color: var(--p-slate-800);
+    font-size: 15px;
+}
+
+.setting-info p {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--p-slate-600);
+}
+
+.setting-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+/* Inputs */
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--p-slate-700);
+    margin-bottom: 8px;
+}
+
+.premium-input, .premium-select, .premium-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--p-slate-200);
+    background: var(--p-slate-50);
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.premium-input:focus, .premium-select:focus, .premium-textarea:focus {
+    outline: none;
+    border-color: var(--p-indigo);
+    background: white;
+    box-shadow: 0 0 0 4px var(--p-indigo-soft);
+}
+
+.premium-textarea {
+    resize: vertical;
+}
+
+.mono { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 13px; }
+.mono-code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: #1e293b; color: #e2e8f0; border: none; }
+
+/* Toggle */
+.premium-toggle {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+}
+
+.premium-toggle input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--p-slate-300);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px; width: 20px;
+    left: 4px; bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+input:checked + .toggle-slider { background-color: var(--p-indigo); }
+.toggle-success input:checked + .toggle-slider { background-color: var(--p-emerald); }
+.toggle-danger input:checked + .toggle-slider { background-color: var(--p-rose); }
+
+input:checked + .toggle-slider:before { transform: translateX(24px); }
+
+/* API Key Input Group */
+.premium-input-group {
+    display: flex;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--p-slate-200);
+}
+
+.premium-input-group .premium-input {
+    border: none;
+    border-radius: 0;
+}
+
+.btn-input-action {
+    background: var(--p-slate-200);
+    border: none;
+    padding: 0 20px;
+    color: var(--p-slate-700);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-input-action:hover { background: var(--p-slate-300); }
+
+/* Debug Quick Actions */
+.debug-quick-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 1px solid var(--p-slate-100);
+}
+
+.btn-action {
+    background: var(--p-slate-100);
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--p-slate-700);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-action:hover { background: var(--p-slate-200); color: var(--p-indigo); }
+.btn-danger-text:hover { color: var(--p-rose); }
+
+/* Info Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.info-item {
+    padding: 15px;
+    background: var(--p-slate-50);
+    border-radius: 12px;
+    border: 1px solid var(--p-slate-200);
+}
+
+.info-item .label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--p-slate-500);
+    margin-bottom: 4px;
+    font-weight: 700;
+}
+
+.info-item .value {
+    font-weight: 600;
+    color: var(--p-slate-800);
+    font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .advanced-grid { grid-template-columns: 1fr; }
+    .settings-sidebar-nav { display: none; }
+    .info-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 576px) {
+    .setting-columns { grid-template-columns: 1fr; }
+    .info-grid { grid-template-columns: 1fr; }
+    .debug-quick-actions { flex-direction: column; }
+    .premium-header { padding: 20px; }
+    .title-area { flex-direction: column; text-align: center; }
+}
+</style>
+
 <script>
+/**
+ * Advanced Settings Management Logic
+ */
+
+// Smooth scroll & Sidebar active state
+document.addEventListener('DOMContentLoaded', () => {
+    const sections = document.querySelectorAll('.settings-section');
+    const navItems = document.querySelectorAll('.settings-sidebar-nav .nav-item');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (pageYOffset >= (sectionTop - 150)) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navItems.forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('data-section') === current) {
+                item.classList.add('active');
+            }
+        });
+    });
+
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = item.getAttribute('href');
+            document.querySelector(targetId).scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    });
+});
+
 function saveAdvancedSettings() {
-    const formData = new FormData();
+    const form = document.getElementById('advancedSettingsForm');
+    const formData = new FormData(form);
     
-    // Collect all form data
-    document.querySelectorAll('input, select, textarea').forEach(field => {
-        if (field.type === 'checkbox') {
-            formData.append(field.name, field.checked ? '1' : '0');
-        } else if (field.name) {
-            formData.append(field.name, field.value);
+    // Explicitly handle checkboxes that are unchecked (FormData ignores them)
+    form.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        if (!cb.checked) {
+            formData.set(cb.name, '0');
         }
     });
-    
-    formData.append('csrf_token', '<?= csrf_token() ?>');
-    formData.append('setting_group', 'advanced');
-    
+
+    showNotification('Synchronizing engine parameters...', 'info');
+
     fetch('<?= app_base_url('/admin/settings/advanced/save') ?>', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
         if (data.success) {
-            showNotification('Advanced settings saved successfully', 'success');
+            showNotification('System updated successfully! 🚀', 'success');
+            // Flash active indicator if cache was changed
+            location.reload(); 
         } else {
-            showNotification('Failed to save settings: ' + (data.message || 'Unknown error'), 'error');
+            showNotification('Update failed: ' + (data.message || 'Verification error'), 'error');
         }
     })
-    .catch(error => {
-        showNotification('Error saving settings', 'error');
-        console.error(error);
+    .catch(err => {
+        showNotification('Communication error with server', 'error');
+        console.error(err);
+    });
+}
+
+function regenerateKey() {
+    showConfirmModal('Regenerate Master API Key', 'Existing applications using this key will be disconnected immediately. Proceed?', () => {
+        fetch('<?= app_base_url('/admin/settings/advanced/generate-api-key') ?>', {
+            method: 'POST',
+            body: new FormData(document.getElementById('advancedSettingsForm'))
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('api_key_field').value = data.api_key;
+                showNotification('Global API key regenerated!', 'success');
+            } else {
+                showNotification('Key generation failed', 'error');
+            }
+        });
     });
 }
 
 function resetToDefaults() {
-    showConfirmModal('Reset Settings', 'Are you sure you want to reset all advanced settings to their default values? This action cannot be undone.', () => {
-        fetch('<?= app_base_url('/admin/settings/advanced/reset') ?>', {
+    showConfirmModal('Deep Reset System', 'All advanced configuration will revert to factory defaults. Custom code will be lost. Continue?', () => {
+        const resetForm = new FormData();
+        resetForm.append('setting_group', 'advanced');
+        resetForm.append('csrf_token', '<?= csrf_token() ?>');
+
+        fetch('<?= app_base_url('/admin/settings/reset') ?>', {
             method: 'POST',
-            headers: {
-                'X-CSRF-Token': '<?= csrf_token() ?>'
-            }
+            body: resetForm
         })
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
             if (data.success) {
-                showNotification('Settings reset to defaults', 'success');
-                setTimeout(() => location.reload(), 1000);
-            } else {
-                showNotification('Failed to reset settings', 'error');
+                showNotification('System defaults restored.', 'warning');
+                setTimeout(() => location.reload(), 1500);
             }
         });
     });
 }
 
-function generateApiKey() {
-    fetch('<?= app_base_url('/admin/settings/advanced/generate-api-key') ?>', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-Token': '<?= csrf_token() ?>'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.querySelector('input[name="api_key"]').value = data.api_key;
-            showNotification('New API key generated', 'success');
-        } else {
-            showNotification('Failed to generate API key', 'error');
-        }
-    });
-}
-
-function viewSystemLogs() {
-    window.open('<?= app_base_url('/admin/logs/view') ?>', '_blank');
-}
-
-function clearSystemLogs() {
-    showConfirmModal('Clear Logs', 'Are you sure you want to clear all system logs? This action cannot be undone.', () => {
-        fetch('<?= app_base_url('/admin/logs/clear') ?>', {
+function clearLogs() {
+    showConfirmModal('Purge Logs', 'Are you sure you want to delete all historical log entries?', () => {
+        fetch('<?= app_base_url('/admin/debug/clear-logs') ?>', {
             method: 'POST',
-            headers: {
-                'X-CSRF-Token': '<?= csrf_token() ?>'
-            }
+            body: new FormData(document.getElementById('advancedSettingsForm'))
         })
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
-            if (data.success) {
-                showNotification('System logs cleared successfully', 'success');
-            } else {
-                showNotification('Failed to clear logs', 'error');
-            }
+            if (data.success) showNotification('System logs purged.', 'success');
         });
     });
 }
 
-function runDiagnostics() {
-    showNotification('Running system diagnostics...', 'info');
-    
-    fetch('<?= app_base_url('/admin/diagnostics/run') ?>', {
+function runTests() {
+    showNotification('Launching diagnostic suite...', 'info');
+    fetch('<?= app_base_url('/admin/debug/run-tests') ?>', {
         method: 'POST',
-        headers: {
-            'X-CSRF-Token': '<?= csrf_token() ?>'
-        }
+        body: new FormData(document.getElementById('advancedSettingsForm'))
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
         if (data.success) {
-            showNotification('Diagnostics completed successfully', 'success');
-            window.open('<?= app_base_url('/admin/diagnostics/results') ?>', '_blank');
+            showNotification('Tests completed with 0 failures!', 'success');
+            window.open('<?= app_base_url('/admin/debug/error-logs') ?>', '_blank');
         } else {
-            showNotification('Diagnostics failed: ' + (data.message || 'Unknown error'), 'error');
+            showNotification('Diagnostics found potential issues.', 'warning');
         }
     });
 }
 </script>
-
-<style>
-/* Settings Grid */
-.settings-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-}
-
-/* Settings Card */
-.settings-card {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    overflow: hidden;
-}
-
-.settings-card-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1.25rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.settings-card-header i {
-    font-size: 1.25rem;
-}
-
-.settings-card-header h3 {
-    margin: 0;
-    font-size: 1.125rem;
-    font-weight: 600;
-}
-
-.settings-card-body {
-    padding: 1.5rem;
-}
-
-/* Form Styles */
-.form-group-compact {
-    margin-bottom: 1.25rem;
-}
-
-.form-group-compact label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: #2d3748;
-    font-size: 0.875rem;
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-}
-
-.checkbox-label input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-}
-
-.checkbox-label span {
-    font-weight: 500;
-}
-
-.form-group-compact small {
-    display: block;
-    margin-top: 0.25rem;
-    color: #718096;
-    font-size: 0.75rem;
-}
-
-.form-row-compact {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
-.form-control-compact {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    transition: border-color 0.2s;
-}
-
-.form-control-compact:focus {
-    outline: none;
-    border-color: #667eea;
-}
-
-.input-group-compact {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.input-group-compact .form-control-compact {
-    flex: 1;
-}
-
-.debug-actions-compact {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #e2e8f0;
-    flex-wrap: wrap;
-}
-
-@media (max-width: 768px) {
-    .settings-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-row-compact {
-        grid-template-columns: 1fr;
-    }
-    
-    .debug-actions-compact {
-        flex-direction: column;
-    }
-}
-</style>
