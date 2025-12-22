@@ -85,6 +85,14 @@ class CalculatorManagementController extends Controller
     public function toggle()
     {
         // Simple JSON-based toggle instead of DB for now
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        
+        if (!\App\Services\Security::validateCsrfToken()) {
+             http_response_code(403);
+             echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+             return;
+        }
+
         $id = $_POST['id'] ?? '';
         $action = $_POST['action'] ?? ''; // activate/deactivate
         

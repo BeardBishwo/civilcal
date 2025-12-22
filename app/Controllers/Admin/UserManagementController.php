@@ -11,9 +11,7 @@ class UserManagementController extends Controller
     public function __construct()
     {
         parent::__construct();
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        \App\Services\Security::startSession();
         $this->checkAdminAccess();
     }
 
@@ -113,29 +111,22 @@ class UserManagementController extends Controller
         $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
                   strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
-        // Get CSRF token - try both header and POST data
-        $submittedToken = '';
-        if ($isAjax) {
-            $submittedToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['csrf_token'] ?? '');
-        } else {
-            $submittedToken = $_POST['csrf_token'] ?? '';
-        }
-        
-        $sessionToken = $_SESSION['csrf_token'] ?? '';
-        
-        if (empty($submittedToken) || $submittedToken !== $sessionToken) {
+        // Helper to handle CSRF failure
+        $failCsrf = function() use ($isAjax) {
             if ($isAjax) {
                 http_response_code(403);
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Invalid CSRF token'
-                ]);
+                echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
                 exit;
             } else {
                 $_SESSION['flash_messages']['error'] = 'Invalid CSRF token';
                 redirect('/admin/users/create');
                 return;
             }
+        };
+
+        if (!\App\Services\Security::validateCsrfToken()) {
+            $failCsrf();
+            return;
         }
 
         try {
@@ -277,10 +268,8 @@ class UserManagementController extends Controller
                   strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
         // CSRF validation
-        $submittedToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['csrf_token'] ?? '');
-        $sessionToken = $_SESSION['csrf_token'] ?? '';
-        
-        if (empty($submittedToken) || $submittedToken !== $sessionToken) {
+        // CSRF validation
+        if (!\App\Services\Security::validateCsrfToken()) {
             if ($isAjax) {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
@@ -385,20 +374,16 @@ class UserManagementController extends Controller
                   strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
         // CSRF validation
+        // CSRF validation
+        // Security::validateCsrfToken automatically checks headers and POST
+        // For JSON input, we might need manual handling if not parsed automatically into POST
         $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['csrf_token'] ?? '');
-        
-        // Also check JSON input if token is missing
         if (empty($token)) {
-            $input = json_decode(file_get_contents('php://input'), true);
-            if (isset($input['csrf_token'])) {
-                $token = $input['csrf_token'];
-            }
+             $input = json_decode(file_get_contents('php://input'), true);
+             $token = $input['csrf_token'] ?? '';
         }
 
-        $sessionToken = $_SESSION['csrf_token'] ?? '';
-        
-        if (!$token || $token !== $sessionToken) {
-            error_log("Delete User Failed: CSRF Mismatch. Received: '$token', Expected: '$sessionToken'");
+        if (!\App\Services\Security::validateCsrfToken($token)) {
              if ($isAjax) {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
@@ -507,10 +492,11 @@ class UserManagementController extends Controller
         }
 
         // CSRF validation
+        // CSRF validation
         $input = json_decode(file_get_contents('php://input'), true);
         $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($input['csrf_token'] ?? '');
         
-        if (!$token || $token !== ($_SESSION['csrf_token'] ?? '')) {
+        if (!\App\Services\Security::validateCsrfToken($token)) {
             http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
             exit;

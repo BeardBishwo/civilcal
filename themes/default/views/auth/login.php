@@ -2,13 +2,11 @@
 $page_title = 'Sign In - ' . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
 require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-$csrf_token = $_SESSION['csrf_token'];
+// Safe Session Start
+\App\Services\Security::startSession();
+
+// Get CSRF Token
+$csrf_token = \App\Services\Security::generateCsrfToken();
 
 // Captcha Script
 if (\App\Services\SettingsService::get('captcha_on_login') == '1') {

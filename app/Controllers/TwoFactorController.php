@@ -71,6 +71,12 @@ class TwoFactorController extends Controller
                 $this->json(['error' => 'Not authenticated'], 401);
                 return;
             }
+
+            // CSRF Protection
+            if (!\App\Services\Security::validateCsrfToken()) {
+                $this->json(['error' => 'Invalid CSRF token'], 403);
+                return;
+            }
             
             $secret = $_SESSION['2fa_setup_secret'] ?? null;
             $code = $_POST['code'] ?? '';
@@ -111,6 +117,12 @@ class TwoFactorController extends Controller
                 $this->json(['error' => 'Not authenticated'], 401);
                 return;
             }
+
+            // CSRF Protection
+            if (!\App\Services\Security::validateCsrfToken()) {
+                $this->json(['error' => 'Invalid CSRF token'], 403);
+                return;
+            }
             
             $password = $_POST['password'] ?? '';
             
@@ -142,6 +154,11 @@ class TwoFactorController extends Controller
             
             if (!$userId) {
                 throw new Exception('Invalid session');
+            }
+
+            // CSRF Protection
+            if (!\App\Services\Security::validateCsrfToken()) {
+                throw new Exception('Invalid CSRF token');
             }
             
             if (empty($code)) {
@@ -219,6 +236,12 @@ class TwoFactorController extends Controller
                 $this->json(['error' => 'Not authenticated'], 401);
                 return;
             }
+
+            // CSRF Protection
+            if (!\App\Services\Security::validateCsrfToken()) {
+                $this->json(['error' => 'Invalid CSRF token'], 403);
+                return;
+            }
             
             $password = $_POST['password'] ?? '';
             
@@ -274,6 +297,12 @@ class TwoFactorController extends Controller
             
             if (!$userId) {
                 $this->json(['error' => 'Not authenticated'], 401);
+                return;
+            }
+
+            // CSRF Protection
+            if (!\App\Services\Security::validateCsrfToken()) {
+                $this->json(['error' => 'Invalid CSRF token'], 403);
                 return;
             }
             

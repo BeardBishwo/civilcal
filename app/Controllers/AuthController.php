@@ -28,9 +28,7 @@ class AuthController extends Controller
     public function logout()
     {
         try {
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
+            \App\Services\Security::startSession();
 
             // Unset all of the session variables.
             $_SESSION = array();
@@ -69,12 +67,23 @@ class AuthController extends Controller
             $isJson = isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false;
 
             if ($isJson) {
+                // CSRF Check for JSON
+                if (!\App\Services\Security::validateCsrfToken()) {
+                    header('Content-Type: application/json');
+                    http_response_code(403);
+                    echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
+                    exit;
+                }
                 $input = json_decode(file_get_contents('php://input'), true);
                 $username = $input['username_email'] ?? $input['username'] ?? '';
                 $password = $input['password'] ?? '';
                 $rememberMe = !empty($input['remember_me']);
                 $captchaResponse = $input['g-recaptcha-response'] ?? $input['h-captcha-response'] ?? $input['cf-turnstile-response'] ?? '';
             } else {
+                // CSRF Check for Form
+                if (!\App\Services\Security::validateCsrfToken()) {
+                     throw new Exception('Invalid CSRF token. Please refresh and try again.');
+                }
                 $username = $_POST['username'] ?? '';
                 $password = $_POST['password'] ?? '';
                 $rememberMe = isset($_POST['remember_me']);
@@ -252,6 +261,10 @@ class AuthController extends Controller
         $lastName = $_POST['last_name'] ?? '';
         
         try {
+            // CSRF Check
+            if (!\App\Services\Security::validateCsrfToken()) {
+                 throw new Exception('Invalid CSRF token. Please refresh and try again.');
+            }
             // Verify Captcha
             if (\App\Services\SettingsService::get('captcha_on_register') == '1') {
                 $recaptchaService = new \App\Services\RecaptchaService();

@@ -10,9 +10,8 @@ class AdminMiddleware
     public function handle($request, $next)
     {
         // Start session if not already started
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
+        // Start session securely
+        \App\Services\Security::startSession();
 
         // Check if user is authenticated via session
         $isAuthenticated = $this->checkSessionAuthentication();

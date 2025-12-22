@@ -78,6 +78,11 @@ class ProfileController extends Controller
                 throw new Exception('Invalid request method');
             }
 
+            // CSRF Protection
+            if (!\App\Services\Security::validateCsrfToken()) {
+                throw new Exception('Invalid CSRF token');
+            }
+
             $userId = $this->getCurrentUserId();
             $data = $this->getRequestData();
             
@@ -176,6 +181,11 @@ class ProfileController extends Controller
                 throw new Exception('Invalid request method');
             }
 
+            // CSRF Protection
+            if (!\App\Services\Security::validateCsrfToken()) {
+                throw new Exception('Invalid CSRF token');
+            }
+
             $userId = $this->getCurrentUserId();
             $data = $this->getRequestData();
             
@@ -216,6 +226,11 @@ class ProfileController extends Controller
                 throw new Exception('Invalid request method');
             }
 
+            // CSRF Protection
+            if (!\App\Services\Security::validateCsrfToken()) {
+                throw new Exception('Invalid CSRF token');
+            }
+
             $userId = $this->getCurrentUserId();
             $data = $this->getRequestData();
             
@@ -249,6 +264,11 @@ class ProfileController extends Controller
         try {
             if (!$this->isPostRequest()) {
                 throw new Exception('Invalid request method');
+            }
+
+            // CSRF Protection
+            if (!\App\Services\Security::validateCsrfToken()) {
+                throw new Exception('Invalid CSRF token');
             }
 
             $userId = $this->getCurrentUserId();
@@ -298,6 +318,11 @@ class ProfileController extends Controller
         try {
             if (!$this->isPostRequest()) {
                 throw new Exception('Invalid request method');
+            }
+
+            // CSRF Protection
+            if (!\App\Services\Security::validateCsrfToken()) {
+                throw new Exception('Invalid CSRF token');
             }
 
             $userId = $this->getCurrentUserId();
@@ -668,6 +693,11 @@ class ProfileController extends Controller
                 throw new Exception('Invalid request method');
             }
 
+            // CSRF Protection
+            if (!\App\Services\Security::validateCsrfToken()) {
+                throw new Exception('Invalid CSRF token');
+            }
+
             $userId = $this->getCurrentUserId();
             error_log("2FA Enable: User ID: " . $userId);
             
@@ -758,6 +788,11 @@ class ProfileController extends Controller
                 throw new Exception('Invalid request method');
             }
 
+            // CSRF Protection
+            if (!\App\Services\Security::validateCsrfToken()) {
+                throw new Exception('Invalid CSRF token');
+            }
+
             $userId = $this->getCurrentUserId();
             $data = $this->getRequestData();
             $code = $data['code'] ?? '';
@@ -802,6 +837,11 @@ class ProfileController extends Controller
         try {
             if (!$this->isPostRequest()) {
                 throw new Exception('Invalid request method');
+            }
+
+            // CSRF Protection
+            if (!\App\Services\Security::validateCsrfToken()) {
+                throw new Exception('Invalid CSRF token');
             }
 
             $userId = $this->getCurrentUserId();

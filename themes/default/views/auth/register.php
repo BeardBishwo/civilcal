@@ -2,9 +2,8 @@
 $page_title = 'Create Account - ' . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
 require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Safe Session Start
+\App\Services\Security::startSession();
 $csrf_token = \App\Services\Security::generateCsrfToken();
 
 // Engineering specialties

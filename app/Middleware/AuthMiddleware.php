@@ -7,9 +7,8 @@ class AuthMiddleware
     public function handle($request, $next)
     {
         // Start session if not already started
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
+        // Start session securely
+        \App\Services\Security::startSession();
 
         // Check if user is logged in via session
         $authenticated = false;

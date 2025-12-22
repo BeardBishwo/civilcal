@@ -18,7 +18,18 @@ class Security {
 
         // Set secure cookie params
         if (!headers_sent()) {
-            $secure = defined('REQUIRE_HTTPS') ? REQUIRE_HTTPS : true;
+            // Determine if we should use secure cookies
+            $isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+            $isLocalhost = in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1']) || $_SERVER['SERVER_NAME'] === 'localhost';
+            
+            // Default to true, but allow cleanup for localhost/http
+            $secure = defined('REQUIRE_HTTPS') ? REQUIRE_HTTPS : ($isHttps && !$isLocalhost);
+
+            // Force secure if we are definitely on HTTPS regardless of other settings
+            if ($isHttps) {
+                $secure = true;
+            }
+
             $domain = $_SERVER['HTTP_HOST'] ?? '';
             // Remove port from domain if present
             if (strpos($domain, ':') !== false) {
@@ -60,8 +71,11 @@ class Security {
         header('X-XSS-Protection: 1; mode=block');
         // Control referrer information
         header('Referrer-Policy: strict-origin-when-cross-origin');
-        // Enforce HTTPS HSTS (if valid cert)
-        // header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+        
+        // Enforce HTTPS HSTS (if on HTTPS)
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+            header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+        }
     }
 
     /**

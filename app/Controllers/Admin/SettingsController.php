@@ -11,7 +11,7 @@ class SettingsController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->ensureCsrfToken();
+        \App\Services\Security::startSession();
     }
 
     public function general()
@@ -252,14 +252,8 @@ class SettingsController extends Controller
 
 
         // CSRF Token validation
-        $csrfToken = $_POST['csrf_token'] ?? '';
-        $sessionToken = $_SESSION['csrf_token'] ?? '';
-
-        if (empty($csrfToken) || empty($sessionToken) || !hash_equals($sessionToken, $csrfToken)) {
-
+        if (!\App\Services\Security::validateCsrfToken()) {
             error_log("[SETTINGS_DEBUG] ERROR: Invalid CSRF token");
-            error_log("[SETTINGS_DEBUG] Submitted CSRF: $csrfToken");
-            error_log("[SETTINGS_DEBUG] Session CSRF: $sessionToken");
             echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
             exit;
         }
@@ -402,10 +396,7 @@ class SettingsController extends Controller
         }
 
         // CSRF Token validation
-        $csrfToken = $_POST['csrf_token'] ?? '';
-        $sessionToken = $_SESSION['csrf_token'] ?? '';
-
-        if (empty($csrfToken) || empty($sessionToken) || !hash_equals($sessionToken, $csrfToken)) {
+        if (!\App\Services\Security::validateCsrfToken()) {
             echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
             exit;
         }
