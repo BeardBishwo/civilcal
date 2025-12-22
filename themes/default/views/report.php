@@ -19,7 +19,7 @@
 }
 
 .report-card {
-    background: #ffffff !important;
+    background: #ffffff;
     border-radius: 24px;
     box-shadow: var(--card-shadow);
     overflow: hidden;
@@ -62,58 +62,49 @@
 }
 
 /* 
- * AGGRESSIVE OVERRIDES FOR GLOBAL THEME CONFLICTS
- * Force Light Mode behavior within report-card
+ * CLEANED UP REPORT STYLES
+ * No longer battle global theme.css since it has been fixed at the root
  */
 div.report-card label,
 div.report-card .form-label {
-    display: block !important;
-    font-weight: 800 !important;
-    color: #000000 !important;
-    margin-bottom: 0.6rem !important;
-    font-size: 0.95rem !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.025em !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    display: block;
+    font-weight: 800;
+    color: #000000;
+    margin-bottom: 0.6rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
 }
 
-/* Force Input visibility regardless of global theme.css !important rules */
-div.report-card .form-control,
-div.report-card input.form-control,
-div.report-card textarea.form-control {
-    width: 100% !important;
-    padding: 0.8rem 1.25rem !important;
-    border: 2px solid #e2e8e9 !important;
-    border-radius: 12px !important;
-    font-size: 1rem !important;
-    transition: all 0.3s ease !important;
-    background-color: #ffffff !important;
-    background-image: none !important;
-    color: #1a202c !important;
-    box-shadow: none !important;
+/* Clear, accessible inputs for the report form */
+div.report-card .form-control {
+    width: 100%;
+    padding: 0.8rem 1.25rem;
+    border: 2px solid #e2e8e9;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #ffffff;
+    color: #1a202c;
 }
 
 div.report-card .form-control:focus {
-    border-color: var(--input-focus) !important;
-    background-color: #ffffff !important;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1) !important;
-    outline: none !important;
+    border-color: var(--input-focus);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    outline: none;
 }
 
-/* Fix Muted/Small text visibility - Global .text-muted is often too light */
+/* Professional contrast for helper text */
 div.report-card .text-muted,
-div.report-card small,
-div.report-card .file-upload-text {
-    color: #475569 !important;
-    font-weight: 500 !important;
-    opacity: 1 !important;
+div.report-card small {
+    color: #475569;
+    font-weight: 500;
 }
 
 /* Placeholder refinement */
 div.report-card .form-control::placeholder {
-    color: #94a3b8 !important;
-    opacity: 1 !important;
+    color: #94a3b8;
 }
 
 .btn-report {
@@ -179,25 +170,25 @@ div.report-card .form-control::placeholder {
 }
 
 .priority-label {
-    display: block !important;
-    padding: 0.7rem !important;
-    border: 2px solid #e2e8f0 !important;
-    border-radius: 10px !important;
-    text-align: center !important;
-    cursor: pointer !important;
-    transition: all 0.3s ease !important;
-    font-size: 0.8rem !important;
-    font-weight: 700 !important;
-    color: #475569 !important;
-    background-color: #ffffff !important;
-    text-transform: uppercase !important;
+    display: block;
+    padding: 0.7rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #475569;
+    background-color: #ffffff;
+    text-transform: uppercase;
 }
 
 .priority-option input:checked + .priority-label {
-    border-color: #667eea !important;
-    background: var(--primary-gradient) !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+    border-color: #667eea;
+    background: var(--primary-gradient);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .info-item {

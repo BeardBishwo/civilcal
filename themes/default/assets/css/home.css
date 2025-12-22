@@ -1,15 +1,6 @@
 /* Homepage 3D Animated Calculator Tools Styles - Enhanced & Polished */
-:root {
-    --primary: #00ffff;
-    --secondary: #ff00ff;
-    --accent: #00ff00;
-    --dark: #0a0e27;
-    --light: #ffffff;
-    --gradient: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
-    --glass: rgba(0, 255, 255, 0.1);
-    --shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    --glow: 0 0 30px rgba(0, 255, 255, 0.6);
-}
+
+
 
 * {
     margin: 0;
@@ -24,12 +15,13 @@ html {
 
 html,
 body {
-    background: linear-gradient(135deg, #0a0e27, #1a1a4d, #0f0f2e) !important;
-    min-height: 100vh !important;
-    color: var(--light) !important;
-    overflow-x: hidden !important;
+    background: linear-gradient(135deg, #0a0e27, #1a1a4d, #0f0f2e);
+    min-height: 100vh;
+    color: var(--light);
+    overflow-x: hidden;
     position: relative;
 }
+
 
 /* Animated background gradient */
 @keyframes gradientShift {
@@ -50,50 +42,8 @@ body.index-page {
     animation: gradientShift 15s ease infinite;
 }
 
-/* Light mode - proper light background */
-body:not(.dark-theme),
-body:not(.dark-theme).index-page {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%) !important;
-    color: #1e293b !important;
-}
+/* Dark mode base is handled by theme.css */
 
-body:not(.dark-theme) html {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%) !important;
-}
-
-body:not(.dark-theme) .hero {
-    background: rgba(255, 255, 255, 0.8) !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
-}
-
-body:not(.dark-theme) .hero h1,
-body:not(.dark-theme) .hero h2,
-body:not(.dark-theme) .hero p {
-    color: #1e293b !important;
-}
-
-body:not(.dark-theme) .category-card {
-    background: rgba(255, 255, 255, 0.9) !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
-}
-
-body:not(.dark-theme) .category-card:hover {
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15) !important;
-}
-
-body:not(.dark-theme) .category-card h3 {
-    color: #1e293b !important;
-}
-
-body:not(.dark-theme) .category-card p {
-    color: #475569 !important;
-}
-
-body:not(.dark-theme) .category-icon {
-    color: #667eea !important;
-}
 
 .container {
     max-width: 1200px;
@@ -158,13 +108,15 @@ body:not(.dark-theme) .category-icon {
 .hero h1 {
     font-size: 4rem;
     font-weight: 800;
-    background: linear-gradient(45deg, #33ccff, #ff99cc, #66ff00);
+    background: var(--primary-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-bottom: 1rem;
     animation: titlePulse 2s ease-in-out infinite;
 }
+
+
 
 @keyframes titlePulse {
     0%,
@@ -282,7 +234,7 @@ body:not(.dark-theme) .category-icon {
 
 .module-title h2 {
     font-size: 2.5rem;
-    background: linear-gradient(45deg, #ff00ff, #33ccff, #66ff00);
+    background: var(--primary-gradient);
     background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -291,6 +243,8 @@ body:not(.dark-theme) .category-icon {
     padding: 0 2rem;
     animation: gradientFlow 3s ease infinite;
 }
+
+
 
 @keyframes gradientFlow {
     0% {
@@ -330,20 +284,14 @@ body:not(.dark-theme) .category-icon {
     margin: 3rem 0;
 }
 
+/* Category card base styles are in theme.css */
 .category-card {
-    background: rgba(255, 255, 255, 0.05);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
     border-radius: 25px;
     padding: 2.5rem;
-    border: 1px solid rgba(240, 147, 251, 0.15);
-    box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
 }
+
 
 .category-card::before {
     content: "";
@@ -398,11 +346,12 @@ body:not(.dark-theme) .category-icon {
 
 .category-header h3 {
     font-size: 1.8rem;
-    color: #00ffff;
+    color: #e2e8f0;
     margin-bottom: 0.3rem;
     font-weight: 700;
     letter-spacing: 0.5px;
 }
+
 
 .category-header p {
     font-size: 0.95rem;
@@ -424,107 +373,23 @@ body:not(.dark-theme) .category-icon {
     margin: 0;
 }
 
-/* Dark theme tool items (default for homepage) */
-body.dark-theme .tool-item,
-body:not(.light-mode) .tool-item {
-    padding: 1.2rem 1rem;
-    margin: 0.8rem 0;
-    background: rgba(30, 30, 60, 0.6);
+/* Tool items are now dark-theme only */
+/* Tool items use shared theme.css .btn styles where possible */
+.tool-item {
+    background: var(--surface-dark-alt);
+    border: 1px solid var(--glass-border);
     border-radius: 12px;
-    cursor: pointer;
-    border-left: 4px solid transparent;
-    border: 1.5px solid rgba(102, 126, 234, 0.5);
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
+    padding: 1rem;
+    transition: var(--transition-normal);
 }
 
-body.dark-theme .tool-item a,
-body:not(.light-mode) .tool-item a {
-    color: #ffffff;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 1.1rem;
-    font-weight: 800;
-    position: relative;
-    z-index: 1;
-    letter-spacing: 0.5px;
-}
-
-body.dark-theme .tool-item a span,
-body:not(.light-mode) .tool-item a span {
-    flex: 1;
-}
-
-body.dark-theme .tool-item a i,
-body:not(.light-mode) .tool-item a i {
-    margin-left: 0.8rem;
-    font-size: 1rem;
-    opacity: 0.9;
-    transition: all 0.3s ease;
-    color: #ffd700;
-}
-
-body.dark-theme .tool-item a::before,
-body:not(.light-mode) .tool-item a::before {
-    display: none;
-}
-
-/* Light mode tool items */
-body:not(.dark-theme) .tool-item {
-    padding: 1.2rem 1rem;
-    margin: 0.8rem 0;
-    background: rgba(255, 255, 255, 0.85) !important;
-    border-radius: 12px;
-    cursor: pointer;
-    border: 1.5px solid rgba(99, 102, 241, 0.3) !important;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-}
-
-body:not(.dark-theme) .tool-item:hover {
-    background: rgba(255, 255, 255, 0.95) !important;
-    border-color: rgba(99, 102, 241, 0.6) !important;
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+.tool-item:hover {
+    background: var(--surface-dark);
+    border-color: var(--primary-light);
     transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
-body:not(.dark-theme) .tool-item a {
-    color: #1e293b !important;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 1.1rem;
-    font-weight: 800;
-    position: relative;
-    z-index: 1;
-    letter-spacing: 0.5px;
-}
-
-body:not(.dark-theme) .tool-item a:hover {
-    color: #6366f1 !important;
-}
-
-body:not(.dark-theme) .tool-item a span {
-    flex: 1;
-}
-
-body:not(.dark-theme) .tool-item a i {
-    margin-left: 0.8rem;
-    font-size: 1rem;
-    opacity: 0.9;
-    transition: all 0.3s ease;
-    color: #f59e0b !important;
-}
-
-body:not(.dark-theme) .tool-item a::before {
-    display: none;
-}
 
 /* 3D Animation Elements - Enhanced */
 .floating-elements {

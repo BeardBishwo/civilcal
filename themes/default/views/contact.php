@@ -55,18 +55,13 @@
 
 div.contact-card label,
 div.contact-card .form-label {
-    display: block !important;
-    font-weight: 800 !important;
-    color: #000000 !important;
-    margin-bottom: 0.6rem !important;
-    font-size: 0.95rem !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-div.contact-card .form-label {
-    text-transform: uppercase !important;
-    letter-spacing: 0.025em !important;
+    display: block;
+    font-weight: 800;
+    color: #000000;
+    margin-bottom: 0.6rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
 }
 
 .form-label .required {
@@ -131,14 +126,14 @@ div.contact-card .form-label {
     transition: all 0.3s ease;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #1e293b !important;
-    background-color: #ffffff !important;
+    color: #1e293b;
+    background-color: #ffffff;
 }
 
 .priority-option input:checked + .priority-label {
-    border-color: #667eea !important;
-    background: linear-gradient(135deg, #667eea, #764ba2) !important;
-    color: #ffffff !important;
+    border-color: #667eea;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #ffffff;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
