@@ -1312,27 +1312,36 @@ $router->add(
     "Admin\\EmailManagerController@templates",
     ["auth", "admin"],
 );
+// Template Create Routes
 $router->add(
-    "POST",
-    "/admin/email-manager/templates",
+    "GET",
+    "/admin/email-manager/template/create",
     "Admin\\EmailManagerController@createTemplate",
     ["auth", "admin"],
 );
 $router->add(
+    "POST",
+    "/admin/email-manager/template/create",
+    "Admin\\EmailManagerController@createTemplate",
+    ["auth", "admin"],
+);
+// Template Edit Routes
+$router->add(
     "GET",
-    "/admin/email-manager/template/{id}",
+    "/admin/email-manager/template/{id}/edit",
     "Admin\\EmailManagerController@editTemplate",
     ["auth", "admin"],
 );
 $router->add(
-    "PUT",
-    "/admin/email-manager/template/{id}",
+    "POST",
+    "/admin/email-manager/template/{id}/update",
     "Admin\\EmailManagerController@updateTemplate",
     ["auth", "admin"],
 );
+// Template Delete Route
 $router->add(
-    "DELETE",
-    "/admin/email-manager/template/{id}",
+    "POST",
+    "/admin/email-manager/template/{id}/delete",
     "Admin\\EmailManagerController@deleteTemplate",
     ["auth", "admin"],
 );

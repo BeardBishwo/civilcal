@@ -132,11 +132,11 @@
                                             <td>
                                                 <?php if (!empty($template['is_active'])): ?>
                                                     <span class="badge-pill bg-success text-white text-xs">
-                                                        <i class="fas fa-check-circle mr-1"></i> Active
+                                                        Active
                                                     </span>
                                                 <?php else: ?>
                                                     <span class="badge-pill bg-secondary text-white text-xs">
-                                                        <i class="fas fa-times-circle mr-1"></i> Inactive
+                                                        Inactive
                                                     </span>
                                                 <?php endif; ?>
                                             </td>

@@ -534,6 +534,7 @@ class EmailManagerController extends Controller
 
     public function updateTemplate($id)
     {
+        // Accept POST method for form submissions
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return $this->jsonResponse(['error' => 'Method not allowed'], 405);
         }
@@ -579,6 +580,7 @@ class EmailManagerController extends Controller
 
     public function deleteTemplate($id)
     {
+        // Accept POST method for AJAX delete requests
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return $this->jsonResponse(['error' => 'Method not allowed'], 405);
         }
