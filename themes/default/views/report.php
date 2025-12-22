@@ -19,7 +19,7 @@
 }
 
 .report-card {
-    background: #ffffff;
+    background: #ffffff !important;
     border-radius: 24px;
     box-shadow: var(--card-shadow);
     overflow: hidden;
@@ -61,7 +61,10 @@
     margin-bottom: 1.5rem;
 }
 
-/* Explicit Bold Black Labels for Visibility */
+/* 
+ * AGGRESSIVE OVERRIDES FOR GLOBAL THEME CONFLICTS
+ * Force Light Mode behavior within report-card
+ */
 div.report-card label,
 div.report-card .form-label {
     display: block !important;
@@ -75,21 +78,42 @@ div.report-card .form-label {
     opacity: 1 !important;
 }
 
-.form-control {
-    width: 100%;
-    padding: 0.8rem 1.25rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: #f8fafc;
+/* Force Input visibility regardless of global theme.css !important rules */
+div.report-card .form-control,
+div.report-card input.form-control,
+div.report-card textarea.form-control {
+    width: 100% !important;
+    padding: 0.8rem 1.25rem !important;
+    border: 2px solid #e2e8e9 !important;
+    border-radius: 12px !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    color: #1a202c !important;
+    box-shadow: none !important;
 }
 
-.form-control:focus {
-    border-color: var(--input-focus);
-    background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-    outline: none;
+div.report-card .form-control:focus {
+    border-color: var(--input-focus) !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1) !important;
+    outline: none !important;
+}
+
+/* Fix Muted/Small text visibility - Global .text-muted is often too light */
+div.report-card .text-muted,
+div.report-card small,
+div.report-card .file-upload-text {
+    color: #475569 !important;
+    font-weight: 500 !important;
+    opacity: 1 !important;
+}
+
+/* Placeholder refinement */
+div.report-card .form-control::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
 }
 
 .btn-report {
@@ -115,18 +139,12 @@ div.report-card .form-label {
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
 }
 
-.btn-report:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    transform: none;
-}
-
 /* File Upload Premium Styling */
 .file-upload-wrapper {
     position: relative;
     width: 100%;
     height: 120px;
-    border: 2px dashed #e2e8f0;
+    border: 2px dashed #cbd5e1;
     border-radius: 12px;
     display: flex;
     flex-direction: column;
@@ -143,58 +161,13 @@ div.report-card .form-label {
     background: rgba(102, 126, 234, 0.05);
 }
 
-.file-upload-wrapper input[type="file"] {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-}
-
 .file-upload-icon {
     font-size: 2rem;
-    color: #94a3b8;
+    color: #64748b;
     margin-bottom: 0.5rem;
 }
 
-.file-upload-text {
-    color: #64748b;
-    font-size: 0.9rem;
-}
-
-.preview-container {
-    margin-top: 10px;
-    display: none;
-    position: relative;
-    width: 100%;
-    max-height: 200px;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.preview-image {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-}
-
-.remove-preview {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: rgba(239, 68, 68, 0.8);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Priority Styling (Consistent with contact) */
+/* Priority Styling Refinement */
 .priority-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -206,25 +179,25 @@ div.report-card .form-label {
 }
 
 .priority-label {
-    display: block;
-    padding: 0.6rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.8rem;
-    font-weight: 700;
+    display: block !important;
+    padding: 0.7rem !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
     color: #475569 !important;
     background-color: #ffffff !important;
-    text-transform: uppercase;
+    text-transform: uppercase !important;
 }
 
 .priority-option input:checked + .priority-label {
     border-color: #667eea !important;
     background: var(--primary-gradient) !important;
     color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
 }
 
 .info-item {
