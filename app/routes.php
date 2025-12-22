@@ -341,6 +341,12 @@ $router->add(
     ["auth", "admin"],
 );
 $router->add(
+    "POST",
+    "/admin/settings/advanced/save",
+    "Admin\SettingsController@saveAdvanced",
+    ["auth", "admin"],
+);
+$router->add(
     "GET",
     "/admin/settings/backup",
     "Admin\SettingsController@backup",

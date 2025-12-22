@@ -308,6 +308,7 @@
 
         <form action="<?php echo app_base_url('/admin/settings/update'); ?>" method="POST" class="security-form ajax-form" id="securitySettingsForm">
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+            <input type="hidden" name="setting_group" value="security">
 
         <!-- Authentication Section -->
         <div class="security-section">

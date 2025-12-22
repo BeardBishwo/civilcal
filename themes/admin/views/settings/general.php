@@ -567,6 +567,7 @@
                 <div class="card-body">
                     <form id="generalSettingsForm" action="<?php echo app_base_url('/admin/settings/update'); ?>" method="POST" enctype="multipart/form-data" class="ajax-form">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                        <input type="hidden" name="setting_group" value="general">
 
                         <div class="form-section">
                             <div class="form-row">

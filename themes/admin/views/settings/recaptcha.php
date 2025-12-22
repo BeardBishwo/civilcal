@@ -18,6 +18,7 @@ $content = '
 
             <form action="' . app_base_url('admin/settings/update') . '" method="POST" class="settings-form">
                 <input type="hidden" name="csrf_token" value="' . ($_SESSION['csrf_token'] ?? '') . '">
+                <input type="hidden" name="setting_group" value="recaptcha">
                 
                 <div class="form-group mt-3">
                     <label class="form-label">Captcha Provider</label>

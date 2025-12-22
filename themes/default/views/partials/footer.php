@@ -9,7 +9,7 @@ if ($show_footer): ?>
     <footer class="site-footer">
         <div class="container">
             <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro')); ?>. All Rights Reserved.</p>
-            <p>Professional Tools for Modern Engineering</p>
+            <p><?php echo htmlspecialchars(\App\Services\SettingsService::get('footer_text', 'Professional Tools for Modern Engineering')); ?></p>
         </div>
     </footer>
 <?php endif; ?>

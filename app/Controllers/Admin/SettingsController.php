@@ -275,11 +275,18 @@ class SettingsController extends Controller
             file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "SettingsController::save() - POST keys: " . implode(', ', array_keys($_POST)) . "\n", FILE_APPEND);
             file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "SettingsController::save() - POST data: " . json_encode($_POST) . "\n", FILE_APPEND);
 
-            foreach ($_POST as $key => $value) {
-                if ($key !== 'csrf_token' && strpos($key, '_') !== false) {
-                    error_log("[SETTINGS_DEBUG] Processing setting: $key = $value");
+            // Exclude specific POST keys that are NOT settings
+            $excludedKeys = ['csrf_token', 'gateway', 'submit', 'setting_group'];
+            
+            // Get setting group from POST or default to 'general'
+            $settingGroup = $_POST['setting_group'] ?? 'general';
 
-                    // Handle file uploads for image/file type settings
+            foreach ($_POST as $key => $value) {
+                // Remove underscore check to allow keys like 'favicon'
+                if (!in_array($key, $excludedKeys)) {
+                    error_log("[SETTINGS_DEBUG] Processing setting: $key = $value (Group: $settingGroup)");
+
+                    // Handle file uploads for image/file type settings (legacy support within loop)
                     if (isset($_FILES[$key]) && $_FILES[$key]['error'] === UPLOAD_ERR_OK) {
                         error_log("[SETTINGS_DEBUG] Handling file upload for: $key");
                         $value = $this->handleFileUpload($_FILES[$key]);
@@ -287,14 +294,18 @@ class SettingsController extends Controller
                     }
 
                     // Handle checkboxes (boolean values)
-                    if (!isset($_POST[$key]) && $this->isCheckboxField($key)) {
-                        $value = '0';
-                        error_log("[SETTINGS_DEBUG] Checkbox field $key set to 0 (unchecked)");
+                    // Note: If it's a checkbox but NOT in $_POST, this loop won't see it.
+                    // The isCheckboxField() logic is better handled outside for unsets, 
+                    // or we handle the 'on' value here.
+                    if ($value === 'on' || $this->isCheckboxField($key)) {
+                        if ($value === 'on') $value = '1';
+                        error_log("[SETTINGS_DEBUG] Checkbox/Boolean field $key processed as: $value");
                     }
 
                     try {
-                        $setResult = SettingsService::set($key, $value);
-                        error_log("[SETTINGS_DEBUG] SettingsService::set($key, $value) result: " . ($setResult ? 'SUCCESS' : 'FAILED'));
+                        // Pass the group to set()
+                        $setResult = SettingsService::set($key, $value, 'string', $settingGroup);
+                        error_log("[SETTINGS_DEBUG] SettingsService::set($key, $value, 'string', $settingGroup) result: " . ($setResult ? 'SUCCESS' : 'FAILED'));
 
                         if ($setResult) {
                             $updated++;
@@ -304,9 +315,9 @@ class SettingsController extends Controller
                                 'setting_updated',
                                 'settings',
                                 null,
-                                "Setting $key updated",
-                                json_encode(['old_value' => SettingsService::get($key)]),
-                                json_encode(['key' => $key, 'value' => $value])
+                                "Setting $key updated (Group: $settingGroup)",
+                                null, // Avoiding double fetch for performance in mass update
+                                json_encode(['key' => $key, 'value' => $value, 'group' => $settingGroup])
                             );
                         } else {
                             error_log("[SETTINGS_DEBUG] SettingsService::set() returned false for key: $key");
@@ -874,4 +885,95 @@ class SettingsController extends Controller
             ]);
         }
     }
+    /**
+     * Save advanced settings
+     * Handles mixed settings from multiple groups (performance, security, debug, api)
+     */
+    public function saveAdvanced() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            exit(json_encode(['success' => false, 'message' => 'Method not allowed']));
+        }
+
+        // Verify CSRF token
+        if (!verify_csrf($_POST['csrf_token'] ?? '')) {
+            http_response_code(403);
+            exit(json_encode(['success' => false, 'message' => 'Invalid CSRF token']));
+        }
+
+        $settings = $_POST;
+        $updated = 0;
+        $errors = 0;
+
+        // Map settings to their specific groups
+        $groupMap = [
+            // Performance
+            'cache_enabled' => 'performance',
+            'cache_ttl' => 'performance',
+            'cache_driver' => 'performance',
+            'compression_enabled' => 'performance',
+            'session_lifetime' => 'performance',
+            'max_concurrent_users' => 'performance',
+            
+            // Security
+            'force_https' => 'security',
+            'security_headers' => 'security',
+            'rate_limiting' => 'security',
+            'rate_limit_requests' => 'security',
+            'login_attempts' => 'security',
+            'csrf_protection' => 'security',
+            
+            // Debug/System
+            'debug_mode' => 'system',
+            'error_logging' => 'system',
+            'query_debug' => 'system',
+            'log_level' => 'system',
+            'performance_monitoring' => 'system',
+            
+            // API
+            'api_enabled' => 'api',
+            'api_key' => 'api',
+            'api_rate_limit' => 'api',
+            'api_timeout' => 'api',
+            'cors_origins' => 'api'
+        ];
+
+        // Process known settings
+        foreach ($settings as $key => $value) {
+            if (isset($groupMap[$key])) {
+                $group = $groupMap[$key];
+                
+                // Handle booleans (checkboxes sent as '1' or '0')
+                if ($value === '1' || $value === '0') {
+                    // Normalize to what SettingsService expects if needed, or keep as is
+                }
+
+                if (\App\Services\SettingsService::set($key, $value, 'string', $group)) {
+                    $updated++;
+                } else {
+                    $errors++;
+                }
+            }
+        }
+
+        // Log activity
+        if ($updated > 0) {
+            \App\Services\GDPRService::logActivity(
+                $_SESSION['user_id'] ?? null,
+                'settings_updated',
+                'settings',
+                null,
+                "Advanced settings updated ($updated settings changed)"
+            );
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => $updated > 0 || $errors === 0, // Success if no errors, even if nothing updated (unchanged)
+            'message' => "Settings saved successfully. Updated: $updated",
+            'updated' => $updated
+        ]);
+        exit;
+    }
+
 }

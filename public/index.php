@@ -15,6 +15,7 @@ require_once $bootstrapPath;
 // Start session safely
 \App\Services\Security::startSession();
 \App\Services\Security::setSecureHeaders();
+\App\Services\Security::enforceHttps();
 
 
 // Initialize router

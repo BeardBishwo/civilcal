@@ -121,9 +121,16 @@ class Security {
      */
     public static function checkRateLimit(string $action, string $identifier = ''): bool {
         $key = $action . ':' . ($identifier ?: self::getClientIdentifier());
-        $limit = defined('RATE_LIMIT_MAX_REQUESTS') && isset(RATE_LIMIT_MAX_REQUESTS[$action]) 
-            ? RATE_LIMIT_MAX_REQUESTS[$action] 
-            : 1000;
+        // Fix: RATE_LIMIT_MAX_REQUESTS could be an int or an array
+        $limit = 1000;
+        if (defined('RATE_LIMIT_MAX_REQUESTS')) {
+            $configuredLimit = RATE_LIMIT_MAX_REQUESTS;
+            if (is_array($configuredLimit)) {
+                $limit = $configuredLimit[$action] ?? 1000;
+            } else {
+                $limit = (int)$configuredLimit;
+            }
+        }
         $window = defined('RATE_LIMIT_WINDOW') ? RATE_LIMIT_WINDOW : 3600;
         
         $now = time();
@@ -167,11 +174,15 @@ class Security {
     }
 
     /**
-     * Enforce HTTPS in production
+     * Enforce HTTPS in production based on settings
      */
     public static function enforceHttps(): void {
-        $requireHttps = defined('REQUIRE_HTTPS') ? REQUIRE_HTTPS : true;
-        if ($requireHttps && !isset($_SERVER['HTTPS']) && ($_SERVER['SERVER_NAME'] !== 'localhost')) {
+        // Only run if headers haven't been sent
+        if (headers_sent()) return;
+
+        $forceHttps = SettingsService::get('force_https', '0') === '1';
+        
+        if ($forceHttps && !isset($_SERVER['HTTPS']) && ($_SERVER['SERVER_NAME'] !== 'localhost')) {
             $redirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
             header('Location: ' . $redirect, true, 301);
             exit;
