@@ -24,10 +24,17 @@ if ($show_footer): ?>
 
     </main>
     
-    <!-- Back to Top Script -->
+    <!-- Header Script -->
     <?php
     $tm = new \App\Services\ThemeManager();
     ?>
+    <script src="<?php echo $tm->themeUrl('assets/js/header.js'); ?>" 
+            defer
+            onerror="console.error('Error loading header.js:', event)"
+            onload="console.log('Header script loaded successfully')">
+    </script>
+    
+    <!-- Back to Top Script -->
     <script src="<?php echo $tm->themeUrl('assets/js/back-to-top.js'); ?>" 
             defer
             onerror="console.error('Error loading back-to-top.js:', event)"

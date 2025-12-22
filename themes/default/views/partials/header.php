@@ -487,14 +487,31 @@ if (
             </div>
     </header>
 
-    <!-- Search Overlay -->
+    <!-- Search Overlay - Minimal -->
     <div class="search-overlay" id="searchOverlay">
-        <button class="search-overlay-close" id="searchOverlayClose" aria-label="Close search">
-            <i class="fas fa-times"></i>
-        </button>
-        <div class="search-overlay-content">
-            <input type="text" id="overlaySearchInput" placeholder="Type to search tools, calculators..." autocomplete="off">
-            <div id="overlaySearchResults" class="search-suggestions" style="position: static; opacity: 1; visibility: visible; margin-top: 1rem; box-shadow: none; background: transparent; border: none;"></div>
+        <div class="search-overlay-container">
+            <button class="search-overlay-close" id="searchOverlayClose" aria-label="Close search">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input 
+                    type="text" 
+                    id="overlaySearchInput" 
+                    class="search-overlay-input"
+                    placeholder="Search calculators, tools, categories..." 
+                    autocomplete="off"
+                    autofocus>
+                <div class="search-stats" id="searchStats"></div>
+            </div>
+
+            <!-- Search Results -->
+            <div class="search-results-container">
+                <div class="search-results-section" id="searchResultsSection">
+                    <!-- Results will be dynamically inserted here -->
+                </div>
+            </div>
         </div>
     </div>
 
