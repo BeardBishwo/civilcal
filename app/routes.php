@@ -1021,125 +1021,23 @@ $router->add("GET", "/admin/audit-logs/download", "Admin\AuditLogController@down
 
 
 
-// Premium Theme Management Routes
+// Marketplace Management Routes
 $router->add(
     "GET",
-    "/admin/premium-themes",
-    "Admin\PremiumThemeController@index",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/premium-themes/create",
-    "Admin\PremiumThemeController@create",
+    "/admin/marketplace",
+    "Admin\MarketplaceController@index",
     ["auth", "admin"],
 );
 $router->add(
     "POST",
-    "/admin/premium-themes",
-    "Admin\PremiumThemeController@store",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/premium-themes/marketplace",
-    "Admin\PremiumThemeController@marketplace",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/premium-themes/{id}",
-    "Admin\PremiumThemeController@show",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/premium-themes/{id}/edit",
-    "Admin\PremiumThemeController@edit",
-    ["auth", "admin"],
-);
-$router->add(
-    "PUT",
-    "/admin/premium-themes/{id}",
-    "Admin\PremiumThemeController@update",
-    ["auth", "admin"],
-);
-$router->add(
-    "DELETE",
-    "/admin/premium-themes/{id}",
-    "Admin\PremiumThemeController@destroy",
+    "/admin/marketplace/validate-license",
+    "Admin\MarketplaceController@validateLicense",
     ["auth", "admin"],
 );
 $router->add(
     "POST",
-    "/admin/premium-themes/{id}/activate",
-    "Admin\PremiumThemeController@activate",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/premium-themes/{id}/deactivate",
-    "Admin\PremiumThemeController@deactivate",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/premium-themes/validate-license",
-    "Admin\PremiumThemeController@validateLicense",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/premium-themes/install",
-    "Admin\PremiumThemeController@installTheme",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/premium-themes/{id}/settings",
-    "Admin\PremiumThemeController@updateSettings",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/premium-themes/{id}/settings",
-    "Admin\PremiumThemeController@settings",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/premium-themes/{id}/analytics",
-    "Admin\PremiumThemeController@analytics",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/premium-themes/{id}/customize",
-    "Admin\PremiumThemeController@customize",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/premium-themes/{id}/customize",
-    "Admin\PremiumThemeController@updateCustomization",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/premium-themes/{id}/preview",
-    "Admin\PremiumThemeController@preview",
-    ["auth", "admin"],
-);
-$router->add(
-    "POST",
-    "/admin/premium-themes/upload-zip",
-    "Admin\PremiumThemeController@uploadZip",
-    ["auth", "admin"],
-);
-$router->add(
-    "GET",
-    "/admin/premium-themes/export/{id}",
-    "Admin\PremiumThemeController@export",
+    "/admin/marketplace/install",
+    "Admin\MarketplaceController@install",
     ["auth", "admin"],
 );
 

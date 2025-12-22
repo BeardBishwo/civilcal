@@ -916,18 +916,12 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                         </a>
                     </li>
 
-                    <!-- Premium Themes -->
-                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/premium-themes') !== false ? 'active' : ''; ?>">
-                        <a href="<?php echo app_base_url('admin/premium-themes'); ?>" class="nav-link">
-                            <i class="nav-icon fas fa-gem"></i>
-                            <span class="nav-text">Premium Themes</span>
-                            <i class="nav-arrow fas fa-chevron-right"></i>
+                    <!-- Marketplace -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/marketplace') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('admin/marketplace'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-shopping-basket"></i>
+                            <span class="nav-text">Marketplace</span>
                         </a>
-                        <ul class="nav-submenu">
-                            <li><a href="<?php echo app_base_url('admin/premium-themes'); ?>">All Premium</a></li>
-                            <li><a href="<?php echo app_base_url('admin/premium-themes/marketplace'); ?>">Marketplace</a></li>
-                            <li><a href="<?php echo app_base_url('admin/premium-themes/create'); ?>">Create New</a></li>
-                        </ul>
                     </li>
 
                     <!-- System -->

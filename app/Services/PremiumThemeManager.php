@@ -1,4 +1,5 @@
 <?php
+namespace App\Services;
 
 // No namespace - standalone class for easier integration
 
