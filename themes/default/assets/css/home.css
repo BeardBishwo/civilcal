@@ -379,16 +379,38 @@ body.index-page {
     background: var(--surface-dark-alt);
     border: 1px solid var(--glass-border);
     border-radius: 12px;
-    padding: 1rem;
+    padding: 0;
+    margin-bottom: 0.75rem;
     transition: var(--transition-normal);
 }
+
+.tool-item:last-child {
+    margin-bottom: 0;
+}
+
+
 
 .tool-item:hover {
     background: var(--surface-dark);
     border-color: var(--primary-light);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-md);
 }
+
+.tool-item a {
+    display: block;
+    padding: 1rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: var(--transition-fast);
+}
+
+.tool-item:hover a {
+    color: #ffffff;
+}
+
 
 
 /* 3D Animation Elements - Enhanced */
