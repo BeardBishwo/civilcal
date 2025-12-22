@@ -126,17 +126,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #667eea;
-            --secondary: #764ba2;
-            --accent: #f093fb;
-            --dark: #1a202c;
-            --light: #f7fafc;
+            --primary: #ffffff;
+            --secondary: #ffffff;
+            --accent: #ffffff;
+            --dark: #000000;
+            --light: #ffffff;
             --glass: rgba(255, 255, 255, 0.05);
             --shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
 
         body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background: linear-gradient(135deg, #000000, #000000, #000000);
             min-height: 100vh;
             color: var(--light);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -163,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .calculator-wrapper h1 {
             font-size: 2.5rem;
             margin-bottom: 2rem;
-            color: #feca57;
+            color: #ffffff;
         }
 
         .form-group {
@@ -191,8 +191,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .form-control:focus {
             outline: none;
-            border-color: #f093fb;
-            box-shadow: 0 0 15px rgba(240, 147, 251, 0.3);
+            border-color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
 
         .wall-section {
@@ -221,7 +221,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .btn-calculate {
             padding: 1rem 2.5rem;
-            background: linear-gradient(45deg, #f093fb, #f5576c);
+            background: linear-gradient(45deg, #ffffff, #ffffff);
             border: none;
             border-radius: 50px;
             color: var(--light);
@@ -257,7 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .result-area h3 {
             font-size: 1.5rem;
-            color: #feca57;
+            color: #ffffff;
             margin-bottom: 1rem;
         }
 
@@ -270,7 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .result-value {
             font-weight: 700;
-            color: #feca57;
+            color: #ffffff;
             font-size: 1.2rem;
         }
 
@@ -291,7 +291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .material-value {
             font-size: 1.5rem;
             font-weight: bold;
-            color: #feca57;
+            color: #ffffff;
         }
 
         .material-label {
@@ -302,7 +302,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .back-link {
             display: inline-block;
             margin-top: 2rem;
-            color: #f093fb;
+            color: #ffffff;
             text-decoration: none;
             font-size: 1.1rem;
         }

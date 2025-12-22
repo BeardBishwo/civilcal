@@ -1,14 +1,15 @@
 <?php
 // Fix path resolution - use absolute path from document root
-require_once dirname(__DIR__, 4) . '/app/Helpers/functions.php';
+require_once dirname(__DIR__, 3) . '/app/Helpers/functions.php';
 $page_title = 'Concrete Volume Calculator';
 $breadcrumb = [
     ['name' => 'Home', 'url' => app_base_url('/')],
     ['name' => 'Civil', 'url' => app_base_url('civil')],
     ['name' => 'Concrete Volume', 'url' => '#']
 ];
-require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
+require_once dirname(__DIR__, 3) . '/themes/default/views/partials/header.php';
 ?>
+
 
 <div class="container">
     <div class="calculator-wrapper">
@@ -56,6 +57,7 @@ require_once dirname(__DIR__, 4) . '/themes/default/views/partials/header.php';
 </script>
 
 <?php
-require_once dirname(__DIR__, 4) . '/themes/default/views/partials/footer.php';
+require_once dirname(__DIR__, 3) . '/themes/default/views/partials/footer.php';
 ?>
+
 

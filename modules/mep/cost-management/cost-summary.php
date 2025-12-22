@@ -463,7 +463,7 @@ $budget_comparison = $_SESSION['budget_comparison'] ?? null;
         }
         
         .summary-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             color: white;
             padding: 30px;
             border-radius: 10px;
@@ -522,7 +522,7 @@ $budget_comparison = $_SESSION['budget_comparison'] ?? null;
         .form-group select:focus, 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #ffffff;
         }
         
         .checkbox-group {
@@ -558,7 +558,7 @@ $budget_comparison = $_SESSION['budget_comparison'] ?? null;
         }
         
         .btn-primary {
-            background: #667eea;
+            background: #ffffff;
             color: white;
         }
         
@@ -598,7 +598,7 @@ $budget_comparison = $_SESSION['budget_comparison'] ?? null;
             color: #333;
             margin-bottom: 20px;
             text-align: center;
-            border-bottom: 2px solid #667eea;
+            border-bottom: 2px solid #ffffff;
             padding-bottom: 10px;
         }
         
@@ -636,14 +636,14 @@ $budget_comparison = $_SESSION['budget_comparison'] ?? null;
         }
         
         .total-row {
-            background: #667eea !important;
+            background: #ffffff !important;
             color: white;
             font-weight: bold;
         }
         
         .total-row th,
         .total-row td {
-            border-color: #667eea;
+            border-color: #ffffff;
         }
         
         .cost-summary-cards {
@@ -654,7 +654,7 @@ $budget_comparison = $_SESSION['budget_comparison'] ?? null;
         }
         
         .cost-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             color: white;
             padding: 20px;
             border-radius: 10px;
@@ -704,7 +704,7 @@ $budget_comparison = $_SESSION['budget_comparison'] ?? null;
         .comparison-item .value {
             font-size: 1.5em;
             font-weight: bold;
-            color: #667eea;
+            color: #ffffff;
         }
         
         .status-badge {
@@ -743,7 +743,7 @@ $budget_comparison = $_SESSION['budget_comparison'] ?? null;
         
         .saved-summary-item:hover {
             background: #f8f9fa;
-            border-color: #667eea;
+            border-color: #ffffff;
         }
         
         .message {
@@ -1031,7 +1031,7 @@ $budget_comparison = $_SESSION['budget_comparison'] ?? null;
                                 <small>Created: <?php echo date('M j, Y g:i A', strtotime($summary['created_date'])); ?></small>
                             </div>
                             <div style="text-align: right;">
-                                <div style="font-size: 1.5em; font-weight: bold; color: #667eea;">
+                                <div style="font-size: 1.5em; font-weight: bold; color: #ffffff;">
                                     $<?php echo number_format($summary['total_cost'], 2); ?>
                                 </div>
                                 <?php if ($summary['include_contingency']): ?>

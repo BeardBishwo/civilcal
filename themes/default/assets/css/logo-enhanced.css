@@ -25,11 +25,13 @@
 /* Hover effects */
 .logo:hover {
     transform: scale(1.05) translateY(-1px);
-    background: rgba(79, 70, 229, 0.05);
+    background: rgba(255, 255, 255, 0.05);
+
 }
 
 .logo.glow-effect:hover {
-    box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+
     transform: translateY(-1px);
 }
 
@@ -49,14 +51,16 @@
 
 .logo:hover .logo-img {
     transform: rotate(2deg) scale(1.05);
-    filter: drop-shadow(0 4px 12px rgba(79, 70, 229, 0.3));
+    filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.3));
+
 }
 
 /* Logo text styling */
 .logo span {
     background: linear-gradient(135deg, 
-        var(--brand-primary, #4f46e5), 
-        var(--brand-secondary, #10b981));
+        var(--brand-primary, #ffffff), 
+        var(--brand-secondary, #cbd5e1));
+
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -73,8 +77,9 @@
     width: 0;
     height: 2px;
     background: linear-gradient(90deg, 
-        var(--brand-primary, #4f46e5), 
-        var(--brand-accent, #f59e0b));
+        var(--brand-primary, #ffffff), 
+        var(--brand-accent, #cbd5e1));
+
     transition: width 0.3s ease;
 }
 
@@ -97,13 +102,15 @@
 }
 
 .logo.premium-style {
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(16, 185, 129, 0.1));
-    border: 1px solid rgba(79, 70, 229, 0.2);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(200, 200, 200, 0.1));
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+
 .logo.premium-style:hover {
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(16, 185, 129, 0.15));
-    border-color: rgba(79, 70, 229, 0.3);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(200, 200, 200, 0.15));
+    border-color: rgba(255, 255, 255, 0.3);
+
 }
 
 /* Text position variations */
@@ -155,10 +162,11 @@
 
 /* Text effects */
 .logo span {
-    background: linear-gradient(135deg, #818cf8, #34d399);
+    background: linear-gradient(135deg, #ffffff, #cbd5e1);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+
 }
 
 

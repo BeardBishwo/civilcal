@@ -503,7 +503,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .category-structural { background-color: #6f42c1; }
         .category-architectural { background-color: #6c757d; }
         .stats-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             color: white;
             border-radius: 0.375rem;
             padding: 1.5rem;

@@ -938,7 +938,7 @@ function generateTakeoffCSV($takeoff) {
         }
         
         .takeoff-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             color: white;
             padding: 30px;
             border-radius: 12px;
@@ -984,11 +984,11 @@ function generateTakeoffCSV($takeoff) {
         .form-group select:focus,
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #ffffff;
         }
         
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             color: white;
             border: none;
             padding: 12px 24px;
@@ -1008,7 +1008,7 @@ function generateTakeoffCSV($takeoff) {
         }
         
         .btn-secondary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
         }
         
         .takeoff-results {
@@ -1036,7 +1036,7 @@ function generateTakeoffCSV($takeoff) {
         .summary-value {
             font-size: 24px;
             font-weight: bold;
-            color: #667eea;
+            color: #ffffff;
         }
         
         .summary-label {
@@ -1077,13 +1077,13 @@ function generateTakeoffCSV($takeoff) {
         }
         
         .category-header {
-            background: #667eea !important;
+            background: #ffffff !important;
             color: white;
             font-weight: bold;
         }
         
         .total-row {
-            background: #667eea !important;
+            background: #ffffff !important;
             color: white;
             font-weight: bold;
         }
@@ -1104,7 +1104,7 @@ function generateTakeoffCSV($takeoff) {
         
         .loading-spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            border-top: 4px solid #ffffff;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -1128,7 +1128,7 @@ function generateTakeoffCSV($takeoff) {
             background: white;
             padding: 20px;
             border-radius: 8px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #ffffff;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
@@ -1140,7 +1140,7 @@ function generateTakeoffCSV($takeoff) {
         
         .cost-amount {
             font-size: 18px;
-            color: #667eea;
+            color: #ffffff;
             font-weight: bold;
         }
     </style>

@@ -12,11 +12,11 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #667eea;
-            --secondary: #764ba2;
-            --accent: #f093fb;
-            --dark: #1a202c;
-            --light: #f7fafc;
+            --primary: #ffffff;
+            --secondary: #ffffff;
+            --accent: #ffffff;
+            --dark: #000000;
+            --light: #ffffff;
             --glass: rgba(255, 255, 255, 0.05);
             --shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
@@ -53,7 +53,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
 
         .btn-calculate {
             padding: 1rem 2.5rem;
-            background: linear-gradient(45deg, #f093fb, #f5576c);
+            background: linear-gradient(45deg, #ffffff, #ffffff);
             border: none;
             border-radius: 50px;
             color: var(--light);
@@ -73,7 +73,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
         .back-button {
             display: inline-block;
             padding: 0.8rem 2rem;
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #ffffff, #ffffff);
             border-radius: 50px;
             color: var(--light);
             text-decoration: none;

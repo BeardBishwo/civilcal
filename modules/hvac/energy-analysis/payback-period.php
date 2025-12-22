@@ -22,7 +22,7 @@
             color: #2c3e50;
             font-size: 2.5rem;
             margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -43,7 +43,7 @@
             display: inline-flex;
             align-items: center;
             padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             color: white;
             text-decoration: none;
             border-radius: 12px;
@@ -103,7 +103,7 @@
         .input-wrapper input:focus,
         .input-wrapper select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #ffffff;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
@@ -120,7 +120,7 @@
         .calculate-btn {
             width: 100%;
             padding: 1rem 2rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             color: white;
             border: none;
             border-radius: 12px;
@@ -161,7 +161,7 @@
         .results-icon {
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -191,7 +191,7 @@
         }
         
         .result-card.primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             color: white;
         }
         
@@ -256,7 +256,7 @@
             background: white;
             padding: 1rem;
             border-radius: 8px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #ffffff;
         }
         
         .long-term-period {

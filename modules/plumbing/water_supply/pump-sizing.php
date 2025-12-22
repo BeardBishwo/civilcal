@@ -233,7 +233,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
 }
 
 .text-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -304,7 +304,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
 
 .form-control:focus, .form-select:focus {
     background: rgba(255, 255, 255, 0.15);
-    border-color: #667eea;
+    border-color: #ffffff;
     color: #fff;
     box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
 }
@@ -318,7 +318,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
     padding: 1rem;
     border-radius: 8px;
     margin-bottom: 0.75rem;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #ffffff;
 }
 
 .result-label {
@@ -328,7 +328,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
 }
 
 .result-value {
-    color: #667eea;
+    color: #ffffff;
     font-size: 1.5rem;
     font-weight: 600;
 }
@@ -339,7 +339,7 @@ require_once __DIR__ . '/../../../themes/default/views/partials/header.php';
 }
 
 .btn-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
     border: none;
     color: white;
     padding: 0.75rem 1.5rem;

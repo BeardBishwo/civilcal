@@ -10,14 +10,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #667eea;
-            --secondary: #764ba2;
-            --accent: #f093fb;
-            --dark: #1a202c;
-            --light: #f7fafc;
+            --primary: #ffffff;
+            --secondary: #ffffff;
+            --accent: #ffffff;
+            --dark: #000000;
+            --light: #ffffff;
             --glass: rgba(255, 255, 255, 0.05);
             --shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            --yellow: #feca57;
+            --yellow: #ffffff;
         }
 
         body {
@@ -86,13 +86,13 @@
 
         .form-control:focus {
             outline: none;
-            border-color: #f093fb;
-            box-shadow: 0 0 15px rgba(240, 147, 251, 0.3);
+            border-color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
 
         .btn-calculate {
             padding: 1rem 2.5rem;
-            background: linear-gradient(45deg, #f093fb, #f5576c);
+            background: linear-gradient(45deg, #ffffff, #ffffff);
             border: none;
             border-radius: 50px;
             color: var(--light);
@@ -164,7 +164,7 @@
         .back-link {
             display: inline-block;
             margin-top: 2rem;
-            color: #f093fb;
+            color: #ffffff;
             text-decoration: none;
             font-size: 1.1rem;
         }

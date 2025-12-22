@@ -11,7 +11,7 @@
             --primary-color: #2563eb;
             --secondary-color: #64748b;
             --accent-color: #f59e0b;
-            --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             --glass-bg: rgba(255, 255, 255, 0.95);
             --glass-border: rgba(255, 255, 255, 0.2);
         }

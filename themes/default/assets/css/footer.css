@@ -1,14 +1,15 @@
 .footer-separator {
-  height: 2px;
-  background: var(--primary-gradient);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   margin: 0 0 24px 0;
   border: 0;
 }
 
 
+
 .site-footer {
   text-align: center;
-  color: var(--light);
+  color: var(--text-muted);
   padding: 0 0 2rem 0;
 }
 
@@ -20,8 +21,9 @@
 
 .site-footer p {
   margin: 0.5rem 0;
-  color: var(--light);
+  color: var(--text-muted);
 }
+
 
 .site-footer i.fas.fa-heart {
   color: #ff4d4d;

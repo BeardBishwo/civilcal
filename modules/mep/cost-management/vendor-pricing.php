@@ -397,13 +397,13 @@ function generatePOContent($vendor_id, $po_number, $project_name, $delivery_addr
     $html = "
     <div style='font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;'>
         <div style='text-align: center; margin-bottom: 30px;'>
-            <h1 style='color: #667eea; margin: 0;'>PURCHASE ORDER</h1>
+            <h1 style='color: #ffffff; margin: 0;'>PURCHASE ORDER</h1>
             <h2 style='color: #333; margin: 10px 0;'>AEC Calculator - MEP Coordination Suite</h2>
         </div>
         
         <div style='display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;'>
             <div>
-                <h3 style='color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 5px;'>VENDOR INFORMATION</h3>
+                <h3 style='color: #ffffff; border-bottom: 2px solid #ffffff; padding-bottom: 5px;'>VENDOR INFORMATION</h3>
                 <p><strong>Vendor:</strong> " . htmlspecialchars($vendor['vendor_name'] ?? 'N/A') . "</p>
                 <p><strong>Contact:</strong> " . htmlspecialchars($vendor['contact_person'] ?? 'N/A') . "</p>
                 <p><strong>Email:</strong> " . htmlspecialchars($vendor['email'] ?? 'N/A') . "</p>
@@ -412,7 +412,7 @@ function generatePOContent($vendor_id, $po_number, $project_name, $delivery_addr
             </div>
             
             <div>
-                <h3 style='color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 5px;'>ORDER DETAILS</h3>
+                <h3 style='color: #ffffff; border-bottom: 2px solid #ffffff; padding-bottom: 5px;'>ORDER DETAILS</h3>
                 <p><strong>PO Number:</strong> " . htmlspecialchars($po_number) . "</p>
                 <p><strong>Date:</strong> " . date('Y-m-d') . "</p>
                 <p><strong>Project:</strong> " . htmlspecialchars($project_name) . "</p>
@@ -422,13 +422,13 @@ function generatePOContent($vendor_id, $po_number, $project_name, $delivery_addr
         </div>
         
         <div style='margin-bottom: 20px;'>
-            <h3 style='color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 5px;'>DELIVERY ADDRESS</h3>
+            <h3 style='color: #ffffff; border-bottom: 2px solid #ffffff; padding-bottom: 5px;'>DELIVERY ADDRESS</h3>
             <p>" . nl2br(htmlspecialchars($delivery_address)) . "</p>
         </div>
         
         <table style='width: 100%; border-collapse: collapse; margin-bottom: 30px;'>
             <thead>
-                <tr style='background: #667eea; color: white;'>
+                <tr style='background: #ffffff; color: white;'>
                     <th style='padding: 10px; text-align: left; border: 1px solid #ddd;'>Item</th>
                     <th style='padding: 10px; text-align: left; border: 1px solid #ddd;'>Specification</th>
                     <th style='padding: 10px; text-align: center; border: 1px solid #ddd;'>Qty</th>
@@ -460,7 +460,7 @@ function generatePOContent($vendor_id, $po_number, $project_name, $delivery_addr
             </tbody>
         </table>
         
-        <div style='margin-top: 40px; padding-top: 20px; border-top: 2px solid #667eea;'>
+        <div style='margin-top: 40px; padding-top: 20px; border-top: 2px solid #ffffff;'>
             <p><strong>Terms and Conditions:</strong></p>
             <ul style='margin-left: 20px;'>
                 <li>All prices are in USD unless otherwise specified</li>
@@ -557,7 +557,7 @@ function searchMaterials($query, $db) {
         }
         
         .vendor-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             color: white;
             padding: 30px;
             border-radius: 12px;
@@ -586,7 +586,7 @@ function searchMaterials($query, $db) {
         }
         
         .vendor-tab.active {
-            background: #667eea;
+            background: #ffffff;
             color: white;
         }
         
@@ -618,7 +618,7 @@ function searchMaterials($query, $db) {
             background: #f8f9fa;
             padding: 20px;
             border-radius: 8px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #ffffff;
             cursor: pointer;
             transition: transform 0.2s ease;
         }
@@ -653,7 +653,7 @@ function searchMaterials($query, $db) {
         }
         
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             color: white;
             border: none;
             padding: 8px 16px;
@@ -678,7 +678,7 @@ function searchMaterials($query, $db) {
         }
         
         .btn-warning {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
         }
         
         .materials-table {
@@ -733,7 +733,7 @@ function searchMaterials($query, $db) {
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #ffffff;
         }
         
         .form-row {
@@ -797,7 +797,7 @@ function searchMaterials($query, $db) {
         }
         
         .comparison-card .vendor-name {
-            color: #667eea;
+            color: #ffffff;
             font-size: 16px;
         }
         

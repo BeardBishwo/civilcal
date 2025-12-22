@@ -13,8 +13,8 @@
             --primary: #e74c3c;
             --secondary: #c0392b;
             --accent: #f39c12;
-            --dark: #1a202c;
-            --light: #f7fafc;
+            --dark: #000000;
+            --light: #ffffff;
             --glass: rgba(255, 255, 255, 0.05);
             --shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }

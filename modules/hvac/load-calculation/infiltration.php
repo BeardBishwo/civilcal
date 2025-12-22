@@ -10,18 +10,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #667eea;
-            --secondary: #764ba2;
-            --accent: #f093fb;
-            --dark: #1a202c;
-            --light: #f7fafc;
+            --primary: #ffffff;
+            --secondary: #ffffff;
+            --accent: #ffffff;
+            --dark: #000000;
+            --light: #ffffff;
             --glass: rgba(255, 255, 255, 0.05);
             --shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             --success-color: #9b59b6;
         }
 
         body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background: linear-gradient(135deg, #000000, #000000, #000000);
             min-height: 100vh;
             color: var(--light);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -42,7 +42,7 @@
         .header h1 {
             font-size: 2.5rem;
             margin-bottom: 1rem;
-            color: #feca57;
+            color: #ffffff;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
@@ -68,7 +68,7 @@
         }
 
         .calculator-form h3 {
-            color: #f093fb;
+            color: #ffffff;
             margin-bottom: 1.5rem;
             font-size: 1.3rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -117,8 +117,8 @@
 
         .form-control:focus {
             outline: none;
-            border-color: #f093fb;
-            box-shadow: 0 0 15px rgba(240, 147, 251, 0.3);
+            border-color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
 
         .form-control option {
@@ -183,17 +183,17 @@
         .back-link {
             display: inline-block;
             margin-top: 2rem;
-            color: #f093fb;
+            color: #ffffff;
             text-decoration: none;
             font-size: 1.1rem;
             padding: 0.5rem 1rem;
-            border: 1px solid #f093fb;
+            border: 1px solid #ffffff;
             border-radius: 25px;
             transition: all 0.3s ease;
         }
 
         .back-link:hover {
-            background: #f093fb;
+            background: #ffffff;
             color: var(--dark);
         }
 

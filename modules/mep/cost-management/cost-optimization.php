@@ -508,7 +508,7 @@ $recommendations = $_SESSION['cost_recommendations'] ?? null;
         }
         
         .optimization-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             color: white;
             padding: 30px;
             border-radius: 10px;
@@ -566,7 +566,7 @@ $recommendations = $_SESSION['cost_recommendations'] ?? null;
         .form-group select:focus, 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #ffffff;
         }
         
         .btn-group {
@@ -590,7 +590,7 @@ $recommendations = $_SESSION['cost_recommendations'] ?? null;
         }
         
         .btn-primary {
-            background: #667eea;
+            background: #ffffff;
             color: white;
         }
         
@@ -630,7 +630,7 @@ $recommendations = $_SESSION['cost_recommendations'] ?? null;
             color: #333;
             margin-bottom: 20px;
             text-align: center;
-            border-bottom: 2px solid #667eea;
+            border-bottom: 2px solid #ffffff;
             padding-bottom: 10px;
         }
         
@@ -749,7 +749,7 @@ $recommendations = $_SESSION['cost_recommendations'] ?? null;
         }
         
         .recommendation-item {
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #ffffff;
             padding: 20px;
             margin: 20px 0;
             background: #f8f9fa;

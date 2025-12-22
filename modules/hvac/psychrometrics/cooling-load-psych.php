@@ -15,7 +15,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <link href="../../assets/css/theme.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             min-height: 100vh;
         }
         
