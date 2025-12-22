@@ -11,8 +11,8 @@ $router->add("GET", "/", "HomeController@index");
 $router->add("GET", "/features", "HomeController@features");
 $router->add("GET", "/pricing", "HomeController@pricing");
 $router->add("GET", "/about", "HomeController@about");
-$router->add("GET", "/contact", "HomeController@contact");
-$router->add("POST", "/contact", "HomeController@contact");
+$router->add("GET", "/contact", "ContactController@index");
+$router->add("POST", "/contact/submit", "ContactController@submit");
 $router->add("GET", "/pages/preview/{id}", "HomeController@pagePreview");
 
 // Authentication Routes
