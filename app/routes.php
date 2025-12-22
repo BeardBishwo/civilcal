@@ -16,6 +16,7 @@ $router->add("POST", "/contact", "HomeController@contact");
 $router->add("GET", "/pages/preview/{id}", "HomeController@pagePreview");
 
 // Authentication Routes
+$router->add("GET", "/login", "AuthController@showLogin", ["guest"]);
 $router->add("POST", "/login", "AuthController@login", ["guest"]);
 $router->add("GET", "/login/2fa", "AuthController@show2FA", ["guest"]);
 $router->add("POST", "/login/2fa", "AuthController@verify2FA", ["guest"]);
