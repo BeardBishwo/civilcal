@@ -241,7 +241,19 @@ if (
                             style="<?php echo ($header_style === 'text_only') ? 'display: none;' : ''; ?>"
                             onerror="console.log('Logo image failed to load:', this.src); this.style.display='none'; this.parentNode.querySelector('.logo-text').style.display='block';"
                             onload="console.log('Logo image loaded successfully:', this.src);">
-                        <span class="logo-text" style="<?php echo ($header_style === 'logo_only') ? 'display: none;' : 'display: block;'; ?>"><?php echo htmlspecialchars($logo_text); ?></span>
+                        <?php 
+                        $textParts = explode(' ', $logo_text);
+                        if (count($textParts) > 1): ?>
+                            <span class="logo-text" style="<?php echo ($header_style === 'logo_only') ? 'display: none;' : 'display: block;'; ?>">
+                                <?php foreach ($textParts as $part): ?>
+                                    <span><?php echo htmlspecialchars($part); ?></span>
+                                <?php endforeach; ?>
+                            </span>
+                        <?php else: ?>
+                            <span class="logo-text" style="<?php echo ($header_style === 'logo_only') ? 'display: none;' : 'display: block;'; ?>">
+                                <?php echo htmlspecialchars($logo_text); ?>
+                            </span>
+                        <?php endif; ?>
                     <?php else: ?>
                         <span style="<?php echo ($header_style === 'logo_only') ? 'display: none;' : 'display: block;'; ?>"><?php echo htmlspecialchars($logo_text); ?></span>
                     <?php endif; ?>
@@ -272,51 +284,21 @@ if (
                             }
                         } else {
                         ?>
-                            <li><a href="<?php echo app_base_url(
-                                                "civil",
-                                            ); ?>"><i class="fas fa-hard-hat"></i>Civil</a></li>
-                            <li><a href="<?php echo app_base_url(
-                                                "electrical",
-                                            ); ?>"><i class="fas fa-bolt"></i>Electrical</a></li>
-                            <li><a href="<?php echo app_base_url(
-                                                "plumbing",
-                                            ); ?>"><i class="fas fa-faucet"></i>Plumbing</a></li>
-                            <li><a href="<?php echo app_base_url(
-                                                "hvac",
-                                            ); ?>"><i class="fas fa-wind"></i>HVAC</a></li>
-                            <li><a href="<?php echo app_base_url(
-                                                "fire",
-                                            ); ?>"><i class="fas fa-fire-extinguisher"></i>Fire Protection</a></li>
-                            <li class="has-dropdown" id="moreToolsItem">
-                                <a href="#" aria-haspopup="true" aria-expanded="false" role="button" tabindex="0">
-                                    <i class="fas fa-layer-group"></i>
-                                    More Tools
-                                    <i class="fas fa-chevron-down"></i>
-                                </a>
-                                <ul class="dropdown" id="moreToolsMenu" role="menu">
-                                    <li role="none"><a href="<?php echo app_base_url(
-                                                                    "site",
-                                                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-map-marked-alt"></i>Site Development</a></li>
-                                    <li role="none"><a href="<?php echo app_base_url(
-                                                                    "structural",
-                                                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-building"></i>Structural Analysis</a></li>
-                                    <li role="none"><a href="<?php echo app_base_url(
-                                                                    "mep",
-                                                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-cogs"></i>MEP Coordination</a></li>
-                                    <li role="none"><a href="<?php echo app_base_url(
-                                                                    "estimation",
-                                                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-calculator"></i>Estimation Suite</a></li>
-                                    <li role="none"><a href="<?php echo app_base_url(
-                                                                    "management",
-                                                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-project-diagram"></i>Management</a></li>
-                                    <li role="none"><a href="<?php echo app_base_url(
-                                                                    "developers",
-                                                                ); ?>" class="grid-item" role="menuitem"><i class="fas fa-code"></i>API & Developers</a></li>
-                                </ul>
-                            </li>
+                            <li class="nav-item"><a href="<?php echo app_base_url("civil"); ?>"><i class="fas fa-hard-hat"></i>Civil</a></li>
+                            <li class="nav-item"><a href="<?php echo app_base_url("electrical"); ?>"><i class="fas fa-bolt"></i>Electrical</a></li>
+                            <li class="nav-item"><a href="<?php echo app_base_url("plumbing"); ?>"><i class="fas fa-faucet"></i>Plumbing</a></li>
+                            <li class="nav-item"><a href="<?php echo app_base_url("hvac"); ?>"><i class="fas fa-wind"></i>HVAC</a></li>
+                            <li class="nav-item"><a href="<?php echo app_base_url("fire"); ?>"><i class="fas fa-fire-extinguisher"></i>Fire Protection</a></li>
+                            <li class="nav-item"><a href="<?php echo app_base_url("site"); ?>"><i class="fas fa-map-marked-alt"></i>Site</a></li>
                         <?php
                         }
                         ?>
+                        <li class="more-menu-item has-dropdown" id="dynamicMoreItem">
+                            <a href="#" aria-haspopup="true" aria-expanded="false" role="button">
+                                <i class="fas fa-ellipsis-h"></i> More <i class="fas fa-chevron-down"></i>
+                            </a>
+                            <ul class="dropdown" id="moreToolsMenu" role="menu"></ul>
+                        </li>
                     </ul>
                 </nav>
 
@@ -332,31 +314,32 @@ if (
                         <i class="fas fa-search"></i>
                     </button>
 
-                    <!-- User greeting (shown for all users) -->
-                    <div class="user-greeting" id="userGreeting">
-                        Hi, <strong><?php if (!empty($userName)) {
-                                        echo htmlspecialchars(explode(" ", $userName)[0]);
-                                    } else {
-                                        echo "Guest";
-                                    } ?></strong> 👋
-                    </div>
-
-                    <!-- Login Button (Only for guests) -->
                     <?php
                     $is_logged_in =
                         !empty($_SESSION["user"]) ||
                         !empty($_SESSION["user_id"]) ||
                         !empty($_SESSION["username"]) ||
                         !empty($_SESSION["full_name"]);
-                    if (!$is_logged_in): ?>
+                    ?>
+                    <!-- User greeting -->
+                    <div class="user-greeting <?php echo $is_logged_in ? 'logged-in' : 'guest'; ?>" id="userGreeting">
+                        <span class="greeting-text">Hi, </span>
+                        <strong><?php if (!empty($userName)) {
+                                         echo htmlspecialchars(explode(" ", $userName)[0]);
+                                     } else {
+                                         echo "Guest";
+                                     } ?></strong> <?php echo $is_logged_in ? '👋' : ''; ?>
+                    </div>
+
+                    <!-- Actions -->
+                    <?php if (!$is_logged_in): ?>
                         <a href="<?php echo app_base_url(
                                         "login",
                                     ); ?>" class="btn btn-primary login-btn">
                             <i class="fas fa-sign-in-alt"></i>
                             <span class="btn-text">Login</span>
                         </a>
-                    <?php endif;
-                    ?>
+                    <?php endif; ?>
 
                     <?php if (!empty($_SESSION["user"])): ?>
                         <?php if (
@@ -586,6 +569,47 @@ if (
                         header.classList.remove('scrolled');
                     }
                 });
+
+                // Dynamic Menu Overflow (Priority+ Pattern)
+                const mainNavList = document.getElementById('mainNavList');
+                const dynamicMoreItem = document.getElementById('dynamicMoreItem');
+                const moreToolsMenu = document.getElementById('moreToolsMenu');
+                const navItems = Array.from(mainNavList.querySelectorAll('.nav-item'));
+
+                function updateMenuOverflow() {
+                    const availableWidth = mainNavList.parentElement.offsetWidth - 100; // Buffer for 'More' item
+                    let currentWidth = 0;
+                    let overflowed = false;
+
+                    // Reset: Move all back to main list first
+                    navItems.forEach(item => {
+                        mainNavList.insertBefore(item, dynamicMoreItem);
+                        item.style.display = 'flex';
+                    });
+
+                    // Check which items overflow
+                    navItems.forEach(item => {
+                        currentWidth += item.offsetWidth + 8; // Including gap
+                        if (currentWidth > availableWidth) {
+                            moreToolsMenu.appendChild(item);
+                            overflowed = true;
+                        }
+                    });
+
+                    // Toggle 'More' item visibility
+                    if (overflowed) {
+                        dynamicMoreItem.classList.add('visible');
+                    } else {
+                        dynamicMoreItem.classList.remove('visible');
+                    }
+                }
+
+                // Initial run and resize listener
+                if (mainNavList && dynamicMoreItem && moreToolsMenu) {
+                    window.addEventListener('resize', updateMenuOverflow);
+                    // Run after a small delay to ensure styles are applied
+                    setTimeout(updateMenuOverflow, 100);
+                }
 
                 // Mobile menu toggle
                 hamburgerBtn.addEventListener('click', function() {

@@ -20,36 +20,51 @@
 
 .header-content {
   width: 100%;
-  padding: 0.75rem 2rem;
+  height: 80px; /* Explicit height for logo scaling */
+  padding: 0 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .header-left {
-  flex-shrink: 0;
+  flex: 0 0 auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   text-decoration: none;
   font-weight: 700;
   font-size: 1.5rem;
   color: #f1f5f9;
-  transition: transform 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100% !important;
+  padding: 0 !important;
 }
 
 .logo:hover {
-  transform: translateY(-1px);
+  transform: scale(1.02);
 }
 
 .logo-img {
-  height: 40px;
-  width: auto;
-  border-radius: 8px;
+  height: 80px !important; /* Exact match with header height */
+  width: auto !important;
+  min-width: 80px !important; /* Square base */
+  max-height: 80px !important;
+  object-fit: contain !important;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.1));
+}
+
+.logo:hover .logo-img {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.2));
 }
 
 .header-middle {
@@ -139,53 +154,33 @@
   color: white;
 }
 
-/* More Tools Dropdown - Compact Grid Layout */
+/* More Tools Dropdown - Dynamic handling */
+.more-menu-item {
+  position: relative;
+  display: none; /* Initially hidden, JS will show if needed */
+}
+
+.more-menu-item.visible {
+  display: block;
+}
+
 #moreToolsMenu {
-  min-width: 400px;
-  max-width: 500px;
+  min-width: 280px;
+  max-width: 400px;
   padding: 0.75rem;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
+  grid-template-columns: 1fr;
+  gap: 0.25rem;
   position: absolute;
   top: 100%;
-  left: 0;
+  right: 0;
+  left: auto;
   margin-top: 0.5rem;
-}
-
-#moreToolsMenu li {
-  list-style: none;
-  margin: 0;
-}
-
-#moreToolsMenu a {
-  padding: 0.625rem 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  white-space: nowrap;
-}
-
-#moreToolsMenu a i {
-  font-size: 0.875rem;
-  width: 16px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-/* Ensure parent has relative positioning */
-#moreToolsItem {
-  position: relative;
-}
-
-/* Responsive adjustments for More Tools */
-@media (max-width: 1200px) {
-  #moreToolsMenu {
-    min-width: 300px;
-    max-width: 350px;
-    grid-template-columns: 1fr;
-  }
+  background: rgba(10, 10, 10, 0.98);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-2xl);
+  z-index: 1001;
 }
 
 @media (max-width: 768px) {
@@ -261,16 +256,18 @@
 }
 
 .header-right {
-  flex-shrink: 0;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  height: 100%;
 }
 
 .user-actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .theme-toggle-btn {
@@ -378,26 +375,37 @@
 
 .hamburger-btn {
   display: none;
-  background: none;
-  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 1.25rem;
   color: #ffffff;
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 6px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   transition: all 0.2s ease;
+  align-items: center;
+  justify-content: center;
 }
 
 .hamburger-btn:hover {
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .mobile-nav {
   display: none;
-  background: rgba(10, 10, 10, 0.98);
-
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
-  padding: 1rem 2rem;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: rgba(5, 5, 5, 0.98);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  z-index: 999;
 }
 
 .mobile-nav ul {
@@ -448,7 +456,7 @@
 
 @media (max-width: 1024px) {
   .header-content {
-    padding: 0.75rem 1rem;
+    padding: 0.625rem 0.875rem;
   }
   .header-middle {
     gap: 1rem;
@@ -467,10 +475,14 @@
     display: none;
   }
   .hamburger-btn {
-    display: block;
+    display: flex;
   }
   .mobile-nav.active {
     display: block;
+    animation: fadeInDown 0.3s ease;
+  }
+  .user-greeting {
+    display: none;
   }
   .user-actions .btn {
     padding: 0.5rem 1rem;
@@ -480,7 +492,7 @@
 
 @media (max-width: 480px) {
   .header-content {
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.75rem;
   }
   .logo span {
     display: none;
@@ -489,21 +501,32 @@
     display: none;
   }
 }
-/* User Greeting Badge (Green) */
+/* User Greeting Badge */
 .user-greeting {
-  background-color: #059669; /* Emerald 600 */
-  color: #ffffff;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
   font-size: 0.875rem;
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
+  transition: all 0.3s ease;
+}
+
+.user-greeting.guest {
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  white-space: nowrap;
+}
+
+.user-greeting.logged-in {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.greeting-text {
+  opacity: 0.8;
 }
 
 /* Ensure Search Toggle is visible and interactive */
@@ -643,6 +666,27 @@
 .profile-dropdown .menu-item i {
   font-size: 1rem;
   width: 20px;
+}
+
+/* Logo Text Refinement */
+.logo-text {
+  line-height: 1.1;
+  max-width: 200px;
+  display: block;
+  font-size: 1.25rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.logo-text span {
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .logo-text {
+    font-size: 1.1rem;
+    max-width: 150px;
+  }
 }
 
 /* Notification Dropdown Styles */
