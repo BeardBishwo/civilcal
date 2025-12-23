@@ -320,12 +320,7 @@ if (
                     </ul>
                 </nav>
 
-                <div class="search-container">
-                    <input type="search" id="globalSearch" placeholder="Search 50+ engineering tools..." class="search-input">
-                    <div id="searchSuggestions" class="search-suggestions">
-                        <!-- Search suggestions will be populated by JavaScript -->
-                    </div>
-                </div>
+
             </div>
 
             <div class="header-right">
@@ -507,7 +502,7 @@ if (
             </div>
 
             <!-- Search Results -->
-            <div class="search-results-container">
+            <div class="search-results-container" id="searchResultsWrapper">
                 <div class="search-results-section" id="searchResultsSection">
                     <!-- Results will be dynamically inserted here -->
                 </div>
@@ -581,7 +576,6 @@ if (
                 const hamburgerBtn = document.getElementById('hamburgerBtn');
                 const mobileNav = document.getElementById('mobileNav');
                 const themeToggleBtn = document.getElementById('themeToggleBtn');
-                const globalSearch = document.getElementById('globalSearch');
                 const searchSuggestions = document.getElementById('searchSuggestions');
 
                 // Scroll effect for header
@@ -889,7 +883,8 @@ if (
                     // Ctrl+K or / for search
                     if ((event.ctrlKey && event.key === 'k') || event.key === '/') {
                         event.preventDefault();
-                        globalSearch.focus();
+                        const searchToggleBtn = document.getElementById('searchToggleBtn');
+                        if (searchToggleBtn) searchToggleBtn.click();
                     }
 
                     // Escape to close mobile menu
@@ -900,13 +895,7 @@ if (
                 });
 
                 // Add search shortcut hint
-                globalSearch.addEventListener('focus', function() {
-                    this.setAttribute('placeholder', 'Press Ctrl+K to search quickly...');
-                });
 
-                globalSearch.addEventListener('blur', function() {
-                    this.setAttribute('placeholder', 'Search 50+ engineering tools...');
-                });
             });
 
             // Auto-fit user greeting text
