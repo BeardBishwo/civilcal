@@ -266,36 +266,31 @@ if (
                         <?php
                         $menuSvc = new \App\Services\MenuService();
                         $primaryMenu = $menuSvc->get("primary");
-                        if (is_array($primaryMenu) && count($primaryMenu) > 0) {
-                            foreach ($primaryMenu as $item) {
-                                $label = htmlspecialchars($item["label"] ?? "");
-                                $url = app_base_url(
-                                    ltrim($item["url"] ?? "#", "/"),
-                                );
-                                $icon = htmlspecialchars($item["icon"] ?? "");
-                                echo '<li><a href="' .
-                                    $url .
-                                    '">' .
-                                    ($icon
-                                        ? '<i class="' . $icon . '"></i> '
-                                        : "") .
-                                    $label .
-                                    "</a></li>";
-                            }
-                        } else {
+                        // The original if/else block for primaryMenu is replaced here.
+                        // The new logic directly generates the module list.
                         ?>
-                            <li class="nav-item"><a href="<?php echo app_base_url("civil"); ?>"><i class="fas fa-hard-hat"></i>Civil</a></li>
-                            <li class="nav-item"><a href="<?php echo app_base_url("electrical"); ?>"><i class="fas fa-bolt"></i>Electrical</a></li>
-                            <li class="nav-item"><a href="<?php echo app_base_url("plumbing"); ?>"><i class="fas fa-faucet"></i>Plumbing</a></li>
-                            <li class="nav-item"><a href="<?php echo app_base_url("hvac"); ?>"><i class="fas fa-wind"></i>HVAC</a></li>
-                            <li class="nav-item"><a href="<?php echo app_base_url("fire"); ?>"><i class="fas fa-fire-extinguisher"></i>Fire Protection</a></li>
-                            <li class="nav-item"><a href="<?php echo app_base_url("site"); ?>"><i class="fas fa-map-marked-alt"></i>Site</a></li>
                         <?php
-                        }
+                        $modules_list = [
+                            ['id' => 'civil', 'name' => 'Civil', 'icon' => 'fa-hard-hat'],
+                            ['id' => 'electrical', 'name' => 'Electrical', 'icon' => 'fa-bolt'],
+                            ['id' => 'plumbing', 'name' => 'Plumbing', 'icon' => 'fa-faucet'],
+                            ['id' => 'hvac', 'name' => 'HVAC', 'icon' => 'fa-wind'],
+                            ['id' => 'fire', 'name' => 'Fire', 'icon' => 'fa-fire-extinguisher'],
+                            ['id' => 'site', 'name' => 'Site', 'icon' => 'fa-map-marked-alt'],
+                            ['id' => 'structural', 'name' => 'Structural', 'icon' => 'fa-building'],
+                            ['id' => 'estimation', 'name' => 'Estimation', 'icon' => 'fa-calculator'],
+                            ['id' => 'mep', 'name' => 'MEP', 'icon' => 'fa-tools'],
+                            ['id' => 'project-management', 'name' => 'Project', 'icon' => 'fa-tasks'],
+                            ['id' => 'country', 'name' => 'Country', 'icon' => 'fa-globe'],
+                        ];
+
+                        foreach ($modules_list as $mod):
                         ?>
+                            <li class="nav-item"><a href="<?php echo app_base_url($mod['id']); ?>"><i class="fas <?php echo $mod['icon']; ?>"></i><?php echo $mod['name']; ?></a></li>
+                        <?php endforeach; ?>
                         <li class="more-menu-item has-dropdown" id="dynamicMoreItem">
                             <a href="#" aria-haspopup="true" aria-expanded="false" role="button">
-                                <i class="fas fa-ellipsis-h"></i> More <i class="fas fa-chevron-down"></i>
+                                More <i class="fas fa-chevron-down"></i>
                             </a>
                             <ul class="dropdown" id="moreToolsMenu" role="menu"></ul>
                         </li>
@@ -577,30 +572,59 @@ if (
                 const navItems = Array.from(mainNavList.querySelectorAll('.nav-item'));
 
                 function updateMenuOverflow() {
-                    const availableWidth = mainNavList.parentElement.offsetWidth - 100; // Buffer for 'More' item
-                    let currentWidth = 0;
-                    let overflowed = false;
+                    const headerMiddle = document.querySelector('.header-middle');
+                    if (!headerMiddle || !mainNavList || !dynamicMoreItem || !moreToolsMenu) return;
 
-                    // Reset: Move all back to main list first
+                    // Available width from the middle container
+                    const containerWidth = headerMiddle.getBoundingClientRect().width;
+                    
+                    // Show all items to measure accurately
+                    dynamicMoreItem.classList.add('visible');
+                    const moreItemWidth = dynamicMoreItem.getBoundingClientRect().width || 80;
+                    
                     navItems.forEach(item => {
                         mainNavList.insertBefore(item, dynamicMoreItem);
                         item.style.display = 'flex';
                     });
 
-                    // Check which items overflow
-                    navItems.forEach(item => {
-                        currentWidth += item.offsetWidth + 8; // Including gap
-                        if (currentWidth > availableWidth) {
-                            moreToolsMenu.appendChild(item);
-                            overflowed = true;
-                        }
-                    });
+                    let currentWidth = 0;
+                    let overflowed = false;
+                    const itemsToMove = [];
+                    const gap = 8;
 
-                    // Toggle 'More' item visibility
+                    for (let i = 0; i < navItems.length; i++) {
+                        const item = navItems[i];
+                        const itemWidth = item.getBoundingClientRect().width;
+                        const itemTotalWidth = (i > 0 ? gap : 0) + itemWidth;
+
+                        if (overflowed) {
+                            itemsToMove.push(item);
+                            continue;
+                        }
+
+                        // Check if this item fits
+                        // If it's NOT the last item, we need to consider if we'll need 'More' button
+                        const isLast = (i === navItems.length - 1);
+                        const spaceForMore = isLast ? 0 : gap + moreItemWidth;
+
+                        if (currentWidth + itemTotalWidth + spaceForMore > containerWidth) {
+                            // If even the first item doesn't fit with 'More', we must move it
+                            overflowed = true;
+                            itemsToMove.push(item);
+                        } else {
+                            currentWidth += itemTotalWidth;
+                        }
+                    }
+
+                    // Move items to dropdown
+                    itemsToMove.forEach(item => moreToolsMenu.appendChild(item));
+
                     if (overflowed) {
                         dynamicMoreItem.classList.add('visible');
+                        dynamicMoreItem.style.display = 'flex';
                     } else {
                         dynamicMoreItem.classList.remove('visible');
+                        dynamicMoreItem.style.display = 'none';
                     }
                 }
 
@@ -662,7 +686,8 @@ if (
                     font-size: 0.9rem;
                     font-weight: 500;
                     box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
-                    z-index: 10000;
+                    border: 1px solid rgba(255, 255, 255, 0.04);
+                    z-index: 2000;
                     opacity: 0;
                     transform: translateY(-10px);
                     transition: all 0.3s ease;
@@ -737,25 +762,24 @@ if (
                         }
                     });
 
-                    // Toggle on click for mobile/touch
+                    // Toggle on click
                     trigger.addEventListener('click', (e) => {
-                        if (window.innerWidth <= 768 || 'ontouchstart' in window) {
-                            e.preventDefault();
-                            const wasOpen = dropdown.classList.contains('open');
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const wasOpen = dropdown.classList.contains('open');
 
-                            // Close all other dropdowns
-                            document.querySelectorAll('.has-dropdown.open').forEach(d => {
-                                if (d !== dropdown) {
-                                    d.classList.remove('open');
-                                    const t = d.querySelector('[aria-expanded]');
-                                    if (t) t.setAttribute('aria-expanded', 'false');
-                                }
-                            });
+                        // Close all other dropdowns
+                        document.querySelectorAll('.has-dropdown.open').forEach(d => {
+                            if (d !== dropdown) {
+                                d.classList.remove('open');
+                                const t = d.querySelector('[aria-expanded]');
+                                if (t) t.setAttribute('aria-expanded', 'false');
+                            }
+                        });
 
-                            // Toggle this dropdown
-                            dropdown.classList.toggle('open');
-                            trigger.setAttribute('aria-expanded', !wasOpen);
-                        }
+                        // Toggle this dropdown
+                        dropdown.classList.toggle('open');
+                        trigger.setAttribute('aria-expanded', !wasOpen);
                     });
 
                     // Keyboard support (Enter/Space)
@@ -788,18 +812,10 @@ if (
                                 <div class="user-name">${escapeHtml(name)}</div>
                                 ${role ? `<div class="user-role">${escapeHtml(role)}</div>` : ''}
                             </li>
-                            ${isAdmin ? `<li><a href="${escapeHtml('<?php echo app_base_url(
-                                                                        "admin",
-                                                                    ); ?>')}"><i class="fas fa-cog"></i> Admin Panel</a></li>` : ''}
-                            <li><a href="<?php echo app_base_url(
-                                                "dashboard",
-                                            ); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                            <li><a href="<?php echo app_base_url(
-                                                "profile",
-                                            ); ?>"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
-                            <li><a href="<?php echo app_base_url(
-                                                "logout",
-                                            ); ?>"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            ${isAdmin ? `<li><a href="${escapeHtml('<?php echo app_base_url("admin"); ?>')}"><i class="fas fa-cog"></i> Admin Panel</a></li>` : ''}
+                            <li><a href="<?php echo app_base_url("dashboard"); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                            <li><a href="<?php echo app_base_url("profile"); ?>"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
+                            <li><a href="<?php echo app_base_url("logout"); ?>"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                         </ul>
                     </div>
                 `;

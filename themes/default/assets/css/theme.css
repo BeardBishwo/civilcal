@@ -106,15 +106,7 @@ main, .main-content { flex: 1 0 auto; }
 /* Removed - this was forcing dark theme on all pages */
 /* Header styles are now properly handled in header.css with light/dark mode support */
 
-.header-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 80px;
-}
+/* Header styles moved to header.css */
 
 .logo {
     display: flex;
