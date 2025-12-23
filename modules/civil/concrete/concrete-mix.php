@@ -1,192 +1,99 @@
 <?php
-// modules/civil/concrete/concrete-mix.php
+/**
+ * Concrete Mix Design Calculator - Migrated to Calculator Engine
+ * 
+ * Calculate material quantities for concrete mix (cement, sand, aggregate, water)
+ * 
+ * URL: /civil/concrete/concrete-mix
+ * Engine: CalculatorEngine
+ */
+
+require_once dirname(__DIR__, 3) . '/app/bootstrap.php';
+use App\Engine\CalculatorEngine;
+
+$page_title = 'Concrete Mix Design Calculator';
+$breadcrumb = [
+    ['name' => 'Home', 'url' => app_base_url('/')],
+    ['name' => 'Civil', 'url' => app_base_url('civil')],
+    ['name' => 'Concrete Mix', 'url' => '#']
+];
+
+$engine = new CalculatorEngine();
+$result = null;
+$error = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $inputs = [
+            'volume' => $_POST['volume'] ?? '',
+            'mix_ratio' => $_POST['mix_ratio'] ?? '1:2:4'
+        ];
+        
+        $result = $engine->execute('concrete-mix', $inputs);
+    } catch (\Exception $e) {
+        $error = $e->getMessage();
+    }
+}
+
+require_once dirname(__DIR__, 3) . '/themes/default/views/partials/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Concrete Mix Design - AEC Toolkit</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #ffffff;
-            --secondary: #ffffff;
-            --accent: #ffffff;
-            --dark: #000000;
-            --light: #ffffff;
-            --glass: rgba(255, 255, 255, 0.05);
-            --shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        }
 
-        body {
-            background: linear-gradient(135deg, #000000, #000000, #000000);
-            min-height: 100vh;
-            color: var(--light);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .calculator-wrapper {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 3rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: var(--shadow);
-            margin-top: 3rem;
-        }
-
-        .calculator-wrapper h1 {
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            color: #ffffff;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-            opacity: 0.9;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 1rem;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: var(--light);
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #ffffff;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-calculate {
-            padding: 1rem 2.5rem;
-            background: linear-gradient(45deg, #ffffff, #ffffff);
-            border: none;
-            border-radius: 50px;
-            color: var(--light);
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 1rem;
-        }
-
-        .btn-calculate:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .result-area {
-            margin-top: 2rem;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 2rem;
-            border-radius: 10px;
-            display: none; /* Hidden by default */
-        }
-
-        .result-area h3 {
-            font-size: 1.5rem;
-            color: #ffffff;
-            margin-bottom: 1rem;
-        }
-
-        #result {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 2rem;
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 1.1rem;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
-<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
-</head>
-<body>
-    <div class="container">
-        <div class="calculator-wrapper">
-            <h1>Concrete Mix Design</h1>
-            <form id="concrete-mix-form">
-                <div class="form-group">
-                    <label for="volume">Volume (m³)</label>
-                    <input type="number" id="volume" class="form-control" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="grade">Grade</label>
-                    <select id="grade" class="form-control">
-                        <option value="M20">M20 (1:1.5:3)</option>
-                        <option value="M25">M25 (1:1:2)</option>
-                        <option value="M30">M30 (1:0.75:1.5)</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-calculate">Calculate</button>
-            </form>
-            <div class="result-area" id="result-area">
-                <h3>Result</h3>
-                <p id="result"></p>
+<div class="container">
+    <div class="calculator-wrapper">
+        <h1>Concrete Mix Design Calculator</h1>
+        <p class="text-muted">Calculate material quantities for concrete mix (cement, sand, aggregate, water)</p>
+        
+        <?php if ($error): ?>
+            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="volume">Concrete Volume (m³)</label>
+                <input type="number" id="volume" name="volume" class="form-control" step="0.01" 
+                    value="<?php echo htmlspecialchars($_POST['volume'] ?? ''); ?>" required>
             </div>
-        </div>
-        <a href="../../../index.php" class="back-link">Back to Toolkit</a>
+            
+            <div class="form-group">
+                <label for="mix_ratio">Mix Ratio</label>
+                <select id="mix_ratio" name="mix_ratio" class="form-control">
+                    <option value="1:1.5:3" <?php echo ($_POST['mix_ratio'] ?? '') === '1:1.5:3' ? 'selected' : ''; ?>>1:1.5:3 (M25)</option>
+                    <option value="1:2:4" <?php echo ($_POST['mix_ratio'] ?? '1:2:4') === '1:2:4' ? 'selected' : ''; ?>>1:2:4 (M20)</option>
+                    <option value="1:3:6" <?php echo ($_POST['mix_ratio'] ?? '') === '1:3:6' ? 'selected' : ''; ?>>1:3:6 (M15)</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Calculate Mix</button>
+        </form>
+        
+        <?php if ($result && $result['success']): ?>
+            <div class="result-area" style="display: block;">
+                <h3>Material Quantities</h3>
+                <div class="results-grid">
+                    <?php foreach ($result['results'] as $key => $data): ?>
+                        <div class="result-item">
+                            <div class="result-label"><?php echo htmlspecialchars($data['label']); ?></div>
+                            <div class="result-value"><?php echo htmlspecialchars($data['formatted']); ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="calculation-metadata">
+                    <small class="text-muted">
+                        Mix Ratio: <?php echo htmlspecialchars($_POST['mix_ratio']); ?> | 
+                        Calculated in <?php echo $result['metadata']['execution_time']; ?>
+                    </small>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
+</div>
 
-    <script>
-        document.getElementById('concrete-mix-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const volume = parseFloat(document.getElementById('volume').value);
-            const grade = document.getElementById('grade').value;
+<style>
+.results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.result-item { background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); }
+.result-label { font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 0.5rem; }
+.result-value { font-size: 1.5rem; font-weight: 600; color: #fff; }
+.calculation-metadata { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+</style>
 
-            if (isNaN(volume)) {
-                showNotification('Please enter a valid volume.', 'info');
-                return;
-            }
-            
-            const ratios = {
-                'M20': { cement: 1, sand: 1.5, aggregate: 3 },
-                'M25': { cement: 1, sand: 1, aggregate: 2 },
-                'M30': { cement: 1, sand: 0.75, aggregate: 1.5 },
-            };
-            
-            const ratio = ratios[grade];
-            const totalParts = ratio.cement + ratio.sand + ratio.aggregate;
-            const dryVolume = volume * 1.54;
-            const cementVolume = (dryVolume / totalParts) * ratio.cement;
-            const sandVolume = (dryVolume / totalParts) * ratio.sand;
-            const aggregateVolume = (dryVolume / totalParts) * ratio.aggregate;
-            const cementBags = cementVolume / 0.035;
-            
-            document.getElementById('result').innerHTML = `Cement: ${cementBags.toFixed(1)} bags<br>Sand: ${sandVolume.toFixed(3)} m³<br>Aggregate: ${aggregateVolume.toFixed(3)} m³`;
-            document.getElementById('result-area').style.display = 'block';
-        });
-    </script>
-<script src="../../../public/assets/js/global-notifications.js"></script>
-</body>
-</html>
+<?php require_once dirname(__DIR__, 3) . '/themes/default/views/partials/footer.php'; ?>

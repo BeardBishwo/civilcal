@@ -1,190 +1,103 @@
 <?php
-// modules/civil/concrete/rebar-calculation.php
+/**
+ * Rebar Calculation Calculator - Migrated to Calculator Engine
+ * 
+ * Calculate steel reinforcement quantity and weight
+ * 
+ * URL: /civil/concrete/rebar-calculation
+ * Engine: CalculatorEngine
+ */
+
+require_once dirname(__DIR__, 3) . '/app/bootstrap.php';
+use App\Engine\CalculatorEngine;
+
+$page_title = 'Rebar/Reinforcement Calculator';
+$breadcrumb = [
+    ['name' => 'Home', 'url' => app_base_url('/')],
+    ['name' => 'Civil', 'url' => app_base_url('civil')],
+    ['name' => 'Rebar Calculation', 'url' => '#']
+];
+
+$engine = new CalculatorEngine();
+$result = null;
+$error = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $inputs = [
+            'diameter' => $_POST['diameter'] ?? '',
+            'length' => $_POST['length'] ?? '',
+            'quantity' => $_POST['quantity'] ?? 1
+        ];
+        
+        $result = $engine->execute('rebar-calculation', $inputs);
+    } catch (\Exception $e) {
+        $error = $e->getMessage();
+    }
+}
+
+require_once dirname(__DIR__, 3) . '/themes/default/views/partials/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rebar Calculation - AEC Toolkit</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #ffffff;
-            --secondary: #ffffff;
-            --accent: #ffffff;
-            --dark: #000000;
-            --light: #ffffff;
-            --glass: rgba(255, 255, 255, 0.05);
-            --shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        }
 
-        body {
-            background: linear-gradient(135deg, #000000, #000000, #000000);
-            min-height: 100vh;
-            color: var(--light);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .calculator-wrapper {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 3rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: var(--shadow);
-            margin-top: 3rem;
-        }
-
-        .calculator-wrapper h1 {
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            color: #ffffff;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-            opacity: 0.9;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 1rem;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: var(--light);
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #ffffff;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-calculate {
-            padding: 1rem 2.5rem;
-            background: linear-gradient(45deg, #ffffff, #ffffff);
-            border: none;
-            border-radius: 50px;
-            color: var(--light);
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 1rem;
-        }
-
-        .btn-calculate:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .result-area {
-            margin-top: 2rem;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 2rem;
-            border-radius: 10px;
-            display: none; /* Hidden by default */
-        }
-
-        .result-area h3 {
-            font-size: 1.5rem;
-            color: #ffffff;
-            margin-bottom: 1rem;
-        }
-
-        #result {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 2rem;
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 1.1rem;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
-<link rel="stylesheet" href="../../../public/assets/css/global-notifications.css">
-</head>
-<body>
-    <div class="container">
-        <div class="calculator-wrapper">
-            <h1>Rebar Calculation</h1>
-            <form id="rebar-calculation-form">
-                <div class="form-group">
-                    <label for="length">Length (m)</label>
-                    <input type="number" id="length" class="form-control" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="spacing">Spacing (m)</label>
-                    <input type="number" id="spacing" class="form-control" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="diameter">Diameter (mm)</label>
-                    <select id="diameter" class="form-control">
-                        <option value="8">8mm</option>
-                        <option value="10">10mm</option>
-                        <option value="12">12mm</option>
-                        <option value="16">16mm</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-calculate">Calculate</button>
-            </form>
-            <div class="result-area" id="result-area">
-                <h3>Result</h3>
-                <p id="result"></p>
+<div class="container">
+    <div class="calculator-wrapper">
+        <h1>Rebar/Reinforcement Calculator</h1>
+        <p class="text-muted">Calculate steel reinforcement quantity and weight for construction</p>
+        
+        <?php if ($error): ?>
+            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="diameter">Bar Diameter (mm)</label>
+                <input type="number" id="diameter" name="diameter" class="form-control" step="1" min="6" max="50"
+                    value="<?php echo htmlspecialchars($_POST['diameter'] ?? ''); ?>" required>
+                <small class="form-text text-muted">Common sizes: 8, 10, 12, 16, 20, 25, 32 mm</small>
             </div>
-        </div>
-        <a href="../../../index.php" class="back-link">Back to Toolkit</a>
+            
+            <div class="form-group">
+                <label for="length">Total Length (m)</label>
+                <input type="number" id="length" name="length" class="form-control" step="0.01"
+                    value="<?php echo htmlspecialchars($_POST['length'] ?? ''); ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="quantity">Number of Bars</label>
+                <input type="number" id="quantity" name="quantity" class="form-control" step="1" min="1"
+                    value="<?php echo htmlspecialchars($_POST['quantity'] ?? 1); ?>" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Calculate Weight</button>
+        </form>
+        
+        <?php if ($result && $result['success']): ?>
+            <div class="result-area" style="display: block;">
+                <h3>Steel Reinforcement Results</h3>
+                <div class="results-grid">
+                    <?php foreach ($result['results'] as $key => $data): ?>
+                        <div class="result-item">
+                            <div class="result-label"><?php echo htmlspecialchars($data['label']); ?></div>
+                            <div class="result-value"><?php echo htmlspecialchars($data['formatted']); ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="calculation-metadata">
+                    <small class="text-muted">
+                        Calculated in <?php echo $result['metadata']['execution_time']; ?>
+                    </small>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
+</div>
 
-    <script>
-        document.getElementById('rebar-calculation-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const length = parseFloat(document.getElementById('length').value);
-            const spacing = parseFloat(document.getElementById('spacing').value);
-            const diameter = parseFloat(document.getElementById('diameter').value);
+<style>
+.results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.result-item { background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); }
+.result-label { font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 0.5rem; }
+.result-value { font-size: 1.5rem; font-weight: 600; color: #fff; }
+.calculation-metadata { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+</style>
 
-            if (isNaN(length) || isNaN(spacing) || isNaN(diameter)) {
-                showNotification('Please enter valid numbers.', 'info');
-                return;
-            }
-            
-            const area = length * 1; // Assuming 1m width for simplicity
-            const numberOfBars = Math.ceil(area / spacing) + 1;
-            const totalLength = numberOfBars * length;
-            const weightPerMeter = (diameter * diameter) / 162;
-            const totalWeight = totalLength * weightPerMeter;
-            
-            document.getElementById('result').innerHTML = `Total Weight: ${totalWeight.toFixed(2)} kg`;
-            document.getElementById('result-area').style.display = 'block';
-        });
-    </script>
-<script src="../../../public/assets/js/global-notifications.js"></script>
-</body>
-</html>
+<?php require_once dirname(__DIR__, 3) . '/themes/default/views/partials/footer.php'; ?>
