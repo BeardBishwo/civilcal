@@ -53,8 +53,8 @@ class ResultFormatter
         $label = $config['label'] ?? ucfirst($config['name']);
         $type = $config['type'] ?? 'number';
         
-        // Round to specified precision
-        $formattedValue = round($value, $precision);
+        // Round to specified precision if numeric
+        $formattedValue = (is_numeric($value)) ? round($value, $precision) : $value;
         
         // Apply special formatting based on type
         $displayValue = $this->applyTypeFormatting($formattedValue, $type, $config);
@@ -86,12 +86,15 @@ class ResultFormatter
                 return number_format($value, 0);
                 
             case 'scientific':
-                return sprintf('%.2e', $value);
+                return is_numeric($value) ? sprintf('%.2e', $value) : $value;
+                
+            case 'string':
+                return (string)$value;
                 
             case 'number':
             default:
                 $precision = $config['precision'] ?? 2;
-                return number_format($value, $precision);
+                return is_numeric($value) ? number_format($value, $precision) : (string)$value;
         }
     }
     

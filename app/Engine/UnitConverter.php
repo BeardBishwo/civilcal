@@ -70,10 +70,14 @@ class UnitConverter
             $name = $fieldSchema['name'];
             $value = $inputs[$name] ?? null;
             
-            if ($value === null) {
+            if ($value === null || $value === '') {
                 $normalized[$name] = null;
                 continue;
             }
+            
+            // Convert string inputs to proper types based on schema
+            $type = $fieldSchema['type'] ?? 'string';
+            $convertedValue = $this->convertToType($value, $type);
             
             // If field has unit, convert to base unit
             if (isset($fieldSchema['unit'])) {
@@ -81,17 +85,46 @@ class UnitConverter
                 $inputUnit = $inputs[$name . '_unit'] ?? $fieldSchema['unit'];
                 
                 $normalized[$name] = $this->convert(
-                    $value,
+                    floatval($convertedValue),
                     $inputUnit,
                     $baseUnit,
                     $fieldSchema['unit_type'] ?? 'length'
                 );
             } else {
-                $normalized[$name] = $value;
+                $normalized[$name] = $convertedValue;
             }
         }
         
         return $normalized;
+    }
+    
+    /**
+     * Convert value to proper type
+     * 
+     * @param mixed $value Input value (usually string from form)
+     * @param string $type Target type (number, integer, string, etc.)
+     * @return mixed Converted value
+     */
+    private function convertToType($value, string $type)
+    {
+        switch ($type) {
+            case 'number':
+            case 'float':
+            case 'double':
+                return floatval($value);
+                
+            case 'integer':
+            case 'int':
+                return intval($value);
+                
+            case 'boolean':
+            case 'bool':
+                return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                
+            case 'string':
+            default:
+                return (string) $value;
+        }
     }
     
     /**
