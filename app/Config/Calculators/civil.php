@@ -45,9 +45,7 @@ return [
                 'name' => 'depth',
                 'type' => 'number',
                 'unit' => 'm',
-                'unit_type' => '
-
-length',
+                'unit_type' => 'length',
                 'required' => true,
                 'label' => 'Depth/Height',
                 'min' => 0.01,
