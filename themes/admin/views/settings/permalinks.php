@@ -534,21 +534,22 @@ ob_start();
         <h1><i class="fas fa-link"></i> Permalink Settings</h1>
         <p>Configure how calculator URLs appear throughout your website</p>
     </div>
-        <div class="admin-header">
-            <h1>🔗 Permalink Settings</h1>
-            <p>Configure how calculator URLs appear throughout your website. Choose from 7 different structures.</p>
-        </div>
+    
+    <div class="admin-header">
+        <h1>🔗 Permalink Settings</h1>
+        <p>Configure how calculator URLs appear throughout your website. Choose from 7 different structures.</p>
+    </div>
 
-        <?php if ($message): ?>
-            <div class="message-container">
-                <div class="alert <?= $messageType === 'success' ? 'success' : 'error' ?>">
-                    <span class="alert-icon"><?= $messageType === 'success' ? '✅' : '❌' ?></span>
-                    <span><?= htmlspecialchars($message) ?></span>
-                </div>
+    <?php if ($message): ?>
+        <div class="message-container">
+            <div class="alert <?= $messageType === 'success' ? 'success' : 'error' ?>">
+                <span class="alert-icon"><?= $messageType === 'success' ? '✅' : '❌' ?></span>
+                <span><?= htmlspecialchars($message) ?></span>
             </div>
-        <?php endif; ?>
+        </div>
+    <?php endif; ?>
 
-<form method="POST" action="">
+    <form method="POST" action="">
         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
 
         <!-- Structure Selection Section -->
@@ -571,7 +572,11 @@ ob_start();
                                 </div>
                                 <div class="structure-preview" id="preview-<?= $key ?>">
                                     <?= htmlspecialchars($info['example']) ?>
-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
                 </div>
             </div>
 
@@ -644,15 +649,6 @@ ob_start();
         </div>
     </form>
 </div>
-</div>
-
-<?php
-// Capture the content and pass it to the layout
-$content = ob_get_clean();
-
-// Include the admin layout
-require BASE_PATH . '/themes/admin/layouts/main.php';
-?>
 
 <script>
     // Single Page Permalink Settings JavaScript
@@ -689,7 +685,7 @@ require BASE_PATH . '/themes/admin/layouts/main.php';
         }
     }
 
-let currentStructure = '<?= $currentStructure ?>';
+    let currentStructure = '<?= $currentStructure ?>';
     
     function selectStructure(structure) {
         currentStructure = structure;
@@ -777,5 +773,4 @@ let currentStructure = '<?= $currentStructure ?>';
             previewElement.textContent = url;
         }
     }
-</script>
 </script>
