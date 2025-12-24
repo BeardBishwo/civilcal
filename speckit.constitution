@@ -1,0 +1,148 @@
+# Bishwo Calculator Project Constitution
+
+## Core Principles
+
+### 1. **User-Centric Design**
+- **Primary Focus**: All features must serve the needs of electrical engineers, contractors, and construction professionals
+- **Accessibility**: Ensure calculators are usable by professionals with varying levels of technical expertise
+- **Mobile-First**: Prioritize responsive design for field use on mobile devices
+- **Clear Documentation**: Every calculator must include clear instructions, formulas, and units
+
+### 2. **Technical Excellence**
+- **Code Quality**: Maintain clean, well-documented, and maintainable code
+- **Performance**: Optimize for fast calculation and responsive user experience
+- **Security**: Implement robust authentication, authorization, and data protection
+- **Standards Compliance**: Follow industry standards (NEC, IEC, IEEE) and local regulations
+
+### 3. **Modular Architecture**
+- **Plugin System**: All calculators must be implemented as modular plugins
+- **Separation of Concerns**: Clear separation between business logic, presentation, and data layers
+- **Extensibility**: Design for easy addition of new calculators and features
+- **Reusability**: Create shared components and utilities to avoid code duplication
+
+### 4. **Data Integrity**
+- **Accuracy**: All calculations must be mathematically correct and verifiable
+- **Validation**: Implement comprehensive input validation and error handling
+- **Audit Trail**: Maintain logs for critical operations and calculations
+- **Backup Strategy**: Ensure data can be recovered in case of system failure
+
+### 5. **Business Sustainability**
+- **Monetization**: Support both free and premium features with clear value proposition
+- **Scalability**: Design system to handle growth in users and data
+- **Compliance**: Adhere to financial regulations and data protection laws
+- **Customer Support**: Provide responsive support and clear communication channels
+
+## Development Guidelines
+
+### Code Standards
+- **PHP**: Follow PSR-12 coding standards
+- **JavaScript**: Use ES6+ features with consistent formatting
+- **CSS**: Implement BEM methodology for CSS classes
+- **Documentation**: Document all public APIs and complex algorithms
+
+### Testing Requirements
+- **Unit Tests**: All core functionality must have unit tests
+- **Integration Tests**: Test calculator workflows and API endpoints
+- **User Acceptance**: Validate calculations against industry-standard references
+- **Performance Testing**: Ensure calculators perform well under load
+
+### Security Protocols
+- **Input Sanitization**: Sanitize all user inputs to prevent injection attacks
+- **Authentication**: Implement secure login with password policies
+- **Authorization**: Role-based access control for different user types
+- **Data Encryption**: Encrypt sensitive data in transit and at rest
+
+### Deployment Standards
+- **Version Control**: Use Git with meaningful commit messages
+- **CI/CD**: Implement automated testing and deployment pipelines
+- **Environment Separation**: Maintain separate development, staging, and production environments
+- **Monitoring**: Implement application monitoring and error tracking
+
+## Project Structure Principles
+
+### Module Organization
+- **Calculator Modules**: Each calculator type in its own module directory
+- **Shared Services**: Common functionality in dedicated service modules
+- **Configuration**: Centralized configuration management
+- **Documentation**: Inline documentation for all public interfaces
+
+### Database Design
+- **Normalization**: Follow database normalization principles
+- **Indexing**: Optimize queries with appropriate indexes
+- **Relationships**: Maintain referential integrity
+- **Backup**: Regular automated backups with point-in-time recovery
+
+## Quality Assurance
+
+### Code Review Process
+- **Peer Review**: All code changes require peer review
+- **Automated Checks**: Use linting and static analysis tools
+- **Testing**: Ensure tests pass before merging
+- **Documentation**: Update documentation for all significant changes
+
+### Performance Standards
+- **Response Time**: API responses under 200ms for typical requests
+- **Calculation Speed**: Complex calculations complete in under 1 second
+- **Memory Usage**: Optimize for efficient memory usage
+- **Scalability**: System should handle 1000+ concurrent users
+
+## Compliance and Standards
+
+### Industry Standards
+- **Electrical Codes**: NEC, IEC, IEEE standards as applicable
+- **Building Codes**: Local and international building regulations
+- **Safety Standards**: Electrical safety and workplace safety guidelines
+- **Environmental**: Energy efficiency and sustainability considerations
+
+### Legal Requirements
+- **Data Protection**: GDPR, local data protection laws
+- **Financial Regulations**: Payment processing compliance
+- **Intellectual Property**: Respect for third-party licenses and patents
+- **Accessibility**: WCAG 2.1 AA compliance for web interfaces
+
+## Team Collaboration
+
+### Communication
+- **Regular Updates**: Weekly progress reports and sprint reviews
+- **Issue Tracking**: Use project management tools for task tracking
+- **Documentation**: Maintain up-to-date project documentation
+- **Knowledge Sharing**: Regular team meetings and code reviews
+
+### Decision Making
+- **Consensus**: Strive for team consensus on major decisions
+- **Expert Input**: Consult domain experts for technical decisions
+- **User Feedback**: Incorporate user feedback into development decisions
+- **Data-Driven**: Base decisions on metrics and user analytics
+
+## Continuous Improvement
+
+### Monitoring and Analytics
+- **Usage Metrics**: Track calculator usage and user behavior
+- **Performance Metrics**: Monitor system performance and response times
+- **Error Tracking**: Log and analyze system errors and user issues
+- **User Feedback**: Collect and analyze user feedback and suggestions
+
+### Innovation and Growth
+- **Technology Updates**: Stay current with web technologies and frameworks
+- **Feature Enhancement**: Regularly improve existing features based on usage
+- **New Calculators**: Develop new calculators based on user needs
+- **Integration**: Explore integrations with other industry tools
+
+## Governance
+
+### Project Leadership
+- **Technical Lead**: Oversees technical decisions and architecture
+- **Product Owner**: Manages feature prioritization and user requirements
+- **Quality Assurance**: Ensures code quality and testing standards
+- **Security Officer**: Oversees security practices and compliance
+
+### Change Management
+- **Version Control**: All changes tracked in version control system
+- **Release Planning**: Planned releases with clear feature sets
+- **Rollback Strategy**: Ability to quickly revert changes if needed
+- **Communication**: Clear communication of changes to all stakeholders
+
+This constitution serves as the guiding framework for all development activities and decisions within the Bishwo Calculator project. All team members are expected to adhere to these principles and contribute to maintaining the high standards outlined herein.
+
+**Last Updated**: December 24, 2025
+**Version**: 1.0

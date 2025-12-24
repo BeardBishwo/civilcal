@@ -1027,4 +1027,84 @@ class SettingsController extends Controller
         exit;
     }
 
+/**
+     * Permalink Settings Page - Using Proper Admin Layout
+     */
+    public function permalinks()
+    {
+        $this->requireAdminWithBasicAuth();
+        
+        // Handle form submission
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_permalinks'])) {
+            $structure = $_POST['permalink_structure'] ?? 'calculator-only';
+            $phpExtension = isset($_POST['permalink_php_extension']) ? 1 : 0;
+            $basePath = $_POST['permalink_base_path'] ?? 'tools';
+            $customPattern = $_POST['permalink_custom_pattern'] ?? '';
+            $redirectOldUrls = isset($_POST['permalink_redirect_old_urls']) ? 1 : 0;
+            
+            // Validate custom pattern
+            if ($structure === 'custom' && empty($customPattern)) {
+                $message = 'Custom pattern cannot be empty';
+                $messageType = 'error';
+            } else {
+                // Save settings
+                SettingsService::set('permalink_structure', $structure, 'string', 'seo');
+                SettingsService::set('permalink_php_extension', $phpExtension, 'boolean', 'seo');
+                SettingsService::set('permalink_base_path', $basePath, 'string', 'seo');
+                SettingsService::set('permalink_custom_pattern', $customPattern, 'string', 'seo');
+                SettingsService::set('permalink_redirect_old_urls', $redirectOldUrls, 'boolean', 'seo');
+                
+                // Clear URL cache to ensure next read gets fresh data
+                \App\Helpers\UrlHelper::clearCache();
+                
+                $message = 'Permalink settings updated successfully! All links will now use the new format.';
+                $messageType = 'success';
+                
+                // Log the change
+                \App\Services\GDPRService::logActivity(
+                    $_SESSION['user_id'] ?? null,
+                    'permalink_settings_updated',
+                    'settings',
+                    null,
+                    "Permalink settings updated: structure=$structure, php_extension=$phpExtension, base_path=$basePath",
+                    null,
+                    json_encode([
+                        'structure' => $structure,
+                        'php_extension' => $phpExtension,
+                        'base_path' => $basePath,
+                        'custom_pattern' => $customPattern,
+                        'redirect_old_urls' => $redirectOldUrls
+                    ])
+                );
+            }
+        }
+        
+        // Get current permalink structure
+        $currentStructure = SettingsService::get('permalink_structure', 'calculator-only');
+        
+        // Get permalink settings
+        $settings = [
+            'permalink_base_path' => SettingsService::get('permalink_base_path', 'tools'),
+            'permalink_php_extension' => SettingsService::get('permalink_php_extension', false),
+            'permalink_custom_pattern' => SettingsService::get('permalink_custom_pattern', ''),
+            'permalink_redirect_old_urls' => SettingsService::get('permalink_redirect_old_urls', true)
+        ];
+        
+        // Get sample calculator for preview
+        $db = \App\Core\Database::getInstance()->getPdo();
+        $stmt = $db->prepare("SELECT calculator_id, category, subcategory, slug FROM calculator_urls LIMIT 1");
+        $stmt->execute();
+        $sampleCalculator = $stmt->fetch(\PDO::FETCH_ASSOC);
+        
+        // Use the proper admin layout system
+        $this->view->render('admin/settings/permalinks', [
+            'title' => 'Permalink Settings',
+            'currentStructure' => $currentStructure,
+            'settings' => $settings,
+            'sampleCalculator' => $sampleCalculator,
+            'message' => $message ?? '',
+            'messageType' => $messageType ?? ''
+        ]);
+    }
+
 }

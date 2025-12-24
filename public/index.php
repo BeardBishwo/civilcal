@@ -24,6 +24,16 @@ $router = new \App\Core\Router();
 // Make router available globally for routes file
 $GLOBALS['router'] = $router;
 
+// Check if this is a calculator URL request
+if (isset($_GET['calculator'])) {
+    require_once BASE_PATH . '/app/Router/CalculatorRouter.php';
+    $calculatorRouter = new \App\Router\CalculatorRouter();
+    if ($calculatorRouter->handleRequest($_GET['calculator'])) {
+        exit; // Calculator was found and executed
+    }
+    // If calculator not found, continue to normal routing (will show 404)
+}
+
 // Load routes
 require BASE_PATH . '/app/routes.php';
 

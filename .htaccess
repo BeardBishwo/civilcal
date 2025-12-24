@@ -47,6 +47,12 @@ RedirectMatch 403 ^/(app|config|database|includes|storage|vendor|tests)/.*$
     RewriteCond %{REQUEST_URI} public
     RewriteRule ^(.*)public/?(.*)$ /$1$2 [R=301,L]
     
+    # Calculator URL Routing - Check if it's a calculator slug
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/(admin|public|assets|uploads|modules)
+    RewriteRule ^([a-zA-Z0-9\-]+)/?$ public/index.php?calculator=$1 [L,QSA]
+    
     # Route all other requests through public/index.php
     RewriteRule ^(.*)$ public/index.php [L,QSA]
 </IfModule>

@@ -350,6 +350,13 @@ $router->add(
     "Admin\SettingsController@saveAdvanced",
     ["auth", "admin"],
 );
+// Permalink Settings Route
+$router->add(
+    "GET",
+    "/admin/settings/permalinks",
+    "Admin\\SettingsController@permalinks",
+    ["auth", "admin"],
+);
 $router->add(
     "GET",
     "/admin/settings/backup",
