@@ -404,4 +404,33 @@ class CalculatorController extends Controller
         http_response_code(404);
         echo '404 - Page Not Found';
     }
+    
+    /**
+     * Handle permalink-based calculator routing
+     * This is the catch-all route for /calculator-slug URLs
+     */
+    public function permalink($slug)
+    {
+        // Load calculator from database using slug
+        $db = \App\Core\Database::getInstance()->getPdo();
+        $stmt = $db->prepare('SELECT * FROM calculator_urls WHERE slug = ? LIMIT 1');
+        $stmt->execute([$slug]);
+        $calc = $stmt->fetch(\PDO::FETCH_ASSOC);
+        
+        if (!$calc) {
+            $this->notFound();
+            return;
+        }
+        
+        // Load the calculator file
+        $filePath = dirname(__DIR__, 2) . '/modules/' . $calc['full_path'];
+        
+        if (!file_exists($filePath)) {
+            $this->notFound();
+            return;
+        }
+        
+        // Include and execute the calculator file
+        require $filePath;
+    }
 }

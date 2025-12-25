@@ -1616,3 +1616,8 @@ $router->add('POST', '/payment/webhook/{gateway}', 'PaymentController@webhook');
 $router->add('GET', '/payment/webhook/{gateway}', 'PaymentController@webhook');
 $router->add('GET', '/payment/failed', 'PaymentController@failed');
 
+// ============================================
+// CALCULATOR PERMALINK CATCH-ALL ROUTE
+// Must be at the end to not interfere with other routes
+// ============================================
+$router->add('GET', '/{slug}', 'CalculatorController@permalink');
