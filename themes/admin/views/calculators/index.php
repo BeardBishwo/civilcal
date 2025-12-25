@@ -25,7 +25,11 @@ $totalModules = $stats['modules'];
                 </div>
                 <div class="header-subtitle"><?php echo $totalCalculators; ?> calculators • <?php echo $totalModules; ?> modules • <?php echo $activeCalculators; ?> active</div>
             </div>
-            <!-- Future: Add 'Scan New' button if relevant -->
+            <div class="header-right">
+                <a href="<?= get_app_url() ?>/admin/calculators/create" class="btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-plus"></i> Create New Calculator
+                </a>
+            </div>
         </div>
 
         <!-- Compact Stats Cards -->

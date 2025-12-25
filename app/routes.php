@@ -528,18 +528,38 @@ $router->add(
 );
 
 // Analytics Module Routes
-$router->add("GET", "/admin/analytics", "Admin\AnalyticsController@overview", [
+$router->add("GET", "/admin/analytics", "Admin\\AnalyticsController@overview", [
     "auth",
     "admin",
 ]);
 // ... existing analytics routes ...
 
 // CALCULATORS MANAGEMENT ROUTES
-$router->add("GET", "/admin/calculators", "Admin\CalculatorManagementController@index", [
+$router->add("GET", "/admin/calculators", "Admin\\CalculatorManagementController@index", [
     "auth",
     "admin",
 ]);
-$router->add("POST", "/admin/calculators/toggle", "Admin\CalculatorManagementController@toggle", [
+$router->add("GET", "/admin/calculators/create", "Admin\\CalculatorManagementController@create", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/calculators/store", "Admin\\CalculatorManagementController@store", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/calculators/edit/{id}", "Admin\\CalculatorManagementController@edit", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/calculators/update/{id}", "Admin\\CalculatorManagementController@update", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/calculators/delete/{id}", "Admin\\CalculatorManagementController@delete", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/calculators/toggle", "Admin\\CalculatorManagementController@toggle", [
     "auth",
     "admin",
 ]);
