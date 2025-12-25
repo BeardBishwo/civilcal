@@ -90,12 +90,14 @@ class CalculatorController extends Controller
     {
         $user = Auth::user();
         $userId = $user ? $user->id : null;
+        $projectId = $_POST['project_id'] ?? null;
 
         $result = $this->calculationService->performCalculation(
             $category,
             $tool,
             $_POST,
-            $userId
+            $userId,
+            $projectId
         );
 
         header('Content-Type: application/json');

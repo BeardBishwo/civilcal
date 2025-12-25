@@ -146,11 +146,11 @@ if (
     // Generate Canonical URL
     $canonicalUrl = $site_meta["canonical"] ?? null;
     if (empty($canonicalUrl)) {
-        // If calculator context exists, generate canonical calculator URL
+        // ... (existing canonical logic) ...
         if (isset($_SERVER['CALCULATOR_ID'])) {
             $canonicalUrl = app_base_url(\App\Helpers\UrlHelper::calculator($_SERVER['CALCULATOR_ID']));
         } else {
-            // Default to current clean URL
+            // ... (existing canonical logic) ...
             $path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
             $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . $path;
         }
@@ -158,6 +158,41 @@ if (
     if ($canonicalUrl): ?>
     <link rel="canonical" href="<?php echo htmlspecialchars($canonicalUrl); ?>">
     <?php endif; ?>
+
+    <?php
+    // --- SCHEMA MARKUP START ---
+    require_once $basePath . '/app/Helpers/SchemaHelper.php';
+    
+    // 1. WebApplication / SoftwareApplication
+    if (isset($_SERVER['CALCULATOR_ID'])) {
+        // Calculator Page
+        echo '<script type="application/ld+json">' . 
+             \App\Helpers\SchemaHelper::getCalculatorSchema($title_safe, $desc_safe) . 
+             "</script>\n";
+    } elseif ($__req_path === $__base || $__req_path === $__base . '/' || strpos($__req_path, 'index.php') !== false) {
+        // Homepage
+        echo '<script type="application/ld+json">' . 
+             \App\Helpers\SchemaHelper::getHomepageSchema() . 
+             "</script>\n";
+    }
+
+    // 2. Breadcrumbs
+    $bcSegments = array_filter(explode('/', ltrim(str_replace($__base, '', $__req_path), '/')));
+    $bcData = [];
+    $bcPath = '';
+    foreach ($bcSegments as $seg) {
+        if ($seg === 'modules' || $seg === 'index.php') continue; 
+        $bcPath .= '/' . $seg;
+        $bcName = ucwords(str_replace('-', ' ', $seg));
+        $bcData[$bcName] = $bcPath;
+    }
+    if (!empty($bcData)) {
+        echo '<script type="application/ld+json">' . 
+             \App\Helpers\SchemaHelper::getBreadcrumbSchema($bcData) . 
+             "</script>\n";
+    }
+    // --- SCHEMA MARKUP END ---
+    ?>
 
     <script>
         window.appConfig = {

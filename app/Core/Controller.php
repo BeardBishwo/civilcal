@@ -109,6 +109,63 @@ class Controller
      * @param string $token
      * @return bool
      */
+    /**
+     * Render a view
+     * 
+     * @param string $viewName The view file (e.g., 'home')
+     * @param array $data Data to pass to view
+     */
+    protected function view($viewName, $data = [])
+    {
+        if (isset($this->view)) {
+            $this->view->render($viewName, $data);
+        } else {
+            // Fallback if View service not loaded
+            extract($data);
+            $viewPath = __DIR__ . '/../Views/' . str_replace('.', '/', $viewName) . '.php';
+            if (file_exists($viewPath)) {
+                include $viewPath;
+            } else {
+                echo "<h1>View Error</h1>";
+                echo "<p>View file not found: " . htmlspecialchars($viewName) . "</p>";
+            }
+        }
+    }
+
+    /**
+     * Require authentication for a method
+     */
+    protected function requireAuth()
+    {
+        if (isset($this->auth) && !$this->auth->check()) {
+            // Store return URL
+            $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
+            $this->redirect('/login');
+        } elseif (!isset($this->auth) && !isset($_SESSION['user_id'])) {
+             // Fallback auth check
+             $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
+             $this->redirect('/login');
+        }
+    }
+
+    /**
+     * Require admin privileges for a method
+     */
+    protected function requireAdmin()
+    {
+        $this->requireAuth();
+        
+        if (isset($this->auth) && !$this->auth->isAdmin()) {
+            $this->redirect('/');
+        } elseif (!isset($this->auth)) {
+            // Fallback admin check
+            $role = $_SESSION['role'] ?? 'user';
+            if ($role !== 'admin' && $role !== 'super_admin') {
+                $this->redirect('/');
+            }
+        }
+    }
+
     protected function validateCsrfToken($token)
     {
         if (session_status() === PHP_SESSION_NONE) {

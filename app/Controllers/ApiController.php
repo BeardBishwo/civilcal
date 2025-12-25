@@ -48,11 +48,14 @@ class ApiController extends Controller
             return;
         }
         
+        $projectId = $input['project_id'] ?? null;
+
         $result = $this->calculationService->performCalculation(
             $input['category'],
             $input['tool'],
             $input['data'],
-            $userId
+            $userId,
+            $projectId
         );
         
         echo json_encode($result);

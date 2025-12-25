@@ -13,7 +13,7 @@ class CalculationService
         $this->db = Database::getInstance();
     }
     
-    public function performCalculation($calculatorType, $calculatorSlug, $inputData, $userId = null)
+    public function performCalculation($calculatorType, $calculatorSlug, $inputData, $userId = null, $projectId = null)
     {
         try {
             $calculator = CalculatorFactory::create($calculatorType, $calculatorSlug);
@@ -38,8 +38,9 @@ class CalculationService
             $result = $calculator->calculate($inputData);
             
             // Save to history if user is logged in
+            $historyId = null;
             if ($userId) {
-                $this->saveToHistory($userId, $calculatorType, $calculatorSlug, $inputData, $result);
+                $historyId = $this->saveToHistory($userId, $calculatorType, $calculatorSlug, $inputData, $result, $projectId);
             }
             
             // Extract numeric result if it's in a nested structure
@@ -52,6 +53,7 @@ class CalculationService
                 'success' => true,
                 'result' => $numericResult,  // Direct numeric value for API compatibility
                 'data' => $result,           // Full result data for backward compatibility
+                'history_id' => $historyId,  // Return ID
                 'timestamp' => date('Y-m-d H:i:s')
             ];
             
@@ -63,22 +65,26 @@ class CalculationService
         }
     }
     
-    public function saveToHistory($userId, $calculatorType, $calculatorSlug, $inputs, $results)
+    public function saveToHistory($userId, $calculatorType, $calculatorSlug, $inputs, $results, $projectId = null)
     {
         try {
             $stmt = $this->db->prepare("
                 INSERT INTO calculation_history 
-                (user_id, calculator_type, calculator_slug, input_data, result_data, created_at) 
-                VALUES (?, ?, ?, ?, ?, NOW())
+                (user_id, calculator_type, calculator_slug, input_data, result_data, project_id, created_at) 
+                VALUES (?, ?, ?, ?, ?, ?, NOW())
             ");
             
-            return $stmt->execute([
+            if ($stmt->execute([
                 $userId,
                 $calculatorType,
                 $calculatorSlug,
                 json_encode($inputs),
-                json_encode($results)
-            ]);
+                json_encode($results),
+                $projectId
+            ])) {
+                return $this->db->lastInsertId();
+            }
+            return false;
         } catch (\Exception $e) {
             // If table doesn't have calculator_slug, try without it
             try {

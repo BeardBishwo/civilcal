@@ -826,6 +826,14 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                         </ul>
                     </li>
 
+                    <!-- Advertisements -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/advertisements') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('admin/advertisements'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-ad"></i>
+                            <span class="nav-text">Advertisements</span>
+                        </a>
+                    </li>
+
                     <!-- Modules -->
                     <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/modules') !== false ? 'active' : ''; ?>">
                         <a href="<?php echo app_base_url('admin/modules'); ?>" class="nav-link">

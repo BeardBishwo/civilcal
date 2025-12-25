@@ -261,6 +261,15 @@ $router->add(
     ["auth", "admin"],
 );
 
+// Advertisement Management
+$router->add("GET", "/admin/advertisements", "Admin\AdvertisementController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/advertisements/create", "Admin\AdvertisementController@create", ["auth", "admin"]);
+$router->add("POST", "/admin/advertisements/store", "Admin\AdvertisementController@store", ["auth", "admin"]);
+$router->add("GET", "/admin/advertisements/edit/{id}", "Admin\AdvertisementController@edit", ["auth", "admin"]);
+$router->add("POST", "/admin/advertisements/update/{id}", "Admin\AdvertisementController@update", ["auth", "admin"]);
+$router->add("POST", "/admin/advertisements/delete/{id}", "Admin\AdvertisementController@delete", ["auth", "admin"]);
+$router->add("POST", "/admin/advertisements/toggle/{id}", "Admin\AdvertisementController@toggle", ["auth", "admin"]);
+
 // Logo & Branding Settings
 $router->add("GET", "/admin/logo-settings", "Admin\LogoController@index", [
     "auth",
@@ -393,6 +402,19 @@ $router->add(
     "Admin\SettingsController@update",
     ["auth", "admin"],
 );
+
+// Payment Routes (Stripe)
+$router->add("GET", "/payment/checkout/stripe", "Payment\StripeController@checkout", ["auth"]);
+$router->add("GET", "/payment/stripe/success", "Payment\StripeController@success", ["auth"]);
+$router->add("GET", "/payment/stripe/cancel", "Payment\StripeController@cancel", ["auth"]);
+$router->add("POST", "/webhooks/stripe", "Payment\StripeController@webhook"); // Public webhook
+
+// Project Routes
+$router->add("GET", "/projects", "ProjectController@index", ["auth"] );
+$router->add("POST", "/projects/store", "ProjectController@store", ["auth"]);
+$router->add("GET", "/projects/view/{id}", "ProjectController@show", ["auth"]);
+$router->add("POST", "/projects/delete/{id}", "ProjectController@delete", ["auth"]);
+
 $router->add(
     "POST",
     "/admin/email/send-test",
