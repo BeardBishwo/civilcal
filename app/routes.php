@@ -358,6 +358,12 @@ $router->add(
     ["auth", "admin"],
 );
 $router->add(
+    "POST",
+    "/admin/settings/permalinks",
+    "Admin\\SettingsController@permalinks",
+    ["auth", "admin"],
+);
+$router->add(
     "GET",
     "/admin/settings/backup",
     "Admin\BackupController@index",

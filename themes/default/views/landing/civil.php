@@ -34,10 +34,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/civil/concrete/concrete-volume.php'); ?>" class="tool-item"><span>Concrete Volume</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/civil/concrete/rebar-calculation.php'); ?>" class="tool-item"><span>Rebar Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/civil/concrete/concrete-mix.php'); ?>" class="tool-item"><span>Concrete Mix Design</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/civil/concrete/concrete-strength.php'); ?>" class="tool-item"><span>Concrete Strength</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('concrete-volume'); ?>" class="tool-item"><span>Concrete Volume</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('rebar-calculation'); ?>" class="tool-item"><span>Rebar Calculation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('concrete-mix'); ?>" class="tool-item"><span>Concrete Mix Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('concrete-strength'); ?>" class="tool-item"><span>Concrete Strength</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -51,9 +51,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/civil/earthwork/cut-and-fill-volume.php'); ?>" class="tool-item"><span>Cut & Fill Volume</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/civil/earthwork/slope-calculation.php'); ?>" class="tool-item"><span>Slope Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/civil/earthwork/excavation-volume.php'); ?>" class="tool-item"><span>Excavation Volume</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('cut-and-fill-volume'); ?>" class="tool-item"><span>Cut & Fill Volume</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('slope-calculation'); ?>" class="tool-item"><span>Slope Calculation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('excavation-volume'); ?>" class="tool-item"><span>Excavation Volume</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -67,10 +67,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/civil/structural/beam-load-capacity.php'); ?>" class="tool-item"><span>Beam Load Capacity</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/civil/structural/column-design.php'); ?>" class="tool-item"><span>Column Design</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/civil/structural/slab-design.php'); ?>" class="tool-item"><span>Slab Design</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/civil/structural/foundation-design.php'); ?>" class="tool-item"><span>Foundation Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('beam-load-capacity'); ?>" class="tool-item"><span>Beam Load Capacity</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('column-design'); ?>" class="tool-item"><span>Column Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('slab-design'); ?>" class="tool-item"><span>Slab Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('foundation-design'); ?>" class="tool-item"><span>Foundation Design</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -84,9 +84,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/civil/brickwork/brick-quantity.php'); ?>" class="tool-item"><span>Brick Quantity</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/civil/brickwork/mortar-ratio.php'); ?>" class="tool-item"><span>Mortar Ratio</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/civil/brickwork/plastering-estimator.php'); ?>" class="tool-item"><span>Plastering Estimator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('brick-quantity'); ?>" class="tool-item"><span>Brick Quantity</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('mortar-ratio'); ?>" class="tool-item"><span>Mortar Ratio</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('plastering-estimator'); ?>" class="tool-item"><span>Plastering Estimator</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
     </div>

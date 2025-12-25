@@ -35,9 +35,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/dashboard/project-overview.php') : 'modules/project-management/dashboard/project-overview.php'; ?>" class="tool-item"><span>Project Overview</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/dashboard/gantt-chart.php') : 'modules/project-management/dashboard/gantt-chart.php'; ?>" class="tool-item"><span>Gantt Chart</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/dashboard/milestone-tracker.php') : 'modules/project-management/dashboard/milestone-tracker.php'; ?>" class="tool-item"><span>Milestone Tracker</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('project-overview') : 'modules/project-management/dashboard/project-overview.php'; ?>" class="tool-item"><span>Project Overview</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('gantt-chart') : 'modules/project-management/dashboard/gantt-chart.php'; ?>" class="tool-item"><span>Gantt Chart</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('milestone-tracker') : 'modules/project-management/dashboard/milestone-tracker.php'; ?>" class="tool-item"><span>Milestone Tracker</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -51,9 +51,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/scheduling/create-task.php') : 'modules/project-management/scheduling/create-task.php'; ?>" class="tool-item"><span>Create Task</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/scheduling/assign-task.php') : 'modules/project-management/scheduling/assign-task.php'; ?>" class="tool-item"><span>Assign Task</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/scheduling/task-dependency.php') : 'modules/project-management/scheduling/task-dependency.php'; ?>" class="tool-item"><span>Task Dependencies</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('create-task') : 'modules/project-management/scheduling/create-task.php'; ?>" class="tool-item"><span>Create Task</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('assign-task') : 'modules/project-management/scheduling/assign-task.php'; ?>" class="tool-item"><span>Assign Task</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('task-dependency') : 'modules/project-management/scheduling/task-dependency.php'; ?>" class="tool-item"><span>Task Dependencies</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -67,9 +67,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/resources/manpower-planning.php') : 'modules/project-management/resources/manpower-planning.php'; ?>" class="tool-item"><span>Manpower Planning</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/resources/equipment-allocation.php') : 'modules/project-management/resources/equipment-allocation.php'; ?>" class="tool-item"><span>Equipment Allocation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/resources/material-tracking.php') : 'modules/project-management/resources/material-tracking.php'; ?>" class="tool-item"><span>Material Tracking</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('manpower-planning') : 'modules/project-management/resources/manpower-planning.php'; ?>" class="tool-item"><span>Manpower Planning</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('equipment-allocation') : 'modules/project-management/resources/equipment-allocation.php'; ?>" class="tool-item"><span>Equipment Allocation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('material-tracking') : 'modules/project-management/resources/material-tracking.php'; ?>" class="tool-item"><span>Material Tracking</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -83,9 +83,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/financial/budget-tracking.php') : 'modules/project-management/financial/budget-tracking.php'; ?>" class="tool-item"><span>Budget Tracking</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/financial/cost-control.php') : 'modules/project-management/financial/cost-control.php'; ?>" class="tool-item"><span>Cost Control</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/financial/forecast-analysis.php') : 'modules/project-management/financial/forecast-analysis.php'; ?>" class="tool-item"><span>Forecast Analysis</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('budget-tracking') : 'modules/project-management/financial/budget-tracking.php'; ?>" class="tool-item"><span>Budget Tracking</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('cost-control') : 'modules/project-management/financial/cost-control.php'; ?>" class="tool-item"><span>Cost Control</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('forecast-analysis') : 'modules/project-management/financial/forecast-analysis.php'; ?>" class="tool-item"><span>Forecast Analysis</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -99,9 +99,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/quality/quality-checklist.php') : 'modules/project-management/quality/quality-checklist.php'; ?>" class="tool-item"><span>Quality Checklist</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/quality/safety-incidents.php') : 'modules/project-management/quality/safety-incidents.php'; ?>" class="tool-item"><span>Safety Incidents</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/quality/audit-reports.php') : 'modules/project-management/quality/audit-reports.php'; ?>" class="tool-item"><span>Audit Reports</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('quality-checklist') : 'modules/project-management/quality/quality-checklist.php'; ?>" class="tool-item"><span>Quality Checklist</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('safety-incidents') : 'modules/project-management/quality/safety-incidents.php'; ?>" class="tool-item"><span>Safety Incidents</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('audit-reports') : 'modules/project-management/quality/audit-reports.php'; ?>" class="tool-item"><span>Audit Reports</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -115,9 +115,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/documents/document-repository.php') : 'modules/project-management/documents/document-repository.php'; ?>" class="tool-item"><span>Document Repository</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/documents/drawing-register.php') : 'modules/project-management/documents/drawing-register.php'; ?>" class="tool-item"><span>Drawing Register</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo function_exists('app_base_url') ? app_base_url('modules/project-management/documents/submittal-tracking.php') : 'modules/project-management/documents/submittal-tracking.php'; ?>" class="tool-item"><span>Submittal Tracking</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('document-repository') : 'modules/project-management/documents/document-repository.php'; ?>" class="tool-item"><span>Document Repository</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('drawing-register') : 'modules/project-management/documents/drawing-register.php'; ?>" class="tool-item"><span>Drawing Register</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo function_exists('app_base_url') ? \App\Helpers\UrlHelper::calculator('submittal-tracking') : 'modules/project-management/documents/submittal-tracking.php'; ?>" class="tool-item"><span>Submittal Tracking</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
     </div>

@@ -35,9 +35,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/fire/sprinklers/sprinkler-layout.php'); ?>" class="tool-item"><span>Sprinkler Layout</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/fire/sprinklers/discharge-calculations.php'); ?>" class="tool-item"><span>Sprinkler Discharge</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/fire/sprinklers/pipe-sizing.php'); ?>" class="tool-item"><span>Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('sprinkler-layout'); ?>" class="tool-item"><span>Sprinkler Layout</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('discharge-calculations'); ?>" class="tool-item"><span>Sprinkler Discharge</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pipe-sizing'); ?>" class="tool-item"><span>Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -51,7 +51,7 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/fire/hydraulics/hazen-williams.php'); ?>" class="tool-item"><span>Hazen-Williams Calculator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('hazen-williams'); ?>" class="tool-item"><span>Hazen-Williams Calculator</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -65,9 +65,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/fire/standpipes/standpipe-classification.php'); ?>" class="tool-item"><span>Standpipe Classification</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/fire/standpipes/hose-demand.php'); ?>" class="tool-item"><span>Hose Demand</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/fire/standpipes/pressure-calculations.php'); ?>" class="tool-item"><span>Pressure Calculations</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('standpipe-classification'); ?>" class="tool-item"><span>Standpipe Classification</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('hose-demand'); ?>" class="tool-item"><span>Hose Demand</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pressure-calculations'); ?>" class="tool-item"><span>Pressure Calculations</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -81,9 +81,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/fire/hazard-classification/occupancy-assessment.php'); ?>" class="tool-item"><span>Occupancy Assessment</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/fire/hazard-classification/commodity-classification.php'); ?>" class="tool-item"><span>Commodity Classification</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/fire/hazard-classification/design-density.php'); ?>" class="tool-item"><span>Design Density</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('occupancy-assessment'); ?>" class="tool-item"><span>Occupancy Assessment</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('commodity-classification'); ?>" class="tool-item"><span>Commodity Classification</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('design-density'); ?>" class="tool-item"><span>Design Density</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -97,9 +97,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/fire/fire-pumps/pump-sizing.php'); ?>" class="tool-item"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/fire/fire-pumps/driver-power.php'); ?>" class="tool-item"><span>Driver Power</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/fire/fire-pumps/jockey-pump.php'); ?>" class="tool-item"><span>Jockey Pump</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pump-sizing'); ?>" class="tool-item"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('driver-power'); ?>" class="tool-item"><span>Driver Power</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('jockey-pump'); ?>" class="tool-item"><span>Jockey Pump</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
     </div>

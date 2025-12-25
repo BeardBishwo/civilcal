@@ -37,10 +37,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/plumbing/pipe_sizing/water-pipe-sizing.php'); ?>" class="tool-item"><span>Water Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/pipe_sizing/gas-pipe-sizing.php'); ?>" class="tool-item"><span>Gas Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/pipe_sizing/pipe-flow-capacity.php'); ?>" class="tool-item"><span>Pipe Flow Capacity</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/pipe_sizing/expansion-loop-sizing.php'); ?>" class="tool-item"><span>Expansion Loop Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('water-pipe-sizing'); ?>" class="tool-item"><span>Water Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('gas-pipe-sizing'); ?>" class="tool-item"><span>Gas Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pipe-flow-capacity'); ?>" class="tool-item"><span>Pipe Flow Capacity</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('expansion-loop-sizing'); ?>" class="tool-item"><span>Expansion Loop Sizing</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -54,10 +54,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/plumbing/water_supply/water-demand-calculation.php'); ?>" class="tool-item"><span>Water Demand Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/water_supply/storage-tank-sizing.php'); ?>" class="tool-item"><span>Storage Tank Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/water_supply/pump-sizing.php'); ?>" class="tool-item"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/water_supply/water-hammer-calculation.php'); ?>" class="tool-item"><span>Water Hammer Calculation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('water-demand-calculation'); ?>" class="tool-item"><span>Water Demand Calculation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('storage-tank-sizing'); ?>" class="tool-item"><span>Storage Tank Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pump-sizing'); ?>" class="tool-item"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('water-hammer-calculation'); ?>" class="tool-item"><span>Water Hammer Calculation</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -71,10 +71,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/plumbing/drainage/drainage-pipe-sizing.php'); ?>" class="tool-item"><span>Drain Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/drainage/storm-drainage.php'); ?>" class="tool-item"><span>Storm Water Drainage</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/drainage/vent-pipe-sizing.php'); ?>" class="tool-item"><span>Vent Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/drainage/grease-trap-sizing.php'); ?>" class="tool-item"><span>Grease Trap Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('drainage-pipe-sizing'); ?>" class="tool-item"><span>Drain Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('storm-drainage'); ?>" class="tool-item"><span>Storm Water Drainage</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('vent-pipe-sizing'); ?>" class="tool-item"><span>Vent Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('grease-trap-sizing'); ?>" class="tool-item"><span>Grease Trap Sizing</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -88,9 +88,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/plumbing/water_supply/pressure-loss.php'); ?>" class="tool-item"><span>Pipe Friction Loss</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/hot_water/heat-loss-calculation.php'); ?>" class="tool-item"><span>Heat Loss Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/water_supply/main-isolation-valve.php'); ?>" class="tool-item"><span>Isolation Valve Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pressure-loss'); ?>" class="tool-item"><span>Pipe Friction Loss</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('heat-loss-calculation'); ?>" class="tool-item"><span>Heat Loss Calculation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('main-isolation-valve'); ?>" class="tool-item"><span>Isolation Valve Sizing</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -104,10 +104,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/plumbing/hot_water/water-heater-sizing.php'); ?>" class="tool-item"><span>Water Heater Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/hot_water/recirculation-loop.php'); ?>" class="tool-item"><span>Recirculation Loop</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/hot_water/safety-valve.php'); ?>" class="tool-item"><span>Safety Valve Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/hot_water/storage-tank-sizing.php'); ?>" class="tool-item"><span>Hot Water Storage</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('water-heater-sizing'); ?>" class="tool-item"><span>Water Heater Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('recirculation-loop'); ?>" class="tool-item"><span>Recirculation Loop</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('safety-valve'); ?>" class="tool-item"><span>Safety Valve Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('storage-tank-sizing'); ?>" class="tool-item"><span>Hot Water Storage</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -121,10 +121,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/plumbing/stormwater/gutter-sizing.php'); ?>" class="tool-item"><span>Gutter Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/stormwater/downpipe-sizing.php'); ?>" class="tool-item"><span>Downpipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/stormwater/stormwater-storage.php'); ?>" class="tool-item"><span>Stormwater Storage</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/stormwater/pervious-area.php'); ?>" class="tool-item"><span>Pervious Area</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('gutter-sizing'); ?>" class="tool-item"><span>Gutter Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('downpipe-sizing'); ?>" class="tool-item"><span>Downpipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('stormwater-storage'); ?>" class="tool-item"><span>Stormwater Storage</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pervious-area'); ?>" class="tool-item"><span>Pervious Area</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -138,10 +138,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/plumbing/fixtures/fixture-unit-calculation.php'); ?>" class="tool-item"><span>Fixture Unit Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/fixtures/shower-sizing.php'); ?>" class="tool-item"><span>Shower Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/fixtures/sink-sizing.php'); ?>" class="tool-item"><span>Sink Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/plumbing/fixtures/toilet-flow.php'); ?>" class="tool-item"><span>Toilet Flow</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('fixture-unit-calculation'); ?>" class="tool-item"><span>Fixture Unit Calculation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('shower-sizing'); ?>" class="tool-item"><span>Shower Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('sink-sizing'); ?>" class="tool-item"><span>Sink Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('toilet-flow'); ?>" class="tool-item"><span>Toilet Flow</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
     </div>

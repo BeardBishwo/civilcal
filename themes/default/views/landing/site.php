@@ -35,10 +35,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/site/surveying/slope-staking.php'); ?>" class="tool-item"><span>Slope Staking Calculator</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/surveying/batter-boards.php'); ?>" class="tool-item"><span>Batter Board Setup</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/surveying/horizontal-curve-staking.php'); ?>" class="tool-item"><span>Horizontal Curve Staking</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/surveying/grade-rod.php'); ?>" class="tool-item"><span>Grade Rod Calculator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('slope-staking'); ?>" class="tool-item"><span>Slope Staking Calculator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('batter-boards'); ?>" class="tool-item"><span>Batter Board Setup</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('horizontal-curve-staking'); ?>" class="tool-item"><span>Horizontal Curve Staking</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('grade-rod'); ?>" class="tool-item"><span>Grade Rod Calculator</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -52,10 +52,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/site/earthwork/swelling-shrinkage.php'); ?>" class="tool-item"><span>Swelling & Shrinkage</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/earthwork/equipment-production.php'); ?>" class="tool-item"><span>Equipment Production</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/earthwork/cut-fill-balancing.php'); ?>" class="tool-item"><span>Cut/Fill Balancing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/earthwork/slope-paving.php'); ?>" class="tool-item"><span>Slope Paving Calculator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('swelling-shrinkage'); ?>" class="tool-item"><span>Swelling & Shrinkage</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('equipment-production'); ?>" class="tool-item"><span>Equipment Production</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('cut-fill-balancing'); ?>" class="tool-item"><span>Cut/Fill Balancing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('slope-paving'); ?>" class="tool-item"><span>Slope Paving Calculator</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -69,10 +69,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/site/concrete-tools/temperature-control.php'); ?>" class="tool-item"><span>Temperature Control</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/concrete-tools/yardage-adjustments.php'); ?>" class="tool-item"><span>Yardage Adjustments</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/concrete-tools/placement-rate.php'); ?>" class="tool-item"><span>Placement Rate Calculator</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/concrete-tools/testing-requirements.php'); ?>" class="tool-item"><span>Testing Requirements</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('temperature-control'); ?>" class="tool-item"><span>Temperature Control</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('yardage-adjustments'); ?>" class="tool-item"><span>Yardage Adjustments</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('placement-rate'); ?>" class="tool-item"><span>Placement Rate Calculator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('testing-requirements'); ?>" class="tool-item"><span>Testing Requirements</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -86,10 +86,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/site/safety/fall-protection.php'); ?>" class="tool-item"><span>Fall Protection Planning</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/safety/trench-safety.php'); ?>" class="tool-item"><span>Trench Safety Calculator</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/safety/crane-setup.php'); ?>" class="tool-item"><span>Crane Setup Calculator</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/safety/evacuation-planning.php'); ?>" class="tool-item"><span>Evacuation Planning</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('fall-protection'); ?>" class="tool-item"><span>Fall Protection Planning</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('trench-safety'); ?>" class="tool-item"><span>Trench Safety Calculator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('crane-setup'); ?>" class="tool-item"><span>Crane Setup Calculator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('evacuation-planning'); ?>" class="tool-item"><span>Evacuation Planning</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -103,10 +103,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/site/productivity/labor-productivity.php'); ?>" class="tool-item"><span>Labor Productivity</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/productivity/equipment-utilization.php'); ?>" class="tool-item"><span>Equipment Utilization</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/productivity/schedule-compression.php'); ?>" class="tool-item"><span>Schedule Compression</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/site/productivity/cost-productivity.php'); ?>" class="tool-item"><span>Cost Productivity Analysis</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('labor-productivity'); ?>" class="tool-item"><span>Labor Productivity</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('equipment-utilization'); ?>" class="tool-item"><span>Equipment Utilization</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('schedule-compression'); ?>" class="tool-item"><span>Schedule Compression</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('cost-productivity'); ?>" class="tool-item"><span>Cost Productivity Analysis</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
     </div>

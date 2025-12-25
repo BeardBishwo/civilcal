@@ -8,6 +8,7 @@ $meta = isset($meta) ? $meta : [
 ];
 
 //
+use App\Helpers\UrlHelper;
 ?>
 
 <!-- Floating Background Elements -->
@@ -64,9 +65,9 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/concrete/concrete-volume.php'); ?>">Concrete Volume</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/concrete/rebar-calculation.php'); ?>">Rebar Calculation</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/concrete/concrete-mix.php'); ?>">Concrete Mix</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('concrete-volume'); ?>">Concrete Volume</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('rebar-calculation'); ?>">Rebar Calculation</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('concrete-mix'); ?>">Concrete Mix</a></li>
                     </ul>
                 </div>
                 <div class="category-card" data-tilt>
@@ -75,8 +76,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/brickwork/brick-quantity.php'); ?>">Brick Quantity</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/civil/brickwork/mortar-ratio.php'); ?>">Mortar Ratio</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('brick-quantity'); ?>">Brick Quantity</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('mortar-ratio'); ?>">Mortar Ratio</a></li>
                     </ul>
                 </div>
             </div>
@@ -94,8 +95,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/load-calculation/total-load.php'); ?>">Total Load</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/wire-sizing/wire-gauge.php'); ?>">Wire Gauge</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('total-load'); ?>">Total Load</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('wire-gauge'); ?>">Wire Gauge</a></li>
                     </ul>
                 </div>
                 <div class="category-card" data-tilt>
@@ -104,8 +105,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/voltage-drop/drop-calculator.php'); ?>">Voltage Drop</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/electrical/short-circuit/sc-current.php'); ?>">Short Circuit</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('drop-calculator'); ?>">Voltage Drop</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('sc-current'); ?>">Short Circuit</a></li>
                     </ul>
                 </div>
             </div>
@@ -123,8 +124,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/water_supply/pipe-sizing.php'); ?>">Pipe Sizing</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/water_supply/pump-head.php'); ?>">Pump Head</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('pipe-sizing'); ?>">Pipe Sizing</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('pump-head'); ?>">Pump Head</a></li>
                     </ul>
                 </div>
                 <div class="category-card" data-tilt>
@@ -133,8 +134,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/drainage/slope-calculator.php'); ?>">Slope Calculator</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/plumbing/drainage/trap-sizing.php'); ?>">Trap Sizing</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('slope-calculator'); ?>">Slope Calculator</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('trap-sizing'); ?>">Trap Sizing</a></li>
                     </ul>
                 </div>
             </div>
@@ -152,8 +153,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/load-calculation/cooling-load.php'); ?>">Cooling Load</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/load-calculation/heating-load.php'); ?>">Heating Load</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('cooling-load'); ?>">Cooling Load</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('heating-load'); ?>">Heating Load</a></li>
                     </ul>
                 </div>
                 <div class="category-card" data-tilt>
@@ -162,8 +163,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/duct-sizing/duct-dimension.php'); ?>">Duct Dimensions</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/hvac/duct-sizing/static-pressure.php'); ?>">Static Pressure</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('duct-dimension'); ?>">Duct Dimensions</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('static-pressure'); ?>">Static Pressure</a></li>
                     </ul>
                 </div>
             </div>
@@ -181,8 +182,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/hydraulics/pressure-drop.php'); ?>">Pressure Drop</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/fire/sprinklers/spacing.php'); ?>">Sprinkler Spacing</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('pressure-drop'); ?>">Pressure Drop</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('spacing'); ?>">Sprinkler Spacing</a></li>
                     </ul>
                 </div>
             </div>
@@ -200,8 +201,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/site/earthwork/cut-fill.php'); ?>">Cut & Fill</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/site/surveying/leveling.php'); ?>">Leveling</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('cut-fill'); ?>">Cut & Fill</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('leveling'); ?>">Leveling</a></li>
                     </ul>
                 </div>
             </div>
@@ -219,8 +220,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/beam-analysis/bending-moment.php'); ?>">Beam Analysis</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/column-design/axial-load.php'); ?>">Column Design</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('bending-moment'); ?>">Beam Analysis</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('axial-load'); ?>">Column Design</a></li>
                     </ul>
                 </div>
                 <div class="category-card" data-tilt>
@@ -229,8 +230,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/slab-design/slab-thickness.php'); ?>">Slab Design</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/structural/foundation-design/footing-size.php'); ?>">Foundation</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('slab-thickness'); ?>">Slab Design</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('footing-size'); ?>">Foundation</a></li>
                     </ul>
                 </div>
             </div>
@@ -248,8 +249,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/material-estimation/material-list.php'); ?>">Material Estimation</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/takeoff-summary.php'); ?>">Quantity Takeoff</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('material-list'); ?>">Material Estimation</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('takeoff-summary'); ?>">Quantity Takeoff</a></li>
                     </ul>
                 </div>
                 <div class="category-card" data-tilt>
@@ -258,8 +259,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/cost-estimation/project-cost.php'); ?>">Project Budget</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/estimation/project-financials/cash-flow.php'); ?>">Cash Flow</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('project-cost'); ?>">Project Budget</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('cash-flow'); ?>">Cash Flow</a></li>
                     </ul>
                 </div>
             </div>
@@ -277,8 +278,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/coordination/clash-detection.php'); ?>">Clash Detection</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/mep/integration/system-sync.php'); ?>">System Integration</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('clash-detection'); ?>">Clash Detection</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('system-sync'); ?>">System Integration</a></li>
                     </ul>
                 </div>
             </div>
@@ -296,8 +297,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/project-management/scheduling/critical-path.php'); ?>">Scheduling</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/project-management/resources/allocation.php'); ?>">Resource Allocation</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('critical-path'); ?>">Scheduling</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('allocation'); ?>">Resource Allocation</a></li>
                     </ul>
                 </div>
                 <div class="category-card" data-tilt>
@@ -306,8 +307,8 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/project-management/financial/budget-tracking.php'); ?>">Project Financials</a></li>
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/project-management/analytics/kpi-summary.php'); ?>">Analytics</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('budget-tracking'); ?>">Project Financials</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('kpi-summary'); ?>">Analytics</a></li>
                     </ul>
                 </div>
             </div>
@@ -325,7 +326,7 @@ $meta = isset($meta) ? $meta : [
                         <div class="separator"></div>
                     </div>
                     <ul class="tool-list">
-                        <li class="tool-item"><a href="<?php echo app_base_url('modules/country/nepal/unit-calculator.php'); ?>">Nepal Unit Converter</a></li>
+                        <li class="tool-item"><a href="<?php echo UrlHelper::calculator('unit-calculator'); ?>">Nepal Unit Converter</a></li>
                     </ul>
                 </div>
             </div>

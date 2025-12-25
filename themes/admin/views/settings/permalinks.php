@@ -16,55 +16,9 @@ $breadcrumbs = [
     ['title' => 'Permalinks']
 ];
 
-$db = Database::getInstance()->getPdo();
-$message = '';
-$messageType = '';
-
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_permalinks'])) {
-    $structure = $_POST['permalink_structure'] ?? 'calculator-only';
-    
-    // Validate structure
-    $validStructures = ['full-path', 'category-calculator', 'subcategory-calculator', 'calculator-only', 'php-extension', 'base-path', 'custom'];
-    if (in_array($structure, $validStructures)) {
-        // Save settings
-        $phpExtension = isset($_POST['permalink_php_extension']) ? 1 : 0;
-        $basePath = $_POST['permalink_base_path'] ?? 'tools';
-        $customPattern = $_POST['permalink_custom_pattern'] ?? '';
-        $redirectOldUrls = isset($_POST['permalink_redirect_old_urls']) ? 1 : 0;
-        
-        // Validate custom pattern
-        if ($structure === 'custom' && empty($customPattern)) {
-            $message = 'Custom pattern cannot be empty when using Custom Pattern structure.';
-            $messageType = 'error';
-        } else {
-            // Update settings
-            $stmt = $db->prepare("UPDATE settings SET setting_value = ? WHERE setting_key = 'permalink_structure'");
-            $stmt->execute([$structure]);
-            
-            $settings = [
-                ['permalink_php_extension', $phpExtension, 'boolean'],
-                ['permalink_base_path', $basePath, 'string'],
-                ['permalink_custom_pattern', $customPattern, 'string'],
-                ['permalink_redirect_old_urls', $redirectOldUrls, 'boolean']
-            ];
-            
-            foreach ($settings as $setting) {
-                $stmt = $db->prepare("UPDATE settings SET setting_value = ? WHERE setting_key = ?");
-                $stmt->execute([$setting[1], $setting[0]]);
-            }
-            
-            // Clear URL cache
-            UrlHelper::clearCache();
-            
-            $message = '✅ Permalink settings updated successfully! All links will now use the new format.';
-            $messageType = 'success';
-        }
-    } else {
-        $message = '❌ Invalid permalink structure selected.';
-        $messageType = 'error';
-    }
-}
+// Messages are passed from the controller
+$message = $message ?? '';
+$messageType = $messageType ?? '';
 
 // Get data from controller or fetch directly
 $currentStructure = $currentStructure ?? 'calculator-only';
@@ -584,21 +538,25 @@ ob_start();
             <div class="options-section">
                 <div class="options-grid">
                     <!-- PHP Extension Toggle -->
-                    <div class="php-extension-card">
-                        <input type="checkbox" id="permalink_php_extension" name="permalink_php_extension" value="1" <?= $settings['permalink_php_extension'] == '1' ? 'checked' : '' ?>>
-                        <label for="permalink_php_extension">
-                            <strong>Show .php Extension</strong>
-                            <br><small>Add .php extension to URLs for better server compatibility</small>
-                        </label>
+                    <div class="option-card">
+                        <div class="php-extension-toggle">
+                            <input type="checkbox" id="permalink_php_extension" name="permalink_php_extension" value="1" <?= $settings['permalink_php_extension'] == '1' ? 'checked' : '' ?>>
+                            <label for="permalink_php_extension">
+                                <strong>Show .php Extension</strong>
+                                <br><small>Add .php extension to all URLs (e.g., /concrete-volume.php instead of /concrete-volume)</small>
+                            </label>
+                        </div>
                     </div>
 
                     <!-- 301 Redirects Option -->
                     <div class="option-card">
-                        <input type="checkbox" id="redirect_old_urls" name="permalink_redirect_old_urls" value="1" <?= $settings['permalink_redirect_old_urls'] == '1' ? 'checked' : '' ?>>
-                        <label for="redirect_old_urls">
-                            <strong>Enable 301 Redirects</strong>
-                            <br><small>Automatically redirect old URLs to new structure (recommended for SEO)</small>
-                        </label>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="redirect_old_urls" name="permalink_redirect_old_urls" value="1" <?= $settings['permalink_redirect_old_urls'] == '1' ? 'checked' : '' ?>>
+                            <label for="redirect_old_urls">
+                                <strong>Enable 301 Redirects</strong>
+                                <br><small>Automatically redirect old URLs to new structure (recommended for SEO)</small>
+                            </label>
+                        </div>
                     </div>
 
                     <!-- Custom Pattern Field -->
@@ -630,10 +588,11 @@ ob_start();
                 <h4><i class="fas fa-search"></i> SEO Best Practices</h4>
                 <ul>
                     <li><strong>🏆 Best for SEO:</strong> "Calculator Only" structure creates the cleanest, most SEO-friendly URLs</li>
-                    <li><strong>⚡ For Performance:</strong> Shorter URLs load faster and rank better in search results</li>
-                    <li><strong>🔧 For Compatibility:</strong> Enable ".php Extension" if your server requires it</li>
-                    <li><strong>📁 For Organization:</strong> Use "Category + Calculator" to group related calculators</li>
+                    <li><strong>⚡ Clean URLs:</strong> Disable ".php Extension" for modern, clean URLs (recommended for better rankings)</li>
+                    <li><strong>🔧 For Compatibility:</strong> Enable ".php Extension" if your server requires it or for legacy systems</li>
+                    <li><strong>📁 For Organization:</strong> Use "Category + Calculator" or "Subcategory + Calculator" to group related calculators</li>
                     <li><strong>🔄 Always enable:</strong> 301 redirects to preserve SEO rankings when changing structures</li>
+                    <li><strong>✨ Flexibility:</strong> Toggle .php extension on/off anytime - the system handles both formats seamlessly</li>
                 </ul>
             </div>
 
@@ -730,20 +689,24 @@ ob_start();
         const customPatternInput = document.getElementById('permalink_custom_pattern');
         const customPattern = customPatternInput ? customPatternInput.value : '';
         
+        // Check if PHP extension is enabled
+        const phpExtensionCheckbox = document.getElementById('permalink_php_extension');
+        const phpExtension = phpExtensionCheckbox && phpExtensionCheckbox.checked ? '.php' : '';
+        
         let url = '';
         
         switch(currentStructure) {
             case 'full-path':
-                url = `${baseUrl}/modules/${category}/${subcategory}/${sampleId}.php`;
+                url = `${baseUrl}/modules/${category}/${subcategory}/${sampleId}${phpExtension}`;
                 break;
             case 'category-calculator':
-                url = `${baseUrl}/${category}/${sampleId}.php`;
+                url = `${baseUrl}/${category}/${sampleId}${phpExtension}`;
                 break;
             case 'subcategory-calculator':
-                url = `${baseUrl}/${subcategory}/${sampleId}.php`;
+                url = `${baseUrl}/${subcategory}/${sampleId}${phpExtension}`;
                 break;
             case 'calculator-only':
-                url = `${baseUrl}/${slug}.php`;
+                url = `${baseUrl}/${slug}${phpExtension}`;
                 break;
             case 'custom':
                 if (customPattern) {
@@ -755,13 +718,13 @@ ob_start();
                     if (!pattern.startsWith('/')) {
                         pattern = '/' + pattern;
                     }
-                    url = `${baseUrl}${pattern}`;
+                    url = `${baseUrl}${pattern}${phpExtension}`;
                 } else {
-                    url = `${baseUrl}/${slug}`;
+                    url = `${baseUrl}/${slug}${phpExtension}`;
                 }
                 break;
             default:
-                url = `${baseUrl}/${slug}.php`;
+                url = `${baseUrl}/${slug}${phpExtension}`;
                 break;
         }
         

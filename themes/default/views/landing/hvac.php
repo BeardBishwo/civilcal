@@ -35,10 +35,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/hvac/load-calculation/cooling-load.php'); ?>" class="tool-item"><span>Cooling Load Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/load-calculation/heating-load.php'); ?>" class="tool-item"><span>Heating Load Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/load-calculation/ventilation.php'); ?>" class="tool-item"><span>Ventilation Rate Calculator</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/load-calculation/infiltration.php'); ?>" class="tool-item"><span>Infiltration Load</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('cooling-load'); ?>" class="tool-item"><span>Cooling Load Calculation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('heating-load'); ?>" class="tool-item"><span>Heating Load Calculation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('ventilation'); ?>" class="tool-item"><span>Ventilation Rate Calculator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('infiltration'); ?>" class="tool-item"><span>Infiltration Load</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -52,11 +52,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/hvac/duct-sizing/duct-by-velocity.php'); ?>" class="tool-item"><span>Duct Sizing by Velocity</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/duct-sizing/pressure-drop.php'); ?>" class="tool-item"><span>Duct Pressure Drop</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/duct-sizing/equivalent-round.php'); ?>" class="tool-item"><span>Equivalent Round Duct</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/duct-sizing/fitting-loss.php'); ?>" class="tool-item"><span>Duct Fitting Loss</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/duct-sizing/grille-sizing.php'); ?>" class="tool-item"><span>Grille & Diffuser Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('duct-by-velocity'); ?>" class="tool-item"><span>Duct Sizing by Velocity</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pressure-drop'); ?>" class="tool-item"><span>Duct Pressure Drop</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('equivalent-round'); ?>" class="tool-item"><span>Equivalent Round Duct</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('fitting-loss'); ?>" class="tool-item"><span>Duct Fitting Loss</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('grille-sizing'); ?>" class="tool-item"><span>Grille & Diffuser Sizing</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -70,10 +70,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/hvac/psychrometrics/air-properties.php'); ?>" class="tool-item"><span>Air Properties Calculator</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/psychrometrics/enthalpy.php'); ?>" class="tool-item"><span>Enthalpy Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/psychrometrics/cooling-load-psych.php'); ?>" class="tool-item"><span>Cooling Load (Psych)</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/psychrometrics/sensible-heat-ratio.php'); ?>" class="tool-item"><span>Sensible Heat Ratio</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('air-properties'); ?>" class="tool-item"><span>Air Properties Calculator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('enthalpy'); ?>" class="tool-item"><span>Enthalpy Calculation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('cooling-load-psych'); ?>" class="tool-item"><span>Cooling Load (Psych)</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('sensible-heat-ratio'); ?>" class="tool-item"><span>Sensible Heat Ratio</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -87,10 +87,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/hvac/equipment-sizing/ac-sizing.php'); ?>" class="tool-item"><span>AC Unit Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/equipment-sizing/furnace-sizing.php'); ?>" class="tool-item"><span>Furnace Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/equipment-sizing/chiller-sizing.php'); ?>" class="tool-item"><span>Chiller Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/equipment-sizing/pump-sizing.php'); ?>" class="tool-item"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('ac-sizing'); ?>" class="tool-item"><span>AC Unit Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('furnace-sizing'); ?>" class="tool-item"><span>Furnace Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('chiller-sizing'); ?>" class="tool-item"><span>Chiller Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pump-sizing'); ?>" class="tool-item"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -104,10 +104,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/hvac/energy-analysis/energy-consumption.php'); ?>" class="tool-item"><span>Energy Consumption</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/energy-analysis/payback-period.php'); ?>" class="tool-item"><span>Payback Period</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/energy-analysis/co2-emissions.php'); ?>" class="tool-item"><span>CO₂ Emissions</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/hvac/energy-analysis/insulation-savings.php'); ?>" class="tool-item"><span>Insulation Savings</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('energy-consumption'); ?>" class="tool-item"><span>Energy Consumption</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('payback-period'); ?>" class="tool-item"><span>Payback Period</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('co2-emissions'); ?>" class="tool-item"><span>CO₂ Emissions</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('insulation-savings'); ?>" class="tool-item"><span>Insulation Savings</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
     </div>

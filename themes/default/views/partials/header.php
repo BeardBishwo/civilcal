@@ -141,6 +141,24 @@ if (
     <meta name="description" content="<?php echo $desc_safe; ?>">
     <link rel="manifest" href="<?php echo app_base_url("manifest.json"); ?>">
     <meta name="csrf-token" content="<?php echo csrf_token(); ?>">
+    
+    <?php
+    // Generate Canonical URL
+    $canonicalUrl = $site_meta["canonical"] ?? null;
+    if (empty($canonicalUrl)) {
+        // If calculator context exists, generate canonical calculator URL
+        if (isset($_SERVER['CALCULATOR_ID'])) {
+            $canonicalUrl = app_base_url(\App\Helpers\UrlHelper::calculator($_SERVER['CALCULATOR_ID']));
+        } else {
+            // Default to current clean URL
+            $path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+            $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . $path;
+        }
+    }
+    if ($canonicalUrl): ?>
+    <link rel="canonical" href="<?php echo htmlspecialchars($canonicalUrl); ?>">
+    <?php endif; ?>
+
     <script>
         window.appConfig = {
             baseUrl: "<?php echo rtrim(defined('APP_BASE') ? APP_BASE : '', '/'); ?>",

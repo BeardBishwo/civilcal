@@ -38,13 +38,13 @@ $breadcrumb = [
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/concrete-quantity.php'); ?>" class="tool-item"><span>Concrete Quantity</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/brickwork-quantity.php'); ?>" class="tool-item"><span>Brickwork Quantity</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/plaster-quantity.php'); ?>" class="tool-item"><span>Plaster Quantity</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/flooring-quantity.php'); ?>" class="tool-item"><span>Flooring Quantity</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/paint-quantity.php'); ?>" class="tool-item"><span>Paint Quantity</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/formwork-quantity.php'); ?>" class="tool-item"><span>Formwork Quantity</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/quantity-takeoff/rebar-quantity.php'); ?>" class="tool-item"><span>Rebar Quantity</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('concrete-quantity'); ?>" class="tool-item"><span>Concrete Quantity</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('brickwork-quantity'); ?>" class="tool-item"><span>Brickwork Quantity</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('plaster-quantity'); ?>" class="tool-item"><span>Plaster Quantity</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('flooring-quantity'); ?>" class="tool-item"><span>Flooring Quantity</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('paint-quantity'); ?>" class="tool-item"><span>Paint Quantity</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('formwork-quantity'); ?>" class="tool-item"><span>Formwork Quantity</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('rebar-quantity'); ?>" class="tool-item"><span>Rebar Quantity</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>
 
@@ -58,11 +58,11 @@ $breadcrumb = [
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo app_base_url('modules/estimation/material-estimation/concrete-materials.php'); ?>" class="tool-item"><span>Concrete Materials</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/material-estimation/masonry-materials.php'); ?>" class="tool-item"><span>Masonry Materials</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/material-estimation/plaster-materials.php'); ?>" class="tool-item"><span>Plaster Materials</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/material-estimation/tile-materials.php'); ?>" class="tool-item"><span>Tile Materials</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/material-estimation/paint-materials.php'); ?>" class="tool-item"><span>Paint Materials</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('concrete-materials'); ?>" class="tool-item"><span>Concrete Materials</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('masonry-materials'); ?>" class="tool-item"><span>Masonry Materials</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('plaster-materials'); ?>" class="tool-item"><span>Plaster Materials</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('tile-materials'); ?>" class="tool-item"><span>Tile Materials</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('paint-materials'); ?>" class="tool-item"><span>Paint Materials</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>
 
@@ -76,10 +76,10 @@ $breadcrumb = [
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo app_base_url('modules/estimation/cost-estimation/item-rate-analysis.php'); ?>" class="tool-item"><span>Item Rate Analysis</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/cost-estimation/boq-preparation.php'); ?>" class="tool-item"><span>BOQ Preparation</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/cost-estimation/project-cost-summary.php'); ?>" class="tool-item"><span>Project Cost Summary</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/cost-estimation/contingency-overheads.php'); ?>" class="tool-item"><span>Contingency & Overheads</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('item-rate-analysis'); ?>" class="tool-item"><span>Item Rate Analysis</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('boq-preparation'); ?>" class="tool-item"><span>BOQ Preparation</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('project-cost-summary'); ?>" class="tool-item"><span>Project Cost Summary</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('contingency-overheads'); ?>" class="tool-item"><span>Contingency & Overheads</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>
 
@@ -93,9 +93,9 @@ $breadcrumb = [
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo app_base_url('modules/estimation/labor-estimation/labor-rate-analysis.php'); ?>" class="tool-item"><span>Labor Rate Analysis</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/labor-estimation/manpower-requirement.php'); ?>" class="tool-item"><span>Manpower Requirement</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/labor-estimation/labor-hour-calculation.php'); ?>" class="tool-item"><span>Labor Hour Calculation</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('labor-rate-analysis'); ?>" class="tool-item"><span>Labor Rate Analysis</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('manpower-requirement'); ?>" class="tool-item"><span>Manpower Requirement</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('labor-hour-calculation'); ?>" class="tool-item"><span>Labor Hour Calculation</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>
 
@@ -109,9 +109,9 @@ $breadcrumb = [
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo app_base_url('modules/estimation/equipment-estimation/equipment-hourly-rate.php'); ?>" class="tool-item"><span>Equipment Hourly Rate</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/equipment-estimation/machinery-usage.php'); ?>" class="tool-item"><span>Machinery Usage</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/equipment-estimation/fuel-consumption.php'); ?>" class="tool-item"><span>Fuel Consumption</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('equipment-hourly-rate'); ?>" class="tool-item"><span>Equipment Hourly Rate</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('machinery-usage'); ?>" class="tool-item"><span>Machinery Usage</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('fuel-consumption'); ?>" class="tool-item"><span>Fuel Consumption</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>
 
@@ -125,9 +125,9 @@ $breadcrumb = [
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo app_base_url('modules/estimation/project-financials/cash-flow-analysis.php'); ?>" class="tool-item"><span>Cash Flow Analysis</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/project-financials/profit-loss-analysis.php'); ?>" class="tool-item"><span>Profit & Loss</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/project-financials/npv-irr-analysis.php'); ?>" class="tool-item"><span>NPV / IRR Analysis</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('cash-flow-analysis'); ?>" class="tool-item"><span>Cash Flow Analysis</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('profit-loss-analysis'); ?>" class="tool-item"><span>Profit & Loss</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('npv-irr-analysis'); ?>" class="tool-item"><span>NPV / IRR Analysis</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>
 
@@ -141,8 +141,8 @@ $breadcrumb = [
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo app_base_url('modules/estimation/tender-bidding/bid-price-comparison.php'); ?>" class="tool-item"><span>Bid Price Comparison</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/tender-bidding/bid-sheet-generator.php'); ?>" class="tool-item"><span>Bid Sheet Generator</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('bid-price-comparison'); ?>" class="tool-item"><span>Bid Price Comparison</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('bid-sheet-generator'); ?>" class="tool-item"><span>Bid Sheet Generator</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>
 
@@ -156,9 +156,9 @@ $breadcrumb = [
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo app_base_url('modules/estimation/reports/summary-report.php'); ?>" class="tool-item"><span>Summary Report</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/reports/detailed-boq-report.php'); ?>" class="tool-item"><span>Detailed BOQ</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo app_base_url('modules/estimation/reports/financial-dashboard.php'); ?>" class="tool-item"><span>Financial Dashboard</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('summary-report'); ?>" class="tool-item"><span>Summary Report</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('detailed-boq-report'); ?>" class="tool-item"><span>Detailed BOQ</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('financial-dashboard'); ?>" class="tool-item"><span>Financial Dashboard</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>
 	</div>

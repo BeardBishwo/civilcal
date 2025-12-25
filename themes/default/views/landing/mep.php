@@ -40,13 +40,13 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/mep/electrical/conduit-sizing.php'); ?>" class="tool-item"><span>Conduit Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/electrical/earthing-system.php'); ?>" class="tool-item"><span>Earthing System</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/electrical/emergency-power.php'); ?>" class="tool-item"><span>Emergency Power</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/electrical/lighting-layout.php'); ?>" class="tool-item"><span>Lighting Layout</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/electrical/mep-electrical-summary.php'); ?>" class="tool-item"><span>MEP Electrical Summary</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/electrical/panel-schedule.php'); ?>" class="tool-item"><span>Panel Schedule</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/electrical/transformer-sizing.php'); ?>" class="tool-item"><span>Transformer Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('conduit-sizing'); ?>" class="tool-item"><span>Conduit Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('earthing-system'); ?>" class="tool-item"><span>Earthing System</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('emergency-power'); ?>" class="tool-item"><span>Emergency Power</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('lighting-layout'); ?>" class="tool-item"><span>Lighting Layout</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('mep-electrical-summary'); ?>" class="tool-item"><span>MEP Electrical Summary</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('panel-schedule'); ?>" class="tool-item"><span>Panel Schedule</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('transformer-sizing'); ?>" class="tool-item"><span>Transformer Sizing</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -60,9 +60,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/mep/mechanical/chilled-water-piping.php'); ?>" class="tool-item"><span>Chilled Water Piping</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/mechanical/equipment-database.php'); ?>" class="tool-item"><span>Equipment Database</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/mechanical/hvac-duct-sizing.php'); ?>" class="tool-item"><span>HVAC Duct Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('chilled-water-piping'); ?>" class="tool-item"><span>Chilled Water Piping</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('equipment-database'); ?>" class="tool-item"><span>Equipment Database</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('hvac-duct-sizing'); ?>" class="tool-item"><span>HVAC Duct Sizing</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -76,12 +76,12 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/mep/plumbing/drainage-system.php'); ?>" class="tool-item"><span>Drainage System</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/plumbing/plumbing-fixture-count.php'); ?>" class="tool-item"><span>Plumbing Fixture Count</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/plumbing/pump-selection.php'); ?>" class="tool-item"><span>Pump Selection</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/plumbing/storm-water.php'); ?>" class="tool-item"><span>Storm Water</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/plumbing/water-supply.php'); ?>" class="tool-item"><span>Water Supply</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/plumbing/water-tank-sizing.php'); ?>" class="tool-item"><span>Water Tank Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('drainage-system'); ?>" class="tool-item"><span>Drainage System</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('plumbing-fixture-count'); ?>" class="tool-item"><span>Plumbing Fixture Count</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pump-selection'); ?>" class="tool-item"><span>Pump Selection</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('storm-water'); ?>" class="tool-item"><span>Storm Water</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('water-supply'); ?>" class="tool-item"><span>Water Supply</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('water-tank-sizing'); ?>" class="tool-item"><span>Water Tank Sizing</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -95,10 +95,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/mep/fire-protection/fire-hydrant-system.php'); ?>" class="tool-item"><span>Fire Hydrant System</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/fire-protection/fire-pump-sizing.php'); ?>" class="tool-item"><span>Fire Pump Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/fire-protection/fire-safety-zoning.php'); ?>" class="tool-item"><span>Fire Safety Zoning</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/fire-protection/fire-tank-sizing.php'); ?>" class="tool-item"><span>Fire Tank Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('fire-hydrant-system'); ?>" class="tool-item"><span>Fire Hydrant System</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('fire-pump-sizing'); ?>" class="tool-item"><span>Fire Pump Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('fire-safety-zoning'); ?>" class="tool-item"><span>Fire Safety Zoning</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('fire-tank-sizing'); ?>" class="tool-item"><span>Fire Tank Sizing</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -112,11 +112,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/mep/energy-efficiency/energy-consumption.php'); ?>" class="tool-item"><span>Energy Consumption</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/energy-efficiency/green-rating.php'); ?>" class="tool-item"><span>Green Rating</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/energy-efficiency/hvac-efficiency.php'); ?>" class="tool-item"><span>HVAC Efficiency</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/energy-efficiency/solar-system.php'); ?>" class="tool-item"><span>Solar System</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/energy-efficiency/water-efficiency.php'); ?>" class="tool-item"><span>Water Efficiency</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('energy-consumption'); ?>" class="tool-item"><span>Energy Consumption</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('green-rating'); ?>" class="tool-item"><span>Green Rating</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('hvac-efficiency'); ?>" class="tool-item"><span>HVAC Efficiency</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('solar-system'); ?>" class="tool-item"><span>Solar System</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('water-efficiency'); ?>" class="tool-item"><span>Water Efficiency</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -130,11 +130,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/mep/coordination/bim-export.php'); ?>" class="tool-item"><span>BIM Export</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/coordination/clash-detection.php'); ?>" class="tool-item"><span>Clash Detection</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/coordination/coordination-map.php'); ?>" class="tool-item"><span>Coordination Map</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/coordination/space-allocation.php'); ?>" class="tool-item"><span>Space Allocation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/coordination/system-priority.php'); ?>" class="tool-item"><span>System Priority</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('bim-export'); ?>" class="tool-item"><span>BIM Export</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('clash-detection'); ?>" class="tool-item"><span>Clash Detection</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('coordination-map'); ?>" class="tool-item"><span>Coordination Map</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('space-allocation'); ?>" class="tool-item"><span>Space Allocation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('system-priority'); ?>" class="tool-item"><span>System Priority</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -148,11 +148,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/mep/cost-management/boq-generator.php'); ?>" class="tool-item"><span>BOQ Generator</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/cost-management/cost-optimization.php'); ?>" class="tool-item"><span>Cost Optimization</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/cost-management/cost-summary.php'); ?>" class="tool-item"><span>Cost Summary</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/cost-management/material-takeoff.php'); ?>" class="tool-item"><span>Material Takeoff</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/cost-management/vendor-pricing.php'); ?>" class="tool-item"><span>Vendor Pricing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('boq-generator'); ?>" class="tool-item"><span>BOQ Generator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('cost-optimization'); ?>" class="tool-item"><span>Cost Optimization</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('cost-summary'); ?>" class="tool-item"><span>Cost Summary</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('material-takeoff'); ?>" class="tool-item"><span>Material Takeoff</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('vendor-pricing'); ?>" class="tool-item"><span>Vendor Pricing</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -166,11 +166,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/mep/reports-documentation/clash-detection-report.php'); ?>" class="tool-item"><span>Clash Detection Report</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/reports-documentation/equipment-schedule.php'); ?>" class="tool-item"><span>Equipment Schedule</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/reports-documentation/load-summary.php'); ?>" class="tool-item"><span>Load Summary</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/reports-documentation/mep-summary.php'); ?>" class="tool-item"><span>MEP Summary</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/reports-documentation/pdf-export.php'); ?>" class="tool-item"><span>PDF Export</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('clash-detection-report'); ?>" class="tool-item"><span>Clash Detection Report</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('equipment-schedule'); ?>" class="tool-item"><span>Equipment Schedule</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('load-summary'); ?>" class="tool-item"><span>Load Summary</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('mep-summary'); ?>" class="tool-item"><span>MEP Summary</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pdf-export'); ?>" class="tool-item"><span>PDF Export</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -184,12 +184,12 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/mep/data-utilities/api-endpoints.php'); ?>" class="tool-item"><span>API Endpoints</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/data-utilities/input-validator.php'); ?>" class="tool-item"><span>Input Validator</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/data-utilities/material-database.php'); ?>" class="tool-item"><span>Material Database</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/data-utilities/mep-config.php'); ?>" class="tool-item"><span>MEP Config</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/data-utilities/permissions.php'); ?>" class="tool-item"><span>Permissions</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/data-utilities/unit-converter.php'); ?>" class="tool-item"><span>Unit Converter</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('api-endpoints'); ?>" class="tool-item"><span>API Endpoints</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('input-validator'); ?>" class="tool-item"><span>Input Validator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('material-database'); ?>" class="tool-item"><span>Material Database</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('mep-config'); ?>" class="tool-item"><span>MEP Config</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('permissions'); ?>" class="tool-item"><span>Permissions</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('unit-converter'); ?>" class="tool-item"><span>Unit Converter</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -203,11 +203,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/mep/integration/autocad-layer-mapper.php'); ?>" class="tool-item"><span>AutoCAD Layer Mapper</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/integration/bim-integration.php'); ?>" class="tool-item"><span>BIM Integration</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/integration/cloud-sync.php'); ?>" class="tool-item"><span>Cloud Sync</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/integration/project-sharing.php'); ?>" class="tool-item"><span>Project Sharing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/mep/integration/revit-plugin.php'); ?>" class="tool-item"><span>Revit Plugin</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('autocad-layer-mapper'); ?>" class="tool-item"><span>AutoCAD Layer Mapper</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('bim-integration'); ?>" class="tool-item"><span>BIM Integration</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('cloud-sync'); ?>" class="tool-item"><span>Cloud Sync</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('project-sharing'); ?>" class="tool-item"><span>Project Sharing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('revit-plugin'); ?>" class="tool-item"><span>Revit Plugin</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
     </div>

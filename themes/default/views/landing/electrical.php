@@ -35,10 +35,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/electrical/wire-sizing/wire-size-by-current.php'); ?>" class="tool-item"><span>Wire Size by Current</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/wire-sizing/wire-ampacity.php'); ?>" class="tool-item"><span>Wire Ampacity</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/wire-sizing/motor-circuit-wiring.php'); ?>" class="tool-item"><span>Motor Circuit Wiring</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/wire-sizing/transformer-kva-sizing.php'); ?>" class="tool-item"><span>Transformer kVA Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('wire-size-by-current'); ?>" class="tool-item"><span>Wire Size by Current</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('wire-ampacity'); ?>" class="tool-item"><span>Wire Ampacity</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('motor-circuit-wiring'); ?>" class="tool-item"><span>Motor Circuit Wiring</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('transformer-kva-sizing'); ?>" class="tool-item"><span>Transformer kVA Sizing</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -52,10 +52,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/electrical/voltage-drop/single-phase-voltage-drop.php'); ?>" class="tool-item"><span>Single Phase Voltage Drop</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/voltage-drop/three-phase-voltage-drop.php'); ?>" class="tool-item"><span>Three Phase Voltage Drop</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/voltage-drop/voltage-drop-sizing.php'); ?>" class="tool-item"><span>Voltage Drop Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/voltage-drop/voltage-regulation.php'); ?>" class="tool-item"><span>Voltage Regulation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('single-phase-voltage-drop'); ?>" class="tool-item"><span>Single Phase Voltage Drop</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('three-phase-voltage-drop'); ?>" class="tool-item"><span>Three Phase Voltage Drop</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('voltage-drop-sizing'); ?>" class="tool-item"><span>Voltage Drop Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('voltage-regulation'); ?>" class="tool-item"><span>Voltage Regulation</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -69,11 +69,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/electrical/load-calculation/general-lighting-load.php'); ?>" class="tool-item"><span>General Lighting Load</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/load-calculation/receptacle-load.php'); ?>" class="tool-item"><span>Receptacle Load</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/load-calculation/panel-schedule.php'); ?>" class="tool-item"><span>Panel Schedule</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/load-calculation/feeder-sizing.php'); ?>" class="tool-item"><span>Feeder Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/load-calculation/motor-full-load-amps.php'); ?>" class="tool-item"><span>Motor Full Load Currents</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('general-lighting-load'); ?>" class="tool-item"><span>General Lighting Load</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('receptacle-load'); ?>" class="tool-item"><span>Receptacle Load</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('panel-schedule'); ?>" class="tool-item"><span>Panel Schedule</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('feeder-sizing'); ?>" class="tool-item"><span>Feeder Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('motor-full-load-amps'); ?>" class="tool-item"><span>Motor Full Load Currents</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -87,9 +87,9 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/electrical/short-circuit/available-fault-current.php'); ?>" class="tool-item"><span>Available Fault Current</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/short-circuit/ground-conductor-sizing.php'); ?>" class="tool-item"><span>Ground Conductor Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/short-circuit/power-factor-correction.php'); ?>" class="tool-item"><span>Power Factor Correction</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('available-fault-current'); ?>" class="tool-item"><span>Available Fault Current</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('ground-conductor-sizing'); ?>" class="tool-item"><span>Ground Conductor Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('power-factor-correction'); ?>" class="tool-item"><span>Power Factor Correction</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -103,10 +103,10 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/electrical/conduit-sizing/conduit-fill-calculation.php'); ?>" class="tool-item"><span>Conduit Fill Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/conduit-sizing/cable-tray-sizing.php'); ?>" class="tool-item"><span>Cable Tray Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/conduit-sizing/junction-box-sizing.php'); ?>" class="tool-item"><span>Junction Box Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/electrical/conduit-sizing/entrance-service-sizing.php'); ?>" class="tool-item"><span>Entrance & Service Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('conduit-fill-calculation'); ?>" class="tool-item"><span>Conduit Fill Calculation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('cable-tray-sizing'); ?>" class="tool-item"><span>Cable Tray Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('junction-box-sizing'); ?>" class="tool-item"><span>Junction Box Sizing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('entrance-service-sizing'); ?>" class="tool-item"><span>Entrance & Service Sizing</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
     </div>

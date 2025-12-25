@@ -52,20 +52,24 @@ class UrlHelper
         }
         
         $structure = self::getPermalinkStructure();
-        $baseUrl = defined('APP_BASE') ? '/' . APP_BASE : '';
+        $baseUrl = defined('APP_BASE') ? '/' . ltrim(APP_BASE, '/') : '';
+        
+        // Get PHP extension setting
+        $phpExtension = \App\Services\SettingsService::get('permalink_php_extension', '0');
+        $extension = ($phpExtension == '1') ? '.php' : '';
         
         switch ($structure) {
             case 'full-path':
-                $url = "{$baseUrl}/modules/{$calculator['category']}/{$calculator['subcategory']}/{$calculatorId}.php";
+                $url = "{$baseUrl}/modules/{$calculator['category']}/{$calculator['subcategory']}/{$calculatorId}{$extension}";
                 break;
             case 'category-calculator':
-                $url = "{$baseUrl}/{$calculator['category']}/{$calculatorId}.php";
+                $url = "{$baseUrl}/{$calculator['category']}/{$calculatorId}{$extension}";
                 break;
             case 'subcategory-calculator':
-                $url = "{$baseUrl}/{$calculator['subcategory']}/{$calculatorId}.php";
+                $url = "{$baseUrl}/{$calculator['subcategory']}/{$calculatorId}{$extension}";
                 break;
             case 'calculator-only':
-                $url = "{$baseUrl}/{$calculator['slug']}.php";
+                $url = "{$baseUrl}/{$calculator['slug']}{$extension}";
                 break;
             case 'custom':
                 // Get custom pattern from settings
@@ -77,10 +81,10 @@ class UrlHelper
                 if (substr($pattern, 0, 1) !== '/') {
                     $pattern = '/' . $pattern;
                 }
-                $url = "{$baseUrl}{$pattern}";
+                $url = "{$baseUrl}{$pattern}{$extension}";
                 break;
             default:
-                $url = "{$baseUrl}/{$calculator['slug']}.php";
+                $url = "{$baseUrl}/{$calculator['slug']}{$extension}";
                 break;
         }
         
@@ -106,15 +110,19 @@ class UrlHelper
         
         $baseUrl = defined('APP_BASE') ? '/' . APP_BASE : '';
         
+        // Get PHP extension setting
+        $phpExtension = \App\Services\SettingsService::get('permalink_php_extension', '0');
+        $extension = ($phpExtension == '1') ? '.php' : '';
+        
         switch ($structure) {
             case 'full-path':
-                return "{$baseUrl}/modules/{$calculator['category']}/{$calculator['subcategory']}/{$calculatorId}.php";
+                return "{$baseUrl}/modules/{$calculator['category']}/{$calculator['subcategory']}/{$calculatorId}{$extension}";
             case 'category-calculator':
-                return "{$baseUrl}/{$calculator['category']}/{$calculatorId}.php";
+                return "{$baseUrl}/{$calculator['category']}/{$calculatorId}{$extension}";
             case 'subcategory-calculator':
-                return "{$baseUrl}/{$calculator['subcategory']}/{$calculatorId}.php";
+                return "{$baseUrl}/{$calculator['subcategory']}/{$calculatorId}{$extension}";
             case 'calculator-only':
-                return "{$baseUrl}/{$calculator['slug']}.php";
+                return "{$baseUrl}/{$calculator['slug']}{$extension}";
             case 'custom':
                 $pattern = \App\Services\SettingsService::get('permalink_custom_pattern', '{slug}');
                 $pattern = str_replace('{category}', $calculator['category'], $pattern);
@@ -123,9 +131,9 @@ class UrlHelper
                 if (substr($pattern, 0, 1) !== '/') {
                     $pattern = '/' . $pattern;
                 }
-                return "{$baseUrl}{$pattern}";
+                return "{$baseUrl}{$pattern}{$extension}";
             default:
-                return "{$baseUrl}/{$calculator['slug']}.php";
+                return "{$baseUrl}/{$calculator['slug']}{$extension}";
         }
     }
     
@@ -145,29 +153,29 @@ class UrlHelper
     {
         return [
             'full-path' => [
-                'label' => 'Full Path with Modules',
-                'example' => '/modules/civil/concrete/concrete-volume.php',
+                'label' => 'Full Path',
+                'example' => '/modules/civil/concrete/concrete-volume',
                 'description' => 'Complete path with modules, category, and subcategory'
             ],
             'category-calculator' => [
                 'label' => 'Category + Calculator',
-                'example' => '/civil/concrete-volume.php',
+                'example' => '/civil/concrete-volume',
                 'description' => 'Category followed by calculator name'
             ],
             'subcategory-calculator' => [
                 'label' => 'Subcategory + Calculator',
-                'example' => '/concrete/concrete-volume.php',
+                'example' => '/concrete/concrete-volume',
                 'description' => 'Subcategory followed by calculator name'
             ],
             'calculator-only' => [
-                'label' => 'Calculator Only (Shortest)',
-                'example' => '/concrete-volume.php',
-                'description' => 'Just the calculator name (recommended for SEO)'
+                'label' => 'Calculator Only',
+                'example' => '/concrete-volume',
+                'description' => 'Just the calculator name (Best for SEO)'
             ],
             'custom' => [
                 'label' => 'Custom Pattern',
                 'example' => '{category}/{slug}',
-                'description' => 'Define your own URL pattern using placeholders: {category}, {subcategory}, {slug}'
+                'description' => 'Define your own URL pattern using placeholders'
             ]
         ];
     }

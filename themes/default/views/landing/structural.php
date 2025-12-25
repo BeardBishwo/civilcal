@@ -38,11 +38,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/structural/beam-analysis/beam-design.php'); ?>" class="tool-item"><span>Beam Design</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/beam-analysis/beam-load-combination.php'); ?>" class="tool-item"><span>Load Combination</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/beam-analysis/cantilever-beam.php'); ?>" class="tool-item"><span>Cantilever Beam</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/beam-analysis/continuous-beam.php'); ?>" class="tool-item"><span>Continuous Beam</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/beam-analysis/simply-supported-beam.php'); ?>" class="tool-item"><span>Simply Supported Beam</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('beam-design'); ?>" class="tool-item"><span>Beam Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('beam-load-combination'); ?>" class="tool-item"><span>Load Combination</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('cantilever-beam'); ?>" class="tool-item"><span>Cantilever Beam</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('continuous-beam'); ?>" class="tool-item"><span>Continuous Beam</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('simply-supported-beam'); ?>" class="tool-item"><span>Simply Supported Beam</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -56,11 +56,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/structural/column-design/biaxial-column.php'); ?>" class="tool-item"><span>Biaxial Column</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/column-design/column-footing-link.php'); ?>" class="tool-item"><span>Column-Footing Link</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/column-design/long-column.php'); ?>" class="tool-item"><span>Long Column</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/column-design/short-column.php'); ?>" class="tool-item"><span>Short Column</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/column-design/steel-column-design.php'); ?>" class="tool-item"><span>Steel Column Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('biaxial-column'); ?>" class="tool-item"><span>Biaxial Column</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('column-footing-link'); ?>" class="tool-item"><span>Column-Footing Link</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('long-column'); ?>" class="tool-item"><span>Long Column</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('short-column'); ?>" class="tool-item"><span>Short Column</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('steel-column-design'); ?>" class="tool-item"><span>Steel Column Design</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -74,11 +74,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/structural/steel-structure/connection-design.php'); ?>" class="tool-item"><span>Connection Design</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/steel-structure/purlin-design.php'); ?>" class="tool-item"><span>Purlin Design</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/steel-structure/steel-base-plate.php'); ?>" class="tool-item"><span>Base Plate Design</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/steel-structure/steel-beam-design.php'); ?>" class="tool-item"><span>Steel Beam Design</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/steel-structure/steel-truss-analysis.php'); ?>" class="tool-item"><span>Truss Analysis</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('connection-design'); ?>" class="tool-item"><span>Connection Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('purlin-design'); ?>" class="tool-item"><span>Purlin Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('steel-base-plate'); ?>" class="tool-item"><span>Base Plate Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('steel-beam-design'); ?>" class="tool-item"><span>Steel Beam Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('steel-truss-analysis'); ?>" class="tool-item"><span>Truss Analysis</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -92,11 +92,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/structural/foundation-design/combined-footing.php'); ?>" class="tool-item"><span>Combined Footing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/foundation-design/foundation-pressure.php'); ?>" class="tool-item"><span>Foundation Pressure</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/foundation-design/isolated-footing.php'); ?>" class="tool-item"><span>Isolated Footing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/foundation-design/pile-foundation.php'); ?>" class="tool-item"><span>Pile Foundation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/foundation-design/raft-foundation.php'); ?>" class="tool-item"><span>Raft Foundation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('combined-footing'); ?>" class="tool-item"><span>Combined Footing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('foundation-pressure'); ?>" class="tool-item"><span>Foundation Pressure</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('isolated-footing'); ?>" class="tool-item"><span>Isolated Footing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pile-foundation'); ?>" class="tool-item"><span>Pile Foundation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('raft-foundation'); ?>" class="tool-item"><span>Raft Foundation</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -110,11 +110,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/structural/slab-design/flat-slab.php'); ?>" class="tool-item"><span>Flat Slab Design</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/slab-design/one-way-slab.php'); ?>" class="tool-item"><span>One Way Slab</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/slab-design/two-way-slab.php'); ?>" class="tool-item"><span>Two Way Slab</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/slab-design/waffle-slab.php'); ?>" class="tool-item"><span>Waffle Slab</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/slab-design/slab-load-calculation.php'); ?>" class="tool-item"><span>Slab Load Calculator</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('flat-slab'); ?>" class="tool-item"><span>Flat Slab Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('one-way-slab'); ?>" class="tool-item"><span>One Way Slab</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('two-way-slab'); ?>" class="tool-item"><span>Two Way Slab</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('waffle-slab'); ?>" class="tool-item"><span>Waffle Slab</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('slab-load-calculation'); ?>" class="tool-item"><span>Slab Load Calculator</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -128,11 +128,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/structural/load-analysis/dead-load.php'); ?>" class="tool-item"><span>Dead Load</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/load-analysis/live-load.php'); ?>" class="tool-item"><span>Live Load</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/load-analysis/wind-load.php'); ?>" class="tool-item"><span>Wind Load</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/load-analysis/seismic-load.php'); ?>" class="tool-item"><span>Seismic Load</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/load-analysis/load-combination.php'); ?>" class="tool-item"><span>Load Combinations</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('dead-load'); ?>" class="tool-item"><span>Dead Load</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('live-load'); ?>" class="tool-item"><span>Live Load</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('wind-load'); ?>" class="tool-item"><span>Wind Load</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('seismic-load'); ?>" class="tool-item"><span>Seismic Load</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('load-combination'); ?>" class="tool-item"><span>Load Combinations</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -146,11 +146,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/structural/reinforcement/bar-bending-schedule.php'); ?>" class="tool-item"><span>Bar Bending Schedule</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/reinforcement/detailing-drawing.php'); ?>" class="tool-item"><span>Detailing Drawing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/reinforcement/rebar-anchorage.php'); ?>" class="tool-item"><span>Rebar Anchorage</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/reinforcement/reinforcement-optimizer.php'); ?>" class="tool-item"><span>Reinforcement Optimizer</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/reinforcement/stirrup-design.php'); ?>" class="tool-item"><span>Stirrup Design</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('bar-bending-schedule'); ?>" class="tool-item"><span>Bar Bending Schedule</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('detailing-drawing'); ?>" class="tool-item"><span>Detailing Drawing</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('rebar-anchorage'); ?>" class="tool-item"><span>Rebar Anchorage</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('reinforcement-optimizer'); ?>" class="tool-item"><span>Reinforcement Optimizer</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('stirrup-design'); ?>" class="tool-item"><span>Stirrup Design</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
 
@@ -164,11 +164,11 @@ $breadcrumb = [
                 </div>
             </div>
             <ul class="tool-list">
-                <a href="<?php echo app_base_url('modules/structural/reports/beam-report.php'); ?>" class="tool-item"><span>Beam Report</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/reports/column-report.php'); ?>" class="tool-item"><span>Column Report</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/reports/foundation-report.php'); ?>" class="tool-item"><span>Foundation Report</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/reports/full-structure-summary.php'); ?>" class="tool-item"><span>Full Structure Summary</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo app_base_url('modules/structural/reports/load-analysis-summary.php'); ?>" class="tool-item"><span>Load Analysis Summary</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('beam-report'); ?>" class="tool-item"><span>Beam Report</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('column-report'); ?>" class="tool-item"><span>Column Report</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('foundation-report'); ?>" class="tool-item"><span>Foundation Report</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('full-structure-summary'); ?>" class="tool-item"><span>Full Structure Summary</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('load-analysis-summary'); ?>" class="tool-item"><span>Load Analysis Summary</span> <i class="fas fa-arrow-right"></i></a>
             </ul>
         </div>
     </div>

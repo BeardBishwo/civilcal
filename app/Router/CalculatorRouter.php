@@ -168,12 +168,15 @@ class CalculatorRouter
     }
     
     /**
-     * Parse full path structure: /modules/category/subcategory/calculator.php
+     * Parse full path structure: /modules/category/subcategory/calculator
      */
     private function parseFullPath($route)
     {
-        // Extract calculator ID from full path
-        if (preg_match('/^modules\/([^\/]+)\/([^\/]+)\/([^\/]+)\.php$/', $route, $matches)) {
+        // Remove .php extension if present (backward compatibility)
+        $route = rtrim($route, '.php');
+        
+        // Extract calculator ID from full path (with or without .php)
+        if (preg_match('/^modules\/([^\/]+)\/([^\/]+)\/([^\/]+)$/', $route, $matches)) {
             $category = $matches[1];
             $subcategory = $matches[2];
             $calculatorId = $matches[3];
@@ -189,6 +192,9 @@ class CalculatorRouter
      */
     private function parseCategoryCalculator($route)
     {
+        // Remove .php extension if present (backward compatibility)
+        $route = preg_replace('/\.php$/', '', $route);
+        
         if (preg_match('/^([^\/]+)\/([^\/]+)$/', $route, $matches)) {
             $category = $matches[1];
             $calculatorSlug = $matches[2];
@@ -204,6 +210,9 @@ class CalculatorRouter
      */
     private function parseSubcategoryCalculator($route)
     {
+        // Remove .php extension if present (backward compatibility)
+        $route = preg_replace('/\.php$/', '', $route);
+        
         if (preg_match('/^([^\/]+)\/([^\/]+)$/', $route, $matches)) {
             $subcategory = $matches[1];
             $calculatorSlug = $matches[2];
@@ -219,6 +228,9 @@ class CalculatorRouter
      */
     private function parseCalculatorOnly($route)
     {
+        // Remove .php extension if present (backward compatibility)
+        $route = preg_replace('/\.php$/', '', $route);
+        
         // Try to find by slug first
         $calculator = $this->findCalculatorBySlug($route);
         if ($calculator) {
