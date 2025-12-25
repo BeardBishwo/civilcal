@@ -29,8 +29,18 @@ class FormulaRegistry
         
         foreach ($formulas as $resultName => $formula) {
             try {
-                $results[$resultName] = $this->evaluateFormula($formula, $context);
-                $context[$resultName] = $results[$resultName]; // Make result available to subsequent formulas
+                $evaluated = $this->evaluateFormula($formula, $context);
+                
+                // If formula returns an array (e.g. from a closure), merge it into results
+                if (is_array($evaluated)) {
+                    $results = array_merge($results, $evaluated);
+                    $context = array_merge($context, $evaluated);
+                    $results[$resultName] = $evaluated; // Keep the group key as well
+                    $context[$resultName] = $evaluated;
+                } else {
+                    $results[$resultName] = $evaluated;
+                    $context[$resultName] = $evaluated;
+                }
             } catch (\Exception $e) {
                 throw new \Exception("Error in formula '{$resultName}': " . $e->getMessage());
             }
