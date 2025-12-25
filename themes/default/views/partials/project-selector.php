@@ -8,44 +8,60 @@ if (isset($_SESSION['user'])):
     $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <div id="project-selector-template" style="display:none;">
-    <div class="mb-3 project-selector-group">
-        <label class="form-label d-flex justify-content-between align-items-center">
-            <span><i class="fas fa-folder me-1"></i> Save to Project</span>
-            <small class="text-muted"><a href="<?php echo app_base_url('/projects'); ?>" target="_blank" class="text-decoration-none">+ New</a></small>
-        </label>
-        <select name="project_id" class="form-select">
-            <option value="">-- Select Project --</option>
-            <?php foreach ($projects as $proj): ?>
-                <option value="<?php echo $proj['id']; ?>"><?php echo htmlspecialchars($proj['name']); ?></option>
-            <?php endforeach; ?>
-        </select>
+    <!-- This will be injected as a column -->
+    <div class="project-selector-wrapper h-100 d-flex align-items-end">
+        <div class="input-group">
+            <span class="input-group-text bg-dark border-secondary text-light">
+                <i class="fas fa-folder text-primary"></i>
+            </span>
+            <select name="project_id" class="form-select bg-dark text-light border-secondary">
+                <option value="">-- Save to Project (Optional) --</option>
+                <?php foreach ($projects as $proj): ?>
+                    <option value="<?php echo $proj['id']; ?>"><?php echo htmlspecialchars($proj['name']); ?></option>
+                <?php endforeach; ?>
+            </select>
+            <a href="<?php echo app_base_url('/projects'); ?>" target="_blank" class="btn btn-outline-secondary" title="Create New Project">
+                <i class="fas fa-plus"></i>
+            </a>
+        </div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Find all calculator forms
-    // Strategy: Look for forms that have a submit button
-    const forms = document.querySelectorAll('form');
     const template = document.getElementById('project-selector-template');
-    
     if (!template) return;
 
-    forms.forEach(form => {
-        // Try to identify if it's a calculator form. 
-        // Can check if it has inputs or specific classes. 
-        // For now, let's look for a submit button.
-        const submitBtn = form.querySelector('button[type="submit"]');
+    // TARGET ONLY CALCULATOR FORMS
+    // We strictly look for the specific ID we added to the template
+    const calcForm = document.getElementById('calculator-form');
+    
+    if (calcForm) {
+        const submitBtn = calcForm.querySelector('button[type="submit"]');
         if (submitBtn) {
-            // Clone the selector
-            const selectorHtml = template.innerHTML;
-            const wrapper = document.createElement('div');
-            wrapper.innerHTML = selectorHtml;
+            const btnContainer = submitBtn.closest('.col-12'); // The standard container in our template
             
-            // Insert before the submit button's container or the button itself
-            submitBtn.parentNode.insertBefore(wrapper.firstElementChild, submitBtn);
+            if (btnContainer && btnContainer.parentNode.classList.contains('row')) {
+                // 1. Create a new column for the project selector
+                const colDiv = document.createElement('div');
+                colDiv.className = 'col-md-5 mt-4'; 
+                colDiv.innerHTML = template.innerHTML;
+                
+                // 2. Adjust the button container
+                btnContainer.classList.remove('col-12');
+                btnContainer.classList.add('col-md-7');
+                
+                // 3. Insert selector BEFORE the button container
+                btnContainer.parentNode.insertBefore(colDiv, btnContainer);
+            } else {
+                // Fallback Layout
+                const wrapper = document.createElement('div');
+                wrapper.className = 'mb-3';
+                wrapper.innerHTML = template.innerHTML;
+                submitBtn.parentNode.insertBefore(wrapper, submitBtn);
+            }
         }
-    });
+    }
 });
 </script>
 <?php endif; ?>
