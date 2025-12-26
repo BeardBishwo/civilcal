@@ -292,7 +292,7 @@ return [
     // DUCT SIZING (5 calculators)
     // ============================================
     
-    'velocity-sizing' => [
+    'duct-by-velocity' => [
         'name' => 'Duct Velocity Sizing',
         'description' => 'Size ductwork based on velocity method',
         'category' => 'hvac',
@@ -351,7 +351,7 @@ return [
         ],
     ],
     
-    'equivalent-duct' => [
+    'equivalent-round' => [
         'name' => 'Equivalent Duct Calculator',
         'description' => 'Convert between round and rectangular ducts',
         'category' => 'hvac',
