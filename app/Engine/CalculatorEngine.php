@@ -126,7 +126,7 @@ class CalculatorEngine
         $configDir = __DIR__ . '/../Config/Calculators/';
         
         // Try common categories first
-        $categories = ['civil', 'electrical', 'plumbing', 'hvac', 'fire', 'site', 'structural', 'estimation', 'mep', 'project-management', 'country'];
+        $categories = ['civil', 'electrical', 'plumbing', 'hvac', 'fire', 'site', 'structural', 'estimation', 'mep', 'project-management', 'management', 'country'];
         
         foreach ($categories as $category) {
             $file = $configDir . $category . '.php';

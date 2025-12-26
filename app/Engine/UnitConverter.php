@@ -69,9 +69,10 @@ class UnitConverter
         foreach ($schema as $fieldSchema) {
             $name = $fieldSchema['name'];
             $value = $inputs[$name] ?? null;
-            
             if ($value === null || $value === '') {
-                $normalized[$name] = null;
+                $type = $fieldSchema['type'] ?? 'string';
+                $default = $fieldSchema['default'] ?? (($type === 'number' || $type === 'integer' || $type === 'float') ? 0 : '');
+                $normalized[$name] = $default;
                 continue;
             }
             

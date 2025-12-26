@@ -308,7 +308,7 @@ return [
     ],
     'temperature-control' => ['name' => 'Temperature Control', 'description' => 'Concrete temperature monitoring', 'category' => 'site', 'subcategory' => 'concrete', 'version' => '1.0', 'inputs' => [['name' => 'temp', 'type' => 'number', 'label' => 'Current Temp', 'unit' => '°C']], 'formulas' => ['status' => function($i) { return $i['temp'] > 30 ? 'High' : 'Normal'; }], 'outputs' => [['name' => 'status', 'label' => 'Status', 'type' => 'string']]],
     'yardage-adjustments' => ['name' => 'Yardage Adjustments', 'description' => 'Adjust concrete volume for field conditions', 'category' => 'site', 'subcategory' => 'concrete', 'version' => '1.0', 'inputs' => [['name' => 'vol', 'type' => 'number', 'label' => 'Theoretical Vol', 'unit' => 'm³']], 'formulas' => ['actual' => function($i) { return $i['vol'] * 1.05; }], 'outputs' => [['name' => 'actual', 'label' => 'Actual Volume', 'unit' => 'm³', 'precision' => 2]]],
-    'placement-rate' => ['name' => 'Placement Rate Calculator', 'description' => 'Calculate concrete placement speed', 'category' => 'site', 'subcategory' => 'concrete', 'version' => '1.0', 'inputs' => [['name' => 'vol', 'type' => 'number', 'label' => 'Total Volume', 'unit' => 'm³'], ['name' => 'time', 'type' => 'number', 'label' => 'Time', 'unit' => 'hrs']], 'formulas' => ['rate' => function($i) { return $i['vol'] / $i['time']; }], 'outputs' => [['name' => 'rate', 'label' => 'Rate', 'unit' => 'm³/hr', 'precision' => 1]]],
+    'placement-rate' => ['name' => 'Placement Rate Calculator', 'description' => 'Calculate concrete placement speed', 'category' => 'site', 'subcategory' => 'concrete', 'version' => '1.0', 'inputs' => [['name' => 'vol', 'type' => 'number', 'label' => 'Total Volume', 'unit' => 'm³'], ['name' => 'time', 'type' => 'number', 'label' => 'Time', 'unit' => 'hrs']], 'formulas' => ['rate' => function($i) { return $i['time'] > 0 ? $i['vol'] / $i['time'] : 0; }], 'outputs' => [['name' => 'rate', 'label' => 'Rate', 'unit' => 'm³/hr', 'precision' => 1]]],
     'testing-requirements' => ['name' => 'Testing Requirements', 'description' => 'Concrete testing frequency', 'category' => 'site', 'subcategory' => 'concrete', 'version' => '1.0', 'inputs' => [['name' => 'vol', 'type' => 'number', 'label' => 'Total Volume', 'unit' => 'm³']], 'formulas' => ['tests' => function($i) { return ceil($i['vol'] / 50); }], 'outputs' => [['name' => 'tests', 'label' => 'Number of Tests']]],
     'fall-protection' => ['name' => 'Fall Protection Planning', 'description' => 'Fall clearance calculations', 'category' => 'site', 'subcategory' => 'safety', 'version' => '1.0', 'inputs' => [['name' => 'height', 'type' => 'number', 'label' => 'Work Height', 'unit' => 'm']], 'formulas' => ['clearance' => function($i) { return $i['height'] + 2; }], 'outputs' => [['name' => 'clearance', 'label' => 'Required Clearance', 'unit' => 'm', 'precision' => 1]]],
     'trench-safety' => ['name' => 'Trench Safety Calculator', 'description' => 'Trench shoring and sloping requirement', 'category' => 'site', 'subcategory' => 'safety', 'version' => '1.0', 'inputs' => [['name' => 'depth', 'type' => 'number', 'label' => 'Depth', 'unit' => 'm']], 'formulas' => ['status' => function($i) { return $i['depth'] > 1.2 ? 'Shoring Required' : 'Safe'; }], 'outputs' => [['name' => 'status', 'label' => 'Status', 'type' => 'string']]],
@@ -380,8 +380,10 @@ return [
         ],
         'formulas' => [
             'trucks_needed' => function($i) { 
+                if ($i['truck_cycle'] <= 0) return 0;
                 $cycles_per_hr = 60 / $i['truck_cycle'];
                 $truck_output = $i['truck_capacity'] * $cycles_per_hr;
+                if ($truck_output <= 0) return 0;
                 return ceil($i['excavator_output'] / $truck_output);
             },
         ],
@@ -519,6 +521,7 @@ return [
         'formulas' => [
             'tile_area' => function($i) { return ($i['tile_length'] / 1000) * ($i['tile_width'] / 1000); },
             'num_tiles' => function($i, $r) { 
+                if ($r['tile_area'] <= 0) return 0;
                 $base = $i['floor_area'] / $r['tile_area'];
                 return ceil($base * (1 + $i['wastage'] / 100));
             },
@@ -527,9 +530,9 @@ return [
             ['name' => 'num_tiles', 'label' => 'Total Tiles Needed', 'unit' => '', 'precision' => 0],
         ],
     ],
-    'labor-productivity' => ['name' => 'Labor Productivity', 'description' => 'Track labor output', 'category' => 'site', 'subcategory' => 'productivity', 'version' => '1.0', 'inputs' => [['name' => 'work', 'type' => 'number', 'label' => 'Work Done', 'unit' => 'm²'], ['name' => 'hours', 'type' => 'number', 'label' => 'Total Hours']], 'formulas' => ['output' => function($i) { return $i['work'] / $i['hours']; }], 'outputs' => [['name' => 'output', 'label' => 'Production Rate', 'unit' => 'm²/hr', 'precision' => 1]]],
-    'equipment-utilization' => ['name' => 'Equipment Utilization', 'description' => 'Analyze equipment efficiency', 'category' => 'site', 'subcategory' => 'productivity', 'version' => '1.0', 'inputs' => [['name' => 'runtime', 'type' => 'number', 'label' => 'Run Time', 'unit' => 'hrs'], ['name' => 'shift', 'type' => 'number', 'label' => 'Shift Length', 'unit' => 'hrs', 'default' => 8]], 'formulas' => ['util' => function($i) { return ($i['runtime'] / $i['shift']) * 100; }], 'outputs' => [['name' => 'util', 'label' => 'Utilization', 'unit' => '%', 'precision' => 1]]],
+    'labor-productivity' => ['name' => 'Labor Productivity', 'description' => 'Track labor output', 'category' => 'site', 'subcategory' => 'productivity', 'version' => '1.0', 'inputs' => [['name' => 'work', 'type' => 'number', 'label' => 'Work Done', 'unit' => 'm²'], ['name' => 'hours', 'type' => 'number', 'label' => 'Total Hours']], 'formulas' => ['output' => function($i) { return $i['hours'] > 0 ? $i['work'] / $i['hours'] : 0; }], 'outputs' => [['name' => 'output', 'label' => 'Production Rate', 'unit' => 'm²/hr', 'precision' => 1]]],
+    'equipment-utilization' => ['name' => 'Equipment Utilization', 'description' => 'Analyze equipment efficiency', 'category' => 'site', 'subcategory' => 'productivity', 'version' => '1.0', 'inputs' => [['name' => 'runtime', 'type' => 'number', 'label' => 'Run Time', 'unit' => 'hrs'], ['name' => 'shift', 'type' => 'number', 'label' => 'Shift Length', 'unit' => 'hrs', 'default' => 8]], 'formulas' => ['util' => function($i) { return $i['shift'] > 0 ? ($i['runtime'] / $i['shift']) * 100 : 0; }], 'outputs' => [['name' => 'util', 'label' => 'Utilization', 'unit' => '%', 'precision' => 1]]],
     'schedule-compression' => ['name' => 'Schedule Compression', 'description' => 'Analyze crashing costs', 'category' => 'site', 'subcategory' => 'productivity', 'version' => '1.0', 'inputs' => [['name' => 'days', 'type' => 'number', 'label' => 'Days Reduced']], 'formulas' => ['cost' => function($i) { return $i['days'] * 1000; }], 'outputs' => [['name' => 'cost', 'label' => 'Crashing Cost', 'unit' => '$', 'precision' => 0]]],
-    'cost-productivity' => ['name' => 'Cost Productivity Analysis', 'description' => 'Analyze cost per unit', 'category' => 'site', 'subcategory' => 'productivity', 'version' => '1.0', 'inputs' => [['name' => 'cost', 'type' => 'number', 'label' => 'Total Cost', 'unit' => '$'], ['name' => 'qty', 'type' => 'number', 'label' => 'Total Quantity']], 'formulas' => ['cpu' => function($i) { return $i['cost'] / $i['qty']; }], 'outputs' => [['name' => 'cpu', 'label' => 'Cost Per Unit', 'unit' => '$/unit', 'precision' => 2]]],
+    'cost-productivity' => ['name' => 'Cost Productivity Analysis', 'description' => 'Analyze cost per unit', 'category' => 'site', 'subcategory' => 'productivity', 'version' => '1.0', 'inputs' => [['name' => 'cost', 'type' => 'number', 'label' => 'Total Cost', 'unit' => '$'], ['name' => 'qty', 'type' => 'number', 'label' => 'Total Quantity']], 'formulas' => ['cpu' => function($i) { return $i['qty'] > 0 ? $i['cost'] / $i['qty'] : 0; }], 'outputs' => [['name' => 'cpu', 'label' => 'Cost Per Unit', 'unit' => '$/unit', 'precision' => 2]]],
 
 ];
