@@ -423,7 +423,8 @@ class CalculatorController extends Controller
         }
         
         // Load the calculator file
-        $filePath = dirname(__DIR__, 2) . '/modules/' . $calc['full_path'];
+        // full_path from DB already includes modules/
+        $filePath = dirname(__DIR__, 2) . '/' . $calc['full_path'];
         
         if (!file_exists($filePath)) {
             $this->notFound();
