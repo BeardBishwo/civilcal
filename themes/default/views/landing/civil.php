@@ -36,6 +36,7 @@ $breadcrumb = [
             <ul class="tool-list">
                 <a href="<?php echo \App\Helpers\UrlHelper::calculator('concrete-volume'); ?>" class="tool-item"><span>Concrete Volume</span> <i class="fas fa-arrow-right"></i></a>
                 <a href="<?php echo \App\Helpers\UrlHelper::calculator('rebar-calculation'); ?>" class="tool-item"><span>Rebar Calculation</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('formwork-quantity'); ?>" class="tool-item"><span>Formwork & Shuttering</span> <i class="fas fa-arrow-right"></i></a>
                 <a href="<?php echo \App\Helpers\UrlHelper::calculator('concrete-mix'); ?>" class="tool-item"><span>Concrete Mix Design</span> <i class="fas fa-arrow-right"></i></a>
                 <a href="<?php echo \App\Helpers\UrlHelper::calculator('concrete-strength'); ?>" class="tool-item"><span>Concrete Strength</span> <i class="fas fa-arrow-right"></i></a>
             </ul>

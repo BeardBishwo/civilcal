@@ -530,6 +530,53 @@ return [
             ['name' => 'num_tiles', 'label' => 'Total Tiles Needed', 'unit' => '', 'precision' => 0],
         ],
     ],
+
+    'flooring-quantity' => [
+        'name' => 'Flooring Area Calculator',
+        'description' => 'Calculate area for tiles or marble flooring',
+        'category' => 'site',
+        'subcategory' => 'materials',
+        'version' => '1.0',
+        'inputs' => [
+            ['name' => 'length', 'type' => 'number', 'unit' => 'm', 'required' => true, 'label' => 'Room Length'],
+            ['name' => 'width', 'type' => 'number', 'unit' => 'm', 'required' => true, 'label' => 'Room Width']
+        ],
+        'formulas' => ['area' => function($i) { return $i['length'] * $i['width']; }],
+        'outputs' => [['name' => 'area', 'unit' => 'm²', 'label' => 'Flooring Area']]
+    ],
+
+    'paint-quantity' => [
+        'name' => 'Paint Quantity Calculator',
+        'description' => 'Estimate paint required for wall surfaces',
+        'category' => 'site',
+        'subcategory' => 'materials',
+        'version' => '1.0',
+        'inputs' => [
+            ['name' => 'area', 'type' => 'number', 'unit' => 'm²', 'required' => true, 'label' => 'Surface Area'],
+            ['name' => 'coats', 'type' => 'integer', 'required' => true, 'label' => 'Number of Coats', 'default' => 2]
+        ],
+        'formulas' => ['liters' => function($i) { return ($i['area'] / 10) * $i['coats']; }], // Approx 10m²/L
+        'outputs' => [['name' => 'liters', 'unit' => 'L', 'label' => 'Paint Required']]
+    ],
+
+    'paint-materials' => [
+        'name' => 'Paint & Putty Estimator',
+        'description' => 'Calculate paint, putty, and primer requirements',
+        'category' => 'site',
+        'subcategory' => 'materials',
+        'version' => '1.0',
+        'inputs' => [['name' => 'area', 'type' => 'number', 'unit' => 'm²', 'required' => true, 'label' => 'Surface Area']],
+        'formulas' => [
+            'paint' => function($i) { return $i['area'] / 10; },
+            'putty' => function($i) { return $i['area'] * 0.5; }, // Approx 0.5kg/m²
+            'primer' => function($i) { return $i['area'] / 12; }
+        ],
+        'outputs' => [
+            ['name' => 'paint', 'unit' => 'L', 'label' => 'Paint'],
+            ['name' => 'putty', 'unit' => 'kg', 'label' => 'Putty'],
+            ['name' => 'primer', 'unit' => 'L', 'label' => 'Primer']
+        ]
+    ],
     'labor-productivity' => ['name' => 'Labor Productivity', 'description' => 'Track labor output', 'category' => 'site', 'subcategory' => 'productivity', 'version' => '1.0', 'inputs' => [['name' => 'work', 'type' => 'number', 'label' => 'Work Done', 'unit' => 'm²'], ['name' => 'hours', 'type' => 'number', 'label' => 'Total Hours']], 'formulas' => ['output' => function($i) { return $i['hours'] > 0 ? $i['work'] / $i['hours'] : 0; }], 'outputs' => [['name' => 'output', 'label' => 'Production Rate', 'unit' => 'm²/hr', 'precision' => 1]]],
     'equipment-utilization' => ['name' => 'Equipment Utilization', 'description' => 'Analyze equipment efficiency', 'category' => 'site', 'subcategory' => 'productivity', 'version' => '1.0', 'inputs' => [['name' => 'runtime', 'type' => 'number', 'label' => 'Run Time', 'unit' => 'hrs'], ['name' => 'shift', 'type' => 'number', 'label' => 'Shift Length', 'unit' => 'hrs', 'default' => 8]], 'formulas' => ['util' => function($i) { return $i['shift'] > 0 ? ($i['runtime'] / $i['shift']) * 100 : 0; }], 'outputs' => [['name' => 'util', 'label' => 'Utilization', 'unit' => '%', 'precision' => 1]]],
     'schedule-compression' => ['name' => 'Schedule Compression', 'description' => 'Analyze crashing costs', 'category' => 'site', 'subcategory' => 'productivity', 'version' => '1.0', 'inputs' => [['name' => 'days', 'type' => 'number', 'label' => 'Days Reduced']], 'formulas' => ['cost' => function($i) { return $i['days'] * 1000; }], 'outputs' => [['name' => 'cost', 'label' => 'Crashing Cost', 'unit' => '$', 'precision' => 0]]],

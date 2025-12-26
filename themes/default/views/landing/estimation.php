@@ -38,13 +38,13 @@ $breadcrumb = [
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('concrete-quantity'); ?>" class="tool-item"><span>Concrete Quantity</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('brickwork-quantity'); ?>" class="tool-item"><span>Brickwork Quantity</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('plaster-quantity'); ?>" class="tool-item"><span>Plaster Quantity</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('concrete-volume'); ?>" class="tool-item"><span>Concrete Quantity</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('brick-quantity'); ?>" class="tool-item"><span>Brickwork Quantity</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('plastering-estimator'); ?>" class="tool-item"><span>Plaster Quantity</span> <i class="fas fa-arrow-right"></i></a>
 				<a href="<?php echo \App\Helpers\UrlHelper::calculator('flooring-quantity'); ?>" class="tool-item"><span>Flooring Quantity</span> <i class="fas fa-arrow-right"></i></a>
 				<a href="<?php echo \App\Helpers\UrlHelper::calculator('paint-quantity'); ?>" class="tool-item"><span>Paint Quantity</span> <i class="fas fa-arrow-right"></i></a>
 				<a href="<?php echo \App\Helpers\UrlHelper::calculator('formwork-quantity'); ?>" class="tool-item"><span>Formwork Quantity</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('rebar-quantity'); ?>" class="tool-item"><span>Rebar Quantity</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('rebar-calculation'); ?>" class="tool-item"><span>Rebar Quantity</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>
 
@@ -54,14 +54,14 @@ $breadcrumb = [
 				<i class="fas fa-boxes category-icon"></i>
 				<div class="category-title">
 					<h3>Material Estimation</h3>
-					<p>Calculate cement, sand, aggregates, adhesives and paints.</p>
+					<p>Calculate cement, sand, aggregates, and finishing materials.</p>
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('concrete-materials'); ?>" class="tool-item"><span>Concrete Materials</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('masonry-materials'); ?>" class="tool-item"><span>Masonry Materials</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('plaster-materials'); ?>" class="tool-item"><span>Plaster Materials</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('tile-materials'); ?>" class="tool-item"><span>Tile Materials</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('concrete-mix'); ?>" class="tool-item"><span>Concrete Materials</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('mortar-ratio'); ?>" class="tool-item"><span>Masonry Materials</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('plastering-estimator'); ?>" class="tool-item"><span>Plaster Materials</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo \App\Helpers\UrlHelper::calculator('tile-calculator'); ?>" class="tool-item"><span>Tile Materials</span> <i class="fas fa-arrow-right"></i></a>
 				<a href="<?php echo \App\Helpers\UrlHelper::calculator('paint-materials'); ?>" class="tool-item"><span>Paint Materials</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>

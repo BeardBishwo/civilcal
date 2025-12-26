@@ -2,139 +2,12 @@
 
 /**
  * Estimation & Costing Calculators Configuration
+ * Focused on Enterprise BOQ, Rate Analysis, and Billing.
  */
 
 return [
     // ============================================
-    // QUANTITY ESTIMATION (10 calculators)
-    // ============================================
-    'concrete-quantity' => [
-        'name' => 'Concrete Quantity Estimation',
-        'description' => 'Calculate concrete volume and material requirements',
-        'category' => 'estimation',
-        'subcategory' => 'quantity',
-        'version' => '1.0',
-        'inputs' => [['name' => 'length', 'type' => 'number', 'label' => 'Length', 'unit' => 'm', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['length']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Total', 'unit' => 'm³']]
-    ],
-    'brickwork-quantity' => [
-        'name' => 'Brickwork Quantity Estimation',
-        'description' => 'Estimate bricks and mortar for walls',
-        'category' => 'estimation',
-        'subcategory' => 'quantity',
-        'version' => '1.0',
-        'inputs' => [['name' => 'area', 'type' => 'number', 'label' => 'Wall Area', 'unit' => 'm²', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['area']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Total Bricks', 'unit' => 'nos']]
-    ],
-    'plaster-quantity' => [
-        'name' => 'Plaster Quantity Estimation',
-        'description' => 'Calculate plaster area and material volume',
-        'category' => 'estimation',
-        'subcategory' => 'quantity',
-        'version' => '1.0',
-        'inputs' => [['name' => 'area', 'type' => 'number', 'label' => 'Surface Area', 'unit' => 'm²', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['area']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Total Plaster', 'unit' => 'm²']]
-    ],
-    'flooring-quantity' => [
-        'name' => 'Flooring Quantity Estimation',
-        'description' => 'Estimate tiles or marble for flooring',
-        'category' => 'estimation',
-        'subcategory' => 'quantity',
-        'version' => '1.0',
-        'inputs' => [['name' => 'area', 'type' => 'number', 'label' => 'Floor Area', 'unit' => 'm²', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['area']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Total Area', 'unit' => 'm²']]
-    ],
-    'paint-quantity' => [
-        'name' => 'Paint Quantity Estimation',
-        'description' => 'Calculate paint requirements for surfaces',
-        'category' => 'estimation',
-        'subcategory' => 'quantity',
-        'version' => '1.0',
-        'inputs' => [['name' => 'area', 'type' => 'number', 'label' => 'Surface Area', 'unit' => 'm²', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['area']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Total Paint', 'unit' => 'Liters']]
-    ],
-    'formwork-quantity' => [
-        'name' => 'Formwork Quantity Estimation',
-        'description' => 'Estimate shuttering and formwork area',
-        'category' => 'estimation',
-        'subcategory' => 'quantity',
-        'version' => '1.0',
-        'inputs' => [['name' => 'area', 'type' => 'number', 'label' => 'Contact Area', 'unit' => 'm²', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['area']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Total Area', 'unit' => 'm²']]
-    ],
-    'rebar-quantity' => [
-        'name' => 'Rebar Quantity Estimation',
-        'description' => 'Calculate reinforcement steel requirements',
-        'category' => 'estimation',
-        'subcategory' => 'quantity',
-        'version' => '1.0',
-        'inputs' => [['name' => 'weight', 'type' => 'number', 'label' => 'Steel Weight', 'unit' => 'kg', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['weight']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Total Steel', 'unit' => 'kg']]
-    ],
-
-    // ============================================
-    // MATERIAL CALCULATORS (5 calculators)
-    // ============================================
-    'concrete-materials' => [
-        'name' => 'Concrete Materials (Cement/Sand/Agg)',
-        'description' => 'Break down concrete into constituent materials',
-        'category' => 'estimation',
-        'subcategory' => 'materials',
-        'version' => '1.0',
-        'inputs' => [['name' => 'volume', 'type' => 'number', 'label' => 'Concrete Volume', 'unit' => 'm³', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['volume']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Volume', 'unit' => 'm³']]
-    ],
-    'masonry-materials' => [
-        'name' => 'Masonry Materials Calculator',
-        'description' => 'Calculate cement and sand for brick/block work',
-        'category' => 'estimation',
-        'subcategory' => 'materials',
-        'version' => '1.0',
-        'inputs' => [['name' => 'volume', 'type' => 'number', 'label' => 'Mortar Volume', 'unit' => 'm³', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['volume']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Volume', 'unit' => 'm³']]
-    ],
-    'plaster-materials' => [
-        'name' => 'Plaster Materials Calculator',
-        'description' => 'Cement and sand requirement for plaster',
-        'category' => 'estimation',
-        'subcategory' => 'materials',
-        'version' => '1.0',
-        'inputs' => [['name' => 'area', 'type' => 'number', 'label' => 'Plaster Area', 'unit' => 'm²', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['area']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Area', 'unit' => 'm²']]
-    ],
-    'tile-materials' => [
-        'name' => 'Tile & Grout Calculator',
-        'description' => 'Calculate tiles, adhesive, and grout',
-        'category' => 'estimation',
-        'subcategory' => 'materials',
-        'version' => '1.0',
-        'inputs' => [['name' => 'area', 'type' => 'number', 'label' => 'Floor Area', 'unit' => 'm²', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['area']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Area', 'unit' => 'm²']]
-    ],
-    'paint-materials' => [
-        'name' => 'Paint & Primer Calculator',
-        'description' => 'Calculate paint, primer, and putty requirement',
-        'category' => 'estimation',
-        'subcategory' => 'materials',
-        'version' => '1.0',
-        'inputs' => [['name' => 'area', 'type' => 'number', 'label' => 'Surface Area', 'unit' => 'm²', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['area']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Area', 'unit' => 'm²']]
-    ],
-
-    // ============================================
-    // RATE ANALYSIS (5 calculators)
+    // RATE ANALYSIS (Enterprise - Phase 14)
     // ============================================
     'item-rate-analysis' => [
         'name' => 'Item Rate Analysis',
@@ -188,7 +61,7 @@ return [
     ],
 
     // ============================================
-    // LABOR & MANPOWER (3 calculators)
+    // LABOR & MANPOWER
     // ============================================
     'manpower-requirement' => [
         'name' => 'Manpower Requirement',
@@ -210,6 +83,10 @@ return [
         'formulas' => ['total' => function($inputs) { return $inputs['effort'] * 8; }],
         'outputs' => [['name' => 'total', 'label' => 'Man-Hours', 'unit' => 'hrs']]
     ],
+
+    // ============================================
+    // MACHINERY & FUEL
+    // ============================================
     'equipment-hourly-rate' => [
         'name' => 'Equipment Hourly Rate',
         'description' => 'Calculate hourly cost of machinery',
@@ -220,10 +97,6 @@ return [
         'formulas' => ['total' => function($inputs) { return $inputs['cost'] / 2000; }],
         'outputs' => [['name' => 'total', 'label' => 'Rate', 'unit' => 'Amt/hr']]
     ],
-
-    // ============================================
-    // MACHINERY & FUEL (2 calculators)
-    // ============================================
     'machinery-usage' => [
         'name' => 'Machinery Usage Estimator',
         'description' => 'Estimate total machinery hours for task',
@@ -246,7 +119,7 @@ return [
     ],
 
     // ============================================
-    // FINANCIAL ANALYSIS (5 calculators)
+    // FINANCIAL ANALYSIS
     // ============================================
     'cash-flow-analysis' => [
         'name' => 'Cash Flow Analysis',
@@ -300,7 +173,7 @@ return [
     ],
 
     // ============================================
-    // REPORTS (5 calculators)
+    // REPORTS
     // ============================================
     'summary-report' => [
         'name' => 'Project Summary Report',

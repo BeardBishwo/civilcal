@@ -104,6 +104,9 @@ $breadcrumb = [
             </div>
             <ul class="tool-list">
                 <a href="<?php echo \App\Helpers\UrlHelper::calculator('labor-productivity'); ?>" class="tool-item"><span>Labor Productivity</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('flooring-quantity'); ?>" class="tool-item"><span>Flooring Area</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('paint-quantity'); ?>" class="tool-item"><span>Paint Quantity</span> <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo \App\Helpers\UrlHelper::calculator('paint-materials'); ?>" class="tool-item"><span>Paint & Putty Estimator</span> <i class="fas fa-arrow-right"></i></a>
                 <a href="<?php echo \App\Helpers\UrlHelper::calculator('equipment-utilization'); ?>" class="tool-item"><span>Equipment Utilization</span> <i class="fas fa-arrow-right"></i></a>
                 <a href="<?php echo \App\Helpers\UrlHelper::calculator('schedule-compression'); ?>" class="tool-item"><span>Schedule Compression</span> <i class="fas fa-arrow-right"></i></a>
                 <a href="<?php echo \App\Helpers\UrlHelper::calculator('cost-productivity'); ?>" class="tool-item"><span>Cost Productivity Analysis</span> <i class="fas fa-arrow-right"></i></a>

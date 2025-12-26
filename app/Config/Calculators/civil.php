@@ -256,6 +256,26 @@ return [
         ]
     ],
     
+    'formwork-quantity' => [
+        'name' => 'Formwork/Shuttering Calculator',
+        'description' => 'Estimate contact area for formwork and shuttering',
+        'category' => 'civil',
+        'subcategory' => 'concrete',
+        'version' => '1.0',
+        'inputs' => [
+            ['name' => 'length', 'type' => 'number', 'unit' => 'm', 'required' => true, 'label' => 'Length'],
+            ['name' => 'width', 'type' => 'number', 'unit' => 'm', 'required' => true, 'label' => 'Width'],
+            ['name' => 'depth', 'type' => 'number', 'unit' => 'm', 'required' => true, 'label' => 'Depth/Height'],
+            ['name' => 'sides', 'type' => 'integer', 'required' => true, 'label' => 'Exposed Sides', 'default' => 2, 'options' => [1, 2, 3, 4]]
+        ],
+        'formulas' => [
+            'area' => '((length * depth) + (width * depth)) * sides'
+        ],
+        'outputs' => [
+            ['name' => 'area', 'unit' => 'm²', 'label' => 'Formwork Area', 'precision' => 2]
+        ]
+    ],
+    
     'concrete-strength' => [
         'name' => 'Concrete Strength Calculator',
         'description' => 'Calculate compressive strength of concrete',
