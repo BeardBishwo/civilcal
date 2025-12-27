@@ -37,8 +37,8 @@ class SecurityMiddleware
             header('X-XSS-Protection: 1; mode=block');
             header('X-Content-Type-Options: nosniff');
             
-            // Comprehensive CSP
-            $csp = "default-src 'self'; img-src 'self' data: https: cdn.ckeditor.com; style-src 'self' 'unsafe-inline' https: cdn.ckeditor.com cdnjs.cloudflare.com; script-src 'self' https: 'unsafe-inline' cdn.ckeditor.com cdn.jsdelivr.net; font-src 'self' https: data: cdnjs.cloudflare.com; connect-src 'self' https:; frame-ancestors 'self'";
+            // Comprehensive CSP (Added 'unsafe-eval', worker-src, and blob: for spreadsheet engine support)
+            $csp = "default-src 'self'; img-src 'self' data: https: cdn.ckeditor.com; style-src 'self' 'unsafe-inline' https: cdn.ckeditor.com cdnjs.cloudflare.com; script-src 'self' https: 'unsafe-inline' 'unsafe-eval' blob: cdn.ckeditor.com cdn.jsdelivr.net; font-src 'self' https: data: cdnjs.cloudflare.com; connect-src 'self' https:; worker-src 'self' blob: data:; child-src 'self' blob: data:; frame-ancestors 'self'";
             header('Content-Security-Policy: ' . $csp);
             
             // HSTS only if HTTPS

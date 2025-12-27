@@ -415,6 +415,30 @@ $router->add("POST", "/projects/store", "ProjectController@store", ["auth"]);
 $router->add("GET", "/projects/view/{id}", "ProjectController@show", ["auth"]);
 $router->add("POST", "/projects/delete/{id}", "ProjectController@delete", ["auth"]);
 
+// Enterprise Estimation Routes (Excel-Style Sheets)
+$router->add("GET", "/estimation/sheet", "EstimationController@sheet");
+$router->add("GET", "/estimation/sheet/{id}", "EstimationController@sheet");
+$router->add("GET", "/estimation/api/items", "EstimationController@getItems");
+$router->add("POST", "/estimation/api/save", "EstimationController@saveGrid");
+// Rate Manager Routes
+$router->add("GET", "/estimation/rates", "EstimationController@rates_manager");
+$router->add("GET", "/estimation/api/get_location_rates", "EstimationController@get_location_rates");
+$router->add("POST", "/estimation/api/save_bulk_rates", "EstimationController@save_bulk_rates");
+$router->add("POST", "/estimation/api/update_location", "EstimationController@update_location");
+$router->add("GET", "/estimation/api/get_project_rates", "EstimationController@get_project_rates");
+$router->add("GET", "/estimation/export/excel", "EstimationController@export_excel");
+$router->add("GET", "/estimation/export/pdf", "EstimationController@export_pdf");
+$router->add("POST", "/estimation/import/excel", "EstimationController@import_excel");
+
+// Rate Analysis Routes
+$router->add("GET", "/rate-analysis/item", "RateAnalysisController@item_rate_analysis");
+$router->add("POST", "/rate-analysis/calculate", "RateAnalysisController@calculate_rate");
+$router->add("POST", "/rate-analysis/save-to-location", "RateAnalysisController@save_rate_to_location");
+$router->add("GET", "/rate-analysis/labor", "RateAnalysisController@labor_rate_analysis");
+$router->add("GET", "/rate-analysis/equipment", "RateAnalysisController@equipment_hourly_rate");
+$router->add("GET", "/rate-analysis/cash-flow", "RateAnalysisController@cash_flow_analysis");
+$router->add("GET", "/rate-analysis/npv-irr", "RateAnalysisController@npv_irr_analysis");
+
 $router->add(
     "POST",
     "/admin/email/send-test",
