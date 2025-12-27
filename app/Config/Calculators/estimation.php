@@ -10,14 +10,89 @@ return [
     // RATE ANALYSIS (Enterprise - Phase 14)
     // ============================================
     'item-rate-analysis' => [
-        'name' => 'Item Rate Analysis',
-        'description' => 'Analyze unit rate for construction items',
+        'name' => 'Item Rate Analysis (Nepal Norms)',
+        'description' => 'Detailed unit rate analysis based on Nepal Government (DUDBC) Norms',
         'category' => 'estimation',
         'subcategory' => 'rates',
         'version' => '1.0',
-        'inputs' => [['name' => 'cost', 'type' => 'number', 'label' => 'Base Cost', 'unit' => 'Amt', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['cost']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Unit Rate', 'unit' => 'Amt/Unit']]
+        'inputs' => [
+            ['name' => 'item_type', 'type' => 'select', 'label' => 'Item Type', 'required' => true, 'options' => [
+                'pcc_124' => 'PCC 1:2:4 (m³)',
+                'rcc_1153' => 'RCC 1:1.5:3 (m³)',
+                'brick_14' => 'Brickwork 1:4 (m³)',
+                'brick_16' => 'Brickwork 1:6 (m³)',
+                'plaster_12mm' => 'Plaster 1:4 (12.5mm) (m²)',
+                'soil_normal' => 'Earthwork (Normal Soil) (m³)',
+                'soil_hard' => 'Earthwork (Hard Soil) (m³)',
+                'gabion_box' => 'Gabion Box (2x1x1m) (nos)',
+                'gabion_fill' => 'Gabion Filling (m³)'
+            ]],
+            ['name' => 'quantity', 'type' => 'number', 'label' => 'Quantity', 'required' => true, 'default' => 1],
+            ['name' => 'cement_price', 'type' => 'number', 'label' => 'Cement Price (per bag)', 'default' => 750],
+            ['name' => 'sand_price', 'type' => 'number', 'label' => 'Sand Price (per m³)', 'default' => 2500],
+            ['name' => 'agg_price', 'type' => 'number', 'label' => 'Aggregate Price (per m³)', 'default' => 3000],
+            ['name' => 'brick_price', 'type' => 'number', 'label' => 'Brick Price (per nos)', 'default' => 18],
+            ['name' => 'stone_price', 'type' => 'number', 'label' => 'Stone Price (per m³)', 'default' => 1800],
+            ['name' => 'gi_wire_price', 'type' => 'number', 'label' => 'GI Wire Price (per kg)', 'default' => 120],
+            ['name' => 'mason_rate', 'type' => 'number', 'label' => 'Mason Rate (per day)', 'default' => 1200],
+            ['name' => 'labor_rate', 'type' => 'number', 'label' => 'Labor Rate (per day)', 'default' => 850],
+            ['name' => 'overhead', 'type' => 'number', 'label' => 'Overhead & Profit (%)', 'default' => 15],
+        ],
+        'formulas' => [
+            'analysis' => function($i) {
+                $norms = require __DIR__ . '/../norms.php';
+                $type = $i['item_type'];
+                
+                // Map input type to norms keys
+                $map = [
+                    'pcc_124' => ['cat' => 'concrete', 'key' => 'pcc_124'],
+                    'rcc_1153' => ['cat' => 'concrete', 'key' => 'rcc_1153'],
+                    'brick_14' => ['cat' => 'brickwork', 'key' => 'ratio_14'],
+                    'brick_16' => ['cat' => 'brickwork', 'key' => 'ratio_16'],
+                    'plaster_12mm' => ['cat' => 'plaster', 'key' => 'ratio_14_12mm'],
+                    'soil_normal' => ['cat' => 'earthwork', 'key' => 'normal_soil'],
+                    'soil_hard' => ['cat' => 'earthwork', 'key' => 'hard_soil'],
+                    'gabion_box' => ['cat' => 'road_bridge', 'key' => 'gabion_2x1x1'],
+                    'gabion_fill' => ['cat' => 'road_bridge', 'key' => 'gabion_filling']
+                ];
+                
+                $conf = $norms[$map[$type]['cat']][$map[$type]['key']];
+                $mat = $conf['materials'] ?? [];
+                $lab = $conf['labor'] ?? [];
+                $qty = $i['quantity'];
+                
+                $mat_cost = 0;
+                if (isset($mat['cement_bags'])) $mat_cost += ($mat['cement_bags'] * $qty) * $i['cement_price'];
+                if (isset($mat['sand'])) $mat_cost += ($mat['sand'] * $qty) * $i['sand_price'];
+                if (isset($mat['aggregate'])) $mat_cost += ($mat['aggregate'] * $qty) * $i['agg_price'];
+                if (isset($mat['bricks'])) $mat_cost += ($mat['bricks'] * $qty) * $i['brick_price'];
+                if (isset($mat['stones'])) $mat_cost += ($mat['stones'] * $qty) * $i['stone_price'];
+                if (isset($mat['gi_wire'])) $mat_cost += ($mat['gi_wire'] * $qty) * $i['gi_wire_price'];
+                if (isset($mat['selvage_wire'])) $mat_cost += ($mat['selvage_wire'] * $qty) * $i['gi_wire_price'];
+                
+                $lab_cost = 0;
+                if (isset($lab['mason']) || isset($lab['skilled_labor'])) {
+                    $m_qty = ($lab['mason'] ?? 0) + ($lab['skilled_labor'] ?? 0);
+                    $lab_cost += ($m_qty * $qty) * $i['mason_rate'];
+                }
+                if (isset($lab['laborer'])) $lab_cost += ($lab['laborer'] * $qty) * $i['labor_rate'];
+                
+                $direct_cost = $mat_cost + $lab_cost;
+                $vat_profit = $direct_cost * ($i['overhead'] / 100);
+                $total_cost = $direct_cost + $vat_profit;
+                
+                return [
+                    'mat_total' => $mat_cost,
+                    'lab_total' => $lab_cost,
+                    'direct' => $direct_cost,
+                    'final' => $total_cost,
+                    'per_unit' => $total_cost / $qty
+                ];
+            }
+        ],
+        'outputs' => [
+            ['name' => 'analysis', 'label' => 'Rate Breakdown', 'type' => 'table']
+        ]
     ],
     'boq-preparation' => [
         'name' => 'BOQ Preparation Tool',

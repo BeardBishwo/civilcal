@@ -38,6 +38,12 @@ class ResultFormatter
                 $value,
                 $outputDef
             );
+
+            // Special handling for structured data like Rate Analysis breakdown
+            if ($outputDef['type'] === 'table' && is_array($value)) {
+                $formatted[$name]['is_table'] = true;
+                $formatted[$name]['rows'] = $value;
+            }
         }
         
         return $formatted;
@@ -90,6 +96,9 @@ class ResultFormatter
                 
             case 'string':
                 return (string)$value;
+                
+            case 'table':
+                return 'Table Data'; // Label for structured output
                 
             case 'number':
             default:
