@@ -26,7 +26,6 @@ $breadcrumb = [
 	</div>
 
 	<div class="category-grid">
-		<!-- Cost Estimation -->
 		<div id="cost" class="category-card">
 			<div class="category-header">
 				<i class="fas fa-calculator category-icon"></i>
@@ -36,14 +35,13 @@ $breadcrumb = [
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('item-rate-analysis'); ?>" class="tool-item"><span>Item Rate Analysis</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('boq-preparation'); ?>" class="tool-item"><span>BOQ Preparation</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('project-cost-summary'); ?>" class="tool-item"><span>Project Cost Summary</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('contingency-overheads'); ?>" class="tool-item"><span>Contingency & Overheads</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/rate-analysis/item'); ?>" class="tool-item"><span>Item Rate Analysis</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/estimation/sheet'); ?>" class="tool-item"><span>BOQ Preparation</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/estimation/sheet'); ?>" class="tool-item"><span>Project Cost Summary</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/estimation/sheet'); ?>" class="tool-item"><span>Contingency & Overheads</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>
 
-		<!-- Labor Estimation -->
 		<div id="labor" class="category-card">
 			<div class="category-header">
 				<i class="fas fa-users category-icon"></i>
@@ -53,13 +51,12 @@ $breadcrumb = [
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('labor-rate-analysis'); ?>" class="tool-item"><span>Labor Rate Analysis</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('manpower-requirement'); ?>" class="tool-item"><span>Manpower Requirement</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('labor-hour-calculation'); ?>" class="tool-item"><span>Labor Hour Calculation</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/rate-analysis/labor'); ?>" class="tool-item"><span>Labor Rate Analysis</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/rate-analysis/labor'); ?>" class="tool-item"><span>Manpower Requirement</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/rate-analysis/labor'); ?>" class="tool-item"><span>Labor Hour Calculation</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>
 
-		<!-- Equipment Estimation -->
 		<div id="equipment" class="category-card">
 			<div class="category-header">
 				<i class="fas fa-truck-loading category-icon"></i>
@@ -69,13 +66,12 @@ $breadcrumb = [
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('equipment-hourly-rate'); ?>" class="tool-item"><span>Equipment Hourly Rate</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('machinery-usage'); ?>" class="tool-item"><span>Machinery Usage</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('fuel-consumption'); ?>" class="tool-item"><span>Fuel Consumption</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/rate-analysis/equipment'); ?>" class="tool-item"><span>Equipment Hourly Rate</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/rate-analysis/equipment'); ?>" class="tool-item"><span>Machinery Usage</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/rate-analysis/equipment'); ?>" class="tool-item"><span>Fuel Consumption</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>
 
-		<!-- Project Financials -->
 		<div id="financials" class="category-card">
 			<div class="category-header">
 				<i class="fas fa-chart-line category-icon"></i>
@@ -85,9 +81,9 @@ $breadcrumb = [
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('cash-flow-analysis'); ?>" class="tool-item"><span>Cash Flow Analysis</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('profit-loss-analysis'); ?>" class="tool-item"><span>Profit & Loss</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('npv-irr-analysis'); ?>" class="tool-item"><span>NPV / IRR Analysis</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/rate-analysis/cash-flow'); ?>" class="tool-item"><span>Cash Flow Analysis</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/rate-analysis/cash-flow'); ?>" class="tool-item"><span>Profit & Loss</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/rate-analysis/npv-irr'); ?>" class="tool-item"><span>NPV / IRR Analysis</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>
 
@@ -106,7 +102,6 @@ $breadcrumb = [
 			</ul>
 		</div>
 
-		<!-- Reports -->
 		<div id="reports" class="category-card">
 			<div class="category-header">
 				<i class="fas fa-file-alt category-icon"></i>
@@ -116,9 +111,9 @@ $breadcrumb = [
 				</div>
 			</div>
 			<ul class="tool-list">
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('summary-report'); ?>" class="tool-item"><span>Summary Report</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('detailed-boq-report'); ?>" class="tool-item"><span>Detailed BOQ</span> <i class="fas fa-arrow-right"></i></a>
-				<a href="<?php echo \App\Helpers\UrlHelper::calculator('financial-dashboard'); ?>" class="tool-item"><span>Financial Dashboard</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/estimation/sheet'); ?>" class="tool-item"><span>Summary Report</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/estimation/sheet'); ?>" class="tool-item"><span>Detailed BOQ</span> <i class="fas fa-arrow-right"></i></a>
+				<a href="<?php echo app_base_url('/estimation/sheet'); ?>" class="tool-item"><span>Financial Dashboard</span> <i class="fas fa-arrow-right"></i></a>
 			</ul>
 		</div>
 	</div>

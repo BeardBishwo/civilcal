@@ -424,6 +424,9 @@ class EstimationController extends Controller
             'created_by' => $_SESSION['user_id'] ?? 1
         ]);
         
+        // Clear templates cache
+        \App\Core\CacheManager::delete('all_templates');
+        
         echo json_encode(['success' => true, 'message' => 'Template saved successfully']);
     }
 
@@ -433,7 +436,12 @@ class EstimationController extends Controller
     public function get_templates()
     {
         header('Content-Type: application/json');
-        $templates = $this->db->find('est_templates', [], 'created_at DESC');
+        
+        // Cache templates for 10 minutes
+        $templates = \App\Core\CacheManager::remember('all_templates', function() {
+            return $this->db->find('est_templates', [], 'created_at DESC');
+        }, 600);
+        
         echo json_encode(['success' => true, 'templates' => $templates]);
     }
 
