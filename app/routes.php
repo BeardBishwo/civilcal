@@ -37,19 +37,7 @@ $router->add("POST", "/logout", "AuthController@logout"); // No middleware - can
 $router->add("GET", "/user/login/google", "AuthController@loginWithGoogle");
 $router->add("GET", "/user/login/google/callback", "AuthController@handleGoogleCallback");
 
-// Calculator Routes (Public)
-$router->add("GET", "/calculators", "CalculatorController@index");
-$router->add("GET", "/calculator/{category}", "CalculatorController@category");
-$router->add(
-    "GET",
-    "/calculator/{category}/{tool}",
-    "CalculatorController@tool",
-);
-$router->add(
-    "POST",
-    "/calculator/{category}/{tool}/calculate",
-    "CalculatorController@calculate",
-);
+// Basic Calculator Routes moved below for priority
 
 // Calculator Routes (Protected)
 $router->add("GET", "/dashboard", "CalculatorController@dashboard", ["auth"]);
@@ -443,6 +431,75 @@ $router->add("GET", "/rate-analysis/labor", "RateAnalysisController@labor_rate_a
 $router->add("GET", "/rate-analysis/equipment", "RateAnalysisController@equipment_hourly_rate");
 $router->add("GET", "/rate-analysis/cash-flow", "RateAnalysisController@cash_flow_analysis");
 $router->add("GET", "/rate-analysis/npv-irr", "RateAnalysisController@npv_irr_analysis");
+
+// Calculator Platform Routes
+$router->add("GET", "/calculator", "CalculatorController@index");
+$router->add("GET", "/calculator/converter/{slug}", "CalculatorController@converter");
+$router->add("POST", "/calculator/api/convert", "CalculatorController@convert");
+$router->add("POST", "/calculator/api/calculate", "CalculatorController@calculate");
+$router->add("GET", "/calculator/scientific", "CalculatorController@scientific");
+
+// Legacy/Dynamic Tool Routes (Moved here to avoid intercepting /calculator/converter/*)
+$router->add("GET", "/calculators", "CalculatorController@index");
+$router->add("GET", "/calculator/{category}", "CalculatorController@category");
+$router->add("GET", "/calculator/{category}/{tool}", "CalculatorController@tool");
+$router->add("POST", "/calculator/{category}/{tool}/calculate", "CalculatorController@calculate");
+
+// Mathematics Calculators
+$router->add("GET", "/calculator/math/percentage", "MathCalculatorController@percentage");
+$router->add("GET", "/calculator/math/fraction", "MathCalculatorController@fraction");
+$router->add("GET", "/calculator/math/ratio", "MathCalculatorController@ratio");
+$router->add("GET", "/calculator/math/square-root", "MathCalculatorController@square_root");
+$router->add("GET", "/calculator/math/exponent", "MathCalculatorController@exponent");
+$router->add("POST", "/calculator/api/percentage", "MathCalculatorController@api_percentage");
+$router->add("POST", "/calculator/api/fraction", "MathCalculatorController@api_fraction");
+$router->add("GET", "/calculator/math/bmi", "MathCalculatorController@bmi");
+$router->add("GET", "/calculator/math/loan", "MathCalculatorController@loan");
+$router->add("GET", "/calculator/math/age", "MathCalculatorController@age");
+$router->add("GET", "/calculator/math/area", "MathCalculatorController@area");
+$router->add("GET", "/calculator/math/statistics", "MathCalculatorController@statistics");
+$router->add("POST", "/calculator/api/bmi", "MathCalculatorController@api_bmi");
+$router->add("POST", "/calculator/api/loan", "MathCalculatorController@api_loan");
+$router->add("POST", "/calculator/api/statistics", "MathCalculatorController@api_statistics");
+$router->add("GET", "/calculator/math/gcd-lcm", "MathCalculatorController@gcd_lcm");
+$router->add("GET", "/calculator/math/quadratic", "MathCalculatorController@quadratic");
+$router->add("GET", "/calculator/math/pythagorean", "MathCalculatorController@pythagorean");
+$router->add("GET", "/calculator/math/discount", "MathCalculatorController@discount");
+$router->add("POST", "/calculator/api/gcd-lcm", "MathCalculatorController@api_gcd_lcm");
+$router->add("POST", "/calculator/api/quadratic", "MathCalculatorController@api_quadratic");
+$router->add("POST", "/calculator/api/pythagorean", "MathCalculatorController@api_pythagorean");
+$router->add("POST", "/calculator/api/discount", "MathCalculatorController@api_discount");
+
+// Finance Calculators
+$router->add("GET", "/calculator/finance/mortgage", "FinanceCalculatorController@mortgage");
+$router->add("GET", "/calculator/finance/investment", "FinanceCalculatorController@investment");
+$router->add("GET", "/calculator/finance/compound-interest", "FinanceCalculatorController@compound_interest");
+$router->add("GET", "/calculator/finance/savings", "FinanceCalculatorController@savings");
+$router->add("GET", "/calculator/finance/roi", "FinanceCalculatorController@roi");
+$router->add("POST", "/calculator/api/mortgage", "FinanceCalculatorController@api_mortgage");
+$router->add("POST", "/calculator/api/compound-interest", "FinanceCalculatorController@api_compound_interest");
+$router->add("POST", "/calculator/api/roi", "FinanceCalculatorController@api_roi");
+
+// Health Calculators
+$router->add("GET", "/calculator/health/bmr", "HealthCalculatorController@bmr");
+$router->add("GET", "/calculator/health/calorie", "HealthCalculatorController@calorie");
+$router->add("GET", "/calculator/health/body-fat", "HealthCalculatorController@body_fat");
+$router->add("GET", "/calculator/health/water-intake", "HealthCalculatorController@water_intake");
+$router->add("GET", "/calculator/health/pregnancy", "HealthCalculatorController@pregnancy");
+$router->add("POST", "/calculator/api/bmr", "HealthCalculatorController@api_bmr");
+$router->add("POST", "/calculator/api/body-fat", "HealthCalculatorController@api_body_fat");
+
+// Physics Calculators
+$router->add("GET", "/calculator/physics/velocity", "PhysicsCalculatorController@velocity");
+$router->add("GET", "/calculator/physics/force", "PhysicsCalculatorController@force");
+$router->add("GET", "/calculator/physics/kinetic-energy", "PhysicsCalculatorController@kinetic_energy");
+$router->add("GET", "/calculator/physics/power", "PhysicsCalculatorController@power");
+$router->add("GET", "/calculator/physics/ohms-law", "PhysicsCalculatorController@ohms_law");
+$router->add("POST", "/calculator/api/velocity", "PhysicsCalculatorController@api_velocity");
+$router->add("POST", "/calculator/api/force", "PhysicsCalculatorController@api_force");
+$router->add("POST", "/calculator/api/kinetic-energy", "PhysicsCalculatorController@api_kinetic_energy");
+$router->add("POST", "/calculator/api/power", "PhysicsCalculatorController@api_power");
+$router->add("POST", "/calculator/api/ohms-law", "PhysicsCalculatorController@api_ohms_law");
 
 $router->add(
     "POST",

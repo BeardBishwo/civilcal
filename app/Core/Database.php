@@ -124,7 +124,7 @@ class Database {
     /**
      * @return array
      */
-    public function find($table, $conditions = [], $columns = '*') {
+    public function find($table, $conditions = [], $orderBy = '', $limit = null) {
         $where = '';
         $params = [];
         
@@ -137,15 +137,25 @@ class Database {
             $where = 'WHERE ' . implode(' AND ', $whereConditions);
         }
         
-        $sql = "SELECT {$columns} FROM {$table} {$where}";
+        $sql = "SELECT * FROM {$table} {$where}";
+        
+        if ($orderBy) {
+            $sql .= " ORDER BY {$orderBy}";
+        }
+        
+        if ($limit) {
+            $sql .= " LIMIT {$limit}";
+        }
+        
         $stmt = $this->prepare($sql);
         $stmt->execute($params);
         
         return $stmt->fetchAll();
     }
     
-    public function findOne($table, $conditions = [], $columns = '*') {
-        $results = $this->find($table, $conditions, $columns);
+    
+    public function findOne($table, $conditions = []) {
+        $results = $this->find($table, $conditions, '', 1);
         return !empty($results) ? $results[0] : null;
     }
     

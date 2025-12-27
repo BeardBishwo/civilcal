@@ -49,6 +49,8 @@ if ($show_footer): ?>
     </script>
     <script src="<?php echo app_base_url('public/assets/js/global-notifications.js'); ?>"></script>
 
+    <?php include __DIR__ . '/floating-calculator.php'; ?>
+
     </body>
 </html>
 

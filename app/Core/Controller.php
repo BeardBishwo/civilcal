@@ -18,7 +18,7 @@ class Controller
         require_once __DIR__ . '/../Helpers/functions.php';
 
         // Initialize database connection
-        $this->db = get_db();
+        $this->db = \App\Core\Database::getInstance();
 
         // Initialize authentication
         if (class_exists('App\Core\Auth')) {
