@@ -429,6 +429,11 @@ $router->add("GET", "/estimation/api/get_project_rates", "EstimationController@g
 $router->add("GET", "/estimation/export/excel", "EstimationController@export_excel");
 $router->add("GET", "/estimation/export/pdf", "EstimationController@export_pdf");
 $router->add("POST", "/estimation/import/excel", "EstimationController@import_excel");
+$router->add("POST", "/estimation/api/save_template", "EstimationController@save_template");
+$router->add("GET", "/estimation/api/get_templates", "EstimationController@get_templates");
+$router->add("GET", "/estimation/api/load_template", "EstimationController@load_template");
+$router->add("GET", "/estimation/api/get_versions", "EstimationController@get_versions");
+$router->add("POST", "/estimation/api/restore_version", "EstimationController@restore_version");
 
 // Rate Analysis Routes
 $router->add("GET", "/rate-analysis/item", "RateAnalysisController@item_rate_analysis");

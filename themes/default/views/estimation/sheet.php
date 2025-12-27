@@ -173,7 +173,9 @@
             </span>
             <button class="btn btn-sm btn-success py-1 me-1" onclick="openImportModal()"><i class="bi bi-upload"></i> Import</button>
             <button class="btn btn-sm btn-light py-1 me-1" onclick="exportExcel()"><i class="bi bi-download"></i> Excel</button>
-            <button class="btn btn-sm btn-danger py-1" onclick="exportPdf()"><i class="bi bi-file-pdf"></i> PDF</button>
+            <button class="btn btn-sm btn-danger py-1 me-1" onclick="exportPdf()"><i class="bi bi-file-pdf"></i> PDF</button>
+            <button class="btn btn-sm btn-info py-1 me-1" onclick="openTemplateModal()"><i class="bi bi-folder-plus"></i> Templates</button>
+            <button class="btn btn-sm btn-warning py-1" onclick="openHistoryModal()"><i class="bi bi-clock-history"></i> History</button>
         </div>
     </div>
 
@@ -279,6 +281,62 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-success" onclick="importExcel()"><i class="bi bi-upload"></i> Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Modal -->
+    <div class="modal fade" id="template-modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-folder-plus text-info me-2"></i>Project Templates</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#load-tab">Load Template</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#save-tab">Save as Template</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <!-- Load Template Tab -->
+                        <div class="tab-pane fade show active" id="load-tab">
+                            <div id="templates-list" class="list-group"></div>
+                        </div>
+                        <!-- Save Template Tab -->
+                        <div class="tab-pane fade" id="save-tab">
+                            <div class="mb-3">
+                                <label class="form-label">Template Name</label>
+                                <input type="text" id="template-name" class="form-control" placeholder="e.g., Residential Building BOQ">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description (Optional)</label>
+                                <textarea id="template-desc" class="form-control" rows="3" placeholder="Brief description of this template"></textarea>
+                            </div>
+                            <button class="btn btn-primary" onclick="saveTemplate()"><i class="bi bi-save me-1"></i> Save Template</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Version History Modal -->
+    <div class="modal fade" id="history-modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-clock-history text-warning me-2"></i>Version History</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">Recent changes to this project (last 20 versions)</p>
+                    <div id="versions-list" class="list-group"></div>
                 </div>
             </div>
         </div>
@@ -711,6 +769,192 @@
             } catch(e) {
                 alert('Import error: ' + e.message);
             }
+        }
+
+        function openTemplateModal() {
+            loadTemplatesList();
+            const modal = new bootstrap.Modal(document.getElementById('template-modal'));
+            modal.show();
+        }
+
+        async function loadTemplatesList() {
+            try {
+                const res = await fetch(appBase + '/estimation/api/get_templates');
+                const json = await res.json();
+                
+                if (json.success) {
+                    const list = document.getElementById('templates-list');
+                    list.innerHTML = '';
+                    
+                    if (json.templates.length === 0) {
+                        list.innerHTML = '<p class="text-muted text-center py-4">No templates saved yet</p>';
+                        return;
+                    }
+                    
+                    json.templates.forEach(t => {
+                        const item = document.createElement('a');
+                        item.className = 'list-group-item list-group-item-action';
+                        item.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">${t.name}</h6>
+                                    <small class="text-muted">${t.description || 'No description'}</small>
+                                </div>
+                                <button class="btn btn-sm btn-primary" onclick="loadTemplate(${t.id})">Load</button>
+                            </div>
+                        `;
+                        list.appendChild(item);
+                    });
+                }
+            } catch(e) {
+                console.error('Failed to load templates', e);
+            }
+        }
+
+        async function saveTemplate() {
+            const name = document.getElementById('template-name').value;
+            const description = document.getElementById('template-desc').value;
+            
+            if (!name) {
+                alert('Please enter template name');
+                return;
+            }
+            
+            const structure = {
+                mb: gridMB.getData(),
+                abstract: gridAbstract.getData(),
+                rate: gridRate.getData()
+            };
+            
+            try {
+                const res = await fetch(appBase + '/estimation/api/save_template', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: name,
+                        description: description,
+                        structure: structure
+                    })
+                });
+                const json = await res.json();
+                
+                if (json.success) {
+                    alert('Template saved successfully!');
+                    document.getElementById('template-name').value = '';
+                    document.getElementById('template-desc').value = '';
+                    loadTemplatesList();
+                } else {
+                    alert('Failed to save template: ' + json.error);
+                }
+            } catch(e) {
+                alert('Error: ' + e.message);
+            }
+        }
+
+        async function loadTemplate(templateId) {
+            if (!confirm('Loading a template will replace current data. Continue?')) return;
+            
+            try {
+                const res = await fetch(appBase + '/estimation/api/load_template?template_id=' + templateId);
+                const json = await res.json();
+                
+                if (json.success) {
+                    // Clear quantities but keep structure
+                    const structure = json.structure;
+                    
+                    // Load structure into grids
+                    gridMB.setData(structure.mb || getDefaultMB());
+                    gridAbstract.setData(structure.abstract || getDefaultAbstract());
+                    gridRate.setData(structure.rate || []);
+                    
+                    alert('Template "' + json.name + '" loaded successfully!');
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('template-modal'));
+                    modal.hide();
+                } else {
+                    alert('Failed to load template: ' + json.error);
+                }
+            } catch(e) {
+                alert('Error: ' + e.message);
+            }
+        }
+
+        function openHistoryModal() {
+            loadVersionHistory();
+            const modal = new bootstrap.Modal(document.getElementById('history-modal'));
+            modal.show();
+        }
+
+        async function loadVersionHistory() {
+            try {
+                const res = await fetch(appBase + '/estimation/api/get_versions?project_id=' + projectId);
+                const json = await res.json();
+                
+                if (json.success) {
+                    const list = document.getElementById('versions-list');
+                    list.innerHTML = '';
+                    
+                    if (json.versions.length === 0) {
+                        list.innerHTML = '<p class="text-muted text-center py-4">No version history yet</p>';
+                        return;
+                    }
+                    
+                    json.versions.forEach((v, index) => {
+                        const item = document.createElement('a');
+                        item.className = 'list-group-item list-group-item-action';
+                        const date = new Date(v.created_at);
+                        const timeAgo = getTimeAgo(date);
+                        
+                        item.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">${index === 0 ? '🟢 Current Version' : 'Version #' + v.id}</h6>
+                                    <small class="text-muted">${timeAgo} - ${v.change_description || 'Auto-save'}</small>
+                                </div>
+                                ${index !== 0 ? `<button class="btn btn-sm btn-warning" onclick="restoreVersion(${v.id})">Restore</button>` : ''}
+                            </div>
+                        `;
+                        list.appendChild(item);
+                    });
+                }
+            } catch(e) {
+                console.error('Failed to load versions', e);
+            }
+        }
+
+        async function restoreVersion(versionId) {
+            if (!confirm('Restore this version? Current work will be saved as a new version.')) return;
+            
+            try {
+                const res = await fetch(appBase + '/estimation/api/restore_version', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ version_id: versionId })
+                });
+                const json = await res.json();
+                
+                if (json.success) {
+                    gridMB.setData(json.data.mb || getDefaultMB());
+                    gridAbstract.setData(json.data.abstract || getDefaultAbstract());
+                    gridRate.setData(json.data.rate || []);
+                    
+                    alert('Version restored successfully!');
+                    location.reload();
+                } else {
+                    alert('Failed to restore: ' + json.error);
+                }
+            } catch(e) {
+                alert('Error: ' + e.message);
+            }
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return 'Just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return minutes + ' min ago';
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return hours + ' hr ago';
+            const days = Math.floor(hours / 24);
+            return days + ' day' + (days > 1 ? 's' : '') + ' ago';
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

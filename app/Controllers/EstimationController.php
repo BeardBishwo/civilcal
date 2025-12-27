@@ -87,6 +87,14 @@ class EstimationController extends Controller
             ]);
         }
 
+        // Save version history
+        $this->db->insert('est_boq_versions', [
+            'project_id' => $projectId,
+            'grid_data' => $gridData,
+            'changed_by' => $_SESSION['user_id'] ?? 1,
+            'change_description' => 'Auto-save'
+        ]);
+
         echo json_encode(['success' => true]);
     }
 
@@ -389,8 +397,116 @@ class EstimationController extends Controller
         $html .= '<td style="border: none; width: 50%;">Approved by: _____________________</td>';
         $html .= '</tr></table>';
         $html .= '</div>';
-
         return $html;
+    }
+
+    /**
+     * API: Save Current BOQ as Template
+     */
+    public function save_template()
+    {
+        header('Content-Type: application/json');
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        $name = $input['name'] ?? null;
+        $description = $input['description'] ?? '';
+        $structureJson = json_encode($input['structure'] ?? []);
+        
+        if (!$name) {
+            echo json_encode(['success' => false, 'error' => 'Template name required']);
+            return;
+        }
+        
+        $this->db->insert('est_templates', [
+            'name' => $name,
+            'description' => $description,
+            'structure_json' => $structureJson,
+            'created_by' => $_SESSION['user_id'] ?? 1
+        ]);
+        
+        echo json_encode(['success' => true, 'message' => 'Template saved successfully']);
+    }
+
+    /**
+     * API: Get All Templates
+     */
+    public function get_templates()
+    {
+        header('Content-Type: application/json');
+        $templates = $this->db->find('est_templates', [], 'created_at DESC');
+        echo json_encode(['success' => true, 'templates' => $templates]);
+    }
+
+    /**
+     * API: Load Template
+     */
+    public function load_template()
+    {
+        header('Content-Type: application/json');
+        $templateId = $_GET['template_id'] ?? null;
+        
+        if (!$templateId) {
+            echo json_encode(['success' => false, 'error' => 'Template ID required']);
+            return;
+        }
+        
+        $template = $this->db->findOne('est_templates', ['id' => $templateId]);
+        
+        if (!$template) {
+            echo json_encode(['success' => false, 'error' => 'Template not found']);
+            return;
+        }
+        
+        $structure = json_decode($template['structure_json'], true);
+        echo json_encode(['success' => true, 'structure' => $structure, 'name' => $template['name']]);
+    }
+
+    /**
+     * API: Get Version History
+     */
+    public function get_versions()
+    {
+        header('Content-Type: application/json');
+        $projectId = $_GET['project_id'] ?? null;
+        
+        if (!$projectId) {
+            echo json_encode(['success' => false, 'error' => 'Project ID required']);
+            return;
+        }
+        
+        $versions = $this->db->find('est_boq_versions', ['project_id' => $projectId], 'created_at DESC', 20);
+        echo json_encode(['success' => true, 'versions' => $versions]);
+    }
+
+    /**
+     * API: Restore Version
+     */
+    public function restore_version()
+    {
+        header('Content-Type: application/json');
+        $versionId = $_POST['version_id'] ?? null;
+        
+        if (!$versionId) {
+            echo json_encode(['success' => false, 'error' => 'Version ID required']);
+            return;
+        }
+        
+        $version = $this->db->findOne('est_boq_versions', ['id' => $versionId]);
+        
+        if (!$version) {
+            echo json_encode(['success' => false, 'error' => 'Version not found']);
+            return;
+        }
+        
+        // Restore to current
+        $this->db->update('est_boq_data', 
+            ['grid_data' => $version['grid_data']], 
+            'project_id = :project_id', 
+            ['project_id' => $version['project_id']]
+        );
+        
+        $data = json_decode($version['grid_data'], true);
+        echo json_encode(['success' => true, 'data' => $data]);
     }
 
     /**
