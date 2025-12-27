@@ -1,4 +1,26 @@
-<?php $page_title = $title ?? 'Unit Converter'; ?>
+<?php 
+$site_meta = get_site_meta();
+$site_title = defined('APP_NAME') ? APP_NAME : $site_meta['title'];
+$page_title = $title ?? ($category['name'] . ' Converter - ' . $site_title); 
+
+// Helper to format unit symbols with superscripts
+function formatUnitSymbol($symbol) {
+    // Map common power representations to HTML superscripts
+    $map = [
+        '2' => '<sup>2</sup>',
+        '3' => '<sup>3</sup>',
+        '²' => '<sup>2</sup>',
+        '³' => '<sup>3</sup>',
+        '┬▓' => '<sup>2</sup>', // Handle potential encoding corruption
+        '┬│' => '<sup>3</sup>',
+    ];
+    // Targeted replacement: only numbers at the end or following non-digits
+    return preg_replace_callback('/([a-zA-Z\/])([23²³])|([┬][▓│])/', function($m) use ($map) {
+        $char = $m[2] ?? $m[0];
+        return ($m[1] ?? '') . ($map[$char] ?? $char);
+    }, $symbol);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,222 +30,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #6366f1;
-            --primary-light: #818cf8;
-            --secondary: #a855f7;
-            --bg-dark: #0f172a;
-            --sidebar-bg: #1e293b;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --border: rgba(255, 255, 255, 0.1);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            overflow: hidden;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .layout-wrapper {
-            display: flex;
-            height: 100vh;
-        }
-
-        /* Sidebar Styles (Consistent with index.php) */
-        .sidebar {
-            width: 300px;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            transition: all 0.3s ease;
-        }
-
-        .sidebar-header {
-            padding: 30px;
-            border-bottom: 1px solid var(--border);
-            text-align: center;
-        }
-
-        .sidebar-brand {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px 0;
-        }
-
-        .nav-category {
-            padding: 12px 25px;
-            display: flex;
-            align-items: center;
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-category:hover, .nav-category.active {
-            color: white;
-            background: rgba(99, 102, 241, 0.1);
-            border-left-color: var(--primary);
-        }
-
-        .nav-category i {
-            font-size: 1.25rem;
-            margin-right: 15px;
-            width: 24px;
-            text-align: center;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 40px;
-        }
-
-        .converter-container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .converter-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border-radius: 24px;
-            border: 1px solid var(--border);
-            padding: 40px;
-            margin-bottom: 30px;
-        }
-
-        .unit-label {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
-        }
-
-        .unit-input-group {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .unit-value-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 2.5rem;
-            font-weight: 700;
-            width: 100%;
-            outline: none;
-        }
-
-        .unit-select-lite {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            color: white;
-            border-radius: 12px;
-            padding: 10px 20px;
-            font-weight: 600;
-            cursor: pointer;
-            outline: none;
-        }
-
-        /* Scientific Shortcut Buttons */
-        .shortcut-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .shortcut-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            border-radius: 10px;
-            padding: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .shortcut-btn:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .swap-circle {
-            width: 50px;
-            height: 50px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: -40px auto 10px;
-            position: relative;
-            z-index: 2;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4);
-            transition: all 0.3s;
-        }
-
-        .swap-circle:hover {
-            transform: rotate(180deg) scale(1.1);
-        }
-
-        /* Results Log */
-        .results-log {
-            background: rgba(15, 23, 42, 0.4);
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            padding: 30px;
-        }
-
-        .log-item {
-            padding: 12px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .log-item:last-child { border-bottom: none; }
-
-        .log-formula { color: var(--text-muted); font-size: 0.9rem; }
-        .log-result { font-weight: 700; color: var(--primary-light); }
-
-        .text-gradient {
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-    </style>
+    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/theme.css'); ?>?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/calculator-platform.css'); ?>?v=<?php echo time(); ?>">
 </head>
 <body>
     <div class="layout-wrapper">
@@ -231,7 +39,11 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <a href="<?php echo app_base_url('/calculator'); ?>" class="sidebar-brand">
-                    <i class="bi bi-grid-fill me-2"></i>Bishwo Calc
+                    <?php if (!empty($site_meta['logo'])): ?>
+                        <img src="<?php echo htmlspecialchars($site_meta['logo']); ?>" alt="<?php echo htmlspecialchars($site_title); ?>" style="max-height: 40px; width: auto;">
+                    <?php else: ?>
+                        <i class="bi bi-grid-fill me-2 text-primary"></i><?php echo htmlspecialchars($site_title); ?>
+                    <?php endif; ?>
                 </a>
             </div>
             <nav class="sidebar-nav">
@@ -253,22 +65,94 @@
                     <span class="badge bg-primary rounded-pill px-3 py-2">Premium Tool</span>
                 </div>
 
-                <div class="converter-card shadow-lg">
+                <div class="converter-card glass-card shadow-lg">
                     <!-- From Section -->
-                    <div class="unit-label">From</div>
-                    <div class="row g-3">
-                        <div class="col-md-8">
-                            <div class="unit-input-group">
-                                <input type="number" id="fromValue" class="unit-value-input" value="1" step="any" oninput="convertUnits()">
+                    <div class="row align-items-center mb-0">
+                        <div class="col-md-5">
+                            <label class="unit-label-sm mb-2 d-block text-secondary small text-uppercase fw-bold ls-1">From</label>
+                            <div class="unit-input-wrapper mb-3">
+                                <input type="number" id="fromValue" class="unit-value-input form-control form-control-lg bg-dark text-white border-glass" value="1" step="any" oninput="convertUnits()">
                             </div>
-                            <!-- Shortcuts -->
-                            <div class="shortcut-grid">
+                             <div class="custom-dropdown-container" id="fromDropdown">
+                                <div class="custom-dropdown-btn" onclick="toggleDropdown('fromDropdown')">
+                                    <span class="selected-text">Select Unit</span>
+                                    <i class="bi bi-chevron-down"></i>
+                                </div>
+                                <div class="custom-dropdown-menu">
+                                    <div class="custom-dropdown-search">
+                                        <input type="text" placeholder="Search units..." oninput="filterCustomDropdown('fromDropdown', this.value)">
+                                    </div>
+                                    <div class="custom-dropdown-list">
+                                        <?php foreach ($units as $unit): ?>
+                                         <div class="custom-dropdown-item <?php echo $unit['base_unit'] ? 'selected' : ''; ?>" 
+                                              data-value="<?php echo $unit['symbol']; ?>" 
+                                              onclick="selectDropdownItem('fromDropdown', '<?php echo $unit['symbol']; ?>', '<?php echo htmlspecialchars($unit['name']); ?>')">
+                                            <?php echo htmlspecialchars($unit['name']); ?> <span class="unit-symbol text-muted ms-1">(<?php echo formatUnitSymbol($unit['symbol']); ?>)</span>
+                                         </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="fromUnit" value="<?php echo array_filter($units, fn($u) => $u['base_unit'])[0]['symbol'] ?? $units[0]['symbol']; ?>" onchange="convertUnits()">
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 text-center py-3 py-md-0">
+                            <div class="swap-circle mx-auto" onclick="swapUnits()">
+                                <i class="bi bi-arrow-left-right fs-4"></i>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <label class="unit-label-sm mb-2 d-block text-secondary small text-uppercase fw-bold ls-1">To</label>
+                            <div class="unit-input-wrapper mb-3">
+                                <input type="number" id="toValue" class="unit-value-input form-control form-control-lg bg-dark text-white border-glass" readonly>
+                            </div>
+                            <div class="custom-dropdown-container" id="toDropdown">
+                                <div class="custom-dropdown-btn" onclick="toggleDropdown('toDropdown')">
+                                    <span class="selected-text">Select Unit</span>
+                                    <i class="bi bi-chevron-down"></i>
+                                </div>
+                                <div class="custom-dropdown-menu">
+                                    <div class="custom-dropdown-search">
+                                        <input type="text" placeholder="Search units..." oninput="filterCustomDropdown('toDropdown', this.value)">
+                                    </div>
+                                    <div class="custom-dropdown-list">
+                                        <?php 
+                                        $firstNonBase = true;
+                                        foreach ($units as $unit): 
+                                            $isSelected = false;
+                                            if (!$unit['base_unit'] && $firstNonBase) {
+                                                $firstNonBase = false; $isSelected = true;
+                                            }
+                                        ?>
+                                         <div class="custom-dropdown-item <?php echo $isSelected ? 'selected' : ''; ?>" 
+                                              data-value="<?php echo $unit['symbol']; ?>" 
+                                              onclick="selectDropdownItem('toDropdown', '<?php echo $unit['symbol']; ?>', '<?php echo htmlspecialchars($unit['name']); ?>')">
+                                            <?php echo htmlspecialchars($unit['name']); ?> <span class="unit-symbol text-muted ms-1">(<?php echo formatUnitSymbol($unit['symbol']); ?>)</span>
+                                         </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="toUnit" value="" onchange="convertUnits()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="glass-divider my-4">
+
+                    <!-- Shortcuts & Actions Bottom Row -->
+                    <div class="d-flex flex-column gap-3">
+                         <!-- Shortcuts -->
+                         <div class="shortcut-rows justify-content-center">
+                            <div class="shortcut-line justify-content-center">
                                 <button class="shortcut-btn" onclick="applyShortcut('base', 2)">x2</button>
                                 <button class="shortcut-btn" onclick="applyShortcut('base', 3)">x3</button>
                                 <button class="shortcut-btn" onclick="applyShortcut('base', 4)">x4</button>
                                 <button class="shortcut-btn" onclick="applyShortcut('base', 5)">x5</button>
                                 <button class="shortcut-btn" onclick="applyShortcut('base', 10)">x10</button>
                                 <button class="shortcut-btn" onclick="applyShortcut('inv', 1)">1/x</button>
+                            </div>
+                            <div class="shortcut-line justify-content-center">
                                 <button class="shortcut-btn" onclick="applyShortcut('base', 0.5)">/2</button>
                                 <button class="shortcut-btn" onclick="applyShortcut('base', 1/3)">/3</button>
                                 <button class="shortcut-btn" onclick="applyShortcut('base', 0.25)">/4</button>
@@ -276,52 +160,16 @@
                                 <button class="shortcut-btn" onclick="applyShortcut('base', 0.1)">/10</button>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <input type="text" class="form-control form-control-sm mb-2 bg-dark text-white border-secondary" placeholder="Search units..." oninput="filterUnits('fromUnit', this.value)">
-                            <select id="fromUnit" class="unit-select-lite w-100" onchange="convertUnits()" size="10" style="height: 200px; padding: 10px;">
-                                <?php foreach ($units as $unit): ?>
-                                <option value="<?php echo $unit['symbol']; ?>" <?php echo $unit['base_unit'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($unit['name']); ?> (<?php echo $unit['symbol']; ?>)
-                                </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
 
-                    <div class="swap-circle" onclick="swapUnits()">
-                        <i class="bi bi-arrow-down-up fs-4"></i>
-                    </div>
-
-                    <!-- To Section -->
-                    <div class="unit-label">To</div>
-                    <div class="row g-3">
-                        <div class="col-md-8">
-                            <div class="unit-input-group">
-                                <input type="number" id="toValue" class="unit-value-input" readonly>
+                        <!-- Add to Log Button -->
+                        <div class="text-center mt-2">
+                             <div class="d-grid gap-2">
+                                <button class="btn btn-primary btn-lg rounded-pill fw-bold shadow-primary transition-hover d-flex align-items-center justify-content-center gap-2" onclick="addToLog()">
+                                    <i class="bi bi-journal-plus fs-5"></i>
+                                    <span>Add to Results Log</span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <input type="text" class="form-control form-control-sm mb-2 bg-dark text-white border-secondary" placeholder="Search units..." oninput="filterUnits('toUnit', this.value)">
-                            <select id="toUnit" class="unit-select-lite w-100" onchange="convertUnits()" size="10" style="height: 200px; padding: 10px;">
-                                <?php 
-                                $firstNonBase = true;
-                                foreach ($units as $unit): 
-                                    if (!$unit['base_unit'] && $firstNonBase) {
-                                        $firstNonBase = false; $selected = 'selected';
-                                    } else { $selected = ''; }
-                                ?>
-                                <option value="<?php echo $unit['symbol']; ?>" <?php echo $selected; ?>>
-                                    <?php echo htmlspecialchars($unit['name']); ?> (<?php echo $unit['symbol']; ?>)
-                                </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="mt-4 text-center">
-                        <button class="btn btn-primary rounded-pill px-5 py-3 fw-bold" onclick="addToLog()">
-                            <i class="bi bi-journal-plus me-2"></i>Add to Results Log
-                        </button>
                     </div>
                 </div>
 
@@ -343,6 +191,59 @@
         const categoryId = <?php echo $category['id']; ?>;
         const unitsData = <?php echo json_encode($units); ?>;
         
+        // Custom Dropdown Logic
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id);
+            const menu = dropdown.querySelector('.custom-dropdown-menu');
+            const isOpen = menu.style.display === 'block';
+            
+            // Close others
+            document.querySelectorAll('.custom-dropdown-menu').forEach(m => m.style.display = 'none');
+            
+            menu.style.display = isOpen ? 'none' : 'block';
+            if (!isOpen) {
+                dropdown.querySelector('.custom-dropdown-search input').focus();
+            }
+        }
+
+        function selectDropdownItem(dropdownId, value, text) {
+            const container = document.getElementById(dropdownId);
+            const hiddenInput = container.querySelector('input[type="hidden"]');
+            const selectedSpan = container.querySelector('.selected-text');
+            
+            hiddenInput.value = value;
+            selectedSpan.innerText = text;
+            
+            // Update UI
+            container.querySelectorAll('.custom-dropdown-item').forEach(item => {
+                item.classList.toggle('selected', item.getAttribute('data-value') === value);
+            });
+            
+            container.querySelector('.custom-dropdown-menu').style.display = 'none';
+            
+            // Trigger conversion
+            convertUnits();
+        }
+
+        function filterCustomDropdown(dropdownId, query) {
+            const container = document.getElementById(dropdownId);
+            const items = container.querySelectorAll('.custom-dropdown-item');
+            const lowerQuery = query.toLowerCase();
+            
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                item.style.display = text.includes(lowerQuery) ? 'block' : 'none';
+            });
+        }
+
+        // Close dropdowns on outside click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.custom-dropdown-container')) {
+                document.querySelectorAll('.custom-dropdown-menu').forEach(m => m.style.display = 'none');
+            }
+        });
+
+        // Conversion Logic
         function convertUnits() {
             const fromValue = parseFloat(document.getElementById('fromValue').value) || 0;
             const fromUnit = document.getElementById('fromUnit').value;
@@ -390,12 +291,18 @@
         }
 
         function swapUnits() {
-            const fromUnit = document.getElementById('fromUnit');
-            const toUnit = document.getElementById('toUnit');
-            const temp = fromUnit.value;
-            fromUnit.value = toUnit.value;
-            toUnit.value = temp;
-            convertUnits();
+            const fromInput = document.getElementById('fromUnit');
+            const toInput = document.getElementById('toUnit');
+            const tempVal = fromInput.value;
+            
+            // Use custom selection logic to update visuals too
+            const fromItem = document.querySelector(`#fromDropdown .custom-dropdown-item[data-value="${toInput.value}"]`);
+            const toItem = document.querySelector(`#toDropdown .custom-dropdown-item[data-value="${tempVal}"]`);
+            
+            if (fromItem && toItem) {
+                selectDropdownItem('fromDropdown', toInput.value, fromItem.innerText);
+                selectDropdownItem('toDropdown', tempVal, toItem.innerText);
+            }
         }
 
         function addToLog() {
@@ -420,20 +327,26 @@
             document.getElementById('logItems').innerHTML = '<div class="text-center py-4 text-muted">No entries in the log yet.</div>';
         }
 
-        function filterUnits(selectId, query) {
-            const select = document.getElementById(selectId);
-            const options = select.options;
-            const lowerQuery = query.toLowerCase();
-            
-            for (let i = 0; i < options.length; i++) {
-                const text = options[i].text.toLowerCase();
-                const match = text.includes(lowerQuery);
-                options[i].style.display = match ? 'block' : 'none';
+        // Sidebar Persistence & Auto-scroll
+        window.onload = function() {
+            const activeItem = document.querySelector('.nav-category.active');
+            if (activeItem) {
+                activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-        }
-
-        // Initial
-        convertUnits();
+            
+            // Initialize Dropdown Texts
+            const fromVal = document.getElementById('fromUnit').value;
+            const fromItem = document.querySelector(`#fromDropdown .custom-dropdown-item[data-value="${fromVal}"]`);
+            if (fromItem) document.querySelector('#fromDropdown .selected-text').innerText = fromItem.innerText;
+            
+            // Initialize 'To' unit (first non-base or second item)
+            const toItems = document.querySelectorAll('#toDropdown .custom-dropdown-item');
+            let toItem = Array.from(toItems).find(i => i.classList.contains('selected'));
+            if (!toItem) toItem = toItems[1] || toItems[0];
+            if (toItem) selectDropdownItem('toDropdown', toItem.getAttribute('data-value'), toItem.innerText);
+            
+            convertUnits();
+        };
     </script>
 </body>
 </html>
