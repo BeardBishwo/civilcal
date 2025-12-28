@@ -1,0 +1,67 @@
+/* Top Header Styles */
+.top-header {
+  background-color: #f7f9fa;
+  border-bottom: 1px solid #d1d7dc;
+  padding: 10px 0;
+  font-family: "Inter", sans-serif;
+  position: relative;
+  z-index: 1001;
+  display: none; /* Hidden by default if empty */
+}
+
+/* Show if it has content (managed via PHP check) */
+.top-header.has-content {
+  display: block;
+}
+
+.top-header .container {
+  display: flex;
+  justify-content: flex-end; /* Align to right like Udemy */
+  align-items: center;
+}
+
+.top-header ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 24px;
+}
+
+.top-header li {
+  display: inline-block;
+}
+
+.top-header a {
+  text-decoration: none;
+  color: #2d2f31;
+  font-size: 13px; /* Small text */
+  font-weight: 400;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.top-header a:hover {
+  color: #5624d0; /* Udemy Purple or Primary Color */
+}
+
+.top-header i {
+  font-size: 14px;
+  color: #6a6f73;
+}
+
+/* Close button style for notifications (if needed later) */
+.top-header-close {
+  margin-left: 20px;
+  cursor: pointer;
+  color: #2d2f31;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .top-header {
+    display: none !important; /* Hide on mobile by default to save space, or make scrollable */
+  }
+}

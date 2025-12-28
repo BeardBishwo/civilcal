@@ -221,6 +221,7 @@ if (
         "back-to-top.css",
         "home.css",
         "logo-enhanced.css",
+        "top-header.css",
     ];
 
     foreach ($cssFiles as $css) {
@@ -251,6 +252,37 @@ if (
 
 <body class="<?php echo htmlspecialchars($body_class); ?>">
     <?php echo \App\Helpers\AdHelper::show('header_top'); ?>
+
+    <!-- Top Header / Notification Bar -->
+    <?php
+    $topMenuItems = (new \App\Services\MenuService())->get('top_header');
+    if (!empty($topMenuItems) && is_array($topMenuItems)):
+    ?>
+    <div class="top-header has-content">
+        <div class="container margin-auto">
+            <ul>
+                <?php foreach ($topMenuItems as $item): 
+                    // Skip inactive items
+                    if (isset($item['is_active']) && $item['is_active'] === false) continue;
+                    
+                    $tParams = $item;
+                    $tUrl = $tParams['url'] ?? '#';
+                    $tLabel = $tParams['name'] ?? ($tParams['title'] ?? ($tParams['label'] ?? 'Link'));
+                    $tIcon = $tParams['icon'] ?? '';
+                    if ($tIcon && strpos($tIcon, 'fa-') === 0) $tIcon = 'fas ' . $tIcon;
+                ?>
+                <li>
+                    <a href="<?php echo (strpos($tUrl, 'http') === 0) ? $tUrl : app_base_url($tUrl); ?>">
+                        <?php if($tIcon): ?><i class="<?php echo htmlspecialchars($tIcon); ?>"></i><?php endif; ?>
+                        <span><?php echo htmlspecialchars($tLabel); ?></span>
+                    </a>
+                </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <header class="site-header" id="siteHeader">
         <div class="header-content">
             <div class="header-left">

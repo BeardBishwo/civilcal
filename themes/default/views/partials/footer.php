@@ -14,17 +14,60 @@ if ($show_footer): ?>
         }
         ?>
         <?php include __DIR__ . '/project-selector.php'; ?>
-        <div class="container">
-            <?php 
-            $footer_text = \App\Services\SettingsService::get('footer_text');
-            if (!empty($footer_text)) {
-                $footer_text = str_replace('{year}', date('Y'), $footer_text);
-                echo $footer_text; 
-            } else {
-            ?>
-                <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Civil Cal')); ?>. All Rights Reserved.</p>
-                <p>Professional Tools for Modern Engineering</p>
-            <?php } ?>
+        
+        <div class="footer-content-wrapper">
+            <div class="container">
+                <div class="footer-grid">
+                    <?php 
+                    $menuService = new \App\Services\MenuService();
+                    // Loop through 4 columns
+                    for ($i = 1; $i <= 4; $i++) {
+                        $colItems = $menuService->get('footer_' . $i);
+                        // If empty, show a fallback title for Admin visualization or empty placeholder
+                        echo '<div class="footer-col">';
+                        if (!empty($colItems) && is_array($colItems)) {
+                            // Extract title from first item if it's a "heading" type, otherwise just list
+                            // For simplicity, we assume the menu name in Admin is the title, BUT
+                            // MenuService doesn't return the menu Name, only items.
+                            // So we will just render the list. The user can add a "Heading" item if needed or we style the first item bold.
+                            echo '<ul class="footer-links">';
+                            foreach ($colItems as $index => $item) {
+                                if (isset($item['is_active']) && $item['is_active'] === false) continue;
+
+                                $url = $item['url'] ?? '#';
+                                $label = $item['name'] ?? ($item['title'] ?? 'Link');
+                                $isHeading = $index === 0; // Optional: Treat first item as heading if we want, but Udemy has distinct headers.
+                                // Better approach: Just render links. User creates "About" as first link or we find a way to pass Menu Name.
+                                // Current System: Just links.
+                                echo '<li><a href="' . ((strpos($url, 'http') === 0) ? $url : app_base_url($url)) . '">' . htmlspecialchars($label) . '</a></li>';
+                            }
+                            echo '</ul>';
+                        } else {
+                            // Empty column placeholder (so grid remains intact)
+                            echo '&nbsp;';
+                        }
+                        echo '</div>';
+                    }
+                    ?>
+                </div>
+                
+                <div class="footer-bottom">
+                    <div class="footer-logo">
+                        <!-- Optional: SVG Logo or Site Name -->
+                        <span class="udemy-style-logo"><?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Civil Cal')); ?></span>
+                    </div>
+                    <div class="copyright-text">
+                        <?php 
+                        $footer_text = \App\Services\SettingsService::get('footer_text');
+                        if (!empty($footer_text)) {
+                            echo str_replace('{year}', date('Y'), $footer_text);
+                        } else {
+                            echo '&copy; ' . date('Y') . ' ' . htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Civil Cal')) . '. All Rights Reserved.';
+                        } 
+                        ?>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
 <?php endif; ?>

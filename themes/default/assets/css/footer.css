@@ -1,39 +1,122 @@
-.footer-separator {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  margin: 0 0 24px 0;
-  border: 0;
+/* Advanced Footer Styles - Udemy Inspired */
+.site-footer {
+    background-color: #1c1d1f; /* Udemy Dark */
+    color: #fff;
+    padding: 24px 0 40px; /* Reduced top padding */
+    font-family: 'Inter', sans-serif;
+    border-top: 1px solid #3e4143;
+    margin-top: auto;
 }
 
+.footer-separator {
+    display: none; /* Hide old separator */
+}
 
-
-.site-footer {
-  text-align: center;
-  color: var(--text-muted);
-  padding: 0 0 2rem 0;
+.footer-content-wrapper {
+    width: 100%;
+    /* No defined width to allow full background stretch */
 }
 
 .site-footer .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem;
+    max-width: 1340px; /* Wider container for 4 columns */
+    margin: 0 auto;
+    padding: 0 24px;
 }
 
-.site-footer p {
-  margin: 0.5rem 0;
-  color: var(--text-muted);
+/* Footer Grid System */
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-bottom: 40px; /* Spacing before bottom bar */
 }
 
+.footer-col {
+    /* Columns */
+}
 
-.site-footer i.fas.fa-heart {
-  color: #ff4d4d;
-  margin: 0 0.25rem;
+/* Footer Links */
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Spacing between links */
+}
+
+.footer-links li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    transition: color 0.2s ease;
+    display: inline-block;
+}
+
+.footer-links li a:hover {
+    text-decoration: underline;
+    color: #fff; /* Keep white on hover, typical of dark headers/footers */
+}
+
+/* Treat first item visually different if needed, or consistent list */
+.footer-links li:first-child a {
+    /* Optional: font-weight: 700; for headings if user desires */
+}
+
+/* Footer Bottom Section (Logo + Copyright) */
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 30px; /* Reduced padding */
+    border-top: 1px solid #3e4143; /* Thin gray line */
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    gap: 20px;
+}
+
+.udemy-style-logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    /* Optional: Add SVG logo replacement logic later */
+}
+
+.copyright-text, .copyright-text p {
+    font-size: 12px;
+    color: #fff;
+    margin: 0;
+    text-align: right;
 }
 
 /* Responsive Design */
 
-@media (max-width: 768px) {
-  .site-footer .container {
-    padding: 0 1rem;
-  }
+/* Tablet (2 Columns) */
+@media (max-width: 992px) {
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+    }
+}
+
+/* Mobile (1 Column) */
+@media (max-width: 576px) {
+    .footer-grid {
+        display: flex;
+        flex-direction: column; /* Stack vertically */
+        gap: 24px; /* Reduced gap */
+    }
+
+    .footer-links {
+        align-items: flex-start; /* Left align links */
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start; /* Left align bottom content */
+    }
+
+    .copyright-text {
+        text-align: left;
+    }
 }

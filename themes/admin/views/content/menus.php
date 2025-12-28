@@ -316,13 +316,35 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
             </div>
             <div class="card-content-compact">
                 <div class="locations-grid">
+                    <!-- Top Header -->
                     <div class="location-card">
-                        <div class="location-icon header">
+                        <div class="location-icon info">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <div class="location-info">
+                            <h4 class="location-name">Top Notif. Bar</h4>
+                            <p class="location-description">Thin strip above main header</p>
+                            <div class="location-select">
+                                <select class="form-control-compact">
+                                    <option value="">Select Menu</option>
+                                    <?php foreach ($menus as $menu): ?>
+                                        <option value="<?php echo $menu['id']; ?>" <?php echo $menu['location'] === 'top_header' ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($menu['name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Header -->
+                    <div class="location-card">
+                        <div class="location-icon primary">
                             <i class="fas fa-arrow-up"></i>
                         </div>
                         <div class="location-info">
-                            <h4 class="location-name">Header Menu</h4>
-                            <p class="location-description">Appears at the top of the page</p>
+                            <h4 class="location-name">Main Header</h4>
+                            <p class="location-description">Primary site navigation</p>
                             <div class="location-select">
                                 <select class="form-control-compact">
                                     <option value="">Select Menu</option>
@@ -336,18 +358,19 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
                         </div>
                     </div>
 
+                    <!-- Mobile Menu -->
                     <div class="location-card">
-                        <div class="location-icon footer">
-                            <i class="fas fa-arrow-down"></i>
+                        <div class="location-icon warning">
+                            <i class="fas fa-mobile-alt"></i>
                         </div>
                         <div class="location-info">
-                            <h4 class="location-name">Footer Menu</h4>
-                            <p class="location-description">Appears at the bottom of the page</p>
+                            <h4 class="location-name">Mobile Menu</h4>
+                            <p class="location-description">Slide-out drawer on mobile</p>
                             <div class="location-select">
                                 <select class="form-control-compact">
                                     <option value="">Select Menu</option>
                                     <?php foreach ($menus as $menu): ?>
-                                        <option value="<?php echo $menu['id']; ?>" <?php echo $menu['location'] === 'footer' ? 'selected' : ''; ?>>
+                                        <option value="<?php echo $menu['id']; ?>" <?php echo $menu['location'] === 'mobile' ? 'selected' : ''; ?>>
                                             <?php echo htmlspecialchars($menu['name']); ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -356,18 +379,82 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
                         </div>
                     </div>
 
+                    <!-- Footer Col 1 -->
                     <div class="location-card">
-                        <div class="location-icon mobile">
-                            <i class="fas fa-mobile-alt"></i>
+                        <div class="location-icon success">
+                            <i class="fas fa-columns"></i>
                         </div>
                         <div class="location-info">
-                            <h4 class="location-name">Mobile Menu</h4>
-                            <p class="location-description">Appears in mobile menu</p>
+                            <h4 class="location-name">Footer Col 1</h4>
+                            <p class="location-description">Leftmost column</p>
                             <div class="location-select">
                                 <select class="form-control-compact">
                                     <option value="">Select Menu</option>
                                     <?php foreach ($menus as $menu): ?>
-                                        <option value="<?php echo $menu['id']; ?>" <?php echo $menu['location'] === 'mobile' ? 'selected' : ''; ?>>
+                                        <option value="<?php echo $menu['id']; ?>" <?php echo $menu['location'] === 'footer_1' ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($menu['name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Col 2 -->
+                    <div class="location-card">
+                        <div class="location-icon success">
+                            <i class="fas fa-columns"></i>
+                        </div>
+                        <div class="location-info">
+                            <h4 class="location-name">Footer Col 2</h4>
+                            <p class="location-description">Center-left column</p>
+                            <div class="location-select">
+                                <select class="form-control-compact">
+                                    <option value="">Select Menu</option>
+                                    <?php foreach ($menus as $menu): ?>
+                                        <option value="<?php echo $menu['id']; ?>" <?php echo $menu['location'] === 'footer_2' ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($menu['name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Col 3 -->
+                    <div class="location-card">
+                        <div class="location-icon success">
+                            <i class="fas fa-columns"></i>
+                        </div>
+                        <div class="location-info">
+                            <h4 class="location-name">Footer Col 3</h4>
+                            <p class="location-description">Center-right column</p>
+                            <div class="location-select">
+                                <select class="form-control-compact">
+                                    <option value="">Select Menu</option>
+                                    <?php foreach ($menus as $menu): ?>
+                                        <option value="<?php echo $menu['id']; ?>" <?php echo $menu['location'] === 'footer_3' ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($menu['name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Col 4 -->
+                    <div class="location-card">
+                        <div class="location-icon success">
+                            <i class="fas fa-columns"></i>
+                        </div>
+                        <div class="location-info">
+                            <h4 class="location-name">Footer Col 4</h4>
+                            <p class="location-description">Rightmost column</p>
+                            <div class="location-select">
+                                <select class="form-control-compact">
+                                    <option value="">Select Menu</option>
+                                    <?php foreach ($menus as $menu): ?>
+                                        <option value="<?php echo $menu['id']; ?>" <?php echo $menu['location'] === 'footer_4' ? 'selected' : ''; ?>>
                                             <?php echo htmlspecialchars($menu['name']); ?>
                                         </option>
                                     <?php endforeach; ?>

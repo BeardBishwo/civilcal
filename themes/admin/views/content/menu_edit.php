@@ -82,9 +82,20 @@ $breadcrumbs = [
                             <div class="form-group-modern">
                                 <label for="menu-location" class="form-label">Location</label>
                                 <select id="menu-location" name="location" class="form-control-modern">
-                                    <option value="header" <?php echo $menuData['location'] === 'header' ? 'selected' : ''; ?>>Header</option>
-                                    <option value="footer" <?php echo $menuData['location'] === 'footer' ? 'selected' : ''; ?>>Footer</option>
-                                    <option value="mobile" <?php echo $menuData['location'] === 'mobile' ? 'selected' : ''; ?>>Mobile</option>
+                                    <optgroup label="Header Areas">
+                                        <option value="top_header" <?php echo $menuData['location'] === 'top_header' ? 'selected' : ''; ?>>Top Notification Bar</option>
+                                        <option value="header" <?php echo $menuData['location'] === 'header' ? 'selected' : ''; ?>>Main Header Navigation</option>
+                                        <option value="mobile" <?php echo $menuData['location'] === 'mobile' ? 'selected' : ''; ?>>Mobile Menu</option>
+                                    </optgroup>
+                                    <optgroup label="Footer Columns">
+                                        <option value="footer_1" <?php echo $menuData['location'] === 'footer_1' ? 'selected' : ''; ?>>Footer Column 1 (Left)</option>
+                                        <option value="footer_2" <?php echo $menuData['location'] === 'footer_2' ? 'selected' : ''; ?>>Footer Column 2</option>
+                                        <option value="footer_3" <?php echo $menuData['location'] === 'footer_3' ? 'selected' : ''; ?>>Footer Column 3</option>
+                                        <option value="footer_4" <?php echo $menuData['location'] === 'footer_4' ? 'selected' : ''; ?>>Footer Column 4 (Right)</option>
+                                    </optgroup>
+                                    <optgroup label="Legacy/Unused">
+                                        <option value="footer" <?php echo $menuData['location'] === 'footer' ? 'selected' : ''; ?>>Old Footer (Hidden)</option>
+                                    </optgroup>
                                 </select>
                             </div>
 
