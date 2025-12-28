@@ -346,6 +346,10 @@ if (
                         }
 
                         foreach ($primaryMenuItems as $item):
+                            // Skip inactive items
+                            if (isset($item['is_active']) && $item['is_active'] === false) {
+                                continue;
+                            }
                             $title = $item['name'] ?? ($item['title'] ?? ($item['label'] ?? 'Link'));
                             $url = $item['url'] ?? '#';
                             $icon = $item['icon'] ?? 'fa-link';
@@ -507,6 +511,10 @@ if (
             <div class="mobile-nav" id="mobileNav">
                 <ul>
                     <?php foreach ($primaryMenuItems as $item): 
+                        // Skip inactive items
+                        if (isset($item['is_active']) && $item['is_active'] === false) {
+                            continue;
+                        }
                         $title = $item['name'] ?? ($item['title'] ?? ($item['label'] ?? 'Link'));
                         $url = $item['url'] ?? '#';
                         $icon = $item['icon'] ?? 'fa-link';

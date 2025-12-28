@@ -151,10 +151,10 @@ $breadcrumbs = [
     /* Menu Builder Styles */
     .menu-builder-item { 
         display: grid; 
-        grid-template-columns: auto 1fr 1.5fr 1fr auto; 
-        gap: 1rem; 
+        grid-template-columns: auto 1fr 1.5fr 1fr 60px auto; 
+        gap: 0.75rem; 
         align-items: center; 
-        padding: 1rem; 
+        padding: 0.75rem 1rem; 
         background: #f9fafb; 
         border: 1px solid #e5e7eb; 
         border-radius: 0.5rem; 
@@ -176,6 +176,11 @@ $breadcrumbs = [
     .slider.round:before { border-radius: 50%; }
     .toggle-switch-wrapper { display: flex; align-items: center; gap: 0.5rem; }
     .toggle-label { font-size: 0.875rem; color: #6b7280; }
+
+    /* Small Switch for items */
+    .switch.sm { width: 34px; height: 18px; }
+    .switch.sm .slider:before { height: 14px; width: 14px; left: 2px; bottom: 2px; }
+    .switch.sm input:checked + .slider:before { transform: translateX(16px); }
 </style>
 
 <script>
@@ -208,6 +213,12 @@ $breadcrumbs = [
                 <div>
                     <input type="text" class="form-control-modern" placeholder="Icon (fa-icon)" value="${item.icon || ''}" onchange="updateItem(${index}, 'icon', this.value)">
                 </div>
+                <div class="item-status-toggle" title="Toggle Visibility">
+                    <label class="switch sm">
+                        <input type="checkbox" ${item.is_active !== false ? 'checked' : ''} onchange="updateItem(${index}, 'is_active', this.checked)">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
                 <button type="button" class="btn-remove-item" onclick="removeItem(${index})">
                     <i class="fas fa-trash"></i>
                 </button>
@@ -219,7 +230,7 @@ $breadcrumbs = [
     }
 
     function addMenuItem() {
-        menuItems.push({ name: '', url: '', icon: '' });
+        menuItems.push({ name: '', url: '', icon: '', is_active: true });
         renderMenuItems();
     }
 
