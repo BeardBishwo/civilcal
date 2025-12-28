@@ -17,54 +17,44 @@ if ($show_footer): ?>
         
         <div class="footer-content-wrapper">
             <div class="container">
-                <div class="footer-grid">
-                    <?php 
-                    $menuService = new \App\Services\MenuService();
-                    // Loop through 4 columns
-                    for ($i = 1; $i <= 4; $i++) {
-                        $colItems = $menuService->get('footer_' . $i);
-                        // If empty, show a fallback title for Admin visualization or empty placeholder
-                        echo '<div class="footer-col">';
-                        if (!empty($colItems) && is_array($colItems)) {
-                            // Extract title from first item if it's a "heading" type, otherwise just list
-                            // For simplicity, we assume the menu name in Admin is the title, BUT
-                            // MenuService doesn't return the menu Name, only items.
-                            // So we will just render the list. The user can add a "Heading" item if needed or we style the first item bold.
-                            echo '<ul class="footer-links">';
-                            foreach ($colItems as $index => $item) {
-                                if (isset($item['is_active']) && $item['is_active'] === false) continue;
-
-                                $url = $item['url'] ?? '#';
-                                $label = $item['name'] ?? ($item['title'] ?? 'Link');
-                                $isHeading = $index === 0; // Optional: Treat first item as heading if we want, but Udemy has distinct headers.
-                                // Better approach: Just render links. User creates "About" as first link or we find a way to pass Menu Name.
-                                // Current System: Just links.
-                                echo '<li><a href="' . ((strpos($url, 'http') === 0) ? $url : app_base_url($url)) . '">' . htmlspecialchars($label) . '</a></li>';
-                            }
-                            echo '</ul>';
-                        } else {
-                            // Empty column placeholder (so grid remains intact)
-                            echo '&nbsp;';
-                        }
-                        echo '</div>';
+                <?php 
+                $menuService = new \App\Services\MenuService();
+                $activeCols = [];
+                for ($i = 1; $i <= 4; $i++) {
+                    $menu = $menuService->getMenu('footer_' . $i);
+                    if ($menu && !empty($menu['items'])) {
+                        $activeCols[] = $menu;
                     }
-                    ?>
+                }
+                
+                $colCount = count($activeCols);
+                ?>
+                <div class="footer-grid col-count-<?php echo $colCount; ?>" 
+                     style="<?php echo $colCount > 0 ? "grid-template-columns: repeat($colCount, 1fr);" : "display:none;"; ?>">
+                    <?php foreach ($activeCols as $menu): ?>
+                        <div class="footer-col">
+                            <h4 class="footer-col-title"><?php echo htmlspecialchars($menu['name']); ?></h4>
+                            <ul class="footer-links">
+                                <?php foreach ($menu['items'] as $item): 
+                                    if (isset($item['is_active']) && $item['is_active'] === false) continue;
+                                    $url = $item['url'] ?? '#';
+                                    $label = $item['name'] ?? ($item['title'] ?? 'Link');
+                                ?>
+                                    <li><a href="<?php echo (strpos($url, 'http') === 0) ? $url : app_base_url($url); ?>"><?php echo htmlspecialchars($label); ?></a></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
                 
                 <div class="footer-bottom">
-                    <div class="footer-logo">
-                        <!-- Optional: SVG Logo or Site Name -->
-                        <span class="udemy-style-logo"><?php echo htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Civil Cal')); ?></span>
-                    </div>
+                    <?php
+                    $site_name = \App\Services\SettingsService::get('site_name', 'Civil Cal');
+                    $site_meta = \App\Services\SettingsService::get('site_meta', []);
+                    ?>
                     <div class="copyright-text">
-                        <?php 
-                        $footer_text = \App\Services\SettingsService::get('footer_text');
-                        if (!empty($footer_text)) {
-                            echo str_replace('{year}', date('Y'), $footer_text);
-                        } else {
-                            echo '&copy; ' . date('Y') . ' ' . htmlspecialchars(\App\Services\SettingsService::get('site_name', 'Civil Cal')) . '. All Rights Reserved.';
-                        } 
-                        ?>
+                        <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars($site_name); ?>. All Rights Reserved.</p>
+                        <p>Made with <i class="fas fa-heart" style="color: #ff5e5e;"></i> in <?php echo htmlspecialchars($site_meta['country'] ?? 'Nepal'); ?> by BeardBishwo</p>
                     </div>
                 </div>
             </div>

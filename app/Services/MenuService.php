@@ -19,6 +19,13 @@ class MenuService {
     }
 
     /**
+     * Get the full menu object for a specific location
+     */
+    public function getMenu($location) {
+        return $this->menuModel->findByLocation($location);
+    }
+
+    /**
      * Set menu items for a location (Admin usage)
      */
     public function set($location, $items) {

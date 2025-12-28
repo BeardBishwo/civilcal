@@ -317,28 +317,62 @@ class ContentController extends Controller
 
     public function saveMenus()
     {
-        $user = Auth::user();
-        if (!$user || !$user->is_admin) {
-            http_response_code(403);
-            die('Access denied');
-        }
-
+        $this->requireAdmin();
         $id = $_POST['id'] ?? null;
         $data = [
             'name' => $_POST['name'] ?? '',
             'location' => $_POST['location'] ?? '',
-            'items' => $_POST['items'] ?? '[]', // Expected JSON string
-            'is_active' => isset($_POST['is_active']) ? 1 : 0
+            'is_active' => isset($_POST['is_active']) ? 1 : 0,
+            'items' => $_POST['items'] ?? '[]'
         ];
 
+        $menuModel = new Menu();
         if ($id) {
-            $this->menuModel->update($id, $data);
+            $menuModel->update($id, $data);
         } else {
-            $this->menuModel->create($data);
+            $menuModel->create($data);
         }
 
-        header('Location: ' . app_base_url('admin/content/menus'));
-        exit;
+        $this->redirect('/admin/content/menus');
+    }
+
+    /**
+     * AJAX Method: Quick assign a menu to a location
+     */
+    public function quickAssignLocation()
+    {
+        $this->requireAdmin();
+        
+        $location = $_POST['location'] ?? null;
+        $menuId = $_POST['menu_id'] ?? null;
+
+        if (!$location) {
+            return $this->json(['success' => false, 'message' => 'Location is required']);
+        }
+
+        $menuModel = new Menu();
+
+        // 1. Clear this location from any other menu (optional but recommended for exclusivity)
+        // Find if any other menu has this location
+        $existing = $menuModel->getAll(['location' => $location]);
+        foreach ($existing as $ex) {
+            if ($ex['id'] != $menuId) {
+                $menuModel->update($ex['id'], ['location' => '']); // Clear it
+            }
+        }
+
+        // 2. Assign to the new menu
+        if ($menuId) {
+            $result = $menuModel->update($menuId, ['location' => $location]);
+            if ($result) {
+                return $this->json(['success' => true, 'message' => 'Menu assigned successfully']);
+            }
+        } else {
+            // If menuId is null/0, it means the user selected "Select Menu" (Unassign)
+            return $this->json(['success' => true, 'message' => 'Location cleared successfully']);
+        }
+
+        return $this->json(['success' => false, 'message' => 'Failed to assign menu']);
     }
 
     public function uploadMedia()
@@ -579,6 +613,66 @@ class ContentController extends Controller
             echo json_encode(['success' => false, 'message' => 'An unexpected error occurred']);
         }
         exit;
+    }
+
+    // AJAX Method: Quick assign a menu to a location
+    public function quickAssignLocation()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $location = $_POST['location'] ?? null;
+        $menuId = $_POST['menu_id'] ?? null;
+
+        if (!$location || !$menuId) {
+            echo json_encode(['success' => false, 'message' => 'Missing parameters']);
+            return;
+        }
+
+        $result = $this->menuModel->update($menuId, ['location' => $location]);
+
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Menu assigned successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to assign menu']);
+        }
+    }
+
+    /**
+     * AJAX Method: Toggle menu active status
+     */
+    public function toggleMenuStatus()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $menuId = $_POST['id'] ?? null;
+        if (!$menuId) {
+            echo json_encode(['success' => false, 'message' => 'Menu ID is required']);
+            return;
+        }
+
+        $menu = $this->menuModel->find($menuId);
+        if (!$menu) {
+            echo json_encode(['success' => false, 'message' => 'Menu not found']);
+            return;
+        }
+
+        $newActive = $menu['is_active'] ? 0 : 1;
+        $result = $this->menuModel->update($menuId, ['is_active' => $newActive]);
+
+        if ($result) {
+            $status = $newActive ? 'activated' : 'deactivated';
+            echo json_encode(['success' => true, 'message' => "Menu $status successfully"]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to toggle status']);
+        }
     }
 
     public function updateMedia($id)

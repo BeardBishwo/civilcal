@@ -797,6 +797,18 @@ $router->add(
     ["auth", "admin"],
 );
 $router->add(
+    "POST",
+    "/admin/content/menus/quick-assign",
+    "Admin\\ContentController@quickAssignLocation",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/content/menus/toggle-status",
+    "Admin\\ContentController@toggleMenuStatus",
+    ["auth", "admin"],
+);
+$router->add(
     "GET",
     "/admin/content/menus/create",
     "Admin\\ContentController@createMenu",
@@ -1775,6 +1787,99 @@ $router->add('GET', '/payment/callback/{gateway}', 'PaymentController@callback')
 $router->add('POST', '/payment/webhook/{gateway}', 'PaymentController@webhook');
 $router->add('GET', '/payment/webhook/{gateway}', 'PaymentController@webhook');
 $router->add('GET', '/payment/failed', 'PaymentController@failed');
+
+// ============================================
+// ENTERPRISE QUIZ MODULE ROUTES
+// ============================================
+
+// Admin Dashboard
+$router->add("GET", "/admin/quiz", "Admin\\Quiz\\QuizDashboardController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/dashboard", "Admin\\Quiz\\QuizDashboardController@index", ["auth", "admin"]);
+
+// Syllabus (Categories/Subjects/Topics)
+$router->add("GET", "/admin/quiz/syllabus", "Admin\\Quiz\\SyllabusController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/categories/store", "Admin\\Quiz\\SyllabusController@storeCategory", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/categories/update/{id}", "Admin\\Quiz\\SyllabusController@updateCategory", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/categories/delete/{id}", "Admin\\Quiz\\SyllabusController@deleteCategory", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/subjects/store", "Admin\\Quiz\\SyllabusController@storeSubject", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/subjects/update/{id}", "Admin\\Quiz\\SyllabusController@updateSubject", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/subjects/delete/{id}", "Admin\\Quiz\\SyllabusController@deleteSubject", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/topics/store", "Admin\\Quiz\\SyllabusController@storeTopic", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/topics/update/{id}", "Admin\\Quiz\\SyllabusController@updateTopic", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/topics/delete/{id}", "Admin\\Quiz\\SyllabusController@deleteTopic", ["auth", "admin"]);
+// AJAX Helpers
+$router->add("GET", "/admin/quiz/get-subjects/{id}", "Admin\\Quiz\\SyllabusController@getSubjects", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/get-topics/{id}", "Admin\\Quiz\\SyllabusController@getTopics", ["auth", "admin"]);
+
+// Question Bank
+$router->add("GET", "/admin/quiz/questions", "Admin\\Quiz\\QuestionBankController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/questions/create", "Admin\\Quiz\\QuestionBankController@create", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/questions/store", "Admin\\Quiz\\QuestionBankController@store", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/questions/edit/{id}", "Admin\\Quiz\\QuestionBankController@edit", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/questions/update/{id}", "Admin\\Quiz\\QuestionBankController@update", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/questions/delete/{id}", "Admin\\Quiz\\QuestionBankController@delete", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/questions/search", "Admin\\Quiz\\QuestionBankController@searchJson", ["auth", "admin"]);
+
+
+// Leaderboard Manager
+$router->add("GET", "/admin/quiz/leaderboard", "Admin\\Quiz\\LeaderboardController@index", ["auth", "admin"]);
+
+// Exam/Mock Test Manager
+$router->add("GET", "/admin/quiz/exams", "Admin\\Quiz\\ExamController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/exams/create", "Admin\\Quiz\\ExamController@create", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/exams/store", "Admin\\Quiz\\ExamController@store", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/exams/edit/{id}", "Admin\\Quiz\\ExamController@edit", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/exams/update/{id}", "Admin\\Quiz\\ExamController@update", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/exams/builder/{id}", "Admin\\Quiz\\ExamController@builder", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/exams/add-question", "Admin\\Quiz\\ExamController@addQuestionToExam", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/exams/remove-question", "Admin\\Quiz\\ExamController@removeQuestionFromExam", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/analytics", "Admin\\Quiz\\ResultsController@index", ["auth", "admin"]);
+
+
+// ============================================
+// FRONTEND QUIZ PORTAL ROUTES
+// ============================================
+$router->add("GET", "/quiz", "Quiz\\PortalController@index");
+$router->add("GET", "/quiz/overview/{slug}", "Quiz\\PortalController@overview");
+
+// Quiz Exam Engine
+$router->add("GET", "/quiz/start/{slug}", "Quiz\\ExamEngineController@start", ["auth"]);
+$router->add("GET", "/quiz/room/{id}", "Quiz\\ExamEngineController@room", ["auth"]);
+$router->add("POST", "/quiz/save-answer", "Quiz\\ExamEngineController@saveAnswer", ["auth"]); // AJAX
+$router->add("POST", "/quiz/submit", "Quiz\\ExamEngineController@submit", ["auth"]);
+$router->add("GET", "/quiz/result/{id}", "Quiz\\ExamEngineController@result", ["auth"]);
+$router->add("GET", "/quiz/leaderboard", "Quiz\\LeaderboardController@index");
+
+
+// Multiplayer / Ghost Mode Routes
+$router->add("GET", "/quiz/multiplayer", "Quiz\\MultiplayerController@index", ["auth"]);
+$router->add("POST", "/quiz/lobby/create", "Quiz\\MultiplayerController@create", ["auth"]);
+$router->add("POST", "/quiz/lobby/join", "Quiz\\MultiplayerController@join", ["auth"]);
+$router->add("GET", "/quiz/lobby/{code}", "Quiz\\MultiplayerController@lobby", ["auth"]);
+// API Pulse
+$router->add("GET", "/api/lobby/{code}/status", "Quiz\\MultiplayerController@status", ["auth"]);
+$router->add("POST", "/api/lobby/wager", "Quiz\\MultiplayerController@placeWager", ["auth"]);
+
+// Gamification / Civil City Routes
+$router->add("GET", "/quiz/city", "Quiz\\GamificationController@city", ["auth"]);
+$router->add("GET", "/quiz/shop", "Quiz\\GamificationController@shop", ["auth"]);
+$router->add("GET", "/quiz/battle-pass", "Quiz\\GamificationController@battlePass", ["auth"]);
+
+// Gamification APIs
+$router->add("POST", "/api/city/build", "Quiz\\GamificationController@build", ["auth"]);
+$router->add("POST", "/api/shop/purchase", "Quiz\\GamificationController@purchaseLifeline", ["auth"]);
+$router->add("POST", "/api/quiz/use-lifeline", "Quiz\\GamificationController@useLifeline", ["auth"]);
+$router->add("POST", "/api/battle-pass/claim", "Quiz\\GamificationController@claimReward", ["auth"]);
+
+// Engineering Firms (Guilds)
+$router->add("GET", "/quiz/firms", "Quiz\\FirmController@index", ["auth"]);
+$router->add("GET", "/quiz/firms/dashboard", "Quiz\\FirmController@dashboard", ["auth"]);
+$router->add("POST", "/api/firms/create", "Quiz\\FirmController@create", ["auth"]);
+$router->add("POST", "/api/firms/donate", "Quiz\\FirmController@donate", ["auth"]);
+$router->add("POST", "/api/firms/handle-request", "Quiz\\FirmController@handleJoinRequest", ["auth"]);
+$router->add("GET", "/quiz/firms/leave", "Quiz\\FirmController@leave", ["auth"]);
+
+
 
 // ============================================
 // CALCULATOR PERMALINK CATCH-ALL ROUTE

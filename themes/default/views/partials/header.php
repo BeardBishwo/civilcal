@@ -261,7 +261,7 @@ if (
     <div class="top-header has-content">
         <div class="container margin-auto">
             <ul>
-                <?php foreach ($topMenuItems as $item): 
+                <?php foreach ($topMenuItems as $index => $item): 
                     // Skip inactive items
                     if (isset($item['is_active']) && $item['is_active'] === false) continue;
                     
@@ -273,6 +273,7 @@ if (
                 ?>
                 <li>
                     <a href="<?php echo (strpos($tUrl, 'http') === 0) ? $tUrl : app_base_url($tUrl); ?>">
+                        <?php if($index === 0): ?><span class="top-header-notice">Notice</span><?php endif; ?>
                         <?php if($tIcon): ?><i class="<?php echo htmlspecialchars($tIcon); ?>"></i><?php endif; ?>
                         <span><?php echo htmlspecialchars($tLabel); ?></span>
                     </a>
@@ -376,6 +377,46 @@ if (
                                 ['title' => 'MEP', 'url' => '/mep', 'icon' => 'fa-tools'],
                             ];
                         }
+                        
+                        // Inject Quiz Menu Item if not present
+                        $hasQuiz = false;
+                        foreach ($primaryMenuItems as $item) {
+                            $t = $item['name'] ?? ($item['title'] ?? ($item['label'] ?? ''));
+                            if (stripos($t, 'Quiz') !== false) {
+                                $hasQuiz = true;
+                                break;
+                            }
+                        }
+                        if (!$hasQuiz) {
+                            // Inject Gamification Hub
+                            array_unshift($primaryMenuItems, 
+                                [
+                                    'title' => 'My City', 
+                                    'url' => '/quiz/city', 
+                                    'icon' => 'fa-city', 
+                                    'is_active' => true
+                                ],
+                                [
+                                    'title' => 'Shop', 
+                                    'url' => '/quiz/shop', 
+                                    'icon' => 'fa-store', 
+                                    'is_active' => true
+                                ],
+                                [
+                                    'title' => 'Battle Pass', 
+                                    'url' => '/quiz/battle-pass', 
+                                    'icon' => 'fa-ticket-alt', 
+                                    'is_active' => true
+                                ],
+                                [
+                                    'title' => 'Quiz Portal', 
+                                    'url' => '/quiz', 
+                                    'icon' => 'fa-graduation-cap', 
+                                    'is_active' => true
+                                ]
+                            );
+                        }
+
 
                         foreach ($primaryMenuItems as $item):
                             // Skip inactive items

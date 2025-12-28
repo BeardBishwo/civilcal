@@ -893,6 +893,24 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                         </a>
                     </li>
 
+                    <!-- Quiz System -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/quiz') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('admin/quiz'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-graduation-cap"></i>
+                            <span class="nav-text">Quiz System</span>
+                            <i class="nav-arrow fas fa-chevron-right"></i>
+                        </a>
+                        <ul class="nav-submenu">
+                            <li><a href="<?php echo app_base_url('admin/quiz'); ?>">Dashboard</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/exams'); ?>">Exam Manager</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/syllabus'); ?>">Syllabus Tree</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/questions'); ?>">Question Bank</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/analytics'); ?>">Results & Analytics</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/leaderboard'); ?>">Leaderboard</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/settings'); ?>">Settings</a></li>
+                        </ul>
+                    </li>
+
 
                     <!-- Activity Logs -->
                     <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/activity') !== false ? 'active' : ''; ?>">

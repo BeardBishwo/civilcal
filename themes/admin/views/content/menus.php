@@ -171,13 +171,29 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
                                                 <td>
                                                     <div class="menu-info">
                                                         <div class="menu-name"><?php echo htmlspecialchars($menu['name']); ?></div>
-                                                        <div class="menu-location-text"><?php echo htmlspecialchars($menu['location']); ?> Menu</div>
+                                                        <div class="menu-location-text">
+                                                            <?php 
+                                                            $loc = $menu['location'];
+                                                            if (strpos($loc, 'footer_') === 0) echo 'Footer Column ' . substr($loc, 7);
+                                                            elseif ($loc === 'top_header') echo 'Top Notif. Bar';
+                                                            else echo htmlspecialchars(ucfirst($loc));
+                                                            ?>
+                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div class="location-badge">
-                                                        <i class="fas fa-<?php echo $menu['location'] === 'header' ? 'arrow-up' : ($menu['location'] === 'footer' ? 'arrow-down' : 'mobile-alt'); ?>"></i>
-                                                        <?php echo ucfirst($menu['location']); ?>
+                                                        <?php 
+                                                        $icon = 'map-marker-alt';
+                                                        $label = ucfirst($loc);
+                                                        if ($loc === 'header') $icon = 'arrow-up';
+                                                        elseif ($loc === 'footer') $icon = 'arrow-down';
+                                                        elseif ($loc === 'mobile') $icon = 'mobile-alt';
+                                                        elseif ($loc === 'top_header') { $icon = 'bullhorn'; $label = 'Top Header'; }
+                                                        elseif (strpos($loc, 'footer_') === 0) { $icon = 'columns'; $label = 'Footer ' . substr($loc, 7); }
+                                                        ?>
+                                                        <i class="fas fa-<?php echo $icon; ?>"></i>
+                                                        <?php echo $label; ?>
                                                     </div>
                                                 </td>
                                                 <td>
@@ -317,7 +333,7 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
             <div class="card-content-compact">
                 <div class="locations-grid">
                     <!-- Top Header -->
-                    <div class="location-card">
+                    <div class="location-card" data-location="top_header">
                         <div class="location-icon info">
                             <i class="fas fa-bullhorn"></i>
                         </div>
@@ -338,7 +354,7 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
                     </div>
 
                     <!-- Main Header -->
-                    <div class="location-card">
+                    <div class="location-card" data-location="header">
                         <div class="location-icon primary">
                             <i class="fas fa-arrow-up"></i>
                         </div>
@@ -359,7 +375,7 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
                     </div>
 
                     <!-- Mobile Menu -->
-                    <div class="location-card">
+                    <div class="location-card" data-location="mobile">
                         <div class="location-icon warning">
                             <i class="fas fa-mobile-alt"></i>
                         </div>
@@ -380,7 +396,7 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
                     </div>
 
                     <!-- Footer Col 1 -->
-                    <div class="location-card">
+                    <div class="location-card" data-location="footer_1">
                         <div class="location-icon success">
                             <i class="fas fa-columns"></i>
                         </div>
@@ -401,7 +417,7 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
                     </div>
 
                     <!-- Footer Col 2 -->
-                    <div class="location-card">
+                    <div class="location-card" data-location="footer_2">
                         <div class="location-icon success">
                             <i class="fas fa-columns"></i>
                         </div>
@@ -422,7 +438,7 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
                     </div>
 
                     <!-- Footer Col 3 -->
-                    <div class="location-card">
+                    <div class="location-card" data-location="footer_3">
                         <div class="location-icon success">
                             <i class="fas fa-columns"></i>
                         </div>
@@ -443,7 +459,7 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
                     </div>
 
                     <!-- Footer Col 4 -->
-                    <div class="location-card">
+                    <div class="location-card" data-location="footer_4">
                         <div class="location-icon success">
                             <i class="fas fa-columns"></i>
                         </div>
@@ -591,11 +607,9 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
         // Location assignment handlers
         document.querySelectorAll('.location-select select').forEach(select => {
             select.addEventListener('change', function() {
-                const location = this.closest('.location-card').querySelector('.location-name').textContent.toLowerCase().replace(' ', '-');
+                const location = this.closest('.location-card').dataset.location;
                 const menuId = this.value;
-                if (menuId) {
-                    assignMenuToLocation(location, menuId);
-                }
+                assignMenuToLocation(location, menuId);
             });
         });
     }
@@ -730,9 +744,34 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
     // Action functions
     function toggleMenuStatus(menuId) {
         showConfirmModal('Toggle Status', 'Are you sure you want to change this menu\'s status?', () => {
-            // Implement status toggle logic
-            console.log('Toggle status for menu:', menuId);
-            showNotification('Menu status updated successfully', 'success');
+            const formData = new FormData();
+            formData.append('id', menuId);
+            
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            if (csrfToken) {
+                formData.append('csrf_token', csrfToken);
+            }
+
+            fetch('<?php echo app_base_url("admin/content/menus/toggle-status"); ?>', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showNotification(data.message || 'Failed to update status', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred while updating status', 'error');
+            });
         });
     }
 
@@ -745,9 +784,37 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
     }
 
     function assignMenuToLocation(location, menuId) {
-        // Implement menu assignment logic
-        console.log(`Assign menu ${menuId} to ${location} location`);
-        showNotification(`Menu assigned to ${location} location`, 'success');
+        const formData = new FormData();
+        formData.append('location', location);
+        formData.append('menu_id', menuId);
+
+        // Get CSRF token from meta tag
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+        if (csrfToken) {
+            formData.append('csrf_token', csrfToken);
+        }
+
+        fetch('<?php echo app_base_url("admin/content/menus/quick-assign"); ?>', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+                // Reload after a short delay to reflect changes in the table
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showNotification(data.message || 'Failed to assign menu', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('An error occurred while assigning the menu', 'error');
+        });
     }
 
 
