@@ -268,6 +268,53 @@ class ContentController extends Controller
         exit;
     }
 
+    public function createMenu()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
+
+        $data = [
+            'user' => $user,
+            'page_title' => 'Create New Menu - Admin Panel',
+            'currentPage' => 'content',
+            'is_edit' => false,
+            'menu' => null,
+            'csrf_token' => $this->generateCsrfToken()
+        ];
+
+        $this->view->render('admin/content/menu_edit', $data);
+    }
+
+    public function editMenu($id)
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
+
+        $menu = $this->menuModel->find($id);
+
+        if (!$menu) {
+            http_response_code(404);
+            die('Menu not found');
+        }
+
+        $data = [
+            'user' => $user,
+            'page_title' => 'Edit Menu - Admin Panel',
+            'currentPage' => 'content',
+            'is_edit' => true,
+            'menu' => $menu,
+            'csrf_token' => $this->generateCsrfToken()
+        ];
+
+        $this->view->render('admin/content/menu_edit', $data);
+    }
+
     public function saveMenus()
     {
         $user = Auth::user();

@@ -798,6 +798,18 @@ $router->add(
 );
 $router->add(
     "GET",
+    "/admin/content/menus/create",
+    "Admin\\ContentController@createMenu",
+    ["auth", "admin"],
+);
+$router->add(
+    "GET",
+    "/admin/content/menus/edit/{id}",
+    "Admin\\ContentController@editMenu",
+    ["auth", "admin"],
+);
+$router->add(
+    "GET",
     "/admin/content/page/create",
     "Admin\ContentController@create",
     ["auth", "admin"],

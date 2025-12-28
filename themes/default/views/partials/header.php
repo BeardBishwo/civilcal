@@ -201,6 +201,42 @@ if (
             csrfToken: "<?php echo csrf_token(); ?>"
         };
     </script>
+
+    <?php
+    // Load CSS files via ThemeManager proxy to ensure correct URL resolution
+    // for both Laragon (document root c:\laragon\www) and built-in server (document root public/)
+    $cssFiles = [
+        "theme.css",
+        "header.css",
+        "footer.css",
+        "back-to-top.css",
+        "home.css",
+        "logo-enhanced.css",
+    ];
+
+    foreach ($cssFiles as $css) {
+        $cssPath = dirname(__DIR__) . "/assets/css/" . $css;
+        $atime = file_exists($cssPath) ? filemtime($cssPath) : time();
+
+        // Use ThemeManager to generate the correct proxy URL
+        if ($themeManager) {
+            $url = $themeManager->themeUrl("assets/css/" . $css . "?v=" . $atime);
+        } else {
+            // Fallback if ThemeManager is unavailable
+            $url = app_base_url(
+                "themes/default/assets/css/" . $css . "?v=" . $atime,
+            );
+        }
+
+        echo '<link rel="stylesheet" href="' .
+            htmlspecialchars($url) .
+            '">' .
+            "\n    ";
+    }
+    ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <meta name="theme-color" content="#000000">
     <!-- Inline styles removed to ensure single source of truth in theme.css -->
 </head>
 
@@ -283,30 +319,41 @@ if (
                     <ul id="mainNavList">
                         <?php
                         $menuSvc = new \App\Services\MenuService();
-                        $primaryMenu = $menuSvc->get("primary");
-                        // The original if/else block for primaryMenu is replaced here.
-                        // The new logic directly generates the module list.
-                        ?>
-                        <?php
-                        $modules_list = [
-                            ['id' => 'civil', 'name' => 'Civil', 'icon' => 'fa-hard-hat'],
-                            ['id' => 'electrical', 'name' => 'Electrical', 'icon' => 'fa-bolt'],
-                            ['id' => 'plumbing', 'name' => 'Plumbing', 'icon' => 'fa-faucet'],
-                            ['id' => 'hvac', 'name' => 'HVAC', 'icon' => 'fa-wind'],
-                            ['id' => 'fire', 'name' => 'Fire', 'icon' => 'fa-fire-extinguisher'],
-                            ['id' => 'site', 'name' => 'Site', 'icon' => 'fa-map-marked-alt'],
-                            ['id' => 'structural', 'name' => 'Structural', 'icon' => 'fa-building'],
-                            ['id' => 'estimation', 'name' => 'Estimation', 'icon' => 'fa-calculator'],
-                            ['id' => 'mep', 'name' => 'MEP', 'icon' => 'fa-tools'],
-                            ['id' => 'project-management', 'name' => 'Project', 'icon' => 'fa-tasks'],
-                            ['id' => 'country', 'name' => 'Country', 'icon' => 'fa-globe'],
-                        ];
+                        $primaryMenuItems = $menuSvc->get("header"); // Use 'header' location as shown in admin
+                        
+                        // Fallback if menu is empty
+                        if (empty($primaryMenuItems)) {
+                            $primaryMenuItems = [
+                                ['title' => 'Civil', 'url' => '/civil', 'icon' => 'fa-hard-hat'],
+                                ['title' => 'Electrical', 'url' => '/electrical', 'icon' => 'fa-bolt'],
+                                ['title' => 'Plumbing', 'url' => '/plumbing', 'icon' => 'fa-faucet'],
+                                ['title' => 'HVAC', 'url' => '/hvac', 'icon' => 'fa-wind'],
+                                ['title' => 'Fire', 'url' => '/fire', 'icon' => 'fa-fire-extinguisher'],
+                                ['title' => 'Site', 'url' => '/site', 'icon' => 'fa-map-marked-alt'],
+                                ['title' => 'Structural', 'url' => '/structural', 'icon' => 'fa-building'],
+                                ['title' => 'Estimation', 'url' => '/estimation', 'icon' => 'fa-calculator'],
+                                ['title' => 'MEP', 'url' => '/mep', 'icon' => 'fa-tools'],
+                            ];
+                        }
 
-                        foreach ($modules_list as $mod):
+                        foreach ($primaryMenuItems as $item):
+                            $title = $item['name'] ?? ($item['title'] ?? ($item['label'] ?? 'Link'));
+                            $url = $item['url'] ?? '#';
+                            $icon = $item['icon'] ?? 'fa-link';
+                            // Ensure icon has fas/far prefix if not present
+                            if (strpos($icon, 'fa-') === 0 && strpos($icon, ' ') === false) {
+                                $icon = 'fas ' . $icon;
+                            }
                         ?>
-                            <li class="nav-item"><a href="<?php echo app_base_url($mod['id']); ?>"><i class="fas <?php echo $mod['icon']; ?>"></i><?php echo $mod['name']; ?></a></li>
+                            <li class="nav-item">
+                                <a href="<?php echo (strpos($url, 'http') === 0) ? $url : app_base_url($url); ?>">
+                                    <i class="<?php echo htmlspecialchars($icon); ?>"></i>
+                                    <span><?php echo htmlspecialchars($title); ?></span>
+                                </a>
+                            </li>
                         <?php endforeach; ?>
-                        <li class="more-menu-item has-dropdown" id="dynamicMoreItem">
+                        
+                        <li class="more-menu-item has-dropdown" id="dynamicMoreItem" style="display: none;">
                             <a href="#" aria-haspopup="true" aria-expanded="false" role="button">
                                 More <i class="fas fa-chevron-down"></i>
                             </a>
@@ -450,30 +497,18 @@ if (
 
             <div class="mobile-nav" id="mobileNav">
                 <ul>
-                    <li><a href="<?php echo app_base_url(
-                                        "civil",
-                                    ); ?>"><i class="fas fa-hard-hat"></i> Civil</a></li>
-                    <li><a href="<?php echo app_base_url(
-                                        "electrical",
-                                    ); ?>"><i class="fas fa-bolt"></i> Electrical</a></li>
-                    <li><a href="<?php echo app_base_url(
-                                        "plumbing",
-                                    ); ?>"><i class="fas fa-faucet"></i> Plumbing</a></li>
-                    <li><a href="<?php echo app_base_url(
-                                        "hvac",
-                                    ); ?>"><i class="fas fa-wind"></i> HVAC</a></li>
-                    <li><a href="<?php echo app_base_url(
-                                        "fire",
-                                    ); ?>"><i class="fas fa-fire-extinguisher"></i> Fire Protection</a></li>
-                    <li><a href="<?php echo app_base_url(
-                                        "site",
-                                    ); ?>"><i class="fas fa-map-marked-alt"></i> Site Development</a></li>
-                    <li><a href="<?php echo app_base_url(
-                                        "estimation",
-                                    ); ?>"><i class="fas fa-calculator"></i> Estimation</a></li>
-                    <li><a href="<?php echo app_base_url(
-                                        "structural",
-                                    ); ?>"><i class="fas fa-building"></i> Structural</a></li>
+                    <?php foreach ($primaryMenuItems as $item): 
+                        $title = $item['name'] ?? ($item['title'] ?? ($item['label'] ?? 'Link'));
+                        $url = $item['url'] ?? '#';
+                        $icon = $item['icon'] ?? 'fa-link';
+                        if (strpos($icon, 'fa-') === 0 && strpos($icon, ' ') === false) {
+                            $icon = 'fas ' . $icon;
+                        }
+                    ?>
+                        <li><a href="<?php echo (strpos($url, 'http') === 0) ? $url : app_base_url($url); ?>">
+                            <i class="<?php echo htmlspecialchars($icon); ?>"></i> <?php echo htmlspecialchars($title); ?>
+                        </a></li>
+                    <?php endforeach; ?>
                 </ul>
             </div>
     </header>
@@ -565,7 +600,6 @@ if (
                 const hamburgerBtn = document.getElementById('hamburgerBtn');
                 const mobileNav = document.getElementById('mobileNav');
                 const themeToggleBtn = document.getElementById('themeToggleBtn');
-                const searchSuggestions = document.getElementById('searchSuggestions');
 
                 // Scroll effect for header
                 window.addEventListener('scroll', function() {
@@ -743,11 +777,11 @@ if (
 
                 // Close mobile menu and any open dropdowns when clicking outside the header
                 document.addEventListener('click', function(event) {
-                    if (!header.contains(event.target)) {
-                        mobileNav.classList.remove('active');
-                        hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    if (header && !header.contains(event.target)) {
+                        if (mobileNav) mobileNav.classList.remove('active');
+                        if (hamburgerBtn) hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
                         // Close any open dropdowns
-                        document.querySelectorAll('.has-dropdown.open').forEach(d => d.classList.remove('open'));
+                        document.querySelectorAll('.has-dropdown.open, .has-dropdown.active').forEach(d => d.classList.remove('open', 'active'));
                         // Update aria-expanded attributes
                         document.querySelectorAll('.has-dropdown [aria-expanded="true"]').forEach(el => el.setAttribute('aria-expanded', 'false'));
                     }

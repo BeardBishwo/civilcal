@@ -10,7 +10,7 @@ if ($show_footer): ?>
         <?php 
         // Inject Footer Ad
         if (class_exists('App\Helpers\AdHelper')) {
-            echo \App\Helpers\AdHelper::render('footer_top');
+            echo \App\Helpers\AdHelper::show('footer_top');
         }
         ?>
         <?php include __DIR__ . '/project-selector.php'; ?>
