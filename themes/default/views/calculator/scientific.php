@@ -75,6 +75,8 @@ $page_title = $title ?? ('Scientific Calculator - ' . $site_title);
                     <div id="historyList" class="history-list"></div>
                 </div>
             </div>
+
+            <?php echo \App\Helpers\AdHelper::show('result_bottom', 'mt-4 text-center'); ?>
         </main>
     </div>
 

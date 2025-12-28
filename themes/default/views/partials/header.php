@@ -162,6 +162,7 @@ if (
     <?php
     // --- SCHEMA MARKUP START ---
     require_once $basePath . '/app/Helpers/SchemaHelper.php';
+    require_once $basePath . '/app/Helpers/AdHelper.php';
     
     // 1. WebApplication / SoftwareApplication
     if (isset($_SERVER['CALCULATOR_ID'])) {
@@ -200,47 +201,11 @@ if (
             csrfToken: "<?php echo csrf_token(); ?>"
         };
     </script>
-    <meta name="theme-color" content="#000000">
-
-    <link rel="icon" href="<?php echo htmlspecialchars($favicon); ?>">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('public/assets/css/global-notifications.css'); ?>">
-    <?php
-    // Load CSS files via ThemeManager proxy to ensure correct URL resolution
-    // for both Laragon (document root c:\laragon\www) and built-in server (document root public/)
-    $cssFiles = [
-        "theme.css",
-        "header.css",
-        "footer.css",
-        "back-to-top.css",
-        "home.css",
-        "logo-enhanced.css",
-    ];
-    foreach ($cssFiles as $css) {
-        $cssPath = dirname(__DIR__) . "/assets/css/" . $css;
-        $mtime = file_exists($cssPath) ? filemtime($cssPath) : time();
-
-        // Use ThemeManager to generate the correct proxy URL
-        if ($themeManager) {
-            $url = $themeManager->themeUrl("assets/css/" . $css . "?v=" . $mtime);
-        } else {
-            // Fallback if ThemeManager is unavailable
-            $url = app_base_url(
-                "themes/default/assets/css/" . $css . "?v=" . $mtime,
-            );
-        }
-
-        echo '<link rel="stylesheet" href="' .
-            htmlspecialchars($url) .
-            '">' .
-            "\n    ";
-    }
-    ?>
     <!-- Inline styles removed to ensure single source of truth in theme.css -->
 </head>
 
 <body class="<?php echo htmlspecialchars($body_class); ?>">
+    <?php echo \App\Helpers\AdHelper::show('header_top'); ?>
     <header class="site-header" id="siteHeader">
         <div class="header-content">
             <div class="header-left">

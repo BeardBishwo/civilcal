@@ -165,6 +165,8 @@ function formatUnitSymbol($symbol) {
                     </div>
                 </div>
 
+                <?php echo \App\Helpers\AdHelper::show('result_bottom', 'mt-4 mb-4 text-center'); ?>
+
                 <!-- Results Log -->
                 <div class="results-log">
                     <div class="d-flex justify-content-between align-items-center mb-4">

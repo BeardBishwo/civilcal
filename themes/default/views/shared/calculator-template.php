@@ -198,6 +198,8 @@ function renderCalculator($calculatorId, $pageTitle = null, $description = null,
                             <i class="fas fa-clock me-1"></i> <?php echo $result['metadata']['execution_time']; ?>
                         </small>
                     </div>
+
+                    <?php echo \App\Helpers\AdHelper::show('result_bottom', 'mt-5 ad-slot-result'); ?>
                 </div>
             <?php endif; ?>
         </div>

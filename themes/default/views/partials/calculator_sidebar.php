@@ -10,7 +10,8 @@
     </div>
 
     <div class="sidebar-search">
-        <div class="position-relative">
+        <?php echo \App\Helpers\AdHelper::show('sidebar_top', 'sidebar-ad-wrapper mt-3 px-3'); ?>
+        <div class="position-relative mt-3">
             <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
             <input type="text" id="sidebarSearch" class="form-control ps-5" placeholder="Search tools..." oninput="filterSidebar()">
         </div>
@@ -83,6 +84,8 @@
             </a>
             <?php endforeach; ?>
         <?php endif; ?>
+
+        <?php echo \App\Helpers\AdHelper::show('sidebar_bottom', 'sidebar-ad-wrapper mt-4 px-3 text-center'); ?>
     </nav>
 </aside>
 

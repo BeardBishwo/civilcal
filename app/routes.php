@@ -17,6 +17,10 @@ $router->add("GET", "/report", "ReportController@index");
 $router->add("POST", "/report/submit", "ReportController@submit");
 $router->add("GET", "/pages/preview/{id}", "HomeController@pagePreview");
 
+// Blog Public Routes
+$router->add("GET", "/blog", "BlogController@index");
+$router->add("GET", "/blog/{slug}", "BlogController@show");
+
 // Authentication Routes
 $router->add("GET", "/login", "AuthController@showLogin", ["guest"]);
 $router->add("POST", "/login", "AuthController@login", ["guest"]);
@@ -257,6 +261,14 @@ $router->add("GET", "/admin/advertisements/edit/{id}", "Admin\AdvertisementContr
 $router->add("POST", "/admin/advertisements/update/{id}", "Admin\AdvertisementController@update", ["auth", "admin"]);
 $router->add("POST", "/admin/advertisements/delete/{id}", "Admin\AdvertisementController@delete", ["auth", "admin"]);
 $router->add("POST", "/admin/advertisements/toggle/{id}", "Admin\AdvertisementController@toggle", ["auth", "admin"]);
+
+// Blog Management
+$router->add("GET", "/admin/blog", "Admin\BlogController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/blog/create", "Admin\BlogController@create", ["auth", "admin"]);
+$router->add("POST", "/admin/blog/store", "Admin\BlogController@store", ["auth", "admin"]);
+$router->add("GET", "/admin/blog/edit/{id}", "Admin\BlogController@edit", ["auth", "admin"]);
+$router->add("POST", "/admin/blog/update/{id}", "Admin\BlogController@update", ["auth", "admin"]);
+$router->add("POST", "/admin/blog/delete/{id}", "Admin\BlogController@delete", ["auth", "admin"]);
 
 // Logo & Branding Settings
 $router->add("GET", "/admin/logo-settings", "Admin\LogoController@index", [
