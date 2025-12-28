@@ -176,4 +176,16 @@ class Controller
 
         return $valid && $notExpired;
     }
+
+    /**
+     * Get calculator categories for sidebar
+     */
+    protected function getConverterCategories()
+    {
+        // Check if DB is initialized
+        if (isset($this->db)) {
+            return $this->db->find('calc_unit_categories', [], 'display_order ASC');
+        }
+        return [];
+    }
 }

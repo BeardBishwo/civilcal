@@ -1,4 +1,13 @@
 <?php 
+/**
+ * Calculator Platform - Scientific Calculator
+ * 
+ * Full-screen scientific calculator interface.
+ * Features:
+ * - Advanced Math Functions (Trig, Log, Pow)
+ * - Calculation History
+ * - Keyboard Support
+ */
 $site_meta = get_site_meta();
 $site_title = defined('APP_NAME') ? APP_NAME : $site_meta['title'];
 $page_title = $title ?? ('Scientific Calculator - ' . $site_title); 
@@ -17,29 +26,7 @@ $page_title = $title ?? ('Scientific Calculator - ' . $site_title);
 </head>
 <body>
     <div class="layout-wrapper">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <a href="<?php echo app_base_url('/calculator'); ?>" class="sidebar-brand">
-                    <?php if (!empty($site_meta['logo'])): ?>
-                        <img src="<?php echo htmlspecialchars($site_meta['logo']); ?>" alt="<?php echo htmlspecialchars($site_title); ?>" style="max-height: 40px; width: auto;">
-                    <?php else: ?>
-                        <i class="bi bi-grid-fill me-2 text-primary"></i><?php echo htmlspecialchars($site_title); ?>
-                    <?php endif; ?>
-                </a>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="<?php echo app_base_url('/calculator/scientific'); ?>" class="nav-category active">
-                    <i class="bi bi-cpu"></i>
-                    <span>Scientific</span>
-                </a>
-                <?php foreach ($categories as $cat): ?>
-                <a href="<?php echo app_base_url('/calculator/converter/' . $cat['slug']); ?>" class="nav-category">
-                    <i class="<?php echo $cat['icon']; ?>"></i>
-                    <span><?php echo htmlspecialchars($cat['name']); ?></span>
-                </a>
-                <?php endforeach; ?>
-            </nav>
-        </aside>
+        <?php include __DIR__ . '/../partials/calculator_sidebar.php'; ?>
 
         <main class="main-content">
             <div class="calc-standalone-card shadow-2xl">

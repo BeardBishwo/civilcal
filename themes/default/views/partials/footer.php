@@ -40,6 +40,9 @@ if ($show_footer): ?>
             onerror="console.error('Error loading header.js:', event)"
             onload="console.log('Header script loaded successfully')">
     </script>
+    <script src="<?php echo $tm->themeUrl('assets/js/favorites.js'); ?>" defer></script>
+    <script src="<?php echo $tm->themeUrl('assets/js/calculator-export.js'); ?>" defer></script>
+    
     
     <!-- Back to Top Script -->
     <script src="<?php echo $tm->themeUrl('assets/js/back-to-top.js'); ?>" 

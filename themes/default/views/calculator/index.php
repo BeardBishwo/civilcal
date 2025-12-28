@@ -1,7 +1,11 @@
 <?php 
+/**
+ * Calculator Platform - Landing Page
+ */
 $site_meta = get_site_meta();
 $site_title = defined('APP_NAME') ? APP_NAME : $site_meta['title'];
 $page_title = $title ?? $site_title; 
+$current_uri = $_SERVER['REQUEST_URI'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,35 +22,7 @@ $page_title = $title ?? $site_title;
 <body>
     <div class="layout-wrapper">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <a href="<?php echo app_base_url('/calculator'); ?>" class="sidebar-brand">
-                    <?php if (!empty($site_meta['logo'])): ?>
-                        <img src="<?php echo htmlspecialchars($site_meta['logo']); ?>" alt="<?php echo htmlspecialchars($site_title); ?>" style="max-height: 40px; width: auto;">
-                    <?php else: ?>
-                        <i class="bi bi-grid-fill me-2 text-primary"></i><?php echo htmlspecialchars($site_title); ?>
-                    <?php endif; ?>
-                </a>
-            </div>
-
-            <div class="sidebar-search">
-                <div class="position-relative">
-                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                    <input type="text" id="sidebarSearch" class="form-control ps-5" placeholder="Search converters..." oninput="filterSidebar()">
-                </div>
-            </div>
-
-            <nav class="sidebar-nav">
-                <?php foreach ($categories as $cat): ?>
-                <a href="<?php echo app_base_url('/calculator/converter/' . $cat['slug']); ?>" 
-                   class="nav-category" 
-                   data-name="<?php echo htmlspecialchars($cat['name']); ?>">
-                    <i class="<?php echo $cat['icon']; ?>"></i>
-                    <span><?php echo htmlspecialchars($cat['name']); ?></span>
-                </a>
-                <?php endforeach; ?>
-            </nav>
-        </aside>
+        <?php include __DIR__ . '/../partials/calculator_sidebar.php'; ?>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -70,47 +46,119 @@ $page_title = $title ?? $site_title;
                 </div>
             </div>
 
+            <div class="row g-4 mb-5">
+                <div class="col-12">
+                     <h3 class="fw-bold mb-4">Scientific Modules</h3>
+                     <div class="dashboard-grid">
+                        <div class="db-card position-relative">
+                            <span class="badge-overlay badge-essential">ESSENTIAL</span>
+                            <button class="card-favorite-btn position-absolute top-0 end-0 m-2 btn btn-sm text-danger border-0 bg-transparent" data-slug="math/trigonometry" data-name="Mathematics"><i class="bi bi-heart"></i></button>
+                            <a href="<?php echo app_base_url('/calculator/math/trigonometry'); ?>" class="text-decoration-none text-white d-block">
+                                <i class="bi bi-calculator"></i>
+                                <h4>Mathematics</h4>
+                                <p>Algebra, Geometry, Trig</p>
+                            </a>
+                        </div>
+                        <div class="db-card position-relative">
+                            <span class="badge-overlay badge-editor">EDITOR'S CHOICE</span>
+                            <button class="card-favorite-btn position-absolute top-0 end-0 m-2 btn btn-sm text-danger border-0 bg-transparent" data-slug="finance/loan" data-name="Finance"><i class="bi bi-heart"></i></button>
+                            <a href="<?php echo app_base_url('/calculator/finance/loan'); ?>" class="text-decoration-none text-white d-block">
+                                <i class="bi bi-cash-coin"></i>
+                                <h4>Finance</h4>
+                                <p>Loans, Investment, Salary</p>
+                            </a>
+                        </div>
+                        <div class="db-card position-relative">
+                            <span class="badge-overlay badge-new">NEW</span>
+                            <button class="card-favorite-btn position-absolute top-0 end-0 m-2 btn btn-sm text-danger border-0 bg-transparent" data-slug="datetime/nepali" data-name="Date & Time"><i class="bi bi-heart"></i></button>
+                            <a href="<?php echo app_base_url('/calculator/datetime/duration'); ?>" class="text-decoration-none text-white d-block">
+                                <i class="bi bi-calendar-date"></i>
+                                <h4>Date & Time</h4>
+                                <p>Diff, Adder, Nepali Date</p>
+                            </a>
+                        </div>
+                        <div class="db-card position-relative">
+                            <span class="badge-overlay badge-popular">POPULAR</span>
+                            <button class="card-favorite-btn position-absolute top-0 end-0 m-2 btn btn-sm text-danger border-0 bg-transparent" data-slug="health/bmi" data-name="Health"><i class="bi bi-heart"></i></button>
+                            <a href="<?php echo app_base_url('/calculator/health/bmi'); ?>" class="text-decoration-none text-white d-block">
+                                <i class="bi bi-activity"></i>
+                                <h4>Health</h4>
+                                <p>BMI, BMR, Calories</p>
+                            </a>
+                        </div>
+                        <div class="db-card position-relative">
+                            <button class="card-favorite-btn position-absolute top-0 end-0 m-2 btn btn-sm text-danger border-0 bg-transparent" data-slug="physics/velocity" data-name="Physics"><i class="bi bi-heart"></i></button>
+                            <a href="<?php echo app_base_url('/calculator/physics/velocity'); ?>" class="text-decoration-none text-white d-block">
+                                <i class="bi bi-lightning-charge"></i>
+                                <h4>Physics</h4>
+                                <p>Force, Energy, Ohms</p>
+                            </a>
+                        </div>
+                        <div class="db-card position-relative">
+                            <span class="badge-overlay badge-new">NEW</span>
+                            <button class="card-favorite-btn position-absolute top-0 end-0 m-2 btn btn-sm text-danger border-0 bg-transparent" data-slug="chemistry/molar-mass" data-name="Chemistry"><i class="bi bi-heart"></i></button>
+                            <a href="<?php echo app_base_url('/calculator/chemistry/molar-mass'); ?>" class="text-decoration-none text-white d-block">
+                                <i class="bi bi-radioactive"></i>
+                                <h4>Chemistry</h4>
+                                <p>Molar Mass, pH, Gas Laws</p>
+                            </a>
+                        </div>
+                        <div class="db-card position-relative">
+                            <button class="card-favorite-btn position-absolute top-0 end-0 m-2 btn btn-sm text-danger border-0 bg-transparent" data-slug="statistics/basic" data-name="Statistics"><i class="bi bi-heart"></i></button>
+                            <a href="<?php echo app_base_url('/calculator/statistics/basic'); ?>" class="text-decoration-none text-white d-block">
+                                <i class="bi bi-bar-chart-steps"></i>
+                                <h4>Statistics</h4>
+                                <p>Mean, Median, Probability</p>
+                            </a>
+                        </div>
+                     </div>
+                </div>
+            </div>
+
             <div class="row g-4">
                 <div class="col-12">
-                    <h3 class="fw-bold mb-4">Popular Tools</h3>
+                    <h3 class="fw-bold mb-4">Popular Converters</h3>
                     <div class="dashboard-grid">
-                        <a href="<?php echo app_base_url('/calculator/scientific'); ?>" class="db-card">
-                            <i class="bi bi-calculator-fill"></i>
-                            <h4>Scientific</h4>
-                            <p>Advanced math & history</p>
-                        </a>
-                        <a href="<?php echo app_base_url('/calculator/converter/length'); ?>" class="db-card">
-                            <i class="bi bi-rulers"></i>
-                            <h4>Length</h4>
-                            <p>Meters, Feet, Miles, etc.</p>
-                        </a>
-                        <a href="<?php echo app_base_url('/calculator/converter/mass-weight'); ?>" class="db-card">
-                            <i class="bi bi-scales"></i>
-                            <h4>Weight</h4>
-                            <p>KG, Pounds, Grams, etc.</p>
-                        </a>
-                        <a href="<?php echo app_base_url('/calculator/converter/area'); ?>" class="db-card">
-                            <i class="bi bi-bounding-box-circles"></i>
-                            <h4>Area</h4>
-                            <p>SQM, Acres, Hectares, etc.</p>
-                        </a>
+                        <div class="db-card position-relative">
+                            <span class="badge-overlay badge-popular">POPULAR</span>
+                            <button class="card-favorite-btn position-absolute top-0 end-0 m-2 btn btn-sm text-danger border-0 bg-transparent" data-slug="converter/length" data-name="Length Converter" data-category="Converters"><i class="bi bi-heart"></i></button>
+                            <a href="<?php echo app_base_url('/calculator/converter/length'); ?>" class="text-decoration-none text-white d-block">
+                                <i class="bi bi-rulers"></i>
+                                <h4>Length</h4>
+                                <p>Meters, Feet, Miles</p>
+                            </a>
+                        </div>
+                        <div class="db-card position-relative">
+                            <span class="badge-overlay badge-essential">ESSENTIAL</span>
+                            <button class="card-favorite-btn position-absolute top-0 end-0 m-2 btn btn-sm text-danger border-0 bg-transparent" data-slug="converter/mass-weight" data-name="Weight Converter" data-category="Converters"><i class="bi bi-heart"></i></button>
+                            <a href="<?php echo app_base_url('/calculator/converter/mass-weight'); ?>" class="text-decoration-none text-white d-block">
+                                <i class="bi bi-scales"></i>
+                                <h4>Weight</h4>
+                                <p>KG, Pounds, Grams</p>
+                            </a>
+                        </div>
+                        <div class="db-card position-relative">
+                            <button class="card-favorite-btn position-absolute top-0 end-0 m-2 btn btn-sm text-danger border-0 bg-transparent" data-slug="converter/area" data-name="Area Converter" data-category="Converters"><i class="bi bi-heart"></i></button>
+                            <a href="<?php echo app_base_url('/calculator/converter/area'); ?>" class="text-decoration-none text-white d-block">
+                                <i class="bi bi-bounding-box-circles"></i>
+                                <h4>Area</h4>
+                                <p>SQM, Acres, Hectares</p>
+                            </a>
+                        </div>
+                        <div class="db-card position-relative">
+                            <button class="card-favorite-btn position-absolute top-0 end-0 m-2 btn btn-sm text-danger border-0 bg-transparent" data-slug="converter/volume" data-name="Volume Converter" data-category="Converters"><i class="bi bi-heart"></i></button>
+                            <a href="<?php echo app_base_url('/calculator/converter/volume'); ?>" class="text-decoration-none text-white d-block">
+                                <i class="bi bi-box"></i>
+                                <h4>Volume</h4>
+                                <p>Liters, Gallons, Cups</p>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <script>
-        function filterSidebar() {
-            const query = document.getElementById('sidebarSearch').value.toLowerCase();
-            const items = document.querySelectorAll('.nav-category');
-            
-            items.forEach(item => {
-                const name = item.getAttribute('data-name').toLowerCase();
-                item.style.display = name.includes(query) ? 'flex' : 'none';
-            });
-        }
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
 </body>

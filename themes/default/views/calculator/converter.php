@@ -1,4 +1,14 @@
 <?php 
+/**
+ * Calculator Platform - Converter View
+ * 
+ * Handles layout and logic for all unit conversions.
+ * Features:
+ * - Dynamic Sidebar & Branding
+ * - Linear Layout (From -> Swap -> To)
+ * - Scientific Shortcuts
+ * - Result Logging
+ */
 $site_meta = get_site_meta();
 $site_title = defined('APP_NAME') ? APP_NAME : $site_meta['title'];
 $page_title = $title ?? ($category['name'] . ' Converter - ' . $site_title); 
@@ -36,26 +46,8 @@ function formatUnitSymbol($symbol) {
 <body>
     <div class="layout-wrapper">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <a href="<?php echo app_base_url('/calculator'); ?>" class="sidebar-brand">
-                    <?php if (!empty($site_meta['logo'])): ?>
-                        <img src="<?php echo htmlspecialchars($site_meta['logo']); ?>" alt="<?php echo htmlspecialchars($site_title); ?>" style="max-height: 40px; width: auto;">
-                    <?php else: ?>
-                        <i class="bi bi-grid-fill me-2 text-primary"></i><?php echo htmlspecialchars($site_title); ?>
-                    <?php endif; ?>
-                </a>
-            </div>
-            <nav class="sidebar-nav">
-                <?php foreach ($categories as $cat): ?>
-                <a href="<?php echo app_base_url('/calculator/converter/' . $cat['slug']); ?>" 
-                   class="nav-category <?php echo ($cat['slug'] == $category['slug']) ? 'active' : ''; ?>">
-                    <i class="<?php echo $cat['icon']; ?>"></i>
-                    <span><?php echo htmlspecialchars($cat['name']); ?></span>
-                </a>
-                <?php endforeach; ?>
-            </nav>
-        </aside>
+        <!-- Sidebar -->
+        <?php include __DIR__ . '/../partials/calculator_sidebar.php'; ?>
 
         <!-- Main Content -->
         <main class="main-content">

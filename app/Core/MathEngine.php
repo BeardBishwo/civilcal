@@ -3,10 +3,10 @@
 namespace App\Core;
 
 /**
- * Universal Calculator Engine
- * Powers all calculators across the platform
+ * Math Engine (formerly Universal Calculator Engine)
+ * Powers basic math and unit conversion features
  */
-class CalculatorEngine
+class MathEngine
 {
     private $precision = 10;
     private $history = [];

@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
-use App\Core\CalculatorEngine;
+use App\Core\MathEngine;
 
 class CalculatorController extends Controller
 {
@@ -12,7 +12,7 @@ class CalculatorController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->engine = new CalculatorEngine();
+        $this->engine = new MathEngine();
     }
 
     private function getCategories()

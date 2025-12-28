@@ -456,7 +456,7 @@ if (
                                         <span class="text">Admin Panel</span>
                                     </a>
                                 <?php endif; ?>
-                                <a href="#" class="menu-item" id="favoritesMenuItem">
+                                <a href="#" class="menu-item" id="favoritesMenuItem" onclick="const w=document.getElementById('favorites-widget'); if(w){w.scrollIntoView({behavior:'smooth'});}else{window.location.href='<?php echo app_base_url('/calculator'); ?>';} return false;">
                                     <i class="fas fa-star" style="color: #f59e0b;"></i>
                                     <span class="text">Favorites</span>
                                 </a>
@@ -588,15 +588,8 @@ if (
 
             // Favorites and Help functionality
             (function() {
-                const favoritesItem = document.getElementById('favoritesMenuItem');
+                // Favorites Logic dealt with inline or via separate script
                 const helpItem = document.getElementById('helpMenuItem');
-
-                if (favoritesItem) {
-                    favoritesItem.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        showNotification('Favorites feature coming soon!', 'info');
-                    });
-                }
             })();
 
 

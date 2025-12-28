@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
-use App\Core\CalculatorEngine;
+use App\Core\MathEngine;
 
 class MathCalculatorController extends Controller
 {
@@ -12,7 +12,7 @@ class MathCalculatorController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->engine = new CalculatorEngine();
+        $this->engine = new MathEngine();
     }
 
     /**
@@ -190,6 +190,26 @@ class MathCalculatorController extends Controller
     }
 
     /**
+     * Volume Calculator
+     */
+    public function volume()
+    {
+        $this->view->render('calculators/math/volume', [
+            'title' => 'Volume Calculator'
+        ]);
+    }
+
+    /**
+     * Surface Area Calculator
+     */
+    public function surface_area()
+    {
+        $this->view->render('calculators/math/surface_area', [
+            'title' => 'Surface Area Calculator'
+        ]);
+    }
+
+    /**
      * Statistics Calculator
      */
     public function statistics()
@@ -317,7 +337,25 @@ class MathCalculatorController extends Controller
     // Quadratic Equation Calculator
     public function quadratic()
     {
-        $this->view->render('calculators/math/quadratic', ['title' => 'Quadratic Equation Calculator']);
+        $this->view->render('calculators/math/quadratic', ['title' => 'Quadratic Equation Solver']);
+    }
+
+    // Linear Equations Calculator
+    public function linear_equations()
+    {
+        $this->view->render('calculators/math/linear_equations', ['title' => 'Linear Equations Solver']);
+    }
+
+    // Trigonometry Calculator
+    public function trigonometry()
+    {
+        $this->view->render('calculators/math/trigonometry', ['title' => 'Trigonometric Functions']);
+    }
+
+    // Right Triangle Calculator
+    public function right_triangle()
+    {
+        $this->view->render('calculators/math/right_triangle', ['title' => 'Right Triangle Solver']);
     }
 
     // Pythagorean Theorem Calculator

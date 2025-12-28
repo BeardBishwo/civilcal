@@ -457,18 +457,65 @@ $router->add("GET", "/calculator/math/bmi", "MathCalculatorController@bmi");
 $router->add("GET", "/calculator/math/loan", "MathCalculatorController@loan");
 $router->add("GET", "/calculator/math/age", "MathCalculatorController@age");
 $router->add("GET", "/calculator/math/area", "MathCalculatorController@area");
+$router->add("GET", "/calculator/math/volume", "MathCalculatorController@volume");
+$router->add("GET", "/calculator/math/surface-area", "MathCalculatorController@surface_area");
+$router->add("GET", "/calculator/math/surface-area", "MathCalculatorController@surface_area");
 $router->add("GET", "/calculator/math/statistics", "MathCalculatorController@statistics");
+$router->add("GET", "/calculator/math/age", "MathCalculatorController@age"); // Legacy Age calc kept here
 $router->add("POST", "/calculator/api/bmi", "MathCalculatorController@api_bmi");
 $router->add("POST", "/calculator/api/loan", "MathCalculatorController@api_loan");
 $router->add("POST", "/calculator/api/statistics", "MathCalculatorController@api_statistics");
 $router->add("GET", "/calculator/math/gcd-lcm", "MathCalculatorController@gcd_lcm");
 $router->add("GET", "/calculator/math/quadratic", "MathCalculatorController@quadratic");
+$router->add("GET", "/calculator/math/linear-equations", "MathCalculatorController@linear_equations");
+$router->add("GET", "/calculator/math/trigonometry", "MathCalculatorController@trigonometry");
+$router->add("GET", "/calculator/math/right-triangle", "MathCalculatorController@right_triangle");
 $router->add("GET", "/calculator/math/pythagorean", "MathCalculatorController@pythagorean");
+
+// Health Calculators
+$router->add("GET", "/calculator/health/bmi", "HealthCalculatorController@bmi");
+$router->add("GET", "/calculator/health/bmr", "HealthCalculatorController@bmr");
+$router->add("GET", "/calculator/health/body-fat", "HealthCalculatorController@body_fat");
+$router->add("GET", "/calculator/health/calories", "HealthCalculatorController@calories");
+
+// Physics Calculators
+$router->add("GET", "/calculator/physics/velocity", "PhysicsCalculatorController@velocity");
+$router->add("GET", "/calculator/physics/force", "PhysicsCalculatorController@force");
+$router->add("GET", "/calculator/physics/ohms-law", "PhysicsCalculatorController@ohms_law");
+$router->add("GET", "/calculator/physics/energy", "PhysicsCalculatorController@energy");
+
+// Chemistry Calculators
+$router->add("GET", "/calculator/chemistry/molar-mass", "ChemistryCalculatorController@molar_mass");
+$router->add("GET", "/calculator/chemistry/ph", "ChemistryCalculatorController@ph");
+$router->add("GET", "/calculator/chemistry/gas-laws", "ChemistryCalculatorController@gas_laws");
+
+// Statistics Calculators
+$router->add("GET", "/calculator/statistics/basic", "StatisticsCalculatorController@basic");
+$router->add("GET", "/calculator/statistics/dispersion", "StatisticsCalculatorController@dispersion");
+$router->add("GET", "/calculator/statistics/probability", "StatisticsCalculatorController@probability");
+
+// Finance Calculators
+$router->add("GET", "/calculator/finance/loan", "FinanceCalculatorController@loan");
+$router->add("GET", "/calculator/finance/investment", "FinanceCalculatorController@investment");
+$router->add("GET", "/calculator/finance/salary", "FinanceCalculatorController@salary");
 $router->add("GET", "/calculator/math/discount", "MathCalculatorController@discount");
 $router->add("POST", "/calculator/api/gcd-lcm", "MathCalculatorController@api_gcd_lcm");
 $router->add("POST", "/calculator/api/quadratic", "MathCalculatorController@api_quadratic");
 $router->add("POST", "/calculator/api/pythagorean", "MathCalculatorController@api_pythagorean");
+$router->add("POST", "/calculator/api/pythagorean", "MathCalculatorController@api_pythagorean");
 $router->add("POST", "/calculator/api/discount", "MathCalculatorController@api_discount");
+
+// Date & Time Calculators
+$router->add("GET", "/calculator/datetime/duration", "DateTimeCalculatorController@duration");
+$router->add("GET", "/calculator/datetime/adder", "DateTimeCalculatorController@adder");
+$router->add("GET", "/calculator/datetime/workdays", "DateTimeCalculatorController@workdays");
+$router->add("GET", "/calculator/datetime/time", "DateTimeCalculatorController@time");
+$router->add("GET", "/calculator/datetime/nepali", "DateTimeCalculatorController@nepali");
+
+$router->add("POST", "/calculator/api/datetime/duration", "DateTimeCalculatorController@api_duration");
+$router->add("POST", "/calculator/api/datetime/adder", "DateTimeCalculatorController@api_adder");
+$router->add("POST", "/calculator/api/datetime/nepali", "DateTimeCalculatorController@api_nepali");
+
 
 // Finance Calculators
 $router->add("GET", "/calculator/finance/mortgage", "FinanceCalculatorController@mortgage");
@@ -553,6 +600,9 @@ $router->add("GET", "/admin/performance-dashboard", "Admin\\DashboardController@
 ]);
 
 // User Management Module Routes
+$router->add("GET", "/api/favorites", "FavoritesController@index", ["auth"]);
+$router->add("POST", "/api/favorites/toggle", "FavoritesController@toggle", ["auth"]);
+
 $router->add("GET", "/admin/users", "Admin\UserManagementController@index", [
     "auth",
     "admin",
