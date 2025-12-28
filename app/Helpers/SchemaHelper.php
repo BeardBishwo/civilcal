@@ -12,7 +12,7 @@ class SchemaHelper
         $url = app_base_url('/');
         $siteName = \App\Services\SettingsService::get('site_name', 'Civil Cal');
         $description = \App\Services\SettingsService::get('site_description', 'Professional Engineering Calculators Suite');
-        $logo = app_base_url('public/assets/images/logo.png'); // Default fallback
+        $logo = \App\Services\SettingsService::get('site_logo') ?: app_base_url('public/assets/images/logo.png');
 
         $schema = [
             '@context' => 'https://schema.org',
@@ -22,6 +22,7 @@ class SchemaHelper
             'description' => $description,
             'applicationCategory' => 'DesignApplication',
             'operatingSystem' => 'All',
+            'image' => $logo,
             'offers' => [
                 '@type' => 'Offer',
                 'price' => '0',
@@ -99,6 +100,75 @@ class SchemaHelper
             '@type' => 'BreadcrumbList',
             'itemListElement' => $itemListElement
         ];
+
+        return json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Generate BlogPosting Schema
+     */
+    public static function getBlogPostSchema($post)
+    {
+        if (empty($post)) return '';
+
+        $siteName = \App\Services\SettingsService::get('site_name', 'Civil Cal');
+        $logo = \App\Services\SettingsService::get('site_logo') ?: app_base_url('public/assets/images/logo.png');
+        
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'BlogPosting',
+            'headline' => $post['title'] ?? '',
+            'description' => $post['seo_description'] ?: ($post['excerpt'] ?? ''),
+            'image' => $post['featured_image'] ?? $logo,
+            'datePublished' => $post['created_at'] ?? date('c'),
+            'dateModified' => $post['updated_at'] ?? ($post['created_at'] ?? date('c')),
+            'author' => [
+                '@type' => 'Person',
+                'name' => $post['author_name'] ?? 'Admin'
+            ],
+            'publisher' => [
+                '@type' => 'Organization',
+                'name' => $siteName,
+                'logo' => [
+                    '@type' => 'ImageObject',
+                    'url' => $logo
+                ]
+            ],
+            'mainEntityOfPage' => [
+                '@type' => 'WebPage',
+                '@id' => app_base_url('blog/' . ($post['slug'] ?? ''))
+            ]
+        ];
+
+        return json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Generate Organization Schema
+     */
+    public static function getOrganizationSchema()
+    {
+        $siteName = \App\Services\SettingsService::get('site_name', 'Civil Cal');
+        $logo = \App\Services\SettingsService::get('site_logo') ?: app_base_url('public/assets/images/logo.png');
+        $url = app_base_url('/');
+
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Organization',
+            'name' => $siteName,
+            'url' => $url,
+            'logo' => $logo,
+            'sameAs' => [
+                // Add social profile URLs if available in settings
+                \App\Services\SettingsService::get('facebook_url'),
+                \App\Services\SettingsService::get('twitter_url'),
+                \App\Services\SettingsService::get('linkedin_url')
+            ]
+        ];
+
+        // Clean up empty sameAs entries
+        $schema['sameAs'] = array_values(array_filter($schema['sameAs']));
+        if (empty($schema['sameAs'])) unset($schema['sameAs']);
 
         return json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }

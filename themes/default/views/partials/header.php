@@ -164,16 +164,25 @@ if (
     require_once $basePath . '/app/Helpers/SchemaHelper.php';
     require_once $basePath . '/app/Helpers/AdHelper.php';
     
-    // 1. WebApplication / SoftwareApplication
+    // 1. WebApplication / SoftwareApplication / Organization / BlogPosting
     if (isset($_SERVER['CALCULATOR_ID'])) {
         // Calculator Page
         echo '<script type="application/ld+json">' . 
              \App\Helpers\SchemaHelper::getCalculatorSchema($title_safe, $desc_safe) . 
              "</script>\n";
     } elseif ($__req_path === $__base || $__req_path === $__base . '/' || strpos($__req_path, 'index.php') !== false) {
-        // Homepage
+        // Homepage - WebApplication + Organization
         echo '<script type="application/ld+json">' . 
              \App\Helpers\SchemaHelper::getHomepageSchema() . 
+             "</script>\n";
+             
+        echo '<script type="application/ld+json">' . 
+             \App\Helpers\SchemaHelper::getOrganizationSchema() . 
+             "</script>\n";
+    } elseif (isset($post) && !empty($post['slug'])) {
+        // Single Blog Post
+        echo '<script type="application/ld+json">' . 
+             \App\Helpers\SchemaHelper::getBlogPostSchema($post) . 
              "</script>\n";
     }
 
