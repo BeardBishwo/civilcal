@@ -615,31 +615,6 @@ class ContentController extends Controller
         exit;
     }
 
-    // AJAX Method: Quick assign a menu to a location
-    public function quickAssignLocation()
-    {
-        $user = Auth::user();
-        if (!$user || !$user->is_admin) {
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-            return;
-        }
-
-        $location = $_POST['location'] ?? null;
-        $menuId = $_POST['menu_id'] ?? null;
-
-        if (!$location || !$menuId) {
-            echo json_encode(['success' => false, 'message' => 'Missing parameters']);
-            return;
-        }
-
-        $result = $this->menuModel->update($menuId, ['location' => $location]);
-
-        if ($result) {
-            echo json_encode(['success' => true, 'message' => 'Menu assigned successfully']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to assign menu']);
-        }
-    }
 
     /**
      * AJAX Method: Toggle menu active status

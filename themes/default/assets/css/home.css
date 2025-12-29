@@ -653,12 +653,6 @@ body.index-page {
     left: 100%;
 }
 
-.footer-separator {
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    margin: 2rem 0;
-    border: 0;
-}
 
 .site-footer {
     text-align: center;

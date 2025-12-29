@@ -706,6 +706,52 @@
                                 </div>
                             </div>
 
+                            <!-- App Downloads -->
+                            <div class="section-divider"></div>
+                            <div class="form-section">
+                                <div class="section-title">
+                                    <span class="section-title-icon">📱</span>
+                                    App Downloads
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="play_store_url" class="form-label">🤖 Google Play Store URL</label>
+                                        <input type="url" class="form-control"
+                                            id="play_store_url"
+                                            name="play_store_url"
+                                            value="<?= htmlspecialchars($settings['play_store_url'] ?? '') ?>"
+                                            placeholder="https://play.google.com/store/apps/details?id=...">
+                                        <div class="form-text">Link to your Android app.</div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="app_store_url" class="form-label">🍎 Apple App Store URL</label>
+                                        <input type="url" class="form-control"
+                                            id="app_store_url"
+                                            name="app_store_url"
+                                            value="<?= htmlspecialchars($settings['app_store_url'] ?? '') ?>"
+                                            placeholder="https://apps.apple.com/app/...">
+                                        <div class="form-text">Link to your iOS app.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Social Presence -->
+                            <div class="section-divider"></div>
+                            <div class="form-section">
+                                <div class="section-title">
+                                    <span class="section-title-icon">🔗</span>
+                                    Social Presence
+                                </div>
+                                <div id="socialLinksContainer">
+                                    <!-- Social items will be added here via JS -->
+                                </div>
+                                <input type="hidden" name="social_links" id="socialLinksHidden">
+                                <button type="button" class="btn btn-change" id="addSocialBtn" style="margin-top: 1rem; background: #6366f1;">
+                                    <i class="fas fa-plus"></i><span>Add Social Link</span>
+                                </button>
+                                <div class="form-text" style="margin-top: 1rem;">Manage your social media presence. These will appear in the footer.</div>
+                            </div>
+
                             <!-- Additional Site Information -->
                             <div class="section-divider"></div>
                             <div class="form-section">
@@ -817,6 +863,78 @@
             }
         }
     });
+
+    // Dynamic Social Links Manager
+    const popularPlatforms = [
+        { id: 'facebook', name: 'Facebook', icon: 'fab fa-facebook-f' },
+        { id: 'twitter', name: 'Twitter / X', icon: 'fab fa-twitter' },
+        { id: 'instagram', name: 'Instagram', icon: 'fab fa-instagram' },
+        { id: 'linkedin', name: 'LinkedIn', icon: 'fab fa-linkedin-in' },
+        { id: 'youtube', name: 'YouTube', icon: 'fab fa-youtube' },
+        { id: 'telegram', name: 'Telegram', icon: 'fab fa-telegram-plane' },
+        { id: 'whatsapp', name: 'WhatsApp', icon: 'fab fa-whatsapp' },
+        { id: 'tiktok', name: 'TikTok', icon: 'fab fa-tiktok' },
+        { id: 'pinterest', name: 'Pinterest', icon: 'fab fa-pinterest-p' },
+        { id: 'github', name: 'GitHub', icon: 'fab fa-github' }
+    ];
+
+    let socialLinks = <?= json_encode($settings['social_links'] ?? []) ?>;
+    if (typeof socialLinks === 'string') {
+        try { socialLinks = JSON.parse(socialLinks); } catch(e) { socialLinks = []; }
+    }
+    if (!Array.isArray(socialLinks)) socialLinks = [];
+
+    const container = document.getElementById('socialLinksContainer');
+    const hiddenInput = document.getElementById('socialLinksHidden');
+    const addBtn = document.getElementById('addSocialBtn');
+
+    function renderSocialLinks() {
+        container.innerHTML = '';
+        socialLinks.forEach((link, index) => {
+            const div = document.createElement('div');
+            div.className = 'form-row social-link-item';
+            div.style.marginBottom = '1rem';
+            div.innerHTML = `
+                <div class="form-group" style="flex: 0 0 30%;">
+                    <select class="form-select platform-select" onchange="updateSocialLink(${index}, 'platform', this.value)">
+                        ${popularPlatforms.map(p => `<option value="${p.id}" ${link.platform === p.id ? 'selected' : ''}>${p.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <input type="url" class="form-control url-input" value="${link.url || ''}" placeholder="https://..." oninput="updateSocialLink(${index}, 'url', this.value)">
+                </div>
+                <div class="form-group" style="flex: 0 0 50px; justify-content: center; align-items: center;">
+                    <button type="button" class="btn-remove" onclick="removeSocialLink(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        updateHiddenInput();
+    }
+
+    window.updateSocialLink = function(index, field, value) {
+        socialLinks[index][field] = value;
+        updateHiddenInput();
+    };
+
+    window.removeSocialLink = function(index) {
+        socialLinks.splice(index, 1);
+        renderSocialLinks();
+    };
+
+    window.updateHiddenInput = function() {
+        hiddenInput.value = JSON.stringify(socialLinks);
+    };
+
+    addBtn.addEventListener('click', () => {
+        socialLinks.push({ platform: 'facebook', url: '' });
+        renderSocialLinks();
+    });
+
+    // Initialize
+    renderSocialLinks();
 
     // Add smooth animations on page load
     document.addEventListener('DOMContentLoaded', function() {

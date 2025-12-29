@@ -288,7 +288,13 @@ class SettingsController extends Controller
                         $value = '1';
                     }
 
-                    if (SettingsService::set($key, $value, 'string', $settingGroup)) {
+                    // Handle specific JSON fields
+                    $type = 'string';
+                    if ($key === 'social_links') {
+                        $type = 'json';
+                    }
+
+                    if (SettingsService::set($key, $value, $type, $settingGroup)) {
                         $updated++;
                         // Log the change
                         GDPRService::logActivity(
@@ -658,7 +664,7 @@ class SettingsController extends Controller
     private function isFieldInGroup($key, $group)
     {
         $groups = [
-        'general' => ['site_name', 'site_description', 'site_logo', 'favicon', 'contact_email', 'contact_address', 'contact_phone', 'default_language', 'default_timezone', 'facebook_url', 'twitter_url', 'instagram_url', 'linkedin_url', 'enable_registration', 'require_email_verification', 'maintenance_mode', 'enable_dark_mode'],
+        'general' => ['site_name', 'site_description', 'site_logo', 'favicon', 'contact_email', 'contact_address', 'contact_phone', 'default_language', 'default_timezone', 'facebook_url', 'twitter_url', 'instagram_url', 'linkedin_url', 'enable_registration', 'require_email_verification', 'maintenance_mode', 'enable_dark_mode', 'play_store_url', 'app_store_url', 'social_links'],
         'email' => ['smtp_enabled', 'smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_encryption', 'from_email', 'from_name'],
         'security' => ['enable_2fa', 'force_https', 'password_min_length', 'password_complexity', 'session_timeout', 'max_login_attempts', 'ip_whitelist_enabled', 'ip_whitelist', 'admin_ip_notification', 'log_failed_logins', 'log_admin_activity', 'log_retention_days', 'csrf_protection', 'security_headers', 'rate_limiting'],
         'advanced' => ['custom_header_code', 'custom_footer_code', 'cache_enabled', 'compression_enabled', 'enable_minification', 'enable_lazy_loading', 'debug_mode', 'error_logging', 'query_debug', 'performance_monitoring', 'api_enabled', 'require_api_key'],

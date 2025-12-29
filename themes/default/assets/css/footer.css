@@ -1,176 +1,250 @@
-/* Advanced Footer Styles - Premium Dark */
-.site-footer {
-  background-color: #1c1d1f; /* Premium Dark */
-  color: #fff;
-  padding: 60px 0 30px; /* Increased top padding for better breathing */
-  font-family: "Inter", sans-serif;
-  border-top: 1px solid #3e4143;
-  margin-top: 40px;
+/* Premium Footer Styling */
+:root {
+    --footer-bg: #0f1012;
+    --footer-text: #9ca3af;
+    --footer-heading: #ffffff;
+    --footer-accent: #6366f1;
+    --footer-accent-glow: rgba(99, 102, 241, 0.15);
+    --footer-link-hover: #ffffff;
+    --footer-border: rgba(255, 255, 255, 0.05);
 }
 
 .footer-separator {
-  display: none;
+    height: 4px;
+    background: linear-gradient(90deg, #ff5e5e 0%, #ff9a9e 50%, #ff5e5e 100%);
+    border: none;
+    margin: 0;
+    width: 100%;
+    opacity: 0.9;
+    box-shadow: 0 0 15px rgba(255, 94, 94, 0.3);
 }
 
-.footer-content-wrapper {
-  width: 100%;
+.site-footer {
+    background: var(--footer-bg);
+    color: var(--footer-text);
+    padding: 0 0 40px; /* Remove top padding to make separator flush */
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle background glow effects */
+.site-footer::before {
+    content: '';
+    position: absolute;
+    top: -150px;
+    left: -150px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.site-footer::after {
+    content: '';
+    position: absolute;
+    bottom: -150px;
+    right: -150px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255, 94, 94, 0.03) 0%, transparent 70%);
+    pointer-events: none;
 }
 
 .site-footer .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-/* Footer Grid System */
-.footer-grid {
+/* Brand Section (Centered) */
+.footer-brand-container {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 60px; /* Add padding here since it was removed from .site-footer */
+}
+
+.footer-logo-wrapper {
+    margin-bottom: 25px;
+}
+
+.footer-logo-img {
+    max-height: 140px; /* Increased from 120px */
+    width: auto;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.1));
+    transition: transform 0.3s ease;
+}
+
+.footer-logo-img:hover {
+    transform: scale(1.05);
+}
+
+.footer-logo-text {
+    font-size: 32px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    text-decoration: none;
+}
+
+.footer-tagline {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    color: #d1d5db;
+    font-weight: 400;
+}
+
+/* Social Icons */
+.footer-social-icons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.social-link {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 18px;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.social-link:hover {
+    background: var(--footer-accent);
+    color: #ffffff;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+    border-color: var(--footer-accent);
+}
+
+/* App Store Buttons */
+.footer-app-stores {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.store-btn {
+    transition: transform 0.3s ease, filter 0.3s ease;
+    filter: brightness(0.9);
+}
+
+.store-btn:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.1);
+}
+
+/* Links Grid (4 Columns) */
+.footer-links-grid {
     display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 40px;
-    margin-bottom: 80px;
-    align-items: start;
-    justify-content: center; /* Center-ish alignment */
-}
-
-.footer-col {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  align-items: flex-start; /* Force columns to start on the same vertical line */
+    padding-top: 60px;
+    border-top: 1px solid var(--footer-border);
 }
 
 .footer-col-title {
-    color: #fff;
     font-size: 16px;
     font-weight: 700;
-    margin: 0;
-    width: 100%; /* Ensure it spans the column width */
-    letter-spacing: 0.5px;
-    text-transform: uppercase; /* More premium look */
+    color: var(--footer-heading);
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
 }
 
+/* Removed underline indicator for cleaner look */
 .footer-col-title::after {
-    content: '';
-    display: block;
-    margin-top: 10px;
-    width: 100%; /* Complete underline as requested */
-    height: 3px;
-    background: #a435f0; 
-    border-radius: 2px;
-}
-
-/* Footer Links */
-.footer-col-links {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-}
-
-.footer-col-links li a {
-  color: #b0b0b0;
-  text-decoration: none;
-  font-size: 14px;
-  transition: color 0.3s;
-  display: block; /* Ensure links take full width for easier clicking */
-}
-
-.footer-col-links li a:hover {
-  color: #fff;
-}
-
-/* Footer Bottom Section */
-.footer-bottom {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding-top: 40px;
-    position: relative; /* For the gradient line */
-    flex-wrap: wrap;
-    gap: 12px;
-    text-align: center;
-}
-
-/* Thick Faded Red Gradient Separator */
-.footer-bottom::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 1200px;
-    height: 3px; /* Increased weight for premium feel */
-    background: linear-gradient(to right, transparent 0%, #ff4d4d 50%, transparent 100%);
-    opacity: 0.9;
-}
-
-.footer-logo {
     display: none;
 }
 
-.udemy-style-logo {
-  font-size: 28px;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: -1px;
-  background: linear-gradient(135deg, #fff 0%, #a435f0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: var(--footer-text);
+    text-decoration: none;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.footer-links a:hover {
+    color: var(--footer-link-hover);
+    /* Removed padding-left on hover for cleaner look */
+}
+
+/* Footer Bottom */
+.footer-bottom {
+    margin-top: 80px;
+    padding-top: 30px;
+    border-top: 1px solid var(--footer-border);
+    text-align: center;
 }
 
 .copyright-text {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
+    font-size: 14px;
+    color: #6b7280;
 }
 
 .copyright-text p {
-    font-size: 14px;
-    font-weight: 700; /* Bold as requested */
-    color: #ffffff; /* Light (White) as requested */
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    opacity: 0.95;
+    margin: 5px 0;
 }
 
-/* Responsive Design */
-@media (max-width: 992px) {
-  .footer-grid {
-    /* On tablet, we stick to 2 columns if more than 2 exist */
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 40px;
-  }
+/* Responsive Styles */
+@media (max-width: 1024px) {
+    .footer-links-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
 }
 
-@media (max-width: 600px) {
-  .footer-grid {
-    grid-template-columns: 1fr !important;
-    text-align: center;
-    gap: 50px;
-  }
-
-  .footer-col-title::after {
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .footer-links li a:hover {
-    transform: translateY(-3px);
-  }
-
-  .footer-bottom {
-    padding-top: 30px;
-  }
-
-  .footer-bottom::before {
-    width: 100%;
-  }
+@media (max-width: 640px) {
+    .site-footer {
+        padding: 60px 0 30px;
+    }
+    
+    .footer-brand-container {
+        margin-bottom: 40px;
+    }
+    
+    .footer-logo-img {
+        max-height: 90px;
+    }
+    
+    .footer-links-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+        text-align: center;
+    }
+    
+    .footer-col-title::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .footer-social-icons {
+        gap: 10px;
+    }
 }
