@@ -93,6 +93,12 @@ class GeolocationService
             'detection_method' => $this->isEnabled ? 'maxmind' : 'fallback'
         ];
 
+        // Check if IP is localhost or private - MaxMind can't geolocate these
+        if ($this->isLocalhostOrPrivateIP($ip)) {
+            // Use online service to get actual public IP and location
+            return $this->getLocationFromOnlineService(null, $result);
+        }
+
         if (!$this->isEnabled || !$this->reader) {
             // Fallback to online service
             return $this->getLocationFromOnlineService($ip, $result);
@@ -125,6 +131,9 @@ class GeolocationService
                     $result['longitude'] = $record['location']['longitude'] ?? $result['longitude'];
                     $result['timezone'] = $record['location']['time_zone'] ?? $result['timezone'];
                 }
+            } else {
+                // No record found in MaxMind, try online service
+                $result = $this->getLocationFromOnlineService($ip, $result);
             }
         } catch (Exception $e) {
             error_log("GeoLocation MaxMind error: " . $e->getMessage());
@@ -133,6 +142,27 @@ class GeolocationService
         }
 
         return $result;
+    }
+
+    /**
+     * Check if IP is localhost or private IP address
+     * 
+     * @param string $ip
+     * @return bool
+     */
+    private function isLocalhostOrPrivateIP($ip)
+    {
+        // Check for localhost
+        if ($ip === '127.0.0.1' || $ip === '::1' || $ip === 'localhost') {
+            return true;
+        }
+        
+        // Check for private IP ranges
+        if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            return true;
+        }
+        
+        return false;
     }
 
     /**

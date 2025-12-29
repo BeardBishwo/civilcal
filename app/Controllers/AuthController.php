@@ -6,6 +6,7 @@ use App\Core\Controller;
 use App\Core\Database;
 use App\Models\User;
 use App\Services\SecurityNotificationService;
+use App\Services\GeolocationService;
 use Exception;
 
 class AuthController extends Controller
@@ -118,9 +119,28 @@ class AuthController extends Controller
                 }
 
                 if (password_verify($password, $user->password)) {
-                    // Reset failed logins
-                    $userModel = new User();
-                    $userModel->updateLastLogin($user->id);
+                // Reset failed logins and log session with geolocation
+                $userModel = new User();
+                
+                // Get geolocation data
+                $geoService = new GeolocationService();
+                $locationData = $geoService->getLocationDetails();
+                
+                // Prepare device info
+                $deviceInfo = [
+                    'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
+                    'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? ''
+                ];
+                
+                // Prepare location info
+                $locationInfo = [
+                    'country' => $locationData['country'] ?? null,
+                    'region' => $locationData['region'] ?? null,
+                    'city' => $locationData['city'] ?? null,
+                    'timezone' => $locationData['timezone'] ?? null
+                ];
+                
+                $userModel->updateLastLogin($user->id, $deviceInfo, $locationInfo);
 
                     // Check if 2FA is required
                     $global2fa = \App\Services\SettingsService::get('enable_2fa', '0') === '1';
