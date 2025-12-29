@@ -105,6 +105,15 @@ class Media
         return $stmt->execute([$id]);
     }
 
+    public function deleteMultiple($ids)
+    {
+        if (empty($ids)) return true;
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $sql = "DELETE FROM media WHERE id IN ($placeholders)";
+        $stmt = $this->db->getPdo()->prepare($sql);
+        return $stmt->execute($ids);
+    }
+
     public function getStats()
     {
         $stmt = $this->db->getPdo()->query("
@@ -116,4 +125,110 @@ class Media
         ");
         return $stmt->fetch();
     }
+
+    /**
+     * Check usage of media items in pages, menus, and settings.
+     * Returns an array of media IDs that are currently in use.
+     */
+    public function getUsageInfo($mediaItems)
+    {
+        if (empty($mediaItems)) return [];
+
+        $pdo = $this->db->getPdo();
+        $usage = [];
+
+        foreach ($mediaItems as $item) {
+            $filename = $item['filename'];
+            $filePath = $item['file_path']; // e.g., media/images/x.png or themes/default/...
+            $id = $item['id'];
+            $isUsed = false;
+            $usedIn = [];
+
+            // Search terms: specific enough to match path, broad enough for filenames
+            $searchTermFile = "%" . $filename . "%";
+            $searchTermPath = "%" . $filePath . "%";
+
+            // 1. Check in Pages (content or meta)
+            $stmt = $pdo->prepare("SELECT id, title FROM pages WHERE content LIKE ? OR content LIKE ? OR meta_description LIKE ? OR meta_description LIKE ?");
+            $stmt->execute([$searchTermFile, $searchTermPath, $searchTermFile, $searchTermPath]);
+            $pages = $stmt->fetchAll();
+            if (!empty($pages)) {
+                $isUsed = true;
+                foreach ($pages as $p) $usedIn[] = ['type' => 'Page', 'name' => $p['title'], 'id' => $p['id']];
+            }
+
+            // 2. Check in Menus (items JSON)
+            $stmt = $pdo->prepare("SELECT id, name FROM menus WHERE items LIKE ? OR items LIKE ?");
+            $stmt->execute([$searchTermFile, $searchTermPath]);
+            $menus = $stmt->fetchAll();
+            if (!empty($menus)) {
+                $isUsed = true;
+                foreach ($menus as $m) $usedIn[] = ['type' => 'Menu', 'name' => $m['name'], 'id' => $m['id']];
+            }
+
+            // 3. Check in Settings
+            $stmt = $pdo->prepare("SELECT setting_key FROM settings WHERE setting_value LIKE ? OR setting_value LIKE ?");
+            $stmt->execute([$searchTermFile, $searchTermPath]);
+            $settings = $stmt->fetchAll();
+            if (!empty($settings)) {
+                $isUsed = true;
+                foreach ($settings as $s) $usedIn[] = ['type' => 'Setting', 'name' => $s['setting_key']];
+            }
+
+            $usage[$id] = [
+                'is_used' => $isUsed,
+                'details' => $usedIn
+            ];
+        }
+
+        return $usage;
+    }
+
+    /**
+     * Find files in the storage folders that are NOT in the database.
+     */
+    public function findUntrackedFiles()
+    {
+        $untracked = [];
+
+        // 1. Standard Managed paths (relative to public/storage/)
+        $storageRoot = __DIR__ . '/../../public/storage/media/';
+        $types = ['images', 'documents', 'other'];
+        foreach ($types as $type) {
+            $dir = $storageRoot . $type . '/';
+            $this->scanFolder($dir, 'media/' . $type . '/', $untracked, $type);
+        }
+
+        // 2. Extra Theme paths (relative to public/storage/ or just relative to root)
+        // We'll treat themes/ as relative to root for URL generation later
+        $themeBase = __DIR__ . '/../../themes/default/assets/';
+        $this->scanFolder($themeBase . 'resources/', 'themes/default/assets/resources/', $untracked, 'documents');
+        $this->scanFolder($themeBase . 'images/', 'themes/default/assets/images/', $untracked, 'images');
+
+        return $untracked;
+    }
+
+    private function scanFolder($dir, $relativePrefix, &$untracked, $type)
+    {
+        if (!is_dir($dir)) return;
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach ($files as $file) {
+            if (is_dir($dir . $file)) continue;
+
+            $relativePath = $relativePrefix . $file;
+            
+            // Check if this specific path is tracked
+            $stmt = $this->db->getPdo()->prepare("SELECT id FROM media WHERE file_path = ?");
+            $stmt->execute([$relativePath]);
+            if (!$stmt->fetch()) {
+                $untracked[] = [
+                    'filename' => $file,
+                    'type' => $type,
+                    'full_path' => $dir . $file,
+                    'relative_path' => $relativePath
+                ];
+            }
+        }
+    }
+
 }

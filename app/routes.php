@@ -812,6 +812,18 @@ $router->add("POST", "/admin/content/media/update/{id}", "Admin\\ContentControll
     "auth",
     "admin",
 ]);
+$router->add("POST", "/admin/content/media/sync", "Admin\\ContentController@syncMedia", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/content/media/bulk-cleanup", "Admin\\ContentController@bulkDeleteUnused", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/content/media/bulk-delete", "Admin\\ContentController@bulkDeleteMedia", [
+    "auth",
+    "admin",
+]);
 $router->add(
     "POST",
     "/admin/content/menus/save",

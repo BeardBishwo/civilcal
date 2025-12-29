@@ -135,15 +135,29 @@ class ContentController extends Controller
             // Get media using Model with error handling
             $mediaData = $this->mediaModel->getAll($filters, $page, 20);
 
+            // Get usage info for these items
+            $usageInfo = $this->mediaModel->getUsageInfo($mediaData['data']);
+
             // Transform data for view if necessary
-            $media = array_map(function ($item) {
+            $media = array_map(function ($item) use ($usageInfo) {
+                $filePath = $item['file_path'];
+                $url = app_base_url('/public/storage/' . $filePath);
+                
+                // If it's a theme path, don't prefix with public/storage/
+                if (strpos($filePath, 'themes/') === 0) {
+                    $url = app_base_url($filePath);
+                }
+
                 return [
                     'id' => $item['id'],
                     'filename' => $item['original_filename'],
-                    'url' => app_base_url('/storage/' . $item['file_path']),
+                    'url' => $url,
                     'type' => $item['mime_type'],
                     'size' => $this->formatSize($item['file_size']),
-                    'uploaded_at' => $item['created_at']
+                    'width' => $item['width'] ?? null,
+                    'height' => $item['height'] ?? null,
+                    'uploaded_at' => $item['created_at'],
+                    'usage' => $usageInfo[$item['id']] ?? ['is_used' => false, 'details' => []]
                 ];
             }, $mediaData['data']);
 
@@ -495,6 +509,17 @@ class ContentController extends Controller
 
                 // Move uploaded file
                 if (move_uploaded_file($tmpName, $filePath)) {
+                    // Collect image dimensions if applicable
+                    $width = null;
+                    $height = null;
+                    if ($fileType === 'images') {
+                        $imageInfo = @getimagesize($filePath);
+                        if ($imageInfo) {
+                            $width = $imageInfo[0];
+                            $height = $imageInfo[1];
+                        }
+                    }
+
                     // Save to database
                     $mediaId = $this->mediaModel->create([
                         'original_filename' => $originalFilename,
@@ -503,6 +528,8 @@ class ContentController extends Controller
                         'file_size' => $fileSize,
                         'file_type' => $fileType,
                         'mime_type' => $mimeType,
+                        'width' => $width,
+                        'height' => $height,
                         'uploaded_by' => $user->id
                     ]);
 
@@ -756,6 +783,162 @@ class ContentController extends Controller
         $logMessage = "[$timestamp] ERROR: $message $contextStr" . PHP_EOL;
 
         error_log($logMessage, 3, $logFile);
+    }
+
+    /**
+     * AJAX Method: Scan disk for untracked files and add them to DB
+     */
+    public function syncMedia()
+    {
+        $this->requireAdmin();
+        
+        // Validate CSRF token
+        $token = $_POST['csrf_token'] ?? '';
+        if (!$this->validateCsrfToken($token)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            return;
+        }
+
+        $untracked = $this->mediaModel->findUntrackedFiles();
+        $syncedCount = 0;
+        $user = Auth::user();
+
+        foreach ($untracked as $file) {
+            $fullPath = $file['full_path'];
+            if (!file_exists($fullPath)) continue;
+
+            $fileSize = filesize($fullPath);
+            $mimeType = mime_content_type($fullPath);
+            
+            $width = null;
+            $height = null;
+            if (strpos($mimeType, 'image/') === 0) {
+                $imageInfo = @getimagesize($fullPath);
+                if ($imageInfo) {
+                    $width = $imageInfo[0];
+                    $height = $imageInfo[1];
+                }
+            }
+
+            // Create DB record
+            $mediaId = $this->mediaModel->create([
+                'original_filename' => $file['filename'],
+                'filename' => $file['filename'],
+                'file_path' => $file['relative_path'],
+                'file_size' => $fileSize,
+                'file_type' => $file['type'],
+                'mime_type' => $mimeType,
+                'width' => $width,
+                'height' => $height,
+                'uploaded_by' => $user->id
+            ]);
+
+            if ($mediaId) $syncedCount++;
+        }
+
+        echo json_encode([
+            'success' => true, 
+            'message' => "$syncedCount new files discovered and added to library."
+        ]);
+    }
+
+    /**
+     * AJAX Method: Delete all media items NOT in use
+     */
+    public function bulkDeleteUnused()
+    {
+        $this->requireAdmin();
+        
+        // Validate CSRF token
+        $token = $_POST['csrf_token'] ?? '';
+        if (!$this->validateCsrfToken($token)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            return;
+        }
+
+        // 1. Get ALL media
+        $allMedia = $this->mediaModel->getAll([], 1, 1000); // Limit to 1000 for safety
+        if (empty($allMedia['data'])) {
+            echo json_encode(['success' => false, 'message' => 'No media found to cleanup.']);
+            return;
+        }
+
+        // 2. Get usage info
+        $usageInfo = $this->mediaModel->getUsageInfo($allMedia['data']);
+        $deletedCount = 0;
+
+        foreach ($allMedia['data'] as $item) {
+            $id = $item['id'];
+            if (!isset($usageInfo[$id]) || !$usageInfo[$id]['is_used']) {
+                // Not used - Delete physical file
+                $filePath = $item['file_path'];
+                $fullPath = __DIR__ . '/../../../public/storage/' . $filePath;
+                if (strpos($filePath, 'themes/') === 0) {
+                    $fullPath = __DIR__ . '/../../../' . $filePath;
+                }
+
+                if (file_exists($fullPath)) {
+                    @unlink($fullPath);
+                }
+                // Delete from DB
+                if ($this->mediaModel->delete($id)) {
+                    $deletedCount++;
+                }
+            }
+        }
+
+        echo json_encode([
+            'success' => true, 
+            'message' => "Cleanup complete. Removed $deletedCount unused files."
+        ]);
+    }
+
+    /**
+     * AJAX Method: Delete multiple selected media items
+     */
+    public function bulkDeleteMedia()
+    {
+        $this->requireAdmin();
+        
+        // Validate CSRF token
+        $token = $_POST['csrf_token'] ?? '';
+        if (!$this->validateCsrfToken($token)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            return;
+        }
+
+        $ids = $_POST['ids'] ?? [];
+        if (empty($ids) || !is_array($ids)) {
+            echo json_encode(['success' => false, 'message' => 'No items selected for deletion.']);
+            return;
+        }
+
+        $deletedCount = 0;
+        foreach ($ids as $id) {
+            $item = $this->mediaModel->find($id);
+            if ($item) {
+                // Delete physical file
+                $filePath = $item['file_path'];
+                $fullPath = __DIR__ . '/../../../public/storage/' . $filePath;
+                if (strpos($filePath, 'themes/') === 0) {
+                    $fullPath = __DIR__ . '/../../../' . $filePath;
+                }
+
+                if (file_exists($fullPath)) {
+                    @unlink($fullPath);
+                }
+                
+                // Delete from DB
+                if ($this->mediaModel->delete($id)) {
+                    $deletedCount++;
+                }
+            }
+        }
+
+        echo json_encode([
+            'success' => true, 
+            'message' => "Successfully deleted $deletedCount items."
+        ]);
     }
 
     /**
