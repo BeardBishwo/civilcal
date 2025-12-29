@@ -461,6 +461,75 @@
             </div>
         </div>
         
+        <!-- Location & Login Security Section -->
+        <div class="security-section">
+            <div class="section-header" style="background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%);">
+                <span class="section-icon">📍</span>
+                <div class="section-title-group">
+                    <h2>Location & Login Security</h2>
+                    <p>Monitor and alert on suspicious login patterns and locations</p>
+                </div>
+            </div>
+
+            <div class="section-body">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="enable_location_alerts" name="enable_location_alerts" value="1" <?= ($settings['enable_location_alerts'] ?? '1') == '1' ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="enable_location_alerts">Enable New Location Alerts</label>
+                    <div class="form-text">Send email notifications when users log in from a new location.</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="location_alert_sensitivity" class="form-label">Location Detection Sensitivity</label>
+                        <select class="form-select" id="location_alert_sensitivity" name="location_alert_sensitivity">
+                            <option value="city" <?= ($settings['location_alert_sensitivity'] ?? 'city') == 'city' ? 'selected' : '' ?>>City Level - Most Sensitive</option>
+                            <option value="region" <?= ($settings['location_alert_sensitivity'] ?? '') == 'region' ? 'selected' : '' ?>>Region/State Level</option>
+                            <option value="country" <?= ($settings['location_alert_sensitivity'] ?? '') == 'country' ? 'selected' : '' ?>>Country Level - Least Sensitive</option>
+                        </select>
+                        <div class="form-text">Higher sensitivity means more alerts but better security.</div>
+                    </div>
+                </div>
+                
+                <div class="settings-divider"></div>
+                
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="enable_suspicious_detection" name="enable_suspicious_detection" value="1" <?= ($settings['enable_suspicious_detection'] ?? '1') == '1' ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="enable_suspicious_detection">Enable Suspicious Login Detection</label>
+                    <div class="form-text">Automatically detect and flag suspicious login patterns (impossible travel, rapid location changes).</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="impossible_travel_threshold" class="form-label">Impossible Travel Threshold (Hours)</label>
+                        <input type="number" class="form-control" id="impossible_travel_threshold" name="impossible_travel_threshold" placeholder="1" value="<?= htmlspecialchars($settings['impossible_travel_threshold'] ?? '1') ?>" min="1" max="24">
+                        <div class="form-text">Flag logins from different countries within this timeframe.</div>
+                    </div>
+                </div>
+                
+                <div class="settings-divider"></div>
+                
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="enable_ip_restrictions" name="enable_ip_restrictions" value="1" <?= ($settings['enable_ip_restrictions'] ?? '0') == '1' ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="enable_ip_restrictions">Enable IP-based Restrictions</label>
+                    <div class="form-text">Allow blocking specific IPs or countries from accessing the application.</div>
+                </div>
+                
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="auto_block_failed_logins" name="auto_block_failed_logins" value="1" <?= ($settings['auto_block_failed_logins'] ?? '1') == '1' ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="auto_block_failed_logins">Auto-Block After Failed Logins</label>
+                    <div class="form-text">Automatically block IPs that exceed the failed login threshold.</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="failed_login_threshold" class="form-label">Failed Login Block Threshold</label>
+                        <input type="number" class="form-control" id="failed_login_threshold" name="failed_login_threshold" placeholder="10" value="<?= htmlspecialchars($settings['failed_login_threshold'] ?? '10') ?>" min="5" max="50">
+                        <div class="form-text">Number of failed login attempts before IP is automatically blocked.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Security Logging Section -->
         <div class="security-section">
             <div class="section-header" style="background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%); border-bottom: none; color: #333;">

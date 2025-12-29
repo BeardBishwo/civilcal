@@ -6,6 +6,7 @@ use App\Core\Controller;
 use App\Core\Database;
 use App\Models\User;
 use App\Services\SecurityNotificationService;
+use App\Services\SecurityAlertService;
 use App\Services\GeolocationService;
 use Exception;
 
@@ -155,6 +156,19 @@ class AuthController extends Controller
                         }
                         header('Location: ' . app_base_url('/login/2fa'));
                         exit;
+                    }
+
+                    // Check for new location and send alert
+                    $securityAlertService = new \App\Services\SecurityAlertService();
+                    $securityAlertService->checkNewLocation($user->id, $locationData);
+
+                    // Analyze for suspicious login patterns
+                    $suspiciousDetector = new \App\Services\SuspiciousActivityDetector();
+                    $analysis = $suspiciousDetector->analyzeLogin($user->id, $locationData, $deviceInfo);
+                    
+                    // Log suspicious activity (optional: could block login if high risk)
+                    if ($analysis['suspicious'] && $analysis['risk_level'] === 'high') {
+                        error_log("High-risk login detected for user {$user->id}: " . json_encode($analysis['alerts']));
                     }
 
                     $this->createUserSession($user, $rememberMe, $isJson);

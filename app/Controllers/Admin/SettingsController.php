@@ -604,6 +604,10 @@ class SettingsController extends Controller
             'csrf_protection',
             'security_headers',
             'rate_limiting',
+            'enable_location_alerts',
+            'enable_suspicious_detection',
+            'enable_ip_restrictions',
+            'auto_block_failed_logins',
             
             // Email
             'smtp_enabled',
