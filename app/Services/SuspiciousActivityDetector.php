@@ -247,10 +247,10 @@ class SuspiciousActivityDetector
             return null;
         }
         
-        $highRiskCountries = json_decode(
-            SettingsService::get('high_risk_countries', '[]'),
-            true
-        );
+        $highRiskCountries = SettingsService::get('high_risk_countries', '[]');
+        if (is_string($highRiskCountries)) {
+            $highRiskCountries = json_decode($highRiskCountries, true) ?? [];
+        }
         
         if (in_array($countryCode, $highRiskCountries)) {
             return [

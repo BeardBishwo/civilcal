@@ -6,7 +6,6 @@ $show_footer = in_array($header_footer_visibility, ['both', 'footer_only']);
 
 if ($show_footer): ?>
     <footer class="site-footer">
-        <hr class="footer-separator">
         <?php 
         // Inject Footer Ad
         if (class_exists('App\Helpers\AdHelper')) {
@@ -17,7 +16,7 @@ if ($show_footer): ?>
         
         <div class="footer-top">
             <div class="container">
-                <!-- Brand Section: Logo, Tagline, Socials, Apps -->
+                <!-- Brand Section: Logo, Tagline -->
                 <div class="footer-brand-container">
                     <?php 
                     $site_name = \App\Services\SettingsService::get('site_name', 'Civil Cal');
@@ -28,67 +27,22 @@ if ($show_footer): ?>
                             <a href="<?= app_base_url('/') ?>">
                                 <img src="<?php echo app_base_url($site_logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" class="footer-logo-img">
                             </a>
-                        <?php else: ?>
-                            <a href="<?= app_base_url('/') ?>" class="footer-logo-text"><?php echo htmlspecialchars($site_name); ?></a>
                         <?php endif; ?>
                     </div>
                     
-                    <p class="footer-tagline">
-                        <?php echo htmlspecialchars(\App\Services\SettingsService::get('site_description', 'Advanced precision tools for engineers and professionals.')); ?>
+                    <p class="footer-about">
+                        Civil Cal is a comprehensive engineering calculator platform designed to help civil engineers, students, and professionals solve complex calculations with precision and ease. From structural analysis to material estimation, we provide the tools you need to build better.
                     </p>
-
-                    <div class="footer-social-icons">
-                        <?php 
-                        $socialLinks = \App\Services\SettingsService::get('social_links', []);
-                        if (is_string($socialLinks)) {
-                            $socialLinks = json_decode($socialLinks, true) ?? [];
-                        }
-                        
-                        $platformIcons = [
-                            'facebook' => 'fab fa-facebook-f', 'twitter' => 'fab fa-twitter',
-                            'instagram' => 'fab fa-instagram', 'linkedin' => 'fab fa-linkedin-in',
-                            'youtube' => 'fab fa-youtube', 'telegram' => 'fab fa-telegram-plane',
-                            'whatsapp' => 'fab fa-whatsapp', 'tiktok' => 'fab fa-tiktok',
-                            'pinterest' => 'fab fa-pinterest-p', 'github' => 'fab fa-github'
-                        ];
-
-                        if (!empty($socialLinks)):
-                            foreach ($socialLinks as $link):
-                                $platform = $link['platform'] ?? '';
-                                $url = $link['url'] ?? '#';
-                                $icon = $platformIcons[$platform] ?? 'fas fa-link';
-                        ?>
-                            <a href="<?php echo htmlspecialchars($url); ?>" target="_blank" class="social-link" title="<?php echo ucfirst($platform); ?>">
-                                <i class="<?php echo $icon; ?>"></i>
-                            </a>
-                        <?php endforeach; endif; ?>
-                    </div>
-
-                    <div class="footer-app-stores">
-                        <?php 
-                        $playStore = \App\Services\SettingsService::get('play_store_url');
-                        $appStore = \App\Services\SettingsService::get('app_store_url');
-                        if ($playStore): ?>
-                            <a href="<?= htmlspecialchars($playStore) ?>" target="_blank" class="store-btn">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" style="height: 40px;">
-                            </a>
-                        <?php endif; 
-                        if ($appStore): ?>
-                            <a href="<?= htmlspecialchars($appStore) ?>" target="_blank" class="store-btn">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg" alt="App Store" style="height: 40px;">
-                            </a>
-                        <?php endif; ?>
-                    </div>
                 </div>
 
-                <!-- Links Grid: 4 Columns -->
+                <!-- Links Grid: 3 Columns (Policy, Company, Find Us Here) -->
                 <div class="footer-links-grid">
                     <?php 
                     $menuService = new \App\Services\MenuService();
-                    for ($i = 1; $i <= 4; $i++) {
+                    for ($i = 1; $i <= 3; $i++) {
                         $menu = $menuService->getMenu('footer_' . $i);
                         if ($menu && !empty($menu['items'])): ?>
-                            <div class="footer-col">
+                            <div class="footer-col" id="footer-col-<?= $i ?>">
                                 <h4 class="footer-col-title"><?php echo htmlspecialchars($menu['name']); ?></h4>
                                 <ul class="footer-links">
                                     <?php foreach ($menu['items'] as $item): 
@@ -99,11 +53,64 @@ if ($show_footer): ?>
                                         <li><a href="<?php echo (strpos($url, 'http') === 0) ? $url : app_base_url($url); ?>"><?php echo htmlspecialchars($label); ?></a></li>
                                     <?php endforeach; ?>
                                 </ul>
+
+                                <?php if ($i === 2): // Play Store in Column 2 ?>
+                                    <div class="footer-app-stores">
+                                        <?php 
+                                        $playStore = \App\Services\SettingsService::get('play_store_url');
+                                        if ($playStore): ?>
+                                            <a href="<?= htmlspecialchars($playStore) ?>" target="_blank" class="store-btn">
+                                                <img src="<?= app_base_url('themes/default/assets/images/playstore.svg') ?>" alt="Get it on Google Play" style="height: 30px;">
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if ($i === 3): // App Store and Social in Column 3 ?>
+                                    <div class="footer-app-stores" style="margin-bottom: 15px;">
+                                        <?php 
+                                        $appStore = \App\Services\SettingsService::get('app_store_url');
+                                        if ($appStore): ?>
+                                            <a href="<?= htmlspecialchars($appStore) ?>" target="_blank" class="store-btn">
+                                                <img src="<?= app_base_url('themes/default/assets/images/appstore.svg') ?>" alt="Download on the App Store" style="height: 30px;">
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="footer-social-links">
+                                        <?php 
+                                        $socialLinks = \App\Services\SettingsService::get('social_links', []);
+                                        if (is_string($socialLinks)) {
+                                            $socialLinks = json_decode($socialLinks, true) ?? [];
+                                        }
+                                        
+                                        $platformIcons = [
+                                            'facebook' => 'fab fa-facebook-f', 'twitter' => 'fab fa-twitter',
+                                            'instagram' => 'fab fa-instagram', 'linkedin' => 'fab fa-linkedin-in',
+                                            'youtube' => 'fab fa-youtube', 'telegram' => 'fab fa-telegram-plane',
+                                            'whatsapp' => 'fab fa-whatsapp', 'tiktok' => 'fab fa-tiktok',
+                                            'pinterest' => 'fab fa-pinterest-p', 'github' => 'fab fa-github'
+                                        ];
+
+                                        if (!empty($socialLinks)):
+                                            foreach ($socialLinks as $link):
+                                                $platform = $link['platform'] ?? '';
+                                                $url = $link['url'] ?? '#';
+                                                $icon = $platformIcons[$platform] ?? 'fas fa-link';
+                                        ?>
+                                            <a href="<?php echo htmlspecialchars($url); ?>" target="_blank" class="social-link" title="<?php echo ucfirst($platform); ?>">
+                                                <i class="<?php echo $icon; ?>"></i>
+                                            </a>
+                                        <?php endforeach; endif; ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                     <?php endif; } ?>
                 </div>
             </div>
         </div>
+
+
+        <hr class="footer-separator">
 
         <div class="footer-bottom">
             <div class="container">

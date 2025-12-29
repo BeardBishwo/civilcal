@@ -397,7 +397,8 @@ class AuthController extends Controller
         }
 
         // Redirect based on role
-        $redirectUrl = '/';
+        $isAdmin = !empty($user['is_admin']) || ($user['role'] === 'admin');
+        $redirectUrl = $isAdmin ? app_base_url('/admin') : app_base_url('/dashboard');
 
         if ($isJson) {
             header('Content-Type: application/json');
@@ -405,7 +406,7 @@ class AuthController extends Controller
             exit;
         }
 
-        header('Location: ' . app_base_url());
+        header('Location: ' . $redirectUrl);
         exit;
     }
 
