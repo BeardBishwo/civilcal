@@ -74,7 +74,30 @@
                     </div>
                 <?php endforeach; ?>
             </div>
-            <div class="mt-auto p-3 border-top">
+            <div class="mt-auto p-3 border-top bg-light">
+                <h6 class="font-weight-bold text-gray-800 mb-3 small text-uppercase">Lifelines</h6>
+                <div class="row no-gutters mb-3">
+                    <div class="col-6 p-1">
+                        <button class="btn btn-outline-warning btn-sm btn-block" onclick="activateLifeline('50_50')" title="Remove 2 wrong answers (50 Coins)">
+                             50/50 
+                        </button>
+                    </div>
+                    <div class="col-6 p-1">
+                        <button class="btn btn-outline-info btn-sm btn-block" onclick="activateLifeline('skip')" title="Skip to next question (20 Coins)">
+                             Skip 
+                        </button>
+                    </div>
+                    <div class="col-6 p-1">
+                        <button class="btn btn-outline-success btn-sm btn-block" onclick="activateLifeline('poll')" title="Show most picked answer (100 Coins)">
+                             Poll 
+                        </button>
+                    </div>
+                    <div class="col-6 p-1">
+                        <button class="btn btn-outline-primary btn-sm btn-block" onclick="activateLifeline('freeze')" title="Pause timer for 60s (30 Coins)">
+                             Freeze 
+                        </button>
+                    </div>
+                </div>
                 <button class="btn btn-block btn-info btn-sm" onclick="toggleReview()">Mark for Review</button>
             </div>
         </div>
@@ -228,6 +251,61 @@
             b.addClass('reviewed');
         }
     };
+
+    window.activateLifeline = function(type) {
+        if (!confirm(`Using ${type.replace('_', ' ')} will cost coins. Proceed?`)) return;
+
+        const q = questions[currentIndex];
+        $.post('<?php echo app_base_url("api/quiz/lifeline/use"); ?>', { 
+            type: type,
+            question_id: q.id 
+        }, function(res) {
+            if (res.success) {
+                // alert(res.message);
+                applyLifelineEffect(type, res);
+                // Refresh Resource HUD (if present)
+                if (typeof refreshResourceHUD === 'function') refreshResourceHUD();
+            } else {
+                alert(res.message);
+            }
+        });
+    };
+
+    function applyLifelineEffect(type, data) {
+        if (type === '50_50' && data.hide_indices) {
+            data.hide_indices.forEach(idx => {
+                $('.option-card').eq(idx).css({
+                    'opacity': '0',
+                    'pointer-events': 'none',
+                    'transition': 'opacity 0.5s ease'
+                });
+            });
+        } else if (type === 'poll' && data.poll_results) {
+            $('.option-card').each(function(i) {
+                let percent = data.poll_results[i] || 0;
+                $(this).css('position', 'relative').append(`
+                    <div class="poll-bar-container" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: #e3e6f0; border-radius: 0 0 8px 8px; overflow: hidden;">
+                        <div class="poll-bar-fill" style="width: 0%; height: 100%; background: #1cc88a; transition: width 1s ease;"></div>
+                    </div>
+                    <div class="poll-percent" style="margin-left: auto; font-weight: bold; color: #1cc88a; font-size: 0.8rem; transition: opacity 0.5s;">${percent}%</div>
+                `);
+                setTimeout(() => {
+                    $(this).find('.poll-bar-fill').css('width', percent + '%');
+                }, 100);
+            });
+        } else if (type === 'skip') {
+            nav(1);
+        } else if (type === 'freeze') {
+            clearInterval(timerInterval);
+            // Change timer color to blue to show it's frozen
+            $('#timer').removeClass('text-danger').addClass('text-info');
+            setTimeout(() => {
+                timerInterval = setInterval(updateTimer, 1000);
+                $('#timer').removeClass('text-info').addClass('text-danger');
+            }, 60000);
+            alert("Timer frozen for 60 seconds!");
+        }
+    }
     
     window.submitExam = function(force = false) {
         if(!force && !confirm("Are you sure you want to submit the exam? You cannot change answers after submission.")) return;

@@ -84,6 +84,10 @@ class Controller
      */
     protected function redirect($url)
     {
+        // Use global redirect function if available or manually prepend base
+        if (function_exists('app_base_url')) {
+            $url = app_base_url($url);
+        }
         header('Location: ' . $url);
         exit;
     }

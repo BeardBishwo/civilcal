@@ -244,6 +244,9 @@ if (
             "\n    ";
     }
     ?>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <meta name="theme-color" content="#000000">
@@ -287,6 +290,7 @@ if (
             </button>
         </div>
     </div>
+    <?php include __DIR__ . '/resource_hud.php'; ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const topHeader = document.getElementById('topHeaderBar');

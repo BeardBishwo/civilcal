@@ -148,4 +148,75 @@ class CalculatorController extends Controller
         header('Location: ' . app_base_url('/calculator'));
         exit;
     }
+    /**
+     * User Dashboard
+     */
+    public function dashboard()
+    {
+        $userId = $_SESSION['user_id'];
+        
+        $userModel = new \App\Models\User();
+        $stats = $userModel->getStatistics($userId);
+        
+        $questService = new \App\Services\QuestService();
+        $rankService = new \App\Services\RankService();
+        $gamification = new \App\Services\GamificationService();
+        
+        $toolOfTheDay = $questService->getToolOfTheDay();
+        $isQuestCompleted = $questService->isCompleted($userId);
+        
+        $wallet = $gamification->getWallet($userId);
+        $rankData = $rankService->getUserRankData($stats, $wallet['coins'] ?? 0);
+
+        $this->view->render('dashboard', [
+            'user_stats' => $stats,
+            'quest' => [
+                'tool' => $toolOfTheDay,
+                'completed' => $isQuestCompleted
+            ],
+            'rank' => $rankData
+        ]);
+    }
+
+    /**
+     * Category Landing Page for CMS Calculators
+     */
+    public function category($categorySlug)
+    {
+        $calculators = $this->db->find('calculators', ['category' => $categorySlug, 'is_active' => 1]);
+        
+        $this->view->render('calculator/category', [
+            'title' => ucfirst($categorySlug) . ' Calculators',
+            'category' => $categorySlug,
+            'calculators' => $calculators
+        ]);
+    }
+
+    /**
+     * Show a specific CMS Calculator
+     */
+    public function show($categorySlug, $calculatorSlug)
+    {
+        $calculator = $this->db->findOne('calculators', [
+            'category' => $categorySlug, 
+            'calculator_id' => $calculatorSlug,
+            'is_active' => 1
+        ]);
+
+        if (!$calculator) {
+            header('Location: ' . app_base_url('/calculators'));
+            exit;
+        }
+
+        $inputs = $this->db->find('calculator_inputs', ['calculator_id' => $calculator['id']], 'order_index ASC');
+        $outputs = $this->db->find('calculator_outputs', ['calculator_id' => $calculator['id']], 'order_index ASC');
+
+        $this->view->render('calculator/show', [
+            'title' => $calculator['name'],
+            'calculator' => $calculator,
+            'inputs' => $inputs,
+            'outputs' => $outputs,
+            'config' => json_decode($calculator['config_json'], true)
+        ]);
+    }
 }

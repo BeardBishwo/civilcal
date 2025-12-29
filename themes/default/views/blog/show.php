@@ -21,6 +21,19 @@ include __DIR__ . '/../partials/header.php';
 
                     <h1 class="display-4 fw-bold mb-4"><?php echo htmlspecialchars($post['title']); ?></h1>
                     
+                    <!-- Smart Reader Reward Bar -->
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                    <div class="reader-reward-container mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-xs fw-bold text-primary"><i class="fas fa-coins me-1"></i> Read-to-Earn Ready</span>
+                            <span id="reader-status-label" class="text-xs text-muted">Reading: <span class="fw-bold text-dark">0%</span></span>
+                        </div>
+                        <div class="progress" style="height: 6px; background: rgba(0,0,0,0.05);">
+                            <div id="reader-progress-bar" class="progress-bar bg-gradient-primary" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
                     <div class="d-flex align-items-center gap-3 mb-5 text-muted small">
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-person-circle fs-5 text-primary"></i>
@@ -112,7 +125,72 @@ include __DIR__ . '/../partials/header.php';
 
 <?php include __DIR__ . '/../partials/footer.php'; ?>
 
+<?php if (isset($_SESSION['user_id'])): ?>
+<script src="<?php echo app_base_url('themes/default/assets/js/smart_reader.js'); ?>"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const reader = new SmartReader(<?= (int)$post['id'] ?>, 60); // 60 seconds target
+    });
+</script>
+<?php endif; ?>
+
 <style>
+.reader-reward-container {
+    background: rgba(79, 70, 229, 0.03);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(79, 70, 229, 0.1);
+}
+.smart-reader-bar {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 800px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 15px 25px;
+        border-radius: 50px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .dark-theme .smart-reader-bar {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    .reward-progress-container {
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+    .dark-theme .reward-progress-container {
+        background: #1e293b;
+    }
+    .reward-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4f46e5, #0ea5e9);
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+    .reader-status {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #475569;
+    }
+    .dark-theme .reader-status {
+        color: #94a3b8;
+    }
+.text-xs { font-size: 0.75rem; }
+.bg-gradient-primary { background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%); }
 .blog-post-page { background: #f8fafc; }
 .rich-text-area { 
     font-size: 1.125rem; line-height: 1.8; color: #334155; 

@@ -1841,6 +1841,8 @@ $router->add("GET", "/admin/quiz/questions/edit/{id}", "Admin\\Quiz\\QuestionBan
 $router->add("POST", "/admin/quiz/questions/update/{id}", "Admin\\Quiz\\QuestionBankController@update", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/questions/delete/{id}", "Admin\\Quiz\\QuestionBankController@delete", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/questions/search", "Admin\\Quiz\\QuestionBankController@searchJson", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/import", "Admin\\Quiz\\QuestionImportController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/import/upload", "Admin\\Quiz\\QuestionImportController@upload", ["auth", "admin"]);
 
 
 // Leaderboard Manager
@@ -1856,6 +1858,13 @@ $router->add("GET", "/admin/quiz/exams/builder/{id}", "Admin\\Quiz\\ExamControll
 $router->add("POST", "/admin/quiz/exams/add-question", "Admin\\Quiz\\ExamController@addQuestionToExam", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/exams/remove-question", "Admin\\Quiz\\ExamController@removeQuestionFromExam", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/analytics", "Admin\\Quiz\\ResultsController@index", ["auth", "admin"]);
+
+// In-Quiz Lifeline API
+$router->add("POST", "/api/quiz/lifeline/use", "Quiz\\LifelineController@use", ["auth"]);
+
+// Ecosystem Integration: Quests & Read-to-Earn
+$router->add("POST", "/api/quest/record-calculation", "QuestController@recordCalculation", ["auth"]);
+$router->add("POST", "/api/quest/news-read", "QuestController@newsRead", ["auth"]);
 
 
 // ============================================

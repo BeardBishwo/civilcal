@@ -55,6 +55,12 @@ class ProfileController extends Controller
             $exportRequests = [];
         }
 
+        // Get rank data
+        $rankService = new \App\Services\RankService();
+        $gamification = new \App\Services\GamificationService();
+        $wallet = $gamification->getWallet($userId);
+        $rankData = $rankService->getUserRankData($stats, $wallet['coins'] ?? 0);
+
         $data = [
             'user' => $user,
             'statistics' => $stats,
@@ -62,9 +68,10 @@ class ProfileController extends Controller
             'notification_preferences' => $this->userModel->getNotificationPreferencesAttribute($userId),
             'social_links' => $this->userModel->getSocialLinksAttribute($userId),
             'two_factor_status' => $twoFactorStatus,
-            'export_requests' => $exportRequests
+            'export_requests' => $exportRequests,
+            'rank_data' => $rankData
         ];
-
+        
         $this->view->render('user/profile', $data);
     }
 

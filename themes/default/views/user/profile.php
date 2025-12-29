@@ -424,12 +424,84 @@ $pageTitle = $page_title ?? 'User Profile';
             padding-left: 44px;
         }
         
-        @media (max-width: 768px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .profile-id-card { grid-template-columns: 1fr; text-align: center; }
-            .stats-grid { justify-content: center; }
-            .nav-tabs { padding-bottom: 10px; }
-            .profile-header { flex-direction: column; text-align: center; }
+        /* Rank Badge */
+        .rank-badge-container {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            z-index: 20;
+        }
+        .rank-badge {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 2px solid white;
+            transform: rotate(-10deg);
+        }
+        .rank-badge.level-1 { background: linear-gradient(135deg, #94a3b8, #64748b); } /* Intern - Silver */
+        .rank-badge.level-2 { background: linear-gradient(135deg, #10b981, #059669); } /* Asst - Emerald */
+        .rank-badge.level-3 { background: linear-gradient(135deg, #3b82f6, #2563eb); } /* Eng - Blue */
+        .rank-badge.level-4 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); } /* Snr - Purple */
+        .rank-badge.level-5 { background: linear-gradient(135deg, #f59e0b, #d97706); font-weight: 800; } /* Chief - Gold */
+
+        /* Power Meters */
+        .power-meter-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+        .meter-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .meter-bar-outer {
+            height: 12px;
+            background: #f1f5f9;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .meter-bar-inner {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+            border-radius: 6px;
+            transition: width 1s ease-out;
+        }
+        .power-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .p-stat-box {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        .p-stat-val {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1e293b;
+            display: block;
+        }
+        .p-stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -471,6 +543,20 @@ $pageTitle = $page_title ?? 'User Profile';
             <!-- Identity Card -->
             <div class="profile-id-card">
                 <div class="avatar-wrapper">
+                    <div class="rank-badge-container">
+                        <div class="rank-badge level-<?php echo $rank_data['rank_level']; ?>" title="Your Rank: <?php echo $rank_data['rank']; ?>">
+                            <i class="fas fa-<?php 
+                                echo match($rank_data['rank_level']) {
+                                    1 => 'seedling',
+                                    2 => 'hard-hat',
+                                    3 => 'drafting-compass',
+                                    4 => 'medal',
+                                    5 => 'crown',
+                                    default => 'user'
+                                };
+                            ?>"></i>
+                        </div>
+                    </div>
                     <img src="<?php 
                         $avatar = $user['avatar'] ?? null;
                         $firstName = $user['first_name'] ?? '';
@@ -494,9 +580,12 @@ $pageTitle = $page_title ?? 'User Profile';
                             <span class="badge" style="background: #fee2e2; color: #ef4444; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">Unverified</span>
                         <?php endif; ?>
                     </p>
-                    <div style="margin-top: 10px;">
+                    <div style="margin-top: 10px; display: flex; gap: 8px;">
                         <span style="background: rgba(99, 102, 241, 0.1); color: #6366f1; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
-                            <?php echo ucfirst($user['role'] ?? 'Member'); ?>
+                            <?php echo $rank_data['rank']; ?>
+                        </span>
+                        <span style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
+                            Lvl <?php echo $rank_data['rank_level']; ?>
                         </span>
                     </div>
                 </div>
@@ -516,6 +605,7 @@ $pageTitle = $page_title ?? 'User Profile';
             <!-- Navigation -->
             <div class="nav-tabs">
                 <button class="nav-tab active" onclick="switchTab('info', this)">Personal Info</button>
+                <button class="nav-tab" onclick="switchTab('prestige', this)">Prestige Center</button>
                 <button class="nav-tab" onclick="switchTab('professional', this)">Professional</button>
                 <button class="nav-tab" onclick="switchTab('social', this)">Social & Links</button>
                 <button class="nav-tab" onclick="switchTab('preferences', this)">Preferences</button>
@@ -526,7 +616,71 @@ $pageTitle = $page_title ?? 'User Profile';
             <form id="profileForm" method="POST" enctype="multipart/form-data">
                 <input type="file" id="avatarInput" name="avatar" accept="image/*" style="display: none;" onchange="handleAvatarUpload(this)">
                 
-                <!-- Tab: Personal Info -->
+                <!-- Tab: Prestige Center -->
+                <div id="tab-prestige" class="tab-content">
+                    <div class="power-meter-card" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; border: none;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px;">
+                            <div>
+                                <h2 style="color: #f1f5f9; font-size: 1.8rem; margin-bottom: 5px;">Overall Status</h2>
+                                <p style="color: #94a3b8;">Level <?php echo $rank_data['rank_level']; ?> • <?php echo $rank_data['rank']; ?></p>
+                            </div>
+                            <div style="text-align: right;">
+                                <span style="font-size: 2.5rem; font-weight: 800; color: #fbbf24;"><?php echo number_format($rank_data['total_power']); ?></span>
+                                <p style="color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Construction Power</p>
+                            </div>
+                        </div>
+
+                        <div class="meter-label">
+                            <span style="color: #e2e8f0;">Progress to <?php echo $rank_data['next_rank']; ?></span>
+                            <span style="color: #fbbf24;"><?php echo $rank_data['rank_progress']; ?>%</span>
+                        </div>
+                        <div class="meter-bar-outer" style="background: rgba(255,255,255,0.1); height: 16px;">
+                            <div class="meter-bar-inner" style="width: <?php echo $rank_data['rank_progress']; ?>%; background: linear-gradient(90deg, #fbbf24, #f59e0b);"></div>
+                        </div>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px; text-align: center;">
+                            Gain <?php echo number_format($rank_data['next_rank_power'] - $rank_data['total_power']); ?> more power to reach next tier!
+                        </p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="power-meter-card">
+                            <div class="meter-label">
+                                <span><i class="fas fa-book-reader" style="color: #6366f1;"></i> Knowledge</span>
+                                <span><?php echo $rank_data['meters']['knowledge']; ?>%</span>
+                            </div>
+                            <div class="meter-bar-outer">
+                                <div class="meter-bar-inner" style="width: <?php echo $rank_data['meters']['knowledge']; ?>%;"></div>
+                            </div>
+                            <p style="font-size: 0.75rem; color: #64748b; margin-top: 10px;">Based on News Reads & Quizzes</p>
+                        </div>
+
+                        <div class="power-meter-card">
+                            <div class="meter-label">
+                                <span><i class="fas fa-bullseye" style="color: #10b981;"></i> Precision</span>
+                                <span><?php echo $rank_data['meters']['precision']; ?>%</span>
+                            </div>
+                            <div class="meter-bar-outer">
+                                <div class="meter-bar-inner" style="width: <?php echo $rank_data['meters']['precision']; ?>%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                            </div>
+                            <p style="font-size: 0.75rem; color: #64748b; margin-top: 10px;">Based on Calculator Accuracy & Usage</p>
+                        </div>
+                    </div>
+
+                    <div class="power-stats">
+                        <div class="p-stat-box">
+                            <span class="p-stat-val"><?php echo $statistics['news_reads_count']; ?></span>
+                            <span class="p-stat-label">Articles Read</span>
+                        </div>
+                        <div class="p-stat-box">
+                            <span class="p-stat-val"><?php echo $statistics['quizzes_completed_count']; ?></span>
+                            <span class="p-stat-label">Quizzes Done</span>
+                        </div>
+                        <div class="p-stat-box">
+                            <span class="p-stat-val"><?php echo $statistics['calculations_count']; ?></span>
+                            <span class="p-stat-label">Total Calcs</span>
+                        </div>
+                    </div>
+                </div>
                 <div id="tab-info" class="tab-content active">
                     <div class="form-grid">
                         <div class="form-group form-grid-full">

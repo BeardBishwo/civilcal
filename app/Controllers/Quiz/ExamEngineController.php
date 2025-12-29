@@ -8,7 +8,7 @@ use App\Services\GamificationService;
 
 class ExamEngineController extends Controller
 {
-    private $db;
+    protected $db;
     private $gamificationService;
 
     public function __construct()
@@ -36,7 +36,7 @@ class ExamEngineController extends Controller
         // 2. Check for existing active attempt
         $stmtAttempt = $this->db->getPdo()->prepare("
             SELECT id FROM quiz_attempts 
-            WHERE user_id = :uid AND exam_id = :eid AND status = 'in_progress'
+            WHERE user_id = :uid AND exam_id = :eid AND status = 'ongoing'
         ");
         $stmtAttempt->execute(['uid' => $_SESSION['user_id'], 'eid' => $exam['id']]);
         $existing = $stmtAttempt->fetch();
@@ -46,7 +46,7 @@ class ExamEngineController extends Controller
             $this->redirect('/quiz/room/' . $existing['id']);
         } else {
             // Create New Attempt
-            $sql = "INSERT INTO quiz_attempts (user_id, exam_id, status, started_at) VALUES (:uid, :eid, 'in_progress', NOW())";
+            $sql = "INSERT INTO quiz_attempts (user_id, exam_id, status, started_at) VALUES (:uid, :eid, 'ongoing', NOW())";
             $stmtInsert = $this->db->getPdo()->prepare($sql);
             $stmtInsert->execute(['uid' => $_SESSION['user_id'], 'eid' => $exam['id']]);
             $attemptId = $this->db->getPdo()->lastInsertId();
@@ -199,71 +199,27 @@ class ExamEngineController extends Controller
             $userAns = json_decode($res['selected_options'], true);
             $correctOpts = array_filter(json_decode($res['options'], true), function($o) { return !empty($o['is_correct']); });
             
-            // Logic based on type
-            if ($res['type'] == 'mcq_single' || $res['type'] == 'true_false') {
-                 // userAns should be a single ID (or string value)
-                 // Check if valid
-                 foreach($correctOpts as $co) {
-                     // Assuming options have generated IDs or simply checking text/index equality
-                     // Since we saved options as JSON without explicit IDs in form (we might have dependent on index), 
-                     // let's rely on matching Text or Index if we implemented IDs.
-                     // The form builder didn't assign UUIDs to options, so we rely on array index match or text match.
-                     // Let's assume for now userAns is the INDEX of the option.
-                     // IMPORTANT: The frontend room needs to send index or text.
-                     // Let's assume standard is Option Index (0, 1, 2, 3).
-                     // But wait, the form builder allows deleting options, so indexes shift? 
-                     // Actually, database stores options as a blob. 
-                     // Safe way: Match the 'text' or assume the array order is preserved.
-                     // Revision: The Exam Room will send the index of the option in the array.
-                     
-                     // If userAns matches the index of a correct option
-                     if (isset($userAns) && isset($correctOpts[$userAns])) {
-                         $isCorrect = true; 
-                     }
-                     // Or strict value match needed?
-                 }
-            }
-                     // Or strict value match needed?
-                 }
-            } elseif ($res['type'] == 'numerical') {
-                 // Numerical Logic
-                 $userVal = is_numeric($userAns) ? (float)$userAns : null;
-                 if ($userVal !== null && count($correctOpts) > 0) {
-                     // Get first correct option (assuming only 1 for numerical)
-                     $firstCorrect = reset($correctOpts);
-                     $targetVal = (float)$firstCorrect['text'];
-                     $tolerance = isset($firstCorrect['tolerance']) ? (float)$firstCorrect['tolerance'] : 0;
-                     
-                     if ($userVal >= ($targetVal - $tolerance) && $userVal <= ($targetVal + $tolerance)) {
-                         $isCorrect = true;
-                     }
-                 }
-                 
-                 // If exact match needed without tolerance check (fallback)
-                 if (!$isCorrect && count($correctOpts) > 0) {
-                     // Check exact string match just in case
-                     $firstCorrect = reset($correctOpts);
-                     if ((string)$userAns === (string)$firstCorrect['text']) {
-                         $isCorrect = true;
-                     }
-                 }
-            }
-            // For MVP strictness: simple index match.  
-            // In a real robust system, I'd give UUIDs to options. 
-            // For this implementation, I will treat userAns as the INDEX (0,1,2,3).
-            
-            // Checking logic:
             // Get correct indices
             $correctIndices = array_keys($correctOpts);
             
             if ($res['type'] == 'mcq_single' || $res['type'] == 'true_false') {
-                if (in_array((int)$userAns, $correctIndices)) {
-                    $isCorrect = true;
+                if (isset($userAns) && in_array((int)$userAns, $correctIndices)) {
+                    $isCorrect = true; 
+                }
+            } elseif ($res['type'] == 'numerical') {
+                $userVal = is_numeric($userAns) ? (float)$userAns : null;
+                if ($userVal !== null && count($correctOpts) > 0) {
+                    $firstCorrect = reset($correctOpts);
+                    $targetVal = (float)$firstCorrect['text'];
+                    $tolerance = isset($firstCorrect['tolerance']) ? (float)$firstCorrect['tolerance'] : 0;
+                    
+                    if ($userVal >= ($targetVal - $tolerance) && $userVal <= ($targetVal + $tolerance)) {
+                        $isCorrect = true;
+                    }
                 }
             }
             
-            // Update the answer row with result
-            $marks = $isCorrect ? $res['default_marks'] : (-1 * abs($res['default_negative_marks']));
+            $marks = $isCorrect ? $res['default_marks'] : (-1 * abs($res['default_negative_marks'] ?? 0));
             if($userAns === null) $marks = 0; // Unanswered
 
             $totalScore += $marks;
@@ -283,6 +239,8 @@ class ExamEngineController extends Controller
         $stmtUpd = $this->db->getPdo()->prepare("
             UPDATE quiz_attempts 
             SET status = 'completed', completed_at = NOW(), score = :score 
+            WHERE id = :id
+        ");
         $stmtUpd->execute(['score' => $totalScore, 'id' => $attemptId]);
 
         // 5. Update Leaderboard Aggregates
@@ -319,8 +277,8 @@ class ExamEngineController extends Controller
 
     public function result($attemptId)
     {
-        // ... (Show Result View) ...
-         $stmt = $this->db->getPdo()->prepare("
+        // 1. Fetch Attempt Summary
+        $stmt = $this->db->getPdo()->prepare("
             SELECT a.*, e.title, e.total_marks
             FROM quiz_attempts a
             JOIN quiz_exams e ON a.exam_id = e.id
@@ -333,6 +291,21 @@ class ExamEngineController extends Controller
             $this->redirect('/quiz');
         }
 
-        $this->view('quiz/analysis/report', ['attempt' => $attempt]);
+        // 2. Fetch Incorrect Answers for "Smart Failure" Tool Linking
+        $stmtIncorrect = $this->db->getPdo()->prepare("
+            SELECT aa.*, q.question_text, q.explanation, q.related_tool_link
+            FROM quiz_attempt_answers aa
+            JOIN quiz_questions q ON aa.question_id = q.id
+            WHERE aa.attempt_id = :aid AND aa.is_correct = 0
+            AND q.related_tool_link IS NOT NULL
+            LIMIT 5
+        ");
+        $stmtIncorrect->execute(['aid' => $attemptId]);
+        $incorrectAnswers = $stmtIncorrect->fetchAll();
+
+        $this->view('quiz/analysis/report', [
+            'attempt' => $attempt,
+            'incorrect_answers' => $incorrectAnswers
+        ]);
     }
 }

@@ -67,6 +67,34 @@
                  Ideally, ExamEngineController::result() should pass $questions with user answers.
             -->
             
+            <!-- Smart Failure: Related Tools -->
+            <?php if (!empty($incorrect_answers)): ?>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="font-weight-bold m-0 text-danger">Review Areas for Improvement</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">Don't worry! Engineering is about learning from mistakes. Use these tools to master the topics you missed:</p>
+                    
+                    <div class="list-group list-group-flush">
+                        <?php foreach ($incorrect_answers as $ans): ?>
+                        <div class="list-group-item px-0 border-soft py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="pr-3">
+                                    <h6 class="mb-1 font-weight-bold"><?= strip_tags($ans['question_text']) ?></h6>
+                                    <p class="small text-muted mb-0"><?= $ans['explanation'] ?></p>
+                                </div>
+                                <a href="<?= $ans['related_tool_link'] ?>" target="_blank" class="btn btn-sm btn-outline-success text-nowrap">
+                                    <i class="fas fa-calculator mr-1"></i> Use Tool
+                                </a>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white py-3">
                     <h5 class="font-weight-bold m-0 text-primary">Next Steps</h5>

@@ -373,7 +373,7 @@ class User
         if (!$user) return null;
 
         // Get calculation count
-        $calcStmt = $this->db->getPdo()->prepare("SELECT COUNT(*) as calculation_count FROM calculation_history WHERE user_id = ?");
+        $calcStmt = $this->db->getPdo()->prepare("SELECT COUNT(*) as calculation_count FROM activity_audit_logs WHERE user_id = ? AND activity_type = 'TOOL_USED'");
         $calcStmt->execute([$userId]);
         $calcResult = $calcStmt->fetch();
 
@@ -382,9 +382,21 @@ class User
         $favStmt->execute([$userId]);
         $favResult = $favStmt->fetch();
 
+        // Get News Reads
+        $newsStmt = $this->db->getPdo()->prepare("SELECT COUNT(*) as news_count FROM activity_audit_logs WHERE user_id = ? AND activity_type = 'NEWS_READ'");
+        $newsStmt->execute([$userId]);
+        $newsResult = $newsStmt->fetch();
+
+        // Get Quizzes Completed
+        $quizStmt = $this->db->getPdo()->prepare("SELECT COUNT(*) as quiz_count FROM quiz_attempts WHERE user_id = ? AND status = 'completed'");
+        $quizStmt->execute([$userId]);
+        $quizResult = $quizStmt->fetch();
+
         return [
             'calculations_count' => $calcResult['calculation_count'] ?? 0,
             'favorites_count' => $favResult['favorites_count'] ?? 0,
+            'news_reads_count' => $newsResult['news_count'] ?? 0,
+            'quizzes_completed_count' => $quizResult['quiz_count'] ?? 0,
             'login_count' => $user['login_count'] ?? 0,
             'last_login' => $user['last_login'],
             'profile_completion' => $this->getProfileCompletion($userId)
