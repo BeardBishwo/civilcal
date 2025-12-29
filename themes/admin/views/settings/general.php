@@ -762,7 +762,19 @@
 
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="footer_text" class="form-label">📜 Footer Text</label>
+                                        <label for="footer_about_text" class="form-label">📖 Footer Column 1 About Text</label>
+                                        <textarea class="form-control"
+                                            id="footer_about_text"
+                                            name="footer_about_text"
+                                            rows="4"
+                                            placeholder="Enter the description for the first column"><?= htmlspecialchars($settings['footer_about_text'] ?? '') ?></textarea>
+                                        <div class="form-text">This is the long description that appears in the first column of the footer under the logo.</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="footer_text" class="form-label">📜 Footer Copyright Text</label>
                                         <textarea class="form-control"
                                             id="footer_text"
                                             name="footer_text"
@@ -867,7 +879,7 @@
     // Dynamic Social Links Manager
     const popularPlatforms = [
         { id: 'facebook', name: 'Facebook', icon: 'fab fa-facebook-f' },
-        { id: 'twitter', name: 'Twitter / X', icon: 'fab fa-twitter' },
+        { id: 'x', name: 'Twitter / X', icon: 'fab fa-twitter' },
         { id: 'instagram', name: 'Instagram', icon: 'fab fa-instagram' },
         { id: 'linkedin', name: 'LinkedIn', icon: 'fab fa-linkedin-in' },
         { id: 'youtube', name: 'YouTube', icon: 'fab fa-youtube' },
@@ -892,20 +904,36 @@
         container.innerHTML = '';
         socialLinks.forEach((link, index) => {
             const div = document.createElement('div');
-            div.className = 'form-row social-link-item';
-            div.style.marginBottom = '1rem';
+            // Custom styling for single-row alignment
+            div.className = 'social-link-item';
+            div.style.display = 'flex';
+            div.style.alignItems = 'center';
+            div.style.gap = '1.5rem';
+            div.style.background = '#fefefe';
+            div.style.border = '1px solid #e2e8f0';
+            div.style.padding = '1rem';
+            div.style.borderRadius = '12px';
+            div.style.marginBottom = '1.2rem';
+            div.style.boxShadow = '0 2px 5px rgba(0,0,0,0.02)';
+
+            // Use project SVGs for preview if possible
+            const svgUrl = `<?= app_base_url('themes/default/assets/images/') ?>${link.platform}.svg`;
+
             div.innerHTML = `
-                <div class="form-group" style="flex: 0 0 30%;">
-                    <select class="form-select platform-select" onchange="updateSocialLink(${index}, 'platform', this.value)">
+                <div style="flex: 0 0 50px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border-radius: 8px; width: 50px; height: 50px; border: 1px solid #edf2f7;">
+                    <img src="${svgUrl}" alt="" style="width: 24px; height: 24px; object-fit: contain;" onerror="this.src='<?= app_base_url('themes/default/assets/images/unknown.svg') ?>'">
+                </div>
+                <div style="flex: 0 0 180px;">
+                    <select class="form-select platform-select" onchange="updateSocialLink(${index}, 'platform', this.value); renderSocialLinks();" style="width: 100%; font-weight: 600;">
                         ${popularPlatforms.map(p => `<option value="${p.id}" ${link.platform === p.id ? 'selected' : ''}>${p.name}</option>`).join('')}
                     </select>
                 </div>
-                <div class="form-group" style="flex: 1;">
-                    <input type="url" class="form-control url-input" value="${link.url || ''}" placeholder="https://..." oninput="updateSocialLink(${index}, 'url', this.value)">
+                <div style="flex: 1;">
+                    <input type="url" class="form-control url-input" value="${link.url || ''}" placeholder="https://social.com/username" oninput="updateSocialLink(${index}, 'url', this.value)" style="width: 100%;">
                 </div>
-                <div class="form-group" style="flex: 0 0 50px; justify-content: center; align-items: center;">
-                    <button type="button" class="btn-remove" onclick="removeSocialLink(${index})">
-                        <i class="fas fa-trash"></i>
+                <div style="flex: 0 0 45px; display: flex; justify-content: flex-end;">
+                    <button type="button" class="btn-remove" onclick="removeSocialLink(${index})" style="background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                        <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
             `;

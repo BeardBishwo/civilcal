@@ -14,6 +14,8 @@ if ($show_footer): ?>
         ?>
         <?php include __DIR__ . '/project-selector.php'; ?>
         
+        <hr class="footer-separator">
+
         <div class="footer-top">
             <div class="container">
                 <!-- Brand Section: Logo, Tagline -->
@@ -31,11 +33,14 @@ if ($show_footer): ?>
                     </div>
                     
                     <p class="footer-about">
-                        Civil Cal is a comprehensive engineering calculator platform designed to help civil engineers, students, and professionals solve complex calculations with precision and ease. From structural analysis to material estimation, we provide the tools you need to build better.
+                        <?php 
+                        $footer_about = \App\Services\SettingsService::get('footer_about_text', 'Civil Cal is a comprehensive engineering calculator platform designed to help civil engineers, students, and professionals solve complex calculations with precision and ease. From structural analysis to material estimation, we provide the tools you need to build better.');
+                        echo nl2br(htmlspecialchars($footer_about)); 
+                        ?>
                     </p>
                 </div>
 
-                <!-- Links Grid: 3 Columns (Policy, Company, Find Us Here) -->
+                <!-- Links Grid: 3 Columns -->
                 <div class="footer-links-grid">
                     <?php 
                     $menuService = new \App\Services\MenuService();
@@ -45,70 +50,78 @@ if ($show_footer): ?>
                             <div class="footer-col" id="footer-col-<?= $i ?>">
                                 <h4 class="footer-col-title"><?php echo htmlspecialchars($menu['name']); ?></h4>
                                 <ul class="footer-links">
-                                    <?php foreach ($menu['items'] as $item): 
+                                    <?php 
+                                    $consecutiveSocials = [];
+                                    $renderSocials = function(&$socials) {
+                                        if (empty($socials)) return;
+                                        echo '<li class="social-wrapper"><div class="footer-social-links">';
+                                        foreach ($socials as $s) {
+                                            $platform = strtolower($s['name']);
+                                            if ($platform === 'twitter') $platform = 'x';
+                                            
+                                            $svg_path = 'themes/default/assets/images/' . $platform . '.svg';
+                                            
+                                            echo '<a href="' . htmlspecialchars($s['url']) . '" target="_blank" class="social-link" title="' . htmlspecialchars($s['name']) . '">';
+                                            if (file_exists(BASE_PATH . '/' . $svg_path)) {
+                                                echo '<img src="' . app_base_url($svg_path) . '" alt="' . htmlspecialchars($s['name']) . '" style="width: 20px; height: 20px; filter: brightness(0) invert(1);">';
+                                            } else {
+                                                echo '<i class="' . htmlspecialchars($s['icon']) . '"></i>';
+                                            }
+                                            echo '</a>';
+                                        }
+                                        echo '</div></li>';
+                                        $socials = [];
+                                    };
+
+                                    foreach ($menu['items'] as $item): 
                                         if (isset($item['is_active']) && $item['is_active'] === false) continue;
                                         $url = $item['url'] ?? '#';
-                                        $label = $item['name'] ?? ($item['title'] ?? 'Link');
-                                    ?>
-                                        <li><a href="<?php echo (strpos($url, 'http') === 0) ? $url : app_base_url($url); ?>"><?php echo htmlspecialchars($label); ?></a></li>
-                                    <?php endforeach; ?>
-                                </ul>
-
-                                <?php if ($i === 2): // Play Store in Column 2 ?>
-                                    <div class="footer-app-stores">
-                                        <?php 
-                                        $playStore = \App\Services\SettingsService::get('play_store_url');
-                                        if ($playStore): ?>
-                                            <a href="<?= htmlspecialchars($playStore) ?>" target="_blank" class="store-btn">
-                                                <img src="<?= app_base_url('themes/default/assets/images/playstore.svg') ?>" alt="Get it on Google Play" style="height: 30px;">
-                                            </a>
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endif; ?>
-
-                                <?php if ($i === 3): // App Store and Social in Column 3 ?>
-                                    <div class="footer-app-stores" style="margin-bottom: 15px;">
-                                        <?php 
-                                        $appStore = \App\Services\SettingsService::get('app_store_url');
-                                        if ($appStore): ?>
-                                            <a href="<?= htmlspecialchars($appStore) ?>" target="_blank" class="store-btn">
-                                                <img src="<?= app_base_url('themes/default/assets/images/appstore.svg') ?>" alt="Download on the App Store" style="height: 30px;">
-                                            </a>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="footer-social-links">
-                                        <?php 
-                                        $socialLinks = \App\Services\SettingsService::get('social_links', []);
-                                        if (is_string($socialLinks)) {
-                                            $socialLinks = json_decode($socialLinks, true) ?? [];
+                                        if (strpos($url, 'http') !== 0) {
+                                            $url = app_base_url($url);
                                         }
-                                        
-                                        $platformIcons = [
-                                            'facebook' => 'fab fa-facebook-f', 'twitter' => 'fab fa-twitter',
-                                            'instagram' => 'fab fa-instagram', 'linkedin' => 'fab fa-linkedin-in',
-                                            'youtube' => 'fab fa-youtube', 'telegram' => 'fab fa-telegram-plane',
-                                            'whatsapp' => 'fab fa-whatsapp', 'tiktok' => 'fab fa-tiktok',
-                                            'pinterest' => 'fab fa-pinterest-p', 'github' => 'fab fa-github'
-                                        ];
+                                        $label = $item['name'] ?? ($item['title'] ?? 'Link');
+                                        $icon = $item['icon'] ?? '';
 
-                                        if (!empty($socialLinks)):
-                                            foreach ($socialLinks as $link):
-                                                $platform = $link['platform'] ?? '';
-                                                $url = $link['url'] ?? '#';
-                                                $icon = $platformIcons[$platform] ?? 'fas fa-link';
-                                        ?>
-                                            <a href="<?php echo htmlspecialchars($url); ?>" target="_blank" class="social-link" title="<?php echo ucfirst($platform); ?>">
-                                                <i class="<?php echo $icon; ?>"></i>
-                                            </a>
-                                        <?php endforeach; endif; ?>
-                                    </div>
-                                <?php endif; ?>
+                                        // 1. Social Icons (if icon field is filled with fa-icon)
+                                        if (!empty($icon) && (strpos($icon, 'fa-') !== false || strpos($icon, 'fab') !== false || strpos($icon, 'fas') !== false)):
+                                            $consecutiveSocials[] = ['url' => $url, 'name' => $label, 'icon' => $icon];
+                                            continue;
+                                        else:
+                                            // Render any pending socials before next item
+                                            $renderSocials($consecutiveSocials);
+                                        endif;
+
+                                        // 2. App Store Buttons (by name)
+                                        if (strtolower($label) === 'google play' || strtolower($label) === 'play store'): ?>
+                                            <li class="store-wrapper">
+                                                <div class="footer-app-stores">
+                                                    <a href="<?= htmlspecialchars($url) ?>" target="_blank" class="store-btn">
+                                                        <img src="<?= app_base_url('themes/default/assets/images/playstore.svg') ?>" alt="Get it on Google Play" style="height: 30px;">
+                                                    </a>
+                                                </div>
+                                            </li>
+                                        <?php elseif (strtolower($label) === 'app store' || strtolower($label) === 'apple store'): ?>
+                                            <li class="store-wrapper">
+                                                <div class="footer-app-stores">
+                                                    <a href="<?= htmlspecialchars($url) ?>" target="_blank" class="store-btn">
+                                                        <img src="<?= app_base_url('themes/default/assets/images/appstore.svg') ?>" alt="Download on the App Store" style="height: 30px;">
+                                                    </a>
+                                                </div>
+                                            </li>
+                                        <?php else: ?>
+                                            <!-- 3. Regular Link -->
+                                            <li><a href="<?php echo htmlspecialchars($url); ?>"><?php echo htmlspecialchars($label); ?></a></li>
+                                        <?php endif; ?>
+                                    <?php endforeach; 
+                                    // Final flush of socials
+                                    $renderSocials($consecutiveSocials);
+                                    ?>
+                                </ul>
                             </div>
                     <?php endif; } ?>
                 </div>
             </div>
         </div>
-
 
         <hr class="footer-separator">
 
