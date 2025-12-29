@@ -1,12 +1,20 @@
 /* Top Header Styles - Notice Bar */
 .top-header {
-  background: linear-gradient(90deg, #1c1d1f 0%, #2d2f31 100%); /* Dark gradient */
+  background: linear-gradient(
+    90deg,
+    #1c1d1f 0%,
+    #2d2f31 100%
+  ); /* Dark gradient */
   border-bottom: 1px solid #3e4143;
-  padding: 8px 0;
+  height: 30px; /* Force 30px height as requested */
+  padding: 2px 0; /* 2px top/bottom padding */
+  box-sizing: border-box;
   font-family: "Inter", sans-serif;
   position: relative;
   z-index: 1001;
   display: none;
+  overflow: hidden; /* For marquee ticker */
+  margin: 0 !important; /* No margin */
 }
 
 .top-header.has-content {
@@ -15,8 +23,25 @@
 
 .top-header .container {
   display: flex;
-  justify-content: center; /* Center for notice feel, or stay end? */
+  justify-content: center; /* Center the ticker by default */
   align-items: center;
+  height: 100%;
+  width: 100% !important; /* Full width as requested */
+  max-width: 100% !important; /* Override global/bootstrap max-width */
+  padding: 0 15px;
+  position: relative;
+  margin: 0 !important; /* Explicitly no margin as requested */
+}
+
+/* Ticker Wrapper */
+.top-header-ticker {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center content when not scrolling */
 }
 
 .top-header ul {
@@ -26,6 +51,8 @@
   display: flex;
   gap: 30px;
   align-items: center;
+  justify-content: center; /* Center list items */
+  width: max-content; /* Ensure it stays as wide as items */
 }
 
 .top-header li {
@@ -37,6 +64,7 @@
   text-decoration: none;
   color: #fff;
   font-size: 13px;
+  line-height: 1;
   font-weight: 500;
   transition: all 0.3s ease;
   display: flex;
@@ -48,7 +76,6 @@
 .top-header a:hover {
   opacity: 1;
   color: #a435f0;
-  transform: translateY(-1px);
 }
 
 .top-header i {
@@ -58,19 +85,67 @@
 
 /* Notice specific style */
 .top-header-notice {
-    background: #a435f0;
-    color: #fff;
-    font-size: 10px;
-    font-weight: 800;
-    padding: 2px 6px;
-    border-radius: 4px;
-    text-transform: uppercase;
-    margin-right: 10px;
+  background: #a435f0;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+/* Close Icon */
+.top-header-close {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.6;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.2s;
+  height: 100%;
+  position: absolute; /* Absolute position to not affect center */
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.top-header-close:hover {
+  opacity: 1;
+}
+
+/* Marquee Animation Classes (Optional/Dynamic) */
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.ticker-active {
+  animation: ticker 20s linear infinite;
+  padding-left: 100%; /* Start from off-screen */
+}
+
+.ticker-active:hover {
+  animation-play-state: paused;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .top-header {
-    display: none !important;
+    height: auto;
+    min-height: 30px;
+  }
+  .top-header-notice {
+    display: none;
   }
 }

@@ -258,30 +258,76 @@ if (
     $topMenuItems = (new \App\Services\MenuService())->get('top_header');
     if (!empty($topMenuItems) && is_array($topMenuItems)):
     ?>
-    <div class="top-header has-content">
+    <div class="top-header has-content" id="topHeaderBar">
         <div class="container margin-auto">
-            <ul>
-                <?php foreach ($topMenuItems as $index => $item): 
-                    // Skip inactive items
-                    if (isset($item['is_active']) && $item['is_active'] === false) continue;
-                    
-                    $tParams = $item;
-                    $tUrl = $tParams['url'] ?? '#';
-                    $tLabel = $tParams['name'] ?? ($tParams['title'] ?? ($tParams['label'] ?? 'Link'));
-                    $tIcon = $tParams['icon'] ?? '';
-                    if ($tIcon && strpos($tIcon, 'fa-') === 0) $tIcon = 'fas ' . $tIcon;
-                ?>
-                <li>
-                    <a href="<?php echo (strpos($tUrl, 'http') === 0) ? $tUrl : app_base_url($tUrl); ?>">
-                        <?php if($index === 0): ?><span class="top-header-notice">Notice</span><?php endif; ?>
-                        <?php if($tIcon): ?><i class="<?php echo htmlspecialchars($tIcon); ?>"></i><?php endif; ?>
-                        <span><?php echo htmlspecialchars($tLabel); ?></span>
-                    </a>
-                </li>
-                <?php endforeach; ?>
-            </ul>
+            <div class="top-header-ticker" id="topHeaderTicker">
+                <ul id="topHeaderList">
+                    <?php foreach ($topMenuItems as $index => $item): 
+                        // Skip inactive items
+                        if (isset($item['is_active']) && $item['is_active'] === false) continue;
+                        
+                        $tParams = $item;
+                        $tUrl = $tParams['url'] ?? '#';
+                        $tLabel = $tParams['name'] ?? ($tParams['title'] ?? ($tParams['label'] ?? 'Link'));
+                        $tIcon = $tParams['icon'] ?? '';
+                        if ($tIcon && strpos($tIcon, 'fa-') === 0) $tIcon = 'fas ' . $tIcon;
+                    ?>
+                    <li>
+                        <a href="<?php echo (strpos($tUrl, 'http') === 0) ? $tUrl : app_base_url($tUrl); ?>">
+                            <?php if($index === 0): ?><span class="top-header-notice">Notice</span><?php endif; ?>
+                            <?php if($tIcon): ?><i class="<?php echo htmlspecialchars($tIcon); ?>"></i><?php endif; ?>
+                            <span><?php echo htmlspecialchars($tLabel); ?></span>
+                        </a>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <button class="top-header-close" id="closeTopHeader" title="Close">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const topHeader = document.getElementById('topHeaderBar');
+            const ticker = document.getElementById('topHeaderTicker');
+            const list = document.getElementById('topHeaderList');
+            const closeBtn = document.getElementById('closeTopHeader');
+
+            // 1. Close Functionality
+            if (closeBtn && topHeader) {
+                closeBtn.addEventListener('click', function() {
+                    topHeader.style.display = 'none';
+                    // Optional: Store in session or local storage to keep it closed
+                    localStorage.setItem('topHeaderClosed', 'true');
+                });
+
+                // Check if it was closed before
+                if (localStorage.getItem('topHeaderClosed') === 'true') {
+                    topHeader.style.display = 'none';
+                }
+            }
+
+            // 2. Ticker Functionality
+            function checkTicker() {
+                if (ticker && list) {
+                    const isOverflowing = list.scrollWidth > ticker.clientWidth;
+                    if (isOverflowing) {
+                        list.classList.add('ticker-active');
+                        // Calculate duration based on width for consistent speed
+                        const speed = 50; // pixels per second
+                        const duration = list.scrollWidth / speed;
+                        list.style.animationDuration = duration + 's';
+                    } else {
+                        list.classList.remove('ticker-active');
+                    }
+                }
+            }
+
+            checkTicker();
+            window.addEventListener('resize', checkTicker);
+        });
+    </script>
     <?php endif; ?>
 
     <header class="site-header" id="siteHeader">
