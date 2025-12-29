@@ -793,8 +793,12 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                         </a>
                         <ul class="nav-submenu">
                             <li><a href="<?php echo app_base_url('admin/users'); ?>">All Users</a></li>
+                            <li><a href="<?php echo app_base_url('admin/users/inactive'); ?>">Inactive</a></li>
+                            <li><a href="<?php echo app_base_url('admin/users/banned'); ?>">Banned</a></li>
+                            <li><a href="<?php echo app_base_url('admin/users/admins'); ?>">Admins</a></li>
                             <li><a href="<?php echo app_base_url('admin/users/create'); ?>">Add New</a></li>
                             <li><a href="<?php echo app_base_url('admin/users/roles'); ?>">Roles</a></li>
+                            <li><a href="<?php echo app_base_url('admin/users/logs/logins'); ?>">Login Logs</a></li>
                         </ul>
                     </li>
 

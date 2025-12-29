@@ -560,10 +560,186 @@ class UserManagementController extends Controller
         $this->view->render('admin/users/bulk', $data);
     }
 
+    public function inactive()
+    {
+        $_GET['status'] = 'inactive';
+        return $this->index();
+    }
+
+    public function banned()
+    {
+        // Special case for banned users as they might not be 'inactive' in the traditional sense
+        // but are blocked from logging in.
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = 15;
+        $offset = ($page - 1) * $perPage;
+
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+        
+        $where = ["is_banned = 1"];
+        $params = [];
+
+        if ($search) {
+            $where[] = "(username LIKE ? OR email LIKE ? OR first_name LIKE ? OR last_name LIKE ?)";
+            $params = array_merge($params, ["%$search%", "%$search%", "%$search%", "%$search%"]);
+        }
+
+        $whereSql = 'WHERE ' . implode(' AND ', $where);
+
+        $countSql = "SELECT COUNT(*) FROM users $whereSql";
+        $stmt = $this->db->prepare($countSql);
+        $stmt->execute($params);
+        $totalFiltered = $stmt->fetchColumn();
+        $totalPages = ceil($totalFiltered / $perPage);
+
+        $sql = "SELECT * FROM users $whereSql ORDER BY banned_at DESC LIMIT $perPage OFFSET $offset";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        $users = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $data = [
+            'page_title' => 'Banned Users',
+            'users' => $users,
+            'filters' => [
+                'search' => $search,
+                'page' => $page,
+                'total_pages' => $totalPages,
+                'total_records' => $totalFiltered
+            ]
+        ];
+
+        $this->view->render('admin/users/banned', $data);
+    }
+
+    public function admins()
+    {
+        $_GET['role'] = 'admin';
+        return $this->index();
+    }
+
+    public function ban($id)
+    {
+        if (!\App\Services\Security::validateCsrfToken()) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            exit;
+        }
+
+        if ($id == $_SESSION['user_id']) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'You cannot ban yourself']);
+            exit;
+        }
+
+        try {
+            $reason = $_POST['reason'] ?? 'Violation of terms';
+            $stmt = $this->db->prepare("UPDATE users SET is_banned = 1, ban_reason = ?, banned_at = NOW(), is_active = 0 WHERE id = ?");
+            $stmt->execute([$reason, $id]);
+
+            echo json_encode(['success' => true, 'message' => 'User banned successfully']);
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Failed to ban user: ' . $e->getMessage()]);
+        }
+        exit;
+    }
+
+    public function unban($id)
+    {
+        if (!\App\Services\Security::validateCsrfToken()) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            exit;
+        }
+
+        try {
+            $stmt = $this->db->prepare("UPDATE users SET is_banned = 0, ban_reason = NULL, banned_at = NULL, is_active = 1 WHERE id = ?");
+            $stmt->execute([$id]);
+
+            echo json_encode(['success' => true, 'message' => 'User unbanned successfully']);
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Failed to unban user: ' . $e->getMessage()]);
+        }
+        exit;
+    }
+
+    public function loginLogs()
+    {
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = 20;
+        $offset = ($page - 1) * $perPage;
+
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+        
+        $where = [];
+        $params = [];
+
+        if ($search) {
+            $where[] = "(u.username LIKE ? OR u.email LIKE ? OR ls.ip_address LIKE ? OR ls.city LIKE ? OR ls.country LIKE ?)";
+            $params = array_merge($params, ["%$search%", "%$search%", "%$search%", "%$search%", "%$search%"]);
+        }
+
+        $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        // Check if table exists first to avoid error if no logins yet
+        $this->db->query("CREATE TABLE IF NOT EXISTS login_sessions (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            ip_address VARCHAR(45),
+            user_agent TEXT,
+            device_type VARCHAR(50),
+            browser VARCHAR(100),
+            os VARCHAR(100),
+            country VARCHAR(100),
+            region VARCHAR(100), 
+            city VARCHAR(100),
+            timezone VARCHAR(100),
+            login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )");
+
+        $countSql = "SELECT COUNT(*) FROM login_sessions ls LEFT JOIN users u ON ls.user_id = u.id $whereSql";
+        $stmt = $this->db->prepare($countSql);
+        $stmt->execute($params);
+        $totalFiltered = $stmt->fetchColumn();
+        $totalPages = ceil($totalFiltered / $perPage);
+
+        $sql = "SELECT ls.*, u.username, u.email, u.first_name, u.last_name 
+                FROM login_sessions ls 
+                LEFT JOIN users u ON ls.user_id = u.id 
+                $whereSql 
+                ORDER BY ls.login_time DESC 
+                LIMIT $perPage OFFSET $offset";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        $logs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $data = [
+            'page_title' => 'Login Logs',
+            'logs' => $logs,
+            'filters' => [
+                'search' => $search,
+                'page' => $page,
+                'total_pages' => $totalPages,
+                'total_records' => $totalFiltered
+            ]
+        ];
+
+        $this->view->render('admin/users/logs/logins', $data);
+    }
+
     private function checkAdminAccess()
     {
         if (!isset($_SESSION['user_id'])) {
             redirect('/login');
+            exit;
+        }
+        
+        // Additional admin check
+        $userModel = new User();
+        if (!$userModel->isAdmin($_SESSION['user_id'])) {
+            redirect('/');
             exit;
         }
     }

@@ -136,7 +136,10 @@ class User
                 'force_password_change' => "ALTER TABLE users ADD COLUMN force_password_change TINYINT(1) DEFAULT 0 AFTER privacy_agreed_at",
                 'password_generated_at' => "ALTER TABLE users ADD COLUMN password_generated_at DATETIME NULL AFTER force_password_change",
                 'failed_logins' => "ALTER TABLE users ADD COLUMN failed_logins TINYINT(3) DEFAULT 0 AFTER password_generated_at",
-                'lockout_until' => "ALTER TABLE users ADD COLUMN lockout_until DATETIME NULL AFTER failed_logins"
+                'lockout_until' => "ALTER TABLE users ADD COLUMN lockout_until DATETIME NULL AFTER failed_logins",
+                'is_banned' => "ALTER TABLE users ADD COLUMN is_banned TINYINT(1) DEFAULT 0 AFTER lockout_until",
+                'ban_reason' => "ALTER TABLE users ADD COLUMN ban_reason TEXT NULL AFTER is_banned",
+                'banned_at' => "ALTER TABLE users ADD COLUMN banned_at DATETIME NULL AFTER ban_reason"
             ];
 
             foreach ($requiredColumns as $columnName => $alterSql) {
@@ -234,10 +237,8 @@ class User
         $stmt = $this->db->getPdo()->prepare("UPDATE users SET last_login = NOW(), login_count = login_count + 1, failed_logins = 0, lockout_until = NULL, updated_at = NOW() WHERE id = ?");
         $result = $stmt->execute([$userId]);
 
-        // Log device and location info for ads targeting (if provided)
-        if ($deviceInfo || $locationInfo) {
-            $this->logLoginSession($userId, $deviceInfo, $locationInfo);
-        }
+        // Log device and location info for security and analytics
+        $this->logLoginSession($userId, $deviceInfo, $locationInfo);
 
         return $result;
     }
@@ -267,7 +268,7 @@ class User
     /**
      * Log login session with device and location info for ads
      */
-    private function logLoginSession($userId, $deviceInfo = null, $locationInfo = null)
+    public function logLoginSession($userId, $deviceInfo = null, $locationInfo = null)
     {
         try {
             // Create login_sessions table if it doesn't exist

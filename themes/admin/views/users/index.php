@@ -189,6 +189,11 @@ $regularUsers = $stats['regular'] ?? ($totalUsers - $adminUsers);
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                     <?php if (($user['role'] ?? '') !== 'admin'): ?>
+                                                    <button class="action-btn-icon ban-btn"
+                                                        onclick="openBanModal(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'] ?? 'User'); ?>')"
+                                                        title="Ban User" style="color: #ef4444;">
+                                                        <i class="fas fa-user-slash"></i>
+                                                    </button>
                                                     <button class="action-btn-icon delete-btn"
                                                         onclick="deleteUser(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'] ?? 'User'); ?>')"
                                                         title="Delete">
@@ -226,6 +231,9 @@ $regularUsers = $stats['regular'] ?? ($totalUsers - $adminUsers);
                                         </div>
                                         <div class="card-actions">
                                              <?php if (($user['role'] ?? '') !== 'admin'): ?>
+                                            <button class="action-btn-icon" onclick="openBanModal(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'] ?? 'User'); ?>')" title="Ban User" style="color: #ef4444;">
+                                                <i class="fas fa-user-slash"></i>
+                                            </button>
                                             <button class="action-btn-icon" onclick="deleteUser(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'] ?? 'User'); ?>')" title="Delete">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -327,6 +335,31 @@ $regularUsers = $stats['regular'] ?? ($totalUsers - $adminUsers);
             <i class="fas fa-times"></i>
         </button>
     </div>
+</div>
+
+<!-- Ban User Modal -->
+<div class="modal fade" id="banUserModal" tabindex="-1" role="dialog" aria-labelledby="banUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="banUserModalLabel">Ban User: <span id="ban-username-display"></span></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="ban-user-id">
+        <div class="form-group">
+          <label for="ban-reason">Reason for Ban</label>
+          <textarea class="form-control" id="ban-reason" rows="3" placeholder="Violation of terms of service..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="submitBan()">Confirm Ban</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -511,6 +544,53 @@ $regularUsers = $stats['regular'] ?? ($totalUsers - $adminUsers);
     }
 
 
+
+    function openBanModal(userId, username) {
+        document.getElementById('ban-user-id').value = userId;
+        document.getElementById('ban-username-display').textContent = username;
+        document.getElementById('ban-reason').value = 'Violation of terms of service';
+        
+        const modalEl = document.getElementById('banUserModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    }
+
+    function submitBan() {
+        const userId = document.getElementById('ban-user-id').value;
+        const reason = document.getElementById('ban-reason').value;
+        const token = getCsrfToken();
+        
+        if (!reason) {
+            alert('Please provide a reason');
+            return;
+        }
+
+        fetch(`<?= app_base_url('/admin/users/') ?>${userId}/ban`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-Token': token,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: `reason=${encodeURIComponent(reason)}&csrf_token=${token}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const modalEl = document.getElementById('banUserModal');
+                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modal.hide();
+                showNotification('User banned successfully', 'success');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showNotification(data.message || 'Error banning user', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('An error occurred while banning the user', 'error');
+        });
+    }
 
     function deleteUser(userId, userName) {
         showConfirmModal(

@@ -661,12 +661,34 @@ $router->add(
     "Admin\UserManagementController@permissions",
     ["auth", "admin"],
 );
-$router->add(
-    "GET",
-    "/admin/users/bulk",
-    "Admin\UserManagementController@bulk",
-    ["auth", "admin"],
-);
+$router->add("GET", "/admin/users/bulk", "Admin\UserManagementController@bulk", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/users/inactive", "Admin\UserManagementController@inactive", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/users/banned", "Admin\UserManagementController@banned", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/users/admins", "Admin\UserManagementController@admins", [
+    "auth",
+    "admin",
+]);
+$router->add("GET", "/admin/users/logs/logins", "Admin\UserManagementController@loginLogs", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/users/{id}/ban", "Admin\UserManagementController@ban", [
+    "auth",
+    "admin",
+]);
+$router->add("POST", "/admin/users/{id}/unban", "Admin\UserManagementController@unban", [
+    "auth",
+    "admin",
+]);
 
 $router->add(
     "POST",
