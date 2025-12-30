@@ -52,12 +52,20 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
         justify-content: space-between;
         gap: 1rem;
         z-index: 10;
+        flex-wrap: wrap;
     }
 
     .toolbar-left, .toolbar-right {
         display: flex;
         align-items: center;
         gap: 0.8rem;
+        flex-wrap: wrap;
+    }
+
+    .toolbar-right {
+        flex: 1;
+        justify-content: flex-end;
+        min-width: 300px;
     }
 
     .media-grid-container {
@@ -124,9 +132,25 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
         left: 8px;
         z-index: 15;
         display: none;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 3px;
+        padding: 2px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    .selection-mode .item-checkbox-wrapper {
+    /* Show checkbox on hover (Windows-style) */
+    .media-item:hover .item-checkbox-wrapper {
+        display: block;
+    }
+
+    /* Always show in selection mode */
+    #media-manager.selection-mode .item-checkbox-wrapper {
+        display: block;
+    }
+
+    /* Show checkbox if it's checked */
+    .item-checkbox:checked + .item-checkbox-wrapper,
+    .item-checkbox-wrapper:has(.item-checkbox:checked) {
         display: block;
     }
 
@@ -135,6 +159,7 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
         height: 18px;
         cursor: pointer;
         accent-color: var(--media-primary);
+        display: block;
     }
 
     /* Usage Badge */
@@ -152,7 +177,7 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
-    .selection-mode .usage-badge {
+    #media-manager.selection-mode .usage-badge {
         display: none;
     }
 
@@ -275,7 +300,7 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
         font-size: 13px;
     }
 
-    .selection-mode .bulk-actions-toolbar {
+    #media-manager.selection-mode .bulk-actions-toolbar {
         display: flex;
     }
 
@@ -299,6 +324,41 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
         border-radius: 6px;
         font-size: 13px;
         outline: none;
+    }
+
+    /* Drag & Drop Overlay */
+    .upload-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(79, 70, 229, 0.95);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        z-index: 100;
+        border: 4px dashed white;
+        margin: 1rem;
+        border-radius: 8px;
+    }
+
+    .upload-overlay.active {
+        display: flex;
+    }
+
+    .upload-overlay-content {
+        text-align: center;
+    }
+
+    .upload-overlay-content i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .upload-overlay-content h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
     }
 </style>
 
@@ -334,12 +394,38 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
             </div>
             
             <div class="toolbar-right">
+                <select class="form-control-media" onchange="changePerPage(this.value)" title="Items per page">
+                    <option value="20" <?php echo ($_GET['per_page'] ?? 50) == 20 ? 'selected' : ''; ?>>20 per page</option>
+                    <option value="50" <?php echo ($_GET['per_page'] ?? 50) == 50 ? 'selected' : ''; ?>>50 per page</option>
+                    <option value="100" <?php echo ($_GET['per_page'] ?? 50) == 100 ? 'selected' : ''; ?>>100 per page</option>
+                    <option value="200" <?php echo ($_GET['per_page'] ?? 50) == 200 ? 'selected' : ''; ?>>200 per page</option>
+                </select>
                 <select class="form-control-media" onchange="filterType(this.value)">
                     <option value="">All items</option>
                     <option value="images" <?php echo ($_GET['type'] ?? '') === 'images' ? 'selected' : ''; ?>>Images</option>
                     <option value="documents" <?php echo ($_GET['type'] ?? '') === 'documents' ? 'selected' : ''; ?>>Docs</option>
                 </select>
                 <input type="text" placeholder="Search..." class="form-control-media" id="media-search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" style="width: 150px;">
+                
+                <?php if (isset($pagination) && $pagination['last_page'] > 1): ?>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-left: 1rem;">
+                        <button class="btn-media btn-media-secondary" onclick="changePage(1)" <?php echo $pagination['current_page'] <= 1 ? 'disabled' : ''; ?> title="First page">
+                            <i class="fas fa-angle-double-left"></i>
+                        </button>
+                        <button class="btn-media btn-media-secondary" onclick="changePage(<?php echo $pagination['current_page'] - 1; ?>)" <?php echo $pagination['current_page'] <= 1 ? 'disabled' : ''; ?> title="Previous">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span style="font-size: 13px; color: var(--media-gray-600); white-space: nowrap;">
+                            Page <?php echo $pagination['current_page']; ?> of <?php echo $pagination['last_page']; ?>
+                        </span>
+                        <button class="btn-media btn-media-secondary" onclick="changePage(<?php echo $pagination['current_page'] + 1; ?>)" <?php echo $pagination['current_page'] >= $pagination['last_page'] ? 'disabled' : ''; ?> title="Next">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="btn-media btn-media-secondary" onclick="changePage(<?php echo $pagination['last_page']; ?>)" <?php echo $pagination['current_page'] >= $pagination['last_page'] ? 'disabled' : ''; ?> title="Last page">
+                            <i class="fas fa-angle-double-right"></i>
+                        </button>
+                    </div>
+                <?php endif; ?>
                 <span style="font-size: 13px; color: var(--media-gray-600); margin-left: 1rem;"><?php echo $totalFiles; ?> items</span>
             </div>
         </div>
@@ -470,12 +556,27 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
     }
 
     function handleItemClick(element, event) {
+        // Don't trigger if clicking on checkbox itself
+        if (event.target.classList.contains('item-checkbox')) {
+            return;
+        }
+        
         if (isSelectionMode) {
             const cb = element.querySelector('.item-checkbox');
             cb.checked = !cb.checked;
             updateSelectedCount();
         } else {
-            selectMedia(element);
+            // Check if any items are selected
+            const anySelected = document.querySelectorAll('.item-checkbox:checked').length > 0;
+            if (anySelected) {
+                // If items are selected, clicking should toggle checkbox
+                const cb = element.querySelector('.item-checkbox');
+                cb.checked = !cb.checked;
+                updateSelectedCount();
+            } else {
+                // Otherwise, open sidebar
+                selectMedia(element);
+            }
         }
     }
 
@@ -489,6 +590,14 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
         const count = checked.length;
         document.getElementById('selected-count').innerText = `${count} item${count !== 1 ? 's' : ''} selected`;
         document.getElementById('btn-delete-selected').disabled = count === 0;
+        
+        // Show bulk actions bar if items are selected (even outside selection mode)
+        const bulkBar = document.querySelector('.bulk-actions-toolbar');
+        if (count > 0) {
+            bulkBar.style.display = 'flex';
+        } else if (!isSelectionMode) {
+            bulkBar.style.display = 'none';
+        }
     }
 
     function selectMedia(element) {
@@ -609,6 +718,19 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
     function filterType(type) {
         const url = new URL(window.location.href);
         if (type) url.searchParams.set('type', type); else url.searchParams.delete('type');
+        window.location.href = url.toString();
+    }
+
+    function changePage(page) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', page);
+        window.location.href = url.toString();
+    }
+
+    function changePerPage(perPage) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('per_page', perPage);
+        url.searchParams.delete('page'); // Reset to page 1 when changing per-page
         window.location.href = url.toString();
     }
 

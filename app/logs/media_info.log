@@ -5,3 +5,7 @@
 [2025-12-29 17:40:27] INFO: Media uploaded {"media_id":"5","filename":"screencapture-toolking-net-admin-users-logs-logins-2025-12-29-16_09_55.png","user_id":3}
 [2025-12-29 17:40:27] INFO: Media uploaded {"media_id":"6","filename":"screencapture-toolking-net-admin-roles-2025-12-29-16_09_35.png","user_id":3}
 [2025-12-29 17:40:27] INFO: Media uploaded {"media_id":"7","filename":"screencapture-toolking-net-admin-users-admins-2025-12-29-16_04_38.png","user_id":3}
+[2025-12-30 01:15:45] INFO: Media uploaded {"media_id":"402","filename":"screencapture-toolking-net-admin-roles-2025-12-29-16_09_35.png","user_id":3}
+[2025-12-30 01:15:45] INFO: Media uploaded {"media_id":"403","filename":"screencapture-tinypng-2025-12-29-20_32_04.png","user_id":3}
+[2025-12-30 01:20:06] INFO: Media deleted {"media_id":"403","filename":"screencapture-tinypng-2025-12-29-20_32_04.png","user_id":3}
+[2025-12-30 01:20:10] INFO: Media deleted {"media_id":"402","filename":"screencapture-toolking-net-admin-roles-2025-12-29-16_09_35.png","user_id":3}

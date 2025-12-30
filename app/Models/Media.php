@@ -211,20 +211,39 @@ class Media
     private function scanFolder($dir, $relativePrefix, &$untracked, $type)
     {
         if (!is_dir($dir)) return;
+        
+        // Ensure directory path ends with separator
+        if (substr($dir, -1) !== DIRECTORY_SEPARATOR) {
+            $dir .= DIRECTORY_SEPARATOR;
+        }
+        
         $files = array_diff(scandir($dir), ['.', '..']);
+        
         foreach ($files as $file) {
-            if (is_dir($dir . $file)) continue;
-
+            $fullPath = $dir . $file;
+            
+            // If it's a directory, recurse into it
+            if (is_dir($fullPath)) {
+                $this->scanFolder(
+                    $fullPath, 
+                    $relativePrefix . $file . '/', 
+                    $untracked, 
+                    $type
+                );
+                continue;
+            }
+            
+            // It's a file - check if tracked
             $relativePath = $relativePrefix . $file;
             
-            // Check if this specific path is tracked
             $stmt = $this->db->getPdo()->prepare("SELECT id FROM media WHERE file_path = ?");
             $stmt->execute([$relativePath]);
+            
             if (!$stmt->fetch()) {
                 $untracked[] = [
                     'filename' => $file,
                     'type' => $type,
-                    'full_path' => $dir . $file,
+                    'full_path' => $fullPath,
                     'relative_path' => $relativePath
                 ];
             }

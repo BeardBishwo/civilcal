@@ -127,13 +127,18 @@ class ContentController extends Controller
             }
 
             $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+            $perPage = isset($_GET['per_page']) && is_numeric($_GET['per_page']) ? (int)$_GET['per_page'] : 50;
+            
+            // Limit perPage to reasonable values
+            $perPage = max(20, min($perPage, 200));
+            
             $filters = [
                 'search' => isset($_GET['search']) ? trim($_GET['search']) : null,
                 'type' => isset($_GET['type']) ? trim($_GET['type']) : null
             ];
 
             // Get media using Model with error handling
-            $mediaData = $this->mediaModel->getAll($filters, $page, 20);
+            $mediaData = $this->mediaModel->getAll($filters, $page, $perPage);
 
             // Get usage info for these items
             $usageInfo = $this->mediaModel->getUsageInfo($mediaData['data']);
