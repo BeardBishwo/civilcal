@@ -1127,12 +1127,16 @@ class SettingsController extends Controller
         $resources = SettingsService::get('economy_resources', []);
         $ranks = SettingsService::get('economy_ranks', []);
         $hudConfig = SettingsService::get('economy_hud_config', []);
+        $bundles = SettingsService::get('economy_bundles', []);
+        $cashPacks = SettingsService::get('economy_cash_packs', []);
 
         $this->view->render('admin/settings/economy', [
             'title' => 'Gamenta Economy Settings',
             'resources' => $resources,
             'ranks' => $ranks,
-            'hudConfig' => $hudConfig
+            'hudConfig' => $hudConfig,
+            'bundles' => $bundles,
+            'cashPacks' => $cashPacks
         ]);
     }
 
@@ -1154,7 +1158,6 @@ class SettingsController extends Controller
             
             if ($type === 'resources') {
                 $resources = $_POST['resources'] ?? [];
-                // Process resource updates
                 SettingsService::set('economy_resources', $resources, 'json', 'economy');
             } elseif ($type === 'ranks') {
                 $ranks = $_POST['ranks'] ?? [];
@@ -1162,6 +1165,12 @@ class SettingsController extends Controller
             } elseif ($type === 'hud') {
                 $hud = $_POST['hud'] ?? [];
                 SettingsService::set('economy_hud_config', $hud, 'json', 'economy');
+            } elseif ($type === 'bundles') {
+                $bundles = $_POST['bundles'] ?? [];
+                SettingsService::set('economy_bundles', $bundles, 'json', 'economy');
+            } elseif ($type === 'cash_packs') {
+                $cashPacks = $_POST['cash_packs'] ?? [];
+                SettingsService::set('economy_cash_packs', $cashPacks, 'json', 'economy');
             }
 
             SettingsService::clearCache();

@@ -144,15 +144,32 @@ class GamificationController extends Controller
     }
 
     /**
-     * AJAX: Sell Resource
+     * Sell Resource (AJAX)
      */
     public function sellResource()
     {
+        header('Content-Type: application/json');
+        
         $resource = $_POST['resource'] ?? '';
         $amount = (int)($_POST['amount'] ?? 1);
         
         $result = $this->gamificationService->sellResource($_SESSION['user_id'], $resource, $amount);
-        $this->json($result, $result['success'] ? 200 : 400);
+        echo json_encode($result);
+        exit;
+    }
+
+    /**
+     * Purchase Bundle (AJAX)
+     */
+    public function purchaseBundle()
+    {
+        header('Content-Type: application/json');
+        
+        $bundleKey = $_POST['bundle'] ?? '';
+        
+        $result = $this->gamificationService->purchaseBundle($_SESSION['user_id'], $bundleKey);
+        echo json_encode($result);
+        exit;
     }
 
     /**

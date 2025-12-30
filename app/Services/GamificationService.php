@@ -243,6 +243,45 @@ class GamificationService
     }
 
     /**
+     * Purchase Bundle (Bulk Offer)
+     */
+    public function purchaseBundle($userId, $bundleKey)
+    {
+        $bundles = SettingsService::get('economy_bundles', []);
+        
+        if (!isset($bundles[$bundleKey])) {
+            return ['success' => false, 'message' => 'Bundle not found'];
+        }
+        
+        $bundle = $bundles[$bundleKey];
+        $wallet = $this->getWallet($userId);
+        
+        if ($wallet['coins'] < $bundle['buy']) {
+            return ['success' => false, 'message' => 'Insufficient Coins'];
+        }
+        
+        $resource = $bundle['resource'];
+        $qty = $bundle['qty'];
+        $cost = $bundle['buy'];
+        
+        $sql = "UPDATE user_resources 
+                SET coins = coins - :cost, 
+                    $resource = $resource + :qty 
+                WHERE user_id = :uid";
+        
+        $this->db->query($sql, [
+            'cost' => $cost,
+            'qty' => $qty,
+            'uid' => $userId
+        ]);
+        
+        $this->logTransaction($userId, 'coins', -$cost, 'bundle_purchase');
+        $this->logTransaction($userId, $resource, $qty, 'bundle_purchase');
+        
+        return ['success' => true, 'message' => "Purchased {$bundle['name']}! Saved {$bundle['savings']} coins."];
+    }
+
+    /**
      * Construct a Building
      */
     public function constructBuilding($userId, $buildingType)
