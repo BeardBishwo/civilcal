@@ -964,35 +964,20 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                         </a>
                     </li>
 
-                    <!-- System -->
-                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/system') !== false ? 'active' : ''; ?>">
-                        <a href="<?php echo app_base_url('admin/system-status'); ?>" class="nav-link">
-                            <i class="nav-icon fas fa-server"></i>
-                            <span class="nav-text">System</span>
-                        </a>
-                    </li>
 
-                    <!-- Debug & Testing -->
-                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/debug') !== false ? 'active' : ''; ?>">
-                        <a href="<?php echo app_base_url('admin/debug'); ?>" class="nav-link">
-                            <i class="nav-icon fas fa-bug"></i>
-                            <span class="nav-text">Debug</span>
+                    <!-- Support & Resources -->
+                    <li class="nav-item <?php echo (strpos($_SERVER['REQUEST_URI'], '/help') !== false || strpos($_SERVER['REQUEST_URI'], '/developers') !== false || strpos($_SERVER['REQUEST_URI'], '/admin/system-status') !== false || strpos($_SERVER['REQUEST_URI'], '/admin/backup') !== false) ? 'active' : ''; ?>">
+                        <a href="javascript:void(0)" class="nav-link">
+                            <i class="nav-icon fas fa-life-ring"></i>
+                            <span class="nav-text">Support & Resources</span>
                             <i class="nav-arrow fas fa-chevron-right"></i>
                         </a>
                         <ul class="nav-submenu">
-                            <li><a href="<?php echo app_base_url('admin/debug'); ?>">Dashboard</a></li>
-                            <li><a href="<?php echo app_base_url('admin/debug/error-logs'); ?>">Error Logs</a></li>
-                            <li><a href="<?php echo app_base_url('admin/debug/tests'); ?>">System Tests</a></li>
-                            <li><a href="<?php echo app_base_url('admin/debug/live-errors'); ?>">Live Monitor</a></li>
+                            <li><a href="<?php echo app_base_url('help'); ?>"><i class="fas fa-question-circle"></i> Help Center</a></li>
+                            <li><a href="<?php echo app_base_url('developers'); ?>"><i class="fas fa-code"></i> Developer API</a></li>
+                            <li><a href="<?php echo app_base_url('admin/system-status'); ?>"><i class="fas fa-server"></i> System Status</a></li>
+                            <li><a href="<?php echo app_base_url('admin/backup'); ?>"><i class="fas fa-database"></i> Backup & Restore</a></li>
                         </ul>
-                    </li>
-
-                    <!-- Backup -->
-                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/backup') !== false ? 'active' : ''; ?>">
-                        <a href="<?php echo app_base_url('admin/backup'); ?>" class="nav-link">
-                            <i class="nav-icon fas fa-database"></i>
-                            <span class="nav-text">Backup</span>
-                        </a>
                     </li>
 
                     <!-- Plugins -->
