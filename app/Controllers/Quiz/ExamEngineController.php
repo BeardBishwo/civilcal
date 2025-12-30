@@ -5,11 +5,14 @@ namespace App\Controllers\Quiz;
 use App\Core\Controller;
 use App\Core\Database;
 use App\Services\GamificationService;
+use App\Services\NonceService;
+use App\Services\SecurityMonitor;
 
 class ExamEngineController extends Controller
 {
     protected $db;
     private $gamificationService;
+    private NonceService $nonceService;
 
     public function __construct()
     {
@@ -17,6 +20,7 @@ class ExamEngineController extends Controller
         $this->requireAuth();
         $this->db = \App\Core\Database::getInstance();
         $this->gamificationService = new GamificationService();
+        $this->nonceService = new NonceService();
     }
 
     /**
@@ -115,10 +119,14 @@ class ExamEngineController extends Controller
         $stmtAns->execute(['aid' => $attemptId]);
         $savedAnswers = $stmtAns->fetchAll(\PDO::FETCH_KEY_PAIR); // [qid => json_val]
 
+        // Nonce for secure submission
+        $nonce = $this->nonceService->generate($_SESSION['user_id'], 'quiz');
+
         $this->view('quiz/arena/room', [
             'attempt' => $attempt,
             'questions' => $questions,
             'savedAnswers' => $savedAnswers,
+            'quizNonce' => $nonce['nonce'] ?? null,
             'title' => 'Exam Room'
         ]);
     }
@@ -131,6 +139,14 @@ class ExamEngineController extends Controller
         $attemptId = $_POST['attempt_id'];
         $questionId = $_POST['question_id'];
         $selectedOptions = $_POST['selected_options']; // Array or Value
+        $trap = $_POST['trap_answer'] ?? '';
+
+        if (!empty($trap)) {
+            SecurityMonitor::log($_SESSION['user_id'] ?? null, 'honeypot_trigger', $_SERVER['REQUEST_URI'] ?? '', ['attempt_id' => $attemptId], 'critical');
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Invalid request']);
+            exit;
+        }
 
         // Validate ownership
         $stmt = $this->db->getPdo()->prepare("SELECT id FROM quiz_attempts WHERE id = :id AND user_id = :uid");
@@ -166,6 +182,17 @@ class ExamEngineController extends Controller
     public function submit()
     {
         $attemptId = $_POST['attempt_id'];
+        $nonce = $_POST['nonce'] ?? '';
+        $trap = $_POST['trap_answer'] ?? '';
+
+        if (!empty($trap)) {
+            SecurityMonitor::log($_SESSION['user_id'] ?? null, 'honeypot_trigger', $_SERVER['REQUEST_URI'] ?? '', ['attempt_id' => $attemptId], 'critical');
+            die("Invalid request");
+        }
+
+        if (!$this->nonceService->validateAndConsume($nonce, $_SESSION['user_id'], 'quiz')) {
+            die("Invalid or expired token");
+        }
         
         // 1. Validate
         $stmt = $this->db->getPdo()->prepare("SELECT * FROM quiz_attempts WHERE id = :id AND user_id = :uid");

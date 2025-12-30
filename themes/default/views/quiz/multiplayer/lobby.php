@@ -139,6 +139,15 @@
 <script>
     const ROOM_CODE = "<?php echo $code; ?>";
     const API_URL = "/api/lobby/" + ROOM_CODE + "/status";
+    let wagerNonce = '<?php echo htmlspecialchars($wagerNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>';
+    let lifelineNonce = '<?php echo htmlspecialchars($lifelineNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>';
+    const trapInput = document.createElement('input');
+    trapInput.type = 'text';
+    trapInput.name = 'trap_answer';
+    trapInput.id = 'lobby_trap';
+    trapInput.autocomplete = 'off';
+    trapInput.style.display = 'none';
+    document.body.appendChild(trapInput);
     
     let currentState = 'waiting';
     let lastPulse = 0;
@@ -290,11 +299,14 @@
             const fd = new FormData();
             fd.append('amount', amt);
             fd.append('lobby_id', '<?php echo $participant["lobby_id"]; ?>');
+            fd.append('nonce', wagerNonce);
+            fd.append('trap_answer', document.getElementById('lobby_trap').value || '');
 
             try {
                 const res = await fetch('/api/lobby/wager', { method: 'POST', body: fd });
                 const data = await res.json();
                 if (data.success) {
+                    if (data.nonce) wagerNonce = data.nonce;
                     location.reload();
                 } else {
                     alert(data.message);
@@ -321,10 +333,15 @@
             const type = this.dataset.type;
             const res = await fetch('/api/quiz/use-lifeline', {
                 method: 'POST',
-                body: new URLSearchParams({type})
+                body: new URLSearchParams({
+                    type,
+                    nonce: lifelineNonce,
+                    trap_answer: document.getElementById('lobby_trap').value || ''
+                })
             });
             const data = await res.json();
             if (data.success) {
+                if (data.nonce) lifelineNonce = data.nonce;
                 showBotToast("You used " + type);
                 loadInventory();
                 // Logic to actually apply the effect (e.g. 50/50 hides options)

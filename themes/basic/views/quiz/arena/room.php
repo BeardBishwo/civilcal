@@ -120,9 +120,17 @@
     const attemptId = <?php echo $attempt['id']; ?>;
     const saveUrl = '<?php echo app_base_url('quiz/save-answer'); ?>';
     const submitUrl = '<?php echo app_base_url('quiz/submit'); ?>';
+    let quizNonce = '<?php echo htmlspecialchars($quizNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>';
     
     let currentIndex = 0;
     let reviewStatus = {}; // {index: bool}
+    const honeypotInput = document.createElement('input');
+    honeypotInput.type = 'text';
+    honeypotInput.name = 'trap_answer';
+    honeypotInput.id = 'trap_answer';
+    honeypotInput.autocomplete = 'off';
+    honeypotInput.style.display = 'none';
+    document.body.appendChild(honeypotInput);
     
     // Timer
     const durationMins = <?php echo $attempt['duration_minutes']; ?>;
@@ -230,7 +238,8 @@
         $.post(saveUrl, {
             attempt_id: attemptId,
             question_id: q.id,
-            selected_options: val
+            selected_options: val,
+            trap_answer: document.getElementById('trap_answer').value || ''
         });
     };
     
@@ -310,7 +319,11 @@
     window.submitExam = function(force = false) {
         if(!force && !confirm("Are you sure you want to submit the exam? You cannot change answers after submission.")) return;
         
-        $.post(submitUrl, { attempt_id: attemptId }, function() {
+        $.post(submitUrl, { 
+            attempt_id: attemptId,
+            nonce: quizNonce,
+            trap_answer: document.getElementById('trap_answer').value || ''
+        }, function() {
             window.location.href = '<?php echo app_base_url('quiz/result/' . $attempt['id']); ?>';
         });
     };

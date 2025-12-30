@@ -5,11 +5,16 @@ namespace App\Controllers\Quiz;
 use App\Core\Controller;
 use App\Services\LobbyService;
 use App\Services\BotEngine;
+use App\Services\NonceService;
+use App\Services\SecurityValidator;
+use App\Services\SecurityMonitor;
+use App\Services\RateLimiter;
 
 class MultiplayerController extends Controller
 {
     private $lobbyService;
     private $botEngine;
+    private NonceService $nonceService;
 
     public function __construct()
     {
@@ -17,6 +22,7 @@ class MultiplayerController extends Controller
         $this->requireAuth();
         $this->lobbyService = new LobbyService();
         $this->botEngine = new BotEngine();
+        $this->nonceService = new NonceService();
     }
 
     /**
@@ -66,12 +72,16 @@ class MultiplayerController extends Controller
 
         $wallet = (new \App\Services\GamificationService())->getWallet($_SESSION['user_id']);
         $participant = $this->db->findOne('quiz_lobby_participants', ['lobby_id' => $lobby['id'], 'user_id' => $_SESSION['user_id']]);
+        $wagerNonce = $this->nonceService->generate($_SESSION['user_id'], 'wager');
+        $lifelineNonce = $this->nonceService->generate($_SESSION['user_id'], 'lifeline');
 
         // This is the hybrid view. JS handles "Waiting" vs "Active" state.
         $this->view('quiz/multiplayer/lobby', [
             'code' => $code,
             'wallet' => $wallet,
-            'participant' => $participant
+            'participant' => $participant,
+            'wagerNonce' => $wagerNonce['nonce'] ?? null,
+            'lifelineNonce' => $lifelineNonce['nonce'] ?? null,
         ]);
     }
 
@@ -86,9 +96,31 @@ class MultiplayerController extends Controller
 
         $lobbyId = $_POST['lobby_id'] ?? 0;
         $amount = (int)($_POST['amount'] ?? 0);
+        $nonce = $_POST['nonce'] ?? '';
+        $trap = $_POST['trap_answer'] ?? '';
 
-        if ($amount < 0) {
+        if (!empty($trap)) {
+            SecurityMonitor::log($_SESSION['user_id'] ?? null, 'honeypot_trigger', $_SERVER['REQUEST_URI'] ?? '', ['lobby_id' => $lobbyId], 'critical');
+            $this->json(['success' => false, 'message' => 'Invalid request'], 400);
+            return;
+        }
+
+        if (!$this->nonceService->validateAndConsume($nonce, $_SESSION['user_id'], 'wager')) {
+            $this->json(['success' => false, 'message' => 'Invalid or expired request token'], 400);
+            return;
+        }
+
+        $rateLimiter = new RateLimiter();
+        $rateCheck = $rateLimiter->check($_SESSION['user_id'], '/api/lobby/wager', 5, 30);
+        if (!$rateCheck['allowed']) {
+            $this->json(['success' => false, 'message' => 'Too many requests, slow down'], 429);
+            return;
+        }
+
+        $amount = SecurityValidator::validateInteger($amount, 1, 100000);
+        if ($amount === false) {
             $this->json(['success' => false, 'message' => 'Invalid amount'], 400);
+            return;
         }
 
         $gamification = new \App\Services\GamificationService();
@@ -110,7 +142,14 @@ class MultiplayerController extends Controller
             'uid' => $_SESSION['user_id']
         ]);
 
-        $this->json(['success' => true, 'message' => 'Wager placed!', 'new_balance' => $wallet['coins'] - $amount]);
+        $newNonce = $this->nonceService->generate($_SESSION['user_id'], 'wager');
+
+        $this->json([
+            'success' => true,
+            'message' => 'Wager placed!',
+            'new_balance' => $wallet['coins'] - $amount,
+            'nonce' => $newNonce['nonce'] ?? null
+        ]);
     }
 
     /**

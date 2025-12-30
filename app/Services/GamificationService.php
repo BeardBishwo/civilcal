@@ -5,13 +5,16 @@ namespace App\Services;
 use App\Core\Database;
 use Exception;
 
+
 class GamificationService
 {
     private $db;
+    private EconomicSecurityService $economicSecurity;
 
     public function __construct()
     {
         $this->db = \App\Core\Database::getInstance();
+        $this->economicSecurity = new EconomicSecurityService();
     }
 
     /**
@@ -28,7 +31,13 @@ class GamificationService
      */
     public function rewardUser($userId, $isCorrect, $difficulty = 'medium', $referenceId = null)
     {
-        if (!$isCorrect) return; // No reward for wrong answers
+        if (!$isCorrect) {
+            return;
+        }
+
+        if (!$this->economicSecurity->canReward($userId)) {
+            return;
+        }
 
         $this->initWallet($userId);
 
@@ -171,21 +180,15 @@ class GamificationService
      */
     public function purchaseResource($userId, $resource, $amount = 1)
     {
-        $resources = SettingsService::get('economy_resources', []);
-        
-        if (!isset($resources[$resource]) || !isset($resources[$resource]['buy'])) {
-            return ['success' => false, 'message' => 'Resource not available'];
-        }
-        
-        $price = $resources[$resource]['buy'];
-        if ($price <= 0) return ['success' => false, 'message' => 'This item cannot be purchased'];
+        $validation = $this->economicSecurity->validatePurchase($userId, $resource, $amount);
 
-        $totalCost = $price * $amount;
-        $wallet = $this->getWallet($userId);
-        
-        if ($wallet['coins'] < $totalCost) {
-            return ['success' => false, 'message' => 'Insufficient Coins'];
+        if (!$validation['success']) {
+            return $validation;
         }
+
+        $resource = $validation['resource'];
+        $amount = $validation['amount'];
+        $totalCost = $validation['total_cost'];
         
         $sql = "UPDATE user_resources 
                 SET coins = coins - :cost, 
@@ -197,11 +200,19 @@ class GamificationService
             'amt' => $amount,
             'uid' => $userId
         ]);
-        
+
         $this->logTransaction($userId, 'coins', -$totalCost, 'shop_purchase');
         $this->logTransaction($userId, $resource, $amount, 'shop_purchase');
-        
-        return ['success' => true, 'message' => "Purchased $amount " . ($resources[$resource]['name'] ?? $resource)];
+
+        $label = $validation['resource_label'] ?? $resource;
+
+        return [
+            'success' => true,
+            'message' => "Purchased $amount " . $label,
+            'resource' => $resource,
+            'resource_label' => $label,
+            'total_cost' => $totalCost
+        ];
     }
 
     /**
@@ -209,21 +220,15 @@ class GamificationService
      */
     public function sellResource($userId, $resource, $amount = 1)
     {
-        $resources = SettingsService::get('economy_resources', []);
-        
-        if (!isset($resources[$resource]) || !isset($resources[$resource]['sell'])) {
-            return ['success' => false, 'message' => 'Resource cannot be sold'];
-        }
-        
-        $price = $resources[$resource]['sell'];
-        if ($price <= 0) return ['success' => false, 'message' => 'This item has no resale value'];
+        $validation = $this->economicSecurity->validateSell($userId, $resource, $amount);
 
-        $wallet = $this->getWallet($userId);
-        if ($wallet[$resource] < $amount) {
-            return ['success' => false, 'message' => 'Insufficient stock'];
+        if (!$validation['success']) {
+            return $validation;
         }
-        
-        $gain = $price * $amount;
+
+        $resource = $validation['resource'];
+        $amount = $validation['amount'];
+        $gain = $validation['total_gain'];
         
         $sql = "UPDATE user_resources 
                 SET coins = coins + :gain, 
@@ -238,8 +243,16 @@ class GamificationService
         
         $this->logTransaction($userId, $resource, -$amount, 'shop_sell');
         $this->logTransaction($userId, 'coins', $gain, 'shop_sell');
-        
-        return ['success' => true, 'message' => "Sold $amount for $gain Coins"];
+
+        $label = $validation['resource_label'] ?? $resource;
+
+        return [
+            'success' => true,
+            'message' => "Sold $amount $label for $gain Coins",
+            'resource' => $resource,
+            'resource_label' => $label,
+            'total_gain' => $gain
+        ];
     }
 
     /**

@@ -40,13 +40,19 @@ class NonceService
     /**
      * Validate and consume nonce (one-time use)
      */
-    public function validateAndConsume($nonce, $userId)
+    public function validateAndConsume($nonce, $userId, $quizType = null)
     {
         // Find nonce
-        $session = $this->db->findOne('quiz_sessions', [
+        $criteria = [
             'nonce' => $nonce,
             'user_id' => $userId
-        ]);
+        ];
+
+        if ($quizType !== null) {
+            $criteria['quiz_type'] = $quizType;
+        }
+
+        $session = $this->db->findOne('quiz_sessions', $criteria);
 
         if (!$session) {
             SecurityMonitor::log($userId, 'invalid_nonce', '', ['nonce' => substr($nonce, 0, 10)], 'high');

@@ -145,6 +145,15 @@
 </style>
 
 <script>
+let claimNonce = '<?php echo htmlspecialchars($claimNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>';
+const bpTrap = document.createElement('input');
+bpTrap.type = 'text';
+bpTrap.name = 'trap_answer';
+bpTrap.id = 'bp_trap';
+bpTrap.autocomplete = 'off';
+bpTrap.style.display = 'none';
+document.body.appendChild(bpTrap);
+
 document.querySelectorAll('.btn-claim').forEach(btn => {
     btn.addEventListener('click', async function() {
         const rewardId = this.dataset.id;
@@ -154,6 +163,8 @@ document.querySelectorAll('.btn-claim').forEach(btn => {
         try {
             const formData = new FormData();
             formData.append('reward_id', rewardId);
+            formData.append('nonce', claimNonce);
+            formData.append('trap_answer', document.getElementById('bp_trap').value || '');
             
             const response = await fetch('/api/battle-pass/claim', {
                 method: 'POST',
@@ -162,6 +173,7 @@ document.querySelectorAll('.btn-claim').forEach(btn => {
             const data = await response.json();
 
             if (data.success) {
+                if (data.nonce) claimNonce = data.nonce;
                 this.innerHTML = '<i class="fas fa-check"></i>';
                 this.className = 'btn btn-light btn-sm';
                 if (window.playSfx) playSfx('win');

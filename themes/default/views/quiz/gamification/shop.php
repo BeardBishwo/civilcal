@@ -277,6 +277,16 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
 </style>
 
 <script>
+// Nonce + honeypot
+let shopNonce = '<?php echo isset($shopNonce) ? htmlspecialchars($shopNonce, ENT_QUOTES, 'UTF-8') : ''; ?>';
+const shopTrap = document.createElement('input');
+shopTrap.type = 'text';
+shopTrap.name = 'trap_answer';
+shopTrap.id = 'shop_trap';
+shopTrap.autocomplete = 'off';
+shopTrap.style.display = 'none';
+document.body.appendChild(shopTrap);
+
 function switchMarketTab(evt, tabName) {
     document.querySelectorAll('.market-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
@@ -314,11 +324,14 @@ async function performTransaction(url, data) {
     try {
         const fd = new FormData();
         for (const [key, val] of Object.entries(data)) fd.append(key, val);
+        fd.append('nonce', shopNonce);
+        fd.append('trap_answer', document.getElementById('shop_trap').value || '');
 
         const res = await fetch(app_base_url(url.substring(1)), { method: 'POST', body: fd });
         const result = await res.json();
         
         if (result.success) {
+            if (result.nonce) shopNonce = result.nonce;
             location.reload();
         } else {
             alert("Oracle says: " + result.message);

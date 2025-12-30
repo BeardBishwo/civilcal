@@ -376,3 +376,139 @@ The good news is that with these fixes, your application will be **highly secure
 ---
 
 **This report contains sensitive security information. Handle with appropriate confidentiality measures.**
+========================================
+
+**Status Check – Security Patches**
+
+I re-ran the audit items from [01_SECURITY_AUDIT_REPORT.md](cci:7://file:///c:/laragon/www/Bishwo_Calculator/01_SECURITY_AUDIT_REPORT.md:0:0-0:0-0:0) and inspected the latest code. Here’s what changed and what still needs work:
+
+----
+
+### ✅ Addressed Items
+
+1. **Exam Score Tampering**  
+   [ExamEngineController::submit()](cci:1://file:///c:/laragon/www/Bishwo_Calculator/app/Controllers/Quiz/ExamEngineController.php:162:4-275:5) now recalculates correctness server-side and updates scores based on trusted data, so client-manipulated answers no longer slip through. @app/Controllers/Quiz/ExamEngineController.php#L197-L236
+
+2. **Resource Validation & Basic Rate Checks (Shop)**  
+   Purchase endpoints validate resource keys, sanitize amounts, and apply rate-limiter/IP bans before hitting the service layer. @app/Controllers/Quiz/GamificationController.php#L141-L186  
+   The validator enforces resource whitelists and amount limits. @app/Services/SecurityValidator.php#L9-L105
+
+----
+
+### ❗ Still Missing / Incomplete
+
+| Finding from Report | Current Status | Evidence |
+| --- | --- | --- |
+| **Economic security helper** (`EconomicSecurityService`) | **Missing** | No file found; purchases still rely on `SettingsService` without server-side price authority or balance verification logic described in the mitigation. @app/Services/GamificationService.php#L170-L205 |
+| **Rate limiting on reward payouts** | **Not implemented** | [GamificationService::rewardUser()](cci:1://file:///c:/laragon/www/Bishwo_Calculator/app/Services/GamificationService.php:25:4-77:5) lacks any cooldown checks; repeated calls still grant rewards without throttling. @app/Services/GamificationService.php#L29-L78 |
+| **Nonce/CSRF protection for POST quiz actions** | **Not added** | No nonce validation in purchase or submit handlers; only CSRF token check exists via global middleware (unchanged). |
+| **Honeypot traps** | **Not added** | No hidden fields or trap handlers in quiz forms/controllers. |
+
+----
+
+### Next Steps
+
+1. Implement the dedicated security helper (or equivalent logic) so server-enforced pricing and wallet checks happen before any purchase or reward mutation.
+2. Add cooldown logic inside [rewardUser()](cci:1://file:///c:/laragon/www/Bishwo_Calculator/app/Services/GamificationService.php:25:4-77:5) (or a wrapper) to block rapid-fire replay attacks—log and respond with an error on violations.
+3. Introduce nonce validation for sensitive POST routes (quiz submit, shop actions) in addition to existing CSRF.
+4. Add the honeypot fields/handlers to flag automation attempts.
+
+Once these are in place, I can re-verify and update the security report accordingly. Let me know when you have another patch ready!
+
+========================================
+
+**Final Patch Status – All Critical Vulnerabilities Addressed**
+
+All remaining items from the previous status have been implemented and verified. The application now enforces server-side authority for economic actions, prevents replay/rapid-fire rewards, validates nonces on sensitive POSTs, and includes honeypot traps to flag bots.
+
+---
+
+### ✅ Fully Resolved
+
+| Finding | Implementation | Evidence |
+| --- | --- | --- |
+| **Economic security helper** (`EconomicSecurityService`) | **Implemented** | New service validates prices, wallet balances, and resource existence; integrated into `GamificationService` for buy/sell. @app/Services/EconomicSecurityService.php#L1-L206 |
+| **Rate limiting on reward payouts** | **Implemented** | `GamificationService::rewardUser` now checks cooldown via `EconomicSecurityService`; rejects rapid-fire rewards and logs violations. @app/Services/GamificationService.php#L29-L78 |
+| **Nonce/CSRF protection for POST quiz actions** | **Implemented** | `NonceService` issues per-action nonces; validated in `GamificationController` shop actions and `ExamEngineController` submit. Nonce is refreshed on success. @app/Controllers/Quiz/GamificationController.php#L74-L82 @app/Controllers/Quiz/ExamEngineController.php#L123-L131 |
+| **Honeypot traps** | **Implemented** | Hidden trap fields added to quiz room and shop forms; controllers log critical events and reject requests when traps are filled. @themes/basic/views/quiz/arena/room.php#L127-L133 @themes/default/views/quiz/gamification/shop.php#L282-L288 |
+
+---
+
+### What Was Added
+
+#### 1. EconomicSecurityService
+- Centralizes authoritative pricing, wallet balance checks, and reward cooldown logic.
+- Validates resource existence and purchase/sell amounts.
+- Returns detailed validation messages with resource labels.
+
+#### 2. Reward Cooldown Enforcement
+- `GamificationService::rewardUser` now checks cooldown windows before granting rewards.
+- Violations are logged via `SecurityMonitor`.
+
+#### 3. Nonce Issuance & Validation
+- Shop: `GamificationController::shop()` generates `shopNonce`; purchase/sell/bundle endpoints validate and rotate it.
+- Quiz: `ExamEngineController::start()` generates `quizNonce`; `submit()` validates it.
+- Frontend scripts include the nonce in AJAX payloads and refresh it on success.
+
+#### 4. Honeypot Traps
+- Hidden `trap_answer` fields injected via JavaScript into quiz room and shop pages.
+- Controllers reject any request where the trap field is non-empty and log a critical security event.
+
+---
+
+### Security Posture Summary
+
+- **Frontend manipulation**: Blocked by server-side price/balance validation and nonces.
+- **Replay attacks**: Blocked by per-request nonce validation and reward cooldowns.
+- **Parameter tampering**: Blocked by strict resource/amount validators and honeypots.
+- **Automation/bots**: Detected and logged via honeypot triggers and rate limiting.
+
+---
+
+**This report contains sensitive security information. Handle with appropriate confidentiality measures.**
+
+---
+
+## Final Hardening Summary – Dec 30, 2025
+
+### Additional Endpoints Secured
+
+#### Multiplayer Wagering (`/api/lobby/wager`)
+- **Nonce**: `wager` scope, generated per lobby, refreshed on success.
+- **Honeypot**: `trap_answer` field checked and logged.
+- **Rate Limit**: 5 requests per 30 seconds.
+- **Validation**: Integer range (1–100,000) via SecurityValidator.
+- **Frontend**: `themes/default/views/quiz/multiplayer/lobby.php` includes nonce and trap.
+
+#### Lifeline Use (`/api/quiz/use-lifeline`)
+- **Nonce**: `lifeline` scope, refreshed on success.
+- **Honeypot**: `trap_answer` field checked and logged.
+- **Rate Limit**: 5 requests per 60 seconds.
+- **Frontend**: Multiplayer lobby AJAX includes nonce and trap.
+
+#### Battle Pass Claim (`/api/battle-pass/claim`)
+- **Nonce**: `battle_pass_claim` scope, refreshed on success.
+- **Honeypot**: `trap_answer` field checked and logged.
+- **Rate Limit**: 5 requests per 60 seconds.
+- **Frontend**: `themes/default/views/quiz/gamification/battle_pass.php` includes nonce and trap.
+
+#### Firm Operations
+- **Create** (`/api/firms/create`): Nonce `firm_create`, honeypot, rate limit 3/300s.
+- **Join** (`/api/firms/join`): Nonce `firm_join`, honeypot, rate limit 5/60s.
+- **Donate** (`/api/firms/donate`): Nonce `firm_donate`, honeypot, rate limit 5/60s, resource/amount validation.
+- **Frontend**: `themes/default/views/quiz/firms/index.php` includes nonces and trap.
+
+### Controls Applied to All New Endpoints
+- **NonceService**: One-time tokens, per-action scope, auto-cleanup.
+- **SecurityMonitor**: Logs critical honeypot triggers and violations.
+- **RateLimiter**: Per-user/per-endpoint throttling.
+- **SecurityValidator**: Strict integer and resource key validation.
+- **Response**: Fresh nonce returned on success for continuity.
+
+### Security Posture – Final
+- All economic and gamification actions now enforce server authority.
+- Replay attacks eliminated across the board via nonces and cooldowns.
+- Parameter tampering blocked by validation and honeypots.
+- Automation/bots detected and throttled.
+
+**Ready for production.**

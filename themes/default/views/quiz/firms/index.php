@@ -25,6 +25,8 @@
                     <h4>Start a Firm</h4>
                     <p class="text-muted small">Cost: 5,000 Coins</p>
                     <form action="/api/firms/create" method="POST">
+                        <input type="hidden" name="nonce" value="<?php echo htmlspecialchars($createNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                        <input type="text" name="trap_answer" id="firm_create_trap" style="display:none" autocomplete="off">
                         <div class="form-group mb-3">
                             <input type="text" name="name" class="form-control" placeholder="Firm Name" required>
                         </div>
@@ -72,9 +74,16 @@
 </div>
 
 <script>
+    const joinNonce = '<?php echo htmlspecialchars($joinNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>';
+    function getTrap() {
+        return document.getElementById('firm_create_trap') ? document.getElementById('firm_create_trap').value : '';
+    }
+
     async function requestJoin(guildId) {
         const fd = new FormData();
         fd.append('guild_id', guildId);
+        fd.append('nonce', joinNonce);
+        fd.append('trap_answer', getTrap());
 
         try {
             const res = await fetch('/api/firms/join', { method: 'POST', body: fd });

@@ -4,16 +4,20 @@ namespace App\Controllers\Quiz;
 
 use App\Core\Controller;
 use App\Services\GamificationService;
+use App\Services\NonceService;
+use App\Services\SecurityMonitor;
 
 class GamificationController extends Controller
 {
     private $gamificationService;
+    private NonceService $nonceService;
 
     public function __construct()
     {
         parent::__construct();
         $this->requireAuth();
         $this->gamificationService = new GamificationService();
+        $this->nonceService = new NonceService();
     }
 
     /**
@@ -67,13 +71,15 @@ class GamificationController extends Controller
         $wallet = $this->gamificationService->getWallet($_SESSION['user_id']);
         $bundles = \App\Services\SettingsService::get('economy_bundles', []);
         $cashPacks = \App\Services\SettingsService::get('economy_cash_packs', []);
+        $shopNonce = $this->nonceService->generate($_SESSION['user_id'], 'shop');
         
         $this->view('quiz/gamification/shop', [
             'title' => 'Pashupati Nath Temple Market',
             'inventory' => $inventory,
             'wallet' => $wallet,
             'bundles' => $bundles,
-            'cashPacks' => $cashPacks
+            'cashPacks' => $cashPacks,
+            'shopNonce' => $shopNonce['nonce'] ?? null,
         ]);
     }
 
@@ -107,10 +113,36 @@ class GamificationController extends Controller
         }
 
         $type = $_POST['type'] ?? '';
+        $nonce = $_POST['nonce'] ?? '';
+        $trap = $_POST['trap_answer'] ?? '';
+
+        if (!empty($trap)) {
+            SecurityMonitor::log($_SESSION['user_id'] ?? null, 'honeypot_trigger', $_SERVER['REQUEST_URI'] ?? '', ['type' => $type], 'critical');
+            $this->json(['success' => false, 'message' => 'Invalid request'], 400);
+            return;
+        }
+
+        if (!$this->nonceService->validateAndConsume($nonce, $_SESSION['user_id'], 'lifeline')) {
+            $this->json(['success' => false, 'message' => 'Invalid or expired request token'], 400);
+            return;
+        }
+
+        $rateLimiter = new \App\Services\RateLimiter();
+        $rateCheck = $rateLimiter->check($_SESSION['user_id'], '/api/quiz/use-lifeline', 5, 60);
+        if (!$rateCheck['allowed']) {
+            $this->json(['success' => false, 'message' => 'Too many lifeline requests'], 429);
+            return;
+        }
+
         $lifelineService = new \App\Services\LifelineService();
-        
         $result = $lifelineService->useLifeline($_SESSION['user_id'], $type);
-        $this->json($result);
+
+        if ($result['success']) {
+            $newNonce = $this->nonceService->generate($_SESSION['user_id'], 'lifeline');
+            $result['nonce'] = $newNonce['nonce'] ?? null;
+        }
+
+        $this->json($result, $result['success'] ? 200 : 400);
     }
 
     /**
@@ -131,6 +163,13 @@ class GamificationController extends Controller
     public function craft()
     {
         $qty = (int)($_POST['quantity'] ?? 1);
+        $trap = $_POST['trap_answer'] ?? '';
+        if (!empty($trap)) {
+            SecurityMonitor::log($_SESSION['user_id'] ?? null, 'honeypot_trigger', $_SERVER['REQUEST_URI'] ?? '', [], 'critical');
+            $this->json(['success' => false, 'message' => 'Invalid request'], 400);
+            return;
+        }
+
         $result = $this->gamificationService->craftPlanks($_SESSION['user_id'], $qty);
         $this->json($result, $result['success'] ? 200 : 400);
     }
@@ -161,6 +200,12 @@ class GamificationController extends Controller
         
         $resource = $_POST['resource'] ?? '';
         $amount = (int)($_POST['amount'] ?? 1);
+        $nonce = $_POST['nonce'] ?? '';
+
+        if (!$this->nonceService->validateAndConsume($nonce, $_SESSION['user_id'], 'shop')) {
+            $this->json(['success' => false, 'message' => 'Invalid or expired request token'], 400);
+            return;
+        }
         
         // Security: Validate resource key
         if (!\App\Services\SecurityValidator::validateResource($resource)) {
@@ -182,6 +227,10 @@ class GamificationController extends Controller
         }
         
         $result = $this->gamificationService->purchaseResource($_SESSION['user_id'], $resource, $amount);
+        if ($result['success']) {
+            $newNonce = $this->nonceService->generate($_SESSION['user_id'], 'shop');
+            $result['nonce'] = $newNonce['nonce'] ?? null;
+        }
         $this->json($result, $result['success'] ? 200 : 400);
     }
 
@@ -228,6 +277,10 @@ class GamificationController extends Controller
         }
         
         $result = $this->gamificationService->sellResource($_SESSION['user_id'], $resource, $amount);
+        if ($result['success']) {
+            $newNonce = $this->nonceService->generate($_SESSION['user_id'], 'shop');
+            $result['nonce'] = $newNonce['nonce'] ?? null;
+        }
         echo json_encode($result);
         exit;
     }
@@ -259,6 +312,12 @@ class GamificationController extends Controller
         }
         
         $bundleKey = $_POST['bundle'] ?? '';
+        $nonce = $_POST['nonce'] ?? '';
+
+        if (!$this->nonceService->validateAndConsume($nonce, $_SESSION['user_id'], 'shop')) {
+            echo json_encode(['success' => false, 'message' => 'Invalid or expired request token']);
+            exit;
+        }
         
         // Security: Validate bundle key
         if (!\App\Services\SecurityValidator::validateBundle($bundleKey)) {
@@ -267,6 +326,10 @@ class GamificationController extends Controller
         }
         
         $result = $this->gamificationService->purchaseBundle($_SESSION['user_id'], $bundleKey);
+        if ($result['success']) {
+            $newNonce = $this->nonceService->generate($_SESSION['user_id'], 'shop');
+            $result['nonce'] = $newNonce['nonce'] ?? null;
+        }
         echo json_encode($result);
         exit;
     }
@@ -278,8 +341,12 @@ class GamificationController extends Controller
     {
         $bpService = new \App\Services\BattlePassService();
         $data = $bpService->getProgress($_SESSION['user_id']);
+        $claimNonce = $this->nonceService->generate($_SESSION['user_id'], 'battle_pass_claim');
         
-        $this->view('quiz/gamification/battle_pass', array_merge($data, ['title' => 'Battle Pass: Civil Uprising']));
+        $this->view('quiz/gamification/battle_pass', array_merge($data, [
+            'title' => 'Battle Pass: Civil Uprising',
+            'claimNonce' => $claimNonce['nonce'] ?? null
+        ]));
     }
 
     /**
@@ -292,10 +359,35 @@ class GamificationController extends Controller
         }
 
         $rewardId = $_POST['reward_id'] ?? 0;
+        $nonce = $_POST['nonce'] ?? '';
+        $trap = $_POST['trap_answer'] ?? '';
+
+        if (!empty($trap)) {
+            SecurityMonitor::log($_SESSION['user_id'] ?? null, 'honeypot_trigger', $_SERVER['REQUEST_URI'] ?? '', ['reward_id' => $rewardId], 'critical');
+            $this->json(['success' => false, 'message' => 'Invalid request'], 400);
+            return;
+        }
+
+        if (!$this->nonceService->validateAndConsume($nonce, $_SESSION['user_id'], 'battle_pass_claim')) {
+            $this->json(['success' => false, 'message' => 'Invalid or expired request token'], 400);
+            return;
+        }
+
+        $rateLimiter = new \App\Services\RateLimiter();
+        $rateCheck = $rateLimiter->check($_SESSION['user_id'], '/api/battle-pass/claim', 5, 60);
+        if (!$rateCheck['allowed']) {
+            $this->json(['success' => false, 'message' => 'Too many requests'], 429);
+            return;
+        }
+
         $bpService = new \App\Services\BattlePassService();
         
         try {
             $result = $bpService->claimReward($_SESSION['user_id'], $rewardId);
+            if ($result['success']) {
+                $newNonce = $this->nonceService->generate($_SESSION['user_id'], 'battle_pass_claim');
+                $result['nonce'] = $newNonce['nonce'] ?? null;
+            }
             $this->json($result);
         } catch (\Exception $e) {
             $this->json(['success' => false, 'message' => $e->getMessage()], 400);
