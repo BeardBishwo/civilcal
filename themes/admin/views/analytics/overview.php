@@ -159,6 +159,63 @@ $monthlyCalcs = $overviewStats['monthly_calculations'] ?? 0;
                 </div>
             </div>
 
+            <!-- Location Analytics Section -->
+            <div class="analytics-split-grid">
+                <!-- Map Widget -->
+                <div class="page-card-compact chart-card">
+                    <div class="card-header-compact">
+                        <div class="header-title-sm">
+                            <i class="fas fa-globe-americas text-info"></i>
+                            Global Reach
+                        </div>
+                    </div>
+                    <div class="card-content-compact p-0" style="position: relative; overflow: hidden; height: 350px;">
+                        <img src="<?= app_base_url('/themes/default/assets/images/map.png') ?>" alt="World Map" style="width: 100%; height: 100%; object-fit: contain; background: #f8f9fa;">
+                        <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9); padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; color: #666; border: 1px solid #ddd;">
+                            <i class="fas fa-circle text-success" style="font-size: 8px;"></i> Live Logins
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Locations List -->
+                <div class="page-card-compact">
+                    <div class="card-header-compact">
+                        <div class="header-title-sm">
+                            <i class="fas fa-map-marker-alt text-danger"></i>
+                            Top Locations
+                        </div>
+                    </div>
+                    <div class="card-content-compact p-0">
+                        <?php if (!empty($location_stats ?? [])): ?>
+                            <div class="top-list">
+                                <?php foreach ($location_stats as $stat): ?>
+                                    <div class="top-list-item">
+                                        <div class="top-item-icon" style="background: #fee2e2; color: #ef4444;">
+                                            <i class="fas fa-map-pin"></i>
+                                        </div>
+                                        <div class="top-item-info">
+                                            <div class="top-item-name"><?php echo htmlspecialchars($stat['country']); ?></div>
+                                            <div class="top-item-meta">
+                                                <?php echo number_format($stat['total_logins']); ?> logins · 
+                                                <?php echo number_format($stat['user_count']); ?> users
+                                            </div>
+                                        </div>
+                                        <div class="status-badge" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                                            <?php echo number_format($stat['total_logins']); ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="empty-state-compact py-4">
+                                <i class="fas fa-globe" style="font-size: 2rem;"></i>
+                                <p class="mb-0 mt-2">No location data yet.</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
             <!-- Deep Dive Section -->
             <div class="section-header">
                 <h3><i class="fas fa-compass"></i> Deep Dive</h3>

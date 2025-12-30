@@ -20,6 +20,10 @@ $filters = $filters ?? [];
                 <div class="header-subtitle">Tracking user access, security, and geolocation</div>
             </div>
             <div class="header-actions">
+                <a href="<?= app_base_url('/admin/users/logs/export') ?><?= !empty($filters['search']) ? '?search='.urlencode($filters['search']) : '' ?>" class="btn btn-compact" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; margin-right: 0.5rem;">
+                    <i class="fas fa-file-csv"></i>
+                    <span>Export CSV</span>
+                </a>
                 <button onclick="location.reload()" class="btn btn-compact" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
                     <i class="fas fa-sync-alt"></i>
                     <span>Refresh</span>

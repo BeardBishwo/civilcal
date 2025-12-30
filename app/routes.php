@@ -270,6 +270,14 @@ $router->add("POST", "/admin/advertisements/update/{id}", "Admin\AdvertisementCo
 $router->add("POST", "/admin/advertisements/delete/{id}", "Admin\AdvertisementController@delete", ["auth", "admin"]);
 $router->add("POST", "/admin/advertisements/toggle/{id}", "Admin\AdvertisementController@toggle", ["auth", "admin"]);
 
+$router->add("GET", "/admin/analytics", "Admin\\AnalyticsController@overview", ["auth", "admin"]);
+$router->add("GET", "/admin/analytics/overview", "Admin\\AnalyticsController@overview", ["auth", "admin"]);
+$router->add("GET", "/admin/analytics/users", "Admin\\AnalyticsController@users", ["auth", "admin"]);
+$router->add("GET", "/admin/analytics/calculators", "Admin\\AnalyticsController@calculators", ["auth", "admin"]);
+$router->add("GET", "/admin/analytics/reports", "Admin\\AnalyticsController@reports", ["auth", "admin"]);
+$router->add("POST", "/admin/analytics/reports/generate", "Admin\\AnalyticsController@generateReport", ["auth", "admin"]);
+$router->add("GET", "/admin/analytics/performance", "Admin\\AnalyticsController@performance", ["auth", "admin"]);
+
 // Blog Management
 $router->add("GET", "/admin/blog", "Admin\BlogController@index", ["auth", "admin"]);
 $router->add("GET", "/admin/blog/create", "Admin\BlogController@create", ["auth", "admin"]);
@@ -792,6 +800,14 @@ $router->add("GET", "/admin/content/pages/edit/{id}", "Admin\ContentController@e
     "auth",
     "admin",
 ]);
+$router->add("POST", "/admin/security/alerts/resolve", "Admin\\SecurityAlertsController@resolve", [
+    "auth",
+    "admin",
+]);
+// IP Restrictions
+$router->add("GET", "/admin/security/ip-restrictions", "Admin\\IPRestrictionsController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/security/ip-restrictions/add", "Admin\\IPRestrictionsController@add", ["auth", "admin"]);
+$router->add("POST", "/admin/security/ip-restrictions/remove", "Admin\\IPRestrictionsController@remove", ["auth", "admin"]);
 $router->add("POST", "/admin/content/pages/save", "Admin\ContentController@save", [
     "auth",
     "admin",
@@ -1886,6 +1902,24 @@ $router->add("POST", "/api/quiz/lifeline/use", "Quiz\\LifelineController@use", [
 $router->add("POST", "/api/quest/record-calculation", "QuestController@recordCalculation", ["auth"]);
 $router->add("POST", "/api/quest/news-read", "QuestController@newsRead", ["auth"]);
 
+
+// ============================================
+// SECURITY & ACCESS CONTROL ROUTES
+// ============================================
+
+// IP Restrictions
+$router->add("GET", "/admin/security/ip-restrictions", "Admin\\IPRestrictionsController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/security/ip-restrictions/add", "Admin\\IPRestrictionsController@add", ["auth", "admin"]);
+$router->add("POST", "/admin/security/ip-restrictions/remove", "Admin\\IPRestrictionsController@remove", ["auth", "admin"]);
+
+// Security Alerts
+$router->add("GET", "/admin/security/alerts", "Admin\\SecurityAlertsController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/security/alerts/resolve", "Admin\\SecurityAlertsController@resolve", ["auth", "admin"]);
+
+// Analytics Hub (Additional Routes)
+$router->add("GET", "/admin/analytics/overview", "Admin\\AnalyticsController@overview", ["auth", "admin"]);
+$router->add("GET", "/admin/analytics/reports", "Admin\\AnalyticsController@reports", ["auth", "admin"]);
+$router->add("POST", "/admin/analytics/reports/generate", "Admin\\AnalyticsController@generateReport", ["auth", "admin"]);
 
 // ============================================
 // FRONTEND QUIZ PORTAL ROUTES

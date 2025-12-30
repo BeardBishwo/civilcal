@@ -118,6 +118,15 @@ class AuthController extends Controller
                     $waitMinutes = ceil((strtotime($user->lockout_until) - time()) / 60);
                     throw new Exception("Account is temporarily locked due to too many failed login attempts. Please try again in {$waitMinutes} minutes.");
                 }
+                // Check IP Restrictions
+                $ipService = new \App\Services\IPRestrictionService();
+                $ipCheck = $ipService->checkIP($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+                
+                if (!$ipCheck['allowed']) {
+                    // Log attempted login from blocked IP?
+                    error_log("Blocked login attempt from IP: " . ($_SERVER['REMOTE_ADDR'] ?? 'unknown') . " Reason: " . $ipCheck['reason']);
+                    throw new Exception('Access denied: ' . $ipCheck['reason']);
+                }
 
                 if (password_verify($password, $user->password)) {
                 // Reset failed logins and log session with geolocation

@@ -96,7 +96,7 @@ class Analytics
                 FROM analytics_events 
                 WHERE event_type = :type 
                 AND created_at >= DATE_SUB(NOW(), INTERVAL :days DAY)
-                GROUP BY page_url
+                GROUP BY page_url, event_category
                 ORDER BY count DESC
                 LIMIT " . (int)$limit;
                 

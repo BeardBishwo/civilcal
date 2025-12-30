@@ -356,6 +356,29 @@ class AnalyticsService
     }
 
     /**
+     * Get login location statistics
+     */
+    public function getLoginLocationStats($limit = 10)
+    {
+        try {
+            $stmt = $this->userModel->getDb()->getPdo()->prepare("
+                SELECT country, COUNT(DISTINCT user_id) as user_count, SUM(login_count) as total_logins
+                FROM user_login_locations
+                WHERE country IS NOT NULL
+                GROUP BY country
+                ORDER BY total_logins DESC
+                LIMIT ?
+            ");
+            $stmt->bindValue(1, $limit, \PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log('AnalyticsService location stats error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
      * Get the database connection from a model for internal use
      */
     public function getDatabaseConnection()

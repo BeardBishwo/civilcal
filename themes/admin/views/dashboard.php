@@ -621,13 +621,3 @@
         }
     }
 </script>
-        showNotification('System health check running... All services are operational.', 'success');
-    }
-    
-    // Backup simulation
-    function createBackup() {
-        showConfirmModal('Start Backup', 'Start system backup?', () => {
-             showNotification('Backup started in background.', 'info');
-        });
-    }
-</script>

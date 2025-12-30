@@ -799,6 +799,8 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                             <li><a href="<?php echo app_base_url('admin/users/create'); ?>">Add New</a></li>
                             <li><a href="<?php echo app_base_url('admin/users/roles'); ?>">Roles</a></li>
                             <li><a href="<?php echo app_base_url('admin/users/logs/logins'); ?>">Login Logs</a></li>
+                            <li><a href="<?php echo app_base_url('admin/security/ip-restrictions'); ?>">IP Access Control</a></li>
+                            <li><a href="<?php echo app_base_url('admin/security/alerts'); ?>">Security Alerts</a></li>
                         </ul>
                     </li>
 
