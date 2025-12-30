@@ -1046,6 +1046,9 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                 <div class="header-right">
                     <!-- Quick Actions -->
                     <div class="quick-actions">
+                        <button class="btn btn-icon" title="Global Search" onclick="toggleSearch()">
+                            <i class="fas fa-search"></i>
+                        </button>
                         <button class="btn btn-icon" title="System Health" onclick="window.location.href='<?php echo app_base_url('admin/system-status'); ?>'">
                             <i class="fas fa-heartbeat"></i>
                         </button>
@@ -1267,6 +1270,230 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                     console.error("❌ Theme toggle button not found");
                 }
             }, 1000);
+        });
+    </script>
+    <!-- Global Search Overlay -->
+    <div id="search-overlay" class="search-overlay">
+        <div class="search-container">
+            <div class="search-input-wrapper">
+                 <i class="fas fa-search search-icon"></i>
+                 <input type="text" id="global-search-input" placeholder="Type to search..." autocomplete="off">
+                 <i class="fas fa-spinner fa-spin search-spinner" style="display:none;"></i>
+            </div>
+            <div id="search-results" class="search-results"></div>
+            <div class="search-footer">
+                 Press ESC to close
+            </div>
+        </div>
+        <button class="close-search" onclick="toggleSearch()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <style>
+    /* Search Overlay Styles */
+    .search-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(8px);
+        z-index: 99999;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 100px;
+    }
+    .search-overlay.open {
+        display: flex;
+        opacity: 1;
+    }
+    .search-container {
+        width: 100%;
+        max-width: 600px;
+        background: transparent;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        transform: translateY(-20px);
+        transition: transform 0.3s ease;
+    }
+    .search-overlay.open .search-container {
+        transform: translateY(0);
+    }
+    .search-input-wrapper {
+        position: relative;
+        width: 100%;
+        background: var(--admin-white);
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+    }
+    .search-input-wrapper .search-icon {
+        position: absolute;
+        left: 20px;
+        font-size: 1.2rem;
+        color: var(--admin-gray-400);
+    }
+    .search-input-wrapper .search-spinner {
+        position: absolute;
+        right: 20px;
+        font-size: 1.2rem;
+        color: var(--admin-primary);
+    }
+    #global-search-input {
+        width: 100%;
+        padding: 1.5rem 1.5rem 1.5rem 3.5rem;
+        font-size: 1.2rem;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: var(--admin-gray-800);
+    }
+    .search-results {
+        background: var(--admin-white);
+        border-radius: 12px;
+        overflow: hidden;
+        max-height: 50vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        display: none; 
+    }
+    .search-result-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--admin-gray-200);
+        cursor: pointer;
+        text-decoration: none;
+        color: var(--admin-gray-800);
+        transition: background 0.2s;
+    }
+    .search-result-item:last-child { border-bottom: none; }
+    .search-result-item:hover { background: var(--admin-gray-50); }
+    .search-result-icon {
+        width: 32px;
+        height: 32px;
+        background: var(--admin-gray-100);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--admin-gray-600);
+    }
+    .search-result-info {
+        display: flex;
+        flex-direction: column;
+    }
+    .search-result-title { font-weight: 500; font-size: 1rem; }
+    .search-result-type { font-size: 0.75rem; color: var(--admin-gray-500); text-transform: uppercase; font-weight: 600; }
+    .close-search {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        background: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.2rem;
+        color: var(--admin-gray-600);
+        transition: transform 0.2s;
+    }
+    .close-search:hover { transform: rotate(90deg); color: var(--admin-danger); }
+    .search-footer { color: rgba(255,255,255,0.6); text-align: center; font-size: 0.8rem; margin-top: 1rem; }
+    </style>
+
+    <script>
+        function toggleSearch() {
+            const overlay = document.getElementById('search-overlay');
+            const input = document.getElementById('global-search-input');
+            
+            if (overlay.classList.contains('open')) {
+                overlay.classList.remove('open');
+                setTimeout(() => overlay.style.display = 'none', 300);
+                 document.body.style.overflow = '';
+            } else {
+                overlay.style.display = 'flex';
+                // Trigger reflow
+                overlay.offsetHeight; 
+                overlay.classList.add('open');
+                setTimeout(() => input.focus(), 100);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Search Logic
+        const searchInput = document.getElementById('global-search-input');
+        const resultsContainer = document.getElementById('search-results');
+        const searchSpinner = document.querySelector('.search-spinner');
+        let searchTimeout;
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                clearTimeout(searchTimeout);
+                
+                if (query.length < 2) {
+                    resultsContainer.style.display = 'none';
+                    resultsContainer.innerHTML = '';
+                    return;
+                }
+
+                searchSpinner.style.display = 'block';
+                
+                searchTimeout = setTimeout(() => {
+                    fetch('<?php echo app_base_url('/admin/api/search?q='); ?>' + encodeURIComponent(query))
+                        .then(r => r.json())
+                        .then(data => {
+                            searchSpinner.style.display = 'none';
+                            resultsContainer.innerHTML = '';
+                            
+                            if (data.length > 0) {
+                                resultsContainer.style.display = 'block';
+                                data.forEach(item => {
+                                    resultsContainer.innerHTML += `
+                                        <a href="${item.url}" class="search-result-item">
+                                            <div class="search-result-icon"><i class="fas ${item.icon}"></i></div>
+                                            <div class="search-result-info">
+                                                <span class="search-result-title">${item.title}</span>
+                                                <span class="search-result-type">${item.type}</span>
+                                            </div>
+                                        </a>
+                                    `;
+                                });
+                            } else {
+                                 resultsContainer.style.display = 'block';
+                                 resultsContainer.innerHTML = '<div style="padding:1.5rem; text-align:center; color:var(--admin-gray-500);">No results found</div>';
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            searchSpinner.style.display = 'none';
+                        });
+                }, 300);
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const overlay = document.getElementById('search-overlay');
+            if (e.key === 'Escape' && overlay && overlay.classList.contains('open')) {
+                toggleSearch();
+            }
+            // CMD+K or CTRL+K
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                 e.preventDefault();
+                 toggleSearch();
+            }
         });
     </script>
 </body>

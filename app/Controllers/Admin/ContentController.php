@@ -512,21 +512,73 @@ class ContentController extends Controller
                     continue;
                 }
 
-                // Move uploaded file
                 if (move_uploaded_file($tmpName, $filePath)) {
                     // Collect image dimensions if applicable
                     $width = null;
                     $height = null;
+                    $optimizedData = [];
+                    
                     if ($fileType === 'images') {
                         $imageInfo = @getimagesize($filePath);
                         if ($imageInfo) {
                             $width = $imageInfo[0];
                             $height = $imageInfo[1];
                         }
+
+                        // Optimization Logic
+                        try {
+                            $optimizer = new \App\Services\ImageOptimizer();
+                            
+                            // 1. Optimize Original
+                            $optResult = $optimizer->optimize($filePath);
+                            if ($optResult) {
+                                $optimizedData['optimized'] = 1;
+                                $optimizedData['original_size'] = $optResult['original_size'];
+                                $optimizedData['optimized_size'] = $optResult['optimized_size'];
+                                $optimizedData['compression_ratio'] = ($optResult['original_size'] > 0) 
+                                    ? round((($optResult['original_size'] - $optResult['optimized_size']) / $optResult['original_size']) * 100, 2) 
+                                    : 0;
+                            }
+
+                            // 2. Generate Thumbnail (150px)
+                            $thumbDir = $storagePath . 'thumbnails/';
+                            if (!is_dir($thumbDir)) mkdir($thumbDir, 0755, true);
+                            
+                            $thumbFilename = 'thumb_' . $filename;
+                            $thumbPath = $thumbDir . $thumbFilename;
+                            
+                            if ($optimizer->resize($filePath, $thumbPath, 150)) {
+                                $optimizedData['thumbnail_path'] = 'media/' . $fileType . '/thumbnails/' . $thumbFilename;
+                            }
+
+                            // 3. Generate Medium (800px)
+                            $mediumDir = $storagePath . 'medium/';
+                            if (!is_dir($mediumDir)) mkdir($mediumDir, 0755, true);
+                            
+                            $mediumFilename = 'medium_' . $filename;
+                            $mediumPath = $mediumDir . $mediumFilename;
+                            
+                            if ($width > 800) {
+                                if ($optimizer->resize($filePath, $mediumPath, 800)) {
+                                    $optimizedData['medium_path'] = 'media/' . $fileType . '/medium/' . $mediumFilename;
+                                }
+                            }
+
+                            // 4. Convert to WebP
+                            $webpFilename = pathinfo($filename, PATHINFO_FILENAME) . '.webp';
+                            $webpPath = $storagePath . $webpFilename;
+                            
+                            if ($optimizer->convertToWebP($filePath, $webpPath)) {
+                                $optimizedData['has_webp'] = 1;
+                            }
+
+                        } catch (\Exception $e) {
+                            $this->logError('Image optimization failed', ['error' => $e->getMessage(), 'file' => $filename]);
+                        }
                     }
 
                     // Save to database
-                    $mediaId = $this->mediaModel->create([
+                    $mediaId = $this->mediaModel->create(array_merge([
                         'original_filename' => $originalFilename,
                         'filename' => $filename,
                         'file_path' => $relativeFilePath,
@@ -536,7 +588,7 @@ class ContentController extends Controller
                         'width' => $width,
                         'height' => $height,
                         'uploaded_by' => $user->id
-                    ]);
+                    ], $optimizedData));
 
                     if ($mediaId) {
                         $uploadedFiles[] = [

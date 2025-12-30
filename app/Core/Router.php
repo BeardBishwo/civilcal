@@ -16,7 +16,8 @@ class Router
         'csrf' => '\App\Middleware\CsrfMiddleware',
         'security' => '\App\Middleware\SecurityMiddleware',
         'ratelimit' => '\App\Middleware\RateLimitMiddleware',
-        'maintenance' => '\App\Middleware\MaintenanceMiddleware'
+        'maintenance' => '\App\Middleware\MaintenanceMiddleware',
+        'analytics' => '\App\Middleware\AnalyticsTracker'
     ];
 
     public function add($method, $uri, $controller, $middleware = [])
@@ -27,6 +28,9 @@ class Router
         }
         if (!in_array('security', $mw, true)) {
             $mw[] = 'security';
+        }
+        if (!in_array('analytics', $mw, true)) {
+            $mw[] = 'analytics';
         }
         if (stripos($uri, '/api') === 0) {
             if (!in_array('cors', $mw, true)) {

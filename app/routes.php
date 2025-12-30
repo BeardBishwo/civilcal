@@ -223,6 +223,14 @@ $router->add("GET", "/admin/dashboard_complex", "Admin\\DashboardController@dash
     "admin",
 ]);
 
+// Analytics API Routes
+$router->add("GET", "/admin/api/analytics/stats", "Admin\DashboardController@getStats", ["auth", "admin"]);
+$router->add("GET", "/admin/api/analytics/popular", "Admin\DashboardController@getPopular", ["auth", "admin"]);
+
+// Search API Routes
+$router->add("GET", "/admin/api/search", "Admin\SearchController@search", ["auth", "admin"]);
+$router->add("POST", "/admin/api/search/reindex", "Admin\SearchController@reindex", ["auth", "admin"]);
+
 // MODULE MANAGEMENT - CONSOLIDATED (Fixed duplicate conflict)
 $router->add("GET", "/admin/modules", "Admin\ModuleController@index", [
     "auth",

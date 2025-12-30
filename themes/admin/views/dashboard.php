@@ -29,10 +29,10 @@
                     <i class="fas fa-users"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value"><?php echo number_format($stats['total_users'] ?? 0); ?></div>
-                    <div class="stat-label">Total Users</div>
-                    <div class="stat-trend text-success">
-                        <i class="fas fa-arrow-up"></i> 12.5% vs last month
+                    <div class="stat-value"><?php echo number_format($stats['visitors_today'] ?? 0); ?></div>
+                    <div class="stat-label">Visitors Today</div>
+                    <div class="stat-trend text-primary">
+                        <i class="fas fa-eye"></i> <?php echo number_format($stats['views_today'] ?? 0); ?> views
                     </div>
                 </div>
             </div>
@@ -41,10 +41,10 @@
                     <i class="fas fa-user-check"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value"><?php echo number_format($stats['active_users'] ?? 0); ?></div>
-                    <div class="stat-label">Active Users</div>
+                    <div class="stat-value"><?php echo number_format($stats['total_users'] ?? 0); ?></div>
+                    <div class="stat-label">Total Users</div>
                     <div class="stat-trend text-success">
-                        <i class="fas fa-arrow-up"></i> 8.2% vs last month
+                        <i class="fas fa-plus"></i> Active
                     </div>
                 </div>
             </div>
@@ -53,10 +53,10 @@
                     <i class="fas fa-calculator"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-value"><?php echo number_format($stats['monthly_calculations'] ?? 0); ?></div>
-                    <div class="stat-label">Calculations This Month</div>
+                    <div class="stat-value"><?php echo number_format($stats['total_calculations'] ?? 0); ?></div>
+                    <div class="stat-label">Calculations Today</div>
                     <div class="stat-trend text-success">
-                        <i class="fas fa-arrow-up"></i> 15.3% vs last month
+                        <i class="fas fa-arrow-up"></i> Real-time
                     </div>
                 </div>
             </div>
@@ -81,6 +81,18 @@
                 <!-- Left Column -->
                 <div class="grid-col-8">
                     
+                    <!-- Traffic Chart -->
+                    <div class="page-card-compact mb-4">
+                        <div class="card-header-compact">
+                            <div class="header-title-sm">
+                                <i class="fas fa-chart-area text-primary"></i> Traffic Overview (30 Days)
+                            </div>
+                        </div>
+                        <div class="card-content-compact">
+                            <canvas id="trafficChart" height="100"></canvas>
+                        </div>
+                    </div>
+
                     <!-- Quick Actions -->
                      <div class="page-card-compact mb-4">
                         <div class="card-header-compact">
@@ -122,38 +134,38 @@
                             <div class="table-wrapper">
                                 <table class="table-compact">
                                     <tbody>
+                                        <?php if(empty($recent_activity)): ?>
                                         <tr>
-                                            <td width="40" class="text-center"><i class="fas fa-user-plus text-success"></i></td>
-                                            <td>
-                                                <div class="font-medium text-dark">New user registered</div>
-                                                <div class="text-xs text-muted">john.doe@example.com</div>
-                                            </td>
-                                            <td class="text-right text-xs text-muted">5 mins ago</td>
+                                            <td colspan="3" class="text-center text-muted p-4">No recent activity found</td>
                                         </tr>
-                                        <tr>
-                                            <td width="40" class="text-center"><i class="fas fa-calculator text-primary"></i></td>
-                                            <td>
-                                                <div class="font-medium text-dark">Concrete calculator used</div>
-                                                <div class="text-xs text-muted">Anonymous user</div>
-                                            </td>
-                                            <td class="text-right text-xs text-muted">12 mins ago</td>
-                                        </tr>
-                                        <tr>
-                                            <td width="40" class="text-center"><i class="fas fa-cog text-gray-400"></i></td>
-                                            <td>
-                                                <div class="font-medium text-dark">System settings updated</div>
-                                                <div class="text-xs text-muted">admin@example.com</div>
-                                            </td>
-                                            <td class="text-right text-xs text-muted">1 hour ago</td>
-                                        </tr>
-                                        <tr>
-                                            <td width="40" class="text-center"><i class="fas fa-puzzle-piece text-warning"></i></td>
-                                            <td>
-                                                <div class="font-medium text-dark">Analytics module activated</div>
-                                                <div class="text-xs text-muted">admin@example.com</div>
-                                            </td>
-                                            <td class="text-right text-xs text-muted">2 hours ago</td>
-                                        </tr>
+                                        <?php else: ?>
+                                            <?php foreach($recent_activity as $act): 
+                                                $icon = 'fa-circle text-gray-400';
+                                                $text = 'User Action';
+                                                
+                                                if ($act['event_type'] == 'page_view') {
+                                                    $icon = 'fa-eye text-info';
+                                                    $text = 'Visited ' . $act['page_url'];
+                                                } elseif ($act['event_type'] == 'calculator_use') {
+                                                    $icon = 'fa-calculator text-primary';
+                                                    $text = 'Used Calculator: ' . ($act['event_category'] ?? 'General');
+                                                } elseif ($act['event_type'] == 'login') {
+                                                    $icon = 'fa-sign-in-alt text-success';
+                                                    $text = 'User logged in';
+                                                }
+                                                
+                                                $time = \App\Helpers\TimeHelper::timeAgo($act['created_at']);
+                                            ?>
+                                            <tr>
+                                                <td width="40" class="text-center"><i class="fas <?php echo $icon; ?>"></i></td>
+                                                <td>
+                                                    <div class="font-medium text-dark"><?php echo htmlspecialchars($text); ?></div>
+                                                    <div class="text-xs text-muted"><?php echo $act['ip_address']; ?></div>
+                                                </td>
+                                                <td class="text-right text-xs text-muted"><?php echo $time; ?></td>
+                                            </tr>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -164,33 +176,48 @@
                 <!-- Right Column -->
                 <div class="grid-col-4">
                     
-                    <!-- Revenue Widget -->
+                    <!-- Popular Calculators Widget -->
                     <div class="page-card-compact mb-4">
                         <div class="card-header-compact">
                             <div class="header-title-sm">
-                                <i class="fas fa-dollar-sign text-success"></i> Revenue
+                                <i class="fas fa-chart-pie text-info"></i> Top Content
                             </div>
-                            <a href="<?php echo app_base_url('/admin/subscriptions'); ?>" class="text-xs font-medium text-primary hover:underline">Details</a>
                         </div>
-                        <div class="card-content-compact">
-                            <div class="text-center py-3">
-                                <div class="text-3xl font-bold text-dark">$2,450</div>
-                                <div class="text-xs text-muted uppercase tracking-wide">Monthly Revenue</div>
-                            </div>
-                             <div class="table-container">
-                                <table class="table-compact w-100">
-                                    <tbody>
+                        <div class="table-container">
+                             <table class="table-compact">
+                                <tbody>
+                                    <?php if(empty($popular_calculators)): ?>
+                                        <tr><td class="text-center text-muted p-3">No data yet</td></tr>
+                                    <?php else: ?>
+                                        <?php 
+                                            $max = 0;
+                                            foreach($popular_calculators as $p) $max = max($max, $p['count']);
+                                            if($max == 0) $max = 1;
+                                        ?>
+                                        <?php foreach($popular_calculators as $calc): 
+                                            $percent = round(($calc['count'] / $max) * 100);
+                                        ?>
                                         <tr>
-                                            <td class="text-sm">Active Subs</td>
-                                            <td class="text-right font-medium">47</td>
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <span class="text-sm font-medium text-truncate" style="max-width: 180px;" title="<?php echo htmlspecialchars($calc['page_url']); ?>">
+                                                        <?php 
+                                                            $name = basename($calc['page_url']);
+                                                            $name = str_replace(['-', '_'], ' ', $name);
+                                                            echo ucwords($name); 
+                                                        ?>
+                                                    </span>
+                                                    <span class="text-xs text-muted"><?php echo $calc['count']; ?></span>
+                                                </div>
+                                                <div class="progress-bar-compact bg-gray-100 rounded-full h-1 mt-1">
+                                                    <div class="bg-blue-500 h-1 rounded-full" style="width: <?php echo $percent; ?>%"></div>
+                                                </div>
+                                            </td>
                                         </tr>
-                                         <tr>
-                                            <td class="text-sm">New This Month</td>
-                                            <td class="text-right font-medium text-success">+12</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                             </div>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -512,9 +539,88 @@
 
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Init Traffic Chart
+        const ctx = document.getElementById('trafficChart');
+        if (ctx) {
+            fetch('<?php echo app_base_url("/admin/api/analytics/stats?type=page_view&days=30"); ?>')
+                .then(response => response.json())
+                .then(data => {
+                    const dates = data.map(item => {
+                        const d = new Date(item.date);
+                        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    });
+                    const counts = data.map(item => item.count);
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [{
+                                label: 'Page Views',
+                                data: counts,
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 2,
+                                pointHoverRadius: 5
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    mode: 'index',
+                                    intersect: false,
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: { borderDash: [2, 4], color: '#f3f4f6' },
+                                    ticks: { font: { size: 10 } }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { font: { size: 10 }, maxTicksLimit: 10 }
+                                }
+                            },
+                            interaction: {
+                                mode: 'nearest',
+                                axis: 'x',
+                                intersect: false
+                            }
+                        }
+                    });
+                })
+                .catch(err => console.error('Error loading chart data:', err));
+        }
+    });
+
     // System health check simulation
     function checkSystemHealth() {
+        showNotification('System health check running... All services are operational.', 'success');
+    }
+    
+    // Backup simulation
+    function createBackup() {
+        if (typeof showConfirmModal === 'function') {
+            showConfirmModal('Start Backup', 'Start system backup?', () => {
+                 showNotification('Backup started in background.', 'info');
+            });
+        } else {
+            if(confirm('Start system backup?')) {
+                alert('Backup started in background.');
+            }
+        }
+    }
+</script>
         showNotification('System health check running... All services are operational.', 'success');
     }
     

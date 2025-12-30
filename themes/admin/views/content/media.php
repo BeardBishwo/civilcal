@@ -184,6 +184,23 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
     .badge-used { background: var(--media-success); }
     .badge-unused { background: var(--media-warning); }
 
+    .optimized-badge {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        background: var(--media-primary);
+        color: white;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
     .media-item .file-placeholder {
         width: 100%;
         height: 100%;
@@ -462,6 +479,9 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
                          data-width="<?php echo $item['width'] ?? ''; ?>"
                          data-height="<?php echo $item['height'] ?? ''; ?>"
                          data-usage='<?php echo json_encode($item['usage']); ?>'
+                         data-optimized="<?php echo $item['optimized'] ?? 0; ?>"
+                         data-ratio="<?php echo $item['compression_ratio'] ?? 0; ?>"
+                         data-webp="<?php echo $item['has_webp'] ?? 0; ?>"
                          onclick="handleItemClick(this, event)">
                         
                         <div class="item-checkbox-wrapper">
@@ -471,6 +491,12 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
                         <div class="usage-badge <?php echo $isUsed ? 'badge-used' : 'badge-unused'; ?>">
                             <?php echo $isUsed ? 'Used' : 'Unused'; ?>
                         </div>
+
+                        <?php if(!empty($item['optimized'])): ?>
+                        <div class="optimized-badge" title="Optimized (-<?php echo $item['compression_ratio']; ?>%)">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <?php endif; ?>
 
                         <div class="media-item-content">
                             <?php if ($isImage): ?>
@@ -497,6 +523,7 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
         <div class="media-info-sidebar-content">
             <div class="media-detail-preview" id="sidebar-preview"></div>
             <div class="media-detail-info">
+                <div id="sidebar-optimization" style="margin-bottom:0.5rem; font-size:0.8rem; color:var(--media-success); display:none;"></div>
                 <h3 id="sidebar-filename" style="font-size:0.9rem; margin-bottom:0.2rem; word-break: break-all;"></h3>
                 <p id="sidebar-date" style="font-size:0.8rem; color: var(--media-gray-600);"></p>
                 <p id="sidebar-file-meta" style="font-size:0.8rem; color: var(--media-gray-600);"></p>
@@ -612,6 +639,14 @@ $totalFiles = isset($pagination) ? $pagination['total'] : count($media);
         document.getElementById('sidebar-date').innerText = data.date;
         document.getElementById('sidebar-file-meta').innerText = data.size + (data.width ? ` (${data.width}x${data.height})` : '');
         document.getElementById('sidebar-url-input').value = data.url;
+
+        const optDiv = document.getElementById('sidebar-optimization');
+        if (data.optimized == '1') {
+             optDiv.style.display = 'block';
+             optDiv.innerHTML = '<i class="fas fa-check-circle"></i> Optimized ' + (data.ratio > 0 ? `(-${data.ratio}%)` : '') + (data.webp == '1' ? ' <span style="margin-left:5px; padding:1px 4px; background:var(--media-primary); color:white; border-radius:3px; font-size:9px;">WEBP</span>' : '');
+        } else {
+             optDiv.style.display = 'none';
+        }
 
         const previewContainer = document.getElementById('sidebar-preview');
         previewContainer.innerHTML = data.type.startsWith('image/') ? `<img src="${data.url}" alt="">` : `<i class="fas fa-file-alt" style="font-size: 4rem; color: var(--media-gray-300);"></i>`;
