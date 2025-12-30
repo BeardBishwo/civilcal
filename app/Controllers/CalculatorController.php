@@ -166,7 +166,8 @@ class CalculatorController extends Controller
         $isQuestCompleted = $questService->isCompleted($userId);
         
         $wallet = $gamification->getWallet($userId);
-        $rankData = $rankService->getUserRankData($stats, $wallet['coins'] ?? 0);
+        $rankData = $rankService->getUserRankData($stats, $wallet);
+
 
         $this->view->render('dashboard', [
             'user_stats' => $stats,

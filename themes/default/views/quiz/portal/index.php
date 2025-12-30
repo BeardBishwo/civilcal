@@ -12,6 +12,44 @@
  */
 ?>
 
+<?php if (isset($dailyBonus) && $dailyBonus && $dailyBonus['success']): ?>
+<div class="daily-bonus-toast animate__animated animate__bounceIn">
+    <div class="bonus-icon"><?php echo isset($dailyBonus['rewards']['steel']) ? '🛡️' : '🪵'; ?></div>
+    <div class="bonus-details">
+        <h5>Daily Civil Reward! (Day <?php echo $dailyBonus['rewards']['streak']; ?>)</h5>
+        <p>
+            <?php if (isset($dailyBonus['rewards']['steel'])): ?>
+                You received a <strong>Steel Bundle (+10 Steel)</strong> for your 7-day streak!
+            <?php else: ?>
+                You received <strong>1 Timber Log</strong> for logging in today.
+            <?php endif; ?>
+        </p>
+    </div>
+    <button class="close-toast" onclick="this.parentElement.remove()">×</button>
+</div>
+<style>
+.daily-bonus-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+    color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.bonus-icon { font-size: 2.5rem; }
+.bonus-details h5 { margin: 0; font-weight: 800; color: #f59e0b; }
+.bonus-details p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
+.close-toast { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+</style>
+<?php endif; ?>
+
 <div class="portal-container">
     <!-- Hero Section -->
     <section class="portal-hero">
@@ -196,6 +234,7 @@
 .gradient-text {
     background: linear-gradient(90deg, #6366f1, #a855f7);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 800;
 }

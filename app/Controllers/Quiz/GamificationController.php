@@ -110,6 +110,52 @@ class GamificationController extends Controller
     }
 
     /**
+     * Show Sawmill (Crafting)
+     */
+    public function sawmill()
+    {
+        $wallet = $this->gamificationService->getWallet($_SESSION['user_id']);
+        $this->view('quiz/gamification/sawmill', [
+            'wallet' => $wallet,
+            'title' => 'The Sawmill'
+        ]);
+    }
+
+    /**
+     * AJAX: Craft Planks
+     */
+    public function craft()
+    {
+        $qty = (int)($_POST['quantity'] ?? 1);
+        $result = $this->gamificationService->craftPlanks($_SESSION['user_id'], $qty);
+        $this->json($result, $result['success'] ? 200 : 400);
+    }
+
+    /**
+     * AJAX: Purchase Resource
+     */
+    public function purchaseResource()
+    {
+        $resource = $_POST['resource'] ?? '';
+        $amount = (int)($_POST['amount'] ?? 1);
+        
+        $result = $this->gamificationService->purchaseResource($_SESSION['user_id'], $resource, $amount);
+        $this->json($result, $result['success'] ? 200 : 400);
+    }
+
+    /**
+     * AJAX: Sell Resource
+     */
+    public function sellResource()
+    {
+        $resource = $_POST['resource'] ?? '';
+        $amount = (int)($_POST['amount'] ?? 1);
+        
+        $result = $this->gamificationService->sellResource($_SESSION['user_id'], $resource, $amount);
+        $this->json($result, $result['success'] ? 200 : 400);
+    }
+
+    /**
      * Show Battle Pass
      */
     public function battlePass()

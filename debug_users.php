@@ -1,15 +1,8 @@
 <?php
-$host = '127.0.0.1';
-$db   = 'bishwo_calculator';
-$user = 'root';
-$pass = '';
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
-    $res = $pdo->query("DESCRIBE users")->fetchAll(PDO::FETCH_ASSOC);
-    foreach($res as $col) {
-        echo $col['Field'] . ': ' . $col['Type'] . "\n";
-    }
-} catch(Exception $e) {
-    echo $e->getMessage();
+require_once __DIR__ . '/app/Core/Database.php';
+use App\Core\Database;
+$db = Database::getInstance();
+$columns = $db->query("DESCRIBE users")->fetchAll();
+foreach ($columns as $col) {
+    echo $col['Field'] . "\n";
 }

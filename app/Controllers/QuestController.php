@@ -65,7 +65,7 @@ class QuestController extends Controller
             $userId, 
             'NEWS_READ', 
             $data['article_id'], 
-            20, 
+            10, // 10 Coins per handbook
             $data['time_spent'] ?? 0, 
             $data['scroll_depth'] ?? 0
         );

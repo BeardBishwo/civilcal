@@ -19,7 +19,7 @@ class GamificationService
      */
     public function initWallet($userId)
     {
-        $sql = "INSERT IGNORE INTO user_resources (user_id, bricks, cement, steel, coins) VALUES (:uid, 0, 0, 0, 0)";
+        $sql = "INSERT IGNORE INTO user_resources (user_id, bricks, cement, steel, coins, sand, wood_logs, wood_planks) VALUES (:uid, 0, 0, 0, 0, 0, 0, 0)";
         $this->db->query($sql, ['uid' => $userId]);
     }
 
@@ -32,11 +32,11 @@ class GamificationService
 
         $this->initWallet($userId);
 
-        // Define Rewards
+        // Define Rewards (Official Handbook)
         $rewards = [
-            'easy' => ['bricks' => 5, 'xp' => 50],
-            'medium' => ['bricks' => 10, 'cement' => 2, 'xp' => 100],
-            'hard' => ['bricks' => 20, 'steel' => 5, 'xp' => 200]
+            'easy' => ['coins' => 5, 'bricks' => 1, 'xp' => 50],
+            'medium' => ['coins' => 10, 'bricks' => 5, 'cement' => 1, 'xp' => 100],
+            'hard' => ['coins' => 20, 'steel' => 1, 'xp' => 200]
         ];
 
         // Map numeric difficulty (1-5) to string if needed
@@ -78,18 +78,183 @@ class GamificationService
     }
 
     /**
+     * Process Daily Login Bonus (Grant Logs/Steel based on streak)
+     */
+    public function processDailyLoginBonus($userId)
+    {
+        $this->initWallet($userId);
+        
+        $user = $this->db->findOne('users', ['id' => $userId]);
+        $today = date('Y-m-d');
+        $yesterday = date('Y-m-d', strtotime('-1 day'));
+        
+        if ($user && $user['last_login_reward_at'] !== $today) {
+            $streak = (int)($user['login_streak'] ?? 0);
+            
+            // Check if streak is maintained
+            if ($user['last_login_reward_at'] === $yesterday) {
+                $streak++;
+            } else {
+                $streak = 1;
+            }
+            
+            $rewards = [];
+            if ($streak % 7 === 0) {
+                // Day 7 Reward: 1 Steel Bundle (10 Steel)
+                $rewards['steel'] = 10;
+                $sql = "UPDATE user_resources SET steel = steel + 10 WHERE user_id = :uid";
+                $this->db->query($sql, ['uid' => $userId]);
+            } else {
+                // Standard Reward: 1 Log
+                $rewards['wood_logs'] = 1;
+                $sql = "UPDATE user_resources SET wood_logs = wood_logs + 1 WHERE user_id = :uid";
+                $this->db->query($sql, ['uid' => $userId]);
+            }
+            
+            // Update user streak and last reward date
+            $this->db->query("UPDATE users SET last_login_reward_at = :today, login_streak = :streak WHERE id = :uid", [
+                'today' => $today,
+                'streak' => $streak,
+                'uid' => $userId
+            ]);
+            
+            foreach ($rewards as $res => $amt) {
+                $this->logTransaction($userId, $res, $amt, 'daily_login');
+            }
+            
+            $rewards['streak'] = $streak; // Pass streak for UI notification
+            return ['success' => true, 'rewards' => $rewards];
+        }
+        
+        return ['success' => false, 'message' => 'Already claimed today'];
+    }
+
+    /**
+     * Craft Planks from Logs (Sawmill)
+     * 1 Log + 5 Coins -> 4 Planks
+     */
+    public function craftPlanks($userId, $quantity = 1)
+    {
+        $this->initWallet($userId);
+        $wallet = $this->getWallet($userId);
+        
+        $logCost = $quantity;
+        $coinCost = $quantity * 10; // 10 Coins labor fee (Official Handbook)
+        $plankGain = $quantity * 4;
+        
+        if ($wallet['wood_logs'] < $logCost || $wallet['coins'] < $coinCost) {
+            return ['success' => false, 'message' => 'Insufficient Logs or Coins (Fee: 10 Coins/Log)'];
+        }
+        
+        $sql = "UPDATE user_resources 
+                SET wood_logs = wood_logs - :logs, 
+                    coins = coins - :coins, 
+                    wood_planks = wood_planks + :planks 
+                WHERE user_id = :uid";
+        
+        $this->db->query($sql, [
+            'logs' => $logCost,
+            'coins' => $coinCost,
+            'planks' => $plankGain,
+            'uid' => $userId
+        ]);
+        
+        $this->logTransaction($userId, 'wood_logs', -$logCost, 'crafting');
+        $this->logTransaction($userId, 'coins', -$coinCost, 'crafting');
+        $this->logTransaction($userId, 'wood_planks', $plankGain, 'crafting');
+        
+        return ['success' => true, 'message' => "Crafted $plankGain Planks!"];
+    }
+
+    /**
+     * Purchase Resources (Temple Shop)
+     */
+    public function purchaseResource($userId, $resource, $amount = 1)
+    {
+        $resources = SettingsService::get('economy_resources', []);
+        
+        if (!isset($resources[$resource]) || !isset($resources[$resource]['buy'])) {
+            return ['success' => false, 'message' => 'Resource not available'];
+        }
+        
+        $price = $resources[$resource]['buy'];
+        if ($price <= 0) return ['success' => false, 'message' => 'This item cannot be purchased'];
+
+        $totalCost = $price * $amount;
+        $wallet = $this->getWallet($userId);
+        
+        if ($wallet['coins'] < $totalCost) {
+            return ['success' => false, 'message' => 'Insufficient Coins'];
+        }
+        
+        $sql = "UPDATE user_resources 
+                SET coins = coins - :cost, 
+                    $resource = $resource + :amt 
+                WHERE user_id = :uid";
+        
+        $this->db->query($sql, [
+            'cost' => $totalCost,
+            'amt' => $amount,
+            'uid' => $userId
+        ]);
+        
+        $this->logTransaction($userId, 'coins', -$totalCost, 'shop_purchase');
+        $this->logTransaction($userId, $resource, $amount, 'shop_purchase');
+        
+        return ['success' => true, 'message' => "Purchased $amount " . ($resources[$resource]['name'] ?? $resource)];
+    }
+
+    /**
+     * Sell Resources (Quick Cash)
+     */
+    public function sellResource($userId, $resource, $amount = 1)
+    {
+        $resources = SettingsService::get('economy_resources', []);
+        
+        if (!isset($resources[$resource]) || !isset($resources[$resource]['sell'])) {
+            return ['success' => false, 'message' => 'Resource cannot be sold'];
+        }
+        
+        $price = $resources[$resource]['sell'];
+        if ($price <= 0) return ['success' => false, 'message' => 'This item has no resale value'];
+
+        $wallet = $this->getWallet($userId);
+        if ($wallet[$resource] < $amount) {
+            return ['success' => false, 'message' => 'Insufficient stock'];
+        }
+        
+        $gain = $price * $amount;
+        
+        $sql = "UPDATE user_resources 
+                SET coins = coins + :gain, 
+                    $resource = $resource - :amt 
+                WHERE user_id = :uid";
+        
+        $this->db->query($sql, [
+            'gain' => $gain,
+            'amt' => $amount,
+            'uid' => $userId
+        ]);
+        
+        $this->logTransaction($userId, $resource, -$amount, 'shop_sell');
+        $this->logTransaction($userId, 'coins', $gain, 'shop_sell');
+        
+        return ['success' => true, 'message' => "Sold $amount for $gain Coins"];
+    }
+
+    /**
      * Construct a Building
      */
     public function constructBuilding($userId, $buildingType)
     {
         $this->initWallet($userId);
         
-        // Define Costs
+        // Define Costs (Updated to use more materials)
         $costs = [
-            'house' => ['bricks' => 100],
-            'road' => ['cement' => 50],
-            'bridge' => ['bricks' => 500, 'steel' => 200],
-            'tower' => ['bricks' => 1000, 'cement' => 500, 'steel' => 500]
+            'house' => ['bricks' => 100, 'wood_planks' => 20, 'sand' => 50, 'cement' => 10],
+            'road' => ['cement' => 50, 'sand' => 200],
+            'bridge' => ['bricks' => 500, 'steel' => 200, 'cement' => 100],
+            'tower' => ['bricks' => 1000, 'cement' => 500, 'steel' => 500, 'wood_planks' => 100]
         ];
 
         if (!isset($costs[$buildingType])) {
@@ -99,11 +264,11 @@ class GamificationService
         $cost = $costs[$buildingType];
         
         // Check Balance
-        $wallet = $this->db->findOne('user_resources', ['user_id' => $userId]);
+        $wallet = $this->getWallet($userId);
         
         foreach ($cost as $res => $amount) {
             if ($wallet[$res] < $amount) {
-                return ['success' => false, 'message' => "Not enough " . ucfirst($res)];
+                return ['success' => false, 'message' => "Not enough " . str_replace('_', ' ', ucfirst($res))];
             }
         }
 

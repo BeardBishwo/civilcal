@@ -7,18 +7,27 @@ class RankService
     /**
      * Get Rank and Power Metrics for a user
      */
-    public function getUserRankData($stats, $coins)
+    public function getUserRankData($stats, $wallet)
     {
         $newsReads = $stats['news_reads_count'] ?? 0;
         $quizzes = $stats['quizzes_completed_count'] ?? 0;
         $calcs = $stats['calculations_count'] ?? 0;
 
+        $coins = $wallet['coins'] ?? 0;
+        $bricks = $wallet['bricks'] ?? 0;
+        $cement = $wallet['cement'] ?? 0;
+        $steel = $wallet['steel'] ?? 0;
+
         // Calculate segment scores
         $knowledgeScore = ($newsReads * 10) + ($quizzes * 50);
         $precisionScore = ($calcs * 5);
-        $statusScore = (int)($coins * 0.1);
+        
+        // Status Score: Weighted materials
+        // 1000 Steel = 100,000 Power (Target for Chief Engineer)
+        $statusScore = (int)($coins * 0.1) + ($bricks * 2) + ($cement * 20) + ($steel * 100);
 
         $totalPower = $knowledgeScore + $precisionScore + $statusScore;
+
 
         $rank = $this->calculateRank($totalPower);
         
@@ -39,13 +48,13 @@ class RankService
 
     private function calculateRank($power)
     {
-        $tiers = [
-            ['name' => 'Intern', 'level' => 1, 'min' => 0],
-            ['name' => 'Assistant Engineer', 'level' => 2, 'min' => 1000],
-            ['name' => 'Engineer', 'level' => 3, 'min' => 5000],
-            ['name' => 'Senior Engineer', 'level' => 4, 'min' => 20000],
+        $tiers = SettingsService::get('economy_ranks', [
+            ['name' => 'Laborer', 'level' => 1, 'min' => 0],
+            ['name' => 'Mason', 'level' => 2, 'min' => 1000],
+            ['name' => 'Contractor', 'level' => 3, 'min' => 5000],
+            ['name' => 'Project Manager', 'level' => 4, 'min' => 20000],
             ['name' => 'Chief Engineer', 'level' => 5, 'min' => 100000],
-        ];
+        ]);
 
         $currentTier = $tiers[0];
         $nextTier = $tiers[1];

@@ -59,7 +59,8 @@ class ProfileController extends Controller
         $rankService = new \App\Services\RankService();
         $gamification = new \App\Services\GamificationService();
         $wallet = $gamification->getWallet($userId);
-        $rankData = $rankService->getUserRankData($stats, $wallet['coins'] ?? 0);
+        $rankData = $rankService->getUserRankData($stats, $wallet);
+
 
         $data = [
             'user' => $user,

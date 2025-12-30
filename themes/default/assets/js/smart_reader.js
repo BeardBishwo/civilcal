@@ -67,7 +67,7 @@ class SmartReader {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          alert("Congratulations! Earning 20 G-Coins for reading.");
+          alert("Congratulations! Earning 10 BB Coins for reading.");
           if (typeof refreshResourceHUD === "function") refreshResourceHUD();
         }
       });

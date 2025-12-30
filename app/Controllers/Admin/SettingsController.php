@@ -1117,4 +1117,63 @@ class SettingsController extends Controller
         ]);
     }
 
+    /**
+     * Economy Settings Page
+     */
+    public function economy()
+    {
+        $this->requireAdminWithBasicAuth();
+        
+        $resources = SettingsService::get('economy_resources', []);
+        $ranks = SettingsService::get('economy_ranks', []);
+        $hudConfig = SettingsService::get('economy_hud_config', []);
+
+        $this->view->render('admin/settings/economy', [
+            'title' => 'Gamenta Economy Settings',
+            'resources' => $resources,
+            'ranks' => $ranks,
+            'hudConfig' => $hudConfig
+        ]);
+    }
+
+    /**
+     * Save Economy Settings
+     */
+    public function saveEconomy()
+    {
+        $this->requireAdminWithBasicAuth();
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid request']);
+            exit;
+        }
+
+        try {
+            $type = $_POST['type'] ?? '';
+            
+            if ($type === 'resources') {
+                $resources = $_POST['resources'] ?? [];
+                // Process resource updates
+                SettingsService::set('economy_resources', $resources, 'json', 'economy');
+            } elseif ($type === 'ranks') {
+                $ranks = $_POST['ranks'] ?? [];
+                SettingsService::set('economy_ranks', $ranks, 'json', 'economy');
+            } elseif ($type === 'hud') {
+                $hud = $_POST['hud'] ?? [];
+                SettingsService::set('economy_hud_config', $hud, 'json', 'economy');
+            }
+
+            SettingsService::clearCache();
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Economy settings updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+        exit;
+    }
+
 }

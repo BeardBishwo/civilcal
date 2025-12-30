@@ -917,6 +917,23 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                         </ul>
                     </li>
 
+                    <!-- Gamenta Gamification -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/quiz/') !== false ? 'active' : ''; ?>">
+                        <a href="javascript:void(0)" class="nav-link">
+                            <i class="nav-icon fas fa-gamepad"></i>
+                            <span class="nav-text">Gamenta World</span>
+                            <i class="nav-arrow fas fa-chevron-right"></i>
+                        </a>
+                        <ul class="nav-submenu">
+                            <li><a href="<?php echo app_base_url('quiz/portal'); ?>"><i class="fas fa-city text-info"></i> Civil City</a></li>
+                            <li><a href="<?php echo app_base_url('quiz/shop'); ?>"><i class="fas fa-store text-warning"></i> Temple Market</a></li>
+                            <li><a href="<?php echo app_base_url('quiz/sawmill'); ?>"><i class="fas fa-hammer text-danger"></i> The Sawmill</a></li>
+                            <li><a href="<?php echo app_base_url('quiz/missions'); ?>"><i class="fas fa-tasks text-success"></i> Daily Missions</a></li>
+                            <li><a href="<?php echo app_base_url('quiz/battle-pass'); ?>"><i class="fas fa-ticket-alt text-primary"></i> Battle Pass</a></li>
+                            <li><a href="<?php echo app_base_url('admin/settings/economy'); ?>"><i class="fas fa-cog text-secondary"></i> Economy Settings</a></li>
+                        </ul>
+                    </li>
+
 
                     <!-- Activity Logs -->
                     <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/activity') !== false ? 'active' : ''; ?>">

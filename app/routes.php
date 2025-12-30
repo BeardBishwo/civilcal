@@ -413,6 +413,18 @@ $router->add(
     ["auth", "admin"],
 );
 $router->add(
+    "GET",
+    "/admin/settings/economy",
+    "Admin\SettingsController@economy",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/settings/economy/save",
+    "Admin\SettingsController@saveEconomy",
+    ["auth", "admin"],
+);
+$router->add(
     "POST",
     "/admin/settings/update",
     "Admin\SettingsController@update",
@@ -1948,11 +1960,15 @@ $router->add("POST", "/api/lobby/wager", "Quiz\\MultiplayerController@placeWager
 // Gamification / Civil City Routes
 $router->add("GET", "/quiz/city", "Quiz\\GamificationController@city", ["auth"]);
 $router->add("GET", "/quiz/shop", "Quiz\\GamificationController@shop", ["auth"]);
+$router->add("GET", "/quiz/sawmill", "Quiz\\GamificationController@sawmill", ["auth"]);
 $router->add("GET", "/quiz/battle-pass", "Quiz\\GamificationController@battlePass", ["auth"]);
 
 // Gamification APIs
 $router->add("POST", "/api/city/build", "Quiz\\GamificationController@build", ["auth"]);
+$router->add("POST", "/api/city/craft", "Quiz\\GamificationController@craft", ["auth"]);
 $router->add("POST", "/api/shop/purchase", "Quiz\\GamificationController@purchaseLifeline", ["auth"]);
+$router->add("POST", "/api/shop/purchase-resource", "Quiz\\GamificationController@purchaseResource", ["auth"]);
+$router->add("POST", "/api/shop/sell-resource", "Quiz\\GamificationController@sellResource", ["auth"]);
 $router->add("POST", "/api/quiz/use-lifeline", "Quiz\\GamificationController@useLifeline", ["auth"]);
 $router->add("POST", "/api/battle-pass/claim", "Quiz\\GamificationController@claimReward", ["auth"]);
 

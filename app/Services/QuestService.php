@@ -65,7 +65,7 @@ class QuestService
         require_once __DIR__ . '/ActivityLogger.php';
         $logger = new ActivityLogger();
         
-        // Reward: 100 Coins + 5 Bricks
-        return $logger->logAndReward($userId, 'DAILY_QUEST_COMPLETE', 0, 100, 0, 0);
+        // Reward: 50 Coins (Official Handbook Alignment)
+        return $logger->logAndReward($userId, 'DAILY_QUEST_COMPLETE', 0, 50, 0, 0);
     }
 }

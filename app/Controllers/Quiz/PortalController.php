@@ -34,7 +34,13 @@ class PortalController extends Controller
 
         // 3. User's Recent Activity (if logged in)
         $recentAttempts = [];
+        $dailyBonus = null;
+
         if (isset($_SESSION['user_id'])) {
+            // Trigger Daily Bonus
+            $gs = new \App\Services\GamificationService();
+            $dailyBonus = $gs->processDailyLoginBonus($_SESSION['user_id']);
+
             $sqlAttempts = "
                 SELECT a.*, e.title as exam_title 
                 FROM quiz_attempts a
@@ -52,8 +58,10 @@ class PortalController extends Controller
             'categories' => $categories,
             'exams' => $exams,
             'recentAttempts' => $recentAttempts,
+            'dailyBonus' => $dailyBonus,
             'title' => 'Quiz Portal | Bishwo Calculator'
         ]);
+
     }
 
     /**
