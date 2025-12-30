@@ -65,11 +65,15 @@ class GamificationController extends Controller
         $lifelineService = new \App\Services\LifelineService();
         $inventory = $lifelineService->getInventory($_SESSION['user_id']);
         $wallet = $this->gamificationService->getWallet($_SESSION['user_id']);
+        $bundles = \App\Services\SettingsService::get('economy_bundles', []);
+        $cashPacks = \App\Services\SettingsService::get('economy_cash_packs', []);
         
         $this->view('quiz/gamification/shop', [
-            'title' => 'General Store',
+            'title' => 'Pashupati Nath Temple Market',
             'inventory' => $inventory,
-            'wallet' => $wallet
+            'wallet' => $wallet,
+            'bundles' => $bundles,
+            'cashPacks' => $cashPacks
         ]);
     }
 
@@ -136,8 +140,46 @@ class GamificationController extends Controller
      */
     public function purchaseResource()
     {
+        // Security: Check IP ban
+        $ip = \App\Services\SecurityValidator::getClientIp();
+        if (\App\Services\SecurityValidator::isIpBanned($ip)) {
+            $this->json(['success' => false, 'message' => 'Access denied'], 403);
+            return;
+        }
+        
+        // Security: Rate limiting
+        $rateLimiter = new \App\Services\RateLimiter();
+        $rateCheck = $rateLimiter->check($_SESSION['user_id'], '/api/shop/purchase-resource');
+        
+        if (!$rateCheck['allowed']) {
+            $this->json([
+                'success' => false, 
+                'message' => 'Too many requests. Try again in ' . $rateCheck['reset_in'] . ' seconds.'
+            ], 429);
+            return;
+        }
+        
         $resource = $_POST['resource'] ?? '';
         $amount = (int)($_POST['amount'] ?? 1);
+        
+        // Security: Validate resource key
+        if (!\App\Services\SecurityValidator::validateResource($resource)) {
+            $this->json(['success' => false, 'message' => 'Invalid resource'], 400);
+            return;
+        }
+        
+        // Security: Validate amount
+        $amount = \App\Services\SecurityValidator::validatePurchaseAmount($amount);
+        if ($amount === false) {
+            $this->json(['success' => false, 'message' => 'Invalid amount'], 400);
+            return;
+        }
+        
+        // Security: Check for suspicious patterns
+        if (\App\Services\SecurityMonitor::detectSuspiciousActivity($_SESSION['user_id'])) {
+            $this->json(['success' => false, 'message' => 'Account flagged for review'], 403);
+            return;
+        }
         
         $result = $this->gamificationService->purchaseResource($_SESSION['user_id'], $resource, $amount);
         $this->json($result, $result['success'] ? 200 : 400);
@@ -150,8 +192,40 @@ class GamificationController extends Controller
     {
         header('Content-Type: application/json');
         
+        // Security: Check IP ban
+        $ip = \App\Services\SecurityValidator::getClientIp();
+        if (\App\Services\SecurityValidator::isIpBanned($ip)) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            exit;
+        }
+        
+        // Security: Rate limiting
+        $rateLimiter = new \App\Services\RateLimiter();
+        $rateCheck = $rateLimiter->check($_SESSION['user_id'], '/api/shop/sell-resource');
+        
+        if (!$rateCheck['allowed']) {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Too many requests. Try again in ' . $rateCheck['reset_in'] . ' seconds.'
+            ]);
+            exit;
+        }
+        
         $resource = $_POST['resource'] ?? '';
         $amount = (int)($_POST['amount'] ?? 1);
+        
+        // Security: Validate resource key
+        if (!\App\Services\SecurityValidator::validateResource($resource)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid resource']);
+            exit;
+        }
+        
+        // Security: Validate amount
+        $amount = \App\Services\SecurityValidator::validateInteger($amount, 1, 1000);
+        if ($amount === false) {
+            echo json_encode(['success' => false, 'message' => 'Invalid amount']);
+            exit;
+        }
         
         $result = $this->gamificationService->sellResource($_SESSION['user_id'], $resource, $amount);
         echo json_encode($result);
@@ -165,7 +239,32 @@ class GamificationController extends Controller
     {
         header('Content-Type: application/json');
         
+        // Security: Check IP ban
+        $ip = \App\Services\SecurityValidator::getClientIp();
+        if (\App\Services\SecurityValidator::isIpBanned($ip)) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            exit;
+        }
+        
+        // Security: Rate limiting
+        $rateLimiter = new \App\Services\RateLimiter();
+        $rateCheck = $rateLimiter->check($_SESSION['user_id'], '/api/shop/purchase-bundle');
+        
+        if (!$rateCheck['allowed']) {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Too many requests. Try again in ' . $rateCheck['reset_in'] . ' seconds.'
+            ]);
+            exit;
+        }
+        
         $bundleKey = $_POST['bundle'] ?? '';
+        
+        // Security: Validate bundle key
+        if (!\App\Services\SecurityValidator::validateBundle($bundleKey)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid bundle']);
+            exit;
+        }
         
         $result = $this->gamificationService->purchaseBundle($_SESSION['user_id'], $bundleKey);
         echo json_encode($result);

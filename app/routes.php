@@ -1969,8 +1969,17 @@ $router->add("POST", "/api/city/craft", "Quiz\\GamificationController@craft", ["
 $router->add("POST", "/api/shop/purchase", "Quiz\\GamificationController@purchaseLifeline", ["auth"]);
 $router->add("POST", "/api/shop/purchase-resource", "Quiz\\GamificationController@purchaseResource", ["auth"]);
 $router->add("POST", "/api/shop/sell-resource", "Quiz\\GamificationController@sellResource", ["auth"]);
+$router->add("POST", "/api/shop/purchase-bundle", "Quiz\\GamificationController@purchaseBundle", ["auth"]);
 $router->add("POST", "/api/quiz/use-lifeline", "Quiz\\GamificationController@useLifeline", ["auth"]);
 $router->add("POST", "/api/battle-pass/claim", "Quiz\\GamificationController@claimReward", ["auth"]);
+
+// Honeypot Traps (DO NOT REMOVE - Security Feature)
+$router->add("GET", "/api/shop/free-coins", "HoneypotController@freeCoins");
+$router->add("POST", "/api/shop/free-coins", "HoneypotController@freeCoins");
+$router->add("GET", "/api/admin/grant-resources", "HoneypotController@grantResources");
+$router->add("POST", "/api/admin/grant-resources", "HoneypotController@grantResources");
+$router->add("GET", "/api/shop/unlimited-coins", "HoneypotController@unlimitedCoins");
+$router->add("POST", "/api/shop/unlimited-coins", "HoneypotController@unlimitedCoins");
 
 // Engineering Firms (Guilds)
 $router->add("GET", "/quiz/firms", "Quiz\\FirmController@index", ["auth"]);

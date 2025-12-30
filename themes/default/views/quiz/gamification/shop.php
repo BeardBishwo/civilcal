@@ -34,11 +34,19 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
     <!-- Market Navigation -->
     <div class="market-nav">
         <button class="nav-item active" onclick="switchMarketTab(event, 'lifelines')">
-            <i class="fas fa-magic"></i> Engineering Artifacts
+            <i class="fas fa-magic"></i> Artifacts
         </button>
         <button class="nav-item" onclick="switchMarketTab(event, 'materials')">
-            <i class="fas fa-gem"></i> Raw Materials
+            <i class="fas fa-gem"></i> Materials
         </button>
+        <button class="nav-item" onclick="switchMarketTab(event, 'bundles')">
+            <i class="fas fa-box-open"></i> Bundles
+        </button>
+        <?php if (!empty($cashPacks)): ?>
+        <button class="nav-item" onclick="switchMarketTab(event, 'cash')">
+            <i class="fas fa-dollar-sign"></i> Premium
+        </button>
+        <?php endif; ?>
     </div>
 
     <div class="market-content">
@@ -111,6 +119,65 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
                 <?php endforeach; ?>
             </div>
         </div>
+
+        <!-- Bundles Tab -->
+        <div id="bundles" class="market-tab">
+            <div class="bundles-header">
+                <h2><i class="fas fa-box-open"></i> Special Bundle Offers</h2>
+                <p>Save coins with bulk purchases!</p>
+            </div>
+            <div class="item-grid">
+                <?php foreach ($bundles as $key => $bundle): ?>
+                <div class="premium-card bundle-card">
+                    <div class="savings-badge">Save <?= $bundle['savings'] ?> Coins!</div>
+                    <div class="card-inner">
+                        <div class="material-preview">
+                            <img src="<?= app_base_url($bundle['icon']) ?>" class="rare-glow">
+                        </div>
+                        <h3 class="item-name"><?= htmlspecialchars($bundle['name']) ?></h3>
+                        <p class="bundle-desc"><?= htmlspecialchars($bundle['description']) ?></p>
+                        <div class="bundle-details">
+                            <span class="qty-badge"><?= $bundle['qty'] ?>x <?= ucfirst($bundle['resource']) ?></span>
+                        </div>
+                        <button class="buy-button bundle-buy" onclick="buyBundle('<?= $key ?>', <?= $bundle['buy'] ?>)">
+                            <span><?= $bundle['buy'] ?></span>
+                            <img src="<?= app_base_url($coinConfig['icon']) ?>" width="18">
+                        </button>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <!-- Cash Packs Tab -->
+        <?php if (!empty($cashPacks)): ?>
+        <div id="cash" class="market-tab">
+            <div class="bundles-header">
+                <h2><i class="fas fa-gem"></i> Premium Coin Packs</h2>
+                <p>Support the game and boost your treasury!</p>
+            </div>
+            <div class="item-grid">
+                <?php foreach ($cashPacks as $key => $pack): ?>
+                <div class="premium-card cash-card <?= $pack['popular'] ? 'popular' : '' ?>">
+                    <?php if ($pack['popular']): ?>
+                    <div class="popular-badge">BEST VALUE</div>
+                    <?php endif; ?>
+                    <div class="card-inner">
+                        <div class="material-preview">
+                            <img src="<?= app_base_url($pack['icon']) ?>">
+                        </div>
+                        <h3 class="item-name"><?= htmlspecialchars($pack['name']) ?></h3>
+                        <p class="bundle-desc"><?= htmlspecialchars($pack['description']) ?></p>
+                        <div class="cash-amount"><?= number_format($pack['coins']) ?> Coins</div>
+                        <button class="buy-button cash-buy" onclick="alert('Payment integration coming soon!')">
+                            $<?= number_format($pack['price_usd'], 2) ?> USD
+                        </button>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -180,6 +247,24 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
 .trade-btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); }
 .trade-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
+/* Bundle & Cash Pack Specifics */
+.bundles-header { text-align: center; margin-bottom: 40px; }
+.bundles-header h2 { font-size: 2rem; font-weight: 700; color: #1e293b; margin-bottom: 10px; }
+.bundles-header p { color: #64748b; font-size: 1.1rem; }
+
+.bundle-card, .cash-card { position: relative; }
+.savings-badge { position: absolute; top: -10px; right: -10px; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; z-index: 10; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4); }
+.popular-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 8px 20px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; z-index: 10; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); }
+
+.bundle-desc { font-size: 0.9rem; color: #64748b; margin-bottom: 15px; line-height: 1.4; }
+.bundle-details { margin-bottom: 20px; }
+.qty-badge { background: #eff6ff; color: #2563eb; padding: 8px 16px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; }
+
+.cash-amount { font-size: 2rem; font-weight: 800; color: #daa520; margin-bottom: 20px; }
+.cash-buy { background: linear-gradient(135deg, #10b981, #059669); }
+.cash-buy:hover { background: linear-gradient(135deg, #059669, #047857); }
+.cash-card.popular { border: 3px solid #f59e0b; }
+
 /* Animations */
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
@@ -218,6 +303,11 @@ async function tradeMaterial(action, resource, price) {
     if (!confirm(`${action === 'buy' ? 'Procure' : 'Relinquish'} ${qty} units for ${total} Coins?`)) return;
 
     performTransaction(url, { resource, amount: qty, csrf_token: '<?= csrf_token() ?>' });
+}
+
+async function buyBundle(bundleKey, cost) {
+    if (!confirm(`Purchase this bundle for ${cost} Coins?`)) return;
+    performTransaction('/api/shop/purchase-bundle', { bundle: bundleKey, csrf_token: '<?= csrf_token() ?>' });
 }
 
 async function performTransaction(url, data) {
