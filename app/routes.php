@@ -1942,8 +1942,8 @@ $router->add("GET", "/quiz/overview/{slug}", "Quiz\\PortalController@overview");
 // Quiz Exam Engine
 $router->add("GET", "/quiz/start/{slug}", "Quiz\\ExamEngineController@start", ["auth"]);
 $router->add("GET", "/quiz/room/{id}", "Quiz\\ExamEngineController@room", ["auth"]);
-$router->add("POST", "/quiz/save-answer", "Quiz\\ExamEngineController@saveAnswer", ["auth"]); // AJAX
-$router->add("POST", "/quiz/submit", "Quiz\\ExamEngineController@submit", ["auth"]);
+$router->add("POST", "/quiz/save-answer", "Quiz\\ExamEngineController@saveAnswer", ["auth", "csrf"]); // AJAX
+$router->add("POST", "/quiz/submit", "Quiz\\ExamEngineController@submit", ["auth", "csrf"]);
 $router->add("GET", "/quiz/result/{id}", "Quiz\\ExamEngineController@result", ["auth"]);
 $router->add("GET", "/quiz/leaderboard", "Quiz\\LeaderboardController@index");
 

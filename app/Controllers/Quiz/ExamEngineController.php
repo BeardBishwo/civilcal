@@ -7,6 +7,7 @@ use App\Core\Database;
 use App\Services\GamificationService;
 use App\Services\NonceService;
 use App\Services\SecurityMonitor;
+use App\Services\Security;
 
 class ExamEngineController extends Controller
 {
@@ -121,12 +122,14 @@ class ExamEngineController extends Controller
 
         // Nonce for secure submission
         $nonce = $this->nonceService->generate($_SESSION['user_id'], 'quiz');
+        $csrfToken = Security::generateCsrfToken();
 
         $this->view('quiz/arena/room', [
             'attempt' => $attempt,
             'questions' => $questions,
             'savedAnswers' => $savedAnswers,
             'quizNonce' => $nonce['nonce'] ?? null,
+            'csrfToken' => $csrfToken,
             'title' => 'Exam Room'
         ]);
     }
@@ -208,10 +211,12 @@ class ExamEngineController extends Controller
 
         // 3. Calculate Score
         $totalScore = 0;
+        $correctAnswersList = []; // For batch gamification
+        $correctCount = 0;
         
         // Fetch all questions and user answers
         $sqlParams = "
-            SELECT q.id, q.type, q.options, q.default_marks, q.default_negative_marks,
+            SELECT q.id, q.type, q.options, q.default_marks, q.default_negative_marks, q.difficulty_level,
                    a.selected_options
             FROM quiz_questions q
             JOIN quiz_attempt_answers a ON q.id = a.question_id
@@ -254,12 +259,19 @@ class ExamEngineController extends Controller
             $this->db->getPdo()->prepare("UPDATE quiz_attempt_answers SET is_correct = :ic, marks_earned = :me WHERE attempt_id = :aid AND question_id = :qid")
                 ->execute(['ic' => $isCorrect, 'me' => $marks, 'aid' => $attemptId, 'qid' => $res['id']]);
 
-            // Gamification: Award Resources
+            // Accumulate for Batch Reward
             if ($isCorrect) {
-                // Determine difficulty from question or default to medium
-                $difficulty = $res['difficulty_level'] ?? 3; // 1-5
-                $this->gamificationService->rewardUser($_SESSION['user_id'], true, $difficulty, $attemptId);
+                $correctCount++;
+                $correctAnswersList[] = [
+                    'question_id' => $res['id'],
+                    'difficulty' => $res['difficulty_level'] ?? 3
+                ];
             }
+        }
+
+        // Process Batch Rewards
+        if (!empty($correctAnswersList)) {
+            $this->gamificationService->processExamRewards($_SESSION['user_id'], $correctAnswersList, $attemptId);
         }
 
         // 4. Update Attempt Status
@@ -273,29 +285,12 @@ class ExamEngineController extends Controller
         // 5. Update Leaderboard Aggregates
         try {
             $totalQuestions = count($results);
-            $correctAnswers = 0;
-            // Iterate to count correct
-            foreach ($results as $res) {
-                 $userAns = json_decode($res['selected_options'], true);
-                 // We need to know if this specific answer was correct.
-                 // We updated 'is_correct' in DB, but we didn't track it in a variable loop above clearly.
-                 // Let's query the specific answers again or better, capture it in the loop above.
-                 // OPTIMIZATION: Refactor loop above to track $correctAnswers
-            }
-            // For now, let's just query the count of correct answers for this attempt.
-            $stmtCount = $this->db->getPdo()->prepare("SELECT count(*) FROM quiz_attempt_answers WHERE attempt_id = ? AND is_correct = 1");
-            $stmtCount->execute([$attemptId]);
-            $correctAnswers = $stmtCount->fetchColumn();
-
+            
             require_once __DIR__ . '/../../Services/LeaderboardService.php';
             $lbService = new \App\Services\LeaderboardService();
-            // TODO: Pass category ID if Exam has category?
-            // $exam['category_id'] is not in quiz_exams table currently, it's linked via questions or Syllabus.
-            // For MVP, we pass null (Global Rank). 
-            $lbService->updateUserRank($_SESSION['user_id'], $totalScore, $totalQuestions, $correctAnswers);
+            $lbService->updateUserRank($_SESSION['user_id'], $totalScore, $totalQuestions, $correctCount);
             
         } catch (\Exception $e) {
-            // Log error but don't stop flow
             error_log("Leaderboard Update Fail: " . $e->getMessage());
         }
         

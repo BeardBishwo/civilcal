@@ -84,11 +84,77 @@ class GamificationService
         }
 
         return $payout;
+        return $payout;
     }
 
     /**
-     * Process Daily Login Bonus (Grant Logs/Steel based on streak)
+     * Process Batch Rewards for Exam Completion
+     * Prevents rate-limit issues by handling all rewards in one transaction
      */
+    public function processExamRewards($userId, $correctAnswers, $attemptId)
+    {
+        if (empty($correctAnswers)) return;
+
+        $this->initWallet($userId);
+        
+        // Calculate Total Loot
+        $totalLoot = ['coins' => 0, 'bricks' => 0, 'cement' => 0, 'steel' => 0, 'xp' => 0];
+        
+        $rewards = [
+            'easy' => ['coins' => 5, 'bricks' => 1, 'xp' => 50],
+            'medium' => ['coins' => 10, 'bricks' => 5, 'cement' => 1, 'xp' => 100],
+            'hard' => ['coins' => 20, 'steel' => 1, 'xp' => 200]
+        ];
+
+        foreach ($correctAnswers as $ans) {
+            $diff = $ans['difficulty'] ?? 'medium';
+            if (is_numeric($diff)) {
+                if ($diff <= 2) $diff = 'easy';
+                elseif ($diff <= 4) $diff = 'medium';
+                else $diff = 'hard';
+            }
+            
+            $payout = $rewards[$diff] ?? $rewards['medium'];
+            
+            foreach ($payout as $res => $amt) {
+                if (isset($totalLoot[$res])) {
+                    $totalLoot[$res] += $amt;
+                }
+            }
+        }
+
+        // Apply to User Wallet in ONE transaction
+        $setParts = [];
+        $params = ['uid' => $userId];
+        
+        // Handle XP Separately
+        if ($totalLoot['xp'] > 0) {
+            $bp = new BattlePassService();
+            $bp->addXp($userId, $totalLoot['xp']);
+            $ms = new MissionService();
+            $ms->updateProgress($userId, 'solve_questions'); 
+            unset($totalLoot['xp']);
+        }
+
+        foreach ($totalLoot as $res => $amount) {
+            if ($amount > 0) {
+                $setParts[] = "$res = $res + :$res";
+                $params[$res] = $amount;
+            }
+        }
+        
+        if (!empty($setParts)) {
+            $sql = "UPDATE user_resources SET " . implode(', ', $setParts) . " WHERE user_id = :uid";
+            $this->db->query($sql, $params);
+            
+            // Log aggregated transaction
+            foreach ($totalLoot as $res => $amount) {
+                if ($amount > 0) {
+                    $this->logTransaction($userId, $res, $amount, 'exam_reward', $attemptId);
+                }
+            }
+        }
+    }
     public function processDailyLoginBonus($userId)
     {
         $this->initWallet($userId);

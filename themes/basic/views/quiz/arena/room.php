@@ -121,6 +121,7 @@
     const saveUrl = '<?php echo app_base_url('quiz/save-answer'); ?>';
     const submitUrl = '<?php echo app_base_url('quiz/submit'); ?>';
     let quizNonce = '<?php echo htmlspecialchars($quizNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>';
+    let csrfToken = '<?php echo htmlspecialchars($csrfToken ?? '', ENT_QUOTES, 'UTF-8'); ?>';
     
     let currentIndex = 0;
     let reviewStatus = {}; // {index: bool}
@@ -239,7 +240,8 @@
             attempt_id: attemptId,
             question_id: q.id,
             selected_options: val,
-            trap_answer: document.getElementById('trap_answer').value || ''
+            trap_answer: document.getElementById('trap_answer').value || '',
+            csrf_token: csrfToken
         });
     };
     
@@ -322,7 +324,8 @@
         $.post(submitUrl, { 
             attempt_id: attemptId,
             nonce: quizNonce,
-            trap_answer: document.getElementById('trap_answer').value || ''
+            trap_answer: document.getElementById('trap_answer').value || '',
+            csrf_token: csrfToken
         }, function() {
             window.location.href = '<?php echo app_base_url('quiz/result/' . $attempt['id']); ?>';
         });
