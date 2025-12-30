@@ -17,6 +17,11 @@ $router->add("GET", "/report", "ReportController@index");
 $router->add("POST", "/report/submit", "ReportController@submit");
 $router->add("GET", "/pages/preview/{id}", "HomeController@pagePreview");
 
+// Legal Routes
+$router->add("GET", "/privacy-policy", "LegalController@privacy");
+$router->add("GET", "/terms-of-service", "LegalController@terms");
+$router->add("GET", "/refund-policy", "LegalController@refund");
+
 // Blog Public Routes
 $router->add("GET", "/blog", "BlogController@index");
 $router->add("GET", "/blog/{slug}", "BlogController@show");

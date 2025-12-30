@@ -100,8 +100,34 @@ class LeaderboardService
             };
         }
         
+        // 1. Try Cache First
+        $pdo = $this->db->getPdo();
+        $stmtCache = $pdo->prepare("SELECT top_users FROM leaderboard_cache WHERE category = :cat AND period_type = :ptype AND period_value = :pval");
+        $categoryName = ($categoryId == 0) ? 'global' : 'cat_' . $categoryId; // Simple mapping
+        
+        $stmtCache->execute([
+            'cat' => $categoryName,
+            'ptype' => $periodType,
+            'pval' => $periodValue
+        ]);
+        
+        $cacheRow = $stmtCache->fetch();
+        if ($cacheRow && !empty($cacheRow['top_users'])) {
+            $results = json_decode($cacheRow['top_users'], true);
+            
+            // Add trends dummy logic
+            $rank = 1;
+            foreach ($results as &$row) {
+                $row['calculated_rank'] = $rank++;
+                // Trend is tricky directly from cache unless stored. MVP: 0
+                $row['trend'] = 0; 
+            }
+            return $results;
+        }
+
+        // 2. Fallback to Real-Time (if cache missing)
         $sql = "
-            SELECT l.*, u.full_name, u.username 
+            SELECT l.*, u.full_name, u.username, u.avatar 
             FROM quiz_leaderboard_aggregates l
             JOIN users u ON l.user_id = u.id
             WHERE l.period_type = :ptype 
@@ -111,7 +137,7 @@ class LeaderboardService
             LIMIT $limit
         ";
         
-        $stmt = $this->db->getPdo()->prepare($sql);
+        $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'ptype' => $periodType,
             'pval' => $periodValue,
@@ -120,12 +146,10 @@ class LeaderboardService
         
         $results = $stmt->fetchAll();
         
-        // Dynamic Ranking calculation on read (since we don't have heavy periodic job yet)
-        // With limit 100, this is fast.
         $rank = 1;
         foreach ($results as &$row) {
             $row['calculated_rank'] = $rank++;
-            $row['trend'] = $this->calculateTrend($row['user_id'], $row['calculated_rank'], $periodType, $periodValue);
+            $row['trend'] = 0;
         }
         
         return $results;
