@@ -796,6 +796,46 @@ $router->add(
     "Admin\AnalyticsController@performance",
     ["auth", "admin"],
 );
+
+// Blueprint Vault (Library) Routes
+$router->add("GET", "/library", "LibraryController@index", ["auth"]);
+$router->add("GET", "/library/upload", "LibraryController@upload", ["auth"]);
+$router->add("GET", "/admin/library/requests", "Admin\LibraryController@index", ["auth", "admin"]);
+
+// Library API Routes
+$router->add("GET", "/api/library/browse", "Api\LibraryApiController@browse");
+$router->add("POST", "/api/library/upload", "Api\LibraryApiController@upload", ["auth"]);
+$router->add("GET", "/api/library/download", "Api\LibraryApiController@download", ["auth"]);
+// Note: Frontend uses /api/admin/library/approve, mapping it:
+$router->add("POST", "/api/admin/library/approve", "Api\LibraryApiController@approve", ["auth", "admin"]);
+
+// Bounty System Routes
+$router->add("GET", "/bounty", "BountyController@index", ["auth", "auth"]); // Typo auth auth fixed? No just one.
+$router->add("GET", "/bounty/create", "BountyController@create", ["auth"]);
+$router->add("GET", "/bounty/dashboard", "BountyController@dashboard", ["auth"]);
+$router->add("GET", "/bounty/view/{id}", "BountyController@show", ["auth"]);
+
+// Bounty API
+$router->add("GET", "/api/bounty/browse", "Api\BountyApiController@browse");
+$router->add("POST", "/api/bounty/create", "Api\BountyApiController@create", ["auth"]);
+$router->add("POST", "/api/bounty/submit", "Api\BountyApiController@submit", ["auth"]);
+$router->add("POST", "/api/bounty/decide", "Api\BountyApiController@clientDecide", ["auth"]);
+
+// Bounty Admin API
+$router->add("GET", "/api/admin/bounty/pending", "Api\BountyApiController@pendingSubmissions", ["auth", "admin"]);
+$router->add("POST", "/api/admin/bounty/review", "Api\BountyApiController@adminReview", ["auth", "admin"]);
+// Bounty Admin View Route
+$router->add("GET", "/admin/bounty/requests", "Admin\BountyController@index", ["auth", "admin"]);
+
+// Human Elements API
+$router->add("GET", "/api/notifications", "Api\HumanApiController@getNotifications", ["auth"]);
+$router->add("POST", "/api/notifications/read", "Api\HumanApiController@markNotificationRead", ["auth"]);
+$router->add("POST", "/api/library/review", "Api\HumanApiController@submitReview", ["auth"]);
+$router->add("POST", "/api/library/report", "Api\HumanApiController@submitReport", ["auth"]);
+
+
+
+
 $router->add(
     "GET",
     "/admin/analytics/reports",

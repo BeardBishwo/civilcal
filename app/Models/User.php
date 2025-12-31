@@ -9,6 +9,7 @@ class User
 {
     private $db;
     public $id;
+    public $coins;
 
     public function __construct()
     {
@@ -610,6 +611,125 @@ class User
     {
         $stmt = $this->db->getPdo()->prepare("DELETE FROM users WHERE id = ?");
         return $stmt->execute([$userId]);
+    }
+
+    // Economy / Coins Methods
+
+    public function getCoins($userId = null)
+    {
+        $checkId = $userId ?? $this->id;
+        $user = $this->find($checkId);
+        return $user ? ($user['coins'] ?? 0) : 0;
+    }
+
+    public function addCoins($userId, $amount, $reason, $referenceId = null)
+    {
+        if ($amount <= 0) return false;
+
+        $pdo = $this->db->getPdo();
+        try {
+            $pdo->beginTransaction();
+
+            // Update user balance
+            $stmt = $pdo->prepare("UPDATE users SET coins = coins + ?, updated_at = NOW() WHERE id = ?");
+            $stmt->execute([$amount, $userId]);
+
+            // Log transaction
+            $txnStmt = $pdo->prepare("INSERT INTO user_transactions (user_id, amount, type, reference_id, description) VALUES (?, ?, 'upload_reward', ?, ?)");
+            $txnStmt->execute([$userId, $amount, $referenceId, $reason]);
+
+            $pdo->commit();
+            return true;
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            error_log("Failed to add coins: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function deductCoins($userId, $amount, $reason, $referenceId = null)
+    {
+        if ($amount <= 0) return false;
+
+        $pdo = $this->db->getPdo();
+        
+        // Check balance first
+        $currentBalance = $this->getCoins($userId);
+        if ($currentBalance < $amount) {
+            return false; // Insufficient funds
+        }
+
+        try {
+            $pdo->beginTransaction();
+
+            // Update user balance
+            $stmt = $pdo->prepare("UPDATE users SET coins = coins - ?, updated_at = NOW() WHERE id = ?");
+            $stmt->execute([$amount, $userId]);
+
+            // Log transaction
+            $txnStmt = $pdo->prepare("INSERT INTO user_transactions (user_id, amount, type, reference_id, description) VALUES (?, ?, 'download_cost', ?, ?)");
+            $txnStmt->execute([$userId, -1 * $amount, $referenceId, $reason]);
+
+            $pdo->commit();
+            return true;
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            error_log("Failed to deduct coins: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function setReferral($userId, $referredByCode)
+    {
+        if (!$referredByCode) return;
+        
+        $pdo = $this->db->getPdo();
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE referral_code = ?");
+        $stmt->execute([$referredByCode]);
+        $referrerId = $stmt->fetchColumn();
+        
+        if ($referrerId && $referrerId != $userId) {
+            $upd = $pdo->prepare("UPDATE users SET referred_by = ? WHERE id = ?");
+            $upd->execute([$referrerId, $userId]);
+        }
+    }
+
+    public function incrementQuizCount($userId)
+    {
+        $pdo = $this->db->getPdo();
+        
+        // Ensure referral code exists for self if missing (simple fix for legacy users)
+        $checkRef = $pdo->prepare("SELECT referral_code FROM users WHERE id = ?");
+        $checkRef->execute([$userId]);
+        if (!$checkRef->fetchColumn()) {
+            $pdo->prepare("UPDATE users SET referral_code = ? WHERE id = ?")
+                ->execute([uniqid(substr(md5($userId . time()), 0, 5)), $userId]);
+        }
+
+        try {
+            $pdo->beginTransaction();
+            $stmt = $pdo->prepare("UPDATE users SET quiz_solved_count = quiz_solved_count + 1 WHERE id = ?");
+            $stmt->execute([$userId]);
+            
+            // Check if hit 5
+            $check = $pdo->prepare("SELECT quiz_solved_count, referred_by FROM users WHERE id = ?");
+            $check->execute([$userId]);
+            $user = $check->fetch(\PDO::FETCH_ASSOC);
+            
+            if ($user && $user['quiz_solved_count'] == 5 && $user['referred_by']) {
+                // Reward Referrer
+                $this->addCoins($user['referred_by'], 50, "Referral Bonus", $userId);
+                // Reward User
+                $this->addCoins($userId, 20, "Referral Welcome Bonus", $user['referred_by']);
+                
+                // Notify Referrer (Quick inline notification logic)
+                $notifSql = "INSERT INTO notifications (user_id, message, created_at) VALUES (?, ?, NOW())";
+                $pdo->prepare($notifSql)->execute([$user['referred_by'], "You earned 50 Coins from a referral!"]);
+            }
+            $pdo->commit();
+        } catch (Exception $e) {
+            $pdo->rollBack();
+        }
     }
 
     // Attribute Accessors

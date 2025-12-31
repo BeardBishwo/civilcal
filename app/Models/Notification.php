@@ -1,191 +1,40 @@
 <?php
+
 namespace App\Models;
 
-use App\Core\Model;
+use App\Core\Database;
 
-class Notification extends Model
+class Notification
 {
-    protected $table = 'notifications';
+    private $db;
 
-    /**
-     * Create a new notification
-     */
-    public function createNotification($userId, $type, $title, $message, $options = [])
+    public function __construct()
     {
-        $sql = "INSERT INTO {$this->table} (
-            user_id, type, title, message, action_url, action_text, 
-            icon, priority, metadata, expires_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        $stmt = $this->db->prepare($sql);
-        
-        return $stmt->execute([
-            $userId,
-            $type,
-            $title,
-            $message,
-            $options['action_url'] ?? null,
-            $options['action_text'] ?? null,
-            $options['icon'] ?? 'fa-bell',
-            $options['priority'] ?? 'normal',
-            isset($options['metadata']) ? json_encode($options['metadata']) : null,
-            $options['expires_at'] ?? null
-        ]);
+        $this->db = Database::getInstance();
     }
 
-    /**
-     * Get user notifications with filters
-     */
-    public function getUserNotifications($userId, $filters = [])
+    public function create($userId, $message, $link = null)
     {
-        $sql = "SELECT * FROM {$this->table} WHERE user_id = ?";
-        $params = [$userId];
+        $stmt = $this->db->getPdo()->prepare("INSERT INTO notifications (user_id, message, link, created_at) VALUES (?, ?, ?, NOW())");
+        return $stmt->execute([$userId, $message, $link]);
+    }
 
-        // Filter by read status
-        if (isset($filters['is_read'])) {
-            $sql .= " AND is_read = ?";
-            $params[] = $filters['is_read'];
-        }
-
-        // Filter by type
-        if (isset($filters['type'])) {
-            $sql .= " AND type = ?";
-            $params[] = $filters['type'];
-        }
-
-        // Filter by archived
-        if (!isset($filters['include_archived']) || !$filters['include_archived']) {
-            $sql .= " AND is_archived = 0";
-        }
-
-        // Exclude expired
-        $sql .= " AND (expires_at IS NULL OR expires_at > NOW())";
-
-        // Order by created date
-        $sql .= " ORDER BY created_at DESC";
-
-        // Limit
-        if (isset($filters['limit'])) {
-            $sql .= " LIMIT " . (int)$filters['limit'];
-        }
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        
+    public function getUnread($userId)
+    {
+        $stmt = $this->db->getPdo()->prepare("SELECT * FROM notifications WHERE user_id = ? AND is_read = 0 ORDER BY created_at DESC");
+        $stmt->execute([$userId]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Get unread count for user
-     */
-    public function getUnreadCount($userId)
+    public function markAsRead($id, $userId)
     {
-        $sql = "SELECT COUNT(*) as count FROM {$this->table} 
-                WHERE user_id = ? AND is_read = 0 AND is_archived = 0
-                AND (expires_at IS NULL OR expires_at > NOW())";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$userId]);
-        
-        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
-        return (int)$result['count'];
+        $stmt = $this->db->getPdo()->prepare("UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?");
+        return $stmt->execute([$id, $userId]);
     }
-
-    /**
-     * Mark notification as read
-     */
-    public function markAsRead($notificationId, $userId = null)
-    {
-        $sql = "UPDATE {$this->table} SET is_read = 1, read_at = NOW() WHERE id = ?";
-        $params = [$notificationId];
-
-        if ($userId) {
-            $sql .= " AND user_id = ?";
-            $params[] = $userId;
-        }
-
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute($params);
-    }
-
-    /**
-     * Mark all notifications as read for user
-     */
+    
     public function markAllAsRead($userId)
     {
-        $sql = "UPDATE {$this->table} SET is_read = 1, read_at = NOW() 
-                WHERE user_id = ? AND is_read = 0";
-        
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getPdo()->prepare("UPDATE notifications SET is_read = 1 WHERE user_id = ?");
         return $stmt->execute([$userId]);
-    }
-
-    /**
-     * Delete notification
-     */
-    public function delete($notificationId, $userId = null)
-    {
-        $sql = "DELETE FROM {$this->table} WHERE id = ?";
-        $params = [$notificationId];
-
-        if ($userId) {
-            $sql .= " AND user_id = ?";
-            $params[] = $userId;
-        }
-
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute($params);
-    }
-
-    /**
-     * Archive notification
-     */
-    public function archive($notificationId, $userId = null)
-    {
-        $sql = "UPDATE {$this->table} SET is_archived = 1 WHERE id = ?";
-        $params = [$notificationId];
-
-        if ($userId) {
-            $sql .= " AND user_id = ?";
-            $params[] = $userId;
-        }
-
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute($params);
-    }
-
-    /**
-     * Get notification by ID
-     */
-    public function find($id, $userId = null)
-    {
-        $sql = "SELECT * FROM {$this->table} WHERE id = ?";
-        $params = [$id];
-
-        if ($userId) {
-            $sql .= " AND user_id = ?";
-            $params[] = $userId;
-        }
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
-    }
-
-    // Legacy methods for backward compatibility
-    public function getByUser($userId, $limit = 50, $offset = 0)
-    {
-        return $this->getUserNotifications($userId, ['limit' => $limit]);
-    }
-
-    public function getUnreadByUser($userId, $limit = 50, $offset = 0)
-    {
-        return $this->getUserNotifications($userId, ['is_read' => 0, 'limit' => $limit]);
-    }
-
-    public function getCountByUser($userId)
-    {
-        return $this->getUnreadCount($userId);
     }
 }
