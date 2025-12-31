@@ -29,6 +29,11 @@ try {
     // 3. Cleanup Old Notifications (Optional, if table exists)
     // $stmt = $pdo->query("DELETE FROM notifications WHERE is_read = 1 AND created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)");
     
+    // 4. Cleanup Old Login Sessions (Older than 1 year)
+    // Using login_time as the timestamp column
+    $stmt = $pdo->query("DELETE FROM login_sessions WHERE login_time < DATE_SUB(NOW(), INTERVAL 1 YEAR)");
+    echo "✅ Purged " . $stmt->rowCount() . " old login sessions (1 year+).\n";
+    
     $pdo->commit();
     echo "System Cleanup Finished Successfully.\n";
 

@@ -625,6 +625,16 @@ class UserManagementController extends Controller
             exit;
         }
 
+        // Rate Limiting: 5 requests per minute
+        $rateLimiter = new \App\Services\RateLimiter();
+        $rateCheck = $rateLimiter->check($_SESSION['user_id'], '/admin/users/ban', 5, 60);
+
+        if (!$rateCheck['allowed']) {
+            http_response_code(429);
+            echo json_encode(['success' => false, 'message' => 'Too many requests. Please try again later.']);
+            exit;
+        }
+
         if ($id == $_SESSION['user_id']) {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'You cannot ban yourself']);
@@ -649,6 +659,16 @@ class UserManagementController extends Controller
         if (!\App\Services\Security::validateCsrfToken()) {
             http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            exit;
+        }
+
+        // Rate Limiting: 5 requests per minute
+        $rateLimiter = new \App\Services\RateLimiter();
+        $rateCheck = $rateLimiter->check($_SESSION['user_id'], '/admin/users/unban', 5, 60);
+
+        if (!$rateCheck['allowed']) {
+            http_response_code(429);
+            echo json_encode(['success' => false, 'message' => 'Too many requests. Please try again later.']);
             exit;
         }
 
