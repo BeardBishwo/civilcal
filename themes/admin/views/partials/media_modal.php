@@ -1,5 +1,5 @@
 <!-- Media Manager Modal -->
-<div class="modal fade" id="mediaManagerModal" tabindex="-1" aria-labelledby="mediaManagerModalLabel" aria-hidden="true">
+<div class="modal fade" id="mediaManagerModal" tabindex="-1" aria-labelledby="mediaManagerModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content" style="height: 80vh;">
             <div class="modal-header">
@@ -12,7 +12,7 @@
                 <div class="media-toolbar p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
                     <div class="d-flex gap-2">
                         <button class="btn btn-primary btn-sm" onclick="document.getElementById('modal-upload-input').click()">
-                            <i class="fas fa-upload"></i> Upload
+                            <i class="fas fa-upload"></i> Upload to Media Library
                         </button>
                         <input type="file" id="modal-upload-input" style="display:none" onchange="MediaModal.handleUpload(this.files)">
                     </div>
@@ -62,6 +62,8 @@
         border-color: var(--admin-primary);
         box-shadow: 0 0 0 2px var(--admin-primary);
     }
+    .media-grid::-webkit-scrollbar { width: 6px; }
+    .media-grid::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 3px; }
 </style>
 
 <script>
@@ -72,35 +74,64 @@ window.MediaModal = {
     isLoading: false,
 
     init: function() {
-        if (!this.modal) {
-            this.modal = new bootstrap.Modal(document.getElementById('mediaManagerModal'));
-            
-            // Search listener
-            let timer;
-            document.getElementById('modal-media-search').addEventListener('input', (e) => {
-                clearTimeout(timer);
-                timer = setTimeout(() => this.loadMedia(1, e.target.value), 500);
-            });
+        const modalEl = document.getElementById('mediaManagerModal');
+        if (modalEl) {
+            // Move to body to prevent z-index/overflow issues
+            if (modalEl.parentNode !== document.body) {
+                document.body.appendChild(modalEl);
+            }
+
+            // Remove inline display none when initializing (Bootstrap handles visibility)
+             modalEl.style.display = '';
+
+            if (!this.modal) {
+                // Ensure Bootstrap is available
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    this.modal = new bootstrap.Modal(modalEl, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                } else {
+                    console.error('Bootstrap Modal not found');
+                    return;
+                }
+                
+                // Search listener
+                let timer;
+                const searchInput = document.getElementById('modal-media-search');
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        clearTimeout(timer);
+                        timer = setTimeout(() => this.loadMedia(1, e.target.value), 500);
+                    });
+                }
+            }
         }
     },
 
     open: function(callback) {
         this.init();
-        this.callback = callback;
-        this.loadMedia(1);
-        this.modal.show();
+        if (this.modal) {
+            this.callback = callback;
+            this.loadMedia(1);
+            this.modal.show();
+        } else {
+            alert('Could not initialize Media Manager. Please refresh the page.');
+        }
     },
 
     loadMedia: function(page = 1, search = '') {
         this.isLoading = true;
         const grid = document.getElementById('modal-media-grid');
+        if (!grid) return;
+        
         if (page === 1) grid.innerHTML = '<div class="text-center w-100 p-5"><i class="fas fa-spinner fa-spin fa-2x text-muted"></i></div>';
 
         fetch(`<?php echo app_base_url('/admin/api/media'); ?>?page=${page}&search=${search}`)
             .then(r => r.json())
             .then(data => {
                 grid.innerHTML = '';
-                if (data.data.length === 0) {
+                if (!data.data || data.data.length === 0) {
                     grid.innerHTML = '<div class="text-center w-100 p-5 text-muted">No media found.</div>';
                     return;
                 }
@@ -120,7 +151,8 @@ window.MediaModal = {
                     grid.appendChild(el);
                 });
 
-                document.getElementById('modal-status-text').innerText = `Showing ${data.data.length} items`;
+                const statusEl = document.getElementById('modal-status-text');
+                if (statusEl) statusEl.innerText = `Showing ${data.data.length} items`;
             })
             .catch(err => {
                 console.error(err);
@@ -134,7 +166,16 @@ window.MediaModal = {
         
         const fd = new FormData();
         fd.append('file', files[0]);
-        fd.append('csrf_token', window.appConfig.csrfToken); // Ensure csrf_token is available
+        
+        // Robust CSRF handling
+        let csrfToken = '';
+        if (window.appConfig && window.appConfig.csrfToken) {
+            csrfToken = window.appConfig.csrfToken;
+        } else {
+            const csrfInput = document.querySelector('input[name="csrf_token"]');
+            if (csrfInput) csrfToken = csrfInput.value;
+        }
+        fd.append('csrf_token', csrfToken);
 
         const grid = document.getElementById('modal-media-grid');
         // Show uploading state
@@ -156,6 +197,7 @@ window.MediaModal = {
             }
         })
         .catch(err => {
+            console.error(err);
             alert('Upload error');
             this.loadMedia(1);
         });
