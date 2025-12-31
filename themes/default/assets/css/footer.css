@@ -1,25 +1,27 @@
 /* Premium Footer Styling - Quiz Gamenta Style */
 :root {
-  --footer-bg: #1a1d3a; /* Dark navy blue */
-  --footer-text: #d1d5db; /* Lighter for better readability */
+  --footer-bg: #1a1d3a;
+  /* Dark navy blue */
+  --footer-text: #d1d5db;
+  /* Lighter for better readability */
   --footer-heading: #ffffff;
   --footer-accent: #6366f1;
   --footer-accent-glow: rgba(99, 102, 241, 0.15);
   --footer-link-hover: #ffffff;
-  --footer-border: rgba(255, 255, 255, 0.12); /* Slightly more visible */
+  --footer-border: rgba(255, 255, 255, 0.12);
+  /* Slightly more visible */
 }
 
 
 .footer-separator {
   height: 3px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 0, 0, 0.8) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 0, 0, 0.8) 50%,
+      transparent 100%);
   border: none;
-  margin: 2px 0 2px 0; /* Ultra-compact spacing */
+  margin: 2px 0 2px 0;
+  /* Ultra-compact spacing */
   width: 100%;
   box-shadow: 0 0 25px rgba(255, 0, 0, 0.3);
   position: relative;
@@ -30,7 +32,8 @@
 .site-footer {
   background: var(--footer-bg);
   color: var(--footer-text);
-  padding: 0 0 40px; /* Remove top padding to make separator flush */
+  padding: 0 0 40px;
+  /* Remove top padding to make separator flush */
   font-family: "Inter", sans-serif;
   position: relative;
   overflow: hidden;
@@ -45,14 +48,12 @@
   left: 0;
   right: 0;
   height: 80px;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(26, 29, 58, 0.2) 20%,
-    rgba(26, 29, 58, 0.5) 50%,
-    rgba(26, 29, 58, 0.8) 80%,
-    var(--footer-bg) 100%
-  );
+  background: linear-gradient(to bottom,
+      transparent 0%,
+      rgba(26, 29, 58, 0.2) 20%,
+      rgba(26, 29, 58, 0.5) 50%,
+      rgba(26, 29, 58, 0.8) 80%,
+      var(--footer-bg) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -64,11 +65,9 @@
   right: -150px;
   width: 300px;
   height: 300px;
-  background: radial-gradient(
-    circle,
-    rgba(255, 94, 94, 0.03) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(circle,
+      rgba(255, 94, 94, 0.03) 0%,
+      transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -88,61 +87,81 @@
 }
 
 .footer-top .container {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 60px;
+  display: block;
 }
 
-/* Brand Section (LEFT-ALIGNED) */
-.footer-brand-container {
-  flex: 0 0 300px; /* Fixed width for brand section */
-  text-align: left;
+.footer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 40px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.footer-col {
+  flex: 1;
+  min-width: 200px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
 }
 
+/* First column (Brand) is typically wider in Gamenta style */
+.footer-col:first-child {
+  flex: 1.5;
+  min-width: 280px;
+}
+
+@media (max-width: 1024px) {
+  .footer-col {
+    flex: 1 1 40%;
+    /* 2 columns on tablet */
+  }
+}
+
+@media (max-width: 640px) {
+  .footer-col {
+    flex: 1 1 100%;
+    /* 1 column on mobile */
+    min-width: 100%;
+    align-items: center;
+    text-align: center !important;
+  }
+}
+
+/* Brand Section Styles (Now used inside footer-col) */
 .footer-logo-wrapper {
   margin-bottom: 20px;
 }
 
 .footer-logo-img {
-  max-height: 100px; /* Increased from 80px */
+  max-height: 80px;
   width: auto;
   filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.2));
   transition: transform 0.3s ease;
-  margin-bottom: 8px; /* Reduced for compactness */
 }
 
 .footer-logo-img:hover {
   transform: scale(1.05);
 }
 
-.footer-logo-text {
-  font-size: 24px;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.5px;
-  text-decoration: none;
-}
-
-.footer-tagline {
-  font-size: 14px;
-  line-height: 1.6;
-  margin-bottom: 15px;
-  color: #d1d5db;
-  font-weight: 400;
-}
-
-/* About section */
-.footer-about {
-  font-size: 15px; /* Increased from 13px */
-  line-height: 1.8;
-  margin-bottom: 30px;
+.footer-text-block {
+  font-size: 15px;
+  line-height: 1.7;
   color: var(--footer-text);
-  font-weight: 500; /* Bolder */
-  max-width: 320px;
+  margin-bottom: 25px;
+  opacity: 0.9;
+}
+
+.footer-text-block p {
+  margin-bottom: 0.8rem;
+}
+
+.footer-text-block img {
+  max-width: 180px;
+  height: auto;
+  margin-bottom: 1.2rem;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.1));
 }
 
 
@@ -151,25 +170,55 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 12px;
-  margin-top: 20px;
+  justify-content: flex-start;
+  gap: 15px;
+  margin-top: 10px;
 }
 
 .store-btn {
-  transition: transform 0.3s ease, filter 0.3s ease;
-  filter: brightness(0.9);
+  display: inline-block;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 6px 12px;
+  transition: all 0.3s ease;
+  line-height: 0;
 }
 
 .store-btn:hover {
-  transform: scale(1.05);
-  filter: brightness(1.1);
+  background: #111;
+  border-color: var(--footer-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.store-btn img {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
+.store-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.2);
 }
 
 .footer-links li.social-wrapper,
-.footer-links li.store-wrapper {
+.footer-links li.store-wrapper,
+.footer-links li.multi-icon-wrapper,
+.footer-links li.image-icon-wrapper {
   list-style: none;
   margin-left: 0;
   padding-left: 0;
+}
+
+.footer-app-stores.side-by-side {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-app-stores.side-by-side .store-btn {
+  margin-bottom: 8px;
 }
 
 .footer-social-links {
@@ -177,13 +226,15 @@
   flex-direction: row;
   align-items: center;
   gap: 12px;
-  margin-top: 15px; /* Compact margin when in list */
+  margin-top: 15px;
+  /* Compact margin when in list */
   padding-left: 0;
   margin-left: 0;
 }
 
 .footer-social-links .social-link:first-child {
-  margin-left: 0; /* Ensure first icon is flush */
+  margin-left: 0;
+  /* Ensure first icon is flush */
 }
 
 .footer-social-links .social-link {
@@ -222,21 +273,14 @@
   border-color: var(--footer-accent);
 }
 
-/* Links Grid (3 Columns - RIGHT SIDE) */
-.footer-links-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 50px; /* Increased spacing */
-}
-
+/* Links Grid (Replaced by footer-grid) */
 .footer-col-title {
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--footer-heading);
-  margin-bottom: 30px;
+  margin-bottom: 25px;
   text-transform: uppercase;
-  letter-spacing: normal; /* Removed letter-spacing for perfect alignment */
+  letter-spacing: 1px;
   position: relative;
   text-align: left;
   width: 100%;
@@ -262,8 +306,10 @@
 .footer-links a {
   color: var(--footer-text);
   text-decoration: none;
-  font-size: 16px; /* Increased from 15px */
-  font-weight: 500; /* Bolder */
+  font-size: 16px;
+  /* Increased from 15px */
+  font-weight: 500;
+  /* Bolder */
   transition: all 0.2s ease;
   display: inline-block;
 }
@@ -276,8 +322,10 @@
 /* Footer Bottom */
 .footer-bottom {
   margin-top: 0;
-  padding-top: 15px; /* Minimal padding */
-  border-top: none; /* Removed redundant line */
+  padding-top: 15px;
+  /* Minimal padding */
+  border-top: none;
+  /* Removed redundant line */
   text-align: center;
 }
 
@@ -292,51 +340,30 @@
 
 /* Responsive Styles */
 @media (max-width: 1024px) {
-  .footer-top .container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .footer-brand-container {
-    flex: 1;
-    width: 100%;
-  }
-
-  .footer-links-grid {
+  .footer-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
+    gap: 40px;
   }
 }
 
 @media (max-width: 640px) {
-  .site-footer {
-    padding: 40px 0 30px;
+  .footer-col {
+    flex: 1 1 100% !important;
+    text-align: center !important;
+    align-items: center !important;
+    margin-bottom: 40px;
   }
 
-  .footer-top .container {
-    flex-direction: column;
-    gap: 40px;
+  .footer-grid {
+    gap: 0;
   }
 
-  .footer-brand-container {
-    width: 100%;
+  .footer-col-title {
+    text-align: center !important;
   }
 
-  .footer-logo-img {
-    max-height: 50px;
-  }
-
-  .footer-links-grid {
-    grid-template-columns: 1fr;
-    gap: 25px;
-  }
-
-  .footer-social-icons {
-    gap: 10px;
-  }
-
-  .footer-app-stores {
-    flex-direction: row;
-    flex-wrap: wrap;
+  .footer-app-stores,
+  .footer-social-links {
+    justify-content: center !important;
   }
 }

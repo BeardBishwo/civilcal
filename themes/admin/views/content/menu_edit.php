@@ -73,7 +73,7 @@ $breadcrumbs = [
                         <h3 class="card-title">Menu Configuration</h3>
                     </div>
                     <div class="card-body-clean">
-                        <div class="settings-grid" style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1.5rem;">
+                        <div class="settings-grid" style="display: grid; grid-template-columns: 2fr 1fr auto auto; gap: 1.5rem; align-items: end;">
                             <div class="form-group-modern">
                                 <label for="menu-name" class="form-label required">Menu Name</label>
                                 <input type="text" id="menu-name" name="name" class="form-control-modern" value="<?php echo htmlspecialchars($menuData['name']); ?>" required placeholder="e.g. Main Menu">
@@ -93,9 +93,6 @@ $breadcrumbs = [
                                         <option value="footer_3" <?php echo $menuData['location'] === 'footer_3' ? 'selected' : ''; ?>>Footer Column 3</option>
                                         <option value="footer_4" <?php echo $menuData['location'] === 'footer_4' ? 'selected' : ''; ?>>Footer Column 4 (Right)</option>
                                     </optgroup>
-                                    <optgroup label="Legacy/Unused">
-                                        <option value="footer" <?php echo $menuData['location'] === 'footer' ? 'selected' : ''; ?>>Old Footer (Hidden)</option>
-                                    </optgroup>
                                 </select>
                             </div>
 
@@ -109,6 +106,17 @@ $breadcrumbs = [
                                     <span class="toggle-label">Active</span>
                                 </div>
                             </div>
+
+                            <div class="form-group-modern">
+                                <label class="form-label">Show Name</label>
+                                <div class="toggle-switch-wrapper">
+                                    <label class="switch">
+                                        <input type="checkbox" name="show_name" <?php echo ($menuData['show_name'] ?? 1) ? 'checked' : ''; ?>>
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <span class="toggle-label">Visible</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -117,9 +125,17 @@ $breadcrumbs = [
                 <div class="content-card">
                     <div class="card-header-clean">
                         <h3 class="card-title">Menu Items</h3>
-                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="addMenuItem()">
-                            <i class="fas fa-plus"></i> Add Link
-                        </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-info" onclick="uploadItem()">
+                                <i class="fas fa-upload"></i> Upload
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addItem('link')">
+                                <i class="fas fa-link"></i> Add Link
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-success" onclick="addItem('text')">
+                                <i class="fas fa-font"></i> Add Text
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body-clean">
                         <div id="menu-items-list" class="menu-builder-list">
@@ -172,9 +188,16 @@ $breadcrumbs = [
         margin-bottom: 0.75rem; 
         cursor: move;
     }
-    .item-drag-handle { color: #9ca3af; cursor: grab; }
+    .item-drag-handle { color: #9ca3af; cursor: grab; padding: 0.5rem; }
     .btn-remove-item { color: #ef4444; background: none; border: none; cursor: pointer; padding: 0.5rem; }
     .btn-remove-item:hover { background: #fee2e2; border-radius: 4px; }
+
+    /* Text Item Specific */
+    .menu-builder-item.text-block {
+        grid-template-columns: auto 1fr auto auto;
+    }
+    .text-editor-container { grid-column: 2; width: 100%; }
+    .text-editor-container .tox-tinymce { border-radius: 8px; border: 1px solid #d1d5db !important; }
     
     /* Toggle Switch */
     .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
@@ -192,6 +215,20 @@ $breadcrumbs = [
     .switch.sm { width: 34px; height: 18px; }
     .switch.sm .slider:before { height: 14px; width: 14px; left: 2px; bottom: 2px; }
     .switch.sm input:checked + .slider:before { transform: translateX(16px); }
+    .input-group-modern { display: flex; position: relative; }
+    .input-group-modern .form-control-modern { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+    .btn-input-append { 
+        padding: 0 0.75rem; 
+        background: #f3f4f6; 
+        border: 1px solid #d1d5db; 
+        border-left: none; 
+        border-top-right-radius: 0.5rem; 
+        border-bottom-right-radius: 0.5rem; 
+        cursor: pointer; 
+        color: #4b5563; 
+        transition: all 0.2s;
+    }
+    .btn-input-append:hover { background: #e5e7eb; color: #1f2937; }
 </style>
 
 <script>
@@ -201,6 +238,13 @@ $breadcrumbs = [
         const list = document.getElementById('menu-items-list');
         const emptyMsg = document.getElementById('empty-menu-msg');
         
+        // Destroy existing tinymce instances to prevent memory leaks and ghost editors
+        menuItems.forEach((item, index) => {
+            if (item.type === 'text' && tinymce.get(`item-text-${index}`)) {
+                tinymce.get(`item-text-${index}`).remove();
+            }
+        });
+
         list.innerHTML = '';
         
         if (menuItems.length === 0) {
@@ -212,40 +256,133 @@ $breadcrumbs = [
         
         menuItems.forEach((item, index) => {
             const row = document.createElement('div');
-            row.className = 'menu-builder-item';
-            row.innerHTML = `
-                <div class="item-drag-handle"><i class="fas fa-grip-vertical"></i></div>
-                <div>
-                    <input type="text" class="form-control-modern" placeholder="Label" value="${item.name || item.label || ''}" onchange="updateItem(${index}, 'name', this.value)">
-                </div>
-                <div>
-                    <input type="text" class="form-control-modern" placeholder="URL" value="${item.url || ''}" onchange="updateItem(${index}, 'url', this.value)">
-                </div>
-                <div>
-                    <input type="text" class="form-control-modern" placeholder="Icon (fa-icon)" value="${item.icon || ''}" onchange="updateItem(${index}, 'icon', this.value)">
-                </div>
-                <div class="item-status-toggle" title="Toggle Visibility">
-                    <label class="switch sm">
-                        <input type="checkbox" ${item.is_active !== false ? 'checked' : ''} onchange="updateItem(${index}, 'is_active', this.checked)">
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-                <button type="button" class="btn-remove-item" onclick="removeItem(${index})">
-                    <i class="fas fa-trash"></i>
-                </button>
-            `;
+            row.className = `menu-builder-item ${item.type === 'text' ? 'text-block' : 'link-block'}`;
+            
+            if (item.type === 'text') {
+                row.innerHTML = `
+                    <div class="item-drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                    <div class="text-editor-container">
+                        <textarea id="item-text-${index}" class="menu-item-content">${item.content || ''}</textarea>
+                    </div>
+                    <div class="item-status-toggle" title="Toggle Visibility">
+                        <label class="switch sm">
+                            <input type="checkbox" ${item.is_active !== false ? 'checked' : ''} onchange="updateItem(${index}, 'is_active', this.checked)">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <button type="button" class="btn-remove-item" onclick="removeItem(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+            } else {
+                row.innerHTML = `
+                    <div class="item-drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                    <div>
+                        <input type="text" class="form-control-modern" placeholder="Label" value="${item.name || item.label || ''}" onchange="updateItem(${index}, 'name', this.value)">
+                    </div>
+                    <div class="input-group-modern">
+                        <input type="text" id="item-url-${index}" class="form-control-modern" placeholder="URL or Image paths" value="${item.url || ''}" onchange="updateItem(${index}, 'url', this.value)">
+                        <button type="button" class="btn-input-append" onclick="browseUrl(${index})" title="Browse Media">
+                            <i class="fas fa-images"></i>
+                        </button>
+                    </div>
+                    <div>
+                        <input type="text" class="form-control-modern" placeholder="Icon (fa-icon)" value="${item.icon || ''}" onchange="updateItem(${index}, 'icon', this.value)">
+                    </div>
+                    <div class="item-status-toggle" title="Toggle Visibility">
+                        <label class="switch sm">
+                            <input type="checkbox" ${item.is_active !== false ? 'checked' : ''} onchange="updateItem(${index}, 'is_active', this.checked)">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <button type="button" class="btn-remove-item" onclick="removeItem(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+            }
             list.appendChild(row);
+
+            // Initialize TinyMCE for text blocks
+            if (item.type === 'text') {
+                initItemEditor(`item-text-${index}`, index);
+            }
         });
         
         updateHiddenInput();
     }
 
-    function addMenuItem() {
-        menuItems.push({ name: '', url: '', icon: '', is_active: true });
+    function initItemEditor(id, index) {
+        setTimeout(() => {
+            tinymce.init({
+                selector: `#${id}`,
+                height: 200,
+                menubar: false,
+                plugins: 'advlist autolink lists link image charmap preview anchor code fullscreen media table help wordcount',
+                toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image media-library | code',
+                setup: function (editor) {
+                    editor.ui.registry.addButton('media-library', {
+                        text: 'Media',
+                        icon: 'image',
+                        onAction: function () {
+                            MediaModal.open(function(url) {
+                                editor.insertContent(`<img src="${url}" style="max-width:100%; height:auto;" />`);
+                            });
+                        }
+                    });
+                    editor.on('change', function () {
+                        updateItem(index, 'content', editor.getContent());
+                    });
+                },
+                content_style: 'body { font-family:Inter,sans-serif; font-size:14px }'
+            });
+        }, 100);
+    }
+
+    function addItem(type = 'link') {
+        if (type === 'text') {
+            menuItems.push({ type: 'text', content: '', is_active: true });
+        } else {
+            menuItems.push({ type: 'link', name: '', url: '', icon: '', is_active: true });
+        }
         renderMenuItems();
     }
 
+    function uploadItem() {
+        if (typeof MediaModal !== 'undefined') {
+            MediaModal.open(function(url) {
+                // If the URL is absolute from our storage, make it relative
+                const relativeUrl = url.replace(window.location.origin, '').replace(/^\/Bishwo_Calculator\//, '');
+                menuItems.push({ type: 'link', name: '', url: relativeUrl, icon: '', is_active: true });
+                renderMenuItems();
+            });
+        } else {
+            alert('Media Manager is not available.');
+        }
+    }
+
+    function browseUrl(index) {
+        if (typeof MediaModal !== 'undefined') {
+            MediaModal.open(function(url) {
+                const relativeUrl = url.replace(window.location.origin, '').replace(/^\/Bishwo_Calculator\//, '');
+                const input = document.getElementById(`item-url-${index}`);
+                if (input) {
+                    // Append if there's already something, otherwise set
+                    if (input.value) {
+                         input.value += ', ' + relativeUrl;
+                    } else {
+                         input.value = relativeUrl;
+                    }
+                    updateItem(index, 'url', input.value);
+                    renderMenuItems();
+                }
+            });
+        }
+    }
+
     function removeItem(index) {
+        if (menuItems[index].type === 'text' && tinymce.get(`item-text-${index}`)) {
+            tinymce.get(`item-text-${index}`).remove();
+        }
         menuItems.splice(index, 1);
         renderMenuItems();
     }
@@ -261,3 +398,5 @@ $breadcrumbs = [
 
     document.addEventListener('DOMContentLoaded', renderMenuItems);
 </script>
+
+<?php include __DIR__ . '/../partials/media_modal.php'; ?>

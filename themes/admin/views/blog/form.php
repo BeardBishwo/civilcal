@@ -137,6 +137,7 @@ $form_action = $is_edit ? app_base_url('/admin/blog/update/' . $post['id']) : ap
     </div>
 </div>
 
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const titleInput = document.getElementById('post-title');
@@ -157,10 +158,25 @@ document.addEventListener('DOMContentLoaded', function() {
             .replace(/-+$/, '');             // Trim - from end of text
     }
 
+    // Initialize CKEditor
+    if (document.getElementById('post-content')) {
+        CKEDITOR.replace('post-content', {
+            height: 400,
+            removePlugins: 'resize',
+            allowedContent: true // Allow all HTML
+        });
+    }
+
     // Form submission
     const form = document.getElementById('blog-form');
     form.addEventListener('submit', function(e) {
         e.preventDefault();
+        
+        // Update textarea from CKEditor
+        if (CKEDITOR.instances['post-content']) {
+            CKEDITOR.instances['post-content'].updateElement();
+        }
+
         const formData = new FormData(this);
         
         fetch(this.action, {

@@ -760,29 +760,9 @@
                                     Additional Information
                                 </div>
 
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="footer_about_text" class="form-label">📖 Footer Column 1 About Text</label>
-                                        <textarea class="form-control"
-                                            id="footer_about_text"
-                                            name="footer_about_text"
-                                            rows="4"
-                                            placeholder="Enter the description for the first column"><?= htmlspecialchars($settings['footer_about_text'] ?? '') ?></textarea>
-                                        <div class="form-text">This is the long description that appears in the first column of the footer under the logo.</div>
-                                    </div>
-                                </div>
+                                <!-- (Footer management moved to Content > Menus) -->
 
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="footer_text" class="form-label">📜 Footer Copyright Text</label>
-                                        <textarea class="form-control"
-                                            id="footer_text"
-                                            name="footer_text"
-                                            rows="3"
-                                            placeholder="&lt;p&gt;&amp;copy; {year} Civil Cal Premium. All Rights Reserved.&lt;/p&gt;"><?= htmlspecialchars($settings['footer_text'] ?? '') ?></textarea>
-                                        <div class="form-text">Text displayed in your website footer. You can use <strong>{year}</strong> for the current year and HTML tags for links or styling.</div>
-                                    </div>
-                                </div>
+
 
                                 <div class="form-row">
                                     <div class="form-group">

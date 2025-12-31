@@ -618,6 +618,10 @@ $router->add("GET", "/developers/sdk", "DeveloperController@sdk");
 $router->add("GET", "/developers/sdk/{language}", "DeveloperController@sdk");
 $router->add("GET", "/developers/playground", "DeveloperController@playground");
 
+// Media API Routes (for new Media Modal)
+$router->add("GET", "/admin/api/media", "Admin\MediaApiController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/api/media/upload", "Admin\MediaApiController@upload", ["auth", "admin"]);
+
 // Advanced Admin Features
 $router->add(
     "GET",
@@ -893,6 +897,12 @@ $router->add(
     "GET",
     "/admin/content/menus/edit/{id}",
     "Admin\\ContentController@editMenu",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/content/menus/delete/{id}",
+    "Admin\\ContentController@deleteMenu",
     ["auth", "admin"],
 );
 $router->add(

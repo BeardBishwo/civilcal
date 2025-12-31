@@ -149,8 +149,8 @@ class ContentController extends Controller
                 $url = app_base_url('/public/storage/' . $filePath);
                 
                 // If it's a theme path, don't prefix with public/storage/
-                if (strpos($filePath, 'themes/') === 0) {
-                    $url = app_base_url($filePath);
+                if (strpos($filePath, 'themes/') === 0 || strpos($filePath, '/themes/') === 0) {
+                    $url = app_base_url(ltrim($filePath, '/'));
                 }
 
                 return [
@@ -287,6 +287,29 @@ class ContentController extends Controller
         exit;
     }
 
+    public function deleteMenu($id)
+    {
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            http_response_code(403);
+            die('Access denied');
+        }
+
+        // Use the menu model to delete
+        $menuModel = new Menu();
+        $menuModel->delete($id);
+
+        // If AJAX request
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, 'message' => 'Menu deleted successfully']);
+            exit;
+        }
+
+        header('Location: ' . app_base_url('admin/content/menus'));
+        exit;
+    }
+
     public function createMenu()
     {
         $user = Auth::user();
@@ -342,6 +365,7 @@ class ContentController extends Controller
             'name' => $_POST['name'] ?? '',
             'location' => $_POST['location'] ?? '',
             'is_active' => isset($_POST['is_active']) ? 1 : 0,
+            'show_name' => isset($_POST['show_name']) ? 1 : 0,
             'items' => $_POST['items'] ?? '[]'
         ];
 

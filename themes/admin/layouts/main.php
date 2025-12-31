@@ -1137,6 +1137,45 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
     <div id="notification-toast" class="notification-toast"></div>
 
     <!-- Admin Scripts -->
+    <!-- TinyMCE -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"></script>
+    
+    <!-- Media Modal Partial -->
+    <?php include BASE_PATH . '/themes/admin/views/partials/media_modal.php'; ?>
+
+    <script>
+    // Initialize TinyMCE globally
+    document.addEventListener('DOMContentLoaded', function() {
+        tinymce.init({
+            selector: '.rich-editor',
+            height: 300,
+            menubar: false,
+            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
+            toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image media-library | code',
+            
+            // Custom Button for Media Library
+            setup: function (editor) {
+                editor.ui.registry.addButton('media-library', {
+                    text: 'Select Image',
+                    icon: 'image',
+                    onAction: function () {
+                        // Open Media Modal
+                        MediaModal.open(function(url) {
+                            editor.insertContent(`<img src="${url}" style="max-width:100%; height:auto;" />`);
+                        });
+                    }
+                });
+            },
+            
+            // Disable default file picker in favor of custom button (optional, but cleaner)
+            image_title: true,
+            automatic_uploads: true,
+            file_picker_types: 'image',
+            content_style: 'body { font-family:Inter,sans-serif; font-size:14px }'
+        });
+    });
+    </script>
+    
     <script src="<?php echo app_base_url('themes/admin/assets/js/admin.js?v=' . time()); ?>"></script>
     <script src="<?php echo app_base_url('public/assets/js/global-notifications.js'); ?>"></script>
     <script src="<?php echo app_base_url('themes/admin/assets/js/notification-fixed.js'); ?>"></script>

@@ -101,7 +101,7 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
                 <select id="location-filter" class="filter-compact">
                     <option value="">All Locations</option>
                     <option value="header">Header</option>
-                    <option value="footer">Footer</option>
+                    <option value="footer_">Footer Columns</option>
                     <option value="mobile">Mobile</option>
                 </select>
             </div>
@@ -777,9 +777,34 @@ $totalMenuItems = array_sum(array_column($menus, 'items_count'));
 
     function deleteMenu(menuId, menuName) {
         showConfirmModal('Delete Menu', `Are you sure you want to delete "${menuName}"? This action cannot be undone.`, () => {
-            // Implement delete logic
-            console.log('Delete menu:', menuId);
-            showNotification('Menu deleted successfully', 'success');
+            const formData = new FormData();
+            formData.append('id', menuId);
+            
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            if (csrfToken) {
+                formData.append('csrf_token', csrfToken);
+            }
+
+            fetch('<?php echo app_base_url("admin/content/menus/delete"); ?>/' + menuId, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showNotification(data.message || 'Failed to delete menu', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred while deleting the menu', 'error');
+            });
         });
     }
 
