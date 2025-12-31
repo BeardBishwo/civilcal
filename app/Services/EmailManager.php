@@ -26,35 +26,46 @@ class EmailManager
     /**
      * Load email settings from configuration or database
      */
+    /**
+     * Load email settings from database with .env fallback
+     */
     private function loadSettings()
     {
-        // Default settings
-        $this->settings = [
-            'use_phpmailer' => true,
-            'smtp_host' => 'smtp.gmail.com',
-            'smtp_port' => 587,
-            'smtp_username' => '',
-            'smtp_password' => '',
-            'smtp_encryption' => 'tls',
-            'from_email' => 'noreply@example.com',
-            'from_name' => \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro'),
-            'reply_to' => 'support@example.com'
-        ];
-
-        // Load from database if available
+        // 1. Try to load from Database (SettingsService) via 'site_settings' table pattern used in this class
+        // Note: Existing code used direct query to 'site_settings', but SettingsService uses 'settings' table.
+        // We will stick to the existing class logic which queries 'site_settings' directly for 'email_%' keys
+        // as per the existing codebase style, but we will make it robust.
+        
+        $dbSettings = [];
         try {
             $db = Database::getInstance();
+            // Check site_settings table (legacy/current implementation)
             $stmt = $db->query("SELECT setting_key, setting_value FROM site_settings WHERE setting_key LIKE 'email_%'");
             if ($stmt) {
                 while ($row = $stmt->fetch()) {
                     $key = str_replace('email_', '', $row['setting_key']);
-                    $this->settings[$key] = $row['setting_value'];
+                    $dbSettings[$key] = $row['setting_value'];
                 }
             }
         } catch (Exception $e) {
-            // Use defaults if database loading fails
-            error_log('Email settings loading failed: ' . $e->getMessage());
+            error_log('Database email settings check failed: ' . $e->getMessage());
         }
+
+        // 2. Define defaults using .env as fallback (Soft Coding)
+        $this->settings = [
+            'use_phpmailer' => $dbSettings['use_phpmailer'] ?? filter_var(getenv('USE_PHPMAILER') ?: true, FILTER_VALIDATE_BOOLEAN),
+            
+            // Prioritize Database -> Then ENV -> Then empty
+            'smtp_host' => $dbSettings['smtp_host'] ?? getenv('SMTP_HOST') ?: '',
+            'smtp_port' => $dbSettings['smtp_port'] ?? getenv('SMTP_PORT') ?: 587,
+            'smtp_username' => $dbSettings['smtp_username'] ?? getenv('SMTP_USER') ?: '',
+            'smtp_password' => $dbSettings['smtp_password'] ?? getenv('SMTP_PASS') ?: '',
+            'smtp_encryption' => $dbSettings['smtp_encryption'] ?? getenv('SMTP_ENCRYPTION') ?: 'tls',
+            
+            'from_email' => $dbSettings['from_email'] ?? getenv('MAIL_FROM_ADDRESS') ?: 'noreply@example.com',
+            'from_name' => $dbSettings['from_name'] ?? getenv('MAIL_FROM_NAME') ?? \App\Services\SettingsService::get('site_name', 'Bishwo Calculator'),
+            'reply_to' => $dbSettings['reply_to'] ?? getenv('MAIL_REPLY_TO') ?: 'support@example.com'
+        ];
 
         // Check if PHPMailer should be used
         $this->usePHPMailer = ($this->settings['use_phpmailer'] ?? true) && !empty($this->settings['smtp_host']);

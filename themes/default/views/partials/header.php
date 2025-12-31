@@ -251,14 +251,19 @@ if (
     
     <meta name="theme-color" content="#000000">
     <!-- Inline styles removed to ensure single source of truth in theme.css -->
-    <!-- Google Analytics (Placeholder) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <!-- Google Analytics -->
+    <?php 
+    $gaId = \App\Services\SettingsService::get('google_analytics_id');
+    if (!empty($gaId)): 
+    ?>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<?= htmlspecialchars($gaId) ?>"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'GA_MEASUREMENT_ID'); // Replace with actual ID
+        gtag('config', '<?= htmlspecialchars($gaId) ?>');
     </script>
+    <?php endif; ?>
 
     <!-- PWA Service Worker Registration -->
     <script>

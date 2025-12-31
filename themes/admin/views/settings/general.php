@@ -796,6 +796,19 @@
                                     </div>
                                 </div>
 
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="google_analytics_id" class="form-label">📊 Google Analytics Measurement ID</label>
+                                        <input type="text" class="form-control"
+                                            id="google_analytics_id"
+                                            name="google_analytics_id"
+                                            value="<?= htmlspecialchars($settings['google_analytics_id'] ?? '') ?>"
+                                            placeholder="G-XXXXXXXXXX">
+                                        <div class="form-text">Enter your Google Analytics 4 Measurement ID (starting with 'G-'). Tracking will be automatically enabled.</div>
+                                    </div>
+
+                                </div>
+
                                 <div class="form-hint">
                                     💡 <strong>Pro Tip:</strong> Ensure all information is up-to-date and reflects your current business details for better user experience.
                                 </div>
