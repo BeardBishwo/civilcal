@@ -798,15 +798,17 @@ $router->add(
 );
 
 // Blueprint Vault (Library) Routes
-$router->add("GET", "/library", "LibraryController@index", ["auth"]);
+$router->add("GET", "/library", "LibraryController@index");
 $router->add("GET", "/library/upload", "LibraryController@upload", ["auth"]);
 $router->add("GET", "/admin/library/requests", "Admin\LibraryController@index", ["auth", "admin"]);
 
+// Library API
 // Library API Routes
 $router->add("GET", "/api/library/browse", "Api\LibraryApiController@browse");
 $router->add("POST", "/api/library/upload", "Api\LibraryApiController@upload", ["auth"]);
+$router->add("POST", "/api/library/unlock", "Api\LibraryApiController@unlock", ["auth"]);
 $router->add("GET", "/api/library/download", "Api\LibraryApiController@download", ["auth"]);
-// Note: Frontend uses /api/admin/library/approve, mapping it:
+$router->add("GET", "/api/library/preview", "Api\LibraryApiController@previewImage");
 $router->add("POST", "/api/admin/library/approve", "Api\LibraryApiController@approve", ["auth", "admin"]);
 
 // Bounty System Routes

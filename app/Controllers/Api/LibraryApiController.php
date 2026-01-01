@@ -2,14 +2,20 @@
 
 namespace App\Controllers\Api;
 
-use App\Controllers\Controller;
-use App\Services\Auth;
+use App\Core\Controller;
+use App\Core\Auth;
 use App\Models\LibraryFile;
 use App\Models\User;
 use Exception;
 
 class LibraryApiController extends Controller
 {
+    private function userId($user)
+    {
+        if (!$user) return null;
+        return is_object($user) ? ($user->id ?? null) : ($user['id'] ?? null);
+    }
+
     public function browse()
     {
         try {
@@ -22,7 +28,8 @@ class LibraryApiController extends Controller
                 $user = Auth::user();
                 $userModel = new User();
                 // Check if user is admin
-                if (!$user || !$userModel->isAdmin($user['id'])) {
+                $uid = $this->userId($user);
+                if (!$uid || !$userModel->isAdmin($uid)) {
                     $status = 'approved'; // Fallback for non-admins
                 }
             } else {
@@ -51,7 +58,8 @@ class LibraryApiController extends Controller
     {
         try {
             $user = Auth::user();
-            if (!$user) {
+            $uid = $this->userId($user);
+            if (!$uid) {
                 throw new Exception('Unauthorized access', 401);
             }
 
@@ -62,12 +70,13 @@ class LibraryApiController extends Controller
             $title = trim($_POST['title'] ?? '');
             $description = trim($_POST['description'] ?? '');
             $fileType = $_POST['type'] ?? 'other';
+            $priceCoins = max(0, (int)($_POST['price'] ?? 0));
 
             if (empty($title)) {
                 throw new Exception('Title is required', 400);
             }
 
-            $allowedExtensions = ['dwg', 'dxf', 'pdf', 'xlsx', 'xls', 'xlsm', 'docx', 'doc', 'jpg', 'png'];
+            $allowedExtensions = ['dwg', 'dxf', 'pdf', 'xlsx', 'xls', 'xlsm', 'docx', 'doc', 'jpg', 'jpeg', 'png'];
             $maxSize = 15 * 1024 * 1024; // 15MB
 
             $file = $_FILES['file'];
@@ -82,8 +91,8 @@ class LibraryApiController extends Controller
             }
 
             $uploadDir = STORAGE_PATH . '/library/quarantine';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
+            if (!is_dir($uploadDir) && !@mkdir($uploadDir, 0755, true)) {
+                throw new Exception('Failed to create upload directory', 500);
             }
 
             $filename = uniqid('lib_') . '_' . time() . '.' . $ext;
@@ -96,15 +105,19 @@ class LibraryApiController extends Controller
             // Duplicate Check
             $existing = $libraryFileModel->findByHash($fileHash);
             if ($existing) {
-                if ($existing->uploader_id == $user['id']) {
+                if ($existing->uploader_id == $uid) {
                     throw new Exception('You have already uploaded this file.', 409);
                 } else {
                     throw new Exception('Duplicate file detected. This resource was found in our library uploaded by another user.', 409);
                 }
             }
 
+            // Attempt to move; fallback to rename (sometimes needed on Windows)
             if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
-                throw new Exception('Failed to save file', 500);
+                if (!@rename($file['tmp_name'], $targetPath)) {
+                    $errDetail = $this->uploadErrorMessage($file['error'] ?? null);
+                    throw new Exception('Failed to save file. ' . $errDetail, 500);
+                }
             }
 
             // Preview Handling (CAD requires screenshot)
@@ -116,10 +129,12 @@ class LibraryApiController extends Controller
                      // Upload Preview
                      $previewFilename = uniqid('preview_') . '_' . time() . '.' . $previewExt;
                      $previewDir = STORAGE_PATH . '/library/previews';
-                     if (!is_dir($previewDir)) mkdir($previewDir, 0755, true);
+                     if (!is_dir($previewDir) && !@mkdir($previewDir, 0755, true)) {
+                        throw new Exception('Failed to create preview directory', 500);
+                     }
                      
                      $targetPreview = $previewDir . '/' . $previewFilename;
-                     if(move_uploaded_file($previewFile['tmp_name'], $targetPreview)) {
+                     if (move_uploaded_file($previewFile['tmp_name'], $targetPreview) || @rename($previewFile['tmp_name'], $targetPreview)) {
                          $previewPath = 'previews/' . $previewFilename;
 
                          // WATERMARK LOGIC
@@ -171,13 +186,13 @@ class LibraryApiController extends Controller
             }
 
             $fileId = $libraryFileModel->create([
-                'uploader_id' => $user['id'],
+                'uploader_id' => $uid,
                 'title' => $title,
                 'description' => $description,
                 'file_path' => 'quarantine/' . $filename,
                 'file_type' => $fileType,
                 'file_size_kb' => round($file['size'] / 1024),
-                'price_coins' => 50,
+                'price_coins' => $priceCoins,
                 'status' => 'pending',
                 'file_hash' => $fileHash,
                 'preview_path' => $previewPath

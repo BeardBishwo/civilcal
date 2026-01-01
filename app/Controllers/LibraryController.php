@@ -2,25 +2,31 @@
 
 namespace App\Controllers;
 
-use App\Services\Auth;
+use App\Core\Controller;
+use App\Core\Auth;
 use App\Models\User;
 
 class LibraryController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
+        $userId = $user->id ?? null;
+        $coins = $userId ? (new User())->getCoins($userId) : 0;
+
         $this->view('library/index', [
             'title' => 'Blueprint Vault - Civil City Library',
-            'user' => Auth::user(),
-            'coins' => (new User())->getCoins(Auth::id())
+            'user' => $user,
+            'coins' => $coins
         ]);
     }
 
     public function upload()
     {
+        $user = Auth::user();
         $this->view('library/upload', [
             'title' => 'Upload Resource - Blueprint Vault',
-            'user' => Auth::user()
+            'user' => $user
         ]);
     }
 
