@@ -1313,15 +1313,15 @@ if (
                 // Fetch notifications
                 async function fetchNotifications() {
                     try {
-                        const res = await fetch(`${baseUrl}/api/notifications/list?limit=10`);
+                        const res = await fetch(`${baseUrl}/api/notifications`);
                         const data = await res.json();
                         
                         if (data.success) {
                             renderNotifications(data.notifications);
-                            updateBadge(data.unread_count);
+                            updateBadge(data.notifications.length);
                             isLoaded = true;
-                        } else if (data.error === 'Access denied') {
-                             // User logged out or session expired
+                        } else if (res.status === 401) {
+                             // User logged out
                              list.innerHTML = `<div class="notification-empty">
                                 <i class="fas fa-exclamation-circle"></i>
                                 <p>Please login to view notifications</p>
@@ -1329,23 +1329,20 @@ if (
                         }
                     } catch (err) {
                         console.error('Failed to fetch notifications', err);
-                        list.innerHTML = `<div class="notification-empty" style="color: #ef4444;">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <p>Failed to load notifications</p>
-                        </div>`;
                     }
                 }
 
                 // Initial Badge Count
                 async function checkUnreadCount() {
                     try {
-                        const res = await fetch(`${baseUrl}/api/notifications/unread-count`);
+                        // Re-use same endpoint as it returns unread list
+                        const res = await fetch(`${baseUrl}/api/notifications`);
                         const data = await res.json();
                         if (data.success) {
-                            updateBadge(data.unread_count);
+                            updateBadge(data.notifications.length);
                         }
                     } catch (err) {
-                        // Silent fail for background check
+                        // Silent fail
                     }
                 }
 

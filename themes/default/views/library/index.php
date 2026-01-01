@@ -65,9 +65,16 @@ function loadResources(type = '') {
             }
 
             grid.innerHTML = data.files.map(file => `
-                <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden border border-gray-100">
-                    <div class="h-40 bg-gray-50 flex items-center justify-center border-b">
+                <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden border border-gray-100 relative group">
+                    <button onclick="reportFile(${file.id})" class="absolute top-2 right-2 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition" title="Report Content">
+                        <i class="fas fa-flag"></i>
+                    </button>
+                    <div class="h-40 bg-gray-50 flex items-center justify-center border-b relative">
                         <span class="text-4xl">${getFileIcon(file.file_type)}</span>
+                        ${file.avg_rating ? `
+                        <div class="absolute bottom-2 right-2 bg-white px-2 py-1 rounded-full text-xs font-bold text-yellow-500 shadow flex items-center gap-1">
+                            <i class="fas fa-star"></i> ${parseFloat(file.avg_rating).toFixed(1)}
+                        </div>` : ''}
                     </div>
                     <div class="p-5">
                         <div class="flex justify-between items-start mb-2">
@@ -84,6 +91,11 @@ function loadResources(type = '') {
                             <button onclick="downloadFile(${file.id}, ${file.price_coins})" class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
                                 <span>🔒 Unlock</span>
                                 <span class="bg-gray-700 px-1.5 py-0.5 rounded text-xs">${file.price_coins} C</span>
+                            </button>
+                            
+                            <!-- Review Button (Hidden unless downloaded - Logic handled in modal/click) -->
+                            <button onclick="rateFile(${file.id})" class="ml-2 text-gray-400 hover:text-yellow-500" title="Rate">
+                                <i class="far fa-star"></i>
                             </button>
                         </div>
                     </div>
@@ -119,5 +131,44 @@ function downloadFile(id, price) {
     
     // Optimistically update coins (or reload page)
     // setTimeout(() => location.reload(), 1000); 
+}
+
+function reportFile(id) {
+    const reason = prompt("Why are you reporting this file? (Copyright, Spam, Broken)");
+    if (!reason) return;
+
+    fetch('/api/library/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ file_id: id, reason: reason })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if(d.success) alert(d.message);
+        else alert('Error: ' + d.message);
+    });
+}
+
+function rateFile(id) {
+    const rating = prompt("Rate this file (1-5 Stars):");
+    if (!rating || isNaN(rating) || rating < 1 || rating > 5) return;
+    
+    // Optional comment
+    const comment = prompt("Any comments? (Optional)");
+
+    fetch('/api/library/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ file_id: id, rating: rating, comment: comment || '' })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if(d.success) {
+            alert('Thank you for your review!');
+            loadResources(); // Refresh to show new rating
+        } else {
+            alert('Error: ' + d.message);
+        }
+    });
 }
 </script>

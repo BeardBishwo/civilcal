@@ -1539,6 +1539,21 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
             }
         });
     </script>
+    <script>
+        // Sidebar Auto-Scroll to Active Item
+        document.addEventListener('DOMContentLoaded', function() {
+            const activeItem = document.querySelector('.nav-item.active');
+            if (activeItem) {
+                setTimeout(() => {
+                    activeItem.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                        inline: 'nearest'
+                    });
+                }, 300);
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -158,6 +158,37 @@ function get_tool_url($tool) {
     return app_base_url($tool['path'] ?? '#');
 }
 ?>
+        <!-- Referral Program Card -->
+        <div class="rank-card" style="grid-column: 1 / -1; background: linear-gradient(to right, #f0f9ff, #e0f2fe); border-color: #bae6fd;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-weight: 800; color: #0369a1; margin: 0;">Invite & Earn</h3>
+                <span class="status-badge" style="background: #0ea5e9; color: white;">+50 Coins / Friend</span>
+            </div>
+            <div style="display: flex; gap: 30px; align-items: center; flex-wrap: wrap;">
+                <div style="flex: 1;">
+                    <p style="color: #0c4a6e; margin-bottom: 15px;">Share your unique link. When they solve 5 quizzes, you both get paid!</p>
+                    <?php 
+                        $currUser = (new \App\Models\User())->find($_SESSION['user_id'] ?? 0);
+                        $refCode = $currUser->referral_code ?? 'GENERATE'; 
+                        if($refCode === 'GENERATE') {
+                            // Auto-fix if missing
+                            (new \App\Models\User())->incrementQuizCount($_SESSION['user_id'] ?? 0);
+                            $refCode = (new \App\Models\User())->find($_SESSION['user_id'])->referral_code;
+                        }
+                        $refLink = app_base_url('/register?ref=' . $refCode);
+                    ?>
+                    <div style="background: white; padding: 10px 15px; border-radius: 12px; display: flex; gap: 10px; border: 1px dashed #7dd3fc; align-items: center;">
+                        <code style="font-weight: bold; color: #0284c7; flex: 1;"><?= $refLink ?></code>
+                        <button onclick="navigator.clipboard.writeText('<?= $refLink ?>'); alert('Copied!');" style="border: none; background: #0ea5e9; color: white; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Copy</button>
+                    </div>
+                </div>
+                <div style="text-align: center; min-width: 120px;">
+                    <div style="font-size: 2rem; font-weight: 800; color: #0284c7;"><?= $currUser->quiz_solved_count ?? 0 ?></div>
+                    <div style="font-size: 0.8rem; color: #0c4a6e; font-weight: 600;">Quizzes Solved</div>
+                </div>
+            </div>
+        </div>
+
         <!-- App Shortcuts Card -->
         <div class="rank-card" style="grid-column: 1 / -1;">
             <h3 style="font-weight: 800; color: #1e293b; margin-bottom: 25px;">Quick Actions</h3>

@@ -1,8 +1,31 @@
 # Project Structure Report
 
-Generated: 2026-01-01 08:06:36
+Generated: 2026-01-01 08:44:19
 
 ```
+=== PROJECT STATISTICS ===
+📁 Directories: 1,528
+📄 Files: 16,930
+💾 Total Size: 1.15 GB
+🐘 PHP Files: 7268 (1,066,982 lines)
+📋 JSON Files: 162
+🎨 CSS Files: 38
+⚡ JS Files: 479
+📝 MD Files: 231
+🗄️ SQL Files: 25
+
+=== STATISTICS (EXCLUDING VENDOR/NODE_MODULES/STORAGE CACHE) ===
+📁 Directories: 1,464
+📄 Files: 13,800
+💾 Total Size: 1.14 GB
+🐘 PHP Files: 7268 (1,066,982 lines)
+📋 JSON Files: 156
+🎨 CSS Files: 31
+⚡ JS Files: 33
+📝 MD Files: 221
+🗄️ SQL Files: 25
+
+--- FILE TREE ---
 Bishwo_Calculator/
 ├── .env
 ├── .env.production
@@ -1152,7 +1175,9 @@ Bishwo_Calculator/
 │   └── specs/
 ├── package-lock.json
 ├── package.json
+├── project-structure-report.md
 ├── project-structure-report.php
+├── project-structure-report.txt
 ├── public/
 │   ├── .htaccess
 │   ├── assets/
