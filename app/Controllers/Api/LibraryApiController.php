@@ -107,6 +107,69 @@ class LibraryApiController extends Controller
                 throw new Exception('Failed to save file', 500);
             }
 
+            // Preview Handling (CAD requires screenshot)
+            $previewPath = null;
+            if (isset($_FILES['preview']) && $_FILES['preview']['error'] === UPLOAD_ERR_OK) {
+                $previewFile = $_FILES['preview'];
+                $previewExt = strtolower(pathinfo($previewFile['name'], PATHINFO_EXTENSION));
+                if (in_array($previewExt, ['jpg', 'jpeg', 'png', 'webp'])) {
+                     // Upload Preview
+                     $previewFilename = uniqid('preview_') . '_' . time() . '.' . $previewExt;
+                     $previewDir = STORAGE_PATH . '/library/previews';
+                     if (!is_dir($previewDir)) mkdir($previewDir, 0755, true);
+                     
+                     $targetPreview = $previewDir . '/' . $previewFilename;
+                     if(move_uploaded_file($previewFile['tmp_name'], $targetPreview)) {
+                         $previewPath = 'previews/' . $previewFilename;
+
+                         // WATERMARK LOGIC
+                         try {
+                             if (class_exists(\Intervention\Image\ImageManager::class)) {
+                                 // v3
+                                 $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                                 $image = $manager->read($targetPreview);
+                                 
+                                 // Add text watermark
+                                 $image->text('PREVIEW ONLY - UNPAID', $image->width() / 2, $image->height() / 2, function ($font) {
+                                     $font->size(48);
+                                     $font->color('rgba(255, 0, 0, 0.5)');
+                                     $font->align('center');
+                                     $font->valign('middle');
+                                     $font->angle(45);
+                                 });
+                                 
+                                 $image->save($targetPreview);
+                             } elseif (class_exists(\Intervention\Image\ImageManagerStatic::class)) {
+                                 // v2 Fallback (Unlikely given composer.json, but safe)
+                                 $img = \Intervention\Image\ImageManagerStatic::make($targetPreview);
+                                 $img->text('PREVIEW ONLY', $img->width()/2, $img->height()/2, function($font) {
+                                     $font->size(48);
+                                     $font->color(array(255, 0, 0, 0.5));
+                                     $font->align('center');
+                                     $font->valign('middle');
+                                     $font->angle(45);
+                                 });
+                                 $img->save($targetPreview);
+                             }
+                         } catch (Exception $e) {
+                             // Log or ignore watermark failure, file is still saved
+                             error_log("Watermark failed: " . $e->getMessage());
+                         }
+                     }
+                }
+            } else if ($fileType === 'cad') {
+                // FORCE PREVIEW FOR CAD
+                throw new Exception('A preview image (JPG/PNG) is required for CAD files.', 400); 
+            }
+
+            // Auto-generate preview for Images?
+            // If file_type is 'image' (jpg/png), we can use the file itself as preview or make a thumb.
+            if ($fileType === 'image' && !$previewPath) {
+                 // For now, simple: use the file path itself if we copy it to public? 
+                 // Actually file is in quarantine (protected). better to wait for admin approval logic to move it.
+                 // But we can flag it.
+            }
+
             $fileId = $libraryFileModel->create([
                 'uploader_id' => $user['id'],
                 'title' => $title,
@@ -116,7 +179,8 @@ class LibraryApiController extends Controller
                 'file_size_kb' => round($file['size'] / 1024),
                 'price_coins' => 50,
                 'status' => 'pending',
-                'file_hash' => $fileHash
+                'file_hash' => $fileHash,
+                'preview_path' => $previewPath
             ]);
 
             $this->json([
@@ -252,5 +316,49 @@ class LibraryApiController extends Controller
         } catch (Exception $e) {
             die($e->getMessage());
         }
+    }
+    public function stream()
+    {
+        try {
+             $fileId = $_GET['id'] ?? null;
+             if (!$fileId) die('ID Required');
+
+             $libraryFileModel = new LibraryFile();
+             $file = $libraryFileModel->find($fileId);
+             if (!$file) die('Not found');
+
+             // Check permissions logic if needed
+             // For now, allow viewing if file exists (preview logic)
+             
+             $path = STORAGE_PATH . '/library/' . $file->file_path;
+             if (!file_exists($path)) die('File missing');
+             
+             $mime = mime_content_type($path);
+             header('Content-Type: ' . $mime);
+             header('Content-Disposition: inline; filename="' . basename($path) . '"');
+             readfile($path);
+             exit;
+        } catch (Exception $e) {
+             die($e->getMessage());
+        }
+    }
+
+    public function previewImage()
+    {
+         $fileId = $_GET['id'] ?? null;
+         if (!$fileId) die('ID Required');
+         
+         $libraryFileModel = new LibraryFile();
+         $file = $libraryFileModel->find($fileId);
+         if (!$file || empty($file->preview_path)) die('No preview');
+         
+         $path = STORAGE_PATH . '/library/' . $file->preview_path;
+         if (!file_exists($path)) die('Preview missing');
+         
+         $mime = mime_content_type($path);
+         header('Content-Type: ' . $mime);
+         header('Content-Disposition: inline');
+         readfile($path);
+         exit;
     }
 }

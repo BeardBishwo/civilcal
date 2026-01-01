@@ -5,6 +5,21 @@
  * Core settings for the application
  */
 
+// Helper to get environment variable safely
+if (!function_exists('env')) {
+    function env($key, $default = null)
+    {
+        if (isset($_ENV[$key])) {
+            return $_ENV[$key];
+        }
+        $value = getenv($key);
+        if ($value !== false) {
+            return $value;
+        }
+        return $default;
+    }
+}
+
 // Environment detection
 // Manual .env loading for reliability within config scope
 if (defined('BASE_PATH') && file_exists(BASE_PATH . '/.env')) {
@@ -116,6 +131,8 @@ if (!function_exists('env')) {
         return $default;
     }
 }
+
+// Environment detection
 
 // Database configuration
 // Using environment variables with fallbacks

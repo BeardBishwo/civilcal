@@ -18,8 +18,8 @@ class LibraryFile
         $stmt = $this->db->getPdo()->prepare("
             INSERT INTO library_files (
                 uploader_id, title, description, file_path, file_type, 
-                file_size_kb, price_coins, status, file_hash
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                file_size_kb, price_coins, status, file_hash, preview_path
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
@@ -31,7 +31,8 @@ class LibraryFile
             $data['file_size_kb'] ?? 0,
             $data['price_coins'] ?? 50,
             $data['status'] ?? 'pending',
-            $data['file_hash'] ?? ''
+            $data['file_hash'] ?? '',
+            $data['preview_path'] ?? null
         ]);
 
         return $this->db->getPdo()->lastInsertId();

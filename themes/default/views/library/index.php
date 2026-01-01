@@ -88,10 +88,15 @@ function loadResources(type = '') {
                             <div class="text-sm text-gray-500">
                                 ⬇ ${file.downloads_count}
                             </div>
-                            <button onclick="downloadFile(${file.id}, ${file.price_coins})" class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
-                                <span>🔒 Unlock</span>
-                                <span class="bg-gray-700 px-1.5 py-0.5 rounded text-xs">${file.price_coins} C</span>
-                            </button>
+                            <div class="flex gap-2">
+                                <a href="/library/view/${file.id}" target="_blank" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1" title="Preview">
+                                    <i class="far fa-eye"></i>
+                                </a>
+                                <button onclick="downloadFile(${file.id}, ${file.price_coins})" class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                                    <span>🔒 Unlock</span>
+                                    <span class="bg-gray-700 px-1.5 py-0.5 rounded text-xs">${file.price_coins} C</span>
+                                </button>
+                            </div>
                             
                             <!-- Review Button (Hidden unless downloaded - Logic handled in modal/click) -->
                             <button onclick="rateFile(${file.id})" class="ml-2 text-gray-400 hover:text-yellow-500" title="Rate">

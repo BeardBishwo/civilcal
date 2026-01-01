@@ -2051,3 +2051,8 @@ $router->add("GET", "/quiz/firms/leave", "Quiz\\FirmController@leave", ["auth"])
 // Must be at the end to not interfere with other routes
 // ============================================
 $router->add('GET', '/{slug}', 'CalculatorController@permalink');
+
+// File Viewer Routes
+$router->add('GET', '/library/view/{id}', 'ViewerController@view');
+$router->add('GET', '/api/library/stream', 'Api\LibraryApiController@stream'); // Need this for PDF.js/Image
+$router->add('GET', '/api/library/preview-image', 'Api\LibraryApiController@previewImage');

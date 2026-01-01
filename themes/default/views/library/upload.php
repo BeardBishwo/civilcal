@@ -26,7 +26,7 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                    <select name="type" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <select name="type" id="file-type" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         <option value="cad">AutoCAD / DWG</option>
                         <option value="excel">Excel Sheet</option>
                         <option value="pdf">PDF Document</option>
@@ -41,6 +41,12 @@
                 </div>
             </div>
 
+            <div id="preview-section" class="mt-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                 <label class="block text-sm font-medium text-gray-700 mb-1">Preview Image (Optional - Watermarked)</label>
+                 <input type="file" name="preview" id="preview-file" accept="image/*" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                 <p class="text-xs text-blue-600 mt-1">Please upload a JPG/PNG screenshot of the CAD drawing so users can preview it.</p>
+            </div>
+
             <button type="submit" id="submit-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition">
                 🚀 Upload Resource
             </button>
@@ -49,6 +55,25 @@
 </div>
 
 <script>
+document.getElementById('file-type').addEventListener('change', function() {
+    const previewInput = document.getElementById('preview-file');
+    const previewLabel = document.querySelector('#preview-section label');
+    
+    // Always show, but make required for CAD
+    // Actually, let's keep it visible.
+    
+    if (this.value === 'cad') {
+        previewInput.required = true;
+        previewLabel.textContent = 'Preview Image (Required for CAD)';
+    } else {
+        previewInput.required = false;
+        previewLabel.textContent = 'Preview Image (Optional - Watermarked)';
+    }
+});
+
+// Initialize on load?
+document.getElementById('preview-section').classList.remove('hidden');
+
 document.getElementById('upload-form').addEventListener('submit', function(e) {
     e.preventDefault();
     const btn = document.getElementById('submit-btn');
