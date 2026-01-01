@@ -52,6 +52,28 @@ function formatUnitSymbol($symbol) {
         <!-- Main Content -->
         <main class="main-content">
             <div class="converter-container">
+                <!-- SPONSOR BANNER -->
+                <?php if(isset($campaign) && $campaign): ?>
+                    <div class="sponsor-banner mb-4 p-3 rounded-3 shadow-sm d-flex align-items-center justify-content-between" 
+                         style="background: linear-gradient(90deg, #f0fdf4, #ffffff); border-left: 5px solid #16a34a; position: relative; overflow: hidden;">
+                        <div class="d-flex align-items-center gap-3" style="z-index: 1;">
+                            <?php if(!empty($campaign['logo_path'])): ?>
+                                <img src="/public/uploads/sponsors/<?= $campaign['logo_path'] ?>" alt="<?= htmlspecialchars($campaign['sponsor_name']) ?>" class="img-fluid" style="max-height: 50px; max-width: 120px; object-fit: contain;">
+                            <?php else: ?>
+                                <div class="bg-light rounded p-2 fw-bold text-success border"><?= substr($campaign['sponsor_name'], 0, 1) ?></div>
+                            <?php endif; ?>
+                            <div>
+                                <small class="text-uppercase text-muted fw-bold d-block" style="font-size: 0.65rem; letter-spacing: 1px; line-height: 1;">Sponsored By</small>
+                                <div class="fw-bold text-dark fs-6 mt-1"><?= htmlspecialchars($campaign['ad_text'] ?: $campaign['sponsor_name']) ?></div>
+                            </div>
+                        </div>
+                        <a href="<?= htmlspecialchars($campaign['website_url']) ?>" target="_blank" class="btn btn-sm btn-success rounded-pill px-4 fw-bold shadow-sm" style="z-index: 1;">
+                            <?= htmlspecialchars($campaign['cta_text'] ?? 'Visit Partner') ?> <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
+                        <!-- Background Pattern -->
+                        <i class="bi bi-megaphone text-success opacity-10 position-absolute" style="font-size: 5rem; right: -10px; top: -20px; transform: rotate(-15deg);"></i>
+                    </div>
+                <?php endif; ?>
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="fw-bold m-0"><i class="<?php echo $category['icon']; ?> me-3 text-primary"></i><?php echo htmlspecialchars($category['name']); ?> Converter</h2>
                     <span class="badge bg-primary rounded-pill px-3 py-2">Premium Tool</span>

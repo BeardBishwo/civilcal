@@ -66,16 +66,23 @@ function loadResources(type = '') {
 
             grid.innerHTML = data.files.map(file => `
                 <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden border border-gray-100 relative group">
-                    <button onclick="reportFile(${file.id})" class="absolute top-2 right-2 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition" title="Report Content">
+                    <button onclick="reportFile(${file.id})" class="absolute top-2 right-2 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition z-10" title="Report Content">
                         <i class="fas fa-flag"></i>
                     </button>
+
+                    ${file.price > 0 ? `
+                        <div class="absolute top-2 left-2 z-10 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded shadow-sm flex items-center gap-1">
+                            <i class="fas fa-lock"></i> ${file.price}
+                        </div>
+                    ` : ''}
+
                     <div class="h-40 bg-gray-50 flex items-center justify-center border-b relative">
-                        <span class="text-4xl">${getFileIcon(file.file_type)}</span>
-                        ${file.avg_rating ? `
-                        <div class="absolute bottom-2 right-2 bg-white px-2 py-1 rounded-full text-xs font-bold text-yellow-500 shadow flex items-center gap-1">
-                            <i class="fas fa-star"></i> ${parseFloat(file.avg_rating).toFixed(1)}
-                        </div>` : ''}
+                        ${file.preview_path ? 
+                            `<img src="/storage/library/${file.preview_path}" class="w-full h-full object-cover">` : 
+                            `<span class="text-4xl opacity-50">${getFileIcon(file.file_type)}</span>`
+                        }
                     </div>
+                    
                     <div class="p-5">
                         <div class="flex justify-between items-start mb-2">
                             <span class="text-xs font-semibold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded">${file.file_type}</span>
@@ -86,22 +93,22 @@ function loadResources(type = '') {
                         
                         <div class="flex items-center justify-between mt-4">
                             <div class="text-sm text-gray-500">
-                                ⬇ ${file.downloads_count}
+                                ⬇ ${file.downloads_count || 0}
                             </div>
                             <div class="flex gap-2">
-                                <a href="/library/view/${file.id}" target="_blank" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1" title="Preview">
+                                <a href="/library/view/${file.id}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1">
                                     <i class="far fa-eye"></i>
                                 </a>
-                                <button onclick="downloadFile(${file.id}, ${file.price_coins})" class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
-                                    <span>🔒 Unlock</span>
-                                    <span class="bg-gray-700 px-1.5 py-0.5 rounded text-xs">${file.price_coins} C</span>
-                                </button>
+                                ${file.price > 0 ? `
+                                    <button onclick="unlockFile(${file.id}, ${file.price}, '${file.title.replace(/'/g, "\\'")}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 shadow-sm">
+                                        <i class="fas fa-key"></i> Unlock
+                                    </button>
+                                ` : `
+                                    <button onclick="downloadFile(${file.id})" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                `}
                             </div>
-                            
-                            <!-- Review Button (Hidden unless downloaded - Logic handled in modal/click) -->
-                            <button onclick="rateFile(${file.id})" class="ml-2 text-gray-400 hover:text-yellow-500" title="Rate">
-                                <i class="far fa-star"></i>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -128,14 +135,28 @@ function formatDate(dateString) {
     return new Date(dateString).toLocaleDateString();
 }
 
-function downloadFile(id, price) {
-    if (!confirm(`Unlock this resource for ${price} Coins?`)) return;
+function unlockFile(id, cost, title) {
+    if(!confirm(`Unlock "${title}" for ${cost} Coins?`)) return;
 
-    // Trigger download
+    fetch('/api/library/unlock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ file_id: id })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Unlocked! You can now download/view the file.');
+            loadResources(); // Refresh grid to show download button
+        } else {
+            alert('Error: ' + data.message);
+        }
+    });
+}
+
+function downloadFile(id) {
+    // Direct download (already unlocked or free)
     window.location.href = `/api/library/download?id=${id}`;
-    
-    // Optimistically update coins (or reload page)
-    // setTimeout(() => location.reload(), 1000); 
 }
 
 function reportFile(id) {

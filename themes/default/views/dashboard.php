@@ -71,6 +71,45 @@ $page_title = 'User Dashboard - ' . \App\Services\SettingsService::get('site_nam
         .dashboard-grid { grid-template-columns: 1fr; }
     }
 </style>
+<script>
+function toggleStudyMode() {
+    const currentMode = document.getElementById('mode-status').innerText.includes('LOKSEWA') ? 'psc' : 'world';
+    const newMode = currentMode === 'psc' ? 'world' : 'psc';
+    const slider = document.getElementById('mode-slider');
+    const status = document.getElementById('mode-status');
+
+    // Optimistic UI Update
+    if (newMode === 'world') {
+        slider.classList.remove('left-1', 'bg-green-600');
+        slider.classList.add('left-1/2', 'bg-blue-600');
+        status.innerHTML = '🏗️ WORLD';
+        status.className = 'text-xs font-bold text-blue-400';
+    } else {
+        slider.classList.remove('left-1/2', 'bg-blue-600');
+        slider.classList.add('left-1', 'bg-green-600');
+        status.innerHTML = '🛡️ LOKSEWA';
+        status.className = 'text-xs font-bold text-green-400';
+    }
+
+    fetch('/api/career/mode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: newMode })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Mode updated to ' + data.mode);
+            // Reload page to refresh content filters? Or just toast?
+            // User might want to see changes immediately.
+             window.location.reload(); 
+        } else {
+            console.error('Failed to update mode');
+            // Revert UI?
+        }
+    });
+}
+</script>
 
 <div class="container" style="padding: 40px 20px;">
     <div class="dashboard-hero">
@@ -87,8 +126,21 @@ $page_title = 'User Dashboard - ' . \App\Services\SettingsService::get('site_nam
             </div>
             
             <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
-                <div style="width: 60px; height: 60px; background: #f1f5f9; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #6366f1;">
-                    <i class="fas fa-medal"></i>
+                <?php 
+                    $level = str_pad($rank['rank_level'] ?? 1, 2, '0', STR_PAD_LEFT);
+                    $rawTitle = strtolower($user['rank_title'] ?? 'intern');
+                    $slug = 'intern';
+                    if (strpos($rawTitle, 'surveyor') !== false) $slug = 'surveyor';
+                    elseif (strpos($rawTitle, 'supervisor') !== false) $slug = 'supervisor';
+                    elseif (strpos($rawTitle, 'assistant') !== false) $slug = 'assistant';
+                    elseif (strpos($rawTitle, 'senior') !== false) $slug = 'senior';
+                    elseif (strpos($rawTitle, 'manager') !== false) $slug = 'manager';
+                    elseif (strpos($rawTitle, 'chief') !== false) $slug = 'chief';
+                    
+                    $badgeUrl = "/themes/default/assets/resources/ranks/rank_{$level}_{$slug}.webp";
+                ?>
+                <div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                    <img src="<?= $badgeUrl ?>" onerror="this.src='/themes/default/assets/resources/ranks/rank_01_intern.webp'" class="w-full h-full object-contain filter drop-shadow-lg transition-transform hover:scale-110 duration-300">
                 </div>
                 <div>
                     <h4 style="margin: 0; color: #1e293b; font-size: 1.1rem;"><?php echo $rank['rank']; ?></h4>
@@ -103,6 +155,12 @@ $page_title = 'User Dashboard - ' . \App\Services\SettingsService::get('site_nam
                 <span><?php echo number_format($rank['total_power']); ?> pts</span>
                 <span><?php echo number_format($rank['next_rank_power']); ?> pts</span>
             </div>
+
+            <?php if ($rank['rank_progress'] >= 100): ?>
+                <button onclick="triggerPromotion()" class="w-full mt-4 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-black py-3 rounded-xl shadow-lg border-b-4 border-orange-600 active:border-b-0 active:translate-y-1 transition-all animate-pulse">
+                    <i class="fas fa-crown mr-2"></i> PROMOTION AVAILABLE!
+                </button>
+            <?php endif; ?>
 
             <a href="<?php echo app_base_url('/profile'); ?>" style="display: block; text-align: center; margin-top: 25px; color: #6366f1; text-decoration: none; font-weight: 700; font-size: 0.9rem;">
                 View Detailed Metrics <i class="fas fa-arrow-right" style="margin-left: 5px;"></i>
@@ -120,14 +178,54 @@ $page_title = 'User Dashboard - ' . \App\Services\SettingsService::get('site_nam
 
             <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px;">Complete a calculation with the designated tool of the day to earn bonus coins!</p>
             
-            <div style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px;">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="font-size: 1.5rem; color: #fbbf24;">
-                        <i class="fas fa-rocket"></i>
+            <div class="p-6 bg-gradient-to-r from-blue-900 to-slate-900 border-b border-gray-700">
+                    <div class="relative">
+                        <img src="<?php echo !empty($user['avatar']) ? '/uploads/avatars/' . $user['avatar'] : 'https://ui-avatars.com/api/?name=' . urlencode($user['username']); ?>" 
+                             class="w-16 h-16 rounded-full border-2 border-yellow-500 shadow-lg object-cover">
+                        <!-- Rank Badge Overlay -->
+                        <div class="absolute -bottom-2 -right-2 bg-white rounded-full p-1 shadow-md border border-gray-200" title="<?php echo htmlspecialchars($user['rank_title'] ?? 'Intern'); ?>">
+                            <?php 
+                                $level = str_pad($rank['rank_level'] ?? 1, 2, '0', STR_PAD_LEFT);
+                                // Reuse logic or just use Intern as default if logic repeated
+                                // Ideally use a helper function, but for view simplicity:
+                                $uTitle = strtolower($user['rank_title'] ?? 'intern');
+                                $uSlug = 'intern';
+                                if (strpos($uTitle, 'surveyor') !== false) $uSlug = 'surveyor';
+                                elseif (strpos($uTitle, 'supervisor') !== false) $uSlug = 'supervisor';
+                                elseif (strpos($uTitle, 'assistant') !== false) $uSlug = 'assistant';
+                                elseif (strpos($uTitle, 'senior') !== false) $uSlug = 'senior';
+                                elseif (strpos($uTitle, 'manager') !== false) $uSlug = 'manager';
+                                elseif (strpos($uTitle, 'chief') !== false) $uSlug = 'chief';
+                                
+                            $badgePath = "/themes/default/assets/resources/ranks/rank_{$level}_{$uSlug}.webp";
+                            ?>
+                            <img src="<?php echo $badgePath; ?>" onerror="this.src='/themes/default/assets/resources/ranks/rank_01_intern.webp'" class="w-8 h-8 object-contain filter drop-shadow">
+                        </div>
                     </div>
                     <div>
-                        <h4 style="margin: 0; font-size: 1rem; color: white;">Tool of the Day</h4>
-                        <p style="margin: 4px 0 0; color: #fbbf24; font-weight: 700;"><?php echo $quest['tool']['name']; ?></p>
+                        <h2 class="text-xl font-bold text-white"><?php echo htmlspecialchars($user['username']); ?></h2>
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-bold">
+                                <?php echo htmlspecialchars($user['rank_title'] ?? 'Intern'); ?>
+                            </span>
+                            <span class="text-gray-400">|</span>
+                            <span class="text-gray-300"><?php echo number_format($user['xp'] ?? 0); ?> XP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Study Mode Toggle -->
+                <div class="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs text-gray-400 uppercase tracking-widest font-semibold">Active Mode</span>
+                        <span id="mode-status" class="text-xs font-bold <?php echo ($user['study_mode'] ?? 'psc') === 'psc' ? 'text-green-400' : 'text-blue-400'; ?>">
+                            <?php echo ($user['study_mode'] ?? 'psc') === 'psc' ? '🛡️ LOKSEWA' : '🏗️ WORLD'; ?>
+                        </span>
+                    </div>
+                    <div class="flex bg-gray-900 rounded-full p-1 relative cursor-pointer" onclick="toggleStudyMode()">
+                        <div id="mode-slider" class="w-1/2 h-8 rounded-full shadow-md transition-all duration-300 absolute top-1 <?php echo ($user['study_mode'] ?? 'psc') === 'psc' ? 'left-1 bg-green-600' : 'left-1/2 bg-blue-600'; ?>"></div>
+                        <div class="w-1/2 text-center text-xs font-bold text-white z-10 py-2">PSC</div>
+                        <div class="w-1/2 text-center text-xs font-bold text-white z-10 py-2">WORLD</div>
                     </div>
                 </div>
             </div>
@@ -215,3 +313,86 @@ function get_tool_url($tool) {
         </div>
     </div>
 </div>
+
+<!-- Level Up Modal -->
+<div id="level-up-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-300">
+    <div class="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 text-center transform scale-90 opacity-0 transition-all duration-500 relative" id="level-up-card">
+        <div class="absolute -top-16 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-yellow-400 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(250,204,21,0.5)] animate-bounce-slow border-4 border-white">
+             <!-- Modal Icon -->
+             <img src="/themes/default/assets/resources/ranks/rank_<?= str_pad($rank['rank_level'] ?? 1, 2, '0', STR_PAD_LEFT) ?>_intern.webp" 
+                  class="w-24 h-24 object-contain filter drop-shadow-xl" 
+                  id="level-up-icon"
+                  onerror="this.src='/themes/default/assets/resources/ranks/rank_01_intern.webp'">
+        </div>
+        
+        <div class="mt-16">
+            <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500 mb-2">LEVEL UP!</h2>
+            <p class="text-gray-500 font-medium mb-6">You have been promoted to</p>
+            
+            <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-xl p-4 mb-6 shadow-inner border border-slate-700">
+                <div class="text-xs text-slate-400 uppercase tracking-widest mb-1">New Rank</div>
+                <div class="text-2xl font-black text-yellow-400 tracking-wide" id="level-up-rank"><?= $rank['rank'] ?? 'Engineer' ?></div>
+            </div>
+            
+            <!-- Rewards -->
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    <div class="text-blue-500 text-xs font-bold uppercase tracking-wider">Salary</div>
+                    <div class="text-blue-900 font-bold text-lg">+15%</div>
+                </div>
+                <div class="bg-green-50 p-3 rounded-lg border border-green-100">
+                    <div class="text-green-500 text-xs font-bold uppercase tracking-wider">Bonus</div>
+                    <div class="text-green-900 font-bold text-lg">+50 <small class="font-normal text-xs">Coins</small></div>
+                </div>
+            </div>
+            
+            <button onclick="closeLevelUp()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 transform transition active:scale-95 text-lg">
+                Claim Rewards & Continue
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for promotion session flag
+    <?php if(isset($_SESSION['just_promoted'])): ?>
+        const rankName = "<?= $slug ?? 'intern' ?>";
+        const rankLevel = "<?= str_pad($rank['rank_level'] ?? 1, 2, '0', STR_PAD_LEFT) ?>";
+        
+        // Update Icon Dynamically
+        document.getElementById('level-up-icon').src = `/themes/default/assets/resources/ranks/rank_${rankLevel}_${rankName}.webp`;
+        
+        showLevelUp();
+        <?php unset($_SESSION['just_promoted']); ?>
+    <?php endif; ?>
+    
+    // Add simple confetti function if not exists
+    if(typeof confetti === 'undefined') {
+        // Mock confetti
+    }
+});
+
+function showLevelUp() {
+    const modal = document.getElementById('level-up-modal');
+    const card = document.getElementById('level-up-card');
+    modal.classList.remove('hidden');
+    // Animate in
+    setTimeout(() => {
+        card.classList.remove('scale-90', 'opacity-0');
+        card.classList.add('scale-100', 'opacity-100');
+        
+        // Trigger generic confetti if available (e.g. from CDN)
+        // For now, just a console log or simple CSS animation
+    }, 50);
+}
+
+function closeLevelUp() {
+    const modal = document.getElementById('level-up-modal');
+    modal.classList.add('opacity-0'); // Fade out wrapper
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('opacity-0');
+    }, 300);
+}
+</script>

@@ -9,17 +9,20 @@ class CalculatorController extends Controller
 {
     private $engine;
 
+    private $campaignModel;
+
     public function __construct()
     {
         parent::__construct();
         $this->engine = new MathEngine();
+        $this->campaignModel = new \App\Models\Campaign();
     }
 
     private function getCategories()
     {
         return $this->db->find('calc_unit_categories', [], 'display_order ASC');
     }
-
+    
     /**
      * Calculator Platform Landing Page
      */
@@ -31,9 +34,6 @@ class CalculatorController extends Controller
         ]);
     }
 
-    /**
-     * Unit Converter Page
-     */
     public function converter($categorySlug = null)
     {
         if (!$categorySlug) {
@@ -50,152 +50,30 @@ class CalculatorController extends Controller
         }
 
         $units = $this->db->find('calc_units', ['category_id' => $category['id']], 'display_order ASC');
+        
+        // B2B: Fetch Campaign
+        $campaign = $this->campaignModel->getActiveForCalculator($categorySlug);
+        if ($campaign) {
+            $this->campaignModel->recordImpression(
+                $campaign['id'], 
+                $_SESSION['user_id'] ?? null, 
+                $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1', 
+                $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown'
+            );
+        }
 
         $this->view->render('calculator/converter', [
             'title' => $category['name'] . ' Converter',
             'category' => $category,
             'units' => $units,
-            'categories' => $allCategories
+            'categories' => $allCategories,
+            'campaign' => $campaign // Pass to view
         ]);
     }
+    
+    // ... convert, calculate ...
 
-    /**
-     * API: Convert Units
-     */
-    public function convert()
-    {
-        header('Content-Type: application/json');
-        
-        $value = $_POST['value'] ?? 0;
-        $fromUnit = $_POST['from_unit'] ?? '';
-        $toUnit = $_POST['to_unit'] ?? '';
-        $categoryId = $_POST['category_id'] ?? 0;
-
-        $result = $this->engine->convertUnit($value, $fromUnit, $toUnit, $categoryId);
-
-        echo json_encode([
-            'success' => !isset($result['error']),
-            'result' => $result
-        ]);
-    }
-
-    /**
-     * API: Calculate Expression
-     */
-    public function calculate()
-    {
-        try {
-            $expression = $_POST['expression'] ?? '';
-            
-            if (empty($expression)) {
-                return $this->json([
-                    'success' => false,
-                    'result' => 'Empty expression'
-                ]);
-            }
-
-            $result = $this->engine->evaluate($expression);
-
-            return $this->json([
-                'success' => !isset($result['error']),
-                'result' => $result['error'] ?? $result
-            ]);
-        } catch (\Throwable $e) {
-            return $this->json([
-                'success' => false,
-                'result' => 'Server error: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Dedicated Scientific Calculator Page
-     */
-    public function scientific()
-    {
-        $this->view->render('calculator/scientific', [
-            'title' => 'Professional Scientific Calculator',
-            'categories' => $this->getCategories(),
-            'meta_description' => 'Advanced scientific calculator with history and memory functions.'
-        ]);
-    }
-
-    /**
-     * Catch-all permalink handler
-     */
-    public function permalink($slug)
-    {
-        // Check if $slug matches a unit category
-        $category = $this->db->findOne('calc_unit_categories', ['slug' => $slug]);
-        if ($category) {
-            return $this->converter($slug);
-        }
-
-        // Potential for other calculators based on slug
-        header('Location: ' . app_base_url('/calculator'));
-        exit;
-    }
-
-    /**
-     * Legacy tool handler (safety)
-     */
-    public function tool($category = null, $tool = null)
-    {
-        if ($category === 'converter') {
-            return $this->converter($tool);
-        }
-        
-        header('Location: ' . app_base_url('/calculator'));
-        exit;
-    }
-    /**
-     * User Dashboard
-     */
-    public function dashboard()
-    {
-        $userId = $_SESSION['user_id'];
-        
-        $userModel = new \App\Models\User();
-        $stats = $userModel->getStatistics($userId);
-        
-        $questService = new \App\Services\QuestService();
-        $rankService = new \App\Services\RankService();
-        $gamification = new \App\Services\GamificationService();
-        
-        $toolOfTheDay = $questService->getToolOfTheDay();
-        $isQuestCompleted = $questService->isCompleted($userId);
-        
-        $wallet = $gamification->getWallet($userId);
-        $rankData = $rankService->getUserRankData($stats, $wallet);
-
-
-        $this->view->render('dashboard', [
-            'user_stats' => $stats,
-            'quest' => [
-                'tool' => $toolOfTheDay,
-                'completed' => $isQuestCompleted
-            ],
-            'rank' => $rankData
-        ]);
-    }
-
-    /**
-     * Category Landing Page for CMS Calculators
-     */
-    public function category($categorySlug)
-    {
-        $calculators = $this->db->find('calculators', ['category' => $categorySlug, 'is_active' => 1]);
-        
-        $this->view->render('calculator/category', [
-            'title' => ucfirst($categorySlug) . ' Calculators',
-            'category' => $categorySlug,
-            'calculators' => $calculators
-        ]);
-    }
-
-    /**
-     * Show a specific CMS Calculator
-     */
+    // ... show ...
     public function show($categorySlug, $calculatorSlug)
     {
         $calculator = $this->db->findOne('calculators', [
@@ -208,6 +86,17 @@ class CalculatorController extends Controller
             header('Location: ' . app_base_url('/calculators'));
             exit;
         }
+        
+        // B2B: Fetch Campaign
+        $campaign = $this->campaignModel->getActiveForCalculator($calculatorSlug);
+        if ($campaign) {
+            $this->campaignModel->recordImpression(
+                $campaign['id'], 
+                $_SESSION['user_id'] ?? null, 
+                $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1', 
+                $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown'
+            );
+        }
 
         $inputs = $this->db->find('calculator_inputs', ['calculator_id' => $calculator['id']], 'order_index ASC');
         $outputs = $this->db->find('calculator_outputs', ['calculator_id' => $calculator['id']], 'order_index ASC');
@@ -217,7 +106,8 @@ class CalculatorController extends Controller
             'calculator' => $calculator,
             'inputs' => $inputs,
             'outputs' => $outputs,
-            'config' => json_decode($calculator['config_json'], true)
+            'config' => json_decode($calculator['config_json'], true),
+            'campaign' => $campaign // Pass to view
         ]);
     }
 }

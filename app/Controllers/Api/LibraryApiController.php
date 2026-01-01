@@ -264,6 +264,70 @@ class LibraryApiController extends Controller
         }
     }
 
+    public function unlock() {
+        try {
+            $user = Auth::user();
+            if (!$user) throw new Exception('Unauthorized', 401);
+            
+            $input = json_decode(file_get_contents('php://input'), true);
+            $fileId = $input['file_id'] ?? null;
+            if (!$fileId) throw new Exception('File ID required.');
+
+            $pdo = \App\Core\Database::getInstance()->getPdo();
+            
+            // 1. Get File (Manually for now as model might need refresh)
+            $stmt = $pdo->prepare("SELECT * FROM library_files WHERE id = ?");
+            $stmt->execute([$fileId]);
+            $file = $stmt->fetch();
+            if (!$file) throw new Exception('File not found.');
+            
+            // 2. Check Price
+            if (!isset($file['price']) || $file['price'] <= 0) {
+                $this->json(['success' => true, 'message' => 'File is free.']);
+                return;
+            }
+
+            // 3. Check if already unlocked
+            $check = $pdo->prepare("SELECT id FROM library_unlocks WHERE user_id = ? AND file_id = ?");
+            $check->execute([$user['id'], $fileId]);
+            if ($check->fetchColumn()) {
+                $this->json(['success' => true, 'message' => 'Already unlocked.']);
+                return;
+            }
+
+            // 4. Deduct Coins
+            $userModel = new User();
+            if ($user['coins'] < $file['price']) {
+                throw new Exception("Insufficient coins. Cost: {$file['price']}");
+            }
+            
+            $pdo->beginTransaction();
+            
+            if (!$userModel->deductCoins($user['id'], $file['price'], "Unlocked: " . $file['title'], $fileId)) {
+                throw new Exception('Transaction failed.');
+            }
+            
+            // 5. Record Unlock
+            $rec = $pdo->prepare("INSERT INTO library_unlocks (user_id, file_id, cost) VALUES (?, ?, ?)");
+            $rec->execute([$user['id'], $fileId, $file['price']]);
+            
+            // Reward Uploader (Marketplace Logic: 50% Commission?)
+            if ($file['uploader_id']) {
+                 $commission = floor($file['price'] * 0.5);
+                 if ($commission > 0) {
+                     $userModel->addCoins($file['uploader_id'], $commission, "Royalties: " . $file['title'], $fileId);
+                 }
+            }
+
+            $pdo->commit();
+            $this->json(['success' => true, 'message' => 'Unlocked successfully!']);
+
+        } catch (Exception $e) {
+            if (\App\Core\Database::getInstance()->getPdo()->inTransaction()) \App\Core\Database::getInstance()->getPdo()->rollBack();
+            $this->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+
     public function download()
     {
         try {
@@ -281,20 +345,27 @@ class LibraryApiController extends Controller
             $isUploader = ($file->uploader_id == $user['id']);
             $userModel = new User();
             
-            // Check previous purchase
-             $db = \App\Core\Database::getInstance();
-            $stmt = $db->getPdo()->prepare("SELECT COUNT(*) as count FROM user_transactions WHERE user_id = ? AND reference_id = ? AND type = 'download_cost'");
-            $stmt->execute([$user['id'], $fileId]);
-            $hasPurchased = $stmt->fetch()['count'] > 0;
-
-            if (!$isUploader && !$hasPurchased) {
-                $cost = $file->price_coins;
-                if (!$userModel->deductCoins($user['id'], $cost, 'Purchase: ' . $file->title, $fileId)) {
-                     die("Insufficient Coins. Need $cost Coins.");
+            // CHECK PERMISSIONS (Premium Logic)
+            $isUploader = ($file->uploader_id == $user['id']);
+            $isAdmin = $userModel->isAdmin($user['id']);
+            
+            if (!$isUploader && !$isAdmin) {
+                // If price > 0, check unlock
+                if (isset($file->price) && $file->price > 0) {
+                     $db = \App\Core\Database::getInstance();
+                     $check = $db->getPdo()->prepare("SELECT id FROM library_unlocks WHERE user_id = ? AND file_id = ?");
+                     $check->execute([$user['id'], $fileId]);
+                     if (!$check->fetchColumn()) {
+                         die("This file is locked. Please unlock it for {$file->price} coins.");
+                     }
+                } else {
+                    // Free file cost logic (old logic: 50 coins or free?)
+                    // Keeping old logic for now or replacing it? 
+                    // User Request "Locking Library Files" usually implies replacing the old 'cost' logic with this new explicit price.
+                    // Let's assume if price is 0, it uses the old "Download Cost" system if defined, or just allows it.
+                    // For now, let's keep the existing "Download Cost" check as a fallback if price is 0?
+                    // Actually, let's replace the old "user_transactions" check with this simple price check to avoid double charging.
                 }
-                
-                // Royalty
-                $userModel->addCoins($file->uploader_id, 5, 'Royalty: ' . $file->title, $fileId);
             }
 
             $filePath = STORAGE_PATH . '/library/' . $file->file_path;

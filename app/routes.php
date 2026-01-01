@@ -1548,6 +1548,22 @@ $router->add("POST", "/user/exports/cleanup", "ExportController@cleanup", [
     "auth",
 ]);
 
+// Career System Routes
+$router->add('POST', '/api/career/mode', 'CareerController@switchMode');
+$router->add('GET', '/api/career/promotion-check', 'CareerController@checkPromotion');
+$router->add('POST', '/api/career/promote', 'CareerController@promote');
+
+// Onboarding & Interest System
+$router->add('GET', '/onboarding', 'InterestController@index');
+$router->add('GET', '/api/interests/categories', 'InterestController@getCategories');
+$router->add('POST', '/api/interests/save', 'InterestController@saveInterests');
+$router->add('GET', '/api/feed', 'InterestController@getFeed');
+
+// Shop & Economy System
+$router->add('GET', '/shop', 'ShopController@index');
+$router->add('GET', '/api/shop/items', 'ShopController@getItems');
+$router->add('POST', '/api/shop/purchase', 'ShopController@purchase');
+
 // Share & Comment System Routes
 $router->add("GET", "/share/create", "ShareController@create", ["auth"]);
 $router->add("POST", "/share/store", "ShareController@store", ["auth"]);
@@ -2056,3 +2072,9 @@ $router->add('GET', '/{slug}', 'CalculatorController@permalink');
 $router->add('GET', '/library/view/{id}', 'ViewerController@view');
 $router->add('GET', '/api/library/stream', 'Api\LibraryApiController@stream'); // Need this for PDF.js/Image
 $router->add('GET', '/api/library/preview-image', 'Api\LibraryApiController@previewImage');
+$router->add('POST', '/api/library/unlock', 'Api\LibraryApiController@unlock');
+
+// B2B Sponsorships
+$router->add('GET', '/admin/sponsors', 'Admin\SponsorController@index', ['auth', 'admin']);
+$router->add('POST', '/admin/sponsors/store', 'Admin\SponsorController@store', ['auth', 'admin']);
+$router->add('POST', '/admin/sponsors/campaigns/create', 'Admin\SponsorController@createCampaign', ['auth', 'admin']);

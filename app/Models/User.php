@@ -613,6 +613,38 @@ class User
         return $stmt->execute([$userId]);
     }
 
+    // Career & Rank System
+    public function setStudyMode($userId, $mode)
+    {
+        if (!in_array($mode, ['psc', 'world'])) return false;
+        $stmt = $this->db->getPdo()->prepare("UPDATE users SET study_mode = ?, updated_at = NOW() WHERE id = ?");
+        return $stmt->execute([$mode, $userId]);
+    }
+
+    public function addXp($userId, $amount)
+    {
+        if ($amount <= 0) return false;
+        $stmt = $this->db->getPdo()->prepare("UPDATE users SET xp = xp + ?, updated_at = NOW() WHERE id = ?");
+        return $stmt->execute([$amount, $userId]);
+    }
+
+    public function getCareerStats($userId)
+    {
+        $user = $this->find($userId);
+        if (!$user) return null;
+        return [
+            'rank_title' => $user['rank_title'] ?? 'Intern',
+            'study_mode' => $user['study_mode'] ?? 'psc',
+            'xp' => $user['xp'] ?? 0
+        ];
+    }
+    
+    public function updateRank($userId, $newRank)
+    {
+        $stmt = $this->db->getPdo()->prepare("UPDATE users SET rank_title = ?, updated_at = NOW() WHERE id = ?");
+        return $stmt->execute([$newRank, $userId]);
+    }
+
     // Economy / Coins Methods
 
     public function getCoins($userId = null)

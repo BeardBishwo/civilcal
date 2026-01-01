@@ -832,11 +832,11 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                         </ul>
                     </li>
 
-                    <!-- Advertisements -->
-                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/advertisements') !== false ? 'active' : ''; ?>">
-                        <a href="<?php echo app_base_url('/admin/advertisements'); ?>" class="nav-link">
-                            <i class="nav-icon fas fa-ad"></i>
-                            <span class="nav-text">Advertisements</span>
+                    <!-- Sponsorships (B2B) -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/sponsors') !== false ? 'active' : ''; ?>">
+                        <a href="<?php echo app_base_url('/admin/sponsors'); ?>" class="nav-link">
+                            <i class="nav-icon fas fa-handshake"></i>
+                            <span class="nav-text">Sponsorships</span>
                         </a>
                     </li>
 
