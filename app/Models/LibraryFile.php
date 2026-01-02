@@ -99,26 +99,38 @@ class LibraryFile
         return $stmt->fetchAll();
     }
 
-    public function getKeyResources($type = null, $limit = 10, $offset = 0)
+    public function getKeyResources($userId = null, $type = null, $limit = 20, $offset = 0)
     {
         $sql = "
-            SELECT lf.*, u.username as uploader_name 
+            SELECT lf.*, u.username as uploader_name,
+                   CASE WHEN lu.id IS NOT NULL THEN 1 ELSE 0 END as is_unlocked
             FROM library_files lf 
             LEFT JOIN users u ON lf.uploader_id = u.id 
+            LEFT JOIN library_unlocks lu ON lf.id = lu.file_id AND lu.user_id = ?
             WHERE lf.status = 'approved'
         ";
-        $params = [];
+        $params = [$userId];
 
         if ($type) {
             $sql .= " AND lf.file_type = ?";
             $params[] = $type;
         }
 
-        $sql .= " ORDER BY lf.created_at DESC LIMIT $limit OFFSET $offset";
-
+        $sql .= " ORDER BY lf.created_at DESC LIMIT ? OFFSET ?";
+        
         $stmt = $this->db->getPdo()->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+        $stmt->bindValue(1, $userId, \PDO::PARAM_INT);
+        
+        $pIdx = 2;
+        if ($type) {
+            $stmt->bindValue($pIdx++, $type, \PDO::PARAM_STR);
+        }
+        
+        $stmt->bindValue($pIdx++, (int)$limit, \PDO::PARAM_INT);
+        $stmt->bindValue($pIdx++, (int)$offset, \PDO::PARAM_INT);
+        
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function approve($id)

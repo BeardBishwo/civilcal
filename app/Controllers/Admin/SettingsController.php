@@ -1185,4 +1185,18 @@ class SettingsController extends Controller
         exit;
     }
 
+    /**
+     * Quiz Settings Page
+     */
+    public function quiz()
+    {
+        $this->requireAdminWithBasicAuth();
+        
+        $settings = SettingsService::getAll('quiz');
+        
+        $this->view->render('admin/quiz/settings', [
+            'title' => 'Quiz Module Settings',
+            'settings' => $settings
+        ]);
+    }
 }

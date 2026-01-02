@@ -50,7 +50,7 @@ function loadRequests() {
     // (though I haven't implemented that check yet, I should).
     // Or I'll just use a placeholder here and fix the API next.
     
-    fetch('/api/library/browse?status=pending&admin_mode=true') 
+    fetch('<?= app_base_url("/api/library/browse?status=pending&admin_mode=true") ?>') 
         .then(res => res.json())
         .then(data => {
             const tbody = document.getElementById('requests-table');
@@ -65,7 +65,7 @@ function loadRequests() {
                         <strong>${file.title}</strong><br>
                         <small>${file.description || ''}</small><br>
                         <span class="badge badge-info">${file.file_type}</span>
-                        <a href="/api/library/download_preview?id=${file.id}" target="_blank" class="text-xs ml-2">Download to Review</a>
+                        <a href="<?= app_base_url("/api/library/preview?id=") ?>${file.id}" target="_blank" class="text-xs ml-2">Review Image</a>
                     </td>
                     <td>${file.uploader_name}</td>
                     <td>${file.file_size_kb} KB</td>
@@ -85,7 +85,7 @@ function loadRequests() {
 function approveFile(id) {
     if(!confirm('Approve this file and award 100 coins?')) return;
     
-    fetch('/api/admin/library/approve', {
+    fetch('<?= app_base_url("/api/admin/library/approve") ?>', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ file_id: id, action: 'approve' })
@@ -105,7 +105,7 @@ function rejectFile(id) {
     const reason = prompt("Enter rejection reason:");
     if(reason === null) return;
     
-    fetch('/api/admin/library/approve', {
+    fetch('<?= app_base_url("/api/admin/library/approve") ?>', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ file_id: id, action: 'reject', reason: reason })

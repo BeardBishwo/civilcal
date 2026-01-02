@@ -13,8 +13,8 @@ $router->add("GET", "/pricing", "HomeController@pricing");
 $router->add("GET", "/about", "HomeController@about");
 $router->add("GET", "/contact", "ContactController@index");
 $router->add("POST", "/contact/submit", "ContactController@submit");
-// Forum Placeholder (or use actual ForumController if planned)
-$router->add("GET", "/forum", "HomeController@index"); // Redirect to home or show 'Coming Soon' if separate controller doesn't exist yet. The user just said "broken link verify", so making it functional is step 1. Linking to Home or a "Coming Soon" page is safer than crash.
+// Forum Placeholder
+$router->add("GET", "/forum", "ForumController@index");
 $router->add("GET", "/report", "ReportController@index");
 $router->add("POST", "/report/submit", "ReportController@submit");
 $router->add("GET", "/pages/preview/{id}", "HomeController@pagePreview");
@@ -803,6 +803,7 @@ $router->add(
 $router->add("GET", "/library", "LibraryController@index");
 $router->add("GET", "/library/upload", "LibraryController@upload", ["auth"]);
 $router->add("GET", "/admin/library/requests", "Admin\LibraryController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/library", "Admin\LibraryController@index", ["auth", "admin"]); // Redirect/Alias 
 
 // Library API
 // Library API Routes
@@ -1981,6 +1982,7 @@ $router->add("GET", "/admin/quiz/exams/builder/{id}", "Admin\\Quiz\\ExamControll
 $router->add("POST", "/admin/quiz/exams/add-question", "Admin\\Quiz\\ExamController@addQuestionToExam", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/exams/remove-question", "Admin\\Quiz\\ExamController@removeQuestionFromExam", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/analytics", "Admin\\Quiz\\ResultsController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/settings", "Admin\\SettingsController@quiz", ["auth", "admin"]);
 
 // In-Quiz Lifeline API
 $router->add("POST", "/api/quiz/lifeline/use", "Quiz\\LifelineController@use", ["auth"]);

@@ -2,8 +2,8 @@
 
 namespace App\Controllers\Api;
 
-use App\Controllers\Controller;
-use App\Services\Auth;
+use App\Core\Controller;
+use App\Core\Auth;
 use App\Models\BountyRequest;
 use App\Models\BountySubmission;
 use App\Models\User;
@@ -43,18 +43,18 @@ class BountyApiController extends Controller
             }
 
             $userModel = new User();
-            if ($userModel->getCoins($user['id']) < $amount) {
+            if ($userModel->getCoins($user->id) < $amount) {
                 throw new Exception('Insufficient Coins', 400);
             }
 
             // Lock Coins (Deduct immediately)
-            if (!$userModel->deductCoins($user['id'], $amount, "Created Bounty: $title")) {
+            if (!$userModel->deductCoins($user->id, $amount, "Created Bounty: $title")) {
                 throw new Exception('Failed to process coin deduction', 500);
             }
 
             $bountyModel = new BountyRequest();
             $id = $bountyModel->create([
-                'requester_id' => $user['id'],
+                'requester_id' => $user->id,
                 'title' => $title,
                 'description' => $description,
                 'bounty_amount' => $amount
@@ -98,7 +98,7 @@ class BountyApiController extends Controller
             // Duplicate Check
             $existing = $submissionModel->findByHash($fileHash);
             if ($existing) {
-                if ($existing->uploader_id == $user['id']) {
+                if ($existing->uploader_id == $user->id) {
                     throw new Exception('You have already submitted this file.', 409);
                 } else {
                     throw new Exception('Duplicate file detected. This work has already been submitted by another user.', 409);
@@ -152,7 +152,7 @@ class BountyApiController extends Controller
             // Or just use the one created earlier
             $submissionModel->create([
                 'bounty_id' => $bountyId,
-                'uploader_id' => $user['id'],
+                'uploader_id' => $user->id,
                 'file_path' => 'quarantine/' . $filename,
                 'preview_path' => $previewPath,
                 'file_hash' => $fileHash
@@ -183,7 +183,7 @@ class BountyApiController extends Controller
             $bounty = $bountyModel->find($submission->bounty_id);
 
             // Verify Ownership
-            if ($bounty->requester_id != $user['id']) {
+            if ($bounty->requester_id != $user->id) {
                 throw new Exception('You are not the bounty owner', 403);
             }
 

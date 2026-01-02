@@ -2,8 +2,8 @@
 
 namespace App\Controllers\Admin;
 
-use App\Controllers\Controller;
-use App\Services\Auth;
+use App\Core\Controller;
+use App\Core\Auth;
 
 class LibraryController extends Controller
 {
@@ -29,6 +29,6 @@ class LibraryController extends Controller
         
         // Let's assume standard behavior:
         
-        $this->view('library/requests'); 
+        $this->view('admin/library/requests'); 
     }
 }

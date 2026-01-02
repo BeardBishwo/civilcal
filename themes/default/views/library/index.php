@@ -125,6 +125,29 @@
     </div>
 </div>
 
+<!-- Preview Modal -->
+<div id="previewModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+    <div class="relative bg-gray-900 rounded-2xl border border-gray-800 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+        <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+            <h3 id="modalTitle" class="font-bold text-white truncate mr-8">Preview</h3>
+            <button onclick="closePreview()" class="text-gray-500 hover:text-white transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-800">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="flex-grow overflow-auto p-2 bg-gray-950 flex items-center justify-center min-h-[300px]">
+            <img id="modalImage" src="" class="max-w-full max-h-full object-contain" alt="Blueprint Preview">
+            <div id="modalLoading" class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            </div>
+        </div>
+        <div class="p-4 border-t border-gray-800 flex justify-end gap-3">
+             <button id="modalActionBtn" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-bold transition flex items-center gap-2">
+                 <i class="fas fa-download"></i> Download
+             </button>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
     tailwind.config = { darkMode: 'class', theme: { extend: { colors: { gray: { 900: '#111827', 950: '#030712' } } } } }
@@ -172,16 +195,28 @@ function loadLibrary(type = null, search = null) {
                 if (['xls','xlsx'].includes(file.file_type)) iconUrl = 'https://cdn-icons-png.flaticon.com/512/888/888850.png';
                 if (['pdf'].includes(file.file_type)) iconUrl = 'https://cdn-icons-png.flaticon.com/512/337/337946.png';
 
+                const isUnlocked = file.is_unlocked || file.price_coins == 0;
+                const btnLabel = isUnlocked ? 'Download' : `Unlock (${file.price_coins} BB)`;
+                const btnColor = isUnlocked ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-900/30' : 'bg-blue-600 hover:bg-blue-500 shadow-blue-900/30';
+                const btnAction = isUnlocked ? `downloadFile(${file.id})` : `unlockFile(${file.id})`;
+                const btnIcon = isUnlocked ? 'fa-download' : 'fa-lock';
+
                 let previewHtml = file.preview_path ? 
-                    `<img src="<?= app_base_url('/storage/library/') ?>${file.preview_path}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500 filter blur-[1px] group-hover:blur-0">` : 
+                    `<img src="<?= app_base_url('/storage/library/') ?>${file.preview_path}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">` : 
                     `<div class="w-full h-full flex items-center justify-center bg-gray-800 text-gray-700"><i class="fas fa-file-alt text-6xl"></i></div>`;
+
+                let previewBtn = file.preview_path ? 
+                    `<button onclick="openPreview(${file.id}, '${file.title.replace(/'/g, "\\'")}', '${file.preview_path}', ${isUnlocked})" class="absolute top-2 right-2 z-30 bg-black/60 hover:bg-black/80 backdrop-blur text-white p-2 rounded-full shadow-lg transition opacity-0 group-hover:opacity-100">
+                        <i class="fas fa-eye"></i>
+                    </button>` : '';
 
                 return `
                 <div class="bg-gray-900 rounded-xl overflow-hidden shadow-lg hover:shadow-blue-900/20 transition-all border border-gray-800 group flex flex-col hover:-translate-y-1">
                     <div class="relative h-48 bg-gray-800 overflow-hidden border-b border-gray-800">
-                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10 opacity-30 select-none">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10 opacity-30 select-none ${isUnlocked ? 'hidden' : ''}">
                             <div class="transform -rotate-12 text-white font-extrabold text-2xl whitespace-nowrap border-4 border-white px-4 py-1">PREVIEW ONLY</div>
                         </div>
+                        ${previewBtn}
                         <div class="absolute bottom-2 left-2 z-20">
                             <img src="${iconUrl}" class="w-8 h-8 drop-shadow-md bg-white rounded-md p-0.5" alt="${file.file_type}">
                         </div>
@@ -205,8 +240,8 @@ function loadLibrary(type = null, search = null) {
                                 </div>
                                 <span class="text-xs font-medium text-gray-400">${file.uploader_name || 'User'}</span>
                             </div>
-                            <button onclick="downloadFile(${file.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded font-bold transition shadow-lg shadow-emerald-900/30 flex items-center gap-1">
-                                <i class="fas fa-download"></i> Download
+                            <button onclick="${btnAction}" class="${btnColor} text-white text-xs px-3 py-1.5 rounded font-bold transition flex items-center gap-1">
+                                <i class="fas ${btnIcon}"></i> ${btnLabel}
                             </button>
                         </div>
                     </div>
@@ -223,10 +258,41 @@ function loadLibrary(type = null, search = null) {
         });
 }
 
+function openPreview(id, title, path, unlocked) {
+    const modal = document.getElementById('previewModal');
+    const img = document.getElementById('modalImage');
+    const loader = document.getElementById('modalLoading');
+    const btn = document.getElementById('modalActionBtn');
+    
+    document.getElementById('modalTitle').textContent = title;
+    img.src = "<?= app_base_url('/storage/library/') ?>" + path;
+    loader.style.display = 'flex';
+    
+    img.onload = () => loader.style.display = 'none';
+    
+    if (unlocked) {
+        btn.innerHTML = '<i class="fas fa-download"></i> Download';
+        btn.onclick = () => downloadFile(id);
+        btn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg font-bold transition flex items-center gap-2";
+    } else {
+        btn.innerHTML = '<i class="fas fa-lock"></i> Unlock Blueprint';
+        btn.onclick = () => { closePreview(); unlockFile(id); };
+        btn.className = "bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-bold transition flex items-center gap-2";
+    }
+    
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closePreview() {
+    document.getElementById('previewModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
 function unlockFile(id) {
     if(!confirm('Unlock this blueprint for the listed BB Coins?')) return;
     
-    fetch('/api/library/unlock', {
+    fetch('<?= app_base_url("/api/library/unlock") ?>', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({file_id: id})
@@ -235,15 +301,16 @@ function unlockFile(id) {
     .then(data => {
         if(data.success) {
             alert('Unlocked! Starting download...');
-            window.location.href = `/api/library/download?id=${id}`;
+            downloadFile(id);
             loadLibrary(); // Reload to update UI state
         } else {
             alert('Error: ' + data.message);
         }
-    });
+    })
+    .catch(err => alert('Signal Loss: ' + err.message));
 }
 
 function downloadFile(id) {
-     window.location.href = `/api/library/download?id=${id}`;
+     window.location.href = `<?= app_base_url("/api/library/download") ?>?id=${id}`;
 }
 </script>

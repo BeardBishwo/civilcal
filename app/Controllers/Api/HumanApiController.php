@@ -2,8 +2,8 @@
 
 namespace App\Controllers\Api;
 
-use App\Controllers\Controller;
-use App\Services\Auth;
+use App\Core\Controller;
+use App\Core\Auth;
 use App\Models\Notification;
 use App\Models\LibraryFile;
 use App\Models\User;
@@ -18,7 +18,7 @@ class HumanApiController extends Controller
             if (!$user) throw new Exception('Unauthorized', 401);
 
             $notificationModel = new Notification();
-            $notifications = $notificationModel->getUnread($user['id']);
+            $notifications = $notificationModel->getUnread($user->id);
 
             $this->json(['success' => true, 'notifications' => $notifications]);
         } catch (Exception $e) {
@@ -39,9 +39,9 @@ class HumanApiController extends Controller
             $notificationModel = new Notification();
             
             if ($all) {
-                $notificationModel->markAllAsRead($user['id']);
+                $notificationModel->markAllAsRead($user->id);
             } elseif ($id) {
-                $notificationModel->markAsRead($id, $user['id']);
+                $notificationModel->markAsRead($id, $user->id);
             }
 
             $this->json(['success' => true]);
@@ -69,7 +69,7 @@ class HumanApiController extends Controller
             // TODO: Check if user actually downloaded the file via transaction log or downloads table
             // For now, assuming UI logic is strict enough or we update check logic later
             
-            $libraryModel->addReview($fileId, $user['id'], $rating, $comment);
+            $libraryModel->addReview($fileId, $user->id, $rating, $comment);
             
             $this->json(['success' => true, 'message' => 'Review Submitted!']);
         } catch (Exception $e) {
@@ -90,7 +90,7 @@ class HumanApiController extends Controller
             if (!$fileId || empty($reason)) throw new Exception('Reason required', 400);
 
             $libraryModel = new LibraryFile();
-            $result = $libraryModel->report($fileId, $user['id'], $reason);
+            $result = $libraryModel->report($fileId, $user->id, $reason);
 
             if ($result) {
                  // Notify Admin (optional impl)

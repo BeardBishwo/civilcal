@@ -29,12 +29,13 @@ class LibraryApiController extends Controller
             $page = $_GET['page'] ?? 1;
             $status = $_GET['status'] ?? 'approved';
             
+            $user = Auth::user();
+            $uid = $this->userId($user);
+            
             // Security check for pending
             if ($status === 'pending') {
-                $user = Auth::user();
                 $userModel = new User();
                 // Check if user is admin
-                $uid = $this->userId($user);
                 if (!$uid || !$userModel->isAdmin($uid)) {
                     $status = 'approved'; // Fallback for non-admins
                 }
@@ -50,7 +51,7 @@ class LibraryApiController extends Controller
             if ($status === 'pending') {
                 $files = $libraryFileModel->getPending(); // Pending usually small list, ignoring paging for now
             } else {
-                $files = $libraryFileModel->getKeyResources($type, $limit, $offset);
+                $files = $libraryFileModel->getKeyResources($uid, $type, $limit, $offset);
             }
 
             $this->json(['success' => true, 'files' => $files]);
@@ -221,7 +222,7 @@ class LibraryApiController extends Controller
             // Admin check middleware handles auth, but verifying admin role:
             $user = Auth::user();
             $userModel = new User();
-            if (!$userModel->isAdmin($user['id'])) {
+            if (!$userModel->isAdmin($user->id)) {
                 throw new Exception('Unauthorized: Admin access required', 403);
             }
 
@@ -310,7 +311,7 @@ class LibraryApiController extends Controller
 
             // 3. Check if already unlocked
             $check = $pdo->prepare("SELECT id FROM library_unlocks WHERE user_id = ? AND file_id = ?");
-            $check->execute([$user['id'], $fileId]);
+            $check->execute([$user->id, $fileId]);
             if ($check->fetchColumn()) {
                 $this->json(['success' => true, 'message' => 'Already unlocked.']);
                 return;
@@ -318,19 +319,19 @@ class LibraryApiController extends Controller
 
             // 4. Deduct Coins
             $userModel = new User();
-            if ($user['coins'] < $file['price']) {
+            if ($user->coins < $file['price']) {
                 throw new Exception("Insufficient coins. Cost: {$file['price']}");
             }
             
             $pdo->beginTransaction();
             
-            if (!$userModel->deductCoins($user['id'], $file['price'], "Unlocked: " . $file['title'], $fileId)) {
+            if (!$userModel->deductCoins($user->id, $file['price'], "Unlocked: " . $file['title'], $fileId)) {
                 throw new Exception('Transaction failed.');
             }
             
             // 5. Record Unlock
             $rec = $pdo->prepare("INSERT INTO library_unlocks (user_id, file_id, cost) VALUES (?, ?, ?)");
-            $rec->execute([$user['id'], $fileId, $file['price']]);
+            $rec->execute([$user->id, $fileId, $file['price']]);
             
             // Reward Uploader (Marketplace Logic: 50% Commission?)
             if ($file['uploader_id']) {
@@ -363,19 +364,18 @@ class LibraryApiController extends Controller
 
             if (!$file || $file->status !== 'approved') die('File unavailable');
 
-            $isUploader = ($file->uploader_id == $user['id']);
             $userModel = new User();
             
             // CHECK PERMISSIONS (Premium Logic)
-            $isUploader = ($file->uploader_id == $user['id']);
-            $isAdmin = $userModel->isAdmin($user['id']);
+            $isUploader = ($file->uploader_id == $user->id);
+            $isAdmin = $userModel->isAdmin($user->id);
             
             if (!$isUploader && !$isAdmin) {
                 // If price > 0, check unlock
                 if (isset($file->price) && $file->price > 0) {
                      $db = \App\Core\Database::getInstance();
                      $check = $db->getPdo()->prepare("SELECT id FROM library_unlocks WHERE user_id = ? AND file_id = ?");
-                     $check->execute([$user['id'], $fileId]);
+                     $check->execute([$user->id, $fileId]);
                      if (!$check->fetchColumn()) {
                          die("This file is locked. Please unlock it for {$file->price} coins.");
                      }

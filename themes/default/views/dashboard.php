@@ -91,7 +91,7 @@ function toggleStudyMode() {
         status.className = 'text-xs font-bold text-green-400';
     }
 
-    fetch('/api/career/mode', {
+    fetch('<?= app_base_url("/api/career/mode") ?>', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: newMode })

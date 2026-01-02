@@ -31,7 +31,7 @@
         const grid = document.getElementById('shop-grid');
         const wallet = document.getElementById('user-wallet');
 
-        fetch('/api/shop/items')
+        fetch('<?= app_base_url("/api/shop/items") ?>')
             .then(res => res.json())
             .then(data => {
                 if (!data.success) return;
@@ -81,7 +81,7 @@
     function purchaseItem(id) {
         if(!confirm('Are you sure you want to purchase this item?')) return;
 
-        fetch('/api/shop/purchase', {
+        fetch('<?= app_base_url("/api/shop/purchase") ?>', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ item_id: id })

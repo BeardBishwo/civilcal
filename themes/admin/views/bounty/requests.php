@@ -43,7 +43,7 @@ function loadRequests() {
     // Let's add specific endpoint `api/admin/bounty/pending` or reuse a pattern.
     // I'll quickly implement `Api\BountyApiController::pendingSubmissions`
     
-    fetch('/api/admin/bounty/pending') 
+    fetch('<?= app_base_url("/api/admin/bounty/pending") ?>') 
         .then(res => res.json())
         .then(data => {
             const tbody = document.getElementById('bounty-requests-table');
@@ -59,9 +59,9 @@ function loadRequests() {
                         <span class="badge badge-warning">Pending</span><br>
                         <small>Submitted: ${new Date(sub.created_at).toLocaleDateString()}</small><br>
                         <div class="mt-2 text-xs">
-                             <a href="/api/bounty/download_preview?id=${sub.id}" target="_blank" class="text-blue-600 font-bold mb-1 block">⬇ Download Original</a>
+                             <a href="<?= app_base_url("/api/bounty/download_preview?id=") ?>${sub.id}" target="_blank" class="text-blue-600 font-bold mb-1 block">⬇ Download Original</a>
                              ${sub.preview_path ? 
-                                 `<a href="/${sub.preview_path}" target="_blank" class="text-red-500 font-bold block">👁 View Generated Preview</a>` : 
+                                 `<a href="<?= app_base_url("/") ?>${sub.preview_path}" target="_blank" class="text-red-500 font-bold block">👁 View Generated Preview</a>` : 
                                  '<span class="text-gray-400">No Preview Gen</span>'
                              }
                         </div>
@@ -86,7 +86,7 @@ function loadRequests() {
 function approveSubmission(id) {
     if(!confirm('Mark this file as SAFE for the client?')) return;
     
-    fetch('/api/admin/bounty/review', {
+    fetch('<?= app_base_url("/api/admin/bounty/review") ?>', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ submission_id: id, action: 'approve' })
@@ -106,7 +106,7 @@ function rejectSubmission(id) {
     const reason = prompt("Enter Rejection Reason (Virus, Spam, etc):");
     if(!reason) return;
     
-    fetch('/api/admin/bounty/review', {
+    fetch('<?= app_base_url("/api/admin/bounty/review") ?>', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ submission_id: id, action: 'reject', reason: reason })

@@ -914,6 +914,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                             <li><a href="<?php echo app_base_url('admin/quiz/analytics'); ?>">Results & Analytics</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/leaderboard'); ?>">Leaderboard</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/settings'); ?>">Settings</a></li>
+                            <li><a href="<?php echo app_base_url('admin/library'); ?>">Blueprint Vault</a></li>
                         </ul>
                     </li>
 
@@ -925,7 +926,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                             <i class="nav-arrow fas fa-chevron-right"></i>
                         </a>
                         <ul class="nav-submenu">
-                            <li><a href="<?php echo app_base_url('quiz/portal'); ?>"><i class="fas fa-city text-info"></i> Civil City</a></li>
+                            <li><a href="<?php echo app_base_url('quiz/city'); ?>"><i class="fas fa-city text-info"></i> Civil City</a></li>
                             <li><a href="<?php echo app_base_url('quiz/shop'); ?>"><i class="fas fa-store text-warning"></i> Temple Market</a></li>
                             <li><a href="<?php echo app_base_url('quiz/sawmill'); ?>"><i class="fas fa-hammer text-danger"></i> The Sawmill</a></li>
                             <li><a href="<?php echo app_base_url('quiz/missions'); ?>"><i class="fas fa-tasks text-success"></i> Daily Missions</a></li>
