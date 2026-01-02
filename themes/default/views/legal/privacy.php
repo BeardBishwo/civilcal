@@ -7,7 +7,7 @@
             <p><strong>Last Updated: <?php echo date('F d, Y'); ?></strong></p>
             
             <h4>1. Introduction</h4>
-            <p>Welcome to Bishwo Calculator. We respect your privacy and are committed to protecting your personal data.</p>
+            <p>Welcome to <?= APP_NAME ?>. We respect your privacy and are committed to protecting your personal data.</p>
             
             <h4>2. Data We Collect</h4>
             <ul>
@@ -31,7 +31,7 @@
             <p>We implement security measures including password hashing and secure connections to protect your data.</p>
 
             <h4>6. Contact Us</h4>
-            <p>If you have any questions, please contact us at support@bishwocalculator.com.</p>
+            <p>If you have any questions, please contact us at support@example.com.</p>
         </div>
     </div>
 </div>

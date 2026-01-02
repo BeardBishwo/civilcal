@@ -2,7 +2,8 @@
 
 namespace App\Controllers;
 
-use App\Services\Auth;
+use App\Core\Controller;
+use App\Core\Auth;
 use App\Models\BountyRequest;
 use App\Models\BountySubmission;
 use App\Models\User;

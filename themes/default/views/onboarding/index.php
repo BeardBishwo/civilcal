@@ -1,4 +1,4 @@
-<?php require_once VIEW_PATH . '/layouts/header.php'; ?>
+<?php require_once __DIR__ . '/../partials/header.php'; ?>
 
 <div class="container mx-auto px-4 py-12 min-h-screen flex items-center justify-center">
     <div class="max-w-2xl w-full bg-white rounded-2xl shadow-xl overflow-hidden">
@@ -163,4 +163,4 @@
     }
 </script>
 
-<?php require_once VIEW_PATH . '/layouts/footer.php'; ?>
+<?php require_once __DIR__ . '/../partials/footer.php'; ?>

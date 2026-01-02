@@ -189,14 +189,14 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
     margin: 40px auto;
     padding: 0 20px;
     font-family: 'Outfit', sans-serif;
-    color: #1a1a1a;
+    color: #e2e8f0;
 }
 
 /* Header Styling */
 .market-header { margin-bottom: 50px; }
 .header-icon-float { font-size: 4rem; animation: float 3s ease-in-out infinite; }
 .market-title { font-family: 'Cinzel', serif; font-size: 2.8rem; font-weight: 700; background: linear-gradient(135deg, #b8860b 0%, #daa520 50%, #b8860b 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
-.market-subtitle { font-size: 1.1rem; color: #666; max-width: 600px; margin: 0 auto; }
+.market-subtitle { font-size: 1.1rem; color: #94a3b8; max-width: 600px; margin: 0 auto; }
 
 /* Wallet Section */
 .wallet-section { margin-bottom: 40px; display: flex; justify-content: center; }
@@ -209,16 +209,21 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
 .wallet-visual { font-size: 4rem; opacity: 0.1; position: absolute; right: -10px; bottom: -10px; transform: rotate(-15deg); }
 
 /* Navigation */
-.market-nav { border-bottom: 2px solid #e2e8f0; display: flex; justify-content: center; gap: 20px; margin-bottom: 40px; }
-.nav-item { background: none; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
-.nav-item:hover { color: #1e293b; }
-.nav-item.active { color: #b8860b; border-bottom-color: #b8860b; }
+.market-nav { border-bottom: 2px solid rgba(255,255,255,0.1); display: flex; justify-content: center; gap: 20px; margin-bottom: 40px; }
+.nav-item { background: none; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: 600; color: #94a3b8; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+.nav-item:hover { color: #f1f5f9; }
+.nav-item.active { color: #fbbf24; border-bottom-color: #fbbf24; }
+
+/* Tabs Logic */
+.market-tab { display: none; }
+.market-tab.active { display: block; animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Cards Grid */
 .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
 .premium-card { background: white; border-radius: 24px; padding: 3px; position: relative; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
 .premium-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
-.card-inner { background: white; border-radius: 21px; padding: 30px; height: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.card-inner { background: white; border-radius: 21px; padding: 30px; height: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; color: #1e293b; }
 
 /* Lifeline Specifics */
 .lifeline-card[data-color="blue"] { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
@@ -248,9 +253,12 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
 .trade-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* Bundle & Cash Pack Specifics */
+/* Bundle & Cash Pack Specifics */
 .bundles-header { text-align: center; margin-bottom: 40px; }
-.bundles-header h2 { font-size: 2rem; font-weight: 700; color: #1e293b; margin-bottom: 10px; }
-.bundles-header p { color: #64748b; font-size: 1.1rem; }
+.bundles-header h2 { font-size: 2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 10px; }
+.bundles-header p { color: #cbd5e1; font-size: 1.1rem; }
+
+.card-inner { background: white; border-radius: 21px; padding: 30px; height: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; color: #1e293b; }
 
 .bundle-card, .cash-card { position: relative; }
 .savings-badge { position: absolute; top: -10px; right: -10px; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; z-index: 10; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4); }

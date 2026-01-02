@@ -73,14 +73,9 @@ class GamificationController extends Controller
         $cashPacks = \App\Services\SettingsService::get('economy_cash_packs', []);
         $shopNonce = $this->nonceService->generate($_SESSION['user_id'], 'shop');
         
-        $this->view('quiz/gamification/shop', [
-            'title' => 'Pashupati Nath Temple Market',
-            'inventory' => $inventory,
-            'wallet' => $wallet,
-            'bundles' => $bundles,
-            'cashPacks' => $cashPacks,
-            'shopNonce' => $shopNonce['nonce'] ?? null,
-        ]);
+        // Redirect to unified shop
+        header('Location: /Bishwo_Calculator/shop');
+        exit;
     }
 
     /**
@@ -343,10 +338,14 @@ class GamificationController extends Controller
         $data = $bpService->getProgress($_SESSION['user_id']);
         $claimNonce = $this->nonceService->generate($_SESSION['user_id'], 'battle_pass_claim');
         
-        $this->view('quiz/gamification/battle_pass', array_merge($data, [
+        // Flatten the data structure for the view
+        $this->view('quiz/gamification/battle_pass', [
             'title' => 'Battle Pass: Civil Uprising',
+            'progress' => $data['progress'],
+            'rewards' => $data['rewards'],
+            'season' => $data['season'],
             'claimNonce' => $claimNonce['nonce'] ?? null
-        ]));
+        ]);
     }
 
     /**

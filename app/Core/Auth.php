@@ -35,6 +35,14 @@ class Auth
         return self::check();
     }
 
+    /**
+     * Get the current user ID
+     */
+    public static function id()
+    {
+        return $_SESSION['user_id'] ?? null;
+    }
+
     public static function isAdmin()
     {
         $user = self::check();

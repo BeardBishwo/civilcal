@@ -7,7 +7,7 @@
             <p><strong>Last Updated: <?php echo date('F d, Y'); ?></strong></p>
             
             <h4>1. Acceptance of Terms</h4>
-            <p>By accessing Bishwo Calculator, you agree to be bound by these Terms of Service.</p>
+            <p>By accessing <?= APP_NAME ?>, you agree to be bound by these Terms of Service.</p>
             
             <h4>2. Use License</h4>
             <p>You strictly agree NOT to:</p>

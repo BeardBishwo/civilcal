@@ -1,70 +1,86 @@
-
-
 <div class="bp-page">
+    <!-- Compact Hero Section -->
     <div class="bp-hero-shell">
         <div class="bp-hero-glow"></div>
+        <div class="bp-animated-bg">
+            <div class="bp-orb bp-orb-1"></div>
+            <div class="bp-orb bp-orb-2"></div>
+        </div>
         <div class="bp-hero container">
             <div class="row align-items-center">
-                <div class="col-lg-7">
-                    <div class="d-flex align-items-center mb-3">
-                        <span class="bp-chip">Season 1</span>
+                <div class="col-lg-8">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="bp-chip bp-chip-sm">
+                            <i class="fas fa-calendar-alt mr-1"></i>Season 1
+                        </span>
                         <?php if (!$progress['is_premium_unlocked']): ?>
-                            <span class="bp-chip premium ml-2"><i class="fas fa-star mr-1"></i>Premium Locked</span>
+                            <span class="bp-chip bp-chip-sm premium ml-2">
+                                <i class="fas fa-star mr-1"></i>Premium Locked
+                            </span>
                         <?php else: ?>
-                            <span class="bp-chip success ml-2"><i class="fas fa-crown mr-1"></i>Premium Active</span>
+                            <span class="bp-chip bp-chip-sm success ml-2">
+                                <i class="fas fa-crown mr-1"></i>Premium
+                            </span>
                         <?php endif; ?>
                     </div>
                     <h1 class="bp-title">Civil Uprising</h1>
-                    <p class="bp-subtitle">Climb ranks, finish missions, and unlock architecture-grade rewards for your city.</p>
+                    <p class="bp-subtitle">Climb ranks, finish missions, unlock rewards</p>
+                    
+                    <!-- Compact Progress Card -->
                     <div class="bp-progress-card">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span class="bp-meta">Level <?php echo $progress['current_level']; ?></span>
-                            <span class="bp-meta"><?php echo ($progress['current_xp'] % 1000); ?> / 1000 XP</span>
-                        </div>
-                        <div class="bp-progress-bar">
-                            <div class="bp-progress-fill" style="width: <?php echo ($progress['current_xp'] % 1000) / 10; ?>%"></div>
-                        </div>
-                        <div class="d-flex align-items-center mt-3">
-                            <div class="bp-stat">
-                                <span class="bp-stat-label">Current XP</span>
-                                <span class="bp-stat-value"><?php echo number_format($progress['current_xp']); ?></span>
-                            </div>
-                            <div class="bp-divider"></div>
-                            <div class="bp-stat">
-                                <span class="bp-stat-label">Unlocked</span>
-                                <span class="bp-stat-value"><?php echo count($progress['claimed_rewards']); ?> / <?php echo count($rewards); ?></span>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bp-stat-inline">
+                                    <span class="bp-stat-label">Level</span>
+                                    <span class="bp-stat-value"><?php echo $progress['current_level']; ?></span>
+                                </div>
+                                <div class="bp-divider-sm"></div>
+                                <div class="bp-stat-inline">
+                                    <span class="bp-stat-label">Progress</span>
+                                    <span class="bp-stat-value"><?php echo ($progress['current_xp'] % 1000); ?>/1000</span>
+                                </div>
+                                <div class="bp-divider-sm"></div>
+                                <div class="bp-stat-inline">
+                                    <span class="bp-stat-label">Unlocked</span>
+                                    <span class="bp-stat-value"><?php echo count($progress['claimed_rewards']); ?>/<?php echo count($rewards); ?></span>
+                                </div>
                             </div>
                             <?php if (!$progress['is_premium_unlocked']): ?>
-                                <button class="bp-cta ml-auto">Unlock Premium</button>
-                            <?php else: ?>
-                                <div class="ml-auto bp-active-pill"><i class="fas fa-crown mr-1"></i>Premium Active</div>
+                                <button class="bp-cta-sm">
+                                    <i class="fas fa-crown mr-1"></i>Unlock
+                                </button>
                             <?php endif; ?>
+                        </div>
+                        <div class="bp-progress-bar-sm">
+                            <div class="bp-progress-fill" style="width: <?php echo ($progress['current_xp'] % 1000) / 10; ?>%">
+                                <div class="bp-progress-shine"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-5">
-                    <div class="bp-glass">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="bp-meta">Season Boosts</span>
-                            <span class="bp-chip soft"><i class="fas fa-fire-alt mr-1"></i>Live</span>
+                
+                <!-- Compact Stats -->
+                <div class="col-lg-4">
+                    <div class="bp-stats-grid">
+                        <div class="bp-stat-card">
+                            <i class="fas fa-fire text-warning"></i>
+                            <div>
+                                <div class="bp-stat-num">+<?php echo min(7, $progress['current_level']); ?></div>
+                                <div class="bp-stat-txt">Day Streak</div>
+                            </div>
                         </div>
-                        <ul class="bp-list">
-                            <li><i class="fas fa-bolt text-warning mr-2"></i>2x XP on Premium track</li>
-                            <li><i class="fas fa-gem text-info mr-2"></i>Exclusive construction blueprints</li>
-                            <li><i class="fas fa-shield-alt text-success mr-2"></i>Anti-replay secured claims</li>
-                        </ul>
-                        <div class="bp-mini-grid">
+                        <div class="bp-stat-card">
+                            <i class="fas fa-tasks text-info"></i>
                             <div>
-                                <span class="bp-stat-label">Daily streak</span>
-                                <div class="bp-stat-value">+<?php echo min(7, $progress['current_level']); ?> days</div>
+                                <div class="bp-stat-num">3/5</div>
+                                <div class="bp-stat-txt">Missions</div>
                             </div>
+                        </div>
+                        <div class="bp-stat-card">
+                            <img src="<?php echo app_base_url('themes/default/assets/resources/currency/coin.webp'); ?>" style="width: 24px; height: 24px; object-fit: contain;">
                             <div>
-                                <span class="bp-stat-label">Missions</span>
-                                <div class="bp-stat-value">3 / 5</div>
-                            </div>
-                            <div>
-                                <span class="bp-stat-label">Coins</span>
-                                <div class="bp-stat-value">+250</div>
+                                <div class="bp-stat-num">+250</div>
+                                <div class="bp-stat-txt">Coins</div>
                             </div>
                         </div>
                     </div>
@@ -73,101 +89,118 @@
         </div>
     </div>
 
+    <!-- Main Content Area - Compact -->
     <div class="container bp-body">
         <div class="row">
-            <div class="col-lg-8">
+            <div class="col-lg-9">
+                <!-- Compact Section Header -->
                 <div class="bp-section-header">
                     <div>
-                        <p class="bp-kicker"><i class="fas fa-road mr-2"></i>Progress Track</p>
-                        <h3 class="bp-heading">Claimable rewards</h3>
+                        <h3 class="bp-heading"><i class="fas fa-trophy mr-2"></i>Claimable Rewards</h3>
                     </div>
                     <div class="bp-legend">
                         <span class="bp-dot free"></span> Free
-                        <span class="ml-3 bp-dot premium"></span> Premium
+                        <span class="ml-2 bp-dot premium"></span> Premium
                     </div>
                 </div>
+                
+                <!-- Compact Rewards Track -->
                 <div class="bp-track">
-                    <?php foreach ($rewards as $reward): 
+                    <?php foreach ($rewards as $index => $reward): 
                         $isClaimed = in_array($reward['id'], $progress['claimed_rewards']);
                         $isUnlocked = $progress['current_level'] >= $reward['level'];
                         $canClaim = $isUnlocked && !$isClaimed && (!$reward['is_premium'] || $progress['is_premium_unlocked']);
                     ?>
-                    <div class="bp-reward-card <?php echo $isClaimed ? 'claimed' : ''; ?> <?php echo $reward['is_premium'] ? 'premium' : 'free'; ?>">
-                        <div class="d-flex align-items-center w-100">
-                            <div class="bp-level-chip">Lv <?php echo $reward['level']; ?></div>
-                            <div class="bp-icon">
-                                <?php if ($reward['reward_type'] == 'bricks'): ?>
-                                    <i class="fas fa-cubes"></i>
-                                <?php elseif ($reward['reward_type'] == 'coins'): ?>
-                                    <i class="fas fa-coins"></i>
-                                <?php elseif ($reward['reward_type'] == 'lifeline'): ?>
-                                    <i class="fas fa-bolt"></i>
-                                <?php else: ?>
-                                    <i class="fas fa-building"></i>
+                    <div class="bp-reward-card-compact <?php echo $isClaimed ? 'claimed' : ''; ?> <?php echo $reward['is_premium'] ? 'premium' : 'free'; ?> <?php echo $canClaim ? 'claimable' : ''; ?>">
+                        <div class="bp-level-badge"><?php echo $reward['level']; ?></div>
+                        <div class="bp-icon-sm">
+                            <?php if ($reward['reward_type'] == 'bricks'): ?>
+                                <img src="<?php echo app_base_url('themes/default/assets/resources/materials/brick_single.webp'); ?>" style="width: 20px; height: 20px; object-fit: contain;">
+                            <?php elseif ($reward['reward_type'] == 'coins'): ?>
+                                <img src="<?php echo app_base_url('themes/default/assets/resources/currency/coin.webp'); ?>" style="width: 20px; height: 20px; object-fit: contain;">
+                            <?php elseif ($reward['reward_type'] == 'lifeline'): ?>
+                                <i class="fas fa-bolt"></i>
+                            <?php else: ?>
+                                <img src="<?php echo app_base_url('themes/default/assets/resources/materials/plank.webp'); ?>" style="width: 20px; height: 20px; object-fit: contain;">
+                            <?php endif; ?>
+                        </div>
+                        <div class="bp-reward-info">
+                            <div class="bp-reward-name">
+                                <?php echo strtoupper($reward['reward_type']); ?>
+                                <?php if ($reward['is_premium']): ?>
+                                    <span class="bp-tag-sm"><i class="fas fa-crown"></i></span>
                                 <?php endif; ?>
                             </div>
-                            <div class="flex-grow-1">
-                                <div class="d-flex align-items-center">
-                                    <span class="bp-reward-title text-uppercase"><?php echo strtoupper($reward['reward_type']); ?></span>
-                                    <?php if ($reward['is_premium']): ?>
-                                        <span class="bp-tag ml-2">Premium</span>
-                                    <?php endif; ?>
-                                </div>
+                            <div class="bp-reward-status">
                                 <?php if ($isClaimed): ?>
-                                    <div class="bp-reward-meta text-success"><i class="fas fa-check-circle mr-1"></i>Claimed</div>
+                                    <i class="fas fa-check-circle text-success"></i> Claimed
                                 <?php elseif (!$isUnlocked): ?>
-                                    <div class="bp-reward-meta"><i class="fas fa-lock mr-1"></i>Reach level <?php echo $reward['level']; ?> to unlock</div>
+                                    <i class="fas fa-lock"></i> Level <?php echo $reward['level']; ?>
                                 <?php else: ?>
-                                    <div class="bp-reward-meta text-info"><i class="fas fa-unlock mr-1"></i>Ready to claim</div>
+                                    <i class="fas fa-unlock text-info"></i> Ready
                                 <?php endif; ?>
                             </div>
-                            <div>
-                                <?php if ($canClaim): ?>
-                                    <button class="bp-claim-btn btn-claim" data-id="<?php echo $reward['id']; ?>">Claim</button>
-                                <?php elseif ($isClaimed): ?>
-                                    <button class="bp-ghost-btn" disabled>Collected</button>
-                                <?php else: ?>
-                                    <button class="bp-ghost-btn" disabled>Locked</button>
-                                <?php endif; ?>
-                            </div>
+                        </div>
+                        <div class="bp-reward-action">
+                            <?php if ($canClaim): ?>
+                                <button class="bp-btn-claim btn-claim" data-id="<?php echo $reward['id']; ?>">
+                                    <i class="fas fa-gift"></i> Claim
+                                </button>
+                            <?php elseif ($isClaimed): ?>
+                                <button class="bp-btn-disabled" disabled>
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            <?php else: ?>
+                                <button class="bp-btn-disabled" disabled>
+                                    <i class="fas fa-lock"></i>
+                                </button>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <?php endforeach; ?>
                 </div>
             </div>
 
-            <div class="col-lg-4">
-                <div class="bp-card mb-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <span class="bp-kicker mb-0"><i class="fas fa-tasks mr-2"></i>Daily Missions</span>
-                        <span class="bp-chip soft ml-auto">3 / 5</span>
+            <!-- Compact Sidebar -->
+            <div class="col-lg-3">
+                <!-- Missions Card -->
+                <div class="bp-sidebar-card">
+                    <div class="bp-sidebar-header">
+                        <i class="fas fa-tasks"></i>
+                        <span>Missions</span>
+                        <span class="bp-badge">3/5</span>
                     </div>
-                    <div class="bp-mission">
-                        <div class="bp-mission-title">Solve 5 Civil Questions</div>
-                        <div class="bp-mission-progress">
-                            <div style="width: 60%;"></div>
+                    <div class="bp-mission-compact">
+                        <div class="bp-mission-info">
+                            <div class="bp-mission-name">Solve 5 Civil Questions</div>
+                            <div class="bp-mission-reward">+100 XP · +50 Bricks</div>
                         </div>
-                        <div class="bp-mission-meta">3 / 5 · +100 XP | +50 Bricks</div>
-                    </div>
-                    <div class="bp-mission">
-                        <div class="bp-mission-title">Win a Battle Royale</div>
-                        <div class="bp-mission-progress completed">
-                            <div style="width: 100%;"></div>
+                        <div class="bp-mission-bar">
+                            <div class="bp-mission-fill" style="width: 60%;"></div>
                         </div>
-                        <div class="bp-mission-meta text-success"><i class="fas fa-check mr-1"></i>Completed · +250 XP | +20 Coins</div>
                     </div>
-                    <div class="bp-tip"><i class="fas fa-lightbulb mr-2"></i>Premium Pass doubles XP and unlocks exclusive blueprints.</div>
+                    <div class="bp-mission-compact completed">
+                        <div class="bp-mission-info">
+                            <div class="bp-mission-name">Win a Battle Royale</div>
+                            <div class="bp-mission-reward text-success"><i class="fas fa-check"></i> +250 XP</div>
+                        </div>
+                        <div class="bp-mission-bar">
+                            <div class="bp-mission-fill" style="width: 100%;"></div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="bp-card">
-                    <div class="d-flex align-items-center mb-2">
-                        <span class="bp-kicker mb-0"><i class="fas fa-bolt mr-2"></i>Season Boosts</span>
-                        <span class="bp-chip premium ml-auto">Premium</span>
+                <!-- Boosts Card -->
+                <div class="bp-sidebar-card">
+                    <div class="bp-sidebar-header">
+                        <i class="fas fa-bolt"></i>
+                        <span>Boosts</span>
+                        <span class="bp-badge premium">Premium</span>
                     </div>
-                    <ul class="bp-list tight">
-                        <li>+25% XP for quiz streaks</li>
-                        <li>Bonus lifeline drops each 5 levels</li>
-                        <li>Early access to new calculators</li>
+                    <ul class="bp-boost-list">
+                        <li><i class="fas fa-check"></i> +25% XP for streaks</li>
+                        <li><i class="fas fa-check"></i> Bonus lifeline drops</li>
+                        <li><i class="fas fa-check"></i> Early calculator access</li>
                     </ul>
                 </div>
             </div>
@@ -176,11 +209,11 @@
 </div>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-    --bp-bg: #0b0f1a;
-    --bp-card: rgba(255,255,255,0.04);
+    --bp-bg: #0a0e1a;
+    --bp-card: rgba(255,255,255,0.03);
     --bp-border: rgba(255,255,255,0.08);
     --bp-primary: #7c5dff;
     --bp-accent: #00d1ff;
@@ -188,240 +221,814 @@
     --bp-success: #2ee6a8;
     --bp-text: #e8ecf2;
     --bp-muted: #9aa4b5;
-    --bp-glow: 0 20px 80px rgba(124,93,255,0.25);
-    --bp-radius: 16px;
+    --bp-glow: 0 8px 24px rgba(124,93,255,0.2);
+    --bp-radius: 12px;
 }
 
+/* Compact Page Base */
 .bp-page {
-    background: radial-gradient(circle at 20% 20%, rgba(124,93,255,0.08), transparent 35%),
-                radial-gradient(circle at 80% 10%, rgba(0,209,255,0.08), transparent 30%),
-                linear-gradient(180deg, #0b0f1a 0%, #0a0c14 100%);
+    background: linear-gradient(180deg, #0a0e1a 0%, #060810 100%);
     color: var(--bp-text);
-    font-family: 'Space Grotesk', 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     min-height: 100vh;
-    padding-bottom: 64px;
+    padding-bottom: 32px;
+    position: relative;
 }
 
+/* Compact Animated Background */
+.bp-animated-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.bp-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.3;
+    animation: float-orb 20s ease-in-out infinite;
+}
+
+.bp-orb-1 {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(124,93,255,0.3), transparent);
+    top: -80px;
+    left: -80px;
+}
+
+.bp-orb-2 {
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(0,209,255,0.25), transparent);
+    top: 40%;
+    right: -60px;
+    animation-delay: 7s;
+}
+
+@keyframes float-orb {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(30px, -20px); }
+}
+
+/* Compact Hero Section */
 .bp-hero-shell {
     position: relative;
     overflow: hidden;
-    padding: 60px 0 30px;
+    padding: 40px 0 24px;
+    z-index: 1;
 }
+
 .bp-hero-glow {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(124,93,255,0.2), rgba(0,209,255,0.08));
+    background: linear-gradient(135deg, rgba(124,93,255,0.12), rgba(0,209,255,0.06));
     filter: blur(60px);
-    opacity: 0.8;
+    opacity: 0.5;
 }
+
 .bp-hero {
     position: relative;
+    z-index: 2;
 }
+
 .bp-title {
     font-weight: 700;
-    font-size: 44px;
-    margin-bottom: 8px;
+    font-size: 32px;
+    margin-bottom: 6px;
     letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #ffffff 0%, #a8b3cf 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
+
 .bp-subtitle {
     color: var(--bp-muted);
-    font-size: 17px;
-    margin-bottom: 20px;
+    font-size: 14px;
+    margin-bottom: 16px;
+    line-height: 1.5;
 }
+
+/* Compact Chips */
 .bp-chip {
     display: inline-flex;
     align-items: center;
-    padding: 6px 12px;
+    padding: 5px 10px;
     border-radius: 999px;
-    background: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(10px);
     color: var(--bp-text);
     font-weight: 600;
-    font-size: 12px;
+    font-size: 10px;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-.bp-chip.premium { background: rgba(247,201,72,0.15); color: #f7c948; }
-.bp-chip.success { background: rgba(46,230,168,0.12); color: var(--bp-success); }
-.bp-chip.soft { background: rgba(255,255,255,0.06); color: var(--bp-muted); }
-
-.bp-cta {
-    background: linear-gradient(90deg, var(--bp-primary), var(--bp-accent));
-    border: none;
-    color: #0b0f1a;
-    padding: 10px 18px;
-    border-radius: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    box-shadow: var(--bp-glow);
-}
-.bp-active-pill {
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: rgba(46,230,168,0.1);
-    color: var(--bp-success);
-    font-weight: 600;
+    letter-spacing: 0.05em;
+    border: 1px solid rgba(255,255,255,0.08);
 }
 
+.bp-chip-sm {
+    padding: 4px 8px;
+    font-size: 9px;
+}
+
+.bp-chip.premium { 
+    background: linear-gradient(135deg, rgba(247,201,72,0.15), rgba(247,201,72,0.08)); 
+    color: #f7c948; 
+    border-color: rgba(247,201,72,0.2);
+}
+
+.bp-chip.success { 
+    background: linear-gradient(135deg, rgba(46,230,168,0.12), rgba(46,230,168,0.06)); 
+    color: var(--bp-success); 
+    border-color: rgba(46,230,168,0.15);
+}
+
+/* Compact Progress Card */
 .bp-progress-card {
-    background: var(--bp-card);
-    border: 1px solid var(--bp-border);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: var(--bp-radius);
-    padding: 18px;
-    box-shadow: var(--bp-glow);
+    padding: 14px;
+    backdrop-filter: blur(10px);
 }
-.bp-progress-bar {
+
+.bp-progress-bar-sm {
     width: 100%;
-    height: 10px;
-    background: rgba(255,255,255,0.08);
+    height: 6px;
+    background: rgba(255,255,255,0.06);
     border-radius: 999px;
     overflow: hidden;
+    margin-top: 8px;
 }
+
 .bp-progress-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--bp-accent), var(--bp-primary));
     border-radius: 999px;
+    position: relative;
+    transition: width 0.6s ease;
 }
-.bp-stat { margin-right: 18px; }
-.bp-stat-label { color: var(--bp-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
-.bp-stat-value { color: var(--bp-text); font-weight: 700; font-size: 18px; }
-.bp-divider { width: 1px; height: 32px; background: var(--bp-border); margin-right: 18px; }
 
-.bp-glass {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--bp-border);
-    border-radius: var(--bp-radius);
-    padding: 18px;
-    backdrop-filter: blur(8px);
+.bp-progress-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shine 2s ease-in-out infinite;
+}
+
+@keyframes shine {
+    0% { left: -100%; }
+    100% { left: 200%; }
+}
+
+/* Compact Stats */
+.bp-stat-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.bp-stat-label { 
+    color: var(--bp-muted); 
+    font-size: 9px; 
+    text-transform: uppercase; 
+    letter-spacing: 0.05em; 
+    font-weight: 600;
+}
+
+.bp-stat-value { 
+    color: var(--bp-text); 
+    font-weight: 700; 
+    font-size: 14px; 
+}
+
+.bp-divider-sm { 
+    width: 1px; 
+    height: 24px; 
+    background: rgba(255,255,255,0.1); 
+    margin: 0 12px; 
+}
+
+/* Compact CTA Button */
+.bp-cta-sm {
+    background: linear-gradient(135deg, var(--bp-primary), var(--bp-accent));
+    border: none;
+    color: #0a0e1a;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.03em;
     box-shadow: var(--bp-glow);
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
-.bp-list { list-style: none; padding-left: 0; margin-bottom: 16px; }
-.bp-list li { color: var(--bp-text); padding: 6px 0; font-weight: 500; }
-.bp-list.tight li { padding: 4px 0; color: var(--bp-muted); }
-.bp-mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
-.bp-mini-grid div { background: rgba(255,255,255,0.03); border: 1px solid var(--bp-border); border-radius: 12px; padding: 10px; }
 
-.bp-body { margin-top: 10px; }
-.bp-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.bp-kicker { color: var(--bp-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; font-size: 12px; margin-bottom: 4px; }
-.bp-heading { margin: 0; font-weight: 700; }
-.bp-legend { color: var(--bp-muted); font-size: 13px; }
-.bp-dot { width: 10px; height: 10px; display: inline-block; border-radius: 50%; background: var(--bp-accent); vertical-align: middle; }
+.bp-cta-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(124,93,255,0.3);
+}
+
+/* Compact Stats Grid */
+.bp-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.bp-stat-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.bp-stat-card:hover {
+    background: rgba(255,255,255,0.06);
+    transform: translateY(-2px);
+}
+
+.bp-stat-card i {
+    font-size: 18px;
+}
+
+.bp-stat-num {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--bp-text);
+}
+
+.bp-stat-txt {
+    font-size: 10px;
+    color: var(--bp-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Main Content */
+.bp-body { 
+    margin-top: 24px; 
+}
+
+.bp-section-header { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    margin-bottom: 16px; 
+}
+
+.bp-heading { 
+    margin: 0; 
+    font-weight: 700; 
+    font-size: 18px;
+    color: var(--bp-text);
+}
+
+.bp-legend { 
+    color: var(--bp-muted); 
+    font-size: 11px; 
+    display: flex;
+    align-items: center;
+}
+
+.bp-dot { 
+    width: 8px; 
+    height: 8px; 
+    display: inline-block; 
+    border-radius: 50%; 
+    background: var(--bp-accent); 
+    vertical-align: middle; 
+    margin-right: 4px;
+}
+
 .bp-dot.premium { background: var(--bp-premium); }
 .bp-dot.free { background: var(--bp-accent); }
 
-.bp-track { display: flex; flex-direction: column; gap: 14px; }
+/* Compact Reward Cards */
+.bp-track { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px; 
+}
+
+.bp-reward-card-compact {
+    border: 1px solid var(--bp-border);
+    background: rgba(255,255,255,0.02);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.bp-reward-card-compact:hover {
+    transform: translateX(4px);
+    border-color: rgba(124,93,255,0.3);
+    background: rgba(255,255,255,0.04);
+}
+
+.bp-reward-card-compact.premium {
+    border-left: 2px solid rgba(247,201,72,0.4);
+}
+
+.bp-reward-card-compact.free {
+    border-left: 2px solid rgba(0,209,255,0.4);
+}
+
+.bp-reward-card-compact.claimed {
+    opacity: 0.5;
+}
+
+.bp-reward-card-compact.claimable {
+    animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+    0%, 100% { border-color: rgba(124,93,255,0.2); }
+    50% { border-color: rgba(0,209,255,0.5); }
+}
+
+.bp-level-badge {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-weight: 700;
+    font-size: 11px;
+    min-width: 32px;
+    text-align: center;
+}
+
+.bp-icon-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    background: rgba(255,255,255,0.06);
+    color: var(--bp-premium);
+    font-size: 14px;
+}
+
+.bp-reward-info {
+    flex: 1;
+}
+
+.bp-reward-name {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--bp-text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+}
+
+.bp-tag-sm {
+    background: rgba(247,201,72,0.15);
+    color: #f7c948;
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-size: 9px;
+}
+
+.bp-reward-status {
+    color: var(--bp-muted);
+    font-size: 10px;
+}
+
+.bp-reward-action {
+    margin-left: auto;
+}
+
+.bp-btn-claim {
+    background: linear-gradient(135deg, var(--bp-primary), var(--bp-accent));
+    color: #0a0e1a;
+    font-weight: 700;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.bp-btn-claim:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--bp-glow);
+}
+
+.bp-btn-disabled {
+    background: rgba(255,255,255,0.04);
+    border: 1px dashed rgba(255,255,255,0.1);
+    color: var(--bp-muted);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: not-allowed;
+}
+
+/* Compact Sidebar */
+.bp-sidebar-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--bp-radius);
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.bp-sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--bp-text);
+}
+
+.bp-sidebar-header i {
+    font-size: 14px;
+}
+
+.bp-badge {
+    background: rgba(255,255,255,0.06);
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 600;
+    margin-left: auto;
+}
+
+.bp-badge.premium {
+    background: rgba(247,201,72,0.15);
+    color: #f7c948;
+}
+
+/* Compact Missions */
+.bp-mission-compact {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.bp-mission-compact:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.bp-mission-info {
+    margin-bottom: 6px;
+}
+
+.bp-mission-name {
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--bp-text);
+    margin-bottom: 2px;
+}
+
+.bp-mission-reward {
+    color: var(--bp-muted);
+    font-size: 9px;
+}
+
+.bp-mission-bar {
+    background: rgba(255,255,255,0.06);
+    height: 4px;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.bp-mission-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--bp-accent), var(--bp-primary));
+    border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+.bp-mission-compact.completed .bp-mission-fill {
+    background: linear-gradient(90deg, var(--bp-success), #32d583);
+}
+
+/* Compact Boost List */
+.bp-boost-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.bp-boost-list li {
+    color: var(--bp-muted);
+    font-size: 11px;
+    padding: 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bp-boost-list li i {
+    color: var(--bp-success);
+    font-size: 10px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .bp-hero-shell { padding: 32px 0 20px; }
+    .bp-title { font-size: 28px; }
+    .bp-stats-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .bp-page { padding-bottom: 24px; }
+    .bp-title { font-size: 24px; }
+    .bp-section-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .bp-reward-card-compact { padding: 8px 10px; }
+    .bp-stats-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+/* Enhanced Reward Cards */
 .bp-reward-card {
     border: 1px solid var(--bp-border);
     background: rgba(255,255,255,0.02);
     border-radius: var(--bp-radius);
-    padding: 14px;
-    transition: all 0.2s ease;
+    padding: 18px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
-.bp-reward-card:hover { transform: translateY(-2px); border-color: rgba(124,93,255,0.5); box-shadow: var(--bp-glow); }
-.bp-reward-card.premium { background: linear-gradient(90deg, rgba(247,201,72,0.08), rgba(255,255,255,0.02)); }
-.bp-reward-card.free { background: linear-gradient(90deg, rgba(0,209,255,0.08), rgba(255,255,255,0.02)); }
-.bp-reward-card.claimed { opacity: 0.7; }
 
-.bp-level-chip {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid var(--bp-border);
-    border-radius: 10px;
-    padding: 6px 10px;
-    font-weight: 700;
-    margin-right: 12px;
+.bp-reward-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transition: left 0.6s;
 }
+
+.bp-reward-card:hover::before {
+    left: 100%;
+}
+
+.bp-reward-card:hover { 
+    transform: translateX(8px); 
+    border-color: rgba(124,93,255,0.4); 
+    box-shadow: -4px 0 20px rgba(124,93,255,0.2);
+}
+
+.bp-reward-card.premium { 
+    background: linear-gradient(90deg, rgba(247,201,72,0.08), rgba(255,255,255,0.02)); 
+    border-left: 3px solid rgba(247,201,72,0.5);
+}
+
+.bp-reward-card.free { 
+    background: linear-gradient(90deg, rgba(0,209,255,0.08), rgba(255,255,255,0.02)); 
+    border-left: 3px solid rgba(0,209,255,0.5);
+}
+
+.bp-reward-card.claimed { 
+    opacity: 0.5; 
+    filter: grayscale(0.5);
+}
+
+.bp-reward-card.claimable {
+    animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+    0%, 100% { border-color: rgba(124,93,255,0.3); }
+    50% { border-color: rgba(0,209,255,0.6); }
+}
+
+.bp-claim-glow {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(0,209,255,0.3), transparent);
+    filter: blur(30px);
+    transform: translateY(-50%);
+    animation: pulse-glow-effect 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow-effect {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
+
+/* Enhanced Icons */
 .bp-icon {
-    width: 44px; height: 44px;
+    width: 48px; 
+    height: 48px;
     border-radius: 12px;
-    display: grid; place-items: center;
+    display: grid; 
+    place-items: center;
     background: rgba(255,255,255,0.06);
     color: var(--bp-premium);
-    margin-right: 12px;
-    font-size: 18px;
+    margin-right: 14px;
+    font-size: 20px;
+    transition: all 0.3s ease;
 }
-.bp-reward-title { font-weight: 700; letter-spacing: 0.02em; }
-.bp-tag {
+
+.bp-icon-animated:hover {
+    transform: rotate(10deg) scale(1.1);
     background: rgba(247,201,72,0.15);
-    color: #f7c948;
-    border-radius: 8px;
-    padding: 4px 8px;
-    font-weight: 700;
-    font-size: 11px;
-    text-transform: uppercase;
 }
-.bp-reward-meta { color: var(--bp-muted); font-size: 13px; }
+
+/* Enhanced Claim Button */
 .bp-claim-btn {
-    background: linear-gradient(90deg, var(--bp-primary), var(--bp-accent));
-    color: #0b0f1a;
+    background: linear-gradient(135deg, var(--bp-primary), var(--bp-accent));
+    color: #0a0e1a;
     font-weight: 700;
     border: none;
-    padding: 8px 14px;
-    border-radius: 10px;
+    padding: 10px 18px;
+    border-radius: 12px;
     box-shadow: var(--bp-glow);
     text-transform: uppercase;
     font-size: 12px;
-}
-.bp-ghost-btn {
-    background: transparent;
-    border: 1px dashed var(--bp-border);
-    color: var(--bp-muted);
-    padding: 8px 12px;
-    border-radius: 10px;
-    font-weight: 600;
+    letter-spacing: 0.05em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
 
-.bp-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--bp-border);
-    border-radius: var(--bp-radius);
-    padding: 16px;
+.bp-claim-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.bp-claim-btn:hover::after {
+    width: 300px;
+    height: 300px;
+}
+
+.bp-claim-btn:active {
+    transform: scale(0.95);
+}
+
+/* Mission Progress */
+.bp-mission { 
+    margin-bottom: 18px; 
+}
+
+.bp-mission-title { 
+    font-weight: 600; 
+    margin-bottom: 8px;
     color: var(--bp-text);
 }
-.bp-mission { margin-bottom: 14px; }
-.bp-mission-title { font-weight: 700; }
+
 .bp-mission-progress {
     background: rgba(255,255,255,0.06);
-    height: 8px;
+    height: 10px;
     border-radius: 999px;
     overflow: hidden;
-    margin: 8px 0;
-}
-.bp-mission-progress div {
-    height: 100%;
-    background: linear-gradient(90deg, var(--bp-accent), var(--bp-primary));
-}
-.bp-mission-progress.completed div {
-    background: linear-gradient(90deg, var(--bp-success), #32d583);
-}
-.bp-mission-meta { color: var(--bp-muted); font-size: 13px; }
-.bp-tip {
-    margin-top: 8px;
-    background: rgba(255,255,255,0.04);
-    border: 1px dashed var(--bp-border);
-    border-radius: 12px;
-    padding: 10px 12px;
-    color: var(--bp-muted);
+    margin: 10px 0;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
 }
 
+.bp-mission-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--bp-accent), var(--bp-primary));
+    border-radius: 999px;
+    position: relative;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bp-mission-progress.completed .bp-mission-progress-fill {
+    background: linear-gradient(90deg, var(--bp-success), #32d583);
+}
+
+/* Animations */
+.bp-fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.bp-slide-up {
+    animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bp-fade-in-up {
+    animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.bp-delay-1 { animation-delay: 0.1s; }
+.bp-delay-2 { animation-delay: 0.2s; }
+.bp-delay-3 { animation-delay: 0.3s; }
+
+.bp-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.bp-pulse-soft {
+    animation: pulse-soft 3s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+@keyframes fadeInUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 1; 
+    }
+    50% { 
+        transform: scale(1.05); 
+        opacity: 0.9; 
+    }
+}
+
+@keyframes pulse-soft {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+
+/* Responsive Design */
 @media (max-width: 992px) {
-    .bp-hero-shell { padding: 36px 0 20px; }
+    .bp-hero-shell { padding: 60px 0 30px; }
+    .bp-title { font-size: 40px; }
+    .bp-subtitle { font-size: 16px; }
+    .bp-mini-grid { grid-template-columns: repeat(2, 1fr); }
+    .bp-stat { margin-right: 16px; }
+}
+
+@media (max-width: 768px) {
+    .bp-page { padding-bottom: 40px; }
     .bp-title { font-size: 32px; }
     .bp-subtitle { font-size: 15px; }
-    .bp-progress-card { margin-top: 12px; }
-    .bp-mini-grid { grid-template-columns: repeat(2, 1fr); }
+    .bp-section-header { 
+        flex-direction: column; 
+        align-items: flex-start; 
+        gap: 8px; 
+    }
+    .bp-reward-card { padding: 14px; }
+    .bp-icon { margin-right: 10px; width: 40px; height: 40px; }
+    .bp-mini-grid { grid-template-columns: 1fr; }
+    .bp-cta { width: 100%; margin-top: 12px; }
 }
-@media (max-width: 768px) {
-    .bp-page { padding-bottom: 32px; }
-    .bp-section-header { flex-direction: column; align-items: flex-start; gap: 6px; }
-    .bp-legend { margin-top: 0; }
-    .bp-reward-card { padding: 12px; }
-    .bp-icon { margin-right: 10px; }
-    .bp-hero-glow { filter: blur(80px); }
+
+@media (max-width: 576px) {
+    .bp-hero-shell { padding: 40px 0 20px; }
+    .bp-glass-premium { padding: 16px; }
+    .bp-reward-card:hover { transform: translateX(4px); }
 }
 </style>
 
 <script>
+// Enhanced claim functionality with animations
 let claimNonce = '<?php echo htmlspecialchars($claimNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>';
+
+// Honeypot trap
 const bpTrap = document.createElement('input');
 bpTrap.type = 'text';
 bpTrap.name = 'trap_answer';
@@ -430,11 +1037,16 @@ bpTrap.autocomplete = 'off';
 bpTrap.style.display = 'none';
 document.body.appendChild(bpTrap);
 
+// Enhanced claim button functionality
 document.querySelectorAll('.btn-claim').forEach(btn => {
     btn.addEventListener('click', async function() {
         const rewardId = this.dataset.id;
+        const originalHTML = this.innerHTML;
+        
+        // Animated loading state
         this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         this.disabled = true;
+        this.style.pointerEvents = 'none';
 
         try {
             const formData = new FormData();
@@ -442,28 +1054,61 @@ document.querySelectorAll('.btn-claim').forEach(btn => {
             formData.append('nonce', claimNonce);
             formData.append('trap_answer', document.getElementById('bp_trap').value || '');
             
-            const response = await fetch('/api/battle-pass/claim', {
+            const response = await fetch(app_base_url('api/battle-pass/claim'), {
                 method: 'POST',
                 body: formData
             });
+            
             const data = await response.json();
 
             if (data.success) {
+                // Update nonce
                 if (data.nonce) claimNonce = data.nonce;
-                this.innerHTML = '<i class="fas fa-check"></i>';
-                this.className = 'btn btn-light btn-sm';
+                
+                // Success animation
+                this.innerHTML = '<i class="fas fa-check"></i> Claimed!';
+                this.style.background = 'linear-gradient(135deg, #2ee6a8, #32d583)';
+                
+                // Play success sound if available
                 if (window.playSfx) playSfx('win');
-                setTimeout(() => location.reload(), 1500);
+                
+                // Reload after animation
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
             } else {
-                alert(data.message);
-                this.innerHTML = 'CLAIM';
+                // Error state
+                alert(data.message || 'Failed to claim reward');
+                this.innerHTML = originalHTML;
                 this.disabled = false;
+                this.style.pointerEvents = 'auto';
             }
         } catch (e) {
-            alert('Error claiming reward.');
-            this.innerHTML = 'CLAIM';
+            console.error('Claim error:', e);
+            alert('Error claiming reward. Please try again.');
+            this.innerHTML = originalHTML;
             this.disabled = false;
+            this.style.pointerEvents = 'auto';
         }
     });
+});
+
+// Smooth scroll reveal for reward cards
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.bp-reward-card').forEach(card => {
+    observer.observe(card);
 });
 </script>

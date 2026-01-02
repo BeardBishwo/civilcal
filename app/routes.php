@@ -13,6 +13,8 @@ $router->add("GET", "/pricing", "HomeController@pricing");
 $router->add("GET", "/about", "HomeController@about");
 $router->add("GET", "/contact", "ContactController@index");
 $router->add("POST", "/contact/submit", "ContactController@submit");
+// Forum Placeholder (or use actual ForumController if planned)
+$router->add("GET", "/forum", "HomeController@index"); // Redirect to home or show 'Coming Soon' if separate controller doesn't exist yet. The user just said "broken link verify", so making it functional is step 1. Linking to Home or a "Coming Soon" page is safer than crash.
 $router->add("GET", "/report", "ReportController@index");
 $router->add("POST", "/report/submit", "ReportController@submit");
 $router->add("GET", "/pages/preview/{id}", "HomeController@pagePreview");

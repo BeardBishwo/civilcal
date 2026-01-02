@@ -168,7 +168,7 @@ if ($show_footer): ?>
                 ?>
                 <div class="copyright-text">
                     <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars($site_name); ?>. All Rights Reserved.</p>
-                    <p>Made with <i class="fas fa-heart" style="color: #ff5e5e;"></i> in <?php echo htmlspecialchars($site_meta['country'] ?? 'Nepal'); ?> by BeardBishwo</p>
+                    <p>Made with <i class="fas fa-heart" style="color: #ff5e5e;"></i> in <?php echo htmlspecialchars($site_meta['country'] ?? 'Nepal'); ?> by <?= APP_NAME ?></p>
                 </div>
             </div>
         </div>

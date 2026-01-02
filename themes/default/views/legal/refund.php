@@ -17,7 +17,7 @@
             </ul>
 
             <h4>3. How to Request</h4>
-            <p>If you believe you are entitled to a refund under the exceptions above, please contact support@bishwocalculator.com within 48 hours of your purchase with your Transaction ID.</p>
+            <p>If you believe you are entitled to a refund under the exceptions above, please contact support@example.com within 48 hours of your purchase with your Transaction ID.</p>
             
             <h4>4. Chargebacks</h4>
             <p>Initiating a chargeback without contacting us first will result in immediate and permanent account suspension.</p>

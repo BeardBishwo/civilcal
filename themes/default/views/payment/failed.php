@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Failed - Bishwo Calculator</title>
+    <title>Payment Failed - <?= APP_NAME ?></title>
     <link rel="stylesheet" href="/assets/css/app.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -124,7 +124,7 @@
                 <h3 class="font-semibold text-gray-900 mb-3">Still Need Help?</h3>
                 <p class="text-gray-600 mb-4">Our support team is available to assist you with any payment issues.</p>
                 <div class="flex justify-center space-x-6 text-sm text-gray-600">
-                    <a href="mailto:support@bishwocalculator.com" class="flex items-center space-x-1 hover:text-blue-600">
+                    <a href="mailto:support@example.com" class="flex items-center space-x-1 hover:text-blue-600">
                         <i class="fas fa-envelope"></i>
                         <span>Email Support</span>
                     </a>

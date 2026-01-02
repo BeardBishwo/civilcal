@@ -1,5 +1,5 @@
 <?php
-$page_title = $title . ' - ' . \App\Services\SettingsService::get('site_name', 'Bishwo Calculator');
+$page_title = $title . ' - ' . \App\Services\SettingsService::get('site_name', 'Civil Cal');
 ?>
 
 <div class="container" style="padding: 40px 20px;">

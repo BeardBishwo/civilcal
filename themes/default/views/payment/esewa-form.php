@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pay with eSewa - Bishwo Calculator</title>
+    <title>Pay with eSewa - <?= APP_NAME ?></title>
     <link rel="stylesheet" href="/assets/css/app.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -36,7 +36,7 @@
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Product</label>
-                        <div class="text-gray-900">Bishwo Calculator Premium</div>
+                        <div class="text-gray-900"><?= APP_NAME ?> Premium</div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Amount</label>

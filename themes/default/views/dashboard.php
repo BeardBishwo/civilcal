@@ -1,5 +1,5 @@
 <?php
-$page_title = 'User Dashboard - ' . \App\Services\SettingsService::get('site_name', 'Bishwo Calculator');
+$page_title = 'User Dashboard - ' . \App\Services\SettingsService::get('site_name', 'Civil Cal');
 ?>
 
 <style>

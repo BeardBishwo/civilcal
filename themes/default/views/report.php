@@ -326,7 +326,7 @@ div.report-card .form-control::placeholder {
 
                 <div style="margin-top: auto;">
                     <p style="font-size: 0.85rem; opacity: 0.7;">
-                        By submitting this form, you help us maintain the accuracy and quality of Bishwo Calculator. Thank you!
+                        By submitting this form, you help us maintain the accuracy and quality of <?= APP_NAME ?>. Thank you!
                     </p>
                 </div>
             </div>

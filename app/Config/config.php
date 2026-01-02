@@ -53,7 +53,12 @@ if (!defined('ENVIRONMENT')) {
 }
 
 // App configuration
-define('APP_NAME', env('APP_NAME', 'Engineering Calculator Pro'));
+define('APP_NAME', env('APP_NAME', 'Civil Cal'));
+
+// Define View Path for legacy compatibility
+if (!defined('VIEW_PATH')) {
+    define('VIEW_PATH', __DIR__ . '/../../themes/default/views');
+}
 
 // Auto-detect base path for flexible installation (main domain, subdomain, or subfolder)
 // Check if APP_BASE is defined in environment

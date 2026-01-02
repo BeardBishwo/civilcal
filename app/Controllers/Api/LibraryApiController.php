@@ -18,7 +18,13 @@ class LibraryApiController extends Controller
 
     public function browse()
     {
+        // Enforce JSON
+        header('Content-Type: application/json');
+        
         try {
+            // Disable HTML error reporting to prevent breaking JSON
+            ini_set('display_errors', 0);
+            
             $type = $_GET['type'] ?? null;
             $page = $_GET['page'] ?? 1;
             $status = $_GET['status'] ?? 'approved';

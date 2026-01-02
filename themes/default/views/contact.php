@@ -493,7 +493,7 @@ div.contact-card .form-label {
                         </div>
                         <div class="info-content">
                             <h3>Email Us</h3>
-                            <p>admin@newsbishwo.com</p>
+                            <p>admin@example.com</p>
                         </div>
                     </div>
                     

@@ -30,7 +30,7 @@
         <div class="container">
             <a class="navbar-brand" href="/">
                 <i class="fas fa-calculator me-2"></i>
-                Bishwo Calculator
+                <?= APP_NAME ?>
             </a>
             <div class="navbar-nav ms-auto">
                 <?php if ($is_owner): ?>
@@ -297,7 +297,7 @@
                             <div class="embed-preview-content">
                                 <iframe src="<?= htmlspecialchars($share_url) ?>" 
                                         width="100%" height="100%" frameborder="0"
-                                        title="Bishwo Calculator - Shared Calculation"></iframe>
+                                        title="<?= APP_NAME ?> - Shared Calculation"></iframe>
                             </div>
                         </div>
                     </div>
@@ -310,7 +310,7 @@
     <footer class="bg-light py-4 mt-5">
         <div class="container text-center">
             <p class="text-muted mb-0">
-                &copy; <?= date('Y') ?> Bishwo Calculator. 
+                &copy; <?= date('Y') ?> <?= APP_NAME ?>. 
                 <a href="/privacy" class="text-decoration-none">Privacy Policy</a> | 
                 <a href="/terms" class="text-decoration-none">Terms of Service</a>
             </p>
