@@ -759,9 +759,7 @@
     .bp-reward-card-compact { padding: 8px 10px; }
     .bp-stats-grid { grid-template-columns: 1fr; }
 }
-</style>
 
-/* Enhanced Reward Cards */
 .bp-reward-card {
     border: 1px solid var(--bp-border);
     background: rgba(255,255,255,0.02);
