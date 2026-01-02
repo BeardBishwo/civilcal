@@ -3,241 +3,395 @@
 ?>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --up-bg: #0a0e1a;
-    --up-card: rgba(255, 255, 255, 0.03);
-    --up-border: rgba(255, 255, 255, 0.08);
-    --up-primary: #7c5dff;
-    --up-accent: #00d1ff;
-    --up-success: #2ee6a8;
-    --up-text: #e8ecf2;
-    --up-muted: #9aa4b5;
+    --p-bg: #050505;
+    --p-card: rgba(15, 15, 20, 0.4);
+    --p-border: rgba(255, 255, 255, 0.08);
+    --p-primary: #8b5cf6;
+    --p-accent: #06b6d4;
+    --p-success: #10b981;
+    --p-text: #f3f4f6;
+    --p-muted: #9ca3af;
+    --p-glass: rgba(255, 255, 255, 0.03);
+    --p-glow: rgba(139, 92, 246, 0.15);
 }
 
-.upload-wrapper {
-    background: radial-gradient(circle at top right, #1a1f3c, #0a0e1a 60%);
+.upload-page-wrapper {
+    background: var(--p-bg);
     min-height: 100vh;
-    color: var(--up-text);
+    color: var(--p-text);
     font-family: 'Outfit', sans-serif;
-    padding: 60px 20px;
+    position: relative;
+    overflow-x: hidden;
+    padding: 80px 20px;
+}
+
+/* Mesh Gradient Background */
+.mesh-gradient {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0.6;
+    pointer-events: none;
+    filter: blur(100px);
+}
+
+.mesh-ball-1 {
+    position: absolute;
+    top: -10%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--p-primary) 0%, transparent 70%);
+    animation: drift 20s infinite alternate;
+}
+
+.mesh-ball-2 {
+    position: absolute;
+    bottom: -10%;
+    left: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--p-accent) 0%, transparent 70%);
+    animation: drift 25s infinite alternate-reverse;
+}
+
+@keyframes drift {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(100px, 50px) scale(1.1); }
+}
+
+.noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: 0.03;
+    pointer-events: none;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC42NSIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNuKSIvPjwvc3ZnPg==');
 }
 
 .premium-container {
-    max-width: 800px;
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
     margin: 0 auto;
 }
 
-.glass-card {
-    background: var(--up-card);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--up-border);
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+.premium-header {
+    text-align: center;
+    margin-bottom: 50px;
 }
 
-.gradient-banner {
-    background: linear-gradient(135deg, rgba(124, 93, 255, 0.2), rgba(0, 209, 255, 0.1));
-    border: 1px solid rgba(124, 93, 255, 0.3);
-    border-radius: 20px;
-    padding: 24px;
-    margin-bottom: 32px;
-    display: flex;
+.premium-header h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -2px;
+    background: linear-gradient(to right, #fff, var(--p-muted));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px;
+}
+
+.reward-stripe {
+    display: inline-flex;
     align-items: center;
-    gap: 20px;
+    gap: 12px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    padding: clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px);
+    border-radius: 100px;
+    color: var(--p-primary);
+    font-weight: 700;
+    font-size: 14px;
+    backdrop-filter: blur(10px);
 }
 
-.banner-icon {
-    width: 60px;
-    height: 60px;
-    background: var(--up-primary);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    box-shadow: 0 0 20px rgba(124, 93, 255, 0.4);
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px;
 }
 
-.form-group {
+.glass-field-card {
+    background: var(--p-card);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid var(--p-border);
+    border-radius: 28px;
+    padding: 32px;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+    grid-column: span 12;
+}
+
+.input-container {
     margin-bottom: 24px;
 }
 
-.form-label {
+.input-label {
     display: block;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--up-muted);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.form-control-premium {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--up-border);
-    border-radius: 14px;
-    padding: 14px 18px;
-    color: #fff;
-    font-size: 15px;
-    transition: all 0.3s;
-}
-
-.form-control-premium:focus {
-    outline: none;
-    border-color: var(--up-primary);
-    background: rgba(124, 93, 255, 0.05);
-    box-shadow: 0 0 0 4px rgba(124, 93, 255, 0.1);
-}
-
-.helper-text {
     font-size: 12px;
-    color: var(--up-muted);
-    margin-top: 6px;
+    font-weight: 800;
+    color: var(--p-muted);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
-.btn-upload-premium {
+.input-premium {
     width: 100%;
-    background: linear-gradient(135deg, var(--up-primary), #6366f1);
-    color: white;
-    border: none;
-    padding: 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--p-border);
     border-radius: 16px;
-    font-weight: 800;
+    padding: 16px 20px;
+    color: #fff;
     font-size: 16px;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.input-premium:focus {
+    outline: none;
+    border-color: var(--p-primary);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 20px var(--p-glow);
+}
+
+.input-premium::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.upload-zone {
+    position: relative;
+    border: 2px dashed var(--p-border);
+    border-radius: 20px;
+    padding: 40px 20px;
+    text-align: center;
+    transition: all 0.3s;
+    background: rgba(255, 255, 255, 0.01);
+    cursor: pointer;
+}
+
+.upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--p-primary);
+    background: rgba(139, 92, 246, 0.05);
+}
+
+.upload-zone i {
+    font-size: 40px;
+    color: var(--p-primary);
+    margin-bottom: 15px;
+    transition: transform 0.3s;
+}
+
+.upload-zone:hover i {
+    transform: translateY(-5px);
+}
+
+.upload-zone p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--p-muted);
+}
+
+.upload-zone span {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+.file-input-hidden {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.btn-transmit {
+    width: 100%;
+    background: linear-gradient(135deg, var(--p-primary), #6366f1);
+    color: #fff;
+    border: none;
+    padding: 22px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 18px;
+    font-family: 'Space Grotesk', sans-serif;
     letter-spacing: 1px;
     cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 10px 20px rgba(124, 93, 255, 0.3);
+    transition: all 0.4s;
+    box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-transmit::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg);
+    transition: 0.5s;
+}
+
+.btn-transmit:hover:not(:disabled) {
+    transform: translateY(-4px);
+    box-shadow: 0 25px 50px rgba(139, 92, 246, 0.4);
+}
+
+.btn-transmit:hover::after {
+    left: 100%;
+}
+
+.btn-transmit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.status-indicator {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
     margin-top: 10px;
 }
 
-.btn-upload-premium:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 30px rgba(124, 93, 255, 0.4);
-    filter: brightness(1.1);
+.status-indicator.visible { display: flex; }
+.status-success { color: var(--p-success); }
+.status-error { color: #ef4444; }
+
+.section-label {
+    grid-column: span 12;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 20px;
+    background: linear-gradient(to right, #fff, transparent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.btn-upload-premium:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.file-input-wrapper {
-    position: relative;
-    overflow: hidden;
-    display: inline-block;
-    width: 100%;
-}
-
-.file-input-wrapper input[type=file] {
-    position: absolute;
-    left: 0;
-    top: 0;
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-}
-
-.custom-file-btn {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 2px dashed var(--up-border);
-    border-radius: 14px;
-    padding: 30px;
-    justify-content: center;
-    color: var(--up-muted);
-    transition: all 0.3s;
-}
-
-.file-input-wrapper:hover .custom-file-btn {
-    border-color: var(--up-primary);
-    background: rgba(124, 93, 255, 0.05);
-    color: #fff;
+@media (max-width: 768px) {
+    .form-grid { gap: 16px; }
 }
 </style>
 
-<div class="upload-wrapper">
+<div class="upload-page-wrapper">
+    <div class="mesh-gradient">
+        <div class="mesh-ball-1"></div>
+        <div class="mesh-ball-2"></div>
+    </div>
+    <div class="noise-overlay"></div>
+
     <div class="premium-container">
-        <div class="gradient-banner">
-            <div class="banner-icon">
-                <i class="fas fa-coins"></i>
+        <header class="premium-header">
+            <h1>Transmitter</h1>
+            <?php 
+                $reward = \App\Services\SettingsService::get('library_upload_reward', 100);
+            ?>
+            <div class="reward-stripe">
+                <i class="fas fa-sparkles"></i>
+                <span>EARN <?php echo $reward; ?> BB COINS PER APPROVED ASSET</span>
             </div>
-            <div>
-                <h2 style="margin:0; font-size:20px; font-weight:800;">CONTRIBUTE & EARN</h2>
-                <p style="margin:4px 0 0; color:var(--up-muted); font-size:14px;">Get 100 BB Coins for every approved resource. Your city needs blueprints!</p>
+        </header>
+
+        <form id="upload-form" enctype="multipart/form-data">
+            <div class="form-grid">
+                
+                <div class="glass-field-card">
+                    <div class="input-container">
+                        <label class="input-label">Project Identity <span style="color:var(--p-primary)">*</span></label>
+                        <input type="text" name="title" required class="input-premium" placeholder="Enter a professional title...">
+                    </div>
+
+                    <div class="input-container" style="margin-bottom:0">
+                        <label class="input-label">Core Specifications <span style="color:var(--p-primary)">*</span></label>
+                        <textarea name="description" required class="input-premium" style="min-height: 120px;" placeholder="Describe the technical value of this submission..."></textarea>
+                    </div>
+                </div>
+
+                <div class="section-label">Classification</div>
+
+                <div class="glass-field-card" style="grid-column: span 6">
+                    <label class="input-label">Category</label>
+                    <select name="type" id="file-type" class="input-premium">
+                        <option value="cad">AutoCAD (.dwg/.dxf)</option>
+                        <option value="solidworks">SolidWorks (.sldprt/.sldasm)</option>
+                        <option value="excel">Excel (.xlsx/.xlsm)</option>
+                        <option value="pdf">PDF Documentation</option>
+                        <option value="doc">Word / Text</option>
+                        <option value="image">Image / Sketch</option>
+                    </select>
+                </div>
+
+                <div class="glass-field-card" style="grid-column: span 6">
+                    <label class="input-label">Unlock Price (BB)</label>
+                    <input type="number" name="price" min="0" value="0" class="input-premium">
+                </div>
+
+                <div class="glass-field-card" style="grid-column: span 12">
+                    <label class="input-label">Discovery Tags</label>
+                    <input type="text" name="tags" id="hashtags-input" class="input-premium" placeholder="structural, villa, cad, architectural">
+                    <p style="font-size:11px; color:var(--p-muted); margin:8px 0 0">Max 5 hashtags. Help users find your contribution.</p>
+                </div>
+
+                <div class="section-label">Encapsulated Assets</div>
+
+                <div class="glass-field-card" style="grid-column: span 6">
+                    <label class="input-label">Main Payload <span style="color:var(--p-primary)">*</span></label>
+                    <div class="upload-zone" id="main-zone">
+                        <input type="file" name="file" id="main-file" class="file-input-hidden" required>
+                        <i class="fas fa-file-export"></i>
+                        <p id="main-filename">Deposit Primary File</p>
+                        <span>Max 15MB (.dwg, .pdf, .xlsx, .zip)</span>
+                    </div>
+                </div>
+
+                <div class="glass-field-card" style="grid-column: span 6">
+                    <label class="input-label" id="preview-label">Visual Preview</label>
+                    <div class="upload-zone" id="preview-zone">
+                        <input type="file" name="preview" id="preview-file" class="file-input-hidden" accept="image/*">
+                        <i class="fas fa-image"></i>
+                        <p id="preview-filename">Attach Snapshot</p>
+                        <span>Highly recommended for CAD/Excel</span>
+                    </div>
+                </div>
+
+                <div style="grid-column: span 12">
+                    <button type="submit" id="submit-btn" class="btn-transmit">
+                        <i class="fas fa-satellite-dish"></i>
+                        <span>INITIALIZE TRANSMISSION</span>
+                    </button>
+                    
+                    <div id="status-indicator" class="status-indicator">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                        <span id="status-text">Synchronizing with vault...</span>
+                    </div>
+                </div>
+
             </div>
-        </div>
-
-        <div class="glass-card">
-            <h1 style="margin:0 0 32px; font-size:32px; font-weight:800; letter-spacing:-1px;">Blueprint Submission</h1>
-            
-            <form id="upload-form" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label class="form-label">Resource Title</label>
-                    <input type="text" name="title" required class="form-control-premium" placeholder="e.g., Structural Analysis of 3BHK Villa">
-                    <div class="helper-text">Give it a clear, professional name.</div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Technical Description</label>
-                    <textarea name="description" class="form-control-premium" style="min-height: 120px;" placeholder="Explain what makes this resource valuable..."></textarea>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 form-group">
-                        <label class="form-label">Asset Category</label>
-                        <select name="type" id="file-type" class="form-control-premium">
-                            <option value="cad">AutoCAD (.dwg/.dxf)</option>
-                            <option value="excel">Excel (.xlsx/.xlsm)</option>
-                            <option value="pdf">PDF Documentation</option>
-                            <option value="doc">Word / Text</option>
-                            <option value="image">Image / Sketch</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label class="form-label">Unlock Price (BB)</label>
-                        <input type="number" name="price" min="0" value="0" class="form-control-premium">
-                        <div class="helper-text">0 = Free. Users pay this to download.</div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Primary File</label>
-                    <div class="file-input-wrapper">
-                        <div class="custom-file-btn" id="main-file-label">
-                            <i class="fas fa-file-upload fa-2x"></i>
-                            <span>Drop file here or click to browse</span>
-                        </div>
-                        <input type="file" name="file" id="main-file" required>
-                    </div>
-                    <div class="helper-text">Max 15MB. Supported: dwg, dxf, pdf, xls, doc, jpg, png.</div>
-                </div>
-
-                <div class="form-group" id="preview-section">
-                    <label class="form-label" id="preview-label">Visual Preview (Watermarked)</label>
-                    <div class="file-input-wrapper">
-                        <div class="custom-file-btn" id="preview-file-label">
-                            <i class="fas fa-image fa-2x"></i>
-                            <span>Upload a screenshot/preview image</span>
-                        </div>
-                        <input type="file" name="preview" id="preview-file" accept="image/*">
-                    </div>
-                    <div class="helper-text">Required for CAD files so users can see what they're unlocking.</div>
-                </div>
-
-                <button type="submit" id="submit-btn" class="btn-upload-premium">
-                    <i class="fas fa-rocket me-2"></i> TRANSMIT BLUEPRINT
-                </button>
-            </form>
-        </div>
+        </form>
     </div>
 </div>
 
@@ -246,38 +400,90 @@ const fileType = document.getElementById('file-type');
 const previewInput = document.getElementById('preview-file');
 const previewLabel = document.getElementById('preview-label');
 const mainFileInput = document.getElementById('main-file');
-const mainFileLabel = document.querySelector('#main-file-label span');
-const previewFileLabel = document.querySelector('#preview-file-label span');
+const hashtagsInput = document.getElementById('hashtags-input');
+
+const mainZone = document.getElementById('main-zone');
+const previewZone = document.getElementById('preview-zone');
+const mainFilename = document.getElementById('main-filename');
+const previewFilename = document.getElementById('preview-filename');
+
+const statusIndicator = document.getElementById('status-indicator');
+const statusText = document.getElementById('status-text');
+
+const extensionMap = {
+    'cad': ['dwg', 'dxf'],
+    'solidworks': ['sldprt', 'sldasm'],
+    'excel': ['xls', 'xlsx', 'xlsm'],
+    'pdf': ['pdf'],
+    'image': ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    'doc': ['doc', 'docx']
+};
 
 fileType.addEventListener('change', () => {
-    if (fileType.value === 'cad') {
+    if (fileType.value === 'cad' || fileType.value === 'solidworks') {
         previewInput.required = true;
-        previewLabel.innerHTML = 'Visual Preview <span style="color:var(--up-primary)">(REQUIRED FOR CAD)</span>';
+        previewLabel.innerHTML = 'Visual Preview <span style="color:var(--p-primary)">(REQUIRED)</span>';
     } else {
         previewInput.required = false;
-        previewLabel.textContent = 'Visual Preview (Optional)';
+        previewLabel.textContent = 'Visual Preview';
     }
+});
+
+// Drag and drop visuals
+[mainFileInput, previewInput].forEach(input => {
+    const zone = input.parentElement;
+    
+    input.addEventListener('dragenter', () => zone.classList.add('dragover'));
+    input.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    input.addEventListener('drop', () => zone.classList.remove('dragover'));
 });
 
 mainFileInput.addEventListener('change', function() {
     if (this.files && this.files[0]) {
-        mainFileLabel.textContent = this.files[0].name;
+        mainFilename.textContent = this.files[0].name;
+        mainFilename.style.color = 'var(--p-primary)';
+        mainFilename.style.fontWeight = '700';
+    } else {
+        mainFilename.textContent = 'Deposit Primary File';
     }
 });
 
 previewInput.addEventListener('change', function() {
     if (this.files && this.files[0]) {
-        previewFileLabel.textContent = this.files[0].name;
+        previewFilename.textContent = this.files[0].name;
+        previewFilename.style.color = 'var(--p-primary)';
+        previewFilename.style.fontWeight = '700';
+    } else {
+        previewFilename.textContent = 'Attach Snapshot';
     }
 });
 
 document.getElementById('upload-form').addEventListener('submit', async function(e) {
     e.preventDefault();
-    const btn = document.getElementById('submit-btn');
-    const originalText = btn.innerHTML;
     
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> TRANSMITTING...';
+    // 1. Validate Hashtags
+    const tags = hashtagsInput.value.split(',').map(t => t.trim()).filter(t => t !== '');
+    if (tags.length > 5) {
+        showStatus('Error: Payload exceeds 5-tag discovery limit.', 'error');
+        return;
+    }
+
+    // 2. Validate File Extension Match
+    const selectedType = fileType.value;
+    const file = mainFileInput.files[0];
+    if (file) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        const allowed = extensionMap[selectedType];
+        if (allowed && !allowed.includes(ext)) {
+            showStatus(`Error: Protocol mismatch for ${selectedType}. Expected: ${allowed.join(', ')}`, 'error');
+            return;
+        }
+    }
+
+    const btn = document.getElementById('submit-btn');
+    
     btn.disabled = true;
+    showStatus('Uplink active. Transmitting blueprint payload...', 'loading');
     
     try {
         const formData = new FormData(this);
@@ -291,23 +497,36 @@ document.getElementById('upload-form').addEventListener('submit', async function
         const data = await response.json();
         
         if (data.success) {
-            btn.innerHTML = '<i class="fas fa-check"></i> SUCCESS! REDIRECTING...';
-            btn.style.background = 'var(--up-success)';
-            
-            // Show alert for definitive feedback
-            alert('Blueprint transmitted successfully to the vault! Redirecting to library...');
-            
-            window.location.href = '<?php echo app_base_url("/library"); ?>';
+            showStatus('Asset secured. Vault synchronization complete.', 'success');
+            setTimeout(() => {
+                window.location.href = '<?php echo app_base_url("/library"); ?>';
+            }, 1500);
         } else {
-            alert('Transmission Failed: ' + data.message);
-            btn.innerHTML = originalText;
+            showStatus('Uplink terminated: ' + data.message, 'error');
             btn.disabled = false;
         }
     } catch (error) {
         console.error('Upload Error:', error);
-        alert('Signal Loss: Failed to connect to server.');
-        btn.innerHTML = originalText;
+        showStatus('Signal Loss: Vault connection disrupted.', 'error');
         btn.disabled = false;
     }
 });
+
+function showStatus(msg, type) {
+    statusIndicator.className = 'status-indicator visible';
+    statusText.textContent = msg;
+    
+    const icon = statusIndicator.querySelector('i');
+    
+    if (type === 'loading') {
+        icon.className = 'fas fa-circle-notch fa-spin';
+        statusIndicator.style.color = '#fff';
+    } else if (type === 'success') {
+        icon.className = 'fas fa-check-circle';
+        statusIndicator.style.color = 'var(--p-success)';
+    } else {
+        icon.className = 'fas fa-exclamation-triangle';
+        statusIndicator.style.color = '#ef4444';
+    }
+}
 </script>

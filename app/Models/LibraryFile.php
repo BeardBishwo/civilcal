@@ -17,15 +17,16 @@ class LibraryFile
     {
         $stmt = $this->db->getPdo()->prepare("
             INSERT INTO library_files (
-                uploader_id, title, description, file_path, file_type, 
+                uploader_id, title, description, tags, file_path, file_type, 
                 file_size_kb, price_coins, status, file_hash, preview_path
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
             $data['uploader_id'],
             $data['title'],
             $data['description'] ?? '',
+            $data['tags'] ?? null,
             $data['file_path'],
             $data['file_type'],
             $data['file_size_kb'] ?? 0,
@@ -87,16 +88,26 @@ class LibraryFile
         return false;
     }
 
-    public function getPending()
+    public function getPending($type = null)
     {
-        $stmt = $this->db->getPdo()->query("
+        $query = "
             SELECT lf.*, u.username as uploader_name, u.email as uploader_email
             FROM library_files lf 
             LEFT JOIN users u ON lf.uploader_id = u.id 
-            WHERE lf.status = 'pending' 
-            ORDER BY lf.created_at ASC
-        ");
-        return $stmt->fetchAll();
+            WHERE lf.status = 'pending'
+        ";
+        
+        $params = [];
+        if ($type) {
+            $query .= " AND lf.file_type = ?";
+            $params[] = $type;
+        }
+        
+        $query .= " ORDER BY lf.created_at ASC";
+        
+        $stmt = $this->db->getPdo()->prepare($query);
+        $stmt->execute($params);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function getKeyResources($userId = null, $type = null, $limit = 20, $offset = 0)
@@ -133,10 +144,10 @@ class LibraryFile
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function approve($id)
+    public function approve($id, $rewardCoins = 100)
     {
-        $stmt = $this->db->getPdo()->prepare("UPDATE library_files SET status = 'approved', updated_at = NOW() WHERE id = ?");
-        return $stmt->execute([$id]);
+        $stmt = $this->db->getPdo()->prepare("UPDATE library_files SET status = 'approved', reward_coins = ?, approved_at = NOW(), updated_at = NOW() WHERE id = ?");
+        return $stmt->execute([$rewardCoins, $id]);
     }
 
     public function reject($id, $reason = '')

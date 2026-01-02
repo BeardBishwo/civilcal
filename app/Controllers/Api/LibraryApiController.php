@@ -49,12 +49,18 @@ class LibraryApiController extends Controller
             $libraryFileModel = new LibraryFile();
             
             if ($status === 'pending') {
-                $files = $libraryFileModel->getPending(); // Pending usually small list, ignoring paging for now
+                $files = $libraryFileModel->getPending($type);
+                $stats = [];
+                if (isset($_GET['admin_mode'])) {
+                    $db = \App\Core\Database::getInstance();
+                    $stats['approved_today'] = $db->getPdo()->query("SELECT COUNT(*) FROM library_files WHERE status = 'approved' AND DATE(approved_at) = CURRENT_DATE")->fetchColumn();
+                    $stats['rewards_disbursed'] = $db->getPdo()->query("SELECT SUM(reward_coins) FROM library_files WHERE status = 'approved'")->fetchColumn() ?: 0;
+                }
+                $this->json(['success' => true, 'files' => $files, 'stats' => $stats]);
             } else {
                 $files = $libraryFileModel->getKeyResources($uid, $type, $limit, $offset);
+                $this->json(['success' => true, 'files' => $files]);
             }
-
-            $this->json(['success' => true, 'files' => $files]);
 
         } catch (Exception $e) {
             $this->json(['success' => false, 'message' => $e->getMessage()], 500);
@@ -76,25 +82,43 @@ class LibraryApiController extends Controller
 
             $title = trim($_POST['title'] ?? '');
             $description = trim($_POST['description'] ?? '');
+            $tags = trim($_POST['tags'] ?? '');
             $fileType = $_POST['type'] ?? 'other';
             $priceCoins = max(0, (int)($_POST['price'] ?? 0));
+
+            // Validate Hashtags (Max 5)
+            $tagArray = array_filter(array_map('trim', explode(',', $tags)));
+            if (count($tagArray) > 5) {
+                throw new Exception('Maximum 5 hashtags allowed.', 400);
+            }
 
             if (empty($title)) {
                 throw new Exception('Title is required', 400);
             }
 
-            $allowedExtensions = ['dwg', 'dxf', 'pdf', 'xlsx', 'xls', 'xlsm', 'docx', 'doc', 'jpg', 'jpeg', 'png'];
-            $maxSize = 15 * 1024 * 1024; // 15MB
+            $extensionMap = [
+                'cad' => ['dwg', 'dxf'],
+                'solidworks' => ['sldprt', 'sldasm'],
+                'excel' => ['xls', 'xlsx', 'xlsm'],
+                'pdf' => ['pdf'],
+                'image' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                'doc' => ['doc', 'docx'],
+                'other' => ['dwg', 'dxf', 'pdf', 'xlsx', 'xls', 'xlsm', 'docx', 'doc', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'zip', 'rar']
+            ];
 
             $file = $_FILES['file'];
-            
+            $maxSize = 15 * 1024 * 1024; // 15MB
+
             if ($file['size'] > $maxSize) {
                 throw new Exception('File size exceeds 15MB limit', 400);
             }
 
             $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-            if (!in_array($ext, $allowedExtensions)) {
-                throw new Exception('Invalid file type. Allowed: ' . implode(', ', $allowedExtensions), 400);
+            
+            // Validate category-extension match
+            $allowedForCategory = $extensionMap[$fileType] ?? $extensionMap['other'];
+            if (!in_array($ext, $allowedForCategory)) {
+                throw new Exception("Invalid format for category '{$fileType}'. Expected: " . implode(', ', $allowedForCategory), 400);
             }
 
             $uploadDir = STORAGE_PATH . '/library/quarantine';
@@ -179,23 +203,21 @@ class LibraryApiController extends Controller
                          }
                      }
                 }
-            } else if ($fileType === 'cad') {
-                // FORCE PREVIEW FOR CAD
-                throw new Exception('A preview image (JPG/PNG) is required for CAD files.', 400); 
+            } else if ($fileType === 'cad' || $fileType === 'solidworks') {
+                // FORCE PREVIEW FOR CAD/SolidWorks
+                throw new Exception('A preview image (JPG/PNG) is required for CAD/SolidWorks files.', 400); 
             }
 
             // Auto-generate preview for Images?
-            // If file_type is 'image' (jpg/png), we can use the file itself as preview or make a thumb.
             if ($fileType === 'image' && !$previewPath) {
-                 // For now, simple: use the file path itself if we copy it to public? 
-                 // Actually file is in quarantine (protected). better to wait for admin approval logic to move it.
-                 // But we can flag it.
+                 // Logic to make thumb could go here
             }
 
             $fileId = $libraryFileModel->create([
                 'uploader_id' => $uid,
                 'title' => $title,
                 'description' => $description,
+                'tags' => $tags,
                 'file_path' => 'quarantine/' . $filename,
                 'file_type' => $fileType,
                 'file_size_kb' => round($file['size'] / 1024),
@@ -239,41 +261,53 @@ class LibraryApiController extends Controller
             if ($file->status !== 'pending') throw new Exception('File is not pending approval');
 
             if ($action === 'approve') {
-                $sourcePath = STORAGE_PATH . '/library/' . $file->file_path;
-                $fileType = $file->file_type;
-                $targetDir = STORAGE_PATH . '/library/approved/' . $fileType;
-                
-                if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
+            $sourcePath = STORAGE_PATH . '/library/' . $file->file_path;
+            $fileType = $file->file_type;
+            $targetDir = STORAGE_PATH . '/library/approved/' . $fileType;
+            
+            if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
 
-                $fileName = basename($file->file_path);
-                $targetLink = 'approved/' . $fileType . '/' . $fileName;
-                $targetPath = $targetDir . '/' . $fileName;
+            $fileName = basename($file->file_path);
+            $targetPathRelative = 'approved/' . $fileType . '/' . $fileName;
+            $targetPath = $targetDir . '/' . $fileName;
 
-                if (file_exists($sourcePath)) {
-                    if (!rename($sourcePath, $targetPath)) {
-                        throw new Exception('Failed to move file', 500);
-                    }
-                    
-                    // Update Path manually via DB as model doesn't have update method for path yet
-                    $db = \App\Core\Database::getInstance();
-                    $stmt = $db->getPdo()->prepare("UPDATE library_files SET file_path = ? WHERE id = ?");
-                    $stmt->execute([$targetLink, $fileId]);
+            // Handle reward
+            $customReward = (int)($input['reward_amount'] ?? 100);
 
-                } else {
-                     // Log warning but proceed if testing
+            if (file_exists($sourcePath)) {
+                // Ensure target directory exists
+                if (!is_dir(dirname($targetPath))) {
+                    mkdir(dirname($targetPath), 0755, true);
                 }
 
-                $libraryFileModel->approve($fileId);
-
-                $reward = 100;
-                if ($fileType === 'cad') $reward = 200;
-                if ($fileType === 'pdf') $reward = 30;
-
-                $userModel->addCoins($file->uploader_id, $reward, 'Reward for uploading: ' . $file->title, $fileId);
+                if (!rename($sourcePath, $targetPath)) {
+                    // Fallback to copy if rename fails (across partitions)
+                    if (!copy($sourcePath, $targetPath)) {
+                        throw new Exception('Failed to move/copy file to approved directory: ' . $sourcePath, 500);
+                    }
+                    unlink($sourcePath);
+                }
                 
-                $this->json(['success' => true, 'message' => 'Approved and coins awarded']);
+                // Update Path in DB
+                $db = \App\Core\Database::getInstance();
+                $stmt = $db->getPdo()->prepare("UPDATE library_files SET file_path = ? WHERE id = ?");
+                $stmt->execute([$targetPathRelative, $fileId]);
 
-            } elseif ($action === 'reject') {
+            } else {
+                 // If file is missing, we check if it's already in the target (maybe already processed?)
+                 if (!file_exists($targetPath)) {
+                    throw new Exception('Source file missing in quarantine: ' . $sourcePath, 404);
+                 }
+            }
+
+            $libraryFileModel->approve($fileId, $customReward);
+
+            // Add coins to uploader
+            $userModel->addCoins($file->uploader_id, $customReward, 'Reward for approved resource: ' . $file->title, $fileId);
+            
+            $this->json(['success' => true, 'message' => 'Approved and ' . $customReward . ' coins awarded.']);
+
+        } elseif ($action === 'reject') {
                 $reason = $input['reason'] ?? 'Did not meet guidelines';
                 $libraryFileModel->reject($fileId, $reason);
                 $this->json(['success' => true, 'message' => 'Rejected']);
@@ -360,15 +394,19 @@ class LibraryApiController extends Controller
             if (!$fileId) die('File ID required');
 
             $libraryFileModel = new LibraryFile();
-            $file = $libraryFileModel->find($fileId);
+        $file = $libraryFileModel->find($fileId);
 
-            if (!$file || $file->status !== 'approved') die('File unavailable');
+        if (!$file) die('File not found');
 
-            $userModel = new User();
+        $userModel = new User();
+        $isAdmin = $userModel->isAdmin($user->id);
+
+        if ($file->status !== 'approved' && !$isAdmin) {
+             die('File unavailable or pending approval.');
+        }
             
             // CHECK PERMISSIONS (Premium Logic)
             $isUploader = ($file->uploader_id == $user->id);
-            $isAdmin = $userModel->isAdmin($user->id);
             
             if (!$isUploader && !$isAdmin) {
                 // If price > 0, check unlock

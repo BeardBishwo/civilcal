@@ -229,7 +229,21 @@ $breadcrumbs = [
         transition: all 0.2s;
     }
     .btn-input-append:hover { background: #e5e7eb; color: #1f2937; }
+
+    /* Drag and Drop styles */
+    .sortable-ghost {
+        opacity: 0.4;
+        background: #e5e7eb !important;
+        border: 2px dashed #4f46e5 !important;
+    }
+    .sortable-chosen {
+        background: #fff !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+    }
 </style>
+
+<!-- SortableJS -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
 <script>
     let menuItems = <?php echo json_encode($menuData['items']); ?> || [];
@@ -300,6 +314,7 @@ $breadcrumbs = [
                     </button>
                 `;
             }
+            row.setAttribute('data-id', index);
             list.appendChild(row);
 
             // Initialize TinyMCE for text blocks
@@ -309,6 +324,42 @@ $breadcrumbs = [
         });
         
         updateHiddenInput();
+        initializeSortable();
+    }
+
+    function initializeSortable() {
+        const list = document.getElementById('menu-items-list');
+        if (!list) return;
+
+        Sortable.create(list, {
+            animation: 150,
+            handle: '.item-drag-handle',
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            onEnd: function() {
+                reorderItems();
+            }
+        });
+    }
+
+    function reorderItems() {
+        const list = document.getElementById('menu-items-list');
+        const rows = list.querySelectorAll('.menu-builder-item');
+        const newOrder = [];
+        
+        rows.forEach(row => {
+            const index = row.getAttribute('data-id');
+            newOrder.push(menuItems[index]);
+        });
+        
+        menuItems = newOrder;
+        // We don't render again to avoid losing focus/input state, but we update the hidden input
+        updateHiddenInput();
+        
+        // Update data-id attributes for future reorders
+        rows.forEach((row, i) => {
+            row.setAttribute('data-id', i);
+        });
     }
 
     function initItemEditor(id, index) {

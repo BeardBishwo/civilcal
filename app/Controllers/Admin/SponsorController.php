@@ -18,7 +18,7 @@ class SponsorController extends Controller
         
         // Ensure Admin
         $user = Auth::user();
-        if (!$user || $user['role'] !== 'admin') {
+        if (!$user || $user->role !== 'admin') {
             header('Location: /login');
             exit;
         }

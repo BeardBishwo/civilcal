@@ -318,7 +318,7 @@ if (
             </button>
         </div>
     </div>
-    <?php include __DIR__ . '/resource_hud.php'; ?>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const topHeader = document.getElementById('topHeaderBar');
@@ -456,44 +456,7 @@ if (
                             ];
                         }
                         
-                        // Inject Quiz Menu Item if not present
-                        $hasQuiz = false;
-                        foreach ($primaryMenuItems as $item) {
-                            $t = $item['name'] ?? ($item['title'] ?? ($item['label'] ?? ''));
-                            if (stripos($t, 'Quiz') !== false) {
-                                $hasQuiz = true;
-                                break;
-                            }
-                        }
-                        if (!$hasQuiz) {
-                            // Inject Gamification Hub
-                            array_unshift($primaryMenuItems, 
-                                [
-                                    'title' => 'My City', 
-                                    'url' => '/quiz/city', 
-                                    'icon' => 'fa-city', 
-                                    'is_active' => true
-                                ],
-                                [
-                                    'title' => 'Shop', 
-                                    'url' => '/quiz/shop', 
-                                    'icon' => 'fa-store', 
-                                    'is_active' => true
-                                ],
-                                [
-                                    'title' => 'Battle Pass', 
-                                    'url' => '/quiz/battle-pass', 
-                                    'icon' => 'fa-ticket-alt', 
-                                    'is_active' => true
-                                ],
-                                [
-                                    'title' => 'Quiz Portal', 
-                                    'url' => '/quiz', 
-                                    'icon' => 'fa-graduation-cap', 
-                                    'is_active' => true
-                                ]
-                            );
-                        }
+
 
 
                         foreach ($primaryMenuItems as $item):

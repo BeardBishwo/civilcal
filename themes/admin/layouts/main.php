@@ -915,25 +915,11 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                             <li><a href="<?php echo app_base_url('admin/quiz/leaderboard'); ?>">Leaderboard</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/settings'); ?>">Settings</a></li>
                             <li><a href="<?php echo app_base_url('admin/library'); ?>">Blueprint Vault</a></li>
+                            <li><a href="<?php echo app_base_url('admin/settings/economy'); ?>"><i class="fas fa-coins text-warning"></i> Economy Settings</a></li>
                         </ul>
                     </li>
 
-                    <!-- Gamenta Gamification -->
-                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/quiz/') !== false ? 'active' : ''; ?>">
-                        <a href="javascript:void(0)" class="nav-link">
-                            <i class="nav-icon fas fa-gamepad"></i>
-                            <span class="nav-text">Gamenta World</span>
-                            <i class="nav-arrow fas fa-chevron-right"></i>
-                        </a>
-                        <ul class="nav-submenu">
-                            <li><a href="<?php echo app_base_url('quiz/city'); ?>"><i class="fas fa-city text-info"></i> Civil City</a></li>
-                            <li><a href="<?php echo app_base_url('quiz/shop'); ?>"><i class="fas fa-store text-warning"></i> Temple Market</a></li>
-                            <li><a href="<?php echo app_base_url('quiz/sawmill'); ?>"><i class="fas fa-hammer text-danger"></i> The Sawmill</a></li>
-                            <li><a href="<?php echo app_base_url('quiz/missions'); ?>"><i class="fas fa-tasks text-success"></i> Daily Missions</a></li>
-                            <li><a href="<?php echo app_base_url('quiz/battle-pass'); ?>"><i class="fas fa-ticket-alt text-primary"></i> Battle Pass</a></li>
-                            <li><a href="<?php echo app_base_url('admin/settings/economy'); ?>"><i class="fas fa-cog text-secondary"></i> Economy Settings</a></li>
-                        </ul>
-                    </li>
+
 
 
                     <!-- Activity Logs -->
@@ -1031,13 +1017,13 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                     <div class="breadcrumb">
                         <span class="breadcrumb-item">
                             <i class="fas fa-home"></i>
-                            <a href="<?php echo app_base_url('admin'); ?>">Admin</a>
+                            <a href="<?php echo app_base_url('admin'); ?>"><?php echo htmlspecialchars($site_name); ?></a>
                         </span>
                         <?php if (isset($breadcrumbs)): ?>
                             <?php foreach ($breadcrumbs as $crumb): ?>
                                 <span class="breadcrumb-divider">/</span>
                                 <span class="breadcrumb-item">
-                                    <?php if (isset($crumb['url'])): ?>
+                                    <?php if (!empty($crumb['url'])): ?>
                                         <a href="<?php echo $crumb['url']; ?>"><?php echo $crumb['title']; ?></a>
                                     <?php else: ?>
                                         <?php echo $crumb['title']; ?>

@@ -195,7 +195,7 @@ if ($show_footer): ?>
             onerror="console.error('Error loading back-to-top.js:', event)"
             onload="console.log('Back to top script loaded successfully')">
     </script>
-    <script src="<?php echo $tm->themeUrl('assets/js/quest-tracker.js'); ?>" defer></script>
+
     <script src="<?php echo app_base_url('public/assets/js/global-notifications.js'); ?>"></script>
 
     <?php include __DIR__ . '/floating-calculator.php'; ?>
