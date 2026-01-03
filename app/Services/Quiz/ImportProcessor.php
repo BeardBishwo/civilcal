@@ -114,6 +114,7 @@ class ImportProcessor {
         return [
             'batch_id' => $batchId,
             'uploader_id' => $uploaderId,
+            'contest_id' => $row['contest_id'] ?? null,
             'syllabus_main_id' => $mainId,
             'syllabus_node_id' => $subId,
             'question' => $this->cleanText($qText),

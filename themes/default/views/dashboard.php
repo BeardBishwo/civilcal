@@ -206,6 +206,27 @@ function toggleStudyMode() {
             <?php endif; ?>
         </div>
 
+        <!-- NEW: Contest Engine CTA -->
+        <div class="quest-card" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border: 1px solid rgba(139, 92, 246, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <div>
+                    <h3 style="font-weight: 800; color: white; margin: 0; font-size: 1.4rem;">Battle Royale</h3>
+                    <p style="color: #c4b5fd; font-size: 0.9rem; margin: 5px 0 0;">Win big in the Lucky Draw!</p>
+                </div>
+                <div style="background: rgba(251, 191, 36, 0.2); color: #fbbf24; padding: 5px 12px; border-radius: 20px; font-weight: 800; display: flex; align-items: center; gap: 5px; font-size: 0.8rem;">
+                    <i class="fas fa-trophy"></i> LIVE
+                </div>
+            </div>
+
+            <div style="color: #a5b4fc; font-size: 0.85rem; margin-bottom: 20px;">
+                Join high-stakes contests against top engineers. Score top marks to enter the pool of potential winners!
+            </div>
+
+            <a href="<?php echo app_base_url('/contests'); ?>" class="btn" style="background: linear-gradient(to right, #6366f1, #8b5cf6); color: white; width: 100%; border-radius: 12px; font-weight: 800; padding: 15px; text-decoration: none; display: block; text-align: center; transition: all 0.2s; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">
+                <i class="fas fa-bolt" style="margin-right: 5px;"></i> Enter Arena
+            </a>
+        </div>
+
         <!-- Daily Mission Card (Tool of the Day) -->
         <div class="quest-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">

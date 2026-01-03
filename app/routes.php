@@ -2031,6 +2031,12 @@ $router->add("GET", "/admin/quiz/analytics", "Admin\\Quiz\\ResultsController@ind
 $router->add("GET", "/admin/quiz/settings", "Admin\\SettingsController@quiz", ["auth", "admin"]);
 $router->add("POST", "/admin/settings/economy/reset-ranks", "Admin\\SettingsController@resetRanks", ["auth", "admin"]);
 
+// Contest Engine (Admin)
+$router->add("GET", "/admin/contest", "Admin\\Quiz\\ContestController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/contest/store", "Admin\\Quiz\\ContestController@store", ["auth", "admin"]);
+$router->add("POST", "/admin/contest/toggle-auto", "Admin\\Quiz\\ContestController@toggleAuto", ["auth", "admin"]);
+$router->add("POST", "/admin/contest/process/{id}", "Admin\\Quiz\\ContestController@process", ["auth", "admin"]);
+
 // In-Quiz Lifeline API
 $router->add("POST", "/api/quiz/lifeline/use", "Quiz\\LifelineController@use", ["auth"]);
 
@@ -2114,6 +2120,15 @@ $router->add("POST", "/api/firms/handle-request", "Quiz\\FirmController@handleJo
 $router->add("GET", "/quiz/firms/leave", "Quiz\\FirmController@leave", ["auth"]);
 
 
+
+// ============================================
+// CONTEST ENGINE (STUDENT)
+// ============================================
+$router->add("GET", "/contests", "Quiz\\StudentContestController@index", ["auth"]);
+$router->add("GET", "/contest/room/{id}", "Quiz\\StudentContestController@room", ["auth"]);
+$router->add("POST", "/contest/join/{id}", "Quiz\\StudentContestController@join", ["auth"]);
+$router->add("POST", "/contest/submit/{id}", "Quiz\\StudentContestController@submit", ["auth"]);
+$router->add("GET", "/contest/result/{id}", "Quiz\\StudentContestController@result", ["auth"]);
 
 // ============================================
 // CALCULATOR PERMALINK CATCH-ALL ROUTE

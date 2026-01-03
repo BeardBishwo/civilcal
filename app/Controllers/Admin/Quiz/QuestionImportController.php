@@ -58,14 +58,14 @@ class QuestionImportController extends Controller
                 'question', 
                 'option 1', 'option 2', 'option 3', 'option 4', 'option 5', 
                 'answer1', 'answer2', 'answer3', 'answer4', 'answer5', // Multiple Answers
-                'level', 'note', 'level_map_syntax'
+                'level', 'note', 'level_map_syntax', 'contest_id'
             ];
         } else {
             // --- STANDARD TEMPLATE (For MCQ/TF) ---
             $headers = [
                 'category', 'subcategory', 'language_id', 'question_type', 
                 'question', 'option 1', 'option 2', 'option 3', 'option 4', 'option 5', 
-                'answer', 'level', 'note', 'level_map_syntax'
+                'answer', 'level', 'note', 'level_map_syntax', 'contest_id'
             ];
         }
         $sheet->fromArray($headers, NULL, 'A1');
@@ -314,10 +314,12 @@ class QuestionImportController extends Controller
                      $rowData['level'] = $row[15] ?? null;
                      $rowData['note'] = $row[16] ?? null;
                      $rowData['level_map'] = $row[17] ?? null;
+                     $rowData['contest_id'] = $row[18] ?? null;
                  } else {
                      // Simple
                      $rowData['answer1'] = null; // Clear advanced stuff to avoid confusion
                      $rowData['answer2'] = null;
+                     $rowData['contest_id'] = $row[14] ?? null;
                  }
                  
                  if (empty($rowData['question'])) continue;
@@ -342,7 +344,8 @@ class QuestionImportController extends Controller
                      'correct_answer_json' => $cleanData['correct_answer_json'], // Staging Field: correct_answer_json
                      'explanation' => $cleanData['explanation'],
                      'level' => $cleanData['level'],
-                     'level_map' => $cleanData['level_map'] ?? null
+                     'level_map' => $cleanData['level_map'] ?? null,
+                     'contest_id' => $cleanData['contest_id']
                  ]);
                  
                  $processedCount++;
@@ -497,6 +500,20 @@ class QuestionImportController extends Controller
              }
              
              $this->db->delete('question_import_staging', "id = :id", ['id' => $row['id']]);
+
+             // --- CONTEST INJECTION LOGIC ---
+             if (!empty($row['contest_id'])) {
+                 $contest = $this->db->findOne('contests', ['id' => $row['contest_id']]);
+                 if ($contest) {
+                     $currentQs = json_decode($contest['questions'], true) ?: [];
+                     if (!in_array($newQId, $currentQs)) {
+                         $currentQs[] = $newQId;
+                         $this->db->update('contests', [
+                             'questions' => json_encode($currentQs)
+                         ], "id = :id", ['id' => $row['contest_id']]);
+                     }
+                 }
+             }
         }
         
         echo json_encode(['status' => 'success']);
