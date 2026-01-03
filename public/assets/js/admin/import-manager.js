@@ -88,7 +88,7 @@ const ImportManager = {
                     <td class="fw-bold text-primary">${row.category}</td>
                     <td class="text-dark">${row.question_text.substring(0, 80)}...</td>
                     <td><span class="badge bg-secondary rounded-pill px-3">${row.type}</span></td>
-                    <td><span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Ready</span></td>
+                    <td>${this.getStatusBadge('ready')}</td>
                 </tr>
             `).join('');
 
@@ -178,11 +178,25 @@ const ImportManager = {
 
         fetch('/api/admin/quiz/import/publish-clean', {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ batch_id: this.batchId })
         }).then(() => {
             alert("Success! Questions are live.");
             window.location.reload();
         });
+    },
+
+    getStatusBadge: function (status) {
+        if (status === 'ready') {
+            return `<span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill">
+                        <i class="fas fa-check-circle me-1"></i> READY TO LIVE
+                    </span>`;
+        }
+        else if (status === 'duplicate') {
+            return `<span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill animate__animated animate__pulse animate__infinite">
+                        <i class="fas fa-exclamation-triangle me-1"></i> QUARANTINED
+                    </span>`;
+        }
     }
 };
 

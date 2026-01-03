@@ -11,6 +11,24 @@
                 <div class="header-subtitle"><?php echo $total; ?> questions available</div>
             </div>
             <div class="header-actions">
+                <div class="dropdown d-inline-block me-2">
+                    <button class="btn btn-white text-success fw-bold shadow-sm rounded-pill px-3 dropdown-toggle border" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-file-export me-2"></i> Export
+                    </button>
+                    <ul class="dropdown-menu shadow border-0" style="border-radius: 12px;">
+                        <li><h6 class="dropdown-header text-uppercase small fw-bold">Select Scope</h6></li>
+                        <li><a class="dropdown-item" href="/admin/quiz/export?type=all" target="_blank">Full Backup (All Questions)</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <?php if(isset($mainCategories) && is_array($mainCategories)): ?>
+                            <?php foreach($mainCategories as $cat): ?>
+                                <li><a class="dropdown-item" href="/admin/quiz/export?category_id=<?= $cat->id ?>">Only <?= $cat->title ?></a></li>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <li><span class="dropdown-item text-muted">Categories not loaded</span></li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+
                 <a href="<?php echo app_base_url('admin/quiz/questions/create'); ?>" class="btn btn-primary btn-compact">
                     <i class="fas fa-plus"></i>
                     <span>New Question</span>
@@ -97,16 +115,16 @@
                                             <td>
                                                 <div class="page-info">
                                                     <div class="page-title-compact" title="<?php echo htmlspecialchars(strip_tags($content['text'] ?? '')); ?>"><?php echo htmlspecialchars($text); ?></div>
-                                                    <div class="page-slug-compact">Code: <?php echo htmlspecialchars($q['unique_code']); ?></div>
+                                                    <div class="page-slug-compact">Code: <?php echo htmlspecialchars((string)($q['unique_code'] ?? '')); ?></div>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div style="display:flex; flex-direction:column; gap:4px;">
                                                     <span class="status-badge status-active" style="background: var(--admin-gray-100); color: var(--admin-gray-700); width: fit-content;">
-                                                        <?php echo htmlspecialchars($typeInfo['label']); ?>
+                                                        <?php echo htmlspecialchars((string)($typeInfo['label'] ?? 'Unknown')); ?>
                                                     </span>
                                                     <span style="font-size: 11px; color: var(--admin-gray-500);">
-                                                        <?php echo htmlspecialchars($q['topic_name'] ?? 'General'); ?>
+                                                        <?php echo htmlspecialchars((string)($q['topic_name'] ?? 'General')); ?>
                                                     </span>
                                                 </div>
                                             </td>

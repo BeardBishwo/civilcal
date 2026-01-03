@@ -1978,6 +1978,14 @@ $router->add("POST", "/api/admin/quiz/import/resolve", "Admin\Quiz\QuestionImpor
 $router->add("POST", "/api/admin/quiz/import/publish-clean", "Admin\Quiz\QuestionImportController@publishClean", ["auth", "admin"]);
 $router->add("POST", "/api/admin/quiz/import/publish", "Admin\Quiz\QuestionImportController@publishClean", ["auth", "admin"]); // Alias for JS
 
+// Daily Quest Engine (Auto-Pilot)
+$router->add("GET", "/admin/quiz/daily", "Admin\Quiz\DailyQuizController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/daily/generate", "Admin\Quiz\DailyQuizController@generate", ["auth", "admin"]);
+
+// Frontend Daily Quest
+$router->add("GET", "/quiz/daily/start", "Quiz\ExamEngineController@startDaily", ["auth"]);
+
+
 // Question Reports (Enterprise Ticket System)
 $router->add("GET", "/admin/quiz/reports", "Admin\Quiz\ReportController@index", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/report/resolve", "Admin\Quiz\ReportController@resolve", ["auth", "admin"]);
@@ -1988,6 +1996,17 @@ $router->add("GET", "/admin/quiz/questions", "Admin\\Quiz\\QuestionBankControlle
 $router->add("GET", "/admin/quiz/questions/create", "Admin\\Quiz\\QuestionBankController@create", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/questions/store", "Admin\\Quiz\\QuestionBankController@store", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/questions/edit/{id}", "Admin\\Quiz\\QuestionBankController@edit", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/export", "Admin\\Quiz\\QuestionExportController@export", ["auth", "admin"]);
+
+// Blueprint System
+$router->add("GET", "/admin/quiz/blueprints", "Admin\\Quiz\\BlueprintController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/blueprints/create", "Admin\\Quiz\\BlueprintController@create", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/blueprints/edit/{id}", "Admin\\Quiz\\BlueprintController@edit", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/blueprints/store", "Admin\\Quiz\\BlueprintController@store", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/blueprints/update/{id}", "Admin\\Quiz\\BlueprintController@update", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/blueprints/delete/{id}", "Admin\\Quiz\\BlueprintController@delete", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/blueprints/generate/{id}", "Admin\\Quiz\\BlueprintController@generate", ["auth", "admin"]);
+
 $router->add("POST", "/admin/quiz/questions/update/{id}", "Admin\\Quiz\\QuestionBankController@update", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/questions/delete/{id}", "Admin\\Quiz\\QuestionBankController@delete", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/questions/search", "Admin\\Quiz\\QuestionBankController@searchJson", ["auth", "admin"]);

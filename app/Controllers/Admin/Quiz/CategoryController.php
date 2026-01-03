@@ -8,8 +8,8 @@ use App\Services\SyllabusService;
 
 class CategoryController extends Controller
 {
-    private $db;
-    private $syllabusService;
+    protected $db;
+    protected $syllabusService;
 
     public function __construct()
     {
@@ -29,7 +29,7 @@ class CategoryController extends Controller
         // 'question_count' should have been populated by 'recalculateQuestionCounts'
         
         $sql = "SELECT * FROM syllabus_nodes WHERE parent_id IS NULL ORDER BY order_index ASC";
-        $categories = $this->db->fetchAll($sql);
+        $categories = $this->db->query($sql)->fetchAll();
 
         return $this->view('admin/quiz/categories/index', [
             'categories' => $categories

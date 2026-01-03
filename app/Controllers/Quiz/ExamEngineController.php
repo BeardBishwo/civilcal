@@ -8,11 +8,15 @@ use App\Services\GamificationService;
 use App\Services\NonceService;
 use App\Services\SecurityMonitor;
 use App\Services\Security;
+use App\Services\Quiz\DailyQuizService;
+use App\Services\Quiz\StreakService;
 
 class ExamEngineController extends Controller
 {
     protected $db;
     private $gamificationService;
+    private $dailyQuizService;
+    private $streakService;
     private NonceService $nonceService;
     private $storagePath;
 
@@ -22,6 +26,8 @@ class ExamEngineController extends Controller
         $this->requireAuth();
         $this->db = \App\Core\Database::getInstance();
         $this->gamificationService = new GamificationService();
+        $this->dailyQuizService = new DailyQuizService();
+        $this->streakService = new StreakService();
         $this->nonceService = new NonceService();
         $this->storagePath = __DIR__ . '/../../../storage/app/exams/';
         
@@ -73,25 +79,101 @@ class ExamEngineController extends Controller
     }
 
     /**
+     * Start Daily Quest
+     */
+    public function startDaily()
+    {
+        $date = date('Y-m-d');
+        $userId = $_SESSION['user_id'];
+        
+        // 1. Get Quiz info from Schedule
+        // Using session stream_id if available, else null
+        $daily = $this->dailyQuizService->getQuizForUser($date, $_SESSION['user']['stream_id'] ?? null);
+        
+        if (!$daily) {
+             // If no quiz generated yet, trigger one? Or just show error.
+             // Auto-gen should handle it.
+             $_SESSION['flash_error'] = "No Daily Quest available for today yet. Please try again later.";
+             $this->redirect('/quiz/dashboard');
+             return;
+        }
+
+        // 2. Check if already attempted
+        if ($this->dailyQuizService->checkAttempt($userId, $date)) {
+            $_SESSION['flash_info'] = "You have already completed today's quest!";
+            $this->redirect('/quiz/dashboard');
+            return;
+        }
+
+        // 3. Get Placeholder Exam
+        $stmt = $this->db->getPdo()->prepare("SELECT * FROM quiz_exams WHERE slug = 'daily-quest'");
+        $stmt->execute();
+        $exam = $stmt->fetch();
+
+        if (!$exam) {
+            die("System Error: Daily Quest configuration missing.");
+        }
+
+        // 4. Create Attempt 
+        $sql = "INSERT INTO quiz_attempts (user_id, exam_id, status, started_at) VALUES (:uid, :eid, 'ongoing', NOW())";
+        $stmtInsert = $this->db->getPdo()->prepare($sql);
+        $stmtInsert->execute(['uid' => $userId, 'eid' => $exam['id']]);
+        $attemptId = $this->db->getPdo()->lastInsertId();
+
+        // 5. Initialize Cache with Questions
+        $questionIds = json_decode($daily['questions'], true);
+        $this->initializeCache($attemptId, $exam, $questionIds, $daily['id']);
+
+        $this->redirect('/quiz/room/' . $attemptId);
+    }
+
+    /**
      * Initialize the JSON Cache for a new attempt
      */
-    private function initializeCache($attemptId, $exam)
+    private function initializeCache($attemptId, $exam, $questionIds = null, $dailyQuizId = null)
     {
-        // Fetch Questions
-        $sqlQ = "
-            SELECT q.id, q.type, q.content, q.options, q.default_marks, q.default_negative_marks, q.difficulty_level, q.answer_explanation as explanation
-            FROM quiz_exam_questions eq
-            JOIN quiz_questions q ON eq.question_id = q.id
-            WHERE eq.exam_id = :eid
-            ORDER BY eq.`order` ASC, q.id ASC
-        ";
-        $stmtQ = $this->db->getPdo()->prepare($sqlQ);
-        $stmtQ->execute(['eid' => $exam['id']]);
-        $questions = $stmtQ->fetchAll(\PDO::FETCH_ASSOC);
+        $questions = [];
 
-        // Shuffle if enabled
-        if (!empty($exam['shuffle_questions'])) {
-            shuffle($questions);
+        if ($questionIds && is_array($questionIds)) {
+            // Fetch Specific Questions for Daily Quest
+            if (empty($questionIds)) {
+                $questions = [];
+            } else {
+                $placeholders = str_repeat('?,', count($questionIds) - 1) . '?';
+                $sqlQ = "SELECT id, type, content, options, default_marks, default_negative_marks, difficulty_level, answer_explanation as explanation FROM quiz_questions WHERE id IN ($placeholders)";
+                $stmtQ = $this->db->getPdo()->prepare($sqlQ);
+                $stmtQ->execute($questionIds);
+                $questions = $stmtQ->fetchAll(\PDO::FETCH_ASSOC);
+                
+                // Restore randomness/ladder order if needed, but SQL might mess it up.
+                // Re-sort based on input array order?
+                $qMap = [];
+                foreach ($questions as $q) $qMap[$q['id']] = $q;
+                
+                $orderedQuestions = [];
+                foreach ($questionIds as $qid) {
+                    if (isset($qMap[$qid])) $orderedQuestions[] = $qMap[$qid];
+                }
+                $questions = $orderedQuestions;
+            }
+        } else {
+            // Standard Exam Fetch
+            // Fetch Questions
+            $sqlQ = "
+                SELECT q.id, q.type, q.content, q.options, q.default_marks, q.default_negative_marks, q.difficulty_level, q.answer_explanation as explanation
+                FROM quiz_exam_questions eq
+                JOIN quiz_questions q ON eq.question_id = q.id
+                WHERE eq.exam_id = :eid
+                ORDER BY eq.`order` ASC, q.id ASC
+            ";
+            $stmtQ = $this->db->getPdo()->prepare($sqlQ);
+            $stmtQ->execute(['eid' => $exam['id']]);
+            $questions = $stmtQ->fetchAll(\PDO::FETCH_ASSOC);
+
+            // Shuffle if enabled
+            if (!empty($exam['shuffle_questions'])) {
+                shuffle($questions);
+            }
         }
 
         // Decode JSON content/options for storage
@@ -106,7 +188,8 @@ class ExamEngineController extends Controller
             'exam' => $exam,
             'questions' => $questions,
             'answers' => [], // Key: question_id, Value: selected_option
-            'start_time' => time()
+            'start_time' => time(),
+            'daily_quiz_id' => $dailyQuizId
         ];
 
         file_put_contents($this->storagePath . $attemptId . '.json', json_encode($data));
@@ -182,7 +265,7 @@ class ExamEngineController extends Controller
             'quizNonce' => $nonce['nonce'] ?? null,
             'csrfToken' => $csrfToken,
             'title' => $data['exam']['title']
-        ]);
+        ], 'layouts/quiz_focus'); // Use Distraction-Free Layout
     }
 
     /**
@@ -297,6 +380,32 @@ class ExamEngineController extends Controller
             $lbService = new \App\Services\LeaderboardService();
             $lbService->updateUserRank($_SESSION['user_id'], $totalScore, count($data['questions']), $correctCount);
         } catch (\Exception $e) {}
+
+        // --- DAILY QUEST LOGIC ---
+        if (isset($data['daily_quiz_id']) && $data['daily_quiz_id']) {
+            try {
+                // Determine rewards - e.g., Base coin per question or fixed reward?
+                // The schedule table has `reward_coins` (usually 50).
+                // Let's fetch the schedule to get the max reward.
+                // For now, let's just award what's in the schedule OR a function of score.
+                
+                // Let's use the StreakService directly, passing 50 as base. 
+                // Ideally, we fetch `reward_coins` from daily_quiz_schedule.
+                
+                $streakRes = $this->streakService->processVictory($_SESSION['user_id'], 50);
+                
+                // Record the Daily Attempt specifically
+                $this->dailyQuizService->recordAttempt($_SESSION['user_id'], $data['daily_quiz_id'], $totalScore, $streakRes['coins']);
+                
+                // Store streak info in session to show on result page
+                $_SESSION['latest_streak_info'] = $streakRes;
+
+            } catch (\Exception $e) {
+                // Log error but don't fail the submit
+                 error_log("Daily Quest Error: " . $e->getMessage());
+            }
+        }
+        // -------------------------
 
         // Delete Cache
         unlink($file);

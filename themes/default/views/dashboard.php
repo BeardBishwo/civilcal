@@ -167,7 +167,46 @@ function toggleStudyMode() {
             </a>
         </div>
 
-        <!-- Daily Mission Card -->
+        <!-- Daily Quest Card (New) -->
+        <div class="quest-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <div>
+                    <h3 style="font-weight: 800; color: white; margin: 0; font-size: 1.4rem;">Daily Quest</h3>
+                    <p style="color: #94a3b8; font-size: 0.9rem; margin: 5px 0 0;">Keep the streak alive!</p>
+                </div>
+                <div style="background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 5px 12px; border-radius: 20px; font-weight: 800; display: flex; align-items: center; gap: 5px;">
+                    <i class="fas fa-fire"></i> <?php echo $daily_quest['streak']; ?> Day Streak
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 25px;">
+                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 16px; text-align: center;">
+                    <div style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Coin Multiplier</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: #fbbf24;"><?php echo $daily_quest['multiplier']; ?>x</div>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 16px; text-align: center;">
+                    <div style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Streak Freeze</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: #38bdf8;"><?php echo $daily_quest['streak_freeze']; ?></div>
+                </div>
+            </div>
+
+            <?php if ($daily_quest['completed']): ?>
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #10b981; padding: 15px; border-radius: 12px; text-align: center; font-weight: 700;">
+                    <i class="fas fa-check-circle" style="margin-right: 5px;"></i> Quest Completed!
+                    <div style="font-size: 0.85rem; font-weight: 500; opacity: 0.9; margin-top: 5px;">Come back tomorrow for more.</div>
+                </div>
+            <?php elseif ($daily_quest['available']): ?>
+                <a href="<?php echo app_base_url('/quiz/daily/start'); ?>" class="btn" style="background: linear-gradient(to right, #ef4444, #f87171); color: white; width: 100%; border-radius: 12px; font-weight: 800; padding: 15px; text-decoration: none; display: block; text-align: center; transition: all 0.2s; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                    <i class="fas fa-play" style="margin-right: 5px;"></i> Start Daily Quiz
+                </a>
+            <?php else: ?>
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; text-align: center; font-weight: 600; color: #94a3b8;">
+                    No Daily Quest Available Yet
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Daily Mission Card (Tool of the Day) -->
         <div class="quest-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                 <h3 style="font-weight: 800; color: white; margin: 0;">Current Mission</h3>

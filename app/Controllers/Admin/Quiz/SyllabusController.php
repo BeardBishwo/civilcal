@@ -8,8 +8,8 @@ use App\Services\SyllabusService;
 
 class SyllabusController extends Controller
 {
-    private $db;
-    private $syllabusService;
+    protected $db;
+    protected $syllabusService;
 
     public function __construct()
     {
@@ -29,8 +29,8 @@ class SyllabusController extends Controller
         $tree = $this->syllabusService->getTree(null, false); // activeOnly=false to see drafts
 
         // We might want statistics
-        $totalNodes = $this->db->fetch("SELECT count(*) as c FROM syllabus_nodes");
-        $totalQuestions = $this->db->fetch("SELECT count(*) as c FROM quiz_questions"); // Approximation or use map
+        $totalNodes = $this->db->query("SELECT count(*) as c FROM syllabus_nodes")->fetch();
+        $totalQuestions = $this->db->query("SELECT count(*) as c FROM quiz_questions")->fetch(); // Approximation or use map
 
         return $this->view('admin/quiz/syllabus/index', [
             'page_title' => 'Syllabus Master',

@@ -17,12 +17,21 @@ class ImportProcessor {
         $mainId = $this->resolveCategoryId($row['category'] ?? null);
         $subId  = $this->resolveCategoryId($row['subcategory'] ?? null);
 
-        // 2. DETECT QUESTION TYPE (Auto-Intelligence)
-        // CSV says: "2 if true false". We convert to "TF" or "MCQ".
+        // 2. DETECT QUESTION TYPE (Elite Quiz Compatibility Mode)
         $type = 'MCQ'; // Default
+
         if (isset($row['question_type'])) {
-            // Logic: If CSV has '2' OR if Options C/D are empty, assume True/False
-            if ($row['question_type'] == 2 || (empty($row['option 3']) && empty($row['option 4']))) {
+            $rawType = $row['question_type'];
+            
+            // ELITE QUIZ CLEANER:
+            // They sometimes put text like "{2 if true...}". We just want the number.
+            // This regex extracts the first number found in the string.
+            if (preg_match('/(\d+)/', $rawType, $matches)) {
+                $rawType = $matches[0];
+            }
+
+            // Logic: 2 = True/False, 1 = MCQ
+            if ($rawType == 2 || (empty($row['option 3']) && empty($row['option 4']))) {
                 $type = 'TF';
             }
         }

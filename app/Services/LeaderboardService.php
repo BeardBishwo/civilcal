@@ -127,7 +127,7 @@ class LeaderboardService
 
         // 2. Fallback to Real-Time (if cache missing)
         $sql = "
-            SELECT l.*, u.username, u.avatar 
+            SELECT l.*, u.username, CONCAT_WS(' ', u.first_name, u.last_name) as full_name, u.avatar 
             FROM quiz_leaderboard_aggregates l
             JOIN users u ON l.user_id = u.id
             WHERE l.period_type = :ptype 

@@ -8,8 +8,8 @@ use App\Services\SyllabusService;
 
 class SubCategoryController extends Controller
 {
-    private $db;
-    private $syllabusService;
+    protected $db;
+    protected $syllabusService;
 
     public function __construct()
     {
@@ -49,7 +49,7 @@ class SubCategoryController extends Controller
 
         // 2. Fetch Main Categories (For the Dropdown Filter & Modal)
         // Main categories are roots
-        $parents = $this->db->fetchAll("SELECT * FROM syllabus_nodes WHERE parent_id IS NULL ORDER BY title ASC");
+        $parents = $this->db->query("SELECT * FROM syllabus_nodes WHERE parent_id IS NULL ORDER BY title ASC")->fetchAll();
 
         return $this->view('admin/quiz/subcategories/index', [
             'subCategories' => $subCategories,

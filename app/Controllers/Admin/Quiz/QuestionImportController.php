@@ -16,9 +16,9 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
  */
 class QuestionImportController extends Controller
 {
-    private $db;
-    private $importService;
-    private $syllabusService;
+    protected $db;
+    protected $importService;
+    protected $syllabusService;
 
     public function __construct()
     {
@@ -51,7 +51,7 @@ class QuestionImportController extends Controller
         $headers = [
             'category', 'subcategory', 'language_id', 'question_type', 
             'question', 'option 1', 'option 2', 'option 3', 'option 4', 'option 5', 
-            'answer', 'level', 'note'
+            'answer', 'level', 'note', 'level_map_syntax'
         ];
         $sheet->fromArray($headers, NULL, 'A1');
 
@@ -193,12 +193,15 @@ class QuestionImportController extends Controller
                      'option 5' => $row[9] ?? null,
                      'answer' => $row[10] ?? null,
                      'level' => $row[11] ?? null,
-                     'note'  => $row[12] ?? null
+                     'note'  => $row[12] ?? null,
+                     'level_map' => $row[13] ?? null
                  ];
                  
                  if (empty($rowData['question'])) continue;
 
                  $cleanData = $processor->processRow($rowData, $batchId, $userId);
+                 // Pass level_map through if processor doesn't handle it
+                 $cleanData['level_map'] = $rowData['level_map'];
                  
                  // Insert Staging
                  $this->db->insert('question_import_staging', [
@@ -213,7 +216,8 @@ class QuestionImportController extends Controller
                      'options' => $cleanData['options'],
                      'correct_answer' => $cleanData['correct_answer'],
                      'explanation' => $cleanData['explanation'],
-                     'level' => $cleanData['level']
+                     'level' => $cleanData['level'],
+                     'level_map' => $cleanData['level_map'] ?? null
                  ]);
                  
                  $processedCount++;

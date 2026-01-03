@@ -5,17 +5,30 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\MathEngine;
 
+use App\Services\GamificationService;
+use App\Services\RankService;
+use App\Services\QuestService;
+use App\Services\Quiz\DailyQuizService;
+use App\Services\Quiz\StreakService;
+
 class CalculatorController extends Controller
 {
     private $engine;
-
     private $campaignModel;
+    private $rankService;
+    private $questService;
+    private $dailyQuizService;
+    private $streakService;
 
     public function __construct()
     {
         parent::__construct();
         $this->engine = new MathEngine();
         $this->campaignModel = new \App\Models\Campaign();
+        $this->rankService = new RankService();
+        $this->questService = new QuestService();
+        $this->dailyQuizService = new DailyQuizService();
+        $this->streakService = new StreakService();
     }
 
     private function getCategories()
@@ -108,6 +121,44 @@ class CalculatorController extends Controller
             'outputs' => $outputs,
             'config' => json_decode($calculator['config_json'], true),
             'campaign' => $campaign // Pass to view
+        ]);
+    }
+    public function dashboard()
+    {
+        $userId = $_SESSION['user_id'];
+        $user = $this->db->find('users', $userId);
+        
+        // 1. Rank Data
+        $stats = $this->db->findOne('user_stats', ['user_id' => $userId]) ?: [];
+        $wallet = $this->db->findOne('user_wallets', ['user_id' => $userId]) ?: [];
+        $rankData = $this->rankService->getUserRankData($stats, $wallet);
+        
+        // 2. Old Quest (Tool of the Day)
+        $tod = $this->questService->getToolOfTheDay();
+        $todCompleted = $this->questService->isCompleted($userId);
+        $questData = [
+            'tool' => $tod,
+            'completed' => $todCompleted
+        ];
+
+        // 3. NEW: Daily Quest Info
+        $date = date('Y-m-d');
+        $streakInfo = $this->streakService->getStreakInfo($userId);
+        $dailyAttempt = $this->dailyQuizService->checkAttempt($userId, $date);
+        $dailyQuiz = $this->dailyQuizService->getQuizForUser($date, $user['stream_id'] ?? null); // stream_id might not exist in $user array if not selected?
+        
+        // Pass everything to view
+        $this->view->render('dashboard', [
+            'user' => $user, // Ensure view gets user array
+            'rank' => $rankData,
+            'quest' => $questData,
+            'daily_quest' => [
+                'available' => (bool)$dailyQuiz,
+                'completed' => (bool)$dailyAttempt,
+                'streak' => $streakInfo['current_streak'],
+                'multiplier' => min(1 + (($streakInfo['current_streak'] - 1) * 0.05), 2.0),
+                'streak_freeze' => $streakInfo['streak_freeze_left'] ?? 0
+            ]
         ]);
     }
 }
