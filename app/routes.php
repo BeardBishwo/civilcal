@@ -2014,6 +2014,11 @@ $router->add("GET", "/admin/quiz/import", "Admin\\Quiz\\QuestionImportController
 $router->add("POST", "/admin/quiz/import/upload", "Admin\\Quiz\\QuestionImportController@upload", ["auth", "admin"]);
 
 
+// Terminology Manager (Word Bank)
+$router->add("GET", "/admin/quiz/word-bank", "Admin\\Quiz\\WordBankController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/word-bank/store", "Admin\\Quiz\\WordBankController@store", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/word-bank/delete/{id}", "Admin\\Quiz\\WordBankController@delete", ["auth", "admin"]);
+
 // Leaderboard Manager
 $router->add("GET", "/admin/quiz/leaderboard", "Admin\\Quiz\\LeaderboardController@index", ["auth", "admin"]);
 
@@ -2129,6 +2134,14 @@ $router->add("GET", "/contest/room/{id}", "Quiz\\StudentContestController@room",
 $router->add("POST", "/contest/join/{id}", "Quiz\\StudentContestController@join", ["auth"]);
 $router->add("POST", "/contest/submit/{id}", "Quiz\\StudentContestController@submit", ["auth"]);
 $router->add("GET", "/contest/result/{id}", "Quiz\\StudentContestController@result", ["auth"]);
+
+// ============================================
+// BLUEPRINT BUILDER (TERMINOLOGY GAME)
+// ============================================
+$router->add("GET", "/blueprint", "Quiz\\TerminologyController@index", ["auth"]);
+$router->add("GET", "/blueprint/arena/{id}", "Quiz\\TerminologyController@arena", ["auth"]);
+$router->add("POST", "/blueprint/submit", "Quiz\\TerminologyController@submit", ["auth"]);
+
 
 // ============================================
 // CALCULATOR PERMALINK CATCH-ALL ROUTE

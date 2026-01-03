@@ -913,7 +913,8 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                             <li><a href="<?php echo app_base_url('admin/quiz/subcategories'); ?>">Sub-Categories</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/exams'); ?>">Exam Manager</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/daily'); ?>">Daily Quest Scheduler</a></li>
-                            <li><a href="<?php echo app_base_url('admin/quiz/blueprints'); ?>">Exam Blueprints</a></li>
+                             <li><a href="<?php echo app_base_url('admin/quiz/blueprints'); ?>">Exam Blueprints</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/word-bank'); ?>"><i class="fas fa-book text-info"></i> Word Bank (Admin)</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/questions'); ?>">Question Bank</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/import'); ?>">Import Questions</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/analytics'); ?>">Results & Analytics</a></li>
