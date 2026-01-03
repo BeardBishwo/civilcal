@@ -55,6 +55,22 @@ if ($usingThemeChrome) {
             echo '<footer class="site-footer"><div class="container">&copy; ' . date('Y') . ' Bishwo Calculator</div></footer>';
         }
         ?>
+        <!-- Enterprise MathJax Engine -->
+        <script>
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true
+          },
+          options: {
+            ignoreHtmlClass: 'tex2jax_ignore',
+            processHtmlClass: 'tex2jax_process'
+          }
+        };
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+
         <script src="/assets/js/app.js"></script>
     </body>
     </html>

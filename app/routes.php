@@ -1973,8 +1973,15 @@ $router->add("GET", "/admin/quiz/import", "Admin\Quiz\QuestionImportController@i
 $router->add("GET", "/admin/quiz/import/template", "Admin\Quiz\QuestionImportController@downloadTemplate", ["auth", "admin"]);
 $router->add("POST", "/api/admin/quiz/import/process-chunk", "Admin\Quiz\QuestionImportController@processChunk", ["auth", "admin"]);
 $router->add("GET", "/api/admin/quiz/import/staging-stats/{batchId}", "Admin\Quiz\QuestionImportController@stagingStats", ["auth", "admin"]);
+$router->add("GET", "/api/admin/quiz/import/stats", "Admin\Quiz\QuestionImportController@stagingStats", ["auth", "admin"]); // Alias for JS
 $router->add("POST", "/api/admin/quiz/import/resolve", "Admin\Quiz\QuestionImportController@resolve", ["auth", "admin"]);
 $router->add("POST", "/api/admin/quiz/import/publish-clean", "Admin\Quiz\QuestionImportController@publishClean", ["auth", "admin"]);
+$router->add("POST", "/api/admin/quiz/import/publish", "Admin\Quiz\QuestionImportController@publishClean", ["auth", "admin"]); // Alias for JS
+
+// Question Reports (Enterprise Ticket System)
+$router->add("GET", "/admin/quiz/reports", "Admin\Quiz\ReportController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/report/resolve", "Admin\Quiz\ReportController@resolve", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/report/ignore", "Admin\Quiz\ReportController@ignore", ["auth", "admin"]);
 
 // Question Bank
 $router->add("GET", "/admin/quiz/questions", "Admin\\Quiz\\QuestionBankController@index", ["auth", "admin"]);

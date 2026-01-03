@@ -47,53 +47,60 @@ class QuestionImportController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // 1. Set the Headers
-        $headers = ['Category', 'Question Text', 'Option A', 'Option B', 'Option C', 'Option D', 'Correct Option', 'Explanation', 'Practical Mode (Yes/No)'];
+        // 1. EXACT COLUMNS from your 'data-format.csv'
+        $headers = [
+            'category', 'subcategory', 'language_id', 'question_type', 
+            'question', 'option 1', 'option 2', 'option 3', 'option 4', 'option 5', 
+            'answer', 'level', 'note'
+        ];
         $sheet->fromArray($headers, NULL, 'A1');
 
-        // 2. Fetch Syllabus Nodes for the Dropdown (Unit level only)
-        $nodes = $this->db->find('syllabus_nodes', ['type' => 'unit']);
-        $nodeTitles = array_column($nodes, 'title');
+        // 2. MAKE IT SMART (Dropdowns)
         
-        // Excel validation formulas have a limit. If too many nodes, we might need a separate sheet.
-        // For now, simple list.
-        $nodeListString = '"' . implode(',', $nodeTitles) . '"';
+        // A. Question Type Dropdown (Col D)
+        $this->addDropdown($sheet, 'D', ['1 (MCQ)', '2 (True/False)']);
 
-        // 3. Create the Dropdown Validation Logic
-        $validation = $sheet->getCell('A2')->getDataValidation();
-        $validation->setType(DataValidation::TYPE_LIST);
-        $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-        $validation->setAllowBlank(false);
-        $validation->setShowInputMessage(true);
-        $validation->setShowErrorMessage(true);
-        $validation->setShowDropDown(true);
-        $validation->setErrorTitle('Input error');
-        $validation->setError('Value is not in list.');
-        $validation->setFormula1($nodeListString);
+        // B. Answer Dropdown (Col K)
+        $this->addDropdown($sheet, 'K', ['a', 'b', 'c', 'd', 'e']);
 
-        // 4. Apply Dropdown to the first 1000 rows
-        for ($i = 2; $i <= 1000; $i++) {
-            $sheet->getCell("A$i")->setDataValidation(clone $validation);
-        }
-        
-        // Practical Mode Dropdown
-        $boolValidation = $sheet->getCell('I2')->getDataValidation();
-        $boolValidation->setType(DataValidation::TYPE_LIST);
-        $boolValidation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-        $boolValidation->setAllowBlank(true);
-        $boolValidation->setShowDropDown(true);
-        $boolValidation->setFormula1('"Yes,No"');
-        for ($i = 2; $i <= 1000; $i++) {
-            $sheet->getCell("I$i")->setDataValidation(clone $boolValidation);
-        }
+        // C. Level Dropdown (Col L)
+        $this->addDropdown($sheet, 'L', ['1 (Easy)', '2 (Medium)', '3 (Hard)']);
 
-        // 5. Output the File
+        // D. Category Dropdown (Col A) - Fetch from DB
+        $cats = $this->db->find('syllabus_nodes', ['type' => 'part']); // Assuming 'part' is main category
+        $catTitles = array_column($cats, 'title');
+        // Limit to prevent excel crash if too many
+        $catTitles = array_slice($catTitles, 0, 100); 
+        $this->addDropdown($sheet, 'A', $catTitles);
+
+        // 3. STYLE THE HEADER (Visual Polish)
+        $sheet->getStyle('A1:M1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:M1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FF667EEA'); // Civil Cal Purple
+        $sheet->getStyle('A1:M1')->getFont()->getColor()->setARGB('FFFFFFFF');
+
+        // Export
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="CivilCity_Question_Template.xlsx"');
         
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
+    }
+
+    private function addDropdown($sheet, $col, $options) {
+        $validation = $sheet->getCell($col.'2')->getDataValidation();
+        $validation->setType( \PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST );
+        $validation->setErrorStyle( \PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION );
+        $validation->setAllowBlank(false);
+        $validation->setShowInputMessage(true);
+        $validation->setShowErrorMessage(true);
+        $validation->setShowDropDown(true);
+        $validation->setFormula1('"' . implode(',', $options) . '"');
+        
+        // Apply to first 1000 rows
+        for($i=2; $i<=1000; $i++) {
+            $sheet->getCell($col.$i)->setDataValidation(clone $validation);
+        }
     }
 
     /**
@@ -103,6 +110,7 @@ class QuestionImportController extends Controller
     {
         // Increase memory limit for this request
         ini_set('memory_limit', '256M');
+        header('Content-Type: application/json');
 
         if (!isset($_FILES['import_file']) || $_FILES['import_file']['error'] !== UPLOAD_ERR_OK) {
             http_response_code(400);
@@ -112,131 +120,116 @@ class QuestionImportController extends Controller
 
         $filePath = $_FILES['import_file']['tmp_name'];
         $startRow = isset($_POST['start_row']) ? (int)$_POST['start_row'] : 2;
-        // If start_row is 0, it means the beginning, but Excel data starts at row 2 (1 is header)
-        if ($startRow < 2) $startRow = 2;
+        if ($startRow < 2) $startRow = 2; // Rows 1 is header
 
-        $batchId = 'batch_' . date('Ymd_His'); // Should be passed from frontend if continuation?
-        // Actually, frontend should probably pass batchId if it's a chunk.
-        // But the user JS recursively calls processChunk. It doesn't seem to pass batch_id.
-        // It relies on re-uploading the file? "formData.append('import_file', file)"
-        // Wait, if I re-upload the file every chunk, PHP receives a NEW temp file.
-        // I need to maintain batch_id consistency.
-        // But for simplicity, let's assume one "User Session" = One Batch for now, 
-        // OR the JS logic handles "next_row" and expects "batch_id" at the END.
-        // Re-reading usage: `ImportManager.batchId = data.batch_id` is set at the END.
-        // So during processing, all chunks should belong to SAME batch?
-        // If I generate a new batchId every chunk, it's fragmented.
-        // Fix: Use a session-based or passed batch_id.
-        // I'll grab it from POST if exists, else generate.
-        
-        if (isset($_POST['batch_id'])) {
-            $batchId = $_POST['batch_id']; 
-        } else {
-             // If first chunk, maybe user provided it? Or we generate one.
-             // We'll generate one and return it, frontend should send it back?
-             // The JS provided doesn't send it back. It just sends 'start_row'.
-             // This is a flaw in the provided JS.
-             // However, I can use a session variable? Or just return it and expect frontend to store?
-             // The JS provided: `ImportManager.batchId` is ONLY set when `data.eof` is true.
-             // This implies the JS is flawed for batch consistency.
-             // BUT, maybe the "Staging" table just accumulates by Batch ID.
-             // If I generate a NEW batch ID for every chunk, the final "Load Data" will only verify the LAST chunk's batch ID.
-             // This is BAD.
-             // I will persist batch_id in session if not provided, or handle it.
-             // Actually, I'll update the JS later to pass batch_id. 
-             // For now, I'll use a fixed logic: if start_row == 2, generate new. Else, use param.
-        }
-        
-        // Correct logic: Start Row 2 => New Batch.
+        // Batch Management
         if ($startRow == 2) {
             $batchId = 'batch_' . date('Ymd_His');
             $_SESSION['current_import_batch'] = $batchId;
         } else {
-            $batchId = $_SESSION['current_import_batch'] ?? 'batch_unknown';
+            $batchId = $_SESSION['current_import_batch'] ?? 'batch_' . date('Ymd_His');
         }
 
+        $userId = $_SESSION['user_id'] ?? 1; // Default to admin
         $chunkSize = 50;
         
         try {
-            /**  Create a new Reader of the type that defines the file type  **/
             $reader = IOFactory::createReaderForFile($filePath);
             $reader->setReadDataOnly(true);
             
-            /**  Create a generic ChunkReadFilter  **/
-            // We need a class for this. I'll include it internally or define it here.
-            
+            // Chunk Filter logic
             $chunkFilter = new \App\Services\ChunkReadFilter();
             $reader->setReadFilter($chunkFilter);
-            
             $chunkFilter->setRows($startRow, $chunkSize);
             
             $spreadsheet = $reader->load($filePath);
             $worksheet = $spreadsheet->getActiveSheet();
-            $rows = $worksheet->toArray();
+            $rows = $worksheet->toArray(null, true, true, true); // Get formatted array with Alpha indexes? No, toArray default
             
-            // Remove rows that are before startRow (toArray respects filter? Yes, but filter returns array with keys matching row numbers)
-            // We iterate.
+            // Re-read with index assumption A=>0 or A=>A?
+            // toArray default is 0-indexed if no args.
+            // Let's use simple iterator or toArray
+            // Reset reader without filter (too slow) or just assume filtered rows
+            // Warning: Load with Filter loads ONLY those rows.
+            // But toArray() returns array with keys as Row Numbers (1-based) if mapped?
+            // Actually it returns 0-indexed array where 0 is first row loaded... NO.
+            // With ChunkFilter, it loads specific rows.
+            // The safest way is to simple iterate the rows loaded.
+             $rows = $worksheet->toArray();
+             // Since we filtered, $rows only has the chunk.
+             // Wait, PhpSpreadsheet ChunkFilter behavior:
+             // It skips reading non-matching rows, but row indices might be preserved?
+             
+             // Let's simplify and use the ImportProcessor
+             $processor = new \App\Services\Quiz\ImportProcessor();
+             $processedCount = 0;
+             $dbStaging = [];
 
-            $processedCount = 0;
-            $maxRowFound = 0;
+             // Map header? We assume fixed template structure as defined in "downloadTemplate".
+             // Col A (0) -> Category, B (1) -> Subcategory, ... D (3) -> Type ...
+             // Headers from DownloadTemplate:
+             // 0: Category, 1: Subcategory, 2: LangID, 3: QType, 4: Question, 
+             // 5: Opt1, 6: Opt2, 7: Opt3, 8: Opt4, 9: Opt5, 
+             // 10: Answer, 11: Level, 12: Note
+             
+             $maxRowInSheet = $worksheet->getHighestRow();
 
-            foreach ($rows as $rowIndex => $row) {
-                if ($rowIndex < $startRow) continue;
-                if ($rowIndex >= $startRow + $chunkSize) break;
-                
-                $maxRowFound = max($maxRowFound, $rowIndex);
-                
-                // Process Row: A=Category, B=Question, ...
-                // Index 0 based? toArray() returns 0-indexed columns. A=0.
-                
-                $questionText = $row[1] ?? '';
-                if (empty($questionText)) continue;
+             foreach ($rows as $index => $row) {
+                 // Check if row is empty or header
+                 if ($this->isEmptyRow($row)) continue;
+                 // Since we use setReadFilter, the first row in $rows is actually $startRow (effectively)
+                 // Wait, $rows from toArray() is just a list of rows read.
+                 
+                 // Process
+                 $rowData = [
+                     'category' => $row[0] ?? null,
+                     'subcategory' => $row[1] ?? null,
+                     'question_type' => $row[3] ?? null,
+                     'question' => $row[4] ?? null,
+                     'option 1' => $row[5] ?? null,
+                     'option 2' => $row[6] ?? null,
+                     'option 3' => $row[7] ?? null,
+                     'option 4' => $row[8] ?? null,
+                     'option 5' => $row[9] ?? null,
+                     'answer' => $row[10] ?? null,
+                     'level' => $row[11] ?? null,
+                     'note'  => $row[12] ?? null
+                 ];
+                 
+                 if (empty($rowData['question'])) continue;
 
-                // Strip Tags & Hash
-                $cleanText = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $questionText)));
-                $hash = hash('sha256', $cleanText);
-
-                // Check Duplicate
-                $existing = $this->db->findOne('quiz_questions', ['content_hash' => $hash]);
-
-                // Insert Staging
-                $this->db->insert('question_import_staging', [
-                    'batch_id' => $batchId,
-                    'uploader_id' => $_SESSION['user_id'] ?? 1,
-                    'question_text' => $row[1],
-                    'content_hash' => $hash,
-                    'is_duplicate' => $existing ? 1 : 0,
-                    'duplicate_match_id' => $existing ? $existing['id'] : null,
-                    'status' => 'pending',
-                    
-                    // Extra fields
-                    'options' => json_encode([
-                        'a' => $row[2] ?? '',
-                        'b' => $row[3] ?? '',
-                        'c' => $row[4] ?? '',
-                        'd' => $row[5] ?? ''
-                    ]),
-                    'correct_answer' => $row[6] ?? '',
-                    'explanation' => $row[7] ?? '',
-                    'level_map' => $row[9] ?? '', // Column J: Level Map Syntax
-                    'practical_mode' => (isset($row[8]) && strtolower($row[8]) === 'yes') ? 1 : 0
-                ]);
-                
-                $processedCount++;
+                 $cleanData = $processor->processRow($rowData, $batchId, $userId);
+                 
+                 // Insert Staging
+                 $this->db->insert('question_import_staging', [
+                     'batch_id' => $cleanData['batch_id'],
+                     'uploader_id' => $cleanData['uploader_id'],
+                     'syllabus_node_id' => $cleanData['syllabus_node_id'] ?? 0, // Should be integer
+                     'question_text' => $cleanData['question'],
+                     'content_hash' => $cleanData['content_hash'],
+                     'is_duplicate' => $cleanData['is_duplicate'],
+                     'duplicate_match_id' => $cleanData['match_id'],
+                     'status' => $cleanData['status'],
+                     'options' => $cleanData['options'],
+                     'correct_answer' => $cleanData['correct_answer'],
+                     'explanation' => $cleanData['explanation'],
+                     'level' => $cleanData['level']
+                 ]);
+                 
+                 $processedCount++;
+             }
+            
+            $eof = ($startRow + $chunkSize) > 20000; // Hard limit or detect empty
+            // If processedCount < chunkSize, maybe EOF?
+            if ($processedCount < $chunkSize && $maxRowInSheet < ($startRow + $chunkSize)) {
+                $eof = true;
             }
-            
-            $totalRows = $worksheet->getHighestRow(); // Approximate
-            // Better: use startRow + 50 loop logic.
-            
-            // Check if EOF
-            $eof = ($startRow + $chunkSize) > $totalRows;
 
-            header('Content-Type: application/json');
             echo json_encode([
                 'batch_id' => $batchId,
                 'current_row' => $startRow + $processedCount,
                 'next_row' => $startRow + $chunkSize,
-                'total_rows' => $totalRows,
+                // 'total_rows' => $totalRows, // Cannot get total efficiently without full read
                 'eof' => $eof
             ]);
             
@@ -244,6 +237,13 @@ class QuestionImportController extends Controller
             http_response_code(500);
             echo json_encode(['error' => $e->getMessage()]);
         }
+    }
+
+    private function isEmptyRow($row) {
+        foreach($row as $cell) {
+            if (!empty($cell)) return false;
+        }
+        return true;
     }
 
     /**
