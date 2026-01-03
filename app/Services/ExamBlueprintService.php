@@ -74,7 +74,10 @@ class ExamBlueprintService
             $data['slug'] = $this->slugify($data['title']);
         }
 
-        return $this->db->insert('exam_blueprints', $data);
+        if ($this->db->insert('exam_blueprints', $data)) {
+            return $this->db->lastInsertId();
+        }
+        return false;
     }
 
     /**

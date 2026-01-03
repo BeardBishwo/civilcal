@@ -161,7 +161,10 @@ class SyllabusService
             $data['order'] = $maxOrder + 1;
         }
 
-        return $this->db->insert('syllabus_nodes', $data);
+        if ($this->db->insert('syllabus_nodes', $data)) {
+            return $this->db->lastInsertId();
+        }
+        return false;
     }
 
     /**

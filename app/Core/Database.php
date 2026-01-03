@@ -92,8 +92,12 @@ class Database {
     }
     
     public function insert($table, $data) {
-        $columns = implode(',', array_keys($data));
-        $placeholders = ':' . implode(', :', array_keys($data));
+        $keys = array_keys($data);
+        $columns = implode(', ', array_map(function($key) {
+            return "`$key`";
+        }, $keys));
+        
+        $placeholders = ':' . implode(', :', $keys);
         
         $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
         $stmt = $this->prepare($sql);
@@ -104,7 +108,7 @@ class Database {
     public function update($table, $data, $where, $whereParams = []) {
         $set = [];
         foreach ($data as $key => $value) {
-            $set[] = "{$key} = :{$key}";
+            $set[] = "`{$key}` = :{$key}";
         }
         $setClause = implode(', ', $set);
         

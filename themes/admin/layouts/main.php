@@ -909,12 +909,13 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                         <ul class="nav-submenu">
                             <li><a href="<?php echo app_base_url('admin/quiz'); ?>">Dashboard</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/exams'); ?>">Exam Manager</a></li>
-                            <li><a href="<?php echo app_base_url('admin/quiz/syllabus'); ?>">Syllabus Tree</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/syllabus-tree'); ?>">Syllabus Tree</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/blueprints'); ?>">Exam Blueprints</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/questions'); ?>">Question Bank</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/import'); ?>">Import Questions</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/analytics'); ?>">Results & Analytics</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/leaderboard'); ?>">Leaderboard</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/settings'); ?>">Settings</a></li>
-                            <li><a href="<?php echo app_base_url('admin/library'); ?>">Blueprint Vault</a></li>
                             <li><a href="<?php echo app_base_url('admin/settings/economy'); ?>"><i class="fas fa-coins text-warning"></i> Economy Settings</a></li>
                         </ul>
                     </li>
