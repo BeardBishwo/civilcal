@@ -92,6 +92,59 @@ class ExamGeneratorService
     }
 
     /**
+     * Generate exam DIRECTLY from Syllabus (The "Heart of PSC" way)
+     * 
+     * @param string $level e.g., 'Level 5'
+     * @param array $options
+     * @return array Generated exam data
+     */
+    public function generateFromSyllabus($level, $options = [])
+    {
+        // 1. Fetch all syllabus nodes for this level with weight > 0
+        $sql = "SELECT * FROM syllabus_nodes WHERE level = :level AND is_active = 1 AND questions_weight > 0 ORDER BY `order` ASC";
+        $stmt = $this->db->getPdo()->prepare($sql);
+        $stmt->execute(['level' => $level]);
+        $nodes = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (empty($nodes)) {
+            throw new Exception("No weighted syllabus nodes found for level: $level");
+        }
+
+        $selectedQuestions = [];
+        $totalTarget = 0;
+
+        // 2. Process each weighted node as a rule
+        foreach ($nodes as $node) {
+            $targetCount = $node['questions_weight'];
+            $totalTarget += $targetCount;
+
+            // Get questions using our refined query (handles linked_cat/sub/top)
+            $qs = $this->queryQuestions([$node['id']], $level, null, $targetCount);
+            $selectedQuestions = array_merge($selectedQuestions, $qs);
+        }
+
+        // Shuffle if requested
+        if ($options['shuffle'] ?? true) {
+            shuffle($selectedQuestions);
+        }
+
+        return [
+            'blueprint_id' => null,
+            'blueprint_title' => "Auto-Syllabus Exam ($level)",
+            'total_questions' => count($selectedQuestions),
+            'regular_questions' => count($selectedQuestions),
+            'wildcard_questions' => 0,
+            'questions' => $selectedQuestions,
+            'metadata' => [
+                'duration_minutes' => $options['duration'] ?? 45,
+                'total_marks' => count($selectedQuestions) * 2, // 2 marks each by default for PSC
+                'negative_marking_rate' => $options['negative_rate'] ?? 20.00,
+                'level' => $level
+            ]
+        ];
+    }
+
+    /**
      * Get questions for a specific rule
      */
     private function getQuestionsForRule($rule, $level)
@@ -128,15 +181,32 @@ class ExamGeneratorService
     {
         $nodeIdsStr = implode(',', array_map('intval', $nodeIds));
 
+        // Refined SQL to use the "Heart of PSC" linkages
         $sql = "
             SELECT DISTINCT q.*, qsm.difficulty_in_stream, qsm.stream
             FROM quiz_questions q
             LEFT JOIN question_stream_map qsm ON q.id = qsm.question_id
             WHERE q.is_active = 1
             AND (
+                -- 1. Direct Topic Linkage
                 q.topic_id IN (
-                    SELECT id FROM syllabus_nodes WHERE id IN ($nodeIdsStr)
+                    SELECT linked_topic_id FROM syllabus_nodes WHERE id IN ($nodeIdsStr) AND linked_topic_id IS NOT NULL
                 )
+                -- 2. Direct Subject Linkage (pulls all topics in that subject)
+                OR q.topic_id IN (
+                    SELECT id FROM quiz_topics WHERE subject_id IN (
+                        SELECT linked_subject_id FROM syllabus_nodes WHERE id IN ($nodeIdsStr) AND linked_subject_id IS NOT NULL
+                    )
+                )
+                -- 3. Direct Category Linkage (pulls all subjects and topics in that category)
+                OR q.topic_id IN (
+                    SELECT qt.id FROM quiz_topics qt 
+                    JOIN quiz_subjects qs ON qt.subject_id = qs.id
+                    WHERE qs.category_id IN (
+                        SELECT linked_category_id FROM syllabus_nodes WHERE id IN ($nodeIdsStr) AND linked_category_id IS NOT NULL
+                    )
+                )
+                -- 4. Direct QSM Linkage (Level Mapping)
                 OR qsm.syllabus_node_id IN ($nodeIdsStr)
             )
         ";

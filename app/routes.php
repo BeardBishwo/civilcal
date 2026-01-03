@@ -1949,6 +1949,13 @@ $router->add("GET", "/admin/quiz/dashboard", "Admin\\Quiz\\QuizDashboardControll
 // Syllabus (Categories/Subjects/Topics)
 // Syllabus Master system
 $router->add("GET", "/admin/quiz/syllabus", "Admin\\Quiz\\SyllabusController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/syllabus/manage/{level}", "Admin\\Quiz\\SyllabusController@manage", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/syllabus/store", "Admin\\Quiz\\SyllabusController@store", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/syllabus/update/{id}", "Admin\\Quiz\\SyllabusController@update", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/syllabus/delete/{id}", "Admin\\Quiz\\SyllabusController@delete", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/syllabus/reorder", "Admin\\Quiz\\SyllabusController@reorder", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/syllabus/toggle-status/{id}", "Admin\\Quiz\\SyllabusController@toggleStatus", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/syllabus/generate-exam", "Admin\\Quiz\\SyllabusController@generateExam", ["auth", "admin"]);
 
 // Main Categories
 $router->add("GET", "/admin/quiz/categories", "Admin\\Quiz\\CategoryController@index", ["auth", "admin"]);
