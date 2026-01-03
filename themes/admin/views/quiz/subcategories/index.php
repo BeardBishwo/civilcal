@@ -38,58 +38,64 @@
         <!-- List -->
         <div class="col-12">
             <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
-                <div class="card-header bg-white border-bottom py-3">
-                    <div class="row align-items-center text-muted small text-uppercase fw-bold">
-                        <div class="col-1 text-center">Order</div>
-                        <div class="col-4">Section Name</div>
-                        <div class="col-3">Parent Category</div>
-                        <div class="col-2 text-center">Premium</div>
-                        <div class="col-2 text-end">Actions</div>
-                    </div>
-                </div>
-                <div class="list-group list-group-flush" id="subCatSortable">
-                    <?php if (empty($subCategories)): ?>
-                        <div class="list-group-item text-center py-5 text-muted">
-                            <i class="bi bi-collection fs-1 d-block mb-3 opacity-25"></i>
-                            No sub-categories found. Select a parent to filter or add one.
-                        </div>
-                    <?php else: ?>
-                        <?php foreach ($subCategories as $sub): ?>
-                            <div class="list-group-item py-3 sub-item" data-id="<?= $sub['id'] ?>">
-                                <div class="row align-items-center">
-                                    <div class="col-1 text-center text-muted cursor-move handle">
-                                        <i class="bi bi-grip-vertical fs-5"></i>
-                                    </div>
-                                    <div class="col-4">
-                                        <h6 class="mb-0 fw-bold text-dark"><?= htmlspecialchars($sub['title']) ?></h6>
-                                        <span class="badge bg-light text-secondary border ms-0 mt-1">
-                                            <?= $sub['question_count'] ?? 0 ?> Qs
-                                        </span>
-                                    </div>
-                                    <div class="col-3">
-                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">
-                                            <i class="bi bi-folder2-open me-1"></i> <?= htmlspecialchars($sub['parent_title']) ?>
-                                        </span>
-                                    </div>
-                                    <div class="col-2 text-center">
-                                        <div class="form-check form-switch d-flex justify-content-center gap-2 align-items-center">
-                                            <input class="form-check-input premium-toggle" type="checkbox" role="switch" 
-                                                data-id="<?= $sub['id'] ?>" 
-                                                <?= $sub['is_premium'] ? 'checked' : '' ?>>
-                                            <?php if ($sub['is_premium']): ?>
-                                                <small class="text-warning fw-bold"><i class="bi bi-coin"></i> <?= $sub['unlock_price'] ?></small>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                    <div class="col-2 text-end">
-                                        <button class="btn btn-sm btn-white text-danger border-0 delete-btn" data-id="<?= $sub['id'] ?>">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr class="text-muted small text-uppercase fw-bold">
+                                <th class="ps-4" style="width: 80px;">Order</th>
+                                <th>Section Name</th>
+                                <th>Parent Category</th>
+                                <th class="text-center">Premium</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subCatSortable">
+                            <?php if (empty($subCategories)): ?>
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="bi bi-collection fs-1 d-block mb-3 opacity-25"></i>
+                                        No sub-categories found. Select a parent to filter or add one.
+                                    </td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($subCategories as $sub): ?>
+                                    <tr class="sub-item" data-id="<?= $sub['id'] ?>">
+                                        <td class="ps-4 text-center text-muted cursor-move handle">
+                                            <i class="bi bi-grip-vertical fs-5"></i>
+                                        </td>
+                                        <td>
+                                            <h6 class="mb-0 fw-bold text-dark"><?= htmlspecialchars($sub['title']) ?></h6>
+                                            <span class="badge bg-light text-secondary border small mt-1">
+                                                <?= $sub['question_count'] ?? 0 ?> Qs
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill">
+                                                <i class="bi bi-folder2-open me-1"></i> <?= htmlspecialchars($sub['parent_title']) ?>
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex flex-column align-items-center gap-1">
+                                                <div class="form-check form-switch m-0">
+                                                    <input class="form-check-input premium-toggle" type="checkbox" role="switch" 
+                                                        data-id="<?= $sub['id'] ?>" 
+                                                        <?= $sub['is_premium'] ? 'checked' : '' ?>>
+                                                </div>
+                                                <?php if ($sub['is_premium']): ?>
+                                                    <small class="text-warning fw-bold"><i class="bi bi-coin"></i> <?= $sub['unlock_price'] ?></small>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <button class="btn btn-sm btn-link text-danger p-0 delete-btn" data-id="<?= $sub['id'] ?>">
+                                                <i class="bi bi-trash fs-5"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             

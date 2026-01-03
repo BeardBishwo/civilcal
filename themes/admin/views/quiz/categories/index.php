@@ -19,84 +19,90 @@
         <!-- Category List -->
         <div class="col-12">
             <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
-                <div class="card-header bg-white border-bottom py-3">
-                    <div class="row align-items-center text-muted small text-uppercase fw-bold">
-                        <div class="col-1 text-center">Order</div>
-                        <div class="col-1">Icon</div>
-                        <div class="col-4">Category Name</div>
-                        <div class="col-2 text-center">Type</div>
-                        <div class="col-2 text-center">Premium</div>
-                        <div class="col-2 text-end">Actions</div>
-                    </div>
-                </div>
-                <!-- Sortable List -->
-                <div class="list-group list-group-flush" id="categorySortable">
-                    <?php if (empty($categories)): ?>
-                        <div class="list-group-item text-center py-5 text-muted">
-                            <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
-                            No categories found. Create one to get started.
-                        </div>
-                    <?php else: ?>
-                        <?php foreach ($categories as $cat): ?>
-                            <div class="list-group-item py-3 category-item" data-id="<?= $cat['id'] ?>">
-                                <div class="row align-items-center">
-                                    <!-- Drag Handle -->
-                                    <div class="col-1 text-center text-muted cursor-move handle">
-                                        <i class="bi bi-grip-vertical fs-5"></i>
-                                    </div>
-                                    
-                                    <!-- Icon/Image -->
-                                    <div class="col-1">
-                                        <?php if (!empty($cat['image_path'])): ?>
-                                            <img src="<?= htmlspecialchars($cat['image_path']) ?>" class="rounded-3 shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">
-                                        <?php else: ?>
-                                            <div class="rounded-3 bg-light d-flex align-items-center justify-content-center text-primary" style="width: 40px; height: 40px;">
-                                                <i class="bi bi-folder-fill fs-5"></i>
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <!-- Title & Meta -->
-                                    <div class="col-4">
-                                        <h6 class="mb-0 fw-bold text-dark"><?= htmlspecialchars($cat['title']) ?></h6>
-                                        <small class="text-muted fst-italic"><?= htmlspecialchars($cat['slug']) ?></small>
-                                        <span class="badge bg-light text-secondary border ms-2">
-                                            <?= $cat['question_count'] ?? 0 ?> Qs
-                                        </span>
-                                    </div>
-
-                                    <!-- Type -->
-                                    <div class="col-2 text-center">
-                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3">
-                                            <?= strtoupper($cat['type']) ?>
-                                        </span>
-                                    </div>
-
-                                    <!-- Premium Toggle -->
-                                    <div class="col-2 text-center">
-                                        <div class="form-check form-switch d-flex justify-content-center gap-2 align-items-center">
-                                            <input class="form-check-input premium-toggle" type="checkbox" role="switch" 
-                                                data-id="<?= $cat['id'] ?>" 
-                                                <?= $cat['is_premium'] ? 'checked' : '' ?>>
-                                            
-                                            <?php if ($cat['is_premium']): ?>
-                                                <span class="badge bg-warning text-dark border border-warning-subtle rounded-pill" title="Unlock Price">
-                                                    <i class="bi bi-coin me-1"></i> <?= $cat['unlock_price'] ?>
-                                                </span>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr class="text-muted small text-uppercase fw-bold">
+                                <th class="ps-4" style="width: 80px;">Order</th>
+                                <th style="width: 80px;">Icon</th>
+                                <th>Category Name</th>
+                                <th class="text-center">Type</th>
+                                <th class="text-center">Premium</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categorySortable">
+                            <?php if (empty($categories)): ?>
+                                <tr>
+                                    <td colspan="6" class="text-center py-5 text-muted">
+                                        <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
+                                        No categories found. Create one to get started.
+                                    </td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($categories as $cat): ?>
+                                    <tr class="category-item" data-id="<?= $cat['id'] ?>">
+                                        <!-- Drag Handle -->
+                                        <td class="ps-4 text-center text-muted cursor-move handle">
+                                            <i class="bi bi-grip-vertical fs-5"></i>
+                                        </td>
+                                        
+                                        <!-- Icon/Image -->
+                                        <td>
+                                            <?php if (!empty($cat['image_path'])): ?>
+                                                <img src="<?= htmlspecialchars($cat['image_path']) ?>" class="rounded-3 shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <?php else: ?>
+                                                <div class="rounded-3 bg-primary-subtle d-flex align-items-center justify-content-center text-primary" style="width: 40px; height: 40px;">
+                                                    <i class="bi bi-folder-fill fs-5"></i>
+                                                </div>
                                             <?php endif; ?>
-                                        </div>
-                                    </div>
-
-                                    <!-- Actions -->
-                                    <div class="col-2 text-end">
-                                        <button class="btn btn-sm btn-white text-danger border-0 hover-bg-danger-subtle delete-btn" data-id="<?= $cat['id'] ?>">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+                                        </td>
+    
+                                        <!-- Title & Meta -->
+                                        <td>
+                                            <h6 class="mb-0 fw-bold text-dark"><?= htmlspecialchars($cat['title']) ?></h6>
+                                            <div class="d-flex align-items-center gap-2 mt-1">
+                                                <small class="text-muted fst-italic"><?= htmlspecialchars($cat['slug']) ?></small>
+                                                <span class="badge bg-light text-secondary border">
+                                                    <?= $cat['question_count'] ?? 0 ?> Qs
+                                                </span>
+                                            </div>
+                                        </td>
+    
+                                        <!-- Type -->
+                                        <td class="text-center">
+                                            <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-3">
+                                                <?= strtoupper($cat['type']) ?>
+                                            </span>
+                                        </td>
+    
+                                        <!-- Premium Toggle -->
+                                        <td class="text-center">
+                                            <div class="d-flex flex-column align-items-center gap-1">
+                                                <div class="form-check form-switch m-0">
+                                                    <input class="form-check-input premium-toggle" type="checkbox" role="switch" 
+                                                        data-id="<?= $cat['id'] ?>" 
+                                                        <?= $cat['is_premium'] ? 'checked' : '' ?>>
+                                                </div>
+                                                <?php if ($cat['is_premium']): ?>
+                                                    <span class="badge bg-warning text-dark border border-warning-subtle rounded-pill small">
+                                                        <i class="bi bi-coin me-1"></i> <?= $cat['unlock_price'] ?>
+                                                    </span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+    
+                                        <!-- Actions -->
+                                        <td class="text-end pe-4">
+                                            <button class="btn btn-sm btn-link text-danger p-0 delete-btn" data-id="<?= $cat['id'] ?>">
+                                                <i class="bi bi-trash fs-5"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div class="mt-3 text-end text-muted small">

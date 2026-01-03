@@ -20,19 +20,23 @@
             </div>
             <div class="header-actions">
                 <div class="dropdown d-inline-block me-2">
-                    <button class="btn btn-white text-success fw-bold shadow-sm rounded-pill px-3 dropdown-toggle border" type="button" data-bs-toggle="dropdown">
+                    <button class="btn btn-white text-success fw-bold shadow-sm rounded-pill px-3 dropdown-toggle border" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-file-export me-2"></i> Export
                     </button>
-                    <ul class="dropdown-menu shadow border-0" style="border-radius: 12px;">
-                        <li><h6 class="dropdown-header text-uppercase small fw-bold">Select Scope</h6></li>
-                        <li><a class="dropdown-item" href="/admin/quiz/export?type=all" target="_blank">Full Backup (All Questions)</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" aria-labelledby="exportDropdown" style="border-radius: 12px; min-width: 220px; z-index: 1060;">
+                        <li><h6 class="dropdown-header text-uppercase small fw-bold text-muted mb-2">Select Scope</h6></li>
+                        <li><a class="dropdown-item rounded-3 mb-1" href="<?= app_base_url('admin/quiz/export?type=all') ?>" target="_blank">
+                            <i class="fas fa-archive me-2 text-primary"></i> Full Backup
+                        </a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <?php if(isset($mainCategories) && is_array($mainCategories)): ?>
+                        <?php if(!empty($mainCategories)): ?>
                             <?php foreach($mainCategories as $cat): ?>
-                                <li><a class="dropdown-item" href="/admin/quiz/export?category_id=<?= $cat->id ?>">Only <?= $cat->title ?></a></li>
+                                <li><a class="dropdown-item rounded-3 mb-1" href="<?= app_base_url('admin/quiz/export?category_id=' . ($cat['id'] ?? $cat->id)) ?>">
+                                    <i class="fas fa-folder me-2 text-warning"></i> <?= htmlspecialchars($cat['title'] ?? $cat->title) ?>
+                                </a></li>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <li><span class="dropdown-item text-muted">Categories not loaded</span></li>
+                            <li><span class="dropdown-item text-muted small">No root categories found</span></li>
                         <?php endif; ?>
                     </ul>
                 </div>

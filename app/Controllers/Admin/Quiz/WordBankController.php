@@ -19,7 +19,7 @@ class WordBankController extends Controller
 
     public function index()
     {
-        $words = $this->wordModel->getAll();
+        $words = $this->wordModel->findAll();
         $this->view->render('admin/quiz/word-bank/index', [
             'page_title' => 'Terminology Manager',
             'words' => $words

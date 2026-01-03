@@ -14,45 +14,44 @@ function renderNodeRow($node, $level = 0) {
 
     $hasChildren = !empty($node['children']);
     ?>
-    <div class="syllabus-node position-relative mb-2" style="margin-left: <?= $padding ?>px;">
-        <!-- Connector Line (Vertical) -->
+    <div class="syllabus-node position-relative mb-3" style="margin-left: <?= $padding ?>px;">
+        <!-- Connector Line (Vertical & Horizontal) -->
         <?php if ($level > 0): ?>
-            <div class="position-absolute border-start border-2" style="left: -24px; top: -15px; bottom: 50%; width: 0; border-color: #e3e6f0 !important;"></div>
-            <div class="position-absolute border-top border-2" style="left: -24px; top: 50%; width: 20px; border-color: #e3e6f0 !important;"></div>
+            <div class="position-absolute border-start border-2" style="left: -20px; top: -20px; bottom: 50%; width: 0; border-color: #dee2e6 !important;"></div>
+            <div class="position-absolute border-top border-2" style="left: -20px; top: 50%; width: 20px; border-color: #dee2e6 !important;"></div>
         <?php endif; ?>
 
-        <div class="card border-0 shadow-sm transition-hover">
-            <div class="card-body py-2 px-3 d-flex align-items-center">
+        <div class="card border-0 shadow-sm transition-hover blueprint-card overflow-hidden" 
+             style="border-radius: 10px; border-left: 4px solid <?= $level == 0 ? 'var(--admin-primary)' : ($level == 1 ? 'var(--admin-info)' : 'var(--admin-gray-300)') ?> !important;">
+            <div class="card-body py-3 px-4 d-flex align-items-center">
                 <!-- Drag Handle -->
-                <div class="me-3 text-gray-300 cursor-move"><i class="bi bi-grip-vertical"></i></div>
+                <div class="me-3 text-gray-300 cursor-move handle"><i class="bi bi-grip-vertical fs-5"></i></div>
 
                 <!-- Icon -->
-                <div class="me-3 fs-5 <?= $color ?>"><i class="bi <?= $icon ?>"></i></div>
+                <div class="me-3 fs-4 <?= $color ?> d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(var(--admin-primary-rgb), 0.05); border-radius: 8px;">
+                    <i class="bi <?= $icon ?>"></i>
+                </div>
 
                 <!-- Content -->
                 <div class="flex-grow-1">
-                    <div class="d-flex align-items-center mb-1">
-                        <span class="fw-bold text-dark me-2"><?= htmlspecialchars($node['title']) ?></span>
+                    <div class="d-flex align-items-center mb-0">
+                        <span class="fw-bold text-dark fs-6 me-2"><?= htmlspecialchars($node['title']) ?></span>
                         
                         <?php if ($node['is_premium']): ?>
-                            <span class="badge bg-warning text-dark border border-warning-subtle rounded-pill me-1" title="Premium">
-                                <i class="bi bi-gem"></i>
+                            <span class="badge bg-warning text-dark border border-warning-subtle rounded-pill me-2 px-2 py-1" style="font-size: 10px;">
+                                <i class="bi bi-gem me-1"></i> PREMIUM
                             </span>
                         <?php endif; ?>
                         
-                        <small class="text-muted ms-2 bg-light px-2 rounded-pill border">
-                            Q: <?= $node['question_count'] ?? 0 ?>
-                        </small>
+                        <span class="badge bg-light text-secondary border rounded-pill px-2 py-1" style="font-size: 10px;">
+                            <?= $node['question_count'] ?? 0 ?> Qs
+                        </span>
                     </div>
-                    <?php if(!empty($node['slug'])): ?>
-                        <div class="text-xs text-muted font-monospace"><?= $node['slug'] ?></div>
-                    <?php endif; ?>
                 </div>
 
-                <!-- Actions -->
-                <div class="ms-3 op-0 hover-op-100">
-                    <button class="btn btn-sm btn-light text-primary"><i class="bi bi-pencil"></i></button>
-                    <!-- Add Child Button based on level logic could go here -->
+                <!-- Actions (Visible on Hover) -->
+                <div class="ms-3 node-actions opacity-0 transition-all">
+                    <a href="<?= app_base_url('admin/quiz/categories/edit/'.$node['id']) ?>" class="btn btn-sm btn-white border shadow-sm rounded-circle"><i class="bi bi-pencil-fill text-primary"></i></a>
                 </div>
             </div>
         </div>
@@ -68,27 +67,39 @@ function renderNodeRow($node, $level = 0) {
 }
 ?>
 
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">
-            <i class="bi bi-diagram-3-fill text-primary me-2"></i> Syllabus Master
-        </h1>
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
         <div>
-            <span class="badge bg-white text-secondary border shadow-sm p-2"><i class="bi bi-layers me-1"></i> Total Nodes: <?= $stats['nodes'] ?></span>
+            <h1 class="h3 mb-1 text-gray-800 fw-bold">
+                <i class="bi bi-diagram-3-fill text-primary me-2"></i> Syllabus Master
+            </h1>
+            <p class="text-muted small mb-0">Hierarchical overview of all Exam Streams & Units.</p>
+        </div>
+        <div class="d-flex gap-3 align-items-center">
+            <div class="text-end">
+                <div class="h5 mb-0 fw-bold"><?= $stats['nodes'] ?></div>
+                <div class="text-xs text-uppercase text-muted fw-bold">Total Nodes</div>
+            </div>
+            <a href="<?= app_base_url('admin/quiz/categories') ?>" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                <i class="bi bi-gear-fill me-2"></i> Manage Root
+            </a>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-12">
+        <div class="col-lg-10 mx-auto">
             
             <?php if (empty($tree)): ?>
-                <div class="text-center py-5">
-                    <div class="mb-3 text-gray-300"><i class="bi bi-tree fs-1"></i></div>
-                    <h5 class="text-muted">Syllabus Tree is Empty</h5>
-                    <a href="<?= app_base_url('admin/quiz/categories') ?>" class="btn btn-primary mt-3">Create Root Category</a>
+                <div class="card border-0 shadow-sm py-5 text-center">
+                    <div class="card-body">
+                        <div class="mb-3 text-light"><i class="bi bi-tree-fill" style="font-size: 80px;"></i></div>
+                        <h4 class="text-dark fw-bold">Your Syllabus Tree is Empty</h4>
+                        <p class="text-muted">Start building your educational structure by defining main subjects.</p>
+                        <a href="<?= app_base_url('admin/quiz/categories') ?>" class="btn btn-primary mt-3 px-5 rounded-pill">Define Root Category</a>
+                    </div>
                 </div>
             <?php else: ?>
-                <div class="syllabus-tree-container py-3">
+                <div class="syllabus-tree-container ps-2">
                     <?php foreach ($tree as $rootNode): ?>
                         <?= renderNodeRow($rootNode) ?>
                     <?php endforeach; ?>
@@ -100,8 +111,21 @@ function renderNodeRow($node, $level = 0) {
 </div>
 
 <style>
-    .transition-hover { transition: all 0.2s; }
-    .transition-hover:hover { transform: translateX(5px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
-    .op-0 { opacity: 0; transition: opacity 0.2s; }
-    .syllabus-node:hover .op-0 { opacity: 1; }
+    .transition-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .blueprint-card:hover { transform: translateX(8px); box-shadow: 0 10px 20px rgba(0,0,0,0.08)!important; }
+    .blueprint-card:hover .node-actions { opacity: 1 !important; transform: translateX(0); }
+    .node-actions { transform: translateX(10px); }
+    .syllabus-node::before {
+        content: '';
+        position: absolute;
+        left: -20px;
+        top: 0;
+        bottom: 0;
+        border-left: 2px dashed #dee2e6;
+        display: none; /* Can be enabled for deep vertical lines */
+    }
+    .syllabus-tree-container {
+        border-left: 2px solid #f8f9fc;
+        padding-left: 10px;
+    }
 </style>

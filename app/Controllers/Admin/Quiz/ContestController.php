@@ -31,7 +31,7 @@ class ContestController extends Controller
      */
     public function index()
     {
-        $contests = $this->contestModel->getAll();
+        $contests = $this->contestModel->findAll();
         
         // Get AI Manager status from settings
         $stmt = $this->db->getPdo()->prepare("SELECT value FROM settings WHERE `key` = 'contest_auto_manager' LIMIT 1");

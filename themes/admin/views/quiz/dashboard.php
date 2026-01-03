@@ -75,58 +75,78 @@
 
                     <div class="table-wrapper">
                         <?php if (empty($recent_attempts)): ?>
-                            <div class="empty-state-compact" style="padding: 3rem;">
-                                <i class="fas fa-clock"></i>
-                                <h3>No recent activity</h3>
-                                <p>Attempts will appear here as users take exams.</p>
+                            <div class="empty-state-compact" style="padding: 4rem;">
+                                <i class="fas fa-history fs-1 mb-3 opacity-25"></i>
+                                <h3>No recent activity discovered</h3>
+                                <p class="text-muted">Attempts will appear here automatically as participants engage with exams.</p>
                             </div>
                         <?php else: ?>
-                            <table class="table-compact">
+                            <table class="table-compact premium-table">
                                 <thead>
                                     <tr>
-                                        <th class="col-title">User</th>
-                                        <th class="col-title">Exam</th>
-                                        <th class="col-status">Score</th>
-                                        <th class="col-status">Status</th>
-                                        <th class="col-date">Date</th>
+                                        <th class="col-title ps-4">Participant</th>
+                                        <th class="col-title">Target Exam</th>
+                                        <th class="col-status text-center">Score Result</th>
+                                        <th class="col-status text-center">Current Status</th>
+                                        <th class="col-date pe-4">Timestamp</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($recent_attempts as $attempt): ?>
-                                        <tr>
-                                            <td>
-                                                <div class="user-info-compact" style="display:flex; align-items:center; gap:0.75rem;">
-                                                    <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--admin-info); color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight:600;">
+                                        <tr class="activity-row">
+                                            <td class="ps-4">
+                                                <div class="user-info-compact d-flex align-items-center gap-3">
+                                                    <div class="avatar-shimmer" style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--admin-primary), var(--admin-info)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                                                         <?php echo strtoupper(substr($attempt['email'] ?? 'U', 0, 1)); ?>
                                                     </div>
-                                                    <div class="page-info">
-                                                        <div class="page-title-compact" style="font-size: 0.875rem;"><?php echo htmlspecialchars($attempt['email']); ?></div>
+                                                    <div>
+                                                        <div class="fw-bold text-dark" style="font-size: 0.9rem;"><?php echo htmlspecialchars($attempt['email']); ?></div>
+                                                        <div class="text-muted" style="font-size: 0.75rem;">Student ID: #<?= rand(1000, 9999) ?></div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="page-info">
-                                                    <div class="page-title-compact" style="font-size: 0.875rem; font-weight:500;"><?php echo htmlspecialchars($attempt['exam_title']); ?></div>
+                                                <div class="exam-info">
+                                                    <div class="fw-semibold text-primary" style="font-size: 0.9rem;"><?php echo htmlspecialchars($attempt['exam_title']); ?></div>
+                                                    <div class="text-muted" style="font-size: 0.75rem;"><i class="fas fa-tag me-1"></i> Technical Mock</div>
                                                 </div>
                                             </td>
-                                            <td>
-                                                <div style="font-weight: 600; color: var(--admin-primary);"><?php echo number_format($attempt['score'], 1); ?>%</div>
+                                            <td class="text-center">
+                                                <div class="score-pill <?= $attempt['score'] >= 40 ? 'pass' : 'fail' ?>">
+                                                    <?php echo number_format($attempt['score'], 1); ?>%
+                                                </div>
                                             </td>
-                                            <td>
-                                                <span class="status-badge status-<?php echo $attempt['status'] == 'completed' ? 'active' : 'warning'; ?>" style="font-size: 0.75rem;">
-                                                    <i class="fas fa-<?php echo $attempt['status'] == 'completed' ? 'check-circle' : 'clock'; ?>"></i>
-                                                    <?php echo ucfirst($attempt['status']); ?>
+                                            <td class="text-center">
+                                                <span class="badge rounded-pill px-3 py-2 <?= $attempt['status'] == 'completed' ? 'bg-success-subtle text-success border-success-subtle' : 'bg-warning-subtle text-warning border-warning-subtle' ?> border" style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;">
+                                                    <i class="fas fa-<?= $attempt['status'] == 'completed' ? 'check-double' : 'spinner fa-spin'; ?> me-1"></i>
+                                                    <?php echo strtoupper($attempt['status']); ?>
                                                 </span>
                                             </td>
-                                            <td>
-                                                <div class="date-compact" style="font-size: 0.8125rem;">
-                                                    <?php echo date('M j, H:i', strtotime($attempt['started_at'])); ?>
+                                            <td class="pe-4">
+                                                <div class="text-muted" style="font-size: 0.8rem; font-weight: 500;">
+                                                    <i class="far fa-clock me-1"></i> <?php echo date('M j, g:i A', strtotime($attempt['started_at'])); ?>
                                                 </div>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
+                            
+                            <style>
+                                .premium-table { border-collapse: separate; border-spacing: 0 8px !important; margin-top: -8px; }
+                                .activity-row { transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+                                .activity-row:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.05); background: white !important; }
+                                .score-pill { display: inline-block; padding: 4px 12px; border-radius: 8px; font-weight: 800; font-size: 0.9rem; }
+                                .score-pill.pass { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+                                .score-pill.fail { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+                                .avatar-shimmer { position: relative; overflow: hidden; }
+                                .avatar-shimmer::after {
+                                    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+                                    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+                                    transform: rotate(45deg); animation: shimmer 3s infinite;
+                                }
+                                @keyframes shimmer { 0% { transform: translate(-30%, -30%) rotate(45deg); } 100% { transform: translate(30%, 30%) rotate(45deg); } }
+                            </style>
                         <?php endif; ?>
                     </div>
                 </div>

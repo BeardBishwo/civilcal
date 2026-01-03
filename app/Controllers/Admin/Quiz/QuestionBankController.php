@@ -73,24 +73,17 @@ class QuestionBankController extends Controller
         $stmt->execute($params);
         $questions = $stmt->fetchAll();
 
-        // Load Categories for filter dropdown
-        $categories = $this->db->find('quiz_categories', ['is_active' => 1]);
-
-        // Stats for Quick Bar
-        $stats = [
-            'total' => $total, // Total matching filter or total overall? Usually total overall is better for bar.
-            'multi' => $this->db->count('quiz_questions', ['type' => 'MULTI']),
-            'order' => $this->db->count('quiz_questions', ['type' => 'ORDER'])
-        ];
+        // Load roots from syllabus tree for export scope
+        $mainCategories = $this->db->fetchAll("SELECT id, title FROM syllabus_nodes WHERE parent_id IS NULL AND is_active = 1 ORDER BY order_index ASC");
 
         $this->view->render('admin/quiz/questions/index', [
             'page_title' => 'Question Bank',
             'questions' => $questions,
             'total' => $total,
-            'stats' => $stats, // New data
+            'stats' => $stats,
             'page' => $page,
             'limit' => $limit,
-            'categories' => $categories
+            'mainCategories' => $mainCategories
         ]);
     }
 
