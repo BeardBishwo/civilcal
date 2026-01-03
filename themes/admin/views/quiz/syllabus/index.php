@@ -1,86 +1,118 @@
-<div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Syllabus Manager</h1>
-        <button class="btn btn-primary btn-sm shadow-sm" data-toggle="modal" data-target="#modalCategory">
-            <i class="fas fa-plus fa-sm text-white-50"></i> Add Stream/Category
-        </button>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Hierarchy (Stream > Subject > Topic)</h6>
+<div class="admin-wrapper-container">
+    <div class="admin-content-wrapper">
+        
+        <!-- Compact Page Header -->
+        <div class="compact-header">
+            <div class="header-left">
+                <div class="header-title">
+                    <i class="fas fa-sitemap"></i>
+                    <h1>Syllabus Manager</h1>
                 </div>
-                <div class="card-body">
+                <div class="header-subtitle"><?php echo !empty($syllabus) ? count($syllabus) . ' streams configured' : 'Define your quiz hierarchy'; ?></div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary btn-compact" data-toggle="modal" data-target="#modalCategory">
+                    <i class="fas fa-plus"></i>
+                    <span>Add Stream</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Syllabus Content -->
+        <div class="pages-content">
+            <div id="hierarchy-view" class="view-section active">
+                <div class="table-container p-0 border-0 shadow-none">
                     <?php if (empty($syllabus)): ?>
-                        <div class="text-center py-5">
-                            <img src="<?php echo app_base_url('assets/images/empty.svg'); ?>" alt="Empty" style="width: 150px; opacity: 0.5;">
-                            <p class="mt-3 text-gray-500">No syllabus defined yet. Start by adding a stream (e.g., Civil Engineering).</p>
+                        <div class="empty-state-compact">
+                            <i class="fas fa-sitemap"></i>
+                            <h3>No syllabus defined</h3>
+                            <p>Start by adding a master stream (e.g., "Engineering", "General Knowledge").</p>
+                            <button class="btn btn-primary btn-compact mt-3" data-toggle="modal" data-target="#modalCategory">
+                                Create First Stream
+                            </button>
                         </div>
                     <?php else: ?>
                         <div class="accordion" id="syllabusAccordion">
                             <?php foreach ($syllabus as $catId => $cat): ?>
-                                <div class="card mb-2 border-left-primary">
-                                    <div class="card-header d-flex justify-content-between align-items-center bg-white" id="heading<?php echo $catId; ?>">
-                                        <h2 class="mb-0">
-                                            <button class="btn btn-link btn-block text-left font-weight-bold text-primary collapsed" type="button" data-toggle="collapse" data-target="#collapse<?php echo $catId; ?>">
-                                                <i class="fas fa-folder mr-2"></i> <?php echo htmlspecialchars($cat['name']); ?>
+                                <div class="compact-card mb-3 border">
+                                    <div class="compact-card-header bg-white" id="heading<?php echo $catId; ?>">
+                                        <div class="d-flex justify-content-between align-items-center w-100">
+                                            <button class="btn btn-link text-left font-weight-bold text-dark p-0 text-decoration-none d-flex align-items-center gap-3 flex-grow-1" type="button" data-toggle="collapse" data-target="#collapse<?php echo $catId; ?>">
+                                                <div class="icon-box-sm bg-primary-subtle text-primary rounded-3">
+                                                    <i class="fas fa-folder"></i>
+                                                </div>
+                                                <span class="fs-5"><?php echo htmlspecialchars($cat['name']); ?></span>
                                             </button>
-                                        </h2>
-                                        <div class="actions">
-                                            <button class="btn btn-sm btn-outline-success mr-1" onclick="openSubjectModal(<?php echo $catId; ?>, '<?php echo addslashes($cat['name']); ?>')" title="Add Subject">
-                                                <i class="fas fa-plus"></i> Subject
-                                            </button>
-                                            <button class="btn btn-sm btn-light text-primary" onclick="editCategory(<?php echo $catId; ?>, '<?php echo addslashes($cat['name']); ?>', '<?php echo $cat['slug']; ?>')" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-light text-danger" onclick="deleteItem('categories', <?php echo $catId; ?>)" title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                            
+                                            <div class="actions d-flex gap-2">
+                                                <button class="btn btn-sm btn-outline-success font-weight-bold" onclick="openSubjectModal(<?php echo $catId; ?>, '<?php echo addslashes($cat['name']); ?>')" title="Add Subject">
+                                                    <i class="fas fa-plus me-1"></i> Subject
+                                                </button>
+                                                <div class="dropdown no-arrow">
+                                                    <button class="btn btn-sm btn-light rounded-circle" type="button" data-toggle="dropdown">
+                                                        <i class="fas fa-ellipsis-v text-muted"></i>
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
+                                                        <a class="dropdown-item" href="javascript:void(0)" onclick="editCategory(<?php echo $catId; ?>, '<?php echo addslashes($cat['name']); ?>', '<?php echo $cat['slug']; ?>')">
+                                                            <i class="fas fa-edit fa-sm fa-fw mr-2 text-gray-400"></i> Edit
+                                                        </a>
+                                                        <div class="dropdown-divider"></div>
+                                                        <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="deleteItem('categories', <?php echo $catId; ?>)">
+                                                            <i class="fas fa-trash fa-sm fa-fw mr-2 text-danger"></i> Delete
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div id="collapse<?php echo $catId; ?>" class="collapse" data-parent="#syllabusAccordion">
-                                        <div class="card-body bg-gray-100">
+                                    <div id="collapse<?php echo $catId; ?>" class="collapse show" data-parent="#syllabusAccordion">
+                                        <div class="card-body bg-light-subtle p-0">
                                             <!-- Subjects List -->
                                             <?php if (empty($cat['subjects'])): ?>
-                                                <p class="text-muted ml-4"><small>No subjects added yet.</small></p>
+                                                <div class="p-4 text-center text-muted">
+                                                    <small>No subjects in this stream.</small>
+                                                </div>
                                             <?php else: ?>
-                                                <ul class="list-group list-group-flush">
+                                                <div class="list-group list-group-flush">
                                                     <?php foreach ($cat['subjects'] as $subId => $sub): ?>
-                                                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 pl-4">
-                                                            <div>
-                                                                <i class="fas fa-book text-success mr-2"></i> 
-                                                                <strong><?php echo htmlspecialchars($sub['name']); ?></strong>
-                                                                <div class="ml-4 mt-2">
-                                                                    <!-- Topics List -->
-                                                                    <?php if (!empty($sub['topics'])): ?>
-                                                                        <?php foreach ($sub['topics'] as $topic): ?>
-                                                                            <span class="badge badge-light border mr-1 mb-1 p-2">
-                                                                                <i class="fas fa-tag text-info mr-1"></i> <?php echo htmlspecialchars($topic['name']); ?>
-                                                                                <i class="fas fa-times text-danger ml-2 cursor-pointer" onclick="deleteItem('topics', <?php echo $topic['id']; ?>)" title="Remove Topic"></i>
-                                                                                <i class="fas fa-pencil-alt text-gray-500 ml-1 cursor-pointer" onclick="editTopic(<?php echo $topic['id']; ?>, '<?php echo addslashes($topic['name']); ?>', <?php echo $subId; ?>)" title="Edit"></i>
-                                                                            </span>
-                                                                        <?php endforeach; ?>
-                                                                    <?php endif; ?>
-                                                                    <button class="btn btn-xs btn-outline-info rounded-pill mt-1" onclick="openTopicModal(<?php echo $subId; ?>, '<?php echo addslashes($sub['name']); ?>')">
-                                                                        <i class="fas fa-plus"></i> Add Topic
-                                                                    </button>
+                                                        <div class="list-group-item bg-transparent border-bottom">
+                                                            <div class="d-flex justify-content-between align-items-start">
+                                                                <div class="w-100">
+                                                                     <div class="d-flex align-items-center mb-2">
+                                                                        <i class="fas fa-book text-success me-2"></i> 
+                                                                        <strong class="text-dark me-2"><?php echo htmlspecialchars($sub['name']); ?></strong>
+                                                                         <div class="dropdown no-arrow d-inline-block">
+                                                                            <i class="fas fa-cog text-muted cursor-pointer hover-primary" data-toggle="dropdown" style="font-size: 0.8rem;"></i>
+                                                                            <div class="dropdown-menu shadow animated--fade-in">
+                                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="editSubject(<?php echo $subId; ?>, '<?php echo addslashes($sub['name']); ?>', <?php echo $catId; ?>)">Edit Subject</a>
+                                                                                <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="deleteItem('subjects', <?php echo $subId; ?>)">Delete Subject</a>
+                                                                            </div>
+                                                                        </div>
+                                                                     </div>
+
+                                                                    <div class="ms-4 ps-1 d-flex flex-wrap align-items-center gap-2">
+                                                                        <!-- Topics List -->
+                                                                        <?php if (!empty($sub['topics'])): ?>
+                                                                            <?php foreach ($sub['topics'] as $topic): ?>
+                                                                                <span class="badge bg-white border text-secondary fw-normal d-flex align-items-center gap-2 px-2 py-1 rounded-pill">
+                                                                                    <?php echo htmlspecialchars($topic['name']); ?>
+                                                                                    <div class="d-flex gap-1 border-start ps-2 ms-1">
+                                                                                        <i class="fas fa-pencil-alt text-muted cursor-pointer hover-primary" onclick="editTopic(<?php echo $topic['id']; ?>, '<?php echo addslashes($topic['name']); ?>', <?php echo $subId; ?>)" title="Edit" style="font-size: 10px;"></i>
+                                                                                        <i class="fas fa-times text-muted cursor-pointer hover-danger" onclick="deleteItem('topics', <?php echo $topic['id']; ?>)" title="Remove" style="font-size: 10px;"></i>
+                                                                                    </div>
+                                                                                </span>
+                                                                            <?php endforeach; ?>
+                                                                        <?php endif; ?>
+                                                                        <button class="btn btn-sm btn-outline-secondary rounded-circle py-0 px-1" onclick="openTopicModal(<?php echo $subId; ?>, '<?php echo addslashes($sub['name']); ?>')" title="Add Topic" style="width: 24px; height: 24px;">
+                                                                            <i class="fas fa-plus" style="font-size: 10px;"></i>
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="actions">
-                                                                <button class="btn btn-sm btn-light text-primary" onclick="editSubject(<?php echo $subId; ?>, '<?php echo addslashes($sub['name']); ?>', <?php echo $catId; ?>)">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </button>
-                                                                <button class="btn btn-sm btn-light text-danger" onclick="deleteItem('subjects', <?php echo $subId; ?>)">
-                                                                    <i class="fas fa-trash"></i>
-                                                                </button>
-                                                            </div>
-                                                        </li>
-                                                        <hr class="my-1 border-top-dashed">
+                                                        </div>
                                                     <?php endforeach; ?>
-                                                </ul>
+                                                </div>
                                             <?php endif; ?>
                                         </div>
                                     </div>
@@ -94,87 +126,179 @@
     </div>
 </div>
 
-<!-- Modals -->
-
-<!-- Category Modal -->
-<div class="modal fade" id="modalCategory" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
+<!-- Modals (Placed at bottom to confirm visibility control) -->
+<div class="modal fade" id="modalCategory" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg">
             <form id="formCategory" method="POST" action="<?php echo app_base_url('admin/quiz/categories/store'); ?>">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalCategoryTitle">Add New Stream/Category</h5>
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalCategoryTitle">Stream/Category Manager</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <input type="hidden" name="id" id="cat_id">
-                    <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" class="form-control" name="name" id="cat_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Slug (Optional)</label>
-                        <input type="text" class="form-control" name="slug" id="cat_slug">
+                    <div class="form-group-compact">
+                        <label>Stream Name</label>
+                        <input type="text" class="form-control" name="name" id="cat_name" required placeholder="e.g. Civil Engineering">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save Category</button>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Subject Modal -->
-<div class="modal fade" id="modalSubject" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
+<div class="modal fade" id="modalSubject" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg">
             <form id="formSubject" method="POST" action="<?php echo app_base_url('admin/quiz/subjects/store'); ?>">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalSubjectTitle">Add Subject</h5>
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="modalSubjectTitle">Subject Manager</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <input type="hidden" name="id" id="sub_id">
                     <input type="hidden" name="category_id" id="sub_cat_id">
-                    <div class="alert alert-info py-1"><small>Adding to Category: <strong id="sub_cat_name_display"></strong></small></div>
-                    <div class="form-group">
+                    <div class="alert alert-success py-2 mb-3"><small>Adding to stream: <strong id="sub_cat_name_display"></strong></small></div>
+                    <div class="form-group-compact">
                         <label>Subject Name</label>
-                        <input type="text" class="form-control" name="name" id="sub_name" required>
+                        <input type="text" class="form-control" name="name" id="sub_name" required placeholder="e.g. Structural Analysis">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save Subject</button>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success btn-sm">Save Subject</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Topic Modal -->
-<div class="modal fade" id="modalTopic" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
+<div class="modal fade" id="modalTopic" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg">
             <form id="formTopic" method="POST" action="<?php echo app_base_url('admin/quiz/topics/store'); ?>">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalTopicTitle">Add Topic</h5>
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="modalTopicTitle">Topic Manager</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <input type="hidden" name="id" id="topic_id">
                     <input type="hidden" name="subject_id" id="topic_sub_id">
-                    <div class="alert alert-info py-1"><small>Adding to Subject: <strong id="topic_sub_name_display"></strong></small></div>
-                    <div class="form-group">
+                    <div class="alert alert-info py-2 mb-3"><small>Adding to subject: <strong id="topic_sub_name_display"></strong></small></div>
+                    <div class="form-group-compact">
                         <label>Topic Name</label>
-                        <input type="text" class="form-control" name="name" id="topic_name" required>
+                        <input type="text" class="form-control" name="name" id="topic_name" required placeholder="e.g. Beam Deflection">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save Topic</button>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-info btn-sm text-white">Save Topic</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<style>
+/* Robust Premium Layout CSS */
+.admin-wrapper-container {
+    padding: 1.5rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.compact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-title i {
+    font-size: 1.5rem;
+    color: var(--admin-primary);
+}
+
+.header-title h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--bs-gray-900, #212529);
+    margin: 0;
+}
+
+.header-subtitle {
+    font-size: 0.9rem;
+    color: var(--bs-gray-600, #6c757d);
+    margin-top: 0.25rem;
+    margin-left: 2.5rem;
+}
+
+.compact-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    border: 1px solid rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.compact-card-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    background: #fff;
+}
+
+.bg-primary-subtle {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.icon-box-sm {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.hover-primary:hover { color: var(--admin-primary) !important; }
+.hover-danger:hover { color: var(--admin-danger) !important; }
+
+/* Modal Fixes */
+.modal { display: none; } /* Default hidden */
+.modal-backdrop { z-index: 1040; }
+.modal { z-index: 1050; }
+.modal.show { display: block; padding-right: 17px; background: rgba(0,0,0,0.5); }
+
+.form-group-compact label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 0.4rem;
+}
+
+.ms-4 { margin-left: 1.5rem !important; }
+.me-2 { margin-right: 0.5rem !important; }
+.gap-2 { gap: 0.5rem !important; }
+.gap-3 { gap: 1rem !important; }
+</style>
 
 <script>
     // Handlers
@@ -201,16 +325,15 @@
     function editCategory(id, name, slug) {
         $('#cat_id').val(id);
         $('#cat_name').val(name);
-        $('#cat_slug').val(slug);
         $('#formCategory').attr('action', '<?php echo app_base_url('admin/quiz/categories/update/'); ?>' + id);
-        $('#modalCategoryTitle').text('Edit Category');
+        $('#modalCategoryTitle').text('Edit Stream');
         $('#modalCategory').modal('show');
     }
 
     function editSubject(id, name, catId) {
         $('#sub_id').val(id);
         $('#sub_cat_id').val(catId);
-        $('#sub_cat_name_display').text('Current Category'); 
+        $('#sub_cat_name_display').text('Current Stream'); 
         $('#sub_name').val(name);
         $('#formSubject').attr('action', '<?php echo app_base_url('admin/quiz/subjects/update/'); ?>' + id);
         $('#modalSubjectTitle').text('Edit Subject');

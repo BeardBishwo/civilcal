@@ -1981,6 +1981,7 @@ $router->add("POST", "/admin/quiz/exams/update/{id}", "Admin\\Quiz\\ExamControll
 $router->add("GET", "/admin/quiz/exams/builder/{id}", "Admin\\Quiz\\ExamController@builder", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/exams/add-question", "Admin\\Quiz\\ExamController@addQuestionToExam", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/exams/remove-question", "Admin\\Quiz\\ExamController@removeQuestionFromExam", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/results", "Admin\\Quiz\\ResultsController@index", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/analytics", "Admin\\Quiz\\ResultsController@index", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/settings", "Admin\\SettingsController@quiz", ["auth", "admin"]);
 
