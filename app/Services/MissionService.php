@@ -28,7 +28,7 @@ class MissionService
         
         foreach ($missions as $mission) {
             // Check if user already has progress record for today
-            $progress = $this->db->fetch("
+            $progress = $this->db->query("
                 SELECT * FROM user_mission_progress 
                 WHERE user_id = :uid AND mission_id = :mid AND mission_date = :date
             ", [

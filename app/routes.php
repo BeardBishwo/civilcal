@@ -1961,6 +1961,13 @@ $router->add("POST", "/admin/quiz/topics/delete/{id}", "Admin\\Quiz\\SyllabusCon
 $router->add("GET", "/admin/quiz/get-subjects/{id}", "Admin\\Quiz\\SyllabusController@getSubjects", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/get-topics/{id}", "Admin\\Quiz\\SyllabusController@getTopics", ["auth", "admin"]);
 
+// Enterprise Import System Routes
+$router->add("GET", "/admin/quiz/import/template", "Admin\Quiz\QuestionImportController@downloadTemplate", ["auth", "admin"]);
+$router->add("POST", "/api/admin/quiz/import/process-chunk", "Admin\Quiz\QuestionImportController@processChunk", ["auth", "admin"]);
+$router->add("GET", "/api/admin/quiz/import/staging-stats/{batchId}", "Admin\Quiz\QuestionImportController@stagingStats", ["auth", "admin"]);
+$router->add("POST", "/api/admin/quiz/import/resolve", "Admin\Quiz\QuestionImportController@resolve", ["auth", "admin"]);
+$router->add("POST", "/api/admin/quiz/import/publish-clean", "Admin\Quiz\QuestionImportController@publishClean", ["auth", "admin"]);
+
 // Question Bank
 $router->add("GET", "/admin/quiz/questions", "Admin\\Quiz\\QuestionBankController@index", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/questions/create", "Admin\\Quiz\\QuestionBankController@create", ["auth", "admin"]);

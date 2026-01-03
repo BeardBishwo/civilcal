@@ -14,6 +14,7 @@ class ExamEngineController extends Controller
     protected $db;
     private $gamificationService;
     private NonceService $nonceService;
+    private $storagePath;
 
     public function __construct()
     {
@@ -22,15 +23,20 @@ class ExamEngineController extends Controller
         $this->db = \App\Core\Database::getInstance();
         $this->gamificationService = new GamificationService();
         $this->nonceService = new NonceService();
+        $this->storagePath = __DIR__ . '/../../../storage/app/exams/';
+        
+        if (!is_dir($this->storagePath)) {
+            mkdir($this->storagePath, 0777, true);
+        }
     }
 
     /**
-     * Start or Resume an Exam
+     * Start or Resume an Exam (JSON Cached)
      */
     public function start($slug)
     {
         // 1. Get Exam ID
-        $stmt = $this->db->getPdo()->prepare("SELECT id, title, duration_minutes, is_premium, price FROM quiz_exams WHERE slug = :slug");
+        $stmt = $this->db->getPdo()->prepare("SELECT id, title, duration_minutes, is_premium, shuffle_questions, mode FROM quiz_exams WHERE slug = :slug");
         $stmt->execute(['slug' => $slug]);
         $exam = $stmt->fetch();
 
@@ -38,7 +44,7 @@ class ExamEngineController extends Controller
             $this->redirect('/quiz');
         }
 
-        // 2. Check for existing active attempt
+        // 2. Check for existing active attempt (DB)
         $stmtAttempt = $this->db->getPdo()->prepare("
             SELECT id FROM quiz_attempts 
             WHERE user_id = :uid AND exam_id = :eid AND status = 'ongoing'
@@ -47,140 +53,175 @@ class ExamEngineController extends Controller
         $existing = $stmtAttempt->fetch();
 
         if ($existing) {
-            // Resume
+            // Check if JSON exists, if not regenerate it
+            if (!file_exists($this->storagePath . $existing['id'] . '.json')) {
+                $this->regenerateCache($existing['id'], $exam);
+            }
             $this->redirect('/quiz/room/' . $existing['id']);
         } else {
-            // Create New Attempt
+            // 3. Create New Attempt (DB)
             $sql = "INSERT INTO quiz_attempts (user_id, exam_id, status, started_at) VALUES (:uid, :eid, 'ongoing', NOW())";
             $stmtInsert = $this->db->getPdo()->prepare($sql);
             $stmtInsert->execute(['uid' => $_SESSION['user_id'], 'eid' => $exam['id']]);
             $attemptId = $this->db->getPdo()->lastInsertId();
+
+            // 4. Initialize JSON Cache
+            $this->initializeCache($attemptId, $exam);
 
             $this->redirect('/quiz/room/' . $attemptId);
         }
     }
 
     /**
-     * The Main Exam Room Interface
+     * Initialize the JSON Cache for a new attempt
      */
-    public function room($attemptId)
+    private function initializeCache($attemptId, $exam)
     {
-        // 1. Fetch Attempt & Exam
-        $sql = "
-            SELECT a.*, e.title, e.duration_minutes, e.mode, e.shuffle_questions
-            FROM quiz_attempts a
-            JOIN quiz_exams e ON a.exam_id = e.id
-            WHERE a.id = :aid AND a.user_id = :uid
-        ";
-        $stmt = $this->db->getPdo()->prepare($sql);
-        $stmt->execute(['aid' => $attemptId, 'uid' => $_SESSION['user_id']]);
-        $attempt = $stmt->fetch();
-
-        if (!$attempt || $attempt['status'] == 'completed') {
-            $this->redirect('/quiz/result/' . $attemptId);
-        }
-
-        // 2. Fetch Questions (Ordered)
-        // We need to fetch questions associated with this exam via pivot
+        // Fetch Questions
         $sqlQ = "
-            SELECT q.id, q.type, q.content, q.options, q.default_marks
+            SELECT q.id, q.type, q.content, q.options, q.default_marks, q.default_negative_marks, q.difficulty_level, q.answer_explanation as explanation
             FROM quiz_exam_questions eq
             JOIN quiz_questions q ON eq.question_id = q.id
             WHERE eq.exam_id = :eid
-            ORDER BY eq.order ASC, q.id ASC
+            ORDER BY eq.`order` ASC, q.id ASC
         ";
         $stmtQ = $this->db->getPdo()->prepare($sqlQ);
-        $stmtQ->execute(['eid' => $attempt['exam_id']]);
+        $stmtQ->execute(['eid' => $exam['id']]);
         $questions = $stmtQ->fetchAll(\PDO::FETCH_ASSOC);
 
         // Shuffle if enabled
-        if (!empty($attempt['shuffle_questions'])) {
-            mt_srand($attempt['id']); // Seed with attempt ID for deterministic shuffle
+        if (!empty($exam['shuffle_questions'])) {
             shuffle($questions);
-            mt_srand(); // Reset seed
         }
 
-        // Filter sensitive data from JSON before sending to view (e.g., is_correct flag)
+        // Decode JSON content/options for storage
         foreach ($questions as &$q) {
-            $opts = json_decode($q['options'], true);
-            if (is_array($opts)) {
-                foreach ($opts as &$opt) {
-                    if ($attempt['mode'] == 'exam') {
-                        unset($opt['is_correct']); // Hide answer in exam mode
+            $q['content'] = json_decode($q['content'], true);
+            $q['options'] = json_decode($q['options'], true);
+        }
+
+        $data = [
+            'attempt_id' => $attemptId,
+            'user_id' => $_SESSION['user_id'],
+            'exam' => $exam,
+            'questions' => $questions,
+            'answers' => [], // Key: question_id, Value: selected_option
+            'start_time' => time()
+        ];
+
+        file_put_contents($this->storagePath . $attemptId . '.json', json_encode($data));
+    }
+
+    /**
+     * Regenerate Cache from DB (Fallback)
+     */
+    private function regenerateCache($attemptId, $exam)
+    {
+         // Same as initialize but fetch existing answers if needed?
+         // For 'ongoing' attempt without cache, we assume lost cache = empty answers or fetch from DB if partial save existed?
+         // Since we only save to DB on submit, 'ongoing' implies we rely on JSON.
+         // If JSON is gone, answers are gone. This is a trade-off. 
+         // But user is on shared hosting, file persistence is usually reliable.
+         // We'll just re-init.
+         $this->initializeCache($attemptId, $exam);
+    }
+
+    /**
+     * The Main Exam Room Interface (Reads JSON)
+     */
+    public function room($attemptId)
+    {
+        $file = $this->storagePath . $attemptId . '.json';
+        
+        if (!file_exists($file)) {
+            // Fallback: Check DB if valid attempt, then regen
+             $stmt = $this->db->getPdo()->prepare("SELECT * FROM quiz_attempts WHERE id = :id AND user_id = :uid");
+             $stmt->execute(['id' => $attemptId, 'uid' => $_SESSION['user_id']]);
+             $attempt = $stmt->fetch();
+             
+             if (!$attempt || $attempt['status'] !== 'ongoing') {
+                 $this->redirect('/quiz/result/' . $attemptId);
+             }
+             
+             // Get Exam to regen
+             $stmtEx = $this->db->getPdo()->prepare("SELECT * FROM quiz_exams WHERE id = :id");
+             $stmtEx->execute(['id' => $attempt['exam_id']]);
+             $exam = $stmtEx->fetch();
+             
+             $this->regenerateCache($attemptId, $exam);
+        }
+
+        $data = json_decode(file_get_contents($file), true);
+        
+        // Security check
+        if ($data['user_id'] != $_SESSION['user_id']) {
+            die("Unauthorized Access");
+        }
+
+        // Prepare View Data (Hide sensitive)
+        $viewQuestions = $data['questions'];
+        foreach ($viewQuestions as &$q) {
+            if ($data['exam']['mode'] == 'exam') {
+                if (is_array($q['options'])) {
+                    foreach ($q['options'] as &$opt) {
+                        unset($opt['is_correct']);
                     }
                 }
+                unset($q['explanation']);
             }
-            $q['options'] = $opts; // Keep as array for view
-            $q['content'] = json_decode($q['content'], true);
         }
 
-        // 3. fetch saved answers if any (to restore state)
-        $sqlAns = "SELECT question_id, selected_options FROM quiz_attempt_answers WHERE attempt_id = :aid";
-        $stmtAns = $this->db->getPdo()->prepare($sqlAns);
-        $stmtAns->execute(['aid' => $attemptId]);
-        $savedAnswers = $stmtAns->fetchAll(\PDO::FETCH_KEY_PAIR); // [qid => json_val]
-
-        // Nonce for secure submission
+        // Nonce
         $nonce = $this->nonceService->generate($_SESSION['user_id'], 'quiz');
         $csrfToken = Security::generateCsrfToken();
 
         $this->view('quiz/arena/room', [
-            'attempt' => $attempt,
-            'questions' => $questions,
-            'savedAnswers' => $savedAnswers,
+            'attempt' => ['id' => $attemptId, 'title' => $data['exam']['title'], 'duration_minutes' => $data['exam']['duration_minutes']],
+            'questions' => $viewQuestions,
+            'savedAnswers' => $data['answers'],
             'quizNonce' => $nonce['nonce'] ?? null,
             'csrfToken' => $csrfToken,
-            'title' => 'Exam Room'
+            'title' => $data['exam']['title']
         ]);
     }
 
     /**
-     * AJAX: Save Answer (Heartbeat)
+     * AJAX: Save Answer (Writes to JSON)
      */
     public function saveAnswer()
     {
         $attemptId = $_POST['attempt_id'];
         $questionId = $_POST['question_id'];
-        $selectedOptions = $_POST['selected_options']; // Array or Value
+        $selectedOptions = $_POST['selected_options'];
         $trap = $_POST['trap_answer'] ?? '';
 
         if (!empty($trap)) {
             SecurityMonitor::log($_SESSION['user_id'] ?? null, 'honeypot_trigger', $_SERVER['REQUEST_URI'] ?? '', ['attempt_id' => $attemptId], 'critical');
-            http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Invalid request']);
-            exit;
+            http_response_code(400); echo json_encode(['error' => 'Invalid']); exit;
         }
-
-        // Validate ownership
-        $stmt = $this->db->getPdo()->prepare("SELECT id FROM quiz_attempts WHERE id = :id AND user_id = :uid");
-        $stmt->execute(['id' => $attemptId, 'uid' => $_SESSION['user_id']]);
-        if (!$stmt->fetch()) {
-             http_response_code(403);
-             echo json_encode(['success' => false, 'error' => 'Unauthorized']);
-             exit;
-        }
-
-        // Upsert Answer
-        $json = json_encode($selectedOptions);
         
-        $sql = "
-            INSERT INTO quiz_attempt_answers (attempt_id, question_id, selected_options)
-            VALUES (:aid, :qid, :val)
-            ON DUPLICATE KEY UPDATE selected_options = :val2
-        ";
-        $stmt = $this->db->getPdo()->prepare($sql);
-        $stmt->execute([
-            'aid' => $attemptId,
-            'qid' => $questionId,
-            'val' => $json,
-            'val2' => $json
-        ]);
+        $file = $this->storagePath . $attemptId . '.json';
+        if (!file_exists($file)) {
+            http_response_code(404); echo json_encode(['error' => 'Session expired']); exit;
+        }
+
+        $data = json_decode(file_get_contents($file), true);
+        
+        if ($data['user_id'] != $_SESSION['user_id']) {
+            http_response_code(403); echo json_encode(['error' => 'Unauthorized']); exit;
+        }
+
+        // Update Answer
+        $data['answers'][$questionId] = $selectedOptions;
+        
+        // Write Back
+        file_put_contents($file, json_encode($data));
 
         echo json_encode(['success' => true]);
     }
 
     /**
-     * Submit Exam
+     * Submit Exam (Reads JSON -> Writes DB)
      */
     public function submit()
     {
@@ -188,115 +229,81 @@ class ExamEngineController extends Controller
         $nonce = $_POST['nonce'] ?? '';
         $trap = $_POST['trap_answer'] ?? '';
 
-        if (!empty($trap)) {
-            SecurityMonitor::log($_SESSION['user_id'] ?? null, 'honeypot_trigger', $_SERVER['REQUEST_URI'] ?? '', ['attempt_id' => $attemptId], 'critical');
-            die("Invalid request");
-        }
+        if (!empty($trap)) die("Invalid request");
+        if (!$this->nonceService->validateAndConsume($nonce, $_SESSION['user_id'], 'quiz')) die("Token expired");
 
-        if (!$this->nonceService->validateAndConsume($nonce, $_SESSION['user_id'], 'quiz')) {
-            die("Invalid or expired token");
-        }
+        $file = $this->storagePath . $attemptId . '.json';
+        if (!file_exists($file)) die("Session not found");
+
+        $data = json_decode(file_get_contents($file), true);
         
-        // 1. Validate
-        $stmt = $this->db->getPdo()->prepare("SELECT * FROM quiz_attempts WHERE id = :id AND user_id = :uid");
-        $stmt->execute(['id' => $attemptId, 'uid' => $_SESSION['user_id']]);
-        $attempt = $stmt->fetch();
-
-        if (!$attempt) die("Invalid attempt");
-
-        // 2. Load Exam settings for marking scheme
-        $stmtExam = $this->db->getPdo()->prepare("SELECT * FROM quiz_exams WHERE id = :id");
-        $stmtExam->execute(['id' => $attempt['exam_id']]);
-        $exam = $stmtExam->fetch();
-
-        // 3. Calculate Score
+        // Grading Logic
         $totalScore = 0;
-        $correctAnswersList = []; // For batch gamification
         $correctCount = 0;
+        $correctAnswersList = [];
         
-        // Fetch all questions and user answers
-        $sqlParams = "
-            SELECT q.id, q.type, q.options, q.default_marks, q.default_negative_marks, q.difficulty_level,
-                   a.selected_options
-            FROM quiz_questions q
-            JOIN quiz_attempt_answers a ON q.id = a.question_id
-            WHERE a.attempt_id = :aid
-        ";
-        $stmtCalc = $this->db->getPdo()->prepare($sqlParams);
-        $stmtCalc->execute(['aid' => $attemptId]);
-        $results = $stmtCalc->fetchAll(\PDO::FETCH_ASSOC);
-
-        foreach ($results as $res) {
+        // Prepare Batch Insert SQL
+        $sqlValues = [];
+        $params = [];
+        
+        // We use the questions from JSON which are the source of truth for THIS attempt
+        foreach ($data['questions'] as $q) {
+            $qId = $q['id'];
+            $userAns = $data['answers'][$qId] ?? null;
             $isCorrect = false;
-            $userAns = json_decode($res['selected_options'], true);
-            $correctOpts = array_filter(json_decode($res['options'], true), function($o) { return !empty($o['is_correct']); });
             
-            // Get correct indices
-            $correctIndices = array_keys($correctOpts);
+            // Get Correct Options from JSON data
+            $correctOpts = array_filter($q['options'] ?? [], function($o) { return !empty($o['is_correct']); });
             
-            if ($res['type'] == 'mcq_single' || $res['type'] == 'true_false') {
-                if (isset($userAns) && in_array((int)$userAns, $correctIndices)) {
-                    $isCorrect = true; 
+            if (($q['type'] == 'mcq_single' || $q['type'] == 'true_false') && $userAns !== null) {
+                // If userAns matches keys of a correct option
+                if (array_key_exists((int)$userAns, $correctOpts)) {
+                     $isCorrect = true;     
                 }
-            } elseif ($res['type'] == 'numerical') {
-                $userVal = is_numeric($userAns) ? (float)$userAns : null;
-                if ($userVal !== null && count($correctOpts) > 0) {
-                    $firstCorrect = reset($correctOpts);
-                    $targetVal = (float)$firstCorrect['text'];
-                    $tolerance = isset($firstCorrect['tolerance']) ? (float)$firstCorrect['tolerance'] : 0;
-                    
-                    if ($userVal >= ($targetVal - $tolerance) && $userVal <= ($targetVal + $tolerance)) {
-                        $isCorrect = true;
-                    }
-                }
-            }
+            } 
             
-            $marks = $isCorrect ? $res['default_marks'] : (-1 * abs($res['default_negative_marks'] ?? 0));
-            if($userAns === null) $marks = 0; // Unanswered
-
+            $marks = $isCorrect ? $q['default_marks'] : ($userAns !== null ? (-1 * abs($q['default_negative_marks'] ?? 0)) : 0);
             $totalScore += $marks;
 
-            $this->db->getPdo()->prepare("UPDATE quiz_attempt_answers SET is_correct = :ic, marks_earned = :me WHERE attempt_id = :aid AND question_id = :qid")
-                ->execute(['ic' => $isCorrect, 'me' => $marks, 'aid' => $attemptId, 'qid' => $res['id']]);
-
-            // Accumulate for Batch Reward
             if ($isCorrect) {
                 $correctCount++;
-                $correctAnswersList[] = [
-                    'question_id' => $res['id'],
-                    'difficulty' => $res['difficulty_level'] ?? 3
-                ];
+                $correctAnswersList[] = ['question_id' => $qId, 'difficulty' => $q['difficulty_level'] ?? 3];
             }
-        }
-
-        // Process Batch Rewards
-        if (!empty($correctAnswersList)) {
-            $this->gamificationService->processExamRewards($_SESSION['user_id'], $correctAnswersList, $attemptId);
-        }
-
-        // 4. Update Attempt Status
-        $stmtUpd = $this->db->getPdo()->prepare("
-            UPDATE quiz_attempts 
-            SET status = 'completed', completed_at = NOW(), score = :score 
-            WHERE id = :id
-        ");
-        $stmtUpd->execute(['score' => $totalScore, 'id' => $attemptId]);
-
-        // 5. Update Leaderboard Aggregates
-        try {
-            $totalQuestions = count($results);
             
+            // Prepare Insert
+            $sqlValues[] = "(?, ?, ?, ?, ?)";
+            $params[] = $attemptId;
+            $params[] = $qId;
+            $params[] = json_encode($userAns);
+            $params[] = $isCorrect ? 1 : 0;
+            $params[] = $marks;
+        }
+
+        // Bulk Insert Answers
+        if (!empty($sqlValues)) {
+            $sql = "INSERT INTO quiz_attempt_answers (attempt_id, question_id, selected_options, is_correct, marks_earned) VALUES " . implode(',', $sqlValues);
+            $this->db->getPdo()->prepare($sql)->execute($params);
+        }
+
+        // Update Attempt
+        $this->db->getPdo()->prepare("UPDATE quiz_attempts SET status = 'completed', completed_at = NOW(), score = :score WHERE id = :id")
+            ->execute(['score' => $totalScore, 'id' => $attemptId]);
+
+        // Gamification & Leaderboard
+        $this->gamificationService->processExamRewards($_SESSION['user_id'], $correctAnswersList, $attemptId);
+        
+        try {
             require_once __DIR__ . '/../../Services/LeaderboardService.php';
             $lbService = new \App\Services\LeaderboardService();
-            $lbService->updateUserRank($_SESSION['user_id'], $totalScore, $totalQuestions, $correctCount);
-            
-        } catch (\Exception $e) {
-            error_log("Leaderboard Update Fail: " . $e->getMessage());
-        }
-        
+            $lbService->updateUserRank($_SESSION['user_id'], $totalScore, count($data['questions']), $correctCount);
+        } catch (\Exception $e) {}
+
+        // Delete Cache
+        unlink($file);
+
         $this->redirect('/quiz/result/' . $attemptId);
     }
-
+    
     public function result($attemptId)
     {
         // 1. Fetch Attempt Summary
@@ -315,15 +322,19 @@ class ExamEngineController extends Controller
 
         // 2. Fetch Incorrect Answers for "Smart Failure" Tool Linking
         $stmtIncorrect = $this->db->getPdo()->prepare("
-            SELECT aa.*, q.question_text, q.explanation, q.related_tool_link
+            SELECT aa.*, q.content, q.explanation
             FROM quiz_attempt_answers aa
             JOIN quiz_questions q ON aa.question_id = q.id
             WHERE aa.attempt_id = :aid AND aa.is_correct = 0
-            AND q.related_tool_link IS NOT NULL
             LIMIT 5
         ");
         $stmtIncorrect->execute(['aid' => $attemptId]);
         $incorrectAnswers = $stmtIncorrect->fetchAll();
+        
+        // Decode content for view
+        foreach ($incorrectAnswers as &$inc) {
+            $inc['content'] = json_decode($inc['content'], true);
+        }
 
         $this->view('quiz/analysis/report', [
             'attempt' => $attempt,

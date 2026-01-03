@@ -1,0 +1,48 @@
+---------------------------------------------------
+🚀 ENTERPRISE EXAM ENGINE VERIFICATION
+---------------------------------------------------
+✅ Created Test User ID: 108
+✅ Created Test Exam ID: 13 (test-exam-1767431132)
+✅ Linked 5 Questions to Exam
+
+--- SCHEMA: quiz_exam_questions ---
+id (int unsigned)
+exam_id (int unsigned)
+question_id (int unsigned)
+order (int)
+custom_marks (decimal(5,2))
+-----------------------------------
+
+--- SCHEMA: daily_missions ---
+id (int unsigned)
+title (varchar(255))
+description (text)
+requirement_type (varchar(50))
+requirement_value (int)
+xp_reward (int unsigned)
+coin_reward (int unsigned)
+-----------------------------------
+
+[TEST 1] Starting Exam...
+✅ Exam Started. Attempt ID: 12
+✅ JSON Cache File Found: C:\laragon\www\Bishwo_Calculator/storage/app/exams/12.json
+✅ JSON contains correct question count (5)
+
+[TEST 2] Saving Answers to JSON...
+   API Response: {"success":true}...
+✅ Answer saved in JSON correctly.
+✅ DB `quiz_attempt_answers` is validly EMPTY (Zero-Write Strategy confirmed).
+
+[TEST 3] Submitting Exam...
+
+Fatal error: Uncaught PDOException: SQLSTATE[HY093]: Invalid parameter number in C:\laragon\www\Bishwo_Calculator\app\Core\Database.php on line 80
+
+PDOException: SQLSTATE[HY093]: Invalid parameter number in C:\laragon\www\Bishwo_Calculator\app\Core\Database.php on line 80
+
+Call Stack:
+    0.2109     611336   1. {main}() C:\laragon\www\Bishwo_Calculator\tests\verify_exam_engine.php:0
+    0.2983    3106800   2. App\Controllers\Quiz\ExamEngineController->submit() C:\laragon\www\Bishwo_Calculator\tests\verify_exam_engine.php:186
+    0.3030    3123056   3. App\Services\GamificationService->processExamRewards($userId = '108', $correctAnswers = [0 => ['question_id' => 54, 'difficulty' => 3]], $attemptId = '12') C:\laragon\www\Bishwo_Calculator\app\Controllers\Quiz\ExamEngineController.php:293
+    0.3113    3238960   4. App\Core\Database->query($sql = 'UPDATE users SET xp = xp + :xp, total_xp = total_xp + :xp, season_xp = season_xp + :xp WHERE id = :uid', $params = ['xp' => 100, 'uid' => '108']) C:\laragon\www\Bishwo_Calculator\app\Services\GamificationService.php:149
+    0.3115    3249112   5. PDOStatement->execute($params = ['xp' => 100, 'uid' => '108']) C:\laragon\www\Bishwo_Calculator\app\Core\Database.php:80
+

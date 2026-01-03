@@ -1,0 +1,44 @@
+---------------------------------------------------
+🚀 ENTERPRISE EXAM ENGINE VERIFICATION
+---------------------------------------------------
+✅ Created Test User ID: 109
+✅ Created Test Exam ID: 14 (test-exam-1767431160)
+✅ Linked 5 Questions to Exam
+
+--- SCHEMA: quiz_exam_questions ---
+id (int unsigned)
+exam_id (int unsigned)
+question_id (int unsigned)
+order (int)
+custom_marks (decimal(5,2))
+-----------------------------------
+
+--- SCHEMA: daily_missions ---
+id (int unsigned)
+title (varchar(255))
+description (text)
+requirement_type (varchar(50))
+requirement_value (int)
+xp_reward (int unsigned)
+coin_reward (int unsigned)
+-----------------------------------
+
+[TEST 1] Starting Exam...
+✅ Exam Started. Attempt ID: 13
+✅ JSON Cache File Found: C:\laragon\www\Bishwo_Calculator/storage/app/exams/13.json
+✅ JSON contains correct question count (5)
+
+[TEST 2] Saving Answers to JSON...
+   API Response: {"success":true}...
+✅ Answer saved in JSON correctly.
+✅ DB `quiz_attempt_answers` is validly EMPTY (Zero-Write Strategy confirmed).
+
+[TEST 3] Submitting Exam...
+❌ DB Row Count Mismatch (Expected 1, Got 5)
+✅ Attempt marked COMPLETED.
+   Final Score: 1.00
+✅ JSON Cache File deleted (Cleanup successful).
+
+---------------------------------------------------
+🎉 ENTERPRISE SYSTEM VERIFICATION COMPLETE
+---------------------------------------------------

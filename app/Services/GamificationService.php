@@ -147,8 +147,8 @@ class GamificationService
 
             // 2. Identity System (Dual XP)
             $this->db->query(
-                "UPDATE users SET xp = xp + :xp, total_xp = total_xp + :xp, season_xp = season_xp + :xp WHERE id = :uid",
-                ['xp' => $xpAmount, 'uid' => $userId]
+                "UPDATE users SET xp = xp + :xp1, total_xp = total_xp + :xp2, season_xp = season_xp + :xp3 WHERE id = :uid",
+                ['xp1' => $xpAmount, 'xp2' => $xpAmount, 'xp3' => $xpAmount, 'uid' => $userId]
             );
 
             // 3. Check for Rank Unlocks
