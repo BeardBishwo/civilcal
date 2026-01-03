@@ -37,6 +37,8 @@
     <!-- MathJax -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- SortableJS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 <body>
 
@@ -193,17 +195,45 @@
         `;
         
         // Options
-        if (q.type == 'mcq_single' || q.type == 'true_false') {
+        if (q.type == 'mcq_single' || q.type == 'true_false' || q.type == 'MCQ' || q.type == 'TF') {
             q.options.forEach((opt, idx) => {
-                let isSelected = (saved == idx); // Using index as value
+                let isSelected = (saved == (idx + 1)); // Back-compat: check idx+1 for 1-indexed
                 html += `
-                    <div class="option-card ${isSelected ? 'selected' : ''}" onclick="selectOption(${idx}, 'mcq_single')">
+                    <div class="option-card q-opt-${idx+1} ${isSelected ? 'selected' : ''}" onclick="selectOption(${idx + 1})">
                         <div class="option-icon">${String.fromCharCode(65 + idx)}</div>
                         <div class="option-text w-100">${opt.text}</div>
                         ${opt.image ? `<img src="${opt.image}" height="40" class="ml-2">` : ''}
                     </div>
                 `;
             });
+        }
+        else if (q.type == 'MULTI') {
+            let selectedArr = saved ? (Array.isArray(saved) ? saved : JSON.parse(saved)) : [];
+            q.options.forEach((opt, idx) => {
+                let isSelected = selectedArr.includes(String(idx + 1));
+                html += `
+                    <div class="option-card multi-opt-${idx+1} ${isSelected ? 'selected' : ''}" onclick="selectMultiOption(${idx + 1})">
+                        <div class="option-icon bg-light text-primary"><i class="${isSelected ? 'fas fa-check-square' : 'far fa-square'}"></i></div>
+                        <div class="option-text w-100">${opt.text}</div>
+                    </div>
+                `;
+            });
+        }
+        else if (q.type == 'ORDER') {
+            html += `<div id="sortable-options" class="list-group">`;
+            // If saved, use that order. Else use original.
+            let order = saved ? (Array.isArray(saved) ? saved : JSON.parse(saved)) : q.options.map((o,i) => i+1);
+            order.forEach((id) => {
+                let opt = q.options[id-1] || {text: 'Option '+id};
+                html += `
+                    <div class="list-group-item d-flex align-items-center mb-2 shadow-sm rounded border" data-id="${id}" style="cursor: move;">
+                        <i class="fas fa-grip-vertical text-muted mr-3"></i>
+                        <span class="badge badge-primary badge-pill mr-3 step-num"></span>
+                        <div class="flex-grow-1">${opt.text}</div>
+                    </div>
+                `;
+            });
+            html += `</div><p class="small text-muted mt-2"><i class="fas fa-info-circle mr-1"></i> Drag to reorder steps.</p>`;
         }
         
         html += `
@@ -217,33 +247,93 @@
         
         $('#questionConf').html(html);
         
+        // Init Sortable if ORDER
+        if (q.type == 'ORDER') {
+            initSortable();
+        }
+
         // Reprocess MathJax
         if(window.MathJax) {
             MathJax.typesetPromise();
         }
     }
+
+    function initSortable() {
+        const el = document.getElementById('sortable-options');
+        if (!el) return;
+
+        new Sortable(el, {
+            animation: 150,
+            ghostClass: 'bg-primary-light',
+            onEnd: function() {
+                const q = questions[currentIndex];
+                let order = [];
+                $('#sortable-options .list-group-item').each(function() {
+                    order.push($(this).data('id').toString());
+                });
+                savedAnswers[q.id] = order;
+                $('#btn-q-' + currentIndex).addClass('answered');
+                saveAjax(q.id, order);
+                updateOrderBadges();
+            }
+        });
+        updateOrderBadges();
+    }
+
+    function updateOrderBadges() {
+        $('#sortable-options .step-num').each(function(i) {
+            $(this).text(i + 1);
+        });
+    }
     
-    window.selectOption = function(val, type) {
+    window.selectOption = function(val) {
         const q = questions[currentIndex];
         
         // UI
         $('.option-card').removeClass('selected');
-        // Index based selection for now
-        $('.option-card').eq(val).addClass('selected');
+        $('.q-opt-' + val).addClass('selected');
         
         // Update Saved State
         savedAnswers[q.id] = val;
         $('#btn-q-' + currentIndex).addClass('answered');
         
-        // AJAX Save
+        saveAjax(q.id, val);
+    };
+
+    window.selectMultiOption = function(val) {
+        const q = questions[currentIndex];
+        let current = savedAnswers[q.id] || [];
+        if (!Array.isArray(current)) current = JSON.parse(current || "[]");
+        
+        const idx = current.indexOf(String(val));
+        if (idx > -1) current.splice(idx, 1);
+        else current.push(String(val));
+        
+        savedAnswers[q.id] = current;
+        
+        // UI
+        const card = $('.multi-opt-' + val);
+        if (current.includes(String(val))) {
+            card.addClass('selected').find('i').removeClass('far fa-square').addClass('fas fa-check-square');
+        } else {
+            card.removeClass('selected').find('i').removeClass('fas fa-check-square').addClass('far fa-square');
+        }
+        
+        if (current.length > 0) $('#btn-q-' + currentIndex).addClass('answered');
+        else $('#btn-q-' + currentIndex).removeClass('answered');
+
+        saveAjax(q.id, current);
+    };
+
+    function saveAjax(qId, val) {
         $.post(saveUrl, {
             attempt_id: attemptId,
-            question_id: q.id,
+            question_id: qId,
             selected_options: val,
             trap_answer: document.getElementById('trap_answer').value || '',
             csrf_token: csrfToken
         });
-    };
+    }
     
     window.nav = function(dir) {
         let newIndex = currentIndex + dir;

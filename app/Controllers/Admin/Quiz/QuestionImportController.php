@@ -47,18 +47,43 @@ class QuestionImportController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
+        $mode = $_GET['mode'] ?? 'simple'; // 'simple' or 'advanced'
+
         // 1. EXACT COLUMNS from your 'data-format.csv'
-        $headers = [
-            'category', 'subcategory', 'language_id', 'question_type', 
-            'question', 'option 1', 'option 2', 'option 3', 'option 4', 'option 5', 
-            'answer', 'level', 'note', 'level_map_syntax'
-        ];
+        if ($mode == 'advanced') {
+            // --- ADVANCED TEMPLATE (For Multi/Order) ---
+            $headers = [
+                'category', 'subcategory', 'language_id', 
+                'answer_type', // Special Column: 1=Multi, 2=Sequence
+                'question', 
+                'option 1', 'option 2', 'option 3', 'option 4', 'option 5', 
+                'answer1', 'answer2', 'answer3', 'answer4', 'answer5', // Multiple Answers
+                'level', 'note', 'level_map_syntax'
+            ];
+        } else {
+            // --- STANDARD TEMPLATE (For MCQ/TF) ---
+            $headers = [
+                'category', 'subcategory', 'language_id', 'question_type', 
+                'question', 'option 1', 'option 2', 'option 3', 'option 4', 'option 5', 
+                'answer', 'level', 'note', 'level_map_syntax'
+            ];
+        }
         $sheet->fromArray($headers, NULL, 'A1');
 
         // 2. MAKE IT SMART (Dropdowns)
         
-        // A. Question Type Dropdown (Col D)
-        $this->addDropdown($sheet, 'D', ['1 (MCQ)', '2 (True/False)']);
+        // A. Question Type Dropdown
+        if($mode == 'advanced') {
+             // For Col D: Answer Type
+             // 1=Multi, 2=Sequence. We put it in dropdown.
+             $this->addDropdown($sheet, 'D', ['1 (Multi-Select)', '2 (Sequence Order)']);
+             
+             // Initial hint (Multi default)
+             $sheet->setCellValue('D2', '1');
+        } else {
+             // For Col D: Question Type
+             $this->addDropdown($sheet, 'D', ['1 (MCQ)', '2 (True/False)']);
+        }
 
         // B. Answer Dropdown (Col K)
         $this->addDropdown($sheet, 'K', ['a', 'b', 'c', 'd', 'e']);
@@ -74,9 +99,15 @@ class QuestionImportController extends Controller
         $this->addDropdown($sheet, 'A', $catTitles);
 
         // 3. STYLE THE HEADER (Visual Polish)
-        $sheet->getStyle('A1:M1')->getFont()->setBold(true);
-        $sheet->getStyle('A1:M1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FF667EEA'); // Civil Cal Purple
-        $sheet->getStyle('A1:M1')->getFont()->getColor()->setARGB('FFFFFFFF');
+        if ($mode == 'advanced') {
+            $sheet->getStyle('A1:Q1')->getFont()->setBold(true);
+            $sheet->getStyle('A1:Q1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FF2D3748'); // Dark Grey
+            $sheet->getStyle('A1:Q1')->getFont()->getColor()->setARGB('FFFFFFFF');
+        } else {
+            $sheet->getStyle('A1:M1')->getFont()->setBold(true);
+            $sheet->getStyle('A1:M1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FF667EEA'); // Civil Cal Purple
+            $sheet->getStyle('A1:M1')->getFont()->getColor()->setARGB('FFFFFFFF');
+        }
 
         // Export
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -184,18 +215,110 @@ class QuestionImportController extends Controller
                  $rowData = [
                      'category' => $row[0] ?? null,
                      'subcategory' => $row[1] ?? null,
-                     'question_type' => $row[3] ?? null,
+                     // Col 3 (D) is EITHER 'question_type' OR 'answer_type' (handled by ImportProcessor)
+                     'question_type' => $row[3] ?? null, 
+                     'answer_type' => $row[3] ?? null, // Map same col to both keys, Processor detects logic
+                     
                      'question' => $row[4] ?? null,
                      'option 1' => $row[5] ?? null,
                      'option 2' => $row[6] ?? null,
                      'option 3' => $row[7] ?? null,
                      'option 4' => $row[8] ?? null,
                      'option 5' => $row[9] ?? null,
+                     
+                     // Standard Answer (Col 10/K)
+                     'answer' => $row[10] ?? null,
+                     
+                     // Advanced Answers (Cols 11-15: L, M, N, O, P) - ONLY IF ROW HAS THEM
+                     // If standard template, these indices might be Level/Note.
+                     // IMPORTANT: ImportProcessor checks "answer1", "answer2".
+                     // If we import a Simple CSV, row[11] is Level.
+                     // Logic: We should rely on Header detection OR Processor Fallback.
+                     // BUT here we are mapping by INDEX.
+                     // Best solution: Pass ALL potential columns.
+                     // If Simple Template: 
+                     // 10=Answer, 11=Level, 12=Note
+                     // If Advanced Template:
+                     // 10 is 'answer1' ?? No.
+                     // Advanced Headers: 
+                     // 0:Cat ... 3:AnsType, 4:Q, 5-9:Options
+                     // 10: Ans1, 11: Ans2, 12: Ans3, 13: Ans4, 14: Ans5
+                     // 15: Level, 16: Note
+                     
+                     // We need to know which template it is? Or just pass loose array?
+                     // Let's check headers (Row 1) if we could.
+                     // But we are processing chunks.
+                     // Assumption: Admin knows what they uploaded.
+                     // If we map incorrectly, we get garbage.
+                     // Let's map blindly safely:
+                     
+                     'answer1' => $row[11] ?? null, // Advanced: Ans1 (Wait, header 10 is Ans1 in Advanced?)
+                     // Header check:
+                     // Advanced: Cat, Sub, Lang, AnsType, Q, O1, O2, O3, O4, O5, A1, A2, A3, A4, A5, Lvl, Note
+                     // Indices:
+                     // 0,1,2,3,4, 5,6,7,8,9, 10,11,12,13,14, 15,16
+                     // So Ans1 is at 10 (K).
+                     // Simple: Ans is at 10 (K).
+                     // So row[10] acts as 'answer' OR 'answer1'.
+                     
+                     // 'answer2' is at 11.
+                     // In Simple, 11 is 'level'.
+                     // Conflict! 'answer2' vs 'level'.
+                     // If I pass row[11] as 'answer2', and it's 'Easy' (value 1), Processor might think it's answer '1' (Option A).
+                     // This is risky.
+                     
+                     // Helper: Processor checks 'answer_type' (which is col 3).
+                     // If col 3 is '1' (Multi) or '2' (Order) -> It's Advanced Template.
+                     // If col 3 is '1' (MCQ) or '2' (TF) -> It might conflict.
+                     // BUT 'MCQ' is 1. 'Multi' is 1.
+                     // The inputs overlap.
+                     
+                     // BETTER LOGIC: Check header length?
+                     // Advanced has 18 columns. Simple has 14.
+                     'col_count' => count($row),
+                     
+                     // Just pass raw row by index to Processor and let it parse?
+                     // Processor expects named keys.
+                     // Let's pass aliases for both mappings and let Processor decide based on col_count or flags.
+                     
+                     'raw_col_10' => $row[10] ?? null,
+                     'raw_col_11' => $row[11] ?? null,
+                     'raw_col_12' => $row[12] ?? null,
+                     'raw_col_13' => $row[13] ?? null,
+                     'raw_col_14' => $row[14] ?? null,
+                     'raw_col_15' => $row[15] ?? null,
+                     'raw_col_16' => $row[16] ?? null,
+
+                     // Standard mappings (safe defaults)
                      'answer' => $row[10] ?? null,
                      'level' => $row[11] ?? null,
-                     'note'  => $row[12] ?? null,
-                     'level_map' => $row[13] ?? null
+                     'note' => $row[12] ?? null,
+                     
+                     // Advanced mappings (Collision with level/note above)
+                     'answer1' => $row[10] ?? null,
+                     'answer2' => $row[11] ?? null,
+                     'answer3' => $row[12] ?? null,
+                     'answer4' => $row[13] ?? null,
+                     'answer5' => $row[14] ?? null,
+                     
+                     // Advanced Level/Note
+                     'adv_level' => $row[15] ?? null,
+                     'adv_note' => $row[16] ?? null
                  ];
+                 
+                 // Refined Logic in ImportProcessor required? 
+                 // Or pre-processing here?
+                 // Let's assume Advanced if row count > 14?
+                 if (count($row) > 15) {
+                     // Advanced
+                     $rowData['level'] = $row[15] ?? null;
+                     $rowData['note'] = $row[16] ?? null;
+                     $rowData['level_map'] = $row[17] ?? null;
+                 } else {
+                     // Simple
+                     $rowData['answer1'] = null; // Clear advanced stuff to avoid confusion
+                     $rowData['answer2'] = null;
+                 }
                  
                  if (empty($rowData['question'])) continue;
 
@@ -213,8 +336,10 @@ class QuestionImportController extends Controller
                      'is_duplicate' => $cleanData['is_duplicate'],
                      'duplicate_match_id' => $cleanData['match_id'],
                      'status' => $cleanData['status'],
+                     'type' => $cleanData['type'], // Staging Field: type
                      'options' => $cleanData['options'],
                      'correct_answer' => $cleanData['correct_answer'],
+                     'correct_answer_json' => $cleanData['correct_answer_json'], // Staging Field: correct_answer_json
                      'explanation' => $cleanData['explanation'],
                      'level' => $cleanData['level'],
                      'level_map' => $cleanData['level_map'] ?? null
@@ -320,8 +445,10 @@ class QuestionImportController extends Controller
                 
                 $this->db->update('quiz_questions', [
                     'content' => $content,
+                    'type' => $staging['type'],
                     'options' => $staging['options'],
                     'correct_answer' => $staging['correct_answer'],
+                    'correct_answer_json' => $staging['correct_answer_json'],
                     'explanation' => $staging['explanation']
                 ], "id = :id", ['id' => $staging['duplicate_match_id']]);
 
@@ -353,8 +480,10 @@ class QuestionImportController extends Controller
              
              $this->db->insert('quiz_questions', [
                  'content' => $content,
+                 'type' => $row['type'],
                  'options' => $row['options'],
                  'correct_answer' => $row['correct_answer'],
+                 'correct_answer_json' => $row['correct_answer_json'],
                  'explanation' => $row['explanation'],
                  'content_hash' => $row['content_hash'],
                  'status' => 1,

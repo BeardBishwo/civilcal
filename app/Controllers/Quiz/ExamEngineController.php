@@ -10,6 +10,7 @@ use App\Services\SecurityMonitor;
 use App\Services\Security;
 use App\Services\Quiz\DailyQuizService;
 use App\Services\Quiz\StreakService;
+use App\Services\Quiz\ShuffleService;
 
 class ExamEngineController extends Controller
 {
@@ -140,7 +141,7 @@ class ExamEngineController extends Controller
                 $questions = [];
             } else {
                 $placeholders = str_repeat('?,', count($questionIds) - 1) . '?';
-                $sqlQ = "SELECT id, type, content, options, default_marks, default_negative_marks, difficulty_level, answer_explanation as explanation FROM quiz_questions WHERE id IN ($placeholders)";
+                $sqlQ = "SELECT id, type, content, options, correct_answer, correct_answer_json, default_marks, default_negative_marks, difficulty_level, answer_explanation as explanation FROM quiz_questions WHERE id IN ($placeholders)";
                 $stmtQ = $this->db->getPdo()->prepare($sqlQ);
                 $stmtQ->execute($questionIds);
                 $questions = $stmtQ->fetchAll(\PDO::FETCH_ASSOC);
@@ -160,7 +161,7 @@ class ExamEngineController extends Controller
             // Standard Exam Fetch
             // Fetch Questions
             $sqlQ = "
-                SELECT q.id, q.type, q.content, q.options, q.default_marks, q.default_negative_marks, q.difficulty_level, q.answer_explanation as explanation
+                SELECT q.id, q.type, q.content, q.options, q.correct_answer, q.correct_answer_json, q.default_marks, q.default_negative_marks, q.difficulty_level, q.answer_explanation as explanation
                 FROM quiz_exam_questions eq
                 JOIN quiz_questions q ON eq.question_id = q.id
                 WHERE eq.exam_id = :eid
@@ -169,11 +170,12 @@ class ExamEngineController extends Controller
             $stmtQ = $this->db->getPdo()->prepare($sqlQ);
             $stmtQ->execute(['eid' => $exam['id']]);
             $questions = $stmtQ->fetchAll(\PDO::FETCH_ASSOC);
+        }
 
-            // Shuffle if enabled
-            if (!empty($exam['shuffle_questions'])) {
-                shuffle($questions);
-            }
+        // 2-Level Shuffle (Using Chaos Engine)
+        if (!empty($exam['shuffle_questions'])) {
+            $shuffler = new ShuffleService();
+            $questions = $shuffler->randomize($questions, null); // True Random
         }
 
         // Decode JSON content/options for storage
@@ -338,13 +340,42 @@ class ExamEngineController extends Controller
             // Get Correct Options from JSON data
             $correctOpts = array_filter($q['options'] ?? [], function($o) { return !empty($o['is_correct']); });
             
-            if (($q['type'] == 'mcq_single' || $q['type'] == 'true_false') && $userAns !== null) {
-                // If userAns matches keys of a correct option
-                if (array_key_exists((int)$userAns, $correctOpts)) {
+            // 1. MCQ / TF
+            if (($q['type'] == 'MCQ' || $q['type'] == 'TF' || $q['type'] == 'mcq_single' || $q['type'] == 'true_false') && $userAns !== null) {
+                // MCQ stored simple correct_answer idx? 
+                // Wait, if shuffled, correct_answer was updated in ShuffleService.
+                if ((string)$userAns === (string)$q['correct_answer']) {
                      $isCorrect = true;     
                 }
             } 
-            
+            // 2. MULTI-SELECT
+            elseif ($q['type'] == 'MULTI' && $userAns !== null) {
+                // userAns is expected to be an array of selected indices (strings or ints)
+                $ansArray = is_array($userAns) ? $userAns : json_decode($userAns, true);
+                $correctArray = json_decode($q['correct_answer_json'] ?? '[]', true);
+                
+                if (is_array($ansArray) && is_array($correctArray)) {
+                    sort($ansArray);
+                    sort($correctArray);
+                    if (json_encode($ansArray) === json_encode($correctArray)) {
+                        $isCorrect = true;
+                    }
+                }
+            }
+            // 3. SEQUENCE ORDERING
+            elseif ($q['type'] == 'ORDER' && $userAns !== null) {
+                // userAns is the sequence of IDs or names?
+                // In my ShuffleService, ORDER type correct_answer_json is the sequence of original IDs.
+                // Frontend should submit the sequence of IDs.
+                $ansArray = is_array($userAns) ? $userAns : json_decode($userAns, true);
+                $correctArray = json_decode($q['correct_answer_json'] ?? '[]', true);
+
+                if (is_array($ansArray) && is_array($correctArray)) {
+                    if (json_encode($ansArray) === json_encode($correctArray)) {
+                        $isCorrect = true;
+                    }
+                }
+            }            
             $marks = $isCorrect ? $q['default_marks'] : ($userAns !== null ? (-1 * abs($q['default_negative_marks'] ?? 0)) : 0);
             $totalScore += $marks;
 

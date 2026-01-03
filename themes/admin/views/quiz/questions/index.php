@@ -8,7 +8,15 @@
                     <i class="fas fa-database"></i>
                     <h1>Question Bank</h1>
                 </div>
-                <div class="header-subtitle"><?php echo $total; ?> questions available</div>
+                <div class="header-subtitle">
+                    <?php if(!empty($stats)): ?>
+                        <span class="badge bg-white text-dark border me-2"><?= $stats['total'] ?> Total</span>
+                        <span class="badge bg-opacity-10 bg-warning text-warning border-warning border me-2"><?= $stats['multi'] ?> Multi</span>
+                        <span class="badge bg-opacity-10 bg-danger text-danger border-danger border"><?= $stats['order'] ?> Order</span>
+                    <?php else: ?>
+                        <?php echo $total; ?> questions available
+                    <?php endif; ?>
+                </div>
             </div>
             <div class="header-actions">
                 <div class="dropdown d-inline-block me-2">
@@ -47,10 +55,10 @@
                     
                     <select name="type" class="filter-compact" onchange="document.getElementById('filter-form').submit()">
                         <option value="">All Types</option>
-                        <option value="mcq_single" <?php echo ($_GET['type'] ?? '') == 'mcq_single' ? 'selected' : ''; ?>>MCQ (Single)</option>
-                        <option value="mcq_multi" <?php echo ($_GET['type'] ?? '') == 'mcq_multi' ? 'selected' : ''; ?>>MCQ (Multi)</option>
-                        <option value="numerical" <?php echo ($_GET['type'] ?? '') == 'numerical' ? 'selected' : ''; ?>>Numerical</option>
-                        <option value="true_false" <?php echo ($_GET['type'] ?? '') == 'true_false' ? 'selected' : ''; ?>>True/False</option>
+                        <option value="MCQ" <?= ($_GET['type']??'')=='MCQ'?'selected':'' ?>>Standard MCQ</option>
+                        <option value="TF" <?= ($_GET['type']??'')=='TF'?'selected':'' ?>>True / False</option>
+                        <option value="MULTI" <?= ($_GET['type']??'')=='MULTI'?'selected':'' ?>>☑ Multi-Select</option>
+                        <option value="ORDER" <?= ($_GET['type']??'')=='ORDER'?'selected':'' ?>>🔃 Sequence</option>
                     </select>
 
                     <select name="topic_id" class="filter-compact" onchange="document.getElementById('filter-form').submit()">
@@ -91,7 +99,7 @@
                                         <th class="col-title" style="width: 45%;">Question</th>
                                         <th class="col-status">Type & Topic</th>
                                         <th class="col-status">Difficulty</th>
-                                        <th class="col-status">Marks</th>
+                                        <th class="col-status">Answer Key</th>
                                         <th class="col-status">Status</th>
                                         <th class="col-actions">Actions</th>
                                     </tr>
@@ -103,13 +111,19 @@
                                             $text = strip_tags($content['text'] ?? '');
                                             if (strlen($text) > 80) $text = substr($text, 0, 80) . '...';
                                             
+ 
+                                            // Handling both old and new types display
                                             $typeLabels = [
-                                                'mcq_single' => ['label' => 'MCQ', 'class' => 'primary'],
-                                                'mcq_multi' => ['label' => 'Multi', 'class' => 'info'],
-                                                'numerical' => ['label' => 'Num', 'class' => 'warning'],
-                                                'true_false' => ['label' => 'T/F', 'class' => 'secondary']
+                                                'MCQ' => ['label' => 'MCQ', 'class' => 'primary', 'icon' => 'dot-circle'],
+                                                'TF' => ['label' => 'T/F', 'class' => 'info', 'icon' => 'adjust'],
+                                                'MULTI' => ['label' => 'Multi', 'class' => 'warning', 'icon' => 'check-double'],
+                                                'ORDER' => ['label' => 'Seq', 'class' => 'danger', 'icon' => 'sort-amount-down'],
+                                                'mcq_single' => ['label' => 'MCQ', 'class' => 'primary', 'icon' => 'dot-circle'],
+                                                'mcq_multi' => ['label' => 'Multi', 'class' => 'warning', 'icon' => 'check-double'],
+                                                'true_false' => ['label' => 'T/F', 'class' => 'info', 'icon' => 'adjust'],
+                                                'numerical' => ['label' => 'Num', 'class' => 'white', 'icon' => 'hashtag']
                                             ];
-                                            $typeInfo = $typeLabels[$q['type']] ?? ['label' => $q['type'], 'class' => 'secondary'];
+                                            $typeInfo = $typeLabels[$q['type']] ?? ['label' => $q['type'], 'class' => 'secondary', 'icon' => 'question'];
                                         ?>
                                         <tr>
                                             <td>
@@ -136,11 +150,30 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div style="font-size: 12px; font-weight: 600;">
-                                                    <span class="text-success">+<?php echo $q['default_marks']; ?></span>
-                                                    <span class="text-muted">/</span>
-                                                    <span class="text-danger">-<?php echo $q['default_negative_marks']; ?></span>
-                                                </div>
+                                                <!-- Visual Answer Key -->
+                                                <?php 
+                                                    if ($q['type'] == 'MCQ' || $q['type'] == 'TF' || $q['type'] == 'mcq_single' || $q['type'] == 'true_false') {
+                                                        $ans = $q['correct_answer'] ?? '-';
+                                                        echo '<span style="font-weight:700; color:var(--admin-success); font-size:12px;">'.strtoupper($ans).'</span>';
+                                                    } 
+                                                    elseif ($q['type'] == 'MULTI') {
+                                                        $json = json_decode($q['correct_answer_json'] ?? '[]', true);
+                                                        if (is_array($json)) {
+                                                            foreach($json as $k) echo '<span class="status-badge status-active" style="padding:2px 6px; font-size:10px; margin-right:2px;">'.$k.'</span>';
+                                                        }
+                                                    }
+                                                    elseif ($q['type'] == 'ORDER') {
+                                                        $json = json_decode($q['correct_answer_json'] ?? '[]', true);
+                                                        if (is_array($json)) {
+                                                            echo '<div style="display:flex; gap:4px; font-size:10px; color:#64748b; align-items:center;">';
+                                                            foreach($json as $idx => $k) {
+                                                                echo '<span style="font-weight:700; color:#1e293b;">'.$k.'</span>';
+                                                                if($idx < count($json)-1) echo '<i class="fas fa-arrow-right" style="font-size:8px;"></i>';
+                                                            }
+                                                            echo '</div>';
+                                                        }
+                                                    }
+                                                ?>
                                             </td>
                                             <td>
                                                 <span class="status-badge status-<?php echo $q['is_active'] ? 'active' : 'inactive'; ?>">

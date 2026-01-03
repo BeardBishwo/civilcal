@@ -37,6 +37,16 @@
                             <label class="btn btn-outline-primary border-0 rounded-pill px-4 fw-bold" for="type_tf">
                                 <i class="fas fa-check-circle me-2"></i> True / False
                             </label>
+
+                            <input type="radio" class="btn-check" name="type" id="type_multi" value="MULTI" onchange="toggleType('MULTI')">
+                            <label class="btn btn-outline-primary border-0 rounded-pill px-4 fw-bold" for="type_multi">
+                                <i class="fas fa-check-double me-2"></i> Multi-Select
+                            </label>
+
+                            <input type="radio" class="btn-check" name="type" id="type_order" value="ORDER" onchange="toggleType('ORDER')">
+                            <label class="btn btn-outline-primary border-0 rounded-pill px-4 fw-bold" for="type_order">
+                                <i class="fas fa-sort-amount-down me-2"></i> Sequence
+                            </label>
                         </div>
 
                         <div id="options_area">
@@ -102,6 +112,8 @@
     </form>
 </div>
 
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
     // 1. Templates for the UI
     const templates = {
@@ -147,6 +159,50 @@
                 <input type="hidden" name="option_3" value="">
                 <input type="hidden" name="option_4" value="">
             </div>
+            </div>
+        `,
+
+        // 3. MULTI-SELECT (Brainstorming)
+        MULTI: `
+            <div class="row g-3 animate__animated animate__fadeIn">
+                <div class="col-12"><div class="alert alert-info py-2 small"><i class="fas fa-check-double me-2"></i> Select ALL correct options.</div></div>
+                ${[1, 2, 3, 4].map(n => `
+                <div class="col-md-6">
+                    <div class="input-group shadow-sm" style="border-radius: 10px; overflow: hidden;">
+                        <span class="input-group-text bg-white border-0 text-primary fw-bold ps-3">Option ${String.fromCharCode(64 + n)}</span>
+                        <input type="text" name="option_${n}" class="form-control border-0 bg-white" placeholder="Option Text..." required>
+                        <div class="input-group-text bg-white border-0">
+                            <input class="form-check-input" type="checkbox" name="options[${n-1}][is_correct]" value="1">
+                        </div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        `,
+
+        // 4. SEQUENCE / ORDERING (The "Drag" Interface)
+        ORDER: `
+            <div class="p-4 bg-light rounded-3 border border-dashed animate__animated animate__fadeIn">
+                <h6 class="text-muted fw-bold mb-3"><i class="fas fa-sort-amount-down me-2"></i> Define Correct Sequence</h6>
+                <p class="small text-muted mb-3">Enter options, then DRAG the handles on the right to set the correct order.</p>
+                
+                <ul class="list-group" id="sequence_list">
+                    ${[1, 2, 3, 4].map((n, idx) => `
+                    <li class="list-group-item d-flex align-items-center p-2 border-0 mb-2 shadow-sm rounded">
+                        <span class="badge bg-secondary me-3">${n}</span>
+                        <input type="text" name="option_${n}" class="form-control border-0" placeholder="Step ${n}..." required>
+                        <input type="hidden" name="options[${idx}][order]" value="${idx}"> <!-- Implicit Order by List Position via JS? No, logic needed -->
+                        <!-- Wait, if we drag, the input order changes in DOM? Yes. -->
+                        <!-- So if we submit, key 'option_1' corresponds to name='option_1'. -->
+                        <!-- But we need to submit the ORDER. -->
+                        <!-- Strategy: Use JS to update hidden inputs or rely on Controller to parse order based on submitted array sequence? -->
+                        <!-- Controller uses 'options' array from POST. -->
+                        <!-- So we should name inputs 'options[key][text]'? -->
+                    </li>
+                    `).join('')}
+                </ul>
+                <div class="alert alert-warning small mt-3"><i class="fas fa-exclamation-triangle"></i> Note: Drag items to set the Correct Answer sequence (Top = 1st).</div>
+            </div>
         `
     };
 
@@ -156,6 +212,20 @@
         
         // Instant visual switch
         container.innerHTML = templates[type];
+        
+        // Initialize Sortable if ORDER type
+        if (type === 'ORDER') {
+            setTimeout(initSequenceSorter, 100);
+        }
+    }
+
+    // Sortable Helper
+    function initSequenceSorter() {
+        if (typeof Sortable === 'undefined') return;
+        new Sortable(document.getElementById('sequence_list'), {
+            handle: '.handle',
+            animation: 150
+        });
     }
 
     // 3. Helper: Difficulty Label Update

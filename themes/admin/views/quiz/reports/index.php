@@ -52,12 +52,55 @@
                             <h6 class="fw-bold text-primary text-uppercase small">Affected Question (#<?= $report->question_id ?>)</h6>
                             <p class="fw-bold text-dark mb-2"><?= strip_tags($report->question->question) ?></p>
                             
-                            <?php $opts = json_decode($report->question->options, true); ?>
-                            <ul class="list-unstyled small text-muted">
-                                <li><i class="far fa-circle"></i> A: <?= $opts['option_1'] ?? '' ?></li>
-                                <li><i class="far fa-circle"></i> B: <?= $opts['option_2'] ?? '' ?></li>
-                                <li class="text-success fw-bold"><i class="fas fa-check-circle"></i> Correct: Option <?= $report->question->correct_answer ?></li>
-                            </ul>
+                            <?php 
+                                $q = $report->question;
+                                $opts = json_decode($q->options, true); 
+                            ?>
+                            <div class="mt-2">
+                                <?php if($q->type == 'MCQ' || $q->type == 'TF' || $q->type == 'mcq_single' || $q->type == 'true_false'): ?>
+                                    <ul class="list-unstyled small text-muted">
+                                        <?php foreach($opts as $k => $v): if(empty($v)) continue; ?>
+                                            <li class="<?= (str_replace('option_','',$k) == $q->correct_answer) ? 'text-success fw-bold' : '' ?>">
+                                                <i class="<?= (str_replace('option_','',$k) == $q->correct_answer) ? 'fas fa-check-circle' : 'far fa-circle' ?>"></i>
+                                                <?= strtoupper(str_replace('option_','',$k)) ?>: <?= $v ?>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                <?php elseif($q->type == 'MULTI'): ?>
+                                    <div class="small mb-2 fw-bold text-muted"><i class="fas fa-check-double me-1"></i> MULTI-SELECT CORRECT KEYS:</div>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <?php 
+                                            $ans = json_decode($q->correct_answer_json ?? '[]', true);
+                                            foreach($opts as $k => $v): if(empty($v)) continue; 
+                                                $id = str_replace('option_','',$k);
+                                                $isCorrect = is_array($ans) && in_array($id, $ans);
+                                        ?>
+                                            <div class="p-2 rounded border <?= $isCorrect ? 'bg-success bg-opacity-10 border-success text-success fw-bold' : 'bg-light text-muted' ?>" style="font-size:11px;">
+                                                <i class="<?= $isCorrect ? 'fas fa-check-square' : 'far fa-square' ?> me-1"></i>
+                                                <?= $v ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php elseif($q->type == 'ORDER'): ?>
+                                    <div class="small mb-2 fw-bold text-muted"><i class="fas fa-sort-amount-down me-1"></i> CORRECT SEQUENCE:</div>
+                                    <div class="d-flex flex-column gap-1">
+                                        <?php 
+                                            $ans = json_decode($q->correct_answer_json ?? '[]', true);
+                                            if(is_array($ans)):
+                                                foreach($ans as $idx => $id):
+                                                    $text = $opts['option_'.$id] ?? 'Step '.$id;
+                                        ?>
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge bg-primary rounded-circle me-2" style="width:20px; height:20px; padding:4px;"><?= $idx+1 ?></span>
+                                                <span class="small text-dark"><?= $text ?></span>
+                                            </div>
+                                            <?php if($idx < count($ans)-1): ?>
+                                                <i class="fas fa-arrow-down text-muted ms-2" style="font-size:10px; margin: 2px 0;"></i>
+                                            <?php endif; ?>
+                                        <?php endforeach; endif; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
                         </div>
 
                         <div class="col-md-2 d-flex flex-column justify-content-center gap-2">

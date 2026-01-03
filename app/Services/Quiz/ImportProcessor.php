@@ -36,6 +36,14 @@ class ImportProcessor {
             }
         }
 
+        // 1.5. DETECT ANSWER TYPE (Brainstorming Engine)
+        // 1=Multi, 2=Order (from Advanced Template 'answer_type' column)
+        if (isset($row['answer_type'])) {
+            $rawAnsType = $this->extractNumber($row['answer_type']);
+            if ($rawAnsType == 1) $type = 'MULTI';
+            if ($rawAnsType == 2) $type = 'ORDER';
+        }
+
         // 3. CLEAN OPTIONS
         // We pack them into a robust JSON array
         $options = [];
@@ -52,9 +60,40 @@ class ImportProcessor {
             $options = ['option_1' => 'True', 'option_2' => 'False'];
         }
 
-        // 4. MAP CORRECT ANSWER
-        // CSV uses 'a', 'b', '1', '2'. We standardize to '1', '2', '3', '4'.
-        $correct = $this->standardizeAnswer($row['answer'] ?? '');
+
+
+        // 4. MAP CORRECT ANSWER (Complex Logic)
+        $correctJson = null;
+        $simpleCorrect = '';
+
+        if ($type == 'MULTI' || $type == 'ORDER') {
+            // Collect all non-empty answer columns (answer1...answer5)
+            $answers = [];
+            
+            // If answer1 exists, check it. Also check numeric suffix columns from advanced template.
+            // Advanced template likely uses answer1, answer2, etc.
+            // But if user uses single 'answer' column with comma separation?
+            // Prompt says: "answer1, answer2..." in template.
+            for($i=1; $i<=5; $i++) {
+                if(!empty($row["answer$i"])) {
+                    $answers[] = $this->standardizeAnswer($row["answer$i"]);
+                }
+            }
+            
+            // Fallback: If answer1..5 empty, maybe mapped from 'answer' column split by comma?
+            if (empty($answers) && !empty($row['answer'])) {
+                $split = explode(',', $row['answer']);
+                foreach($split as $s) {
+                    $answers[] = $this->standardizeAnswer($s);
+                }
+            }
+            
+            $correctJson = json_encode($answers); 
+        } else {
+            // Standard MCQ/TF
+            // CSV uses 'a', 'b', '1', '2'. We standardize to '1', '2', '3', '4'.
+            $simpleCorrect = $this->standardizeAnswer($row['answer'] ?? ($row['answer1'] ?? ''));
+        }
 
         // 5. GENERATE FINGERPRINT (For Duplicate Detection)
         $qText = $row['question'] ?? '';
@@ -62,7 +101,14 @@ class ImportProcessor {
         $hash = hash('sha256', $cleanQ);
 
         // 6. DETECT DUPLICATE (The "Quarantine" Logic)
-        $existing = Question::where('content_hash', $hash)->first();
+        $db = \App\Core\Database::getInstance();
+        $existing = $db->query("SELECT id FROM quiz_questions WHERE content_hash = ? LIMIT 1", [$hash])->fetch();
+
+        // Object or Array Check
+        $matchId = null;
+        if ($existing) {
+            $matchId = is_array($existing) ? ($existing['id'] ?? null) : ($existing->id ?? null);
+        }
 
         // RETURN THE PACKAGED DATA
         return [
@@ -73,17 +119,14 @@ class ImportProcessor {
             'question' => $this->cleanText($qText),
             'type' => $type,
             'options' => json_encode($options),
-            'correct_answer' => $correct,
+            'correct_answer' => $simpleCorrect,
+            'correct_answer_json' => $correctJson,
             'level' => $this->mapLevel($row['level'] ?? ''), // Map 1->Easy, 2->Medium
             'answer_explanation' => $this->cleanText($row['note'] ?? ''), // Map 'note' to 'answer_explanation'
             'content_hash' => $hash,
             'is_duplicate' => $existing ? 1 : 0,
-            'match_id' => $existing ? $existing->id : null,
-            'status' => 'pending',
-            // 'level_map' -> handled in Controller processLevelMap currently, 
-            // but we can add it here if row has 'level_map' column. 
-            // For now, let's assume 'level' uses simple map if distinct column, 
-            // or if we want advanced level map we would capture row['level_map']
+            'match_id' => $matchId,
+            'status' => 'pending'
         ];
     }
 
@@ -95,8 +138,9 @@ class ImportProcessor {
         if (is_numeric($input)) return $input;
         
         // If string, lookup by Title (Smart Template support)
-        $node = SyllabusNode::where('title', 'LIKE', "%$input%")->first();
-        return $node ? $node->id : null;
+        $db = \App\Core\Database::getInstance();
+        $node = $db->query("SELECT id FROM syllabus_nodes WHERE title LIKE ? LIMIT 1", ["%$input%"])->fetch();
+        return $node ? $node['id'] : null;
     }
 
     private function standardizeAnswer($val) {
@@ -114,5 +158,10 @@ class ImportProcessor {
     private function cleanText($text) {
         // Remove weird CSV artifacts
         return trim(str_replace(['Â', 'â€™'], ['', "'"], $text));
+    }
+
+    private function extractNumber($text) {
+        if (preg_match('/(\d+)/', $text, $matches)) return $matches[0];
+        return 0;
     }
 }
