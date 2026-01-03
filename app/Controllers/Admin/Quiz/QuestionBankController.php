@@ -3,10 +3,13 @@
 namespace App\Controllers\Admin\Quiz;
 
 use App\Core\Controller;
+use App\Services\SyllabusService;
 use Exception;
 
 class QuestionBankController extends Controller
 {
+    private $syllabusService;
+
     public function __construct()
     {
         parent::__construct();
@@ -14,6 +17,7 @@ class QuestionBankController extends Controller
              header('Location: ' . app_base_url('login'));
              exit;
         }
+        $this->syllabusService = new SyllabusService();
     }
 
     /**
@@ -87,12 +91,31 @@ class QuestionBankController extends Controller
      */
     public function create()
     {
-        // Fetch categories for the specialized dropdown chain
-        $categories = $this->db->find('quiz_categories', ['is_active' => 1]);
+        // 1. Fetch Main Categories (Sorted by custom order)
+        // Main categories are Roots (parent_id IS NULL)
+        $mainCategories = $this->db->fetchAll("SELECT * FROM syllabus_nodes WHERE parent_id IS NULL ORDER BY order_index ASC");
+
+        // 2. Fetch Sub-Categories (Also Sorted)
+        // Grouped by parent in the view logic or prepare here.
+        // Let's fetch all active sections/units and pass to view as JSON for the JS filter.
+        $subNodes = $this->db->fetchAll("SELECT id, parent_id, title, is_premium FROM syllabus_nodes WHERE parent_id IS NOT NULL ORDER BY order_index ASC");
         
+        // Convert to array keyed by parent_id for easier JS handling if we were building it here, 
+        // but passing the flat list to JS to filter is often easier for dynamic chains.
+        // Actually, let's match the user's requested structure:
+        // $subCategories->groupBy('parent_id') logic.
+        
+        $groupedSub = [];
+        foreach ($subNodes as $node) {
+            $groupedSub[$node['parent_id']][] = $node;
+        }
+
         $this->view->render('admin/quiz/questions/form', [
             'page_title' => 'Add New Question',
-            'categories' => $categories,
+            'mainCategories' => $mainCategories,
+            'subCategories' => $groupedSub,
+            'last_main_id' => $_SESSION['last_q_main_id'] ?? null,
+            'last_sub_id' => $_SESSION['last_q_sub_id'] ?? null,
             'question' => null,
             'action' => app_base_url('admin/quiz/questions/store')
         ]);
@@ -105,11 +128,12 @@ class QuestionBankController extends Controller
     {
         try {
             // Validation
-            if (empty($_POST['topic_id'])) throw new Exception("Topic is required");
+            if (empty($_POST['syllabus_node_id'])) throw new Exception("Topic (Syllabus Node) is required");
             if (empty($_POST['question_text'])) throw new Exception("Question text is required");
             if (empty($_POST['type'])) throw new Exception("Question type is required");
 
             $type = $_POST['type'];
+            $nodeId = $_POST['syllabus_node_id'];
             
             // Build Content JSON
             $content = [
@@ -120,11 +144,11 @@ class QuestionBankController extends Controller
 
             // Build Options JSON
             $options = [];
-            if ($type !== 'text' && $type !== 'numerical') { // Numerical might not need options in some cases, but sticking to logic
+            if ($type !== 'text' && $type !== 'numerical') { 
                  if (!empty($_POST['options']) && is_array($_POST['options'])) {
                      foreach ($_POST['options'] as $idx => $opt) {
                          $options[] = [
-                             'id' => $idx + 1, // Simple ID generation
+                             'id' => $idx + 1,
                              'text' => $opt['text'] ?? '',
                              'image' => $opt['image'] ?? null,
                              'is_correct' => isset($opt['is_correct']) && $opt['is_correct'] == 1 ? true : false,
@@ -133,10 +157,6 @@ class QuestionBankController extends Controller
                      }
                  }
             } else if ($type === 'numerical' && isset($_POST['numerical_answer'])) {
-                // For numerical, we might store the answer in options or a dedicated field. 
-                // Let's store as a correct option for consistency in some schemas, 
-                // OR just put it in content/metadata. New schema supports flexible JSON.
-                // Let's store it as valid range in content for now, or single option.
                 $options[] = [
                     'id' => 1,
                     'text' => $_POST['numerical_answer'],
@@ -145,10 +165,13 @@ class QuestionBankController extends Controller
                 ];
             }
 
-            // Insert
+            // Insert into quiz_questions
+            // Note: 'topic_id' is legacy. We set it to 0 or derived if needed. 
+            // Ideally we'd map it, but for now 0.
+            
             $data = [
                 'unique_code' => 'Q-' . time() . '-' . rand(100,999),
-                'topic_id' => $_POST['topic_id'],
+                'topic_id' => 0, // Legacy bypass
                 'type' => $type,
                 'content' => json_encode($content),
                 'options' => json_encode($options),
@@ -161,8 +184,33 @@ class QuestionBankController extends Controller
                 'created_by' => $_SESSION['user']['id'] ?? null
             ];
             
-            $this->db->insert('quiz_questions', $data);
+            // Insert Question
+            if (!$this->db->insert('quiz_questions', $data)) {
+                throw new Exception("Failed to insert question record");
+            }
+            $questionId = $this->db->lastInsertId();
             
+            // Map to Syllabus (Question Stream Map)
+            $node = $this->db->findOne('syllabus_nodes', ['id' => $nodeId]);
+            $stream = $node['level'] ?? 'General'; // Default stream if logic allows, or fetch recursive
+            
+            // Insert into stream map
+            $mapData = [
+                'question_id' => $questionId,
+                'stream' => $stream, // e.g., 'Level 5'
+                'syllabus_node_id' => $nodeId,
+                'difficulty_in_stream' => $_POST['difficulty_level'] ?? 3,
+                'is_practical' => 0
+            ];
+            $this->db->insert('question_stream_map', $mapData);
+
+            // SAVE SESSION MEMORY (Advanced Workspace Feature)
+            $_SESSION['last_q_main_id'] = $_POST['syllabus_main_id'] ?? null;
+            $_SESSION['last_q_sub_id'] = $nodeId;
+
+            // Update Counts
+            $this->syllabusService->recalculateQuestionCounts();
+
             $this->jsonResponse(['success' => true, 'message' => 'Question Added Successfully', 'redirect' => app_base_url('admin/quiz/questions')]);
 
         } catch (Exception $e) {
@@ -269,6 +317,7 @@ class QuestionBankController extends Controller
     {
         try {
             $this->db->delete('quiz_questions', "id = :id", ['id' => $id]);
+            $this->syllabusService->recalculateQuestionCounts();
             $this->jsonResponse(['success' => true, 'message' => 'Question Deleted']);
         } catch (Exception $e) {
              $this->jsonResponse(['success' => false, 'error' => $e->getMessage()]);

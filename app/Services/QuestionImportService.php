@@ -148,7 +148,7 @@ class QuestionImportService
      * Parse Level_Map_Syntax and create connections
      * Format: L4:Hard|L5:Medium|L7:Easy
      */
-    private function processLevelMap($questionId, $syntax)
+    public function processLevelMap($questionId, $syntax)
     {
         $mappings = explode('|', $syntax);
         

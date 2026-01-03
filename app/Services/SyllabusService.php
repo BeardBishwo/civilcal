@@ -249,9 +249,61 @@ class SyllabusService
     }
 
     /**
+     * Update Question Counts for the entire tree
+     * (Performance optimization: Stores count in node table)
+     */
+    public function recalculateQuestionCounts()
+    {
+        // 1. Reset all counts
+        $this->db->getPdo()->exec("UPDATE syllabus_nodes SET question_count = 0");
+
+        // 2. Count direct questions (via question_stream_map + direct quiz_questions linkage if any)
+        // Linking to `question_stream_map` is the primary way now.
+        // Also checks `quiz_questions` if foreign key exists there (legacy support if needed, but we focus on stream map).
+
+        $sql = "
+            UPDATE syllabus_nodes sn
+            SET question_count = (
+                SELECT COUNT(DISTINCT qsm.question_id)
+                FROM question_stream_map qsm
+                WHERE qsm.syllabus_node_id = sn.id
+            )
+        ";
+        $this->db->getPdo()->exec($sql);
+
+        // 3. Recursive Rollup (Children -> Parents)
+        // We do this by levels (Unit -> Section -> Part -> Paper) ideally,
+        // or just iterate leaves up. A robust way is multiple passes or known depth.
+        // Assuming max depth 4 (Paper->Part->Section->Unit).
+
+        // Pass 1: Roll up Units to Sections
+        $this->rollupCounts('unit', 'section');
+        // Pass 2: Roll up Sections to Parts
+        $this->rollupCounts('section', 'part');
+        // Pass 3: Roll up Parts to Papers
+        $this->rollupCounts('part', 'paper');
+    }
+
+    private function rollupCounts($childType, $parentType)
+    {
+        $sql = "
+            UPDATE syllabus_nodes parent
+            SET question_count = question_count + (
+                SELECT COALESCE(SUM(child.question_count), 0)
+                FROM syllabus_nodes child
+                WHERE child.parent_id = parent.id
+                AND child.type = :childType
+            )
+            WHERE parent.type = :parentType
+        ";
+        $stmt = $this->db->getPdo()->prepare($sql);
+        $stmt->execute(['childType' => $childType, 'parentType' => $parentType]);
+    }
+
+    /**
      * Helper: Slugify text
      */
-    private function slugify($text)
+    public function slugify($text)
     {
         $text = preg_replace('~[^\pL\d]+~u', '-', $text);
         $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);

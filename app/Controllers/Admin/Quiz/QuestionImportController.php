@@ -218,6 +218,7 @@ class QuestionImportController extends Controller
                     ]),
                     'correct_answer' => $row[6] ?? '',
                     'explanation' => $row[7] ?? '',
+                    'level_map' => $row[9] ?? '', // Column J: Level Map Syntax
                     'practical_mode' => (isset($row[8]) && strtolower($row[8]) === 'yes') ? 1 : 0
                 ]);
                 
@@ -319,6 +320,11 @@ class QuestionImportController extends Controller
                     'correct_answer' => $staging['correct_answer'],
                     'explanation' => $staging['explanation']
                 ], "id = :id", ['id' => $staging['duplicate_match_id']]);
+
+                // Process Level Map for Overwrite
+                if (!empty($staging['level_map'])) {
+                    $this->importService->processLevelMap($staging['duplicate_match_id'], $staging['level_map']);
+                }
                 
                 // Remove from staging
                 $this->db->delete('question_import_staging', "id = :id", ['id' => $id]);
@@ -350,6 +356,12 @@ class QuestionImportController extends Controller
                  'status' => 1,
                  'created_at' => date('Y-m-d H:i:s')
              ]);
+             $newQId = $this->db->lastInsertId();
+
+             // Process Level Map
+             if (!empty($row['level_map'])) {
+                 $this->importService->processLevelMap($newQId, $row['level_map']);
+             }
              
              $this->db->delete('question_import_staging', "id = :id", ['id' => $row['id']]);
         }

@@ -1947,21 +1947,29 @@ $router->add("GET", "/admin/quiz", "Admin\\Quiz\\QuizDashboardController@index",
 $router->add("GET", "/admin/quiz/dashboard", "Admin\\Quiz\\QuizDashboardController@index", ["auth", "admin"]);
 
 // Syllabus (Categories/Subjects/Topics)
+// Syllabus Master system
 $router->add("GET", "/admin/quiz/syllabus", "Admin\\Quiz\\SyllabusController@index", ["auth", "admin"]);
-$router->add("POST", "/admin/quiz/categories/store", "Admin\\Quiz\\SyllabusController@storeCategory", ["auth", "admin"]);
-$router->add("POST", "/admin/quiz/categories/update/{id}", "Admin\\Quiz\\SyllabusController@updateCategory", ["auth", "admin"]);
-$router->add("POST", "/admin/quiz/categories/delete/{id}", "Admin\\Quiz\\SyllabusController@deleteCategory", ["auth", "admin"]);
-$router->add("POST", "/admin/quiz/subjects/store", "Admin\\Quiz\\SyllabusController@storeSubject", ["auth", "admin"]);
-$router->add("POST", "/admin/quiz/subjects/update/{id}", "Admin\\Quiz\\SyllabusController@updateSubject", ["auth", "admin"]);
-$router->add("POST", "/admin/quiz/subjects/delete/{id}", "Admin\\Quiz\\SyllabusController@deleteSubject", ["auth", "admin"]);
-$router->add("POST", "/admin/quiz/topics/store", "Admin\\Quiz\\SyllabusController@storeTopic", ["auth", "admin"]);
-$router->add("POST", "/admin/quiz/topics/update/{id}", "Admin\\Quiz\\SyllabusController@updateTopic", ["auth", "admin"]);
-$router->add("POST", "/admin/quiz/topics/delete/{id}", "Admin\\Quiz\\SyllabusController@deleteTopic", ["auth", "admin"]);
-// AJAX Helpers
-$router->add("GET", "/admin/quiz/get-subjects/{id}", "Admin\\Quiz\\SyllabusController@getSubjects", ["auth", "admin"]);
-$router->add("GET", "/admin/quiz/get-topics/{id}", "Admin\\Quiz\\SyllabusController@getTopics", ["auth", "admin"]);
+
+// Main Categories
+$router->add("GET", "/admin/quiz/categories", "Admin\\Quiz\\CategoryController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/categories/store", "Admin\\Quiz\\CategoryController@store", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/categories/delete/{id}", "Admin\\Quiz\\CategoryController@delete", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/categories/reorder", "Admin\\Quiz\\CategoryController@reorder", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/categories/toggle-premium", "Admin\\Quiz\\CategoryController@togglePremium", ["auth", "admin"]);
+
+// Sub Categories
+$router->add("GET", "/admin/quiz/subcategories", "Admin\\Quiz\\SubCategoryController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/subcategories/store", "Admin\\Quiz\\SubCategoryController@store", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/subcategories/delete/{id}", "Admin\\Quiz\\SubCategoryController@delete", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/subcategories/reorder", "Admin\\Quiz\\SubCategoryController@reorder", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/subcategories/toggle-premium", "Admin\\Quiz\\SubCategoryController@togglePremium", ["auth", "admin"]);
+
+// Legacy Helpers (Optional - kept if needed by other modules, otherwise can be removed)
+// $router->add("GET", "/admin/quiz/get-subjects/{id}", "Admin\\Quiz\\SyllabusController@getSubjects", ["auth", "admin"]);
+
 
 // Enterprise Import System Routes
+$router->add("GET", "/admin/quiz/import", "Admin\Quiz\QuestionImportController@index", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/import/template", "Admin\Quiz\QuestionImportController@downloadTemplate", ["auth", "admin"]);
 $router->add("POST", "/api/admin/quiz/import/process-chunk", "Admin\Quiz\QuestionImportController@processChunk", ["auth", "admin"]);
 $router->add("GET", "/api/admin/quiz/import/staging-stats/{batchId}", "Admin\Quiz\QuestionImportController@stagingStats", ["auth", "admin"]);

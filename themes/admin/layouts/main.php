@@ -907,9 +907,11 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                             <i class="nav-arrow fas fa-chevron-right"></i>
                         </a>
                         <ul class="nav-submenu">
-                            <li><a href="<?php echo app_base_url('admin/quiz'); ?>">Dashboard</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/dashboard'); ?>">Dashboard</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/syllabus'); ?>">Syllabus Tree</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/categories'); ?>">Main Categories</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/subcategories'); ?>">Sub-Categories</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/exams'); ?>">Exam Manager</a></li>
-                            <li><a href="<?php echo app_base_url('admin/quiz/syllabus-tree'); ?>">Syllabus Tree</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/blueprints'); ?>">Exam Blueprints</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/questions'); ?>">Question Bank</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/import'); ?>">Import Questions</a></li>
