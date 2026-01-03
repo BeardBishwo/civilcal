@@ -189,8 +189,11 @@ $content = '
         <!-- RANKS TAB -->
         <div id="ranks-tab" class="tab-content-premium">
             <div class="premium-card-admin">
-                <div class="card-header-premium">
+                <div class="card-header-premium" style="display:flex; justify-content:space-between; align-items:center;">
                     <h3 class="card-title-premium">Hierarchy & Progression</h3>
+                    <button type="button" class="btn btn-sm btn-warning font-weight-bold shadow-sm" onclick="resetRanksStandard()" style="color: #0f172a;">
+                        <i class="fas fa-crown mr-2"></i>Apply Civil City Standard (27 Tiers)
+                    </button>
                 </div>
                 <div class="card-content-premium">
                     <form onsubmit="saveEconomy(event, \'ranks\')" class="economy-form">
@@ -382,6 +385,41 @@ function openTab(evt, tabName) {
     for (let i = 0; i < tabBtns.length; i++) tabBtns[i].classList.remove("active");
     document.getElementById(tabName).classList.add("active");
     evt.currentTarget.classList.add("active");
+}
+
+
+async function resetRanksStandard() {
+    if (!confirm("Are you sure? This will OVERWRITE all current ranks with the official Civil City 27-Tier System.")) return;
+    
+    const btn = document.querySelector(\'button[onclick="resetRanksStandard()"]\');
+    const original = btn.innerHTML;
+    btn.innerHTML = \'<i class="fas fa-spinner fa-spin"></i> Applying...\';
+    btn.disabled = true;
+
+    try {
+        const response = await fetch(\'' . app_base_url('admin/settings/economy/reset-ranks') . '\', {
+            method: \'POST\',
+            headers: {
+                \'Content-Type\': \'application/x-www-form-urlencoded\',
+            },
+            body: \'csrf_token=\' + encodeURIComponent(\'' . ($_SESSION['csrf_token'] ?? '') . '\')
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            toastPremium(result.message, "success");
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            toastPremium("Error: " + result.message, "error");
+            btn.innerHTML = original;
+            btn.disabled = false;
+        }
+    } catch (e) {
+        toastPremium("Error: " + e.message, "error");
+        btn.innerHTML = original;
+        btn.disabled = false;
+    }
 }
 </script>
 ';

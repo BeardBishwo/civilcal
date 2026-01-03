@@ -1984,6 +1984,7 @@ $router->add("POST", "/admin/quiz/exams/remove-question", "Admin\\Quiz\\ExamCont
 $router->add("GET", "/admin/quiz/results", "Admin\\Quiz\\ResultsController@index", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/analytics", "Admin\\Quiz\\ResultsController@index", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/settings", "Admin\\SettingsController@quiz", ["auth", "admin"]);
+$router->add("POST", "/admin/settings/economy/reset-ranks", "Admin\\SettingsController@resetRanks", ["auth", "admin"]);
 
 // In-Quiz Lifeline API
 $router->add("POST", "/api/quiz/lifeline/use", "Quiz\\LifelineController@use", ["auth"]);
