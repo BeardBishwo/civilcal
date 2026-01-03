@@ -1199,48 +1199,48 @@ class SettingsController extends Controller
         }
 
         try {
-            // "Civil City" 27-Rank Tier System
+            // "Civil City" 27-Rank Tier System (7 Primary Icons, Rest Empty)
             $ranks = [
                 // League 1: The Rookies
-                ['level' => 1, 'name' => 'Intern', 'min' => 0, 'icon' => 'themes/default/assets/resources/rank_01.png', 'reward' => 'Base Avatar'],
-                ['level' => 2, 'name' => 'Apprentice', 'min' => 150, 'icon' => 'themes/default/assets/resources/rank_02.png', 'reward' => '+50 Coins'],
-                ['level' => 3, 'name' => 'Trainee', 'min' => 300, 'icon' => 'themes/default/assets/resources/rank_03.png', 'reward' => '+50 Coins'],
+                ['level' => 1, 'name' => 'Intern', 'min' => 0, 'icon' => 'themes/default/assets/resources/ranks/rank_01_intern.webp', 'reward' => 'Base Avatar'],
+                ['level' => 2, 'name' => 'Apprentice', 'min' => 150, 'icon' => '', 'reward' => '+50 Coins'],
+                ['level' => 3, 'name' => 'Trainee', 'min' => 300, 'icon' => '', 'reward' => '+50 Coins'],
                 
                 // League 2: The Field Work
-                ['level' => 4, 'name' => 'Surveyor', 'min' => 500, 'icon' => 'themes/default/assets/resources/rank_04.png', 'reward' => 'Unlock: Daily Challenges'],
-                ['level' => 5, 'name' => 'Chainman', 'min' => 800, 'icon' => 'themes/default/assets/resources/rank_05.png', 'reward' => '+100 Coins'],
-                ['level' => 6, 'name' => 'Leveling Staff', 'min' => 1200, 'icon' => 'themes/default/assets/resources/rank_06.png', 'reward' => '+100 Coins'],
-                ['level' => 7, 'name' => 'Lab Technician', 'min' => 1400, 'icon' => 'themes/default/assets/resources/rank_07.png', 'reward' => 'Unlock: Lab Coat'],
-                ['level' => 8, 'name' => 'Draftsman', 'min' => 1600, 'icon' => 'themes/default/assets/resources/rank_08.png', 'reward' => 'Unlock: Pencil Badge'],
+                ['level' => 4, 'name' => 'Surveyor', 'min' => 500, 'icon' => 'themes/default/assets/resources/ranks/rank_02_surveyor.webp', 'reward' => 'Unlock: Daily Challenges'],
+                ['level' => 5, 'name' => 'Chainman', 'min' => 800, 'icon' => '', 'reward' => '+100 Coins'],
+                ['level' => 6, 'name' => 'Leveling Staff', 'min' => 1200, 'icon' => '', 'reward' => '+100 Coins'],
+                ['level' => 7, 'name' => 'Lab Technician', 'min' => 1400, 'icon' => '', 'reward' => 'Unlock: Lab Coat'],
+                ['level' => 8, 'name' => 'Draftsman', 'min' => 1600, 'icon' => '', 'reward' => 'Unlock: Pencil Badge'],
 
                 // League 3: The Site Management
-                ['level' => 9, 'name' => 'Site Supervisor', 'min' => 2000, 'icon' => 'themes/default/assets/resources/rank_09.png', 'reward' => 'Unlock: Supervisor Avatar'],
-                ['level' => 10, 'name' => 'Senior Foreman', 'min' => 2800, 'icon' => 'themes/default/assets/resources/rank_10.png', 'reward' => '+200 Coins'],
-                ['level' => 11, 'name' => 'Safety Officer', 'min' => 3600, 'icon' => 'themes/default/assets/resources/rank_11.png', 'reward' => 'Unlock: Safety First Sticker'],
-                ['level' => 12, 'name' => 'Site Inspector', 'min' => 4400, 'icon' => 'themes/default/assets/resources/rank_12.png', 'reward' => '+250 Coins'],
+                ['level' => 9, 'name' => 'Site Supervisor', 'min' => 2000, 'icon' => 'themes/default/assets/resources/ranks/rank_03_supervisor.webp', 'reward' => 'Unlock: Supervisor Avatar'],
+                ['level' => 10, 'name' => 'Senior Foreman', 'min' => 2800, 'icon' => '', 'reward' => '+200 Coins'],
+                ['level' => 11, 'name' => 'Safety Officer', 'min' => 3600, 'icon' => '', 'reward' => 'Unlock: Safety First Sticker'],
+                ['level' => 12, 'name' => 'Site Inspector', 'min' => 4400, 'icon' => '', 'reward' => '+250 Coins'],
 
                 // League 4: The Office Engineers
-                ['level' => 13, 'name' => 'Assistant Engineer', 'min' => 5000, 'icon' => 'themes/default/assets/resources/rank_13.png', 'reward' => 'Unlock: The Vault'],
-                ['level' => 14, 'name' => 'QC Engineer', 'min' => 6200, 'icon' => 'themes/default/assets/resources/rank_14.png', 'reward' => 'Unlock: Quality Badge'],
-                ['level' => 15, 'name' => 'Billing Engineer', 'min' => 7500, 'icon' => 'themes/default/assets/resources/rank_15.png', 'reward' => '+500 Coins'],
-                ['level' => 16, 'name' => 'Quantity Surveyor', 'min' => 10000, 'icon' => 'themes/default/assets/resources/rank_16.png', 'reward' => 'Unlock: Dark Theme'],
-                ['level' => 17, 'name' => 'CAD Architect', 'min' => 12500, 'icon' => 'themes/default/assets/resources/rank_17.png', 'reward' => '+750 Coins'],
+                ['level' => 13, 'name' => 'Assistant Engineer', 'min' => 5000, 'icon' => 'themes/default/assets/resources/ranks/rank_04_assistant.webp', 'reward' => 'Unlock: The Vault'],
+                ['level' => 14, 'name' => 'QC Engineer', 'min' => 6200, 'icon' => '', 'reward' => 'Unlock: Quality Badge'],
+                ['level' => 15, 'name' => 'Billing Engineer', 'min' => 7500, 'icon' => '', 'reward' => '+500 Coins'],
+                ['level' => 16, 'name' => 'Quantity Surveyor', 'min' => 10000, 'icon' => '', 'reward' => 'Unlock: Dark Theme'],
+                ['level' => 17, 'name' => 'CAD Architect', 'min' => 12500, 'icon' => '', 'reward' => '+750 Coins'],
 
                 // League 5: The Experts
-                ['level' => 18, 'name' => 'Senior Engineer', 'min' => 15000, 'icon' => 'themes/default/assets/resources/rank_18.png', 'reward' => 'Unlock: Senior Avatar'],
-                ['level' => 19, 'name' => 'Structural Designer', 'min' => 22000, 'icon' => 'themes/default/assets/resources/rank_19.png', 'reward' => '+1,000 Coins'],
-                ['level' => 20, 'name' => 'Environmental Eng.', 'min' => 26000, 'icon' => 'themes/default/assets/resources/rank_20.png', 'reward' => 'Unlock: Green Leaf Badge'],
-                ['level' => 21, 'name' => 'Geotech Specialist', 'min' => 30000, 'icon' => 'themes/default/assets/resources/rank_21.png', 'reward' => 'Unlock: Earth Frame'],
-                ['level' => 22, 'name' => 'Resident Engineer', 'min' => 40000, 'icon' => 'themes/default/assets/resources/rank_22.png', 'reward' => '+2,000 Coins'],
+                ['level' => 18, 'name' => 'Senior Engineer', 'min' => 15000, 'icon' => 'themes/default/assets/resources/ranks/rank_05_senior.webp', 'reward' => 'Unlock: Senior Avatar'],
+                ['level' => 19, 'name' => 'Structural Designer', 'min' => 22000, 'icon' => '', 'reward' => '+1,000 Coins'],
+                ['level' => 20, 'name' => 'Environmental Eng.', 'min' => 26000, 'icon' => '', 'reward' => 'Unlock: Green Leaf Badge'],
+                ['level' => 21, 'name' => 'Geotech Specialist', 'min' => 30000, 'icon' => '', 'reward' => 'Unlock: Earth Frame'],
+                ['level' => 22, 'name' => 'Resident Engineer', 'min' => 40000, 'icon' => '', 'reward' => '+2,000 Coins'],
 
                 // League 6: The Bosses
-                ['level' => 23, 'name' => 'Project Manager', 'min' => 50000, 'icon' => 'themes/default/assets/resources/rank_23.png', 'reward' => 'Unlock: Manager Avatar'],
-                ['level' => 24, 'name' => 'Urban Planner', 'min' => 65000, 'icon' => 'themes/default/assets/resources/rank_24.png', 'reward' => '+3,000 Coins'],
-                ['level' => 25, 'name' => 'Operations Director', 'min' => 75000, 'icon' => 'themes/default/assets/resources/rank_25.png', 'reward' => '+5,000 Coins'],
-                ['level' => 26, 'name' => 'Contract Manager', 'min' => 90000, 'icon' => 'themes/default/assets/resources/rank_26.png', 'reward' => 'Unlock: Gold Pen Effect'],
+                ['level' => 23, 'name' => 'Project Manager', 'min' => 50000, 'icon' => 'themes/default/assets/resources/ranks/rank_06_manager.webp', 'reward' => 'Unlock: Manager Avatar'],
+                ['level' => 24, 'name' => 'Urban Planner', 'min' => 65000, 'icon' => '', 'reward' => '+3,000 Coins'],
+                ['level' => 25, 'name' => 'Operations Director', 'min' => 75000, 'icon' => '', 'reward' => '+5,000 Coins'],
+                ['level' => 26, 'name' => 'Contract Manager', 'min' => 90000, 'icon' => '', 'reward' => 'Unlock: Gold Pen Effect'],
 
                 // League 7: The Legends
-                ['level' => 27, 'name' => 'Chief Engineer', 'min' => 100000, 'icon' => 'themes/default/assets/resources/rank_27.png', 'reward' => 'Unlock: Chief Avatar']
+                ['level' => 27, 'name' => 'Chief Engineer', 'min' => 100000, 'icon' => 'themes/default/assets/resources/ranks/rank_07_chief.webp', 'reward' => 'Unlock: Chief Avatar']
             ];
 
             SettingsService::set('economy_ranks', $ranks, 'json', 'economy');

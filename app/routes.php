@@ -654,6 +654,10 @@ $router->add("GET", "/admin/performance-dashboard", "Admin\\DashboardController@
 $router->add("GET", "/api/favorites", "FavoritesController@index", ["auth"]);
 $router->add("POST", "/api/favorites/toggle", "FavoritesController@toggle", ["auth"]);
 
+// Civil Identity APIs
+$router->add("POST", "/api/user/identity/update", "UserController@updateIdentity", ["auth"]);
+$router->add("POST", "/api/user/identity/buy", "UserController@buyIdentityItem", ["auth"]);
+
 $router->add("GET", "/admin/users", "Admin\UserManagementController@index", [
     "auth",
     "admin",

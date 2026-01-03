@@ -542,33 +542,46 @@ $pageTitle = $page_title ?? 'User Profile';
 
             <!-- Identity Card -->
             <div class="profile-id-card">
-                <div class="avatar-wrapper">
-                    <div class="rank-badge-container">
-                        <div class="rank-badge level-<?php echo $rank_data['rank_level']; ?>" title="Your Rank: <?php echo $rank_data['rank']; ?>">
-                            <i class="fas fa-<?php 
-                                echo match($rank_data['rank_level']) {
-                                    1 => 'seedling',
-                                    2 => 'hard-hat',
-                                    3 => 'drafting-compass',
-                                    4 => 'medal',
-                                    5 => 'crown',
-                                    default => 'user'
-                                };
-                            ?>"></i>
+                    <div class="avatar-wrapper">
+                        <!-- Rank Badge -->
+                        <div class="rank-badge-container">
+                            <div class="rank-badge level-<?php echo $rank_data['rank_level']; ?>" title="Your Rank: <?php echo $rank_data['rank']; ?>">
+                                <i class="fas fa-<?php 
+                                    echo match($rank_data['rank_level']) {
+                                        1 => 'seedling',
+                                        2 => 'hard-hat',
+                                        3 => 'drafting-compass',
+                                        4 => 'medal',
+                                        5 => 'crown',
+                                        default => 'user'
+                                    };
+                                ?>"></i>
+                            </div>
+                        </div>
+
+                        <!-- Civil Identity Composite Avatar -->
+                        <div class="avatar-composite" style="width: 120px; height: 120px;">
+                            <?php 
+                                $avatarFile = !empty($user['avatar_id']) ? $user['avatar_id'] . '.webp' : 'avatar_starter_mascot.webp';
+                                $frameFile = !empty($user['frame_id']) ? $user['frame_id'] . '.webp' : null;
+                                
+                                // Clean up ID to filename just in case
+                                if (!str_contains($avatarFile, '.')) $avatarFile .= '.webp';
+                                if ($frameFile && !str_contains($frameFile, '.')) $frameFile .= '.webp';
+                            ?>
+                            
+                            <!-- Base Face -->
+                            <img src="<?php echo app_url('themes/default/assets/resources/avatars/' . $avatarFile); ?>" 
+                                 class="user-face border-4 border-white shadow-lg" 
+                                 onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($user['username']); ?>&size=120&background=6366f1&color=fff'">
+                            
+                            <!-- Frame Overlay -->
+                            <?php if ($frameFile): ?>
+                                <img src="<?php echo app_url('themes/default/assets/resources/avatars/' . $frameFile); ?>" 
+                                     class="user-frame" style="transform: scale(1.15);">
+                            <?php endif; ?>
                         </div>
                     </div>
-                    <img src="<?php 
-                        $avatar = $user['avatar'] ?? null;
-                        $firstName = $user['first_name'] ?? '';
-                        $lastName = $user['last_name'] ?? '';
-                        echo !empty($avatar)
-                            ? '/profile/avatar/' . htmlspecialchars($avatar)
-                            : 'https://ui-avatars.com/api/?name=' . urlencode(trim($firstName . ' ' . $lastName)) . '&size=200&background=6366f1&color=fff&bold=true';
-                    ?>" alt="Avatar" class="avatar" id="avatarPreview">
-                    <div class="btn-upload-mini" onclick="document.getElementById('avatarInput').click()">
-                        <i class="fas fa-camera"></i>
-                    </div>
-                </div>
                 
                 <div class="user-meta">
                     <h2><?php echo htmlspecialchars(trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''))); ?></h2>
@@ -605,6 +618,7 @@ $pageTitle = $page_title ?? 'User Profile';
             <!-- Navigation -->
             <div class="nav-tabs">
                 <button class="nav-tab active" onclick="switchTab('info', this)">Personal Info</button>
+                <button class="nav-tab" onclick="switchTab('identity', this)">Civil Identity</button>
                 <button class="nav-tab" onclick="switchTab('prestige', this)">Prestige Center</button>
                 <button class="nav-tab" onclick="switchTab('professional', this)">Professional</button>
                 <button class="nav-tab" onclick="switchTab('social', this)">Social & Links</button>
@@ -682,6 +696,17 @@ $pageTitle = $page_title ?? 'User Profile';
                     </div>
                 </div>
                 <div id="tab-info" class="tab-content active">
+                    <!-- ... Personal Info Form ... -->
+                    
+                <!-- Tab: Civil Identity -->
+                <div id="tab-identity" class="tab-content">
+                    <?php 
+                        // Include the Avatar Selector Component
+                        // Pass $user and $db to it automatically via scope
+                        $db = \App\Core\Database::getInstance(); 
+                        include __DIR__ . '/components/avatar_selector.php'; 
+                    ?>
+                </div>
                     <div class="form-grid">
                         <div class="form-group form-grid-full">
                             <h3 style="color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 20px;">Account Credentials</h3>

@@ -122,5 +122,134 @@ class UserController extends Controller {
             $this->json(['error' => 'Invalid request method'], 405);
         }
     }
+
+    /**
+     * Update Identity (Equip Avatar/Frame)
+     */
+    public function updateIdentity() {
+        $this->requireAuth();
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid method']);
+            exit;
+        }
+
+        $type = $_POST['type'] ?? ''; // 'avatar' or 'frame'
+        $key = $_POST['key'] ?? '';
+        $userId = $this->getUser()['id'];
+
+        if (!in_array($type, ['avatar', 'frame'])) {
+            echo json_encode(['success' => false, 'message' => 'Invalid item type']);
+            exit;
+        }
+
+        // Logic: Check if owned (unless it's 'default' frame)
+        if ($key === 'default' && $type === 'frame') {
+            // Allow un-equipping frame
+        } else {
+            // Check Wardrobe
+            $db = \App\Core\Database::getInstance();
+            $owned = $db->query(
+                "SELECT id FROM user_wardrobe WHERE user_id = ? AND item_key = ?", 
+                [$userId, $key]
+            )->fetch();
+
+            // Check if it's a "Starter" avatar (which are always free)
+            $isStarter = strpos($key, 'avatar_starter_') === 0;
+
+            if (!$owned && !$isStarter) {
+                echo json_encode(['success' => false, 'message' => 'You do not own this item.']);
+                exit;
+            }
+        }
+
+        // Update User Profile
+        $col = ($type === 'avatar') ? 'avatar_id' : 'frame_id';
+        $val = ($key === 'default') ? NULL : $key;
+
+        $db = \App\Core\Database::getInstance();
+        $db->query("UPDATE users SET $col = ? WHERE id = ?", [$val, $userId]);
+
+        // Update Session
+        $_SESSION['user'][$col] = $val;
+
+        echo json_encode(['success' => true, 'message' => 'Identity updated!']);
+        exit;
+    }
+
+    /**
+     * Buy Identity Item (Frame)
+     */
+    public function buyIdentityItem() {
+        $this->requireAuth();
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid method']);
+            exit;
+        }
+
+        $key = $_POST['key'] ?? '';
+        $userId = $this->getUser()['id'];
+
+        // Define Prices (Should ideally be in DB or Config)
+        $prices = [
+            'frame_hazard' => 50,
+            'frame_blueprint' => 200,
+            'frame_gold' => 1000
+        ];
+
+        if (!isset($prices[$key])) {
+            echo json_encode(['success' => false, 'message' => 'Item not found']);
+            exit;
+        }
+
+        $price = $prices[$key];
+        $db = \App\Core\Database::getInstance();
+
+        // Check Balance
+        $user = $db->findOne('users', ['id' => $userId]); // Re-fetch for fresh balance
+        $coins = $user['coins'] ?? 0;
+
+        if ($coins < $price) {
+            echo json_encode(['success' => false, 'message' => 'Insufficient coins']);
+            exit;
+        }
+
+        // Check ownership
+        $owned = $db->query(
+            "SELECT id FROM user_wardrobe WHERE user_id = ? AND item_key = ?", 
+            [$userId, $key]
+        )->fetch();
+
+        if ($owned) {
+            echo json_encode(['success' => false, 'message' => 'You already own this item']);
+            exit;
+        }
+
+        // Transaction
+        try {
+            $db->beginTransaction();
+
+            // Deduct Coins
+            $db->query("UPDATE user_resources SET coins = coins - ? WHERE user_id = ?", [$price, $userId]);
+
+            // Add Item
+            $db->query("INSERT INTO user_wardrobe (user_id, item_type, item_key) VALUES (?, 'frame', ?)", [$userId, $key]);
+
+            // Log it
+            $db->query(
+                "INSERT INTO user_resource_logs (user_id, resource_type, amount, source) VALUES (?, 'coins', ?, 'shop_purchase')", 
+                [$userId, -$price]
+            );
+
+            $db->commit();
+            echo json_encode(['success' => true, 'message' => 'Item purchased!']);
+        } catch (\Exception $e) {
+            $db->rollBack();
+            echo json_encode(['success' => false, 'message' => 'Transaction failed: ' . $e->getMessage()]);
+        }
+        exit;
+    }
 }
-?>

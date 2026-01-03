@@ -216,7 +216,9 @@ $content = '
                                     <td><input type="number" name="ranks['.$index.'][min]" value="'.$rank['min'].'" class="form-control-premium"></td>
                                     <td><input type="text" name="ranks['.$index.'][icon]" value="'.htmlspecialchars($rank['icon']).'" class="form-control-premium small"></td>
                                     <td class="text-center">
-                                        <img src="'.app_base_url($rank['icon']).'" class="rank-preview-admin">
+                                        ' . (!empty($rank['icon']) 
+                                            ? '<img src="'.app_base_url($rank['icon']).'" class="rank-preview-admin">' 
+                                            : '<span style="color: #cbd5e1; font-size: 0.8rem; font-style: italic;">No Icon</span>') . '
                                     </td>
                                     <input type="hidden" name="ranks['.$index.'][level]" value="'.$rank['level'].'">
                                 </tr>';

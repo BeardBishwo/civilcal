@@ -68,6 +68,14 @@ class GamificationService
                 // Trigger Mission Progress
                 $ms = new MissionService();
                 $ms->updateProgress($userId, 'solve_questions');
+
+                // Identity System (Dual XP)
+                $this->db->query(
+                    "UPDATE users SET xp = xp + :xp, total_xp = total_xp + :xp, season_xp = season_xp + :xp WHERE id = :uid",
+                    ['xp' => $amount, 'uid' => $userId]
+                );
+                
+                $this->checkAvatarUnlocks($userId);
                 
                 continue;
             }
@@ -129,10 +137,23 @@ class GamificationService
         
         // Handle XP Separately
         if ($totalLoot['xp'] > 0) {
+            $xpAmount = $totalLoot['xp'];
+            
+            // 1. Battle Pass & Missions
             $bp = new BattlePassService();
-            $bp->addXp($userId, $totalLoot['xp']);
+            $bp->addXp($userId, $xpAmount);
             $ms = new MissionService();
             $ms->updateProgress($userId, 'solve_questions'); 
+
+            // 2. Identity System (Dual XP)
+            $this->db->query(
+                "UPDATE users SET xp = xp + :xp, total_xp = total_xp + :xp, season_xp = season_xp + :xp WHERE id = :uid",
+                ['xp' => $xpAmount, 'uid' => $userId]
+            );
+
+            // 3. Check for Rank Unlocks
+            $this->checkAvatarUnlocks($userId);
+
             unset($totalLoot['xp']);
         }
 
@@ -430,5 +451,41 @@ class GamificationService
             'src' => $source, 
             'ref' => $refId
         ]);
+    }
+
+    /**
+     * Check and Unlock Avatars based on Rank/XP
+     */
+    public function checkAvatarUnlocks($userId)
+    {
+        $user = $this->db->findOne('users', ['id' => $userId]);
+        if (!$user) return;
+
+        $xp = $user['total_xp'] ?? 0;
+
+        // Rank Thresholds for Avatar Unlocks
+        $unlocks = [
+            2000 => 'avatar_rank_03_supervisor', // Rank 3: Supervisor
+            15000 => 'avatar_rank_05_senior',    // Rank 5: Senior Engineer
+            100000 => 'avatar_rank_07_chief'     // Rank 7: Chief Engineer
+        ];
+
+        foreach ($unlocks as $threshold => $avatarKey) {
+            if ($xp >= $threshold) {
+                // Check if already owned
+                $owned = $this->db->query(
+                    "SELECT id FROM user_wardrobe WHERE user_id = ? AND item_key = ?", 
+                    [$userId, $avatarKey]
+                )->fetch();
+
+                if (!$owned) {
+                    // Unlock It!
+                    $this->db->query(
+                        "INSERT INTO user_wardrobe (user_id, item_type, item_key) VALUES (?, 'avatar', ?)",
+                        [$userId, $avatarKey]
+                    );
+                }
+            }
+        }
     }
 }
