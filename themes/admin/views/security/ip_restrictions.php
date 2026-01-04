@@ -1,13 +1,13 @@
 <?php
-$page_title = 'IP Access Restrictions - ' . \App\Services\SettingsService::get('site_name', 'Engineering Calculator Pro');
-
-// Pre-calculate stats for the strip
+/**
+ * PREMIUM IP ACCESS CONTROL
+ * Manage Whitelisted and Blacklisted IPs.
+ */
+$page_title = 'IP Access Control';
 $total_whitelist = count($whitelist ?? []);
 $total_blacklist = count($blacklist ?? []);
-$total_restrictions = $total_whitelist + $total_blacklist;
 ?>
 
-<!-- Optimized Admin Wrapper Container -->
 <div class="admin-wrapper-container">
     <div class="admin-content-wrapper">
 
@@ -21,428 +21,273 @@ $total_restrictions = $total_whitelist + $total_blacklist;
                 <div class="header-subtitle">Manage whitelisted and blacklisted IP addresses to secure your platform.</div>
             </div>
             <div class="header-actions">
-                <button onclick="location.reload()" class="btn btn-secondary btn-compact" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">
-                    <i class="fas fa-sync-alt"></i>
-                    <span>Refresh</span>
+                <button onclick="location.reload()" class="btn-secondary-premium">
+                    <i class="fas fa-sync-alt"></i> Refresh
                 </button>
             </div>
         </div>
 
-        <!-- Stats Strip -->
-        <div class="compact-stats">
-            <div class="stat-item">
-                <div class="stat-icon primary">
-                    <i class="fas fa-globe"></i>
+        <!-- Premium Stats Grid -->
+        <div class="stats-grid-premium">
+            <div class="stat-card-premium">
+                <div class="stat-icon-wrapper bg-primary-soft">
+                    <i class="fas fa-globe text-primary"></i>
                 </div>
-                <div class="stat-info">
-                    <div class="stat-value"><?php echo $total_restrictions; ?></div>
-                    <div class="stat-label">Total Rules</div>
-                </div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon success">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value text-success"><?php echo $total_whitelist; ?></div>
-                    <div class="stat-label">Whitelisted</div>
+                <div>
+                    <div class="stat-value-premium"><?= $total_whitelist + $total_blacklist ?></div>
+                    <div class="stat-label-premium">Total Rules</div>
                 </div>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon danger">
-                    <i class="fas fa-ban"></i>
+            <div class="stat-card-premium">
+                <div class="stat-icon-wrapper bg-success-soft">
+                    <i class="fas fa-check-circle text-success"></i>
                 </div>
-                <div class="stat-info">
-                    <div class="stat-value text-danger"><?php echo $total_blacklist; ?></div>
-                    <div class="stat-label">Blacklisted</div>
+                <div>
+                    <div class="stat-value-premium"><?= $total_whitelist ?></div>
+                    <div class="stat-label-premium">Whitelisted</div>
+                </div>
+            </div>
+            <div class="stat-card-premium">
+                <div class="stat-icon-wrapper bg-danger-soft">
+                    <i class="fas fa-ban text-danger"></i>
+                </div>
+                <div>
+                    <div class="stat-value-premium"><?= $total_blacklist ?></div>
+                    <div class="stat-label-premium">Blacklisted</div>
                 </div>
             </div>
         </div>
 
-        <div class="analytics-content-body">
+        <!-- Main Grid Content -->
+        <div class="premium-grid-layout">
             
-            <?php if (isset($_SESSION['success_message'])): ?>
-                <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>
-                    <?= $_SESSION['success_message']; unset($_SESSION['success_message']); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <?php endif; ?>
-
-            <?php if (isset($_SESSION['error_message'])): ?>
-                <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    <?= $_SESSION['error_message']; unset($_SESSION['error_message']); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <?php endif; ?>
-
-            <div class="compact-grid">
-                <!-- Add Restriction Area -->
-                <div class="grid-col-4">
-                    <div class="page-card-compact sticky-top" style="top: 1rem;">
-                        <div class="card-header-compact">
-                            <div class="header-title-sm">
-                                <i class="fas fa-plus-circle text-primary"></i> Add New Rule
-                            </div>
-                        </div>
-                        <div class="card-content-compact">
-                            <form action="<?= app_base_url('/admin/security/ip-restrictions/add') ?>" method="POST" class="modern-form">
-                                <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
-                                
-                                <div class="form-group-compact">
-                                    <label class="form-label-sm">IP Address</label>
-                                    <div class="input-with-icon">
-                                        <i class="fas fa-network-wired"></i>
-                                        <input type="text" name="ip_address" placeholder="e.g. 192.168.1.1" required>
-                                    </div>
-                                </div>
-
-                                <div class="form-group-compact">
-                                    <label class="form-label-sm">Rule Type</label>
-                                    <select name="restriction_type" class="form-select-compact">
-                                        <option value="blacklist">Blacklist (Block)</option>
-                                        <option value="whitelist">Whitelist (Allow)</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group-compact">
-                                    <label class="form-label-sm">Reason / Note</label>
-                                    <textarea name="reason" placeholder="Why is this IP being added?" rows="2"></textarea>
-                                </div>
-
-                                <div class="form-group-compact">
-                                    <label class="form-label-sm">Expiration (Optional)</label>
-                                    <input type="datetime-local" name="expires_at" class="form-input-compact">
-                                </div>
-
-                                <button type="submit" class="btn btn-primary w-100 mt-2">
-                                    <i class="fas fa-plus me-1"></i> Add Restriction
-                                </button>
-                            </form>
-                        </div>
+            <!-- Left: Add New Rule -->
+            <div class="grid-column-small">
+                <div class="premium-card sticky-card">
+                    <div class="card-header-clean">
+                        <h3><i class="fas fa-plus-circle text-primary"></i> Add New Rule</h3>
                     </div>
-                </div>
-
-                <!-- Restrictions Lists -->
-                <div class="grid-col-8">
-                    
-                    <!-- Whitelist Table -->
-                    <div class="page-card-compact mb-4">
-                        <div class="card-header-compact bg-light">
-                            <div class="header-title-sm">
-                                <i class="fas fa-check-double text-success"></i> Whitelist (Priority Access)
+                    <div class="card-body-clean">
+                        <form action="<?= app_base_url('/admin/security/ip-restrictions/add') ?>" method="POST">
+                            <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                            
+                            <div class="form-group-premium">
+                                <label class="label-premium required">IP Address</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-network-wired"></i>
+                                    <input type="text" name="ip_address" class="input-premium pl-4" placeholder="e.g. 192.168.1.1" required>
+                                </div>
                             </div>
-                            <span class="badge rounded-pill bg-success px-3"><?= $total_whitelist ?> IPs</span>
-                        </div>
-                        <div class="table-container">
-                            <table class="table-compact">
-                                <thead>
-                                    <tr>
-                                        <th>IP Address</th>
-                                        <th>Reason</th>
-                                        <th>Expires</th>
-                                        <th class="text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (empty($whitelist)): ?>
-                                        <tr><td colspan="4" class="text-center py-4 text-muted">No whitelisted IPs found.</td></tr>
-                                    <?php else: ?>
-                                        <?php foreach ($whitelist as $item): ?>
-                                            <tr>
-                                                <td class="fw-bold text-dark"><?= htmlspecialchars($item['ip_address']) ?></td>
-                                                <td class="text-muted small"><?= htmlspecialchars($item['reason'] ?: 'No reason provided') ?></td>
-                                                <td>
-                                                    <?php if ($item['expires_at']): ?>
-                                                        <span class="text-warning tiny">
-                                                            <i class="far fa-clock"></i> <?= date('M d, Y', strtotime($item['expires_at'])) ?>
-                                                        </span>
-                                                    <?php else: ?>
-                                                        <span class="text-muted tiny">Permanent</span>
-                                                    <?php endif; ?>
-                                                </td>
-                                                <td class="text-center">
-                                                    <form action="<?= app_base_url('/admin/security/ip-restrictions/remove') ?>" method="POST" onsubmit="return confirm('Remove this restriction?');">
-                                                        <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
-                                                        <input type="hidden" name="id" value="<?= $item['id'] ?>">
-                                                        <button type="submit" class="btn-action text-danger" title="Remove">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
 
-                    <!-- Blacklist Table -->
-                    <div class="page-card-compact">
-                        <div class="card-header-compact bg-light">
-                            <div class="header-title-sm">
-                                <i class="fas fa-user-slash text-danger"></i> Blacklist (Blocked Access)
+                            <div class="form-group-premium">
+                                <label class="label-premium required">Rule Type</label>
+                                <select name="restriction_type" class="select-premium">
+                                    <option value="blacklist">Blacklist (Block Access)</option>
+                                    <option value="whitelist">Whitelist (Allow Access)</option>
+                                </select>
                             </div>
-                            <span class="badge rounded-pill bg-danger px-3"><?= $total_blacklist ?> IPs</span>
-                        </div>
-                        <div class="table-container">
-                            <table class="table-compact">
-                                <thead>
-                                    <tr>
-                                        <th>IP Address</th>
-                                        <th>Reason</th>
-                                        <th>Expires</th>
-                                        <th class="text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (empty($blacklist)): ?>
-                                        <tr><td colspan="4" class="text-center py-4 text-muted">No blacklisted IPs found.</td></tr>
-                                    <?php else: ?>
-                                        <?php foreach ($blacklist as $item): ?>
-                                            <tr>
-                                                <td class="fw-bold text-dark"><?= htmlspecialchars($item['ip_address']) ?></td>
-                                                <td class="text-muted small"><?= htmlspecialchars($item['reason'] ?: 'Security threat') ?></td>
-                                                <td>
-                                                    <?php if ($item['expires_at']): ?>
-                                                        <span class="text-danger tiny">
-                                                            <i class="far fa-clock"></i> <?= date('M d, Y', strtotime($item['expires_at'])) ?>
-                                                        </span>
-                                                    <?php else: ?>
-                                                        <span class="text-muted tiny">Permanent</span>
-                                                    <?php endif; ?>
-                                                </td>
-                                                <td class="text-center">
-                                                    <form action="<?= app_base_url('/admin/security/ip-restrictions/remove') ?>" method="POST" onsubmit="return confirm('Remove this restriction?');">
-                                                        <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
-                                                        <input type="hidden" name="id" value="<?= $item['id'] ?>">
-                                                        <button type="submit" class="btn-action text-danger" title="Remove">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
 
+                            <div class="form-group-premium">
+                                <label class="label-premium">Reason / Note</label>
+                                <textarea name="reason" class="input-premium" rows="2" placeholder="Why is this IP being added?"></textarea>
+                            </div>
+
+                            <div class="form-group-premium">
+                                <label class="label-premium">Expiration (Optional)</label>
+                                <input type="datetime-local" name="expires_at" class="input-premium">
+                            </div>
+
+                            <button type="submit" class="btn-primary-premium w-100 mt-2 justify-center">
+                                <i class="fas fa-plus"></i> Add Restriction
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
 
+            <!-- Right: Tables -->
+            <div class="grid-column-large">
+                
+                <!-- Whitelist Table -->
+                <div class="premium-card mb-4">
+                    <div class="card-header-clean bg-success-light">
+                        <h3 class="text-success"><i class="fas fa-check-double"></i> Whitelist Priorities</h3>
+                        <span class="badge-pill badge-success"><?= $total_whitelist ?> Active</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table-premium">
+                            <thead>
+                                <tr>
+                                    <th>IP Address</th>
+                                    <th>Note</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($whitelist)): ?>
+                                    <tr><td colspan="4" class="text-center py-4 text-muted">No whitelisted IPs found.</td></tr>
+                                <?php else: ?>
+                                    <?php foreach ($whitelist as $item): ?>
+                                        <tr>
+                                            <td class="font-mono font-bold text-dark"><?= htmlspecialchars($item['ip_address']) ?></td>
+                                            <td class="text-sm text-muted"><?= htmlspecialchars($item['reason'] ?: '-') ?></td>
+                                            <td>
+                                                <?php if ($item['expires_at']): ?>
+                                                    <span class="badge-tag">Expires: <?= date('M d, Y', strtotime($item['expires_at'])) ?></span>
+                                                <?php else: ?>
+                                                    <span class="badge-tag bg-green-50 text-green-600">Permanent</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-right">
+                                                <form action="<?= app_base_url('/admin/security/ip-restrictions/remove') ?>" method="POST" onsubmit="return confirm('Remove this restriction?');" style="display:inline;">
+                                                    <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                                                    <input type="hidden" name="id" value="<?= $item['id'] ?>">
+                                                    <button type="submit" class="action-btn-icon text-red" title="Remove">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Blacklist Table -->
+                <div class="premium-card">
+                    <div class="card-header-clean bg-danger-light">
+                        <h3 class="text-danger"><i class="fas fa-ban"></i> Blacklisted IPs</h3>
+                        <span class="badge-pill badge-danger"><?= $total_blacklist ?> Blocked</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table-premium">
+                            <thead>
+                                <tr>
+                                    <th>IP Address</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($blacklist)): ?>
+                                    <tr><td colspan="4" class="text-center py-4 text-muted">No blacklisted IPs found.</td></tr>
+                                <?php else: ?>
+                                    <?php foreach ($blacklist as $item): ?>
+                                        <tr>
+                                            <td class="font-mono font-bold text-dark"><?= htmlspecialchars($item['ip_address']) ?></td>
+                                            <td class="text-sm text-muted"><?= htmlspecialchars($item['reason'] ?: 'Security Threat') ?></td>
+                                            <td>
+                                                <?php if ($item['expires_at']): ?>
+                                                    <span class="badge-tag">Expires: <?= date('M d, Y', strtotime($item['expires_at'])) ?></span>
+                                                <?php else: ?>
+                                                    <span class="badge-tag bg-red-50 text-red-600">Permanent</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-right">
+                                                <form action="<?= app_base_url('/admin/security/ip-restrictions/remove') ?>" method="POST" onsubmit="return confirm('Remove this restriction?');" style="display:inline;">
+                                                    <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                                                    <input type="hidden" name="id" value="<?= $item['id'] ?>">
+                                                    <button type="submit" class="action-btn-icon text-red" title="Remove">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
         </div>
+
     </div>
 </div>
 
 <style>
-    /* Styling consistent with reports.php and new premium standard */
-    .admin-wrapper-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 1rem;
-        background: var(--admin-gray-50, #f8f9fa);
-        min-height: calc(100vh - 70px);
-    }
+/* PREMIUM SYSTEM STYLES (Scoped) */
+:root { --admin-primary: #667eea; --admin-bg: #f8f9fa; --admin-text: #1e293b; }
+body { background: var(--admin-bg); font-family: 'Inter', sans-serif; }
 
-    .admin-content-wrapper {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
-    }
+.admin-wrapper-container { padding: 1rem; max-width: 1400px; margin: 0 auto; }
+.admin-content-wrapper { background: transparent; }
 
-    .compact-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1.5rem 2rem;
-        border-bottom: 1px solid var(--admin-gray-200, #e5e7eb);
-        background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
-        color: white;
-    }
+/* Header */
+.compact-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2rem; background: linear-gradient(135deg, #1f2937 0%, #111827 100%); color: white; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+.header-title { display: flex; align-items: center; gap: 0.75rem; }
+.header-title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; color: white; }
+.header-title i { color: #60a5fa; font-size: 1.25rem; }
+.header-subtitle { color: #9ca3af; font-size: 0.9rem; margin-top: 4px; }
 
-    .header-title {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 0.25rem;
-    }
+/* Buttons */
+.btn-primary-premium { background: var(--admin-primary); color: white; border: none; padding: 0.6rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
+.btn-primary-premium:hover { background: #5a67d8; transform: translateY(-1px); }
+.justify-center { justify-content: center; }
 
-    .header-title h1 {
-        margin: 0;
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: white;
-    }
+.btn-secondary-premium { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.6rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
+.btn-secondary-premium:hover { background: rgba(255,255,255,0.2); }
 
-    .header-subtitle {
-        font-size: 0.875rem;
-        opacity: 0.85;
-        margin: 0;
-    }
+/* Stats Grid */
+.stats-grid-premium { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.stat-card-premium { background: white; padding: 1.25rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem; }
+.stat-icon-wrapper { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+.stat-value-premium { font-size: 1.5rem; font-weight: 700; color: #1e293b; line-height: 1; margin-bottom: 4px; }
+.stat-label-premium { font-size: 0.85rem; color: #64748b; font-weight: 500; }
 
-    /* Stats Strip */
-    .compact-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        padding: 1.5rem 2rem;
-        background: #fbfbfc;
-        border-bottom: 1px solid #edf2f7;
-    }
+/* Colors */
+.bg-primary-soft { background: #e0e7ff; } .text-primary { color: #4338ca; }
+.bg-success-soft { background: #dcfce7; } .text-success { color: #15803d; }
+.bg-danger-soft { background: #fee2e2; } .text-danger { color: #b91c1c; }
 
-    .stat-item {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1.25rem;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        border: 1px solid #edf2f7;
-    }
+/* Layout Grid */
+.premium-grid-layout { display: grid; grid-template-columns: 350px 1fr; gap: 1.5rem; }
+@media (max-width: 1024px) { .premium-grid-layout { grid-template-columns: 1fr; } }
 
-    .stat-icon {
-        width: 3.5rem;
-        height: 3.5rem;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        color: white;
-    }
+/* Cards & Forms */
+.premium-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
+.sticky-card { position: sticky; top: 1rem; }
+.card-header-clean { padding: 1rem 1.5rem; border-bottom: 1px solid #f1f5f9; background: white; display: flex; justify-content: space-between; align-items: center; }
+.card-header-clean h3 { margin: 0; font-size: 1rem; font-weight: 700; color: #334155; display: flex; align-items: center; gap: 8px; }
+.card-body-clean { padding: 1.5rem; }
 
-    .stat-icon.primary { background: #667eea; }
-    .stat-icon.success { background: #48bb78; }
-    .stat-icon.danger { background: #f56565; }
+.bg-success-light { background: #f0fdf4; }
+.bg-danger-light { background: #fef2f2; }
 
-    .stat-value { font-size: 1.5rem; font-weight: 800; line-height: 1; }
-    .stat-label { font-size: 0.8rem; color: #718096; font-weight: 600; text-transform: uppercase; margin-top: 4px; }
+/* Input Fields */
+.form-group-premium { margin-bottom: 1rem; }
+.label-premium { display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 0.5rem; }
+.label-premium.required::after { content: "*"; color: #ef4444; margin-left: 2px; }
+.input-premium, .select-premium { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; transition: 0.2s; }
+.input-premium:focus, .select-premium:focus { border-color: var(--admin-primary); box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+.input-with-icon { position: relative; }
+.input-with-icon i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.9rem; }
+.input-premium.pl-4 { padding-left: 2.25rem; }
 
-    /* Grid & Layout */
-    .analytics-content-body { padding: 2rem; }
-    .compact-grid {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        gap: 1.5rem;
-    }
-    
-    .grid-col-4 { grid-column: span 4; }
-    .grid-col-8 { grid-column: span 8; }
+/* Table */
+.table-premium { width: 100%; border-collapse: collapse; }
+.table-premium th { text-align: left; padding: 1rem 1.5rem; background: #f8fafc; color: #64748b; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e2e8f0; }
+.table-premium td { padding: 1rem 1.5rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #334155; font-size: 0.9rem; }
 
-    @media (max-width: 992px) {
-        .grid-col-4, .grid-col-8 { grid-column: span 12; }
-    }
+/* Badges & Actions */
+.badge-pill { display: inline-flex; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+.badge-success { background: #dcfce7; color: #166534; }
+.badge-danger { background: #fee2e2; color: #991b1b; }
 
-    /* Cards */
-    .page-card-compact {
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
+.badge-tag { background: #f1f5f9; color: #64748b; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
+.bg-green-50 { background: #f0fdf4; } .text-green-600 { color: #16a34a; }
+.bg-red-50 { background: #fef2f2; } .text-red-600 { color: #dc2626; }
 
-    .card-header-compact {
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid #edf2f7;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+.action-btn-icon { width: 32px; height: 32px; border: 1px solid #e2e8f0; border-radius: 8px; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; color: #94a3b8; }
+.action-btn-icon:hover { background: #fef2f2; border-color: #fca5a5; color: #ef4444; }
 
-    .header-title-sm {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #2d3748;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    /* Forms */
-    .card-content-compact { padding: 1.5rem; }
-    .form-group-compact { margin-bottom: 1.25rem; }
-    .form-label-sm { display: block; font-size: 0.85rem; font-weight: 600; color: #4a5568; margin-bottom: 0.5rem; }
-    
-    .input-with-icon {
-        position: relative;
-    }
-    .input-with-icon i {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #a0aec0;
-    }
-    .input-with-icon input {
-        width: 100%;
-        padding: 0.75rem 1rem 0.75rem 2.75rem;
-        border: 1px solid #cbd5e0;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        transition: all 0.2s;
-    }
-    .input-with-icon input:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        outline: none;
-    }
-
-    .form-select-compact, .form-input-compact, textarea {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        border: 1px solid #cbd5e0;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        background: white;
-    }
-
-    /* Tables */
-    .table-compact { width: 100%; border-collapse: collapse; }
-    .table-compact thead th {
-        text-align: left;
-        padding: 1rem 1.5rem;
-        background: #f8fafc;
-        border-bottom: 2px solid #edf2f7;
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #718096;
-        text-transform: uppercase;
-    }
-    .table-compact tbody td {
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid #edf2f7;
-        vertical-align: middle;
-    }
-    .tiny { font-size: 0.75rem; font-weight: 500; }
-    .fw-bold { font-weight: 700; }
-
-    /* Action Buttons */
-    .btn-action {
-        background: none;
-        border: none;
-        padding: 0.5rem;
-        border-radius: 6px;
-        transition: all 0.2s;
-        cursor: pointer;
-    }
-    .btn-action:hover { background: #fff5f5; transform: scale(1.1); }
-    
-    .btn-compact {
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-        border-radius: 6px;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .bg-light { background-color: #fbfbfb !important; }
+.text-right { text-align: right; }
+.font-mono { font-family: monospace; }
+.text-dark { color: #1e293b; }
+.text-muted { color: #64748b; }
 </style>
