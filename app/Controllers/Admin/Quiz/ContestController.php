@@ -31,13 +31,13 @@ class ContestController extends Controller
      */
     public function index()
     {
-        $contests = $this->contestModel->findAll();
+        $contests = $this->contestModel->getAll();
         
         // Get AI Manager status from settings
-        $stmt = $this->db->getPdo()->prepare("SELECT value FROM settings WHERE `key` = 'contest_auto_manager' LIMIT 1");
+        $stmt = $this->db->getPdo()->prepare("SELECT setting_value FROM settings WHERE setting_key = 'contest_auto_manager' LIMIT 1");
         $stmt->execute();
         $res = $stmt->fetch();
-        $autoManager = $res ? (bool)$res['value'] : false;
+        $autoManager = $res ? (bool)$res['setting_value'] : false;
 
         $this->view->render('admin/quiz/contests/index', [
             'page_title' => 'Contest Engine',
@@ -84,7 +84,7 @@ class ContestController extends Controller
             $status = isset($_POST['status']) && $_POST['status'] == '1' ? '1' : '0';
             
             // Upsert setting
-            $stmt = $this->db->getPdo()->prepare("INSERT INTO settings (`key`, `value`) VALUES ('contest_auto_manager', ?) ON DUPLICATE KEY UPDATE `value` = ?");
+            $stmt = $this->db->getPdo()->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('contest_auto_manager', ?) ON DUPLICATE KEY UPDATE setting_value = ?");
             $stmt->execute([$status, $status]);
 
             $this->jsonResponse(['success' => true, 'message' => 'AI Manager Status Updated']);
