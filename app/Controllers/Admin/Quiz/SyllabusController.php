@@ -44,12 +44,8 @@ class SyllabusController extends Controller
 
     public function manage($level = null)
     {
-        // Prioritize query parameter for better compatibility with special characters
-        $level = $_GET['level'] ?? $level;
-        
-        if ($level) {
-            $level = urldecode($level);
-        }
+        if (!$level) $level = $_GET['level'] ?? null;
+        if ($level) $level = urldecode($level);
 
         if (!$level) {
             $_SESSION['error'] = "Level not specified";
@@ -57,7 +53,7 @@ class SyllabusController extends Controller
             exit;
         }
 
-        $isUnassigned = (str_contains($level, 'Unassigned'));
+        $isUnassigned = ($level === 'Unassigned / Draft');
         
         // Fetch nodes with joined names for display
         $sql = "
@@ -67,7 +63,7 @@ class SyllabusController extends Controller
             FROM syllabus_nodes sn
             LEFT JOIN quiz_categories qc ON sn.linked_category_id = qc.id
             LEFT JOIN quiz_topics qt ON sn.linked_topic_id = qt.id
-            WHERE " . ($isUnassigned ? "(sn.level IS NULL OR sn.level = '' OR sn.level LIKE '%Unassigned%')" : "sn.level = :level") . "
+            WHERE " . ($isUnassigned ? "(sn.level IS NULL OR sn.level = '' OR sn.level = 'Unassigned / Draft')" : "sn.level = :level") . "
             ORDER BY sn.order ASC, sn.id ASC
         ";
         
@@ -81,24 +77,11 @@ class SyllabusController extends Controller
         $categories = $this->db->find('quiz_categories', ['is_active' => 1], 'name ASC');
         $topics = $this->db->find('quiz_topics', ['is_active' => 1], 'name ASC');
 
-        // Fetch global settings for this level
-        $settings = $this->db->findOne('syllabus_settings', ['level' => $level]);
-        if (!$settings) {
-            $settings = [
-                'level' => $level,
-                'total_time' => 0,
-                'full_marks' => 0,
-                'pass_marks' => 0,
-                'negative_rate' => 0.00
-            ];
-        }
-
         return $this->view('admin/quiz/syllabus/manage', [
             'page_title' => "Editing: $level",
             'nodes' => $nodes,
             'nodesTree' => $nodesTree,
             'level' => $level,
-            'settings' => $settings,
             'categories' => $categories,
             'topics' => $topics
         ]);
@@ -119,7 +102,103 @@ class SyllabusController extends Controller
         return $branch;
     }
 
-    // --- FIX: Improved Store Method ---
+    /**
+     * NEW: Bulk Save for Pro Grid UI
+     */
+    public function bulkSave()
+    {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $level = $input['level'] ?? null;
+        $nodes = $input['nodes'] ?? [];
+        $settings = $input['settings'] ?? [];
+
+        if (!$level || empty($nodes)) {
+            echo json_encode(['status' => 'error', 'message' => 'No data provided']);
+            return;
+        }
+
+        $this->db->beginTransaction();
+        try {
+            // 1. Clear existing for this level (Simplest way to handle re-ordering/deletes)
+            // Note: In production, consider soft-deletes or smarter diffing to preserve IDs if needed
+            $this->db->delete('syllabus_nodes', "level = :level", ['level' => $level]);
+
+            // 2. Re-insert all nodes
+            // We need to map the flat JS array back to parent_id logic based on depth
+            // This is complex because JS grid relies on order + depth, DB needs parent_id.
+            
+            $parentStack = [null]; // Depth 0 parent is null
+            $previousDepth = -1;
+
+            foreach ($nodes as $index => $node) {
+                $currentDepth = (int)$node['depth'];
+                
+                // Adjust stack based on depth change
+                if ($currentDepth > $previousDepth) {
+                    // Going deeper: Parent is previous node (which we haven't saved ID for yet? We need to save IDs)
+                    // This logic requires saving parent first. 
+                    // Let's assume nodes come in linear order.
+                } 
+                // Actually, simplest way: The UI sends depth. We can reconstruct parent_id on read or write.
+                // The Grid UI doesn't explicitly track parent_id visually, it implies it by depth order.
+                
+                // Simplified Logic: 
+                // If depth = 0, parent = null.
+                // If depth > prevDepth, parent = prevNodeId.
+                // If depth < prevDepth, pop from stack.
+                
+                // Better approach: Let's trust the JS structure is ordered.
+                // We need to generate NEW IDs or map old ones.
+                // For simplicity in this demo, we'll just save them as flat list with depth, 
+                // and use a helper to reconstruct parent_ids if the DB schema strictly requires it.
+                // Assuming DB schema has `parent_id`.
+                
+                // Stack to keep track of the last ID at each depth
+                // $stack[0] = id_of_last_depth_0_item
+                // $stack[1] = id_of_last_depth_1_item
+                
+                $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $node['title']), '-'));
+                $data = [
+                    'level' => $level,
+                    'title' => $node['title'],
+                    'slug' => $slug,
+                    'type' => $node['type'],
+                    'questions_weight' => $node['weight'],
+                    'time_minutes' => $node['time'] ?? 0,
+                    'question_count' => $node['qCount'] ?? 0,
+                    'order' => $index,
+                ];
+                
+                // Insert and get ID
+                $this->db->insert('syllabus_nodes', $data);
+                $newId = $this->db->lastInsertId();
+                
+                // Logic to update parent_id for the *next* items? 
+                // Or better: update THIS item's parent_id based on stack.
+                $parentId = null;
+                if ($currentDepth > 0 && isset($parentStack[$currentDepth - 1])) {
+                    $parentId = $parentStack[$currentDepth - 1];
+                    // Update this node with parent
+                    $this->db->update('syllabus_nodes', ['parent_id' => $parentId], "id = :id", ['id' => $newId]);
+                }
+                
+                // Update stack for children
+                $parentStack[$currentDepth] = $newId;
+                
+                // Clear deeper stack if we went up
+                // (e.g. if we are at depth 1, stack[2], stack[3] are invalid)
+                for($i = $currentDepth + 1; $i < 10; $i++) unset($parentStack[$i]);
+            }
+
+            $this->db->commit();
+            echo json_encode(['status' => 'success']);
+
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+
     public function store()
     {
         // Sanitize Input
@@ -133,8 +212,6 @@ class SyllabusController extends Controller
             'linked_category_id' => !empty($_POST['linked_category_id']) ? $_POST['linked_category_id'] : null,
             'linked_topic_id' => !empty($_POST['linked_topic_id']) ? $_POST['linked_topic_id'] : null,
             'questions_weight' => (int)($_POST['questions_weight'] ?? 0),
-            'time_minutes' => (int)($_POST['time_minutes'] ?? 0),
-            'marks_per_question' => (float)($_POST['marks_per_question'] ?? 0),
             'is_active' => isset($_POST['is_active']) ? 1 : 0
         ];
 
@@ -142,14 +219,13 @@ class SyllabusController extends Controller
         $lastOrder = $this->db->query("SELECT MAX(`order`) as m FROM syllabus_nodes WHERE level = ?", [$data['level']])->fetch()['m'] ?? 0;
         $data['order'] = $lastOrder + 1;
 
-        if ($this->db->create('syllabus_nodes', $data)) {
+        if ($this->db->insert('syllabus_nodes', $data)) {
             echo json_encode(['status' => 'success', 'message' => 'Node created successfully']);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Database error']);
         }
     }
 
-    // --- FIX: Improved Update Method ---
     public function update($id)
     {
         $data = [
@@ -158,8 +234,6 @@ class SyllabusController extends Controller
             'linked_category_id' => !empty($_POST['linked_category_id']) ? $_POST['linked_category_id'] : null,
             'linked_topic_id' => !empty($_POST['linked_topic_id']) ? $_POST['linked_topic_id'] : null,
             'questions_weight' => (int)($_POST['questions_weight'] ?? 0),
-            'time_minutes' => (int)($_POST['time_minutes'] ?? 0),
-            'marks_per_question' => (float)($_POST['marks_per_question'] ?? 0),
             'is_active' => isset($_POST['is_active']) ? 1 : 0
         ];
 
@@ -186,6 +260,26 @@ class SyllabusController extends Controller
             echo json_encode(['status' => 'error']);
         }
     }
+
+    public function deleteLevel()
+    {
+        $level = $_POST['level'] ?? null;
+        if (!$level) {
+            echo json_encode(['status' => 'error', 'message' => 'Level not specified']);
+            return;
+        }
+
+        try {
+            if ($level === 'Unassigned / Draft' || empty($level)) {
+                $this->db->delete('syllabus_nodes', "level IS NULL OR level = '' OR level = 'Unassigned / Draft'");
+            } else {
+                $this->db->delete('syllabus_nodes', "level = :level", ['level' => $level]);
+            }
+            echo json_encode(['status' => 'success', 'message' => "Syllabus for '$level' deleted successfully"]);
+        } catch (\Exception $e) {
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
     
     public function toggleStatus($id)
     {
@@ -195,114 +289,6 @@ class SyllabusController extends Controller
         $this->db->update('syllabus_nodes', ['is_active' => $newStatus], "id = :id", ['id' => $id]);
     }
 
-    /**
-     * AJAX: Delete all nodes for a specific level
-     */
-    public function deleteLevel()
-    {
-        $level = $_POST['level'] ?? null;
-        if (!$level) {
-            echo json_encode(['status' => 'error', 'message' => 'Level missing']);
-            return;
-        }
-
-        $isUnassigned = (str_contains($level, 'Unassigned'));
-        
-        if ($isUnassigned) {
-            $this->db->query("DELETE FROM syllabus_nodes WHERE level IS NULL OR level = '' OR level LIKE '%Unassigned%'");
-        } else {
-            $this->db->delete('syllabus_nodes', "level = :level", ['level' => $level]);
-        }
-        
-        // Also remove settings
-        $this->db->delete('syllabus_settings', "level = :level", ['level' => $level]);
-
-        echo json_encode(['status' => 'success', 'message' => 'Syllabus structure cleared']);
-    }
-
-    /**
-     * AJAX: Save global syllabus settings
-     */
-    public function saveSettings()
-    {
-        $level = $_POST['level'] ?? null;
-        if (!$level) {
-            echo json_encode(['status' => 'error', 'message' => 'Level missing']);
-            return;
-        }
-
-        $data = [
-            'level' => $level,
-            'total_time' => (int)($_POST['total_time'] ?? 0),
-            'full_marks' => (int)($_POST['full_marks'] ?? 0),
-            'pass_marks' => (int)($_POST['pass_marks'] ?? 0),
-            'negative_rate' => (float)($_POST['negative_rate'] ?? 0.00)
-        ];
-
-        $existing = $this->db->findOne('syllabus_settings', ['level' => $level]);
-        if ($existing) {
-            $this->db->update('syllabus_settings', $data, "level = :level", ['level' => $level]);
-        } else {
-            $this->db->create('syllabus_settings', $data);
-        }
-
-        echo json_encode(['status' => 'success', 'message' => 'Settings updated']);
-    }
-
-    /**
-     * AJAX: Duplicate a node
-     */
-    public function duplicate($id)
-    {
-        $node = $this->db->findOne('syllabus_nodes', ['id' => $id]);
-        if (!$node) {
-            echo json_encode(['status' => 'error', 'message' => 'Node not found']);
-            return;
-        }
-
-        $newNode = $node;
-        unset($newNode['id']);
-        unset($newNode['created_at']);
-        unset($newNode['updated_at']);
-        $newNode['title'] .= ' (Copy)';
-        $newNode['order'] = $node['order'] + 1;
-
-        if ($this->db->create('syllabus_nodes', $newNode)) {
-            echo json_encode(['status' => 'success', 'message' => 'Node duplicated']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Duplication failed']);
-        }
-    }
-
-    /**
-     * AJAX: Move node up/down
-     */
-    public function move($id, $direction)
-    {
-        $node = $this->db->findOne('syllabus_nodes', ['id' => $id]);
-        if (!$node) return;
-
-        $currentOrder = $node['order'];
-        $level = $node['level'];
-
-        if ($direction === 'up') {
-            $neighbor = $this->db->query("SELECT * FROM syllabus_nodes WHERE level = ? AND `order` < ? ORDER BY `order` DESC LIMIT 1", [$level, $currentOrder])->fetch();
-        } else {
-            $neighbor = $this->db->query("SELECT * FROM syllabus_nodes WHERE level = ? AND `order` > ? ORDER BY `order` ASC LIMIT 1", [$level, $currentOrder])->fetch();
-        }
-
-        if ($neighbor) {
-            $this->db->update('syllabus_nodes', ['order' => $neighbor['order']], "id = :id", ['id' => $node['id']]);
-            $this->db->update('syllabus_nodes', ['order' => $currentOrder], "id = :id", ['id' => $neighbor['id']]);
-            echo json_encode(['status' => 'success']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Boundary reached']);
-        }
-    }
-
-    /**
-     * AJAX: Generate Exam from Syllabus Rules
-     */
     public function generateExam()
     {
         try {

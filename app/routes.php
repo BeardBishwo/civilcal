@@ -1955,6 +1955,8 @@ $router->add("POST", "/admin/quiz/syllabus/update/{id}", "Admin\\Quiz\\SyllabusC
 $router->add("POST", "/admin/quiz/syllabus/delete/{id}", "Admin\\Quiz\\SyllabusController@delete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/syllabus/reorder", "Admin\\Quiz\\SyllabusController@reorder", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/syllabus/toggle-status/{id}", "Admin\\Quiz\\SyllabusController@toggleStatus", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/syllabus/bulk-save", "Admin\\Quiz\\SyllabusController@bulkSave", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/syllabus/delete-level", "Admin\\Quiz\SyllabusController@deleteLevel", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/syllabus/generate-exam", "Admin\\Quiz\\SyllabusController@generateExam", ["auth", "admin"]);
 
 // Main Categories

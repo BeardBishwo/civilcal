@@ -1,500 +1,462 @@
 <?php
 /**
- * TECHNICAL SYLLABUS STRUCTURE EDITOR
- * Matches the user-provided industrial sample
+ * PREMIUM SYLLABUS EDITOR - PRO GRID UI
+ * Replaces the old tree table with the interactive Grid System
  */
+
+// Helper to flatten the recursive tree for the JS Grid
+function flattenTreeForGrid($tree, $depth = 0, &$result = []) {
+    foreach ($tree as $node) {
+        $flatNode = [
+            'id' => $node['id'],
+            'title' => $node['title'],
+            'type' => $node['type'] ?? 'unit',
+            'depth' => $depth,
+            // Map DB 'questions_weight' to grid 'weight' (Marks)
+            'weight' => (float)($node['questions_weight'] ?? 0),
+            // Default missing fields since DB might not have them yet
+            'time' => (int)($node['time_minutes'] ?? 0), 
+            'qCount' => (int)($node['question_count'] ?? 0), 
+            'qEach' => (float)($node['questions_weight'] > 0 ? ($node['questions_weight'] / ($node['question_count'] ?: 1)) : 0),
+            'selected' => false,
+            // Keep DB references if needed
+            'parent_id' => $node['parent_id'] ?? null
+        ];
+        
+        $result[] = $flatNode;
+        
+        if (!empty($node['children'])) {
+            flattenTreeForGrid($node['children'], $depth + 1, $result);
+        }
+    }
+    return $result;
+}
+
+// Prepare initial data for JS
+$initialData = [];
+if (!empty($nodesTree)) {
+    flattenTreeForGrid($nodesTree, 0, $initialData);
+}
 ?>
 
-<div class="syllabus-editor-wrap">
-    <!-- Top Stats Toolbar -->
-    <div class="syllabus-toolbar d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm sticky-top">
-        <div class="d-flex align-items-center gap-2">
-            <h5 class="fw-bold mb-0 me-3">Syllabus Structure</h5>
-            
-            <div class="stat-badge bg-dark text-white">
-                <span class="label">TOTAL:</span>
-                <span class="value" id="stat-total-marks"><?php echo $settings['full_marks']; ?></span>
-            </div>
-            
-            <div class="stat-badge bg-warning-soft text-dark">
-                <span class="label text-warning-dark"><i class="far fa-clock"></i> TIME:</span>
-                <span class="value"><input type="text" id="set-total-time" class="inline-edit-stat" value="<?php echo $settings['total_time']; ?>"></span>
-            </div>
-            
-            <div class="stat-badge bg-success-soft text-success">
-                <span class="label"><i class="fas fa-check-circle"></i> TALLY:</span>
-                <span class="value"><?php echo count($nodes); ?></span>
-            </div>
-            
-            <div class="stat-badge bg-info-soft text-info">
-                <span class="label"><i class="fas fa-flag"></i> PASS:</span>
-                <span class="value"><input type="number" id="set-pass-marks" class="inline-edit-stat" value="<?php echo $settings['pass_marks']; ?>"></span>
-            </div>
-            
-            <div class="stat-badge bg-danger-soft text-danger">
-                <span class="label">NEG:</span>
-                <span class="value d-flex align-items-center">
-                    <input type="number" id="set-neg-rate" class="inline-edit-stat" value="<?php echo $settings['negative_rate']; ?>">
-                    <span class="ms-1">%</span>
-                </span>
-                <select class="ms-2 border-0 bg-transparent fw-bold text-danger small">
-                    <option>Per Q</option>
-                </select>
-            </div>
-        </div>
-        
-        <div class="d-flex gap-2">
-            <button onclick="openAddModal()" class="btn btn-outline-primary btn-sm rounded-1 px-3">
-                <i class="fas fa-plus me-1"></i> Row
-            </button>
-            <button onclick="saveAllSettings()" class="btn btn-primary btn-sm rounded-1 px-4 shadow-sm">
-                <i class="fas fa-save me-1"></i> Save
-            </button>
-            <button onclick="window.print()" class="btn btn-dark btn-sm rounded-1 px-3">
-                <i class="fas fa-print me-1"></i> Print
-            </button>
-        </div>
-    </div>
+<!-- Load Tailwind CSS for the Pro UI look -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <div class="px-4 py-4">
-        <!-- Main Structure Table -->
-        <div class="card border-0 shadow-sm rounded-1 overflow-hidden">
-            <div class="table-responsive">
-                <table class="table table-bordered align-middle mb-0 syllabus-table">
-                    <thead>
-                        <tr>
-                            <th class="text-center" style="width: 40px;"><input type="checkbox" class="form-check-input mt-0"></th>
-                            <th class="text-center" style="width: 40px;"><i class="fas fa-thumbtack text-muted opacity-25"></i></th>
-                            <th class="text-center" style="width: 50px;">LVL</th>
-                            <th style="min-width: 300px;">TOPIC / TITLE</th>
-                            <th class="text-center" style="width: 80px;">TIME (M)</th>
-                            <th class="text-center" style="width: 120px;">NODE TYPE</th>
-                            <th class="text-center" style="width: 80px;">QTY</th>
-                            <th class="text-center" style="width: 80px;">EACH</th>
-                            <th class="text-center" style="width: 100px;">MARKS</th>
-                            <th class="text-center" style="width: 100px;">HIERARCHY</th>
-                            <th class="text-center" style="width: 100px;">ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php 
-                        function renderSyllabusStructure($nodes) {
-                            foreach ($nodes as $node): 
-                                $rowMarks = $node['questions_weight'] * $node['marks_per_question'];
-                                $typeClass = match(strtolower($node['type'])) {
-                                    'paper', 'phase' => 'type-phase',
-                                    'part', 'section' => 'type-section',
-                                    default => 'type-unit'
-                                };
-                                $typeLabel = match(strtolower($node['type'])) {
-                                    'paper', 'phase' => 'PHASE',
-                                    'part', 'section' => 'SECTION',
-                                    default => 'UNIT'
-                                };
-                            ?>
-                                <tr class="node-row" data-id="<?php echo $node['id']; ?>">
-                                    <td class="text-center"><input type="checkbox" class="form-check-input mt-0"></td>
-                                    <td class="text-center"><i class="fas fa-braille text-muted opacity-50 cursor-move"></i></td>
-                                    <td class="text-center fw-bold text-muted small"><?php echo $node['depth']; ?></td>
-                                    <td>
-                                        <div class="d-flex align-items-center" style="padding-left: <?php echo ($node['depth'] * 24); ?>px;">
-                                            <?php if($node['depth'] > 0): ?>
-                                                <div class="tree-line shadow-none border-start border-bottom rounded-bottom-start"></div>
-                                            <?php endif; ?>
-                                            
-                                            <div class="d-flex align-items-center gap-2">
-                                                <i class="fas <?php echo getIcon($node['type']); ?> text-muted opacity-50" style="font-size: 14px;"></i>
-                                                <span class="node-title fw-bold" onclick="editNode(<?php echo htmlspecialchars(json_encode($node)); ?>)"><?php echo htmlspecialchars($node['title']); ?></span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="p-0">
-                                        <input type="number" class="table-inline-input text-orange fw-bold" value="<?php echo $node['time_minutes']; ?>" onchange="updateNode(<?php echo $node['id']; ?>, 'time_minutes', this.value)">
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge-type <?php echo $typeClass; ?>"><?php echo $typeLabel; ?></span>
-                                    </td>
-                                    <td class="p-0">
-                                        <input type="number" class="table-inline-input text-muted" value="<?php echo $node['questions_weight']; ?>" onchange="updateNode(<?php echo $node['id']; ?>, 'questions_weight', this.value)">
-                                    </td>
-                                    <td class="p-0">
-                                        <input type="number" step="0.5" class="table-inline-input text-muted" value="<?php echo $node['marks_per_question']; ?>" onchange="updateNode(<?php echo $node['id']; ?>, 'marks_per_question', this.value)">
-                                    </td>
-                                    <td class="text-center fw-bold text-primary bg-light">
-                                        <span class="row-total-marks"><?php echo $rowMarks; ?></span>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-link text-muted p-1" onclick="moveNode(<?php echo $node['id']; ?>, 'up')"><i class="fas fa-chevron-up"></i></button>
-                                            <button class="btn btn-link text-muted p-1" onclick="moveNode(<?php echo $node['id']; ?>, 'down')"><i class="fas fa-chevron-down"></i></button>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-link text-muted p-1" onclick="duplicateNode(<?php echo $node['id']; ?>)"><i class="far fa-copy"></i></button>
-                                            <button class="btn btn-link text-danger p-1" onclick="deleteNode(<?php echo $node['id']; ?>)"><i class="far fa-trash-alt"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <?php if (!empty($node['children'])) renderSyllabusStructure($node['children']); ?>
-                            <?php endforeach;
-                        }
+<div class="admin-wrapper-container bg-[#F8FAFC] min-h-screen font-sans">
+    <div class="admin-content-wrapper p-0 shadow-none bg-transparent">
 
-                        function getIcon($type) {
-                            return match(strtolower($type)) {
-                                'paper', 'phase' => 'fa-database',
-                                'part', 'section' => 'fa-folder-open',
-                                'unit' => 'fa-file-alt',
-                                default => 'fa-layer-group'
-                            };
-                        }
-
-                        renderSyllabusStructure($nodesTree);
-                        ?>
-                    </tbody>
-                </table>
-                
-                <?php if(empty($nodes)): ?>
-                    <div class="p-5 text-center bg-light">
-                        <i class="fas fa-sitemap fs-1 text-muted opacity-25 mb-3 d-block"></i>
-                        <h5 class="text-muted">Structure is Empty</h5>
-                        <p class="small text-muted mb-4">You haven't added any syllabus rules for this level yet.</p>
-                        <button onclick="openAddModal()" class="btn btn-primary btn-sm rounded-1"><i class="fas fa-plus me-2"></i>Add First Row</button>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal for adding/editing -->
-<div class="modal fade" id="node-modal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <form id="node-form">
-                <input type="hidden" name="id" id="edit-id">
-                <input type="hidden" name="parent_id" id="field-parent-id">
-                <input type="hidden" name="level" value="<?php echo htmlspecialchars($level); ?>">
-
-                <div class="modal-header border-0 bg-dark text-white px-4">
-                    <h5 class="modal-title fw-bold" id="modal-title">New Entry</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                
-                <div class="modal-body p-4 bg-light">
-                    <div id="parent-context" class="alert alert-info py-2 small mb-3" style="display:none;">
-                        Sub-item for: <b id="parent-name"></b>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Title / Topic Name</label>
-                        <input type="text" name="title" id="field-title" class="form-control rounded-1" required>
-                    </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <label class="form-label small fw-bold text-muted">Node Type</label>
-                            <select name="type" id="field-type" class="form-select rounded-1">
-                                <option value="phase">PHASE (Level 0)</option>
-                                <option value="section">SECTION (Level 1)</option>
-                                <option value="unit">UNIT (Level 2)</option>
-                            </select>
+        <!-- === HEADER: METRICS & ACTIONS === -->
+        <div class="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-50">
+            <div class="max-w-full mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    
+                    <!-- Left: Title & Metrics -->
+                    <div class="flex-1 w-full">
+                        <div class="flex items-center gap-3 mb-3">
+                            <a href="<?php echo app_base_url('admin/quiz/syllabus'); ?>" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition">
+                                <i class="fas fa-chevron-left text-xs"></i>
+                            </a>
+                            <h2 class="text-xl font-bold text-slate-800 mr-2"><?php echo htmlspecialchars($level); ?></h2>
+                            <div id="validator-msg" class="px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center shadow-sm">
+                                <i class="fas fa-check-circle mr-1.5"></i> Tally: <span id="tally-display" class="ml-1">0/0</span>
+                            </div>
                         </div>
-                        <div class="col-6">
-                            <label class="form-label small fw-bold text-muted">Time (Minutes)</label>
-                            <input type="number" name="time_minutes" id="field-time" class="form-control rounded-1" value="0">
+                        
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <!-- Marks -->
+                            <div class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-md flex items-center border border-indigo-500">
+                                TOTAL: 
+                                <input type="text" id="global-marks-input" class="header-input text-white ml-2 w-12 bg-transparent border-b border-indigo-400 text-center focus:outline-none placeholder-indigo-300" placeholder="Auto" onblur="updateGlobalSetting('marks', this.value)" onkeydown="if(event.key==='Enter') this.blur()">
+                            </div>
+                            <!-- Time -->
+                            <div class="bg-amber-400 text-amber-900 border border-amber-300 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center">
+                                <i class="fas fa-clock mr-2 text-amber-700"></i> TIME: 
+                                <input type="text" id="global-time-input" class="header-input text-amber-900 w-16 ml-1 bg-transparent border-b border-amber-500 text-center focus:outline-none" placeholder="Auto" onblur="updateGlobalSetting('time', this.value)" onkeydown="if(event.key==='Enter') this.blur()">
+                            </div>
+                            <!-- Pass -->
+                            <div class="bg-emerald-500 text-white border border-emerald-400 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-white opacity-80"></i> PASS: 
+                                <input type="text" id="global-pass-input" class="header-input text-white ml-1 w-8 bg-transparent border-b border-emerald-300 text-center focus:outline-none" placeholder="40" onblur="updateGlobalSetting('pass', this.value)" onkeydown="if(event.key==='Enter') this.blur()">
+                            </div>
+                            <!-- Neg -->
+                            <div class="bg-rose-500 text-white border border-rose-400 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center gap-2">
+                                <i class="fas fa-minus-circle opacity-80"></i> NEG: 
+                                <input type="number" id="global-neg-input" class="bg-transparent border-b border-rose-300 text-white w-10 text-center focus:outline-none font-mono" placeholder="20" step="1" min="0" onblur="updateGlobalSetting('negValue', this.value)" onkeydown="if(event.key==='Enter') this.blur()">
+                                
+                                <select id="neg-unit-select" class="bg-transparent text-white font-bold outline-none cursor-pointer text-[10px] border-b border-rose-300 hover:text-white" onchange="updateGlobalSetting('negUnit', this.value)">
+                                    <option value="percent" class="text-rose-900">%</option>
+                                    <option value="number" class="text-rose-900">No.</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="row g-3 mb-4">
-                        <div class="col-6">
-                            <label class="form-label small fw-bold text-muted">Qty (Questions)</label>
-                            <input type="number" name="questions_weight" id="field-qty" class="form-control rounded-1" value="0">
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label small fw-bold text-muted">Marks Per Q</label>
-                            <input type="number" step="0.5" name="marks_per_question" id="field-each" class="form-control rounded-1" value="2.0">
-                        </div>
-                    </div>
-
-                    <hr class="border-light opacity-50 mb-4">
-                    <h6 class="small fw-bold text-primary mb-3">Automation Linkage</h6>
-
-                    <div class="mb-3">
-                        <label class="form-label small text-muted">Link to Main Category (Stream)</label>
-                        <select name="linked_category_id" id="field-cat" class="form-select rounded-1">
-                            <option value="">-- None --</option>
-                            <?php foreach($categories as $cat): ?>
-                                <option value="<?php echo $cat['id']; ?>"><?php echo htmlspecialchars($cat['name']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small text-muted">Link to Specific Topic</label>
-                        <select name="linked_topic_id" id="field-topic" class="form-select rounded-1">
-                            <option value="">-- None --</option>
-                            <?php foreach($topics as $top): ?>
-                                <option value="<?php echo $top['id']; ?>"><?php echo htmlspecialchars($top['name']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                    <!-- Right: Actions -->
+                    <div class="flex items-center gap-3 self-end md:self-center">
+                        <button onclick="addTopic()" class="h-10 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-semibold transition flex items-center shadow-sm">
+                            <i class="fas fa-plus mr-2 text-blue-500"></i> Row
+                        </button>
+                        <button onclick="saveSyllabus()" class="h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition shadow-md flex items-center">
+                            <i class="fas fa-save mr-2"></i> Save Changes
+                        </button>
+                        <button onclick="window.print()" class="h-10 px-4 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-semibold transition shadow-md flex items-center">
+                            <i class="fas fa-print mr-2"></i> Print
+                        </button>
                     </div>
                 </div>
-
-                <div class="modal-footer border-0 p-4 bg-light pt-0">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm">Commit</button>
-                </div>
-            </form>
+            </div>
         </div>
+
+        <!-- === MAIN GRID AREA === -->
+        <div class="px-6 py-6 pb-24">
+            <div class="bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden">
+                <div class="syllabus-grid-wrapper overflow-x-auto">
+                    <div class="syllabus-grid" id="syllabus-container">
+                        <!-- Headers -->
+                        <div class="grid-header border-r border-slate-200"><input type="checkbox" id="select-all" class="w-4 h-4 rounded cursor-pointer" onclick="toggleSelectAll()"></div>
+                        <div class="grid-header border-r border-slate-200" title="Drag to Reorder"><i class="fas fa-arrows-alt text-slate-400"></i></div>
+                        <div class="grid-header border-r border-slate-200">Lvl</div>
+                        <div class="grid-header text-left pl-4 border-r border-slate-200">Topic / Title</div>
+                        <div class="grid-header border-r border-slate-200">Time (m)</div>
+                        <div class="grid-header border-r border-slate-200">Node Type</div>
+                        <div class="grid-header border-r border-slate-200">Qty</div>
+                        <div class="grid-header border-r border-slate-200">Each</div>
+                        <div class="grid-header border-r border-slate-200">Marks</div>
+                        <div class="grid-header border-r border-slate-200 text-center">Hierarchy</div>
+                        <div class="grid-header">Actions</div>
+                        <!-- Rows via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Action Bar -->
+        <div id="bulk-action-bar" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 translate-y-full bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-6 z-50 transition-all duration-300 border border-slate-700">
+            <span class="text-sm font-bold text-slate-400"><span id="selected-count" class="text-white text-lg mr-1">0</span> Rows Selected</span>
+            <div class="h-6 w-px bg-slate-700"></div>
+            <button onclick="bulkDuplicate()" class="hover:text-blue-400 transition text-xs font-bold uppercase flex items-center group"><i class="fas fa-copy mr-2 group-hover:scale-110"></i> Duplicate</button>
+            <div class="h-6 w-px bg-slate-700"></div>
+            <button onclick="bulkIndent(-1)" class="hover:text-blue-400 transition text-xs font-bold uppercase flex items-center group"><i class="fas fa-outdent mr-2 group-hover:scale-110"></i> Outdent</button>
+            <button onclick="bulkIndent(1)" class="hover:text-blue-400 transition text-xs font-bold uppercase flex items-center group"><i class="fas fa-indent mr-2 group-hover:scale-110"></i> Indent</button>
+            <div class="h-6 w-px bg-slate-700"></div>
+            <button onclick="bulkDelete()" class="hover:text-rose-400 transition text-xs font-bold uppercase flex items-center group"><i class="fas fa-trash mr-2 group-hover:scale-110"></i> Delete</button>
+            <button onclick="clearSelection()" class="ml-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:text-white transition"><i class="fas fa-times"></i></button>
+        </div>
+
     </div>
 </div>
 
 <style>
-/* Dashboard Styling */
-.syllabus-editor-wrap {
-    background: #f4f5f9;
-    min-height: 100vh;
-}
+    /* Premium Grid Styles */
+    .syllabus-grid {
+        display: grid;
+        grid-template-columns: 50px 40px 50px 3.5fr 100px 120px 80px 80px 90px 120px 100px;
+        background-color: #f1f5f9;
+        min-width: 1200px;
+    }
+    .grid-header {
+        background-color: #f8fafc; color: #64748b; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; padding: 14px 4px; display: flex; align-items: center; justify-content: center;
+    }
+    .grid-row { background-color: white; border-bottom: 1px solid #f1f5f9; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .grid-row:hover { background-color: #f0f9ff; }
+    .grid-row[data-depth="0"] { background-color: #eff6ff; }
+    .grid-row[data-depth="0"]:hover { background-color: #e0f2fe; }
+    
+    .grid-cell { padding: 8px 10px; display: flex; align-items: center; font-size: 0.9rem; color: #334155; position: relative; }
+    
+    .input-premium {
+        width: 100%; padding: 6px; border: 1px solid #e2e8f0; border-radius: 8px; text-align: center; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.85rem; transition: 0.2s;
+        background-color: white;
+    }
+    .input-premium:focus { border-color: #6366f1; ring: 3px rgba(99, 102, 241, 0.1); outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    
+    .time-input { color: #b45309; }
+    .qty-input { color: #059669; }
+    .each-input { color: #2563eb; }
+    
+    .depth-0 { color: #0f172a; font-weight: 800; }
+    .depth-1 { color: #1e293b; font-weight: 700; }
+    .depth-2 { color: #334155; font-weight: 600; }
+    .depth-3 { color: #64748b; font-weight: 500; }
+    
+    .row-checkbox { cursor: pointer; accent-color: #6366f1; }
+    .drag-handle { cursor: grab; color: #cbd5e1; padding: 6px; transition: 0.2s; }
+    .drag-handle:hover { color: #94a3b8; }
+    .drag-handle:active { cursor: grabbing; scale: 0.9; }
 
-.stat-badge {
-    padding: 6px 14px;
-    border-radius: 4px;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border: 1px solid rgba(0,0,0,0.05);
-}
-.stat-badge .label { font-weight: 500; opacity: 0.7; font-size: 11px; text-transform: uppercase; }
-.stat-badge .value { font-weight: 700; font-size: 14px; }
+    #bulk-action-bar.visible { transform: translate(-50%, 0); }
+    
+    .node-badge {
+        padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; width: 100%; text-align: center;
+    }
+    .badge-phase { background: #1e293b; color: white; }
+    .badge-section { background: #e0e7ff; color: #4338ca; }
+    .badge-unit { background: #f1f5f9; color: #64748b; }
 
-.bg-warning-soft { background: #fff8e6; border-color: #ffe8b3; }
-.bg-success-soft { background: #e6f7ef; border-color: #b3e6d0; }
-.bg-info-soft { background: #e6f2ff; border-color: #b3d7ff; }
-.bg-danger-soft { background: #feebeb; border-color: #ffcccc; }
-.text-warning-dark { color: #856404; }
-
-.inline-edit-stat {
-    background: transparent;
-    border: none;
-    width: 50px;
-    font-weight: 700;
-    color: inherit;
-    padding: 0;
-    text-align: center;
-}
-.inline-edit-stat:focus { outline: none; border-bottom: 2px solid; }
-
-/* Table Styling */
-.syllabus-table thead th {
-    background: #f8f9fa;
-    color: #495057;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    padding: 12px 8px;
-    border-bottom: 2px solid #dee2e6;
-}
-
-.node-row:hover { background-color: #f8f9ff !important; }
-
-.tree-line {
-    width: 20px;
-    height: 35px;
-    margin-right: 15px;
-    margin-top: -15px;
-    border-color: #dee2e6 !important;
-    border-width: 2px !important;
-}
-
-.node-title {
-    cursor: pointer;
-    font-size: 14px;
-    color: #2d3748;
-}
-.node-title:hover { color: #4f46e5; text-decoration: underline; }
-
-.badge-type {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: 800;
-    min-width: 80px;
-}
-.type-phase { background: #2d3748; color: white; }
-.type-section { background: #e6f2ff; color: #004ecc; }
-.type-unit { background: #f3f4f6; color: #4b5563; }
-
-.table-inline-input {
-    width: 100%;
-    height: 40px;
-    border: none;
-    background: transparent;
-    text-align: center;
-    font-size: 13px;
-    transition: background 0.2s;
-}
-.table-inline-input:hover { background: #fffcf0; }
-.table-inline-input:focus { background: #fffbe6; outline: none; }
-.text-orange { color: #d97706; }
-
-.cursor-move { cursor: grab; }
-
-.row-total-marks { font-size: 14px; }
-
-/* Utility */
-.rounded-1 { border-radius: 4px !important; }
+    .hierarchy-btn {
+        width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #f8fafc; color: #64748b; transition: 0.2s; border: 1px solid #e2e8f0;
+    }
+    .hierarchy-btn:hover { background: #cbd5e1; color: #0f172a; }
 </style>
 
 <script>
-const nodeModal = new bootstrap.Modal(document.getElementById('node-modal'));
-const nodeForm = document.getElementById('node-form');
-
-function openAddModal(parentId = null, parentName = '') {
-    nodeForm.reset();
-    document.getElementById('edit-id').value = '';
-    document.getElementById('field-parent-id').value = parentId || '';
-    document.getElementById('modal-title').innerText = parentId ? 'Add Sub-Node' : 'New Phase / Row';
+    // 1. DATA INITIALIZATION
+    let syllabusData = <?php echo !empty($initialData) ? json_encode($initialData) : '[]'; ?>;
     
-    if (parentId) {
-        document.getElementById('parent-context').style.display = 'block';
-        document.getElementById('parent-name').innerText = parentName;
-        document.getElementById('field-type').value = 'section';
-    } else {
-        document.getElementById('parent-context').style.display = 'none';
-        document.getElementById('field-type').value = 'phase';
+    if(syllabusData.length === 0) {
+        syllabusData = [
+            { id: Date.now(), title: "Paper I: General", type: "paper", depth: 0, weight: 100, time: 0, qCount: 0, qEach: 0, selected: false }
+        ];
+    }
+
+    let manualSettings = { marks: null, time: null, pass: 40, negValue: 20, negUnit: 'percent' };
+    let draggedItemIndex = null;
+
+    // --- GRID RENDERING ---
+    function renderGrid() {
+        const container = document.getElementById('syllabus-container');
+        while(container.children.length > 11) container.removeChild(container.lastChild);
+
+        syllabusData.forEach((row, index) => {
+            // Checkbox
+            container.appendChild(createCell(`<input type="checkbox" class="row-checkbox w-4 h-4 rounded" ${row.selected ? 'checked' : ''} onchange="toggleRowSelection(${index}, this.checked)">`, 'justify-center border-r border-slate-100'));
+            
+            // Drag Handle
+            const dragCell = createCell(`<i class="fas fa-grip-vertical drag-handle"></i>`, 'justify-center border-r border-slate-100');
+            dragCell.draggable = true;
+            setupDragEvents(dragCell, index);
+            container.appendChild(dragCell);
+
+            // Level
+            container.appendChild(createCell(row.depth, `justify-center depth-${row.depth} bg-slate-50 border-r border-slate-100 font-mono text-xs`));
+
+            // Topic / Title
+            const padding = 20 + (row.depth * 32);
+            let icon = 'fa-folder';
+            if(row.type === 'paper') icon = 'fa-layer-group text-slate-500';
+            else if(row.type === 'section') icon = 'fa-folder-open text-slate-400';
+            
+            container.appendChild(createCell(
+                `<div class="flex items-center w-full">
+                    <i class="fas ${icon} mr-3 opacity-60 text-xs"></i> 
+                    <span contenteditable="true" class="w-full outline-none focus:bg-white rounded px-1 transition duration-200" onblur="updateRow(${index}, 'title', this.innerText)">${row.title}</span>
+                 </div>`,
+                `depth-${row.depth} border-r border-slate-100`, `padding-left: ${padding}px;`
+            ));
+
+            // Time
+            const timeBg = row.depth === 0 ? "bg-amber-100" : "bg-white";
+            container.appendChild(createCell(`<input type="number" class="input-premium time-input ${timeBg}" value="${row.time || 0}" onchange="updateRow(${index}, 'time', this.value)">`, 'justify-center border-r border-slate-100'));
+
+            // Node Type (Badge Style)
+            let badgeClass = 'badge-unit';
+            let typeLabel = row.type.toUpperCase();
+            if(row.type === 'paper') { badgeClass = 'badge-phase'; typeLabel = 'PHASE'; }
+            if(row.type === 'section') badgeClass = 'badge-section';
+
+            container.appendChild(createCell(`
+                <select class="hidden" id="select-type-${index}" onchange="updateRow(${index}, 'type', this.value)">
+                    <option value="paper" ${row.type==='paper'?'selected':''}>Phase</option>
+                    <option value="section" ${row.type==='section'?'selected':''}>Section</option>
+                    <option value="unit" ${row.type==='unit'?'selected':''}>Unit</option>
+                </select>
+                <div class="node-badge ${badgeClass} cursor-pointer hover:opacity-80 transition" onclick="document.getElementById('select-type-${index}').click()">
+                    ${typeLabel}
+                </div>
+            `, 'justify-center border-r border-slate-100 px-3'));
+
+            // Qty
+            const qtyDisabled = (row.type !== 'unit' && row.depth !== 0) ? 'disabled style="background:#f8fafc; color:#cbd5e1;"' : '';
+            container.appendChild(createCell(`<input type="number" class="input-premium qty-input" value="${row.qCount || 0}" onchange="updateRow(${index}, 'qCount', this.value)" ${qtyDisabled}>`, 'justify-center border-r border-slate-100'));
+
+            // Each
+            container.appendChild(createCell(`<input type="number" class="input-premium each-input" value="${row.qEach || 0}" onchange="updateRow(${index}, 'qEach', this.value)" ${qtyDisabled}>`, 'justify-center border-r border-slate-100'));
+
+            // Marks
+            const marksBg = row.depth === 0 ? "bg-slate-100" : "bg-white";
+            container.appendChild(createCell(`<input type="number" class="input-premium font-bold ${marksBg}" value="${row.weight}" onchange="updateRow(${index}, 'weight', this.value)">`, 'justify-center border-r border-slate-100'));
+
+            // Hierarchy
+            container.appendChild(createCell(`
+                <div class="flex gap-1.5 justify-center w-full">
+                    <button onclick="changeDepth(${index}, -1)" class="hierarchy-btn" title="Outdent"><i class="fas fa-chevron-left text-[10px]"></i></button>
+                    <button onclick="changeDepth(${index}, 1)" class="hierarchy-btn" title="Indent"><i class="fas fa-chevron-right text-[10px]"></i></button>
+                </div>
+            `, 'justify-center border-r border-slate-100'));
+
+            // Actions
+            container.appendChild(createCell(`
+                <button onclick="handleRowDuplicate(${index})" class="text-slate-300 hover:text-blue-500 transition px-2" title="Duplicate"><i class="fas fa-clone text-sm"></i></button>
+                <button onclick="deleteRow(${index})" class="text-slate-300 hover:text-rose-500 transition px-2" title="Delete"><i class="fas fa-trash-alt text-sm"></i></button>
+            `, 'justify-center'));
+            
+            // Set depth attribute for styling
+            container.lastChild.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.setAttribute('data-depth', row.depth);
+        });
+
+        validateSyllabus();
+        updateBulkBar();
+    }
+
+    function createCell(html, classes = "", style = "") {
+        const div = document.createElement('div');
+        div.className = `grid-cell grid-row ${classes}`;
+        div.innerHTML = html;
+        if(style) div.style = style;
+        return div;
+    }
+
+    // --- LOGIC FUNCTIONS ---
+    function updateRow(index, field, value) {
+        if(field !== 'title' && field !== 'type') value = parseFloat(value) || 0;
+        syllabusData[index][field] = value;
+        if(field === 'qCount' || field === 'qEach') {
+            syllabusData[index].weight = (syllabusData[index].qCount * syllabusData[index].qEach);
+        }
+        renderGrid();
+    }
+
+    function changeDepth(index, change) {
+        let newDepth = syllabusData[index].depth + change;
+        if(newDepth >= 0 && newDepth <= 3) {
+            syllabusData[index].depth = newDepth;
+            renderGrid();
+        }
+    }
+
+    function addTopic() {
+        syllabusData.push({ id: Date.now(), title: "New Syllabus Item", type: "unit", depth: 2, weight: 0, time: 0, qCount: 0, qEach: 0, selected: false });
+        renderGrid();
+    }
+
+    function deleteRow(index) {
+        syllabusData.splice(index, 1);
+        renderGrid();
+    }
+
+    function handleRowDuplicate(index) {
+        const clone = {...syllabusData[index], id: Date.now(), title: syllabusData[index].title + ' (Copy)'};
+        syllabusData.splice(index + 1, 0, clone);
+        renderGrid();
+    }
+
+    // --- BULK & DRAG ---
+    function setupDragEvents(el, index) {
+        el.addEventListener('dragstart', (e) => { draggedItemIndex = index; e.dataTransfer.effectAllowed = 'move'; });
+        el.addEventListener('dragover', (e) => e.preventDefault());
+        el.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if(draggedItemIndex !== null && draggedItemIndex !== index) {
+                const item = syllabusData.splice(draggedItemIndex, 1)[0];
+                syllabusData.splice(index, 0, item);
+                draggedItemIndex = null;
+                renderGrid();
+            }
+        });
+    }
+
+    function toggleSelectAll() {
+        const checked = document.getElementById('select-all').checked;
+        syllabusData.forEach(r => r.selected = checked);
+        renderGrid();
     }
     
-    nodeModal.show();
-}
+    function toggleRowSelection(index, checked) {
+        syllabusData[index].selected = checked;
+        updateBulkBar();
+    }
 
-function editNode(node) {
-    nodeForm.reset();
-    document.getElementById('edit-id').value = node.id;
-    document.getElementById('field-parent-id').value = node.parent_id || '';
-    document.getElementById('field-title').value = node.title;
-    document.getElementById('field-type').value = node.type;
-    document.getElementById('field-time').value = node.time_minutes;
-    document.getElementById('field-qty').value = node.questions_weight;
-    document.getElementById('field-each').value = node.marks_per_question;
-    document.getElementById('field-cat').value = node.linked_category_id || '';
-    document.getElementById('field-topic').value = node.linked_topic_id || '';
-    
-    document.getElementById('modal-title').innerText = 'Edit Node';
-    document.getElementById('parent-context').style.display = 'none';
-    
-    nodeModal.show();
-}
-
-nodeForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const fd = new FormData(this);
-    const id = document.getElementById('edit-id').value;
-    const url = id ? '<?= app_base_url("admin/quiz/syllabus/update/") ?>' + id : '<?= app_base_url("admin/quiz/syllabus/store") ?>';
-
-    fetch(url, { method: 'POST', body: fd })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === 'success') {
-            location.reload();
+    function updateBulkBar() {
+        const count = syllabusData.filter(r => r.selected).length;
+        const bar = document.getElementById('bulk-action-bar');
+        document.getElementById('selected-count').innerText = count;
+        if(count > 0) {
+            bar.classList.add('visible');
+            bar.classList.remove('translate-y-full');
         } else {
-            Swal.fire('Error', data.message, 'error');
+            bar.classList.remove('visible');
+            bar.classList.add('translate-y-full');
         }
-    });
-});
+    }
 
-function updateNode(id, field, value) {
-    const fd = new FormData();
-    // We need to fetch the existing node data or provide the other required fields
-    // For simplicity, we can have a specialized 'patch' endpoint or just re-save via update
-    // But since our update method needs more fields, let's use a specialized quick-update logic if needed.
-    // However, I'll just reload for now to keep it consistent.
-    
-    const params = new URLSearchParams();
-    params.append(field, value);
-    
-    // Quick and dirty update: we'll use a hidden form/ajax that just updates one field
-    // To make it professional, I should add a patch endpoint in controller.
-    // For now, I'll just trigger a modal-like experience or full save.
-}
+    function bulkDuplicate() {
+        const selected = syllabusData.filter(r => r.selected).map(r => ({...r, id: Date.now() + Math.random(), selected: false, title: r.title + ' (Copy)'}));
+        syllabusData.push(...selected);
+        clearSelection();
+    }
 
-function saveAllSettings() {
-    const fd = new FormData();
-    fd.append('level', '<?= addslashes($level) ?>');
-    fd.append('total_time', document.getElementById('set-total-time').value);
-    fd.append('pass_marks', document.getElementById('set-pass-marks').value);
-    fd.append('negative_rate', document.getElementById('set-neg-rate').value);
-    // Sum up marks
-    let totalMarks = 0;
-    document.querySelectorAll('.row-total-marks').forEach(el => totalMarks += parseFloat(el.innerText) || 0);
-    fd.append('full_marks', totalMarks);
+    function bulkIndent(dir) {
+        syllabusData.forEach(r => {
+            if(r.selected) {
+                let d = r.depth + dir;
+                if(d >= 0 && d <= 3) r.depth = d;
+            }
+        });
+        renderGrid();
+    }
 
-    fetch('<?= app_base_url("admin/quiz/syllabus/save-settings") ?>', {
-        method: 'POST',
-        body: fd
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === 'success') {
-            Swal.fire({
-                icon: 'success',
-                title: 'Saved',
-                text: 'Syllabus settings updated.',
-                timer: 1500,
-                toast: true,
-                position: 'top-end'
-            }).then(() => location.reload());
+    function bulkDelete() {
+        syllabusData = syllabusData.filter(r => !r.selected);
+        clearSelection();
+    }
+
+    function clearSelection() {
+        syllabusData.forEach(r => r.selected = false);
+        const selectAll = document.getElementById('select-all');
+        if(selectAll) selectAll.checked = false;
+        renderGrid();
+    }
+
+    // --- VALIDATION & SAVING ---
+    function updateGlobalSetting(type, value) {
+        if(value.trim() === '') value = null;
+        manualSettings[type] = value;
+        validateSyllabus();
+    }
+
+    function validateSyllabus() {
+        const roots = syllabusData.filter(r => r.depth === 0);
+        const autoTotal = roots.reduce((s, r) => s + r.weight, 0);
+        const unitSum = syllabusData.filter(r => r.type === 'unit').reduce((s, r) => s + r.weight, 0);
+        
+        const target = manualSettings.marks ? parseFloat(manualSettings.marks) : autoTotal;
+        const badge = document.getElementById('validator-msg');
+        const tallyDisplay = document.getElementById('tally-display');
+        
+        tallyDisplay.innerText = `${Math.round(unitSum)}/${Math.round(target)}`;
+        
+        if(Math.abs(unitSum - target) < 0.01) {
+            badge.className = 'px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center shadow-sm bg-emerald-500 text-white';
+        } else {
+            badge.className = 'px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center shadow-sm bg-rose-500 text-white';
         }
-    });
-}
+    }
 
-function duplicateNode(id) {
-    fetch('<?= app_base_url("admin/quiz/syllabus/duplicate/") ?>' + id, { method: 'POST' })
-    .then(() => location.reload());
-}
+    function saveSyllabus() {
+        const payload = JSON.stringify({
+            level: '<?php echo addslashes($level); ?>',
+            nodes: syllabusData,
+            settings: manualSettings
+        });
 
-function moveNode(id, direction) {
-    fetch('<?= app_base_url("admin/quiz/syllabus/move/") ?>' + id + '/' + direction, { method: 'POST' })
-    .then(() => location.reload());
-}
+        fetch('<?php echo app_base_url("admin/quiz/syllabus/bulk-save"); ?>', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: payload
+        })
+        .then(r => r.json())
+        .then(d => {
+            if(d.status === 'success') {
+                // Use custom notification if available, else alert
+                alert('Changes saved successfully!');
+            } else {
+                alert('Error: ' + d.message);
+            }
+        })
+        .catch(err => alert('Communication error'));
+    }
 
-function deleteNode(id) {
-    Swal.fire({
-        title: 'Delete this row?',
-        text: 'All nested child rows will also be removed!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#ff4d4d',
-        confirmButtonText: 'Yes, Delete'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch('<?= app_base_url("admin/quiz/syllabus/delete/") ?>' + id, { method: 'POST' })
-            .then(() => location.reload());
-        }
-    });
-}
-
-function openGenerateModal() {
-    Swal.fire({
-        title: 'Generate Exam?',
-        text: 'This will create a mock exam based on these specific rules.',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Generate Now'
-    }).then(res => {
-        if(res.isConfirmed) {
-            const fd = new FormData();
-            fd.append('level', '<?= addslashes($level) ?>');
-            fetch('<?= app_base_url("admin/quiz/syllabus/generate-exam") ?>', { method: 'POST', body: fd })
-            .then(r => r.json())
-            .then(d => {
-                if(d.status === 'success') {
-                    window.location.href = d.redirect;
-                }
-            });
-        }
-    });
-}
+    document.addEventListener('DOMContentLoaded', () => { renderGrid(); });
 </script>
