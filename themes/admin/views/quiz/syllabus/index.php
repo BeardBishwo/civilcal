@@ -100,11 +100,11 @@
                                         <thead>
                                             <tr>
                                                 <th class="col-title ps-4">Position / Level</th>
-                                                <th class="col-status text-center">Structure</th>
-                                                <th class="col-status text-center">Active Nodes</th>
-                                                <th class="col-status text-center">Total Weight</th>
-                                                <th class="col-date text-center">Last Modified</th>
-                                                <th class="col-actions text-center pe-4">Actions</th>
+                                                <th class="text-center">Structure</th>
+                                                <th class="text-center">Active Nodes</th>
+                                                <th class="text-center">Total Weight</th>
+                                                <th class="text-center">Last Modified</th>
+                                                <th class="text-center pe-4">Actions</th>
                                             </tr>
                                         </thead>
                                 <tbody>
@@ -112,9 +112,9 @@
                                         $levelName = $pos['level'] ?? 'Unassigned / Draft';
                                         $safeLevel = urlencode($levelName);
                                     ?>
-                                        <tr class="page-row cursor-pointer transition hover:bg-slate-50" onclick="window.location='<?php echo app_base_url('admin/quiz/syllabus/manage/' . $safeLevel); ?>'">
-                                            <td class="ps-4">
-                                                <div class="flex items-center gap-3 py-1">
+                                        <tr class="page-row transition hover:bg-slate-50">
+                                            <td class="ps-4 align-middle">
+                                                <div class="flex items-center gap-3 py-1" style="min-height: 44px;">
                                                     <div class="icon-box shrink-0" style="background: rgba(79, 70, 229, 0.1); color: #4f46e5;">
                                                         <i class="fas fa-user-graduate"></i>
                                                     </div>
@@ -125,28 +125,30 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="text-center">
-                                                <span class="status-badge status-active bg-indigo-50 text-indigo-700 border-indigo-100">
+                                            <td class="text-center align-middle">
+                                                <div class="flex items-center justify-center text-indigo-600 font-bold uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px; min-height: 44px;">
                                                     <?php echo $pos['total_nodes']; ?> Items
-                                                </span>
-                                            </td>
-                                            <td class="text-center">
-                                                <div class="small fw-semibold text-slate-600">
-                                                    <?php echo $pos['active_nodes']; ?> <span class="text-slate-300">/</span> <?php echo $pos['total_nodes']; ?>
                                                 </div>
                                             </td>
-                                            <td class="text-center">
-                                                <span class="badge-pill-fancy bg-white border-slate-200 text-slate-600">
-                                                    <?php echo $pos['total_weight']; ?> Marks
-                                                </span>
+                                            <td class="text-center align-middle">
+                                                <div class="flex items-center justify-center font-semibold text-slate-600" style="font-size: 0.85rem; min-height: 44px;">
+                                                    <?php echo $pos['active_nodes']; ?> <span class="text-slate-300 mx-1">/</span> <?php echo $pos['total_nodes']; ?>
+                                                </div>
                                             </td>
-                                            <td class="text-center">
-                                                <div class="date-compact text-slate-500 font-medium" style="font-size: 0.8rem;">
+                                            <td class="text-center align-middle">
+                                                <div class="flex items-center justify-center" style="min-height: 44px;">
+                                                    <span class="badge-pill-fancy bg-white border-slate-200 text-slate-600 inline-flex items-center">
+                                                        <?php echo $pos['total_weight']; ?> Marks
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <div class="flex items-center justify-center text-slate-500 font-medium" style="font-size: 0.85rem; min-height: 44px;">
                                                     <?php echo date('M j, Y', strtotime($pos['last_modified'] ?? 'now')); ?>
                                                 </div>
                                             </td>
-                                            <td class="pe-4">
-                                                <div class="actions-compact justify-center">
+                                            <td class="text-center">
+                                                <div class="actions-compact justify-center items-center" style="min-height: 44px;">
                                                     <a href="<?php echo app_base_url('admin/quiz/syllabus/manage/' . $safeLevel); ?>" class="action-btn-icon edit-btn" title="Edit Structure">
                                                         <i class="fas fa-pencil-alt"></i>
                                                     </a>
@@ -180,6 +182,21 @@
         background: #f8fafc; border: 1px solid #e2e8f0; color: #475569; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
     }
     .shadow-soft { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    
+    .table-compact td {
+        vertical-align: middle !important;
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+    
+    .actions-compact {
+        justify-content: center !important;
+    }
+    
+    .table-compact th {
+        vertical-align: middle !important;
+        height: 50px;
+    }
 </style>
 
 <script>
