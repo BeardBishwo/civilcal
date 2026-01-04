@@ -58,36 +58,42 @@ if (!empty($nodesTree)) {
                             <a href="<?php echo app_base_url('admin/quiz/syllabus'); ?>" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition">
                                 <i class="fas fa-chevron-left text-xs"></i>
                             </a>
-                            <h2 class="text-xl font-bold text-slate-800 mr-2"><?php echo htmlspecialchars($level); ?></h2>
-                            <div id="validator-msg" class="px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center shadow-sm">
-                                <i class="fas fa-check-circle mr-1.5"></i> Tally: <span id="tally-display" class="ml-1">0/0</span>
-                            </div>
+                            <h2 contenteditable="true" id="syllabus-level-title" class="text-xl font-bold text-slate-800 mr-2 outline-none focus:bg-white rounded px-1 transition" onblur="updateGlobalLevel(this.innerText)"><?php echo htmlspecialchars($level); ?></h2>
                         </div>
                         
                         <div class="flex flex-wrap gap-2 items-center">
                             <!-- Marks -->
-                            <div class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-md flex items-center border border-indigo-500">
-                                TOTAL: 
-                                <input type="text" id="global-marks-input" class="header-input text-white ml-2 w-12 bg-transparent border-b border-indigo-400 text-center focus:outline-none placeholder-indigo-300" placeholder="Auto" onblur="updateGlobalSetting('marks', this.value)" onkeydown="if(event.key==='Enter') this.blur()">
+                            <div class="bg-[#1e293b] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center border border-slate-700">
+                                <span class="opacity-70 mr-2">TOTAL:</span>
+                                <input type="text" id="global-marks-input" class="header-input text-white w-10 bg-transparent border-b border-slate-500 text-center focus:outline-none placeholder-slate-500 font-mono" placeholder="230" onblur="updateGlobalSetting('marks', this.value)" onkeydown="if(event.key==='Enter') this.blur()">
                             </div>
                             <!-- Time -->
-                            <div class="bg-amber-400 text-amber-900 border border-amber-300 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center">
-                                <i class="fas fa-clock mr-2 text-amber-700"></i> TIME: 
-                                <input type="text" id="global-time-input" class="header-input text-amber-900 w-16 ml-1 bg-transparent border-b border-amber-500 text-center focus:outline-none" placeholder="Auto" onblur="updateGlobalSetting('time', this.value)" onkeydown="if(event.key==='Enter') this.blur()">
+                            <div class="bg-[#fffbeb] text-[#92400e] border border-[#fef3c7] px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center">
+                                <i class="fas fa-clock mr-2 opacity-70"></i> <span class="opacity-70 mr-1">TIME:</span>
+                                <input type="text" id="global-time-input" class="header-input text-[#92400e] w-16 bg-transparent border-b border-[#fcd34d] text-center focus:outline-none font-mono" placeholder="3h 30m" onblur="updateGlobalSetting('time', this.value)" onkeydown="if(event.key==='Enter') this.blur()">
+                            </div>
+                            <!-- Tally -->
+                            <div id="validator-msg" class="bg-[#ecfdf5] text-[#065f46] border border-[#d1fae5] px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center">
+                                <i class="fas fa-check-circle mr-2 opacity-70"></i> <span class="opacity-70 mr-1">Tally:</span>
+                                <span id="tally-display" class="font-mono">230/230</span>
                             </div>
                             <!-- Pass -->
-                            <div class="bg-emerald-500 text-white border border-emerald-400 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center">
-                                <i class="fas fa-check-circle mr-2 text-white opacity-80"></i> PASS: 
-                                <input type="text" id="global-pass-input" class="header-input text-white ml-1 w-8 bg-transparent border-b border-emerald-300 text-center focus:outline-none" placeholder="40" onblur="updateGlobalSetting('pass', this.value)" onkeydown="if(event.key==='Enter') this.blur()">
+                            <div class="bg-[#ecfdf5] text-[#065f46] border border-[#d1fae5] px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center">
+                                <i class="fas fa-flag mr-2 opacity-70"></i> <span class="opacity-70 mr-1">PASS:</span>
+                                <input type="text" id="global-pass-input" class="header-input text-[#065f46] w-8 bg-transparent border-b border-[#a7f3d0] text-center focus:outline-none font-mono" placeholder="40" onblur="updateGlobalSetting('pass', this.value)" onkeydown="if(event.key==='Enter') this.blur()">
                             </div>
-                            <!-- Neg -->
-                            <div class="bg-rose-500 text-white border border-rose-400 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center gap-2">
-                                <i class="fas fa-minus-circle opacity-80"></i> NEG: 
-                                <input type="number" id="global-neg-input" class="bg-transparent border-b border-rose-300 text-white w-10 text-center focus:outline-none font-mono" placeholder="20" step="1" min="0" onblur="updateGlobalSetting('negValue', this.value)" onkeydown="if(event.key==='Enter') this.blur()">
-                                
-                                <select id="neg-unit-select" class="bg-transparent text-white font-bold outline-none cursor-pointer text-[10px] border-b border-rose-300 hover:text-white" onchange="updateGlobalSetting('negUnit', this.value)">
-                                    <option value="percent" class="text-rose-900">%</option>
-                                    <option value="number" class="text-rose-900">No.</option>
+                            <!-- Neg Control (Complex) -->
+                            <div class="bg-[#fef2f2] text-[#991b1b] border border-[#fee2e2] px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center gap-2">
+                                <i class="fas fa-minus-circle opacity-70"></i> <span class="opacity-70">NEG:</span>
+                                <input type="number" id="global-neg-input" class="bg-transparent border-b border-[#fecaca] text-[#991b1b] w-8 text-center focus:outline-none font-mono" placeholder="20" onblur="updateGlobalSetting('negValue', this.value)">
+                                <select id="neg-unit-select" class="bg-transparent text-[#991b1b] outline-none cursor-pointer appearance-none hover:bg-red-50 px-1 rounded" onchange="updateGlobalSetting('negUnit', this.value)">
+                                    <option value="percent">%</option>
+                                    <option value="number">No.</option>
+                                </select>
+                                <div class="h-4 w-px bg-[#fca5a5] mx-1"></div>
+                                <select id="neg-scope-select" class="bg-transparent text-[#991b1b] outline-none cursor-pointer appearance-none hover:bg-red-50 px-1 rounded" onchange="updateGlobalSetting('negScope', this.value)">
+                                    <option value="per-q">Per Q.</option>
+                                    <option value="total">Total</option>
                                 </select>
                             </div>
                         </div>
@@ -110,7 +116,7 @@ if (!empty($nodesTree)) {
         </div>
 
         <!-- === MAIN GRID AREA === -->
-        <div class="px-6 py-6 pb-24">
+        <div class="p-0">
             <div class="bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden">
                 <div class="syllabus-grid-wrapper overflow-x-auto">
                     <div class="syllabus-grid" id="syllabus-container">
@@ -160,9 +166,15 @@ if (!empty($nodesTree)) {
         background-color: #f8fafc; color: #64748b; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; padding: 14px 4px; display: flex; align-items: center; justify-content: center;
     }
     .grid-row { background-color: white; border-bottom: 1px solid #f1f5f9; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-    .grid-row:hover { background-color: #f0f9ff; }
-    .grid-row[data-depth="0"] { background-color: #eff6ff; }
-    .grid-row[data-depth="0"]:hover { background-color: #e0f2fe; }
+    .grid-row:hover { background-color: #f8fafc; }
+    
+    /* Phase/Level 0 Row - Dark Slate from mockup */
+    .grid-row[data-type="paper"] { background-color: #f1f5f9; }
+    .grid-row[data-type="paper"] .grid-cell { color: #1e293b; font-weight: 800; font-size: 0.95rem; }
+    .grid-row[data-type="paper"] .input-premium { background-color: #fffbeb !important; border-color: #fef3c7; color: #92400e; }
+    
+    .grid-row[data-type="section"] { background-color: #f8fafc; }
+    .grid-row[data-type="section"] .grid-cell { font-weight: 700; color: #334155; }
     
     .grid-cell { padding: 8px 10px; display: flex; align-items: center; font-size: 0.9rem; color: #334155; position: relative; }
     
@@ -211,7 +223,15 @@ if (!empty($nodesTree)) {
         ];
     }
 
-    let manualSettings = { marks: null, time: null, pass: 40, negValue: 20, negUnit: 'percent' };
+    let currentLevel = '<?php echo addslashes($level); ?>';
+    let manualSettings = { 
+        marks: null, 
+        time: null, 
+        pass: 40, 
+        negValue: 20, 
+        negUnit: 'percent',
+        negScope: 'per-q'
+    };
     let draggedItemIndex = null;
 
     // --- GRID RENDERING ---
@@ -292,8 +312,12 @@ if (!empty($nodesTree)) {
                 <button onclick="deleteRow(${index})" class="text-slate-300 hover:text-rose-500 transition px-2" title="Delete"><i class="fas fa-trash-alt text-sm"></i></button>
             `, 'justify-center'));
             
-            // Set depth attribute for styling
-            container.lastChild.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.setAttribute('data-depth', row.depth);
+            // Set depth and type attributes for styling
+            const rowElements = container.querySelectorAll('.grid-cell:nth-last-child(-n+11)');
+            rowElements.forEach(cell => {
+                cell.setAttribute('data-depth', row.depth);
+                cell.setAttribute('data-type', row.type);
+            });
         });
 
         validateSyllabus();
@@ -312,9 +336,14 @@ if (!empty($nodesTree)) {
     function updateRow(index, field, value) {
         if(field !== 'title' && field !== 'type') value = parseFloat(value) || 0;
         syllabusData[index][field] = value;
+        
+        // Auto-calculation logic: QTY * EACH = MARKS
         if(field === 'qCount' || field === 'qEach') {
-            syllabusData[index].weight = (syllabusData[index].qCount * syllabusData[index].qEach);
+            const count = parseFloat(syllabusData[index].qCount) || 0;
+            const each = parseFloat(syllabusData[index].qEach) || 0;
+            syllabusData[index].weight = count * each;
         }
+        
         renderGrid();
     }
 
@@ -410,6 +439,10 @@ if (!empty($nodesTree)) {
     }
 
     // --- VALIDATION & SAVING ---
+    function updateGlobalLevel(value) {
+        currentLevel = value.trim() || 'New Syllabus';
+    }
+
     function updateGlobalSetting(type, value) {
         if(value.trim() === '') value = null;
         manualSettings[type] = value;
@@ -428,15 +461,15 @@ if (!empty($nodesTree)) {
         tallyDisplay.innerText = `${Math.round(unitSum)}/${Math.round(target)}`;
         
         if(Math.abs(unitSum - target) < 0.01) {
-            badge.className = 'px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center shadow-sm bg-emerald-500 text-white';
+            badge.className = 'bg-[#ecfdf5] text-[#065f46] border border-[#d1fae5] px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center';
         } else {
-            badge.className = 'px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center shadow-sm bg-rose-500 text-white';
+            badge.className = 'bg-[#fef2f2] text-[#991b1b] border border-[#fee2e2] px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center';
         }
     }
 
     function saveSyllabus() {
         const payload = JSON.stringify({
-            level: '<?php echo addslashes($level); ?>',
+            level: currentLevel,
             nodes: syllabusData,
             settings: manualSettings
         });
