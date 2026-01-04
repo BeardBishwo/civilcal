@@ -74,7 +74,8 @@ class SubCategoryController extends Controller
             return;
         }
 
-        $slug = $this->syllabusService->slugify($title);
+        $rawSlug = $_POST['slug'] ?? $title;
+        $slug = $this->syllabusService->slugify($rawSlug);
         
         // Get Max Order for this parent
         $stmt = $this->db->getPdo()->prepare("SELECT MAX(order_index) FROM syllabus_nodes WHERE parent_id = ?");
