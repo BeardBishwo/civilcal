@@ -2016,6 +2016,10 @@ $router->add("POST", "/admin/quiz/blueprints/store", "Admin\\Quiz\\BlueprintCont
 $router->add("POST", "/admin/quiz/blueprints/update/{id}", "Admin\\Quiz\\BlueprintController@update", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/blueprints/delete/{id}", "Admin\\Quiz\\BlueprintController@delete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/blueprints/generate/{id}", "Admin\\Quiz\\BlueprintController@generate", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/blueprints/{id}/validate", "Admin\\Quiz\\BlueprintController@validate", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/blueprints/{id}/add-rule", "Admin\\Quiz\\BlueprintController@addRule", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/blueprints/rule/{id}/update", "Admin\\Quiz\\BlueprintController@updateRule", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/blueprints/rule/{id}/delete", "Admin\\Quiz\\BlueprintController@deleteRule", ["auth", "admin"]);
 
 $router->add("POST", "/admin/quiz/questions/update/{id}", "Admin\\Quiz\\QuestionBankController@update", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/questions/delete/{id}", "Admin\\Quiz\\QuestionBankController@delete", ["auth", "admin"]);
