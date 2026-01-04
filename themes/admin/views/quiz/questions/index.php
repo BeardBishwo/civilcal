@@ -242,3 +242,125 @@
         </div>
     </div>
 </div>
+
+<style>
+/* ========================================
+   PREMIUM ARCHITECT DESIGN SYSTEM
+   ======================================== */
+:root {
+    --admin-primary: #667eea;
+    --admin-secondary: #764ba2;
+    --admin-gray-50: #f8fbff;
+    --admin-gray-100: #f1f5f9;
+    --admin-gray-200: #e2e8f0;
+    --admin-gray-300: #cbd5e1;
+    --admin-gray-400: #94a3b8;
+    --admin-gray-600: #475569;
+    --admin-gray-800: #1e293b;
+    --admin-warning: #f59e0b;
+    --admin-success: #10b981;
+    --admin-danger: #ef4444;
+}
+
+/* Base Font Override */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+.admin-wrapper-container *:not(i):not([class*="fa-"]) {
+    font-family: 'Outfit', sans-serif !important;
+}
+
+/* Container & Layout */
+.admin-wrapper-container { padding: 1.5rem; background: var(--admin-gray-50); min-height: calc(100vh - 70px); }
+.admin-content-wrapper { background: white; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); overflow: hidden; padding-bottom: 2rem; border: 1px solid var(--admin-gray-200); }
+
+/* Header Architect */
+.compact-header { 
+    display: flex; justify-content: space-between; align-items: center; padding: 2rem 2.5rem; 
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; border-bottom: 4px solid rgba(0,0,0,0.1);
+}
+.header-left .header-title { display: flex; align-items: center; gap: 1rem; }
+.header-title h1 { margin: 0; font-size: 1.85rem; font-weight: 800; color: white; letter-spacing: -0.5px; }
+.header-title i { font-size: 1.5rem; opacity: 0.9; }
+.header-subtitle { display: flex; align-items: center; margin-top: 8px; gap: 6px; }
+
+/* Header Actions & Dropdown */
+.header-actions { display: flex; align-items: center; gap: 12px; }
+.header-actions ul { list-style: none !important; margin: 0; padding: 0.5rem !important; }
+.header-actions li { list-style: none !important; }
+
+.btn-compact {
+    height: 42px; padding: 0 1.5rem; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);
+    color: white; font-weight: 700; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px;
+    transition: 0.2s; cursor: pointer; text-decoration: none;
+}
+.btn-compact:hover { background: white; color: #4f46e5; transform: translateY(-1px); }
+.btn-primary.btn-compact { background: white; color: #4f46e5; border: none; }
+
+/* Filter Bar */
+.compact-toolbar { 
+    display: flex; justify-content: space-between; align-items: center; padding: 1rem 2.5rem; 
+    background: #f8fafc; border-bottom: 1px solid var(--admin-gray-200);
+}
+.search-compact { position: relative; width: 300px; }
+.search-compact i { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--admin-gray-400); }
+.search-compact input {
+    width: 100%; height: 40px; padding: 0 1rem 0 2.5rem; font-size: 0.9rem;
+    border: 1px solid var(--admin-gray-300); border-radius: 10px; outline: none; transition: 0.2s;
+}
+.search-compact input:focus { border-color: var(--admin-primary); box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1); }
+
+.filter-compact {
+    height: 40px; padding: 0 1rem; border: 1px solid var(--admin-gray-300); border-radius: 10px;
+    background: white; font-size: 0.85rem; font-weight: 600; color: var(--admin-gray-600); cursor: pointer;
+}
+
+/* Table Architecture */
+.table-container { padding: 1.5rem 2.5rem; }
+.table-wrapper { border: 1px solid var(--admin-gray-200); border-radius: 12px; overflow: hidden; }
+.table-compact { width: 100%; border-collapse: collapse; background: white; }
+.table-compact th {
+    background: #f1f5f9; padding: 12px 20px; font-size: 0.75rem; font-weight: 800;
+    color: var(--admin-gray-400); text-transform: uppercase; letter-spacing: 1px; text-align: left;
+}
+.table-compact td { padding: 14px 20px; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+
+.page-info .page-title-compact { font-weight: 700; color: var(--admin-gray-800); font-size: 1rem; line-height: 1.4; }
+.page-slug-compact { font-family: monospace; font-size: 0.75rem; color: var(--admin-gray-400); margin-top: 2px; font-weight: 600; }
+
+.status-badge {
+    padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800;
+    text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px;
+}
+.status-active { background: #ecfdf5; color: #10b981; }
+.status-inactive { background: #fef2f2; color: #ef4444; }
+
+/* Actions */
+.actions-compact { display: flex; gap: 8px; }
+.action-btn-icon {
+    width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--admin-gray-200);
+    background: white; color: var(--admin-gray-400); cursor: pointer; display: flex;
+    align-items: center; justify-content: center; transition: 0.2s; text-decoration: none;
+}
+.action-btn-icon:hover { transform: translateY(-2px); border-color: var(--admin-primary); color: var(--admin-primary); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+.delete-btn:hover { border-color: var(--admin-danger); color: var(--admin-danger); }
+
+/* Pagination */
+.pagination-compact { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 0 0.5rem; }
+.pagination-info { font-size: 0.85rem; font-weight: 600; color: var(--admin-gray-400); }
+.pagination-controls { display: flex; gap: 8px; }
+.page-btn {
+    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    border-radius: 10px; background: white; border: 1px solid var(--admin-gray-200);
+    color: var(--admin-gray-600); font-weight: 700; text-decoration: none; transition: 0.2s;
+}
+.page-btn.active { background: var(--admin-primary); color: white; border-color: var(--admin-primary); }
+.page-btn:hover:not(.disabled):not(.active) { background: #f8fafc; border-color: var(--admin-gray-300); }
+.page-btn.disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Font Awesome Reset */
+.admin-wrapper-container i.fas, 
+.admin-wrapper-container i.fa-solid, 
+.admin-wrapper-container i.fa-regular {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+}
+</style>

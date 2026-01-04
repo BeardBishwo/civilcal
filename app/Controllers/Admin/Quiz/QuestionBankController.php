@@ -73,8 +73,25 @@ class QuestionBankController extends Controller
         $stmt->execute($params);
         $questions = $stmt->fetchAll();
 
+        // Calculate Stats for Header
+        $stats = [
+            'total' => $total,
+            'mcq' => 0,
+            'multi' => 0,
+            'order' => 0
+        ];
+
+        // Efficiently fetch counts for specific types
+        $stmtStats = $this->db->getPdo()->query("SELECT type, COUNT(*) as count FROM quiz_questions GROUP BY type");
+        while($row = $stmtStats->fetch()) {
+            $type = $row['type'];
+            if(in_array($type, ['MCQ', 'mcq_single', 'mcq_single', 'true_false', 'TF'])) $stats['mcq'] += $row['count'];
+            if(in_array($type, ['MULTI', 'mcq_multi'])) $stats['multi'] += $row['count'];
+            if($type == 'ORDER') $stats['order'] += $row['count'];
+        }
+
         // Load roots from syllabus tree for export scope
-        $mainCategories = $this->db->fetchAll("SELECT id, title FROM syllabus_nodes WHERE parent_id IS NULL AND is_active = 1 ORDER BY order_index ASC");
+        $mainCategories = $this->db->query("SELECT id, title FROM syllabus_nodes WHERE parent_id IS NULL AND is_active = 1 ORDER BY order_index ASC")->fetchAll();
 
         $this->view->render('admin/quiz/questions/index', [
             'page_title' => 'Question Bank',
@@ -94,12 +111,12 @@ class QuestionBankController extends Controller
     {
         // 1. Fetch Main Categories (Sorted by custom order)
         // Main categories are Roots (parent_id IS NULL)
-        $mainCategories = $this->db->fetchAll("SELECT * FROM syllabus_nodes WHERE parent_id IS NULL ORDER BY order_index ASC");
+        $mainCategories = $this->db->query("SELECT * FROM syllabus_nodes WHERE parent_id IS NULL ORDER BY order_index ASC")->fetchAll();
 
         // 2. Fetch Sub-Categories (Also Sorted)
         // Grouped by parent in the view logic or prepare here.
         // Let's fetch all active sections/units and pass to view as JSON for the JS filter.
-        $subNodes = $this->db->fetchAll("SELECT id, parent_id, title, is_premium FROM syllabus_nodes WHERE parent_id IS NOT NULL ORDER BY order_index ASC");
+        $subNodes = $this->db->query("SELECT id, parent_id, title, is_premium FROM syllabus_nodes WHERE parent_id IS NOT NULL ORDER BY order_index ASC")->fetchAll();
         
         // Convert to array keyed by parent_id for easier JS handling if we were building it here, 
         // but passing the flat list to JS to filter is often easier for dynamic chains.
