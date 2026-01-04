@@ -44,71 +44,75 @@ if (!empty($nodesTree)) {
 <!-- FontAwesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<div class="admin-wrapper-container bg-[#F8FAFC] min-h-screen font-sans">
+<div class="admin-wrapper-container antialiased">
     <div class="admin-content-wrapper p-0 shadow-none bg-transparent">
 
         <!-- === HEADER: METRICS & ACTIONS === -->
-        <div class="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-50">
-            <div class="max-w-full mx-auto">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    
-                    <!-- Left: Title & Metrics -->
-                    <div class="flex-1 w-full">
-                        <div class="flex items-center gap-3 mb-3">
-                            <a href="<?php echo app_base_url('admin/quiz/syllabus'); ?>" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition">
-                                <i class="fas fa-chevron-left text-xs"></i>
-                            </a>
-                            <h2 contenteditable="true" id="syllabus-level-title" class="text-xl font-bold text-slate-800 mr-2 outline-none focus:bg-white rounded px-1 transition" onblur="updateGlobalLevel(this.innerText)"><?php echo htmlspecialchars($level); ?></h2>
+        <div class="bg-white border-b border-slate-200 px-6 py-3 sticky top-0 z-50 print:relative print:border-none print:px-0">
+            <div class="max-w-full mx-auto flex flex-col gap-3">
+                
+                <!-- TOP LINE: Back, Title | Description -->
+                <div class="flex items-center gap-3">
+                    <a href="<?php echo app_base_url('admin/quiz/syllabus'); ?>" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition shrink-0 print:hidden">
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </a>
+                    <div class="flex items-center gap-2">
+                        <h2 contenteditable="true" id="syllabus-level-title" class="text-xl font-extrabold text-slate-800 outline-none focus:bg-slate-50 rounded px-1 transition whitespace-nowrap" onblur="updateGlobalLevel(this.innerText)"><?php echo htmlspecialchars($level); ?></h2>
+                        <span class="text-slate-300 font-light mx-2">|</span>
+                        <div contenteditable="true" id="syllabus-description-el" class="text-[12px] text-slate-400 font-medium italic outline-none focus:bg-slate-50 rounded px-1 whitespace-nowrap" onblur="updateGlobalSetting('description', this.innerText)">Elevate your curriculum with high-precision metrics.</div>
+                    </div>
+                </div>
+
+                <!-- BOTTOM LINE: Metrics & Actions -->
+                <div class="flex flex-nowrap items-center justify-between gap-4">
+                    <!-- Metrics -->
+                    <div class="flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar print:overflow-visible min-w-0">
+                        <!-- Marks -->
+                        <div class="flex-shrink-0 bg-slate-900 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold shadow-sm flex items-center border border-slate-800">
+                            <span class="text-slate-400 mr-2 uppercase tracking-wide">Total Marks:</span>
+                            <input type="text" id="global-marks-input" class="header-input text-white w-10 bg-transparent border-b border-slate-600 text-center focus:outline-none placeholder-slate-500 font-bold" placeholder="230" onblur="updateGlobalSetting('marks', this.value)">
                         </div>
-                        
-                        <div class="flex flex-wrap gap-2 items-center">
-                            <!-- Marks -->
-                            <div class="bg-[#1e293b] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center border border-slate-700">
-                                <span class="opacity-70 mr-2">TOTAL:</span>
-                                <input type="text" id="global-marks-input" class="header-input text-white w-10 bg-transparent border-b border-slate-500 text-center focus:outline-none placeholder-slate-500 font-mono" placeholder="230" onblur="updateGlobalSetting('marks', this.value)" onkeydown="if(event.key==='Enter') this.blur()">
-                            </div>
-                            <!-- Time -->
-                            <div class="bg-[#fffbeb] text-[#92400e] border border-[#fef3c7] px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center">
-                                <i class="fas fa-clock mr-2 opacity-70"></i> <span class="opacity-70 mr-1">TIME:</span>
-                                <input type="text" id="global-time-input" class="header-input text-[#92400e] w-16 bg-transparent border-b border-[#fcd34d] text-center focus:outline-none font-mono" placeholder="3h 30m" onblur="updateGlobalSetting('time', this.value)" onkeydown="if(event.key==='Enter') this.blur()">
-                            </div>
-                            <!-- Tally -->
-                            <div id="validator-msg" class="bg-[#ecfdf5] text-[#065f46] border border-[#d1fae5] px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center">
-                                <i class="fas fa-check-circle mr-2 opacity-70"></i> <span class="opacity-70 mr-1">Tally:</span>
-                                <span id="tally-display" class="font-mono">230/230</span>
-                            </div>
-                            <!-- Pass -->
-                            <div class="bg-[#ecfdf5] text-[#065f46] border border-[#d1fae5] px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center">
-                                <i class="fas fa-flag mr-2 opacity-70"></i> <span class="opacity-70 mr-1">PASS:</span>
-                                <input type="text" id="global-pass-input" class="header-input text-[#065f46] w-8 bg-transparent border-b border-[#a7f3d0] text-center focus:outline-none font-mono" placeholder="40" onblur="updateGlobalSetting('pass', this.value)" onkeydown="if(event.key==='Enter') this.blur()">
-                            </div>
-                            <!-- Neg Control (Complex) -->
-                            <div class="bg-[#fef2f2] text-[#991b1b] border border-[#fee2e2] px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center gap-2">
-                                <i class="fas fa-minus-circle opacity-70"></i> <span class="opacity-70">NEG:</span>
-                                <input type="number" id="global-neg-input" class="bg-transparent border-b border-[#fecaca] text-[#991b1b] w-8 text-center focus:outline-none font-mono" placeholder="20" onblur="updateGlobalSetting('negValue', this.value)">
-                                <select id="neg-unit-select" class="bg-transparent text-[#991b1b] outline-none cursor-pointer appearance-none hover:bg-red-50 px-1 rounded" onchange="updateGlobalSetting('negUnit', this.value)">
-                                    <option value="percent">%</option>
-                                    <option value="number">No.</option>
-                                </select>
-                                <div class="h-4 w-px bg-[#fca5a5] mx-1"></div>
-                                <select id="neg-scope-select" class="bg-transparent text-[#991b1b] outline-none cursor-pointer appearance-none hover:bg-red-50 px-1 rounded" onchange="updateGlobalSetting('negScope', this.value)">
-                                    <option value="per-q">Per Q.</option>
-                                    <option value="total">Total</option>
-                                </select>
-                            </div>
+                        <!-- Time -->
+                        <div class="flex-shrink-0 bg-amber-50 text-amber-900 border border-amber-200 px-3 py-1.5 rounded-lg text-[11px] font-bold shadow-sm flex items-center">
+                            <i class="fas fa-clock mr-2 text-amber-500"></i> <span class="text-amber-700/70 mr-1 uppercase tracking-wide">Time:</span>
+                            <input type="text" id="global-time-input" class="header-input text-amber-900 w-16 bg-transparent border-b border-amber-300 text-center focus:outline-none font-bold" placeholder="3h 30m" onblur="updateGlobalSetting('time', this.value)">
+                        </div>
+                        <!-- Tally -->
+                        <div id="validator-msg" class="flex-shrink-0 bg-emerald-50 text-emerald-900 border border-emerald-200 px-3 py-1.5 rounded-lg text-[11px] font-bold shadow-sm flex items-center" title="Curriculum Balance Tally">
+                            <i class="fas fa-check-circle mr-2 text-emerald-500"></i>
+                            <span id="tally-display" class="font-bold">230/230</span>
+                        </div>
+                        <!-- Pass -->
+                        <div class="flex-shrink-0 bg-emerald-50 text-emerald-900 border border-emerald-200 px-3 py-1.5 rounded-lg text-[11px] font-bold shadow-sm flex items-center">
+                            <i class="fas fa-flag mr-2 text-emerald-500"></i> <span class="text-emerald-700/70 mr-1 uppercase tracking-wide">Pass:</span>
+                            <input type="text" id="global-pass-input" class="header-input text-emerald-900 w-8 bg-transparent border-b border-emerald-300 text-center focus:outline-none font-bold" placeholder="40" onblur="updateGlobalSetting('pass', this.value)">
+                        </div>
+                        <!-- Neg -->
+                        <div class="flex-shrink-0 bg-rose-50 text-rose-900 border border-rose-200 px-3 py-1.5 rounded-lg text-[11px] font-bold shadow-sm flex items-center gap-1.5">
+                            <i class="fas fa-minus-circle text-rose-500"></i> <span class="text-rose-700/70 mr-1 uppercase tracking-wide">Neg:</span>
+                            <input type="number" id="global-neg-input" class="bg-transparent border-b border-rose-300 text-rose-900 w-8 text-center focus:outline-none font-bold placeholder-rose-300" placeholder="20" onblur="updateGlobalSetting('negValue', this.value)">
+                            <select id="neg-unit-select" class="bg-transparent text-rose-900 font-bold outline-none cursor-pointer appearance-none px-1 rounded hover:bg-white/50" onchange="updateGlobalSetting('negUnit', this.value)">
+                                <option value="percent">%</option>
+                                <option value="number">No.</option>
+                            </select>
+                            <div class="h-3 w-px bg-rose-300 mx-0.5"></div>
+                            <select id="neg-scope-select" class="bg-transparent text-rose-900 font-bold outline-none cursor-pointer appearance-none px-1 rounded hover:bg-white/50" onchange="updateGlobalSetting('negScope', this.value)">
+                                <option value="per-q">Per Q.</option>
+                                <option value="total">Total</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Right: Actions -->
-                    <div class="flex items-center gap-3 self-end md:self-center">
-                        <button onclick="addTopic()" class="h-10 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-semibold transition flex items-center shadow-sm">
+                    <!-- Actions -->
+                    <div class="flex items-center gap-2 shrink-0 print:hidden">
+                        <button onclick="addTopic()" class="h-9 px-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
                             <i class="fas fa-plus mr-2 text-blue-500"></i> Row
                         </button>
-                        <button onclick="saveSyllabus()" class="h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition shadow-md flex items-center">
+                        <button onclick="saveSyllabus()" class="h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition shadow-md flex items-center">
                             <i class="fas fa-save mr-2"></i> Save Changes
                         </button>
-                        <button onclick="window.print()" class="h-10 px-4 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-semibold transition shadow-md flex items-center">
-                            <i class="fas fa-print mr-2"></i> Print
+                        <button onclick="window.print()" class="h-9 w-9 bg-slate-800 hover:bg-slate-900 text-white rounded-full flex items-center justify-center transition shadow-md" title="Print Syllabus">
+                            <i class="fas fa-print"></i>
                         </button>
                     </div>
                 </div>
@@ -139,16 +143,16 @@ if (!empty($nodesTree)) {
         </div>
 
         <!-- Bulk Action Bar -->
-        <div id="bulk-action-bar" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 translate-y-full bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-6 z-50 transition-all duration-300 border border-slate-700">
-            <span class="text-sm font-bold text-slate-400"><span id="selected-count" class="text-white text-lg mr-1">0</span> Rows Selected</span>
+        <div id="bulk-action-bar" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 translate-y-[200%] bg-[#101827] text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-6 z-[100] transition-all duration-500 border border-slate-700 select-none print:hidden opacity-0 invisible">
+            <span class="text-xs font-bold text-slate-400 whitespace-nowrap"><span id="selected-count" class="text-white text-base mr-1">0</span> Rows Selected</span>
             <div class="h-6 w-px bg-slate-700"></div>
-            <button onclick="bulkDuplicate()" class="hover:text-blue-400 transition text-xs font-bold uppercase flex items-center group"><i class="fas fa-copy mr-2 group-hover:scale-110"></i> Duplicate</button>
+            <button onclick="bulkDuplicate()" class="hover:text-blue-400 transition text-[10px] font-extrabold uppercase flex items-center group whitespace-nowrap"><i class="fas fa-copy mr-2 group-hover:scale-110"></i> Duplicate</button>
             <div class="h-6 w-px bg-slate-700"></div>
-            <button onclick="bulkIndent(-1)" class="hover:text-blue-400 transition text-xs font-bold uppercase flex items-center group"><i class="fas fa-outdent mr-2 group-hover:scale-110"></i> Outdent</button>
-            <button onclick="bulkIndent(1)" class="hover:text-blue-400 transition text-xs font-bold uppercase flex items-center group"><i class="fas fa-indent mr-2 group-hover:scale-110"></i> Indent</button>
+            <button onclick="bulkIndent(-1)" class="hover:text-blue-400 transition text-[10px] font-extrabold uppercase flex items-center group whitespace-nowrap"><i class="fas fa-outdent mr-2 group-hover:scale-110"></i> Outdent</button>
+            <button onclick="bulkIndent(1)" class="hover:text-blue-400 transition text-[10px] font-extrabold uppercase flex items-center group whitespace-nowrap"><i class="fas fa-indent mr-2 group-hover:scale-110"></i> Indent</button>
             <div class="h-6 w-px bg-slate-700"></div>
-            <button onclick="bulkDelete()" class="hover:text-rose-400 transition text-xs font-bold uppercase flex items-center group"><i class="fas fa-trash mr-2 group-hover:scale-110"></i> Delete</button>
-            <button onclick="clearSelection()" class="ml-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:text-white transition"><i class="fas fa-times"></i></button>
+            <button onclick="bulkDelete()" class="hover:text-rose-400 transition text-[10px] font-extrabold uppercase flex items-center group whitespace-nowrap"><i class="fas fa-trash mr-2 group-hover:scale-110"></i> Delete</button>
+            <button onclick="clearSelection()" class="ml-2 w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:text-white transition shadow-inner"><i class="fas fa-times text-xs"></i></button>
         </div>
 
     </div>
@@ -210,7 +214,29 @@ if (!empty($nodesTree)) {
     .hierarchy-btn {
         width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #f8fafc; color: #64748b; transition: 0.2s; border: 1px solid #e2e8f0;
     }
-    .hierarchy-btn:hover { background: #cbd5e1; color: #0f172a; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    @media print {
+        #bulk-action-bar, .sticky, .hierarchy-btn, .actions-cell, .drag-handle, .row-checkbox, .grid-header:nth-child(1), .grid-header:nth-child(2), .grid-header:nth-child(10), .grid-header:nth-child(11) {
+            display: none !important;
+        }
+        .admin-wrapper-container { background: white !important; padding: 0 !important; }
+        .syllabus-grid { 
+            display: table !important;
+            width: 100% !important;
+            border-collapse: collapse !important;
+        }
+        .grid-header { display: table-cell !important; padding: 10px !important; border: 1px solid #e2e8f0 !important; }
+        .grid-row { display: table-row !important; }
+        .grid-cell { display: table-cell !important; border: 1px solid #e2e8f0 !important; padding: 10px !important; }
+        
+        /* Hide UI columns in print */
+        .grid-cell:nth-child(1), .grid-cell:nth-child(2),
+        .grid-cell:nth-child(10), .grid-cell:nth-child(11) {
+            display: none !important;
+        }
+    }
 </style>
 
 <script>
@@ -230,7 +256,8 @@ if (!empty($nodesTree)) {
         pass: 40, 
         negValue: 20, 
         negUnit: 'percent',
-        negScope: 'per-q'
+        negScope: 'per-q',
+        description: 'Elevate your curriculum with our high-precision syllabus engine.'
     };
     let draggedItemIndex = null;
 
@@ -402,11 +429,11 @@ if (!empty($nodesTree)) {
         const bar = document.getElementById('bulk-action-bar');
         document.getElementById('selected-count').innerText = count;
         if(count > 0) {
-            bar.classList.add('visible');
-            bar.classList.remove('translate-y-full');
+            bar.classList.remove('opacity-0', 'invisible', 'translate-y-[200%]');
+            bar.classList.add('translate-y-0');
         } else {
-            bar.classList.remove('visible');
-            bar.classList.add('translate-y-full');
+            bar.classList.add('opacity-0', 'invisible', 'translate-y-[200%]');
+            bar.classList.remove('translate-y-0');
         }
     }
 
@@ -461,9 +488,9 @@ if (!empty($nodesTree)) {
         tallyDisplay.innerText = `${Math.round(unitSum)}/${Math.round(target)}`;
         
         if(Math.abs(unitSum - target) < 0.01) {
-            badge.className = 'bg-[#ecfdf5] text-[#065f46] border border-[#d1fae5] px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center';
+            badge.className = 'flex-shrink-0 bg-emerald-50 text-emerald-900 border border-emerald-200 px-3 py-1.5 rounded-lg text-[11px] font-bold shadow-sm flex items-center';
         } else {
-            badge.className = 'bg-[#fef2f2] text-[#991b1b] border border-[#fee2e2] px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center';
+            badge.className = 'flex-shrink-0 bg-rose-50 text-rose-900 border border-rose-200 px-3 py-1.5 rounded-lg text-[11px] font-bold shadow-sm flex items-center';
         }
     }
 
