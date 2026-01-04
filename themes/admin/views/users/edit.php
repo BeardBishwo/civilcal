@@ -1,389 +1,307 @@
 <?php
-$page_title = $page_title ?? 'Edit User';
+/**
+ * PREMIUM USER EDIT FORM
+ * Two-column layout: Identity (Left) vs Access/Security (Right)
+ */
+$page_title = 'Edit User';
 $user = $user ?? [];
 ?>
 
-<div class="admin-content">
-    <!-- Page Header -->
-    <div class="page-header">
-        <h1 class="page-title">
-            <i class="fas fa-user-edit"></i>
-            <?php echo htmlspecialchars($page_title); ?>
-        </h1>
-        <p class="page-description">Edit user account information and settings</p>
-    </div>
+<div class="admin-wrapper-container">
+    <div class="admin-content-wrapper">
 
-    <!-- Breadcrumb -->
-    <nav class="breadcrumb" style="margin-bottom: 24px;">
-        <a href="<?= app_base_url('/admin/users') ?>">Users</a>
-        <span class="breadcrumb-divider">/</span>
-        <span class="breadcrumb-current">Edit User</span>
-    </nav>
-
-    <!-- User Info Card -->
-    <div class="card" style="margin-bottom: 24px;">
-        <div class="card-header">
-            <h3 class="card-title">
-                <i class="fas fa-info-circle"></i>
-                User Information
-            </h3>
-        </div>
-        <div class="card-content">
-            <div style="display: flex; align-items: center; gap: 16px;">
-                <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--admin-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;">
-                    <?php echo strtoupper(substr($user['username'] ?? $user['email'], 0, 1)); ?>
+        <!-- Header -->
+        <div class="compact-header">
+            <div class="header-left">
+                <div class="header-title">
+                    <i class="fas fa-user-edit"></i>
+                    <h1>Edit User</h1>
                 </div>
-                <div>
-                    <h3 style="margin: 0; color: var(--admin-gray-800);">
-                        <?php echo htmlspecialchars(trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''))); ?>
-                    </h3>
-                    <p style="margin: 4px 0; color: var(--admin-gray-600);">
-                        @<?php echo htmlspecialchars($user['username'] ?? ''); ?> • <?php echo htmlspecialchars($user['email'] ?? ''); ?>
-                    </p>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <span class="badge <?php echo ($user['role'] ?? '') === 'admin' ? 'badge-warning' : 'badge-primary'; ?>">
-                            <?php echo htmlspecialchars($user['role'] ?? 'user'); ?>
-                        </span>
-                        <?php if (($user['is_active'] ?? 1)): ?>
-                            <span class="badge badge-success">Active</span>
-                        <?php else: ?>
-                            <span class="badge badge-danger">Inactive</span>
-                        <?php endif; ?>
-                        <span style="font-size: 12px; color: var(--admin-gray-500);">
-                            Joined: <?php echo date('M j, Y', strtotime($user['created_at'] ?? 'now')); ?>
-                        </span>
-                    </div>
+                <div class="header-subtitle">
+                    Editing <strong><?= htmlspecialchars($user['username'] ?? 'User') ?></strong>
                 </div>
             </div>
+            <div class="header-actions">
+                <a href="<?= app_base_url('/admin/users') ?>" class="btn-cancel-premium">
+                    Cancel
+                </a>
+                <button type="button" class="btn-save-premium" id="save-btn" onclick="submitUserForm()">
+                    <i class="fas fa-save"></i> Update User
+                </button>
+            </div>
         </div>
-    </div>
 
-    <!-- Edit User Form -->
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
-                <i class="fas fa-edit"></i>
-                Edit User Information
-            </h3>
-        </div>
-        <div class="card-content">
-            <form id="editUserForm" method="POST" action="<?= app_base_url('/admin/users/' . $user['id'] . '/update') ?>">
-                <?php $this->csrfField(); ?>
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
-                    <!-- Personal Information -->
-                    <div>
-                        <h4 style="margin-bottom: 16px; color: var(--admin-gray-700); border-bottom: 1px solid var(--admin-gray-200); padding-bottom: 8px;">
-                            <i class="fas fa-user"></i>
-                            Personal Information
-                        </h4>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="first_name">First Name *</label>
-                            <input type="text" id="first_name" name="first_name" class="form-control" 
-                                   value="<?php echo htmlspecialchars($user['first_name'] ?? ''); ?>" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="last_name">Last Name *</label>
-                            <input type="text" id="last_name" name="last_name" class="form-control" 
-                                   value="<?php echo htmlspecialchars($user['last_name'] ?? ''); ?>" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="username">Username *</label>
-                            <input type="text" id="username" name="username" class="form-control" 
-                                   value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>" required>
-                            <small style="color: var(--admin-gray-500); font-size: 12px;">Choose a unique username</small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="email">Email Address *</label>
-                            <input type="email" id="email" name="email" class="form-control" 
-                                   value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
-                            <small style="color: var(--admin-gray-500); font-size: 12px;">A valid email address is required</small>
-                        </div>
+        <!-- Form Content -->
+        <form id="editUserForm" class="premium-form-grid">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+            
+            <!-- LEFT COLUMN: Identity -->
+            <div class="form-column-main">
+                <div class="premium-card">
+                    <div class="card-header-clean">
+                        <h3><i class="fas fa-id-card"></i> User Identity</h3>
                     </div>
-                    
-                    <!-- Account Settings -->
-                    <div>
-                        <h4 style="margin-bottom: 16px; color: var(--admin-gray-700); border-bottom: 1px solid var(--admin-gray-200); padding-bottom: 8px;">
-                            <i class="fas fa-cog"></i>
-                            Account Settings
-                        </h4>
+                    <div class="card-body-clean">
                         
-                        <div class="form-group">
-                            <label class="form-label" for="role">Role *</label>
-                            <select id="role" name="role" class="form-control" required>
-                                <option value="user" <?php echo ($user['role'] ?? '') === 'user' ? 'selected' : ''; ?>>Regular User</option>
-                                <option value="engineer" <?php echo ($user['role'] ?? '') === 'engineer' ? 'selected' : ''; ?>>Engineer</option>
-                                <option value="admin" <?php echo ($user['role'] ?? '') === 'admin' ? 'selected' : ''; ?>>Administrator</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Account Status</label>
-                            <div style="display: flex; gap: 16px;">
-                                <label style="display: flex; align-items: center; gap: 8px;">
-                                    <input type="radio" name="is_active" value="1" <?php echo ($user['is_active'] ?? 1) ? 'checked' : ''; ?>>
-                                    <span>Active</span>
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 8px;">
-                                    <input type="radio" name="is_active" value="0" <?php echo !($user['is_active'] ?? 1) ? 'checked' : ''; ?>>
-                                    <span>Inactive</span>
-                                </label>
+                        <div class="form-row-2">
+                            <div class="form-group-premium">
+                                <label class="label-premium required">First Name</label>
+                                <input type="text" name="first_name" class="input-premium" required 
+                                       value="<?= htmlspecialchars($user['first_name'] ?? '') ?>" placeholder="e.g. John">
+                            </div>
+                            <div class="form-group-premium">
+                                <label class="label-premium required">Last Name</label>
+                                <input type="text" name="last_name" class="input-premium" required 
+                                       value="<?= htmlspecialchars($user['last_name'] ?? '') ?>" placeholder="e.g. Doe">
                             </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Email Verification</label>
-                            <div style="display: flex; gap: 16px;">
-                                <label style="display: flex; align-items: center; gap: 8px;">
-                                    <input type="radio" name="email_verified" value="1" <?php echo ($user['email_verified'] ?? 1) ? 'checked' : ''; ?>>
-                                    <span>Verified</span>
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 8px;">
-                                    <input type="radio" name="email_verified" value="0" <?php echo !($user['email_verified'] ?? 1) ? 'checked' : ''; ?>>
-                                    <span>Unverified</span>
-                                </label>
-                            </div>
+
+                        <div class="form-group-premium">
+                            <label class="label-premium required">Email Address</label>
+                            <input type="email" name="email" class="input-premium" required 
+                                   value="<?= htmlspecialchars($user['email'] ?? '') ?>" placeholder="john.doe@example.com">
                         </div>
+
+                        <div class="form-group-premium">
+                            <label class="label-premium required">Username</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-at"></i>
+                                <input type="text" id="username" name="username" class="input-premium pl-4" required 
+                                       value="<?= htmlspecialchars($user['username'] ?? '') ?>" placeholder="johndoe">
+                            </div>
+                            <small class="hint-text">Changing this may affect login sessions.</small>
+                        </div>
+
                     </div>
                 </div>
-                
-                <!-- Account Actions -->
-                <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--admin-gray-200);">
-                    <h4 style="margin-bottom: 16px; color: var(--admin-gray-700); border-bottom: 1px solid var(--admin-gray-200); padding-bottom: 8px;">
-                        <i class="fas fa-key"></i>
-                        Account Actions
-                    </h4>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="checkbox" name="send_password_reset" value="1">
-                            <span>Send password reset email</span>
-                        </label>
-                        
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="checkbox" name="reset_sessions" value="1">
-                            <span>Reset all active sessions</span>
-                        </label>
-                        
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="checkbox" name="marketing_emails" value="1" <?php echo ($user['marketing_emails'] ?? 0) ? 'checked' : ''; ?>>
-                            <span>Allow marketing emails</span>
-                        </label>
-                        
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="checkbox" name="force_password_change" value="1">
-                            <span>Force password change on next login</span>
-                        </label>
+
+                <!-- Delete Actions (Access for Admins only) -->
+                 <?php if (($user['role'] ?? '') !== 'admin'): ?>
+                <div class="premium-card mt-4 border-danger">
+                    <div class="card-header-clean bg-danger-light">
+                        <h3 class="text-danger"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
                     </div>
-                </div>
-                
-                <!-- Danger Zone -->
-                <?php if (($user['role'] ?? '') !== 'admin'): ?>
-                <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--admin-danger);">
-                    <h4 style="margin-bottom: 16px; color: var(--admin-danger); border-bottom: 1px solid var(--admin-gray-200); padding-bottom: 8px;">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Danger Zone
-                    </h4>
-                    
-                    <div style="background: var(--admin-gray-50); padding: 16px; border-radius: 8px; border-left: 4px solid var(--admin-danger);">
-                        <h5 style="margin: 0 0 8px 0; color: var(--admin-danger);">Delete User Account</h5>
-                        <p style="margin: 0 0 16px 0; color: var(--admin-gray-600); font-size: 14px;">
-                            Permanently delete this user account and all associated data. This action cannot be undone.
-                        </p>
-                        <button type="button" class="btn btn-danger" onclick="deleteUser(<?php echo $user['id']; ?>)">
-                            <i class="fas fa-trash"></i> Delete User Account
+                    <div class="card-body-clean">
+                        <p class="text-sm text-gray-600 mb-3">Permanently delete this user and all associated data.</p>
+                        <button type="button" class="btn-danger-outline" onclick="deleteUser(<?= $user['id'] ?>)">
+                            <i class="fas fa-trash-alt"></i> Delete User Account
                         </button>
                     </div>
                 </div>
                 <?php endif; ?>
+            </div>
+
+            <!-- RIGHT COLUMN: Security & Access -->
+            <div class="form-column-side">
+                
+                <!-- Security -->
+                <div class="premium-card">
+                    <div class="card-header-clean">
+                        <h3><i class="fas fa-shield-alt"></i> Access Control</h3>
+                    </div>
+                    <div class="card-body-clean">
+                        <div class="form-group-premium">
+                            <label class="label-premium required">Role</label>
+                            <select name="role" class="select-premium" required>
+                                <option value="user" <?= ($user['role'] ?? '') === 'user' ? 'selected' : '' ?>>Regular User</option>
+                                <option value="editor" <?= ($user['role'] ?? '') === 'editor' ? 'selected' : '' ?>>Editor</option>
+                                <option value="admin" <?= ($user['role'] ?? '') === 'admin' ? 'selected' : '' ?>>Administrator</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group-premium">
+                            <label class="label-premium">Status</label>
+                            <select name="is_active" class="select-premium">
+                                <option value="1" <?= ($user['is_active'] ?? 1) ? 'selected' : '' ?>>Active</option>
+                                <option value="0" <?= !($user['is_active'] ?? 1) ? 'selected' : '' ?>>Inactive</option>
+                            </select>
+                        </div>
+
+                         <div class="form-divider"></div>
+
+                         <div class="preference-list">
+                             <label class="toggle-row">
+                                 <span class="toggle-label">Email Verified</span>
+                                 <input type="checkbox" name="email_verified" value="1" <?= ($user['email_verified'] ?? 0) ? 'checked' : '' ?>>
+                             </label>
+                             <label class="toggle-row">
+                                 <span class="toggle-label">Marketing Emails</span>
+                                 <input type="checkbox" name="marketing_emails" value="1" <?= ($user['marketing_emails'] ?? 0) ? 'checked' : '' ?>>
+                             </label>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Password Reset -->
+                <div class="premium-card mt-4">
+                    <div class="card-header-clean">
+                        <h3><i class="fas fa-key"></i> Password</h3>
+                    </div>
+                    <div class="card-body-clean">
+                        <div class="form-group-premium">
+                            <label class="label-premium">New Password</label>
+                            <div class="password-group">
+                                <input type="text" id="password" name="password" class="input-premium" minlength="8" placeholder="Leave blank to keep">
+                                <button type="button" class="btn-generate" onclick="generatePassword()" title="Generate Random">
+                                    <i class="fas fa-random"></i>
+                                </button>
+                            </div>
+                            <small class="hint-text">Only enter to change.</small>
+                        </div>
+                        
+                        <label class="toggle-row mt-3">
+                             <span class="toggle-label text-sm">Force Change on Login</span>
+                             <input type="checkbox" name="force_password_change" value="1">
+                         </label>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Generate Password
+    function generatePassword() {
+        const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+        let pass = "";
+        for(let i=0; i<14; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+        document.getElementById('password').value = pass;
+    }
+
+    // Submit Form
+    function submitUserForm() {
+        const form = document.getElementById('editUserForm');
+        if(!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const btn = document.getElementById('save-btn');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        btn.disabled = true;
+
+        const formData = new FormData(form);
+
+        fetch('<?= app_base_url('/admin/users/' . $user['id'] . '/update') ?>', {
+            method: 'POST',
+            body: formData,
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        })
+        .then(r => r.json())
+        .then(data => {
+            if(data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'User Updated',
+                    text: 'Changes saved successfully.',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => window.location.href = '<?= app_base_url('/admin/users') ?>');
+            } else {
+                Swal.fire('Error', data.message || 'Failed to update user', 'error');
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            Swal.fire('Error', 'An unexpected error occurred', 'error');
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+        });
+    }
+
+    function deleteUser(id) {
+        Swal.fire({
+            title: 'Delete User?',
+            text: "This cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'Yes, Delete',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`<?= app_base_url('/admin/users/') ?>${id}/delete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ csrf_token: document.querySelector('[name=csrf_token]').value })
+                })
+                .then(r => r.json())
+                .then(d => {
+                    if(d.success) window.location.href = '<?= app_base_url('/admin/users') ?>'; 
+                    else Swal.fire('Error', d.message, 'error');
+                });
+            }
+        });
+    }
+</script>
 
 <style>
-/* Additional user form styles */
-.form-group {
-    margin-bottom: 16px;
-}
+/* PREMIUM FORM STYLES (Scoped - Same as Create) */
+:root { --admin-primary: #667eea; --admin-bg: #f8f9fa; }
+body { background: var(--admin-bg); font-family: 'Inter', sans-serif; }
 
-.form-label {
-    display: block;
-    margin-bottom: 4px;
-    font-weight: 500;
-    color: var(--admin-gray-700);
-}
+.admin-wrapper-container { padding: 1rem; max-width: 1200px; margin: 0 auto; }
+.admin-content-wrapper { background: transparent; }
 
-.form-control {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid var(--admin-gray-300);
-    border-radius: 4px;
-    font-size: 14px;
-}
+/* Header */
+.compact-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2rem; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+.header-title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; color: #1e293b; }
+.header-title i { color: var(--admin-primary); margin-right: 10px; }
+.header-subtitle { color: #64748b; font-size: 0.9rem; margin-top: 4px; margin-left: 36px; }
 
-.form-control:focus {
-    outline: none;
-    border-color: var(--admin-primary);
-    box-shadow: 0 0 0 2px rgba(var(--admin-primary-rgb), 0.1);
-}
+/* Buttons */
+.btn-save-premium { background: var(--admin-primary); color: white; border: none; padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-save-premium:hover { background: #5a67d8; transform: translateY(-1px); }
+.btn-cancel-premium { background: #f1f5f9; color: #64748b; padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; text-decoration: none; transition: 0.2s; }
+.btn-cancel-premium:hover { background: #e2e8f0; color: #475569; }
 
-.btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
+.btn-danger-outline { background: white; border: 1px solid #fecaca; color: #ef4444; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-danger-outline:hover { background: #fee2e2; }
 
-.btn-danger {
-    background: var(--admin-danger);
-    color: white;
-}
+/* Grid Layout */
+.premium-form-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+@media (max-width: 900px) { .premium-form-grid { grid-template-columns: 1fr; } }
 
-.btn-danger:hover {
-    background: #dc3545;
-}
+/* Cards */
+.premium-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
+.premium-card.border-danger { border-color: #fecaca; }
+.card-header-clean { padding: 1rem 1.5rem; border-bottom: 1px solid #f1f5f9; background: #fafafa; }
+.card-header-clean.bg-danger-light { background: #fef2f2; }
+.card-header-clean h3 { margin: 0; font-size: 1rem; font-weight: 600; color: #334155; }
+.card-header-clean h3.text-danger { color: #ef4444; }
+.card-body-clean { padding: 1.5rem; }
 
-.badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-}
+/* Form Elements */
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-group-premium { margin-bottom: 1.25rem; }
+.form-group-premium:last-child { margin-bottom: 0; }
+.label-premium { display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 0.5rem; }
+.label-premium.required::after { content: "*"; color: #ef4444; margin-left: 2px; }
 
-.badge-primary { background: var(--admin-primary); color: white; }
-.badge-warning { background: var(--admin-warning); color: white; }
-.badge-success { background: var(--admin-success); color: white; }
-.badge-danger { background: var(--admin-danger); color: white; }
+.input-premium, .select-premium { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; transition: 0.2s; outline: none; }
+.input-premium:focus, .select-premium:focus { border-color: var(--admin-primary); box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+.input-with-icon { position: relative; }
+.input-with-icon i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.9rem; }
+.input-premium.pl-4 { padding-left: 2.25rem; }
+
+.hint-text { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; display: block; }
+.password-group { display: flex; gap: 8px; }
+.btn-generate { background: #f1f5f9; border: 1px solid #cbd5e1; color: #64748b; border-radius: 8px; width: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+.btn-generate:hover { background: #e2e8f0; color: #475569; }
+
+/* Preferences */
+.form-divider { height: 1px; background: #f1f5f9; margin: 1.5rem 0; }
+.preference-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.toggle-row { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+.toggle-label { font-size: 0.9rem; color: #334155; font-weight: 500; }
+.mt-4 { margin-top: 1.5rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.text-sm { font-size: 0.85rem; }
+.text-gray-600 { color: #475569; }
 </style>
-
-<script>
-// Form validation and interactions
-document.getElementById('editUserForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    updateUser();
-});
-
-function previewChanges() {
-    const form = document.getElementById('editUserForm');
-    const formData = new FormData(form);
-    
-    const changes = {
-        firstName: formData.get('first_name'),
-        lastName: formData.get('last_name'),
-        username: formData.get('username'),
-        email: formData.get('email'),
-        role: formData.get('role'),
-        status: formData.get('is_active') === '1' ? 'Active' : 'Inactive',
-        emailVerified: formData.get('email_verified') === '1' ? 'Verified' : 'Unverified',
-        marketingEmails: formData.get('marketing_emails') === '1' ? 'Yes' : 'No'
-    };
-    
-    let changesHTML = '<h3>Changes Preview</h3>';
-    changesHTML += '<div style="text-align: left;">';
-    changesHTML += '<p><strong>Name:</strong> ' + changes.firstName + ' ' + changes.lastName + '</p>';
-    changesHTML += '<p><strong>Username:</strong> ' + changes.username + '</p>';
-    changesHTML += '<p><strong>Email:</strong> ' + changes.email + '</p>';
-    changesHTML += '<p><strong>Role:</strong> ' + changes.role + '</p>';
-    changesHTML += '<p><strong>Status:</strong> ' + changes.status + '</p>';
-    changesHTML += '<p><strong>Email Verification:</strong> ' + changes.emailVerified + '</p>';
-    changesHTML += '<p><strong>Marketing Emails:</strong> ' + changes.marketingEmails + '</p>';
-    changesHTML += '</div>';
-    
-    showPreviewModal(changesHTML);
-}
-
-function updateUser() {
-    const form = document.getElementById('editUserForm');
-    const formData = new FormData(form);
-    const userId = <?php echo $user['id']; ?>;
-    
-    // Show loading state
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
-    submitBtn.disabled = true;
-    
-    fetch(`<?= app_base_url('/admin/users/') ?>${userId}/update`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-Token': '<?php echo $this->csrfToken(); ?>'
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            showNotification('User updated successfully!', 'success');
-            setTimeout(() => window.location.href = '<?= app_base_url('/admin/users') ?>', 1000);
-        } else {
-            throw new Error('Failed to update user');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotification('Error updating user: ' + error.message, 'error');
-    })
-    .finally(() => {
-        // Reset button state
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    });
-}
-
-function deleteUser(userId) {
-    showConfirmModal('Delete User', 'Are you absolutely sure you want to delete this user? This action cannot be undone.', () => {
-        showConfirmModal('Confirm Deletion', 'This will permanently delete the user account and all associated data. Are you sure?', () => {
-            fetch(`<?= app_base_url('/admin/users/') ?>${userId}/delete`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': '<?php echo $this->csrfToken(); ?>'
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    showNotification('User deleted successfully!', 'success');
-                    setTimeout(() => window.location.href = '<?= app_base_url('/admin/users') ?>', 1000);
-                } else {
-                    throw new Error('Failed to delete user');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Error deleting user: ' + error.message, 'error');
-            });
-        });
-    });
-}
-
-function showPreviewModal(content) {
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
-        z-index: 9999;
-    `;
-    
-    modal.innerHTML = `
-        <div style="background: white; padding: 32px; border-radius: 12px; max-width: 500px; width: 90%;">
-            ${content}
-            <div style="margin-top: 24px; text-align: right;">
-                <button onclick="this.closest('[style*=fixed]').remove()" class="btn btn-secondary">Close</button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    });
-}
-</script>

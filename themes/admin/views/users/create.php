@@ -1,741 +1,273 @@
 <?php
-$page_title = $page_title ?? 'Create New User';
+/**
+ * PREMIUM USER CREATION FORM
+ * Two-column layout: Identity (Left) vs Access/Security (Right)
+ */
+$page_title = 'Create New User';
 ?>
 
-<!-- Optimized Admin Container -->
-<div class="page-create-container">
-    <div class="page-create-wrapper">
+<div class="admin-wrapper-container">
+    <div class="admin-content-wrapper">
 
-        <!-- Compact Page Header -->
-        <div class="compact-create-header">
+        <!-- Header -->
+        <div class="compact-header">
             <div class="header-left">
                 <div class="header-title">
                     <i class="fas fa-user-plus"></i>
-                    <h1><?php echo htmlspecialchars($page_title); ?></h1>
+                    <h1>Create New User</h1>
                 </div>
-                <div class="header-subtitle">
-                    Create a new user account with role-based access control
-                </div>
+                <div class="header-subtitle">Add a new user to the system.</div>
             </div>
             <div class="header-actions">
-                <a href="<?= app_base_url('/admin/users') ?>" class="btn btn-secondary btn-compact">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Back to Users</span>
+                <a href="<?= app_base_url('/admin/users') ?>" class="btn-cancel-premium">
+                    Cancel
                 </a>
-            </div>
-        </div>
-
-        <form id="createUserForm" method="POST" action="<?= app_base_url('/admin/users/store') ?>" class="main-form-container">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
-
-            <!-- Compact Action Bar -->
-            <div class="compact-action-bar">
-                <div class="action-left">
-                    <div class="save-status" id="save-status">
-                         <i class="fas fa-circle"></i>
-                        <span>Ready to create</span>
-                    </div>
-                </div>
-                <div class="action-right">
-                    <button type="button" class="btn btn-outline-secondary btn-compact" onclick="previewUser()">
-                        <i class="fas fa-eye"></i>
-                        Preview
-                    </button>
-                    <button type="submit" class="btn btn-primary btn-compact" id="save-btn">
-                        <i class="fas fa-save"></i>
-                        Create User
-                    </button>
-                </div>
-            </div>
-
-            <!-- Main Content Layout (Single Column) -->
-            <div class="create-content-single-column">
-
-                <!-- Personal Information -->
-                <div class="content-card">
-                    <div class="card-header-clean">
-                        <h3 class="card-title"><i class="fas fa-user"></i> Personal Information</h3>
-                    </div>
-                    <div class="card-body-clean">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                            <div class="form-group-modern">
-                                <label class="form-label required" for="first_name">First Name</label>
-                                <input type="text" id="first_name" name="first_name" class="form-control-modern" required placeholder="John">
-                            </div>
-
-                            <div class="form-group-modern">
-                                <label class="form-label required" for="last_name">Last Name</label>
-                                <input type="text" id="last_name" name="last_name" class="form-control-modern" required placeholder="Doe">
-                            </div>
-                        </div>
-
-                        <div class="form-group-modern">
-                            <label class="form-label required" for="email">Email Address</label>
-                            <input type="email" id="email" name="email" class="form-control-modern" required placeholder="john.doe@example.com">
-                            <small style="color: var(--gray-500); font-size: 0.8rem; margin-top: 0.25rem; display: block;">A valid email address is required for communication.</small>
-                        </div>
-
-                        <div class="form-group-modern">
-                            <label class="form-label required" for="username">Username</label>
-                            <input type="text" id="username" name="username" class="form-control-modern" required placeholder="johndoe">
-                            <small style="color: var(--gray-500); font-size: 0.8rem; margin-top: 0.25rem; display: block;">Unique identifier for login.</small>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Account Settings & Security -->
-                <div class="content-card">
-                    <div class="card-header-clean">
-                        <h3 class="card-title"><i class="fas fa-shield-alt"></i> Security & Access</h3>
-                    </div>
-                    <div class="card-body-clean">
-                        <div class="form-group-modern">
-                            <label class="form-label required" for="password">Password</label>
-                            <div style="display: flex; gap: 0.5rem;">
-                                <div style="position: relative; flex-grow: 1;">
-                                    <input type="password" id="password" name="password" class="form-control-modern" required minlength="8" placeholder="Generated Password">
-                                    <button type="button" onclick="togglePasswordVisibility()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--gray-500); cursor: pointer;">
-                                        <i class="fas fa-eye" id="password-icon"></i>
-                                    </button>
-                                </div>
-                                <button type="button" class="btn btn-secondary btn-compact" onclick="generatePassword()">
-                                    <i class="fas fa-magic"></i> Generate
-                                </button>
-                            </div>
-                            <small style="color: var(--gray-500); font-size: 0.8rem; margin-top: 0.25rem; display: block;">Auto-generated strong password. You can also type manually.</small>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
-                            <div class="form-group-modern">
-                                <label class="form-label required" for="role">Role</label>
-                                <select id="role" name="role" class="form-control-modern" required>
-                                    <option value="">Select a role...</option>
-                                    <option value="user" selected>Regular User</option>
-                                    <option value="engineer">Engineer</option>
-                                    <option value="admin">Administrator</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group-modern">
-                                <label class="form-label">Account Status</label>
-                                <select name="is_active" class="form-control-modern">
-                                    <option value="1">Active</option>
-                                    <option value="0">Inactive</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Additional Options -->
-                <div class="content-card">
-                    <div class="card-header-clean">
-                        <h3 class="card-title"><i class="fas fa-cog"></i> Preferences</h3>
-                    </div>
-                    <div class="card-body-clean">
-                         <div class="option-grid">
-                            <label class="option-checkbox-modern">
-                                <input type="checkbox" name="email_verified" value="1" checked>
-                                <span class="checkmark"></span>
-                                <span class="label-text">Auto-verify email</span>
-                            </label>
-
-                            <label class="option-checkbox-modern">
-                                <input type="checkbox" name="terms_agreed" value="1" checked>
-                                <span class="checkmark"></span>
-                                <span class="label-text">Auto-agree to terms</span>
-                            </label>
-
-                             <label class="option-checkbox-modern">
-                                <input type="checkbox" name="send_welcome_email" value="1" checked>
-                                <span class="checkmark"></span>
-                                <span class="label-text">Send welcome email</span>
-                            </label>
-
-                            <label class="option-checkbox-modern">
-                                <input type="checkbox" name="marketing_emails" value="1" checked>
-                                <span class="checkmark"></span>
-                                <span class="label-text">Allow marketing emails</span>
-                            </label>
-                        </div>
-
-            <!-- Bottom Actions -->
-            <div style="max-width: 960px; margin: 2rem auto 0 auto; display: flex; justify-content: flex-end; gap: 1rem;">
-                <a href="<?= app_base_url('/admin/users') ?>" class="btn btn-secondary btn-compact">Cancel</a>
-                <button type="submit" class="btn btn-primary btn-compact">
+                <button type="button" class="btn-save-premium" id="save-btn" onclick="submitUserForm()">
                     <i class="fas fa-save"></i> Create User
                 </button>
             </div>
+        </div>
+
+        <!-- Form Content -->
+        <form id="createUserForm" class="premium-form-grid">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+            
+            <!-- LEFT COLUMN: Identity -->
+            <div class="form-column-main">
+                <div class="premium-card">
+                    <div class="card-header-clean">
+                        <h3><i class="fas fa-id-card"></i> User Identity</h3>
+                    </div>
+                    <div class="card-body-clean">
+                        
+                        <div class="form-row-2">
+                            <div class="form-group-premium">
+                                <label class="label-premium required">First Name</label>
+                                <input type="text" name="first_name" class="input-premium" required placeholder="e.g. John">
+                            </div>
+                            <div class="form-group-premium">
+                                <label class="label-premium required">Last Name</label>
+                                <input type="text" name="last_name" class="input-premium" required placeholder="e.g. Doe">
+                            </div>
+                        </div>
+
+                        <div class="form-group-premium">
+                            <label class="label-premium required">Email Address</label>
+                            <input type="email" name="email" class="input-premium" required placeholder="john.doe@example.com">
+                            <small class="hint-text">Used for login and notifications.</small>
+                        </div>
+
+                        <div class="form-group-premium">
+                            <label class="label-premium required">Username</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-at"></i>
+                                <input type="text" id="username" name="username" class="input-premium pl-4" required placeholder="johndoe">
+                            </div>
+                            <small id="username-feedback" class="hint-text" style="display:block; min-height:20px;">Unique login identifier.</small>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Security & Access -->
+            <div class="form-column-side">
+                
+                <!-- Security -->
+                <div class="premium-card">
+                    <div class="card-header-clean">
+                        <h3><i class="fas fa-shield-alt"></i> Security</h3>
+                    </div>
+                    <div class="card-body-clean">
+                        <div class="form-group-premium">
+                            <label class="label-premium required">Password</label>
+                            <div class="password-group">
+                                <input type="text" id="password" name="password" class="input-premium" required minlength="8" placeholder="Strong Password">
+                                <button type="button" class="btn-generate" onclick="generatePassword()" title="Generate Random">
+                                    <i class="fas fa-random"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Access & Role -->
+                <div class="premium-card mt-4">
+                    <div class="card-header-clean">
+                        <h3><i class="fas fa-user-tag"></i> Access Control</h3>
+                    </div>
+                    <div class="card-body-clean">
+                        <div class="form-group-premium">
+                            <label class="label-premium required">Role</label>
+                            <select name="role" class="select-premium" required>
+                                <option value="user" selected>Regular User</option>
+                                <option value="editor">Editor</option>
+                                <option value="admin">Administrator</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group-premium">
+                            <label class="label-premium">Status</label>
+                            <select name="is_active" class="select-premium">
+                                <option value="1" selected>Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
+
+                         <div class="form-divider"></div>
+
+                         <div class="preference-list">
+                             <label class="toggle-row">
+                                 <span class="toggle-label">Verify Email</span>
+                                 <input type="checkbox" name="email_verified" value="1" checked>
+                             </label>
+                             <label class="toggle-row">
+                                 <span class="toggle-label">Welcome Email</span>
+                                 <input type="checkbox" name="send_welcome_email" value="1" checked>
+                             </label>
+                         </div>
                     </div>
                 </div>
 
             </div>
         </form>
+
     </div>
 </div>
 
-<!-- Page Preview Modal -->
-<div id="preview-modal" class="preview-modal-compact" style="display: none;">
-    <div class="preview-backdrop" onclick="closePreviewModal()"></div>
-    <div class="preview-content-compact">
-        <div class="preview-header-compact">
-            <h3 class="preview-title">User Preview</h3>
-            <div class="preview-actions">
-                <button class="btn btn-sm btn-outline-secondary" onclick="closePreviewModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-        <div class="preview-body-compact" id="preview-body-content" style="padding: 2rem; overflow-y: auto;">
-            <!-- Content injected via JS -->
-        </div>
-    </div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Form validation and interactions
-    document.getElementById('createUserForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        saveUser();
+    // Generate Password
+    function generatePassword() {
+        const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+        let pass = "";
+        for(let i=0; i<14; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+        document.getElementById('password').value = pass;
+    }
+    document.addEventListener('DOMContentLoaded', generatePassword);
+
+    // Username Check
+    let userTimeout;
+    const usernameInput = document.getElementById('username');
+    const feedback = document.getElementById('username-feedback');
+    
+    usernameInput.addEventListener('keyup', function() {
+        clearTimeout(userTimeout);
+        if(this.value.length < 3) { feedback.innerHTML = 'Unique login identifier.'; feedback.style.color=''; return; }
+        
+        userTimeout = setTimeout(() => {
+            fetch(`<?= app_base_url('/api/check-username') ?>?username=${this.value}`)
+                .then(r => r.json())
+                .then(d => {
+                    if(d.available === false) {
+                        feedback.innerHTML = '<i class="fas fa-times-circle"></i> Username taken';
+                        feedback.style.color = '#ef4444';
+                        usernameInput.style.borderColor = '#ef4444';
+                    } else {
+                        feedback.innerHTML = '<i class="fas fa-check-circle"></i> Username available';
+                        feedback.style.color = '#10b981';
+                        usernameInput.style.borderColor = '#10b981';
+                    }
+                }).catch(() => {});
+        }, 500);
     });
 
-    function saveUser() {
-        const password = document.getElementById('password').value;
-        // Password confirmation removed as per requirement
-
+    // Submit Form
+    function submitUserForm() {
         const form = document.getElementById('createUserForm');
+        if(!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const btn = document.getElementById('save-btn');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        btn.disabled = true;
+
         const formData = new FormData(form);
-        
-        // Show loading state
-        const submitBtn = document.getElementById('save-btn');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
-        submitBtn.disabled = true;
-        updateSaveStatus('saving');
 
         fetch('<?= app_base_url('/admin/users/store') ?>', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-Token': document.querySelector('input[name="csrf_token"]').value,
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    updateSaveStatus('saved');
-                    showNotification(data.message || 'User created successfully!', 'success');
-                    setTimeout(() => window.location.href = data.redirect || '<?= app_base_url('/admin/users') ?>', 1000);
-                } else {
-                    throw new Error(data.message || 'Failed to create user');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                updateSaveStatus('error');
-                showNotification('Error creating user: ' + error.message, 'error');
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            });
-    }
-
-    function updateSaveStatus(status) {
-        const statusElement = document.getElementById('save-status');
-        const icon = statusElement.querySelector('i');
-        const text = statusElement.querySelector('span');
-
-        switch (status) {
-            case 'saving':
-                icon.className = 'fas fa-spinner fa-spin text-info';
-                text.textContent = 'Saving...';
-                break;
-            case 'saved':
-                icon.className = 'fas fa-check-circle text-success';
-                text.textContent = 'Saved successfully';
-                break;
-             case 'error':
-                icon.className = 'fas fa-exclamation-circle text-danger';
-                text.textContent = 'Error saving';
-                break;
-             default:
-                icon.className = 'fas fa-circle';
-                text.textContent = 'Ready to create';
-        }
-    }
-
-    function previewUser() {
-        const form = document.getElementById('createUserForm');
-        const formData = new FormData(form);
-
-        const data = {
-            firstName: formData.get('first_name'),
-            lastName: formData.get('last_name'),
-            username: formData.get('username'),
-            email: formData.get('email'),
-            role: formData.get('role'),
-            status: formData.get('is_active') === '1' ? 'Active' : 'Inactive',
-        };
-
-        let html = `
-            <div style="display: grid; grid-template-columns: 100px 1fr; gap: 1rem; align-items: center;">
-                <div style="width: 80px; height: 80px; background: var(--primary-50); color: var(--primary-600); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div>
-                    <h2 style="margin: 0; font-size: 1.5rem; color: var(--gray-900);">${data.firstName} ${data.lastName}</h2>
-                    <p style="margin: 0; color: var(--gray-500);">@${data.username}</p>
-                    <span class="status-badge" style="display: inline-block; background: ${data.status === 'Active' ? 'var(--success-500)' : 'var(--gray-400)'}; color: white; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; margin-top: 0.5rem;">${data.status}</span>
-                </div>
-            </div>
-            <div style="margin-top: 2rem; border-top: 1px solid var(--gray-200); padding-top: 1rem;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div>
-                        <strong style="display: block; color: var(--gray-500); font-size: 0.875rem;">Email</strong>
-                        <span style="color: var(--gray-800);">${data.email}</span>
-                    </div>
-                     <div>
-                        <strong style="display: block; color: var(--gray-500); font-size: 0.875rem;">Role</strong>
-                        <span style="color: var(--gray-800); text-transform: capitalize;">${data.role || 'N/A'}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.getElementById('preview-body-content').innerHTML = html;
-        
-        const modal = document.getElementById('preview-modal');
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('visible'), 10);
-    }
-
-    function closePreviewModal() {
-        const modal = document.getElementById('preview-modal');
-        modal.classList.remove('visible');
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 300);
-    }
-
-    // Username check & Auto-generate password
-    document.addEventListener('DOMContentLoaded', function() {
-        generatePassword();
-
-        const usernameInput = document.getElementById('username');
-        const feedback = document.createElement('small');
-        feedback.style.display = 'block';
-        feedback.style.marginTop = '0.25rem';
-        usernameInput.parentNode.appendChild(feedback);
-
-        let timeout = null;
-        usernameInput.addEventListener('keyup', function() {
-            clearTimeout(timeout);
-            const username = this.value;
-            
-            if (username.length < 3) {
-                 feedback.textContent = '';
-                 this.style.borderColor = 'var(--gray-300)';
-                 return;
+            method: 'POST',
+            body: formData,
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        })
+        .then(r => r.json())
+        .then(data => {
+            if(data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'User Created',
+                    text: 'The user has been successfully added.',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => window.location.href = '<?= app_base_url('/admin/users') ?>');
+            } else {
+                Swal.fire('Error', data.message || 'Failed to create user', 'error');
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
             }
-
-            timeout = setTimeout(() => {
-                fetch(`<?= app_base_url('/api/check-username') ?>?username=${username}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.available === false) { // Assuming API returns { available: false } if taken
-                            this.style.borderColor = 'var(--danger-500)';
-                            feedback.textContent = '❌ Username not available';
-                            feedback.style.color = 'var(--danger-500)';
-                        } else {
-                            this.style.borderColor = 'var(--success-500)';
-                            feedback.textContent = '✅ Username available';
-                            feedback.style.color = 'var(--success-500)';
-                        }
-                    })
-                    .catch(err => console.error(err));
-            }, 500);
+        })
+        .catch(err => {
+            console.error(err);
+            Swal.fire('Error', 'An unexpected error occurred', 'error');
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
         });
-    });
-
-    function generatePassword() {
-        const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
-        let password = "";
-        for (let i = 0; i < 12; i++) {
-            password += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        document.getElementById("password").value = password;
-        
-        // Ensure visible if implicit requirement, but let's keep it masked by default unless toggled
-        // Optional: document.getElementById("password").type = "text"; 
     }
-
-    function togglePasswordVisibility() {
-        const passwordInput = document.getElementById("password");
-        const icon = document.getElementById("password-icon");
-        if (passwordInput.type === "password") {
-            passwordInput.type = "text";
-            icon.classList.remove("fa-eye");
-            icon.classList.add("fa-eye-slash");
-        } else {
-            passwordInput.type = "password";
-            icon.classList.remove("fa-eye-slash");
-            icon.classList.add("fa-eye");
-        }
-    }
-
 </script>
 
 <style>
-    /* ========================================
-       PREMIUM DESIGN SYSTEM (PRODUCTION READY)
-       ======================================== */
-    :root {
-        --primary-600: #4f46e5;
-        --primary-700: #4338ca;
-        --primary-50: #eef2ff;
+/* PREMIUM FORM STYLES (Scoped) */
+:root { --admin-primary: #667eea; --admin-bg: #f8f9fa; }
+body { background: var(--admin-bg); font-family: 'Inter', sans-serif; }
 
-        --gray-50: #f9fafb;
-        --gray-100: #f3f4f6;
-        --gray-200: #e5e7eb;
-        --gray-300: #d1d5db;
-        --gray-400: #9ca3af;
-        --gray-500: #6b7280;
-        --gray-700: #374151;
-        --gray-800: #1f2937;
-        --gray-900: #111827;
+.admin-wrapper-container { padding: 1rem; max-width: 1200px; margin: 0 auto; }
+.admin-content-wrapper { background: transparent; }
 
-        --success-500: #10b981;
-        --warning-500: #f59e0b;
-        --danger-500: #ef4444;
+/* Header */
+.compact-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2rem; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+.header-title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; color: #1e293b; }
+.header-title i { color: var(--admin-primary); margin-right: 10px; }
+.header-subtitle { color: #64748b; font-size: 0.9rem; margin-top: 4px; margin-left: 36px; }
 
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+/* Buttons */
+.btn-save-premium { background: var(--admin-primary); color: white; border: none; padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-save-premium:hover { background: #5a67d8; transform: translateY(-1px); }
+.btn-cancel-premium { background: #f1f5f9; color: #64748b; padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; text-decoration: none; transition: 0.2s; }
+.btn-cancel-premium:hover { background: #e2e8f0; color: #475569; }
 
-        --radius-md: 0.5rem;
-        --radius-lg: 0.75rem;
-    }
+/* Grid Layout */
+.premium-form-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+@media (max-width: 900px) { .premium-form-grid { grid-template-columns: 1fr; } }
 
-    body.admin-body {
-        background-color: var(--gray-50);
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        color: var(--gray-800);
-    }
+/* Cards */
+.premium-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
+.card-header-clean { padding: 1rem 1.5rem; border-bottom: 1px solid #f1f5f9; background: #fafafa; }
+.card-header-clean h3 { margin: 0; font-size: 1rem; font-weight: 600; color: #334155; }
+.card-body-clean { padding: 1.5rem; }
 
-    .page-create-container {
-        max-width: 100%;
-        padding-bottom: 5rem;
-        background-color: var(--gray-50);
-        min-height: 100vh;
-    }
-    
-    .page-create-wrapper {
-        background: transparent;
-    }
+/* Form Elements */
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-group-premium { margin-bottom: 1.25rem; }
+.form-group-premium:last-child { margin-bottom: 0; }
+.label-premium { display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 0.5rem; }
+.label-premium.required::after { content: "*"; color: #ef4444; margin-left: 2px; }
 
-    /* --- Header --- */
-    .compact-create-header {
-        max-width: 960px;
-        margin: 0 auto;
-        padding: 2rem 0 1.5rem 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 2rem;
-    }
-    
-    .header-title {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .header-title i {
-        font-size: 1.75rem;
-        color: var(--primary-600);
-    }
-    
-    .header-title h1 {
-        margin: 0;
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: var(--gray-900);
-        letter-spacing: -0.025em;
-        line-height: 1.2;
-    }
-    
-    .header-subtitle {
-        font-size: 0.9375rem;
-        color: var(--gray-500);
-        margin: 0;
-        line-height: 1.5;
-        font-weight: 400;
-    }
+.input-premium, .select-premium { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; transition: 0.2s; outline: none; }
+.input-premium:focus, .select-premium:focus { border-color: var(--admin-primary); box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+.input-with-icon { position: relative; }
+.input-with-icon i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.9rem; }
+.input-premium.pl-4 { padding-left: 2.25rem; }
 
-    /* --- Buttons --- */
-    .btn {
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        border: 1px solid transparent;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    
-    .btn-compact {
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-        border-radius: 8px;
-        font-weight: 500;
-    }
+.hint-text { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; display: block; }
+.password-group { display: flex; gap: 8px; }
+.btn-generate { background: #f1f5f9; border: 1px solid #cbd5e1; color: #64748b; border-radius: 8px; width: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+.btn-generate:hover { background: #e2e8f0; color: #475569; }
 
-    .btn-primary {
-        background: var(--primary-600);
-        color: white;
-    }
-    .btn-primary:hover {
-        background: var(--primary-700);
-    }
-
-    .btn-secondary {
-        background: var(--gray-200);
-        color: var(--gray-800);
-    }
-    .btn-secondary:hover {
-        background: var(--gray-300);
-    }
-
-    .btn-outline-secondary {
-        background: white;
-        border: 1px solid var(--gray-300);
-        color: var(--gray-700);
-    }
-    .btn-outline-secondary:hover {
-        background: var(--gray-50);
-        border-color: var(--gray-400);
-    }
-
-    /* --- Floating Action Bar --- */
-    .compact-action-bar {
-        max-width: 960px;
-        margin: 1.5rem auto 2rem auto;
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(8px);
-        padding: 0.75rem 1.25rem;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-lg);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border: 1px solid var(--gray-200);
-        position: sticky;
-        top: 1.5rem;
-        z-index: 50;
-    }
-
-    .save-status {
-        display: flex;
-        align-items: center;
-        gap: 0.625rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--gray-500);
-    }
-
-    .save-status i {
-        font-size: 0.625rem;
-    }
-
-    .action-right {
-        display: flex;
-        gap: 0.75rem;
-    }
-
-    /* --- Content --- */
-    .create-content-single-column {
-        max-width: 960px;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-    }
-
-    .content-card {
-        background: white;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--gray-200);
-        box-shadow: var(--shadow-sm);
-        transition: box-shadow 0.2s ease;
-        overflow: hidden;
-    }
-    .content-card:hover {
-        box-shadow: var(--shadow-md);
-    }
-
-    .card-header-clean {
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid var(--gray-100);
-        background: white;
-    }
-
-    .card-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: var(--gray-900);
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.625rem;
-    }
-    .card-title i {
-         color: var(--gray-400);
-         font-size: 1rem;
-    }
-
-    .card-body-clean {
-        padding: 1.5rem;
-    }
-
-    /* --- Form Controls --- */
-    .form-group-modern {
-        margin-bottom: 1.5rem;
-    }
-    .form-group-modern:last-child {
-        margin-bottom: 0;
-    }
-
-    .form-label {
-        display: block;
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--gray-700);
-        margin-bottom: 0.5rem;
-    }
-    .form-label.required::after {
-        content: "*";
-        color: var(--danger-500);
-        margin-left: 0.125rem;
-    }
-
-    .form-control-modern {
-        width: 100%;
-        padding: 0.625rem 0.875rem;
-        font-size: 0.95rem;
-        line-height: 1.5;
-        border: 1px solid var(--gray-300);
-        border-radius: var(--radius-md);
-        background-color: white;
-        transition: all 0.2s;
-    }
-    .form-control-modern:focus {
-        border-color: var(--primary-600);
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        outline: none;
-    }
-
-    /* --- Custom Checkbox --- */
-    .option-grid {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
-    
-    .option-checkbox-modern {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        cursor: pointer;
-        padding: 0.75rem;
-        border: 1px solid var(--gray-200);
-        border-radius: var(--radius-md);
-        transition: all 0.2s;
-    }
-    .option-checkbox-modern:hover {
-        background-color: var(--gray-50);
-        border-color: var(--gray-300);
-    }
-    
-    .option-checkbox-modern input {
-        display: none;
-    }
-    
-    .checkmark {
-        width: 1.25rem;
-        height: 1.25rem;
-        border: 2px solid var(--gray-300);
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-        flex-shrink: 0;
-    }
-    
-    .option-checkbox-modern input:checked + .checkmark {
-        background-color: var(--primary-600);
-        border-color: var(--primary-600);
-    }
-    
-    .checkmark:after {
-        content: '\f00c';
-        font-family: 'Font Awesome 5 Free';
-        font-weight: 900;
-        color: white;
-        font-size: 0.75rem;
-        opacity: 0;
-        transform: scale(0);
-        transition: all 0.2s;
-    }
-    
-    .option-checkbox-modern input:checked + .checkmark:after {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    /* --- Preview Modal --- */
-    .preview-modal-compact {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    .preview-modal-compact.visible {
-        opacity: 1;
-    }
-    
-    .preview-backdrop {
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(4px);
-    }
-    
-    .preview-content-compact {
-        position: relative;
-        width: 95%;
-        max-width: 600px;
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        max-height: 90vh;
-    }
-    
-    .preview-header-compact {
-        padding: 1rem 1.5rem;
-        background: white;
-        border-bottom: 1px solid var(--gray-200);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+/* Preferences */
+.form-divider { height: 1px; background: #f1f5f9; margin: 1.5rem 0; }
+.preference-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.toggle-row { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+.toggle-label { font-size: 0.9rem; color: #334155; font-weight: 500; }
 </style>
