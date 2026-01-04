@@ -64,7 +64,7 @@ if (!empty($nodesTree)) {
                 </div>
 
                 <!-- BOTTOM LINE: Metrics & Actions -->
-                <div class="flex flex-nowrap items-center justify-between gap-4">
+                <div class="flex flex-nowrap items-center justify-between gap-4 header-metrics-row">
                     <!-- Metrics -->
                     <div class="flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar print:overflow-visible min-w-0">
                         <!-- Marks -->
@@ -218,24 +218,91 @@ if (!empty($nodesTree)) {
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
     @media print {
-        #bulk-action-bar, .sticky, .hierarchy-btn, .actions-cell, .drag-handle, .row-checkbox, .grid-header:nth-child(1), .grid-header:nth-child(2), .grid-header:nth-child(10), .grid-header:nth-child(11) {
+        /* Hide Global Infrastructure */
+        #admin-sidebar, .admin-sidebar, header.admin-header, .admin-header, 
+        .loading-overlay, .notification-toast, .search-overlay,
+        .print:hidden, #bulk-action-bar, .actions-cell, .drag-handle, 
+        .row-checkbox, .hierarchy-btn, .sidebar-spacer, header, nav, 
+        .admin-footer, footer {
             display: none !important;
         }
-        .admin-wrapper-container { background: white !important; padding: 0 !important; }
+        
+        /* Reset Main Containers */
+        #admin-wrapper, .admin-wrapper, #admin-main, .admin-main {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            display: block !important;
+            position: static !important;
+            background: white !important;
+        }
+        
+        .admin-wrapper-container, .admin-content-wrapper { 
+            background: white !important; 
+            padding: 0 !important; 
+            margin: 0 !important; 
+            box-shadow: none !important; 
+            width: 100% !important;
+        }
+        
+        /* Syllabus Header Branding */
+        .sticky { 
+            position: static !important; 
+            display: block !important; 
+            border: none !important; 
+            padding: 2.5cm 0 1cm 0 !important; /* Some breathing room at top */
+        }
+        .header-metrics-row { display: none !important; }
+        
+        /* Force Grid to Professional Table */
         .syllabus-grid { 
             display: table !important;
             width: 100% !important;
             border-collapse: collapse !important;
+            table-layout: fixed !important;
+            margin-top: 10px !important;
         }
-        .grid-header { display: table-cell !important; padding: 10px !important; border: 1px solid #e2e8f0 !important; }
-        .grid-row { display: table-row !important; }
-        .grid-cell { display: table-cell !important; border: 1px solid #e2e8f0 !important; padding: 10px !important; }
+        .grid-header { 
+            display: table-cell !important; 
+            padding: 10px 8px !important; 
+            border: 1px solid #333 !important; 
+            font-size: 11px !important; 
+            font-weight: bold !important;
+            background: #eee !important;
+            text-transform: uppercase !important;
+        }
+        .grid-row { display: table-row !important; page-break-inside: avoid !important; }
+        .grid-cell { 
+            display: table-cell !important; 
+            border: 1px solid #333 !important; 
+            padding: 10px 8px !important; 
+            font-size: 11px !important; 
+            vertical-align: middle !important;
+            word-wrap: break-word !important;
+        }
         
-        /* Hide UI columns in print */
-        .grid-cell:nth-child(1), .grid-cell:nth-child(2),
-        .grid-cell:nth-child(10), .grid-cell:nth-child(11) {
+        /* Precise Column Widths */
+        .grid-header:nth-child(3), .grid-cell:nth-child(3) { width: 35px !important; text-align: center; }
+        .grid-header:nth-child(4), .grid-cell:nth-child(4) { width: auto !important; }
+        .grid-header:nth-child(5) { width: 60px !important; text-align: center; } 
+        .grid-cell:nth-child(5) { width: 60px !important; text-align: center; font-weight: bold; }
+        .grid-header:nth-child(6), .grid-cell:nth-child(6) { width: 85px !important; text-align: center; }
+        .grid-header:nth-child(7), .grid-cell:nth-child(7) { width: 45px !important; text-align: center; }
+        .grid-header:nth-child(8), .grid-cell:nth-child(8) { width: 45px !important; text-align: center; }
+        .grid-header:nth-child(9) { width: 55px !important; text-align: center; }
+        .grid-cell:nth-child(9) { width: 55px !important; text-align: center; font-weight: bold; }
+        
+        /* Hide Interaction Columns */
+        .grid-header:nth-child(1), .grid-cell:nth-child(1),
+        .grid-header:nth-child(2), .grid-cell:nth-child(2),
+        .grid-header:nth-child(10), .grid-cell:nth-child(10),
+        .grid-header:nth-child(11), .grid-cell:nth-child(11) {
             display: none !important;
         }
+
+        /* Prevent Text Truncation */
+        .line-clamp-1 { -webkit-line-clamp: unset !important; display: block !important; }
+        .whitespace-nowrap { white-space: normal !important; }
     }
 </style>
 
