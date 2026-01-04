@@ -25,14 +25,19 @@ class CategoryController extends Controller
     public function index()
     {
         // Fetch only Root Level Categories (Main Categories)
-        // Ordered by custom 'order_index'
-        // 'question_count' should have been populated by 'recalculateQuestionCounts'
-        
         $sql = "SELECT * FROM syllabus_nodes WHERE parent_id IS NULL ORDER BY order_index ASC";
         $categories = $this->db->query($sql)->fetchAll();
 
+        // Calculate Stats
+        $stats = [
+            'total' => count($categories),
+            'premium' => count(array_filter($categories, fn($c) => $c['is_premium'] == 1)),
+            'total_questions' => array_sum(array_column($categories, 'question_count'))
+        ];
+
         return $this->view('admin/quiz/categories/index', [
-            'categories' => $categories
+            'categories' => $categories,
+            'stats' => $stats
         ]);
     }
 
