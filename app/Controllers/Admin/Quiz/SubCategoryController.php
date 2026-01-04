@@ -41,7 +41,7 @@ class SubCategoryController extends Controller
             $params['pid'] = $parentId;
         }
 
-        $sql .= " ORDER BY child.parent_id ASC, child.order_index ASC";
+        $sql .= " ORDER BY child.order_index ASC, child.parent_id ASC";
 
         $stmt = $this->db->getPdo()->prepare($sql);
         $stmt->execute($params);

@@ -216,7 +216,19 @@ function deleteCategory(id) {
 new Sortable(document.getElementById('categorySortable'), {
     animation: 150, handle: '.handle', ghostClass: 'bg-indigo-50',
     onEnd: function() {
-        const order = Array.from(document.querySelectorAll('.category-item')).map(el => el.getAttribute('data-id'));
+        // 1. Get new order of IDs
+        const rows = document.querySelectorAll('.category-item');
+        const order = Array.from(rows).map(el => el.getAttribute('data-id'));
+        
+        // 2. Update visual Order indices immediately
+        rows.forEach((row, index) => {
+            // The Order column is the 3rd column (index 2)
+            // We use querySelector to be safe or assuming strict structure
+            const orderCell = row.querySelectorAll('td')[2].querySelector('span'); 
+            if(orderCell) orderCell.innerText = index + 1;
+        });
+
+        // 3. Send to backend
         fetch('<?php echo app_base_url('admin/quiz/categories/reorder'); ?>', {
             method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({order: order})
         });

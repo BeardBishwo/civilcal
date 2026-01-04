@@ -114,13 +114,14 @@ $stats = [
                         </select>
                     </form>
                 </div>
+                <!-- Search Input Added Here -->
+                <div class="search-compact" style="margin-left: 1rem;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search sub categories..." id="sub-category-search" onkeyup="filterSubCategories()">
+                </div>
             </div>
             <div class="toolbar-right">
-                <?php if ($selectedParent): ?>
-                    <div class="drag-hint"><i class="fas fa-arrows-alt"></i> Drag handle to reorder</div>
-                <?php else: ?>
-                    <div class="drag-hint info"><i class="fas fa-info-circle"></i> Filter by parent to reorder</div>
-                <?php endif; ?>
+                <div class="drag-hint"><i class="fas fa-arrows-alt"></i> Drag handle to reorder (Global)</div>
             </div>
         </div>
 
@@ -142,7 +143,7 @@ $stats = [
                     </thead>
                     <tbody id="subCatSortable">
                         <?php if (empty($subCategories)): ?>
-                            <tr><td colspan="6" class="empty-cell">
+                            <tr><td colspan="8" class="empty-cell">
                                 <div class="empty-state-compact">
                                     <i class="fas fa-folder-open"></i>
                                     <h3>No sub-categories found</h3>
@@ -153,11 +154,7 @@ $stats = [
                             <?php foreach ($subCategories as $sub): ?>
                                 <tr class="sub-item group" data-id="<?php echo $sub['id']; ?>">
                                     <td class="text-center">
-                                        <?php if ($selectedParent): ?>
-                                            <div class="handle"><i class="fas fa-grip-vertical"></i></div>
-                                        <?php else: ?>
-                                            <span class="order-idx"><?php echo $sub['order_index']; ?></span>
-                                        <?php endif; ?>
+                                        <div class="handle"><i class="fas fa-grip-vertical"></i></div>
                                     </td>
                                     <td class="text-center">
                                         <span class="order-idx" style="color:#94a3b8;"><?php echo $sub['id']; ?></span>
@@ -256,17 +253,25 @@ function deleteSub(id) {
     });
 }
 
-<?php if($selectedParent): ?>
+// Global Sortable Initialization
 new Sortable(document.getElementById('subCatSortable'), {
     animation: 150, handle: '.handle', ghostClass: 'bg-indigo-50',
     onEnd: function() {
-        const order = Array.from(document.querySelectorAll('.sub-item')).map(el => el.getAttribute('data-id'));
+        const rows = document.querySelectorAll('.sub-item');
+        const order = Array.from(rows).map(el => el.getAttribute('data-id'));
+        
+        // Update visual Order indices immediately
+        rows.forEach((row, index) => {
+            // The Order column is the 3rd column (index 2)
+            const orderCell = row.querySelectorAll('td')[2].querySelector('span'); 
+            if(orderCell) orderCell.innerText = index + 1;
+        });
+
         fetch('<?php echo app_base_url('admin/quiz/subcategories/reorder'); ?>', {
             method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({order: order})
         });
     }
 });
-<?php endif; ?>
 
 document.querySelectorAll('.premium-toggle').forEach(el => {
     el.addEventListener('change', async function() {
@@ -279,6 +284,14 @@ document.querySelectorAll('.premium-toggle').forEach(el => {
         location.reload();
     });
 });
+
+function filterSubCategories() {
+    const query = document.getElementById('sub-category-search').value.toLowerCase();
+    document.querySelectorAll('.sub-item').forEach(el => {
+        const text = el.innerText.toLowerCase();
+        el.style.display = text.indexOf(query) > -1 ? '' : 'none';
+    });
+}
 </script>
 
 <style>
@@ -336,7 +349,6 @@ document.querySelectorAll('.premium-toggle').forEach(el => {
 .stat-pill .label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.9; }
 .stat-pill .value { font-size: 1.1rem; font-weight: 800; line-height: 1.1; }
 
-/* Creation Toolbar (Single Row) */
 .creation-toolbar {
     padding: 1rem 2rem;
     background: #f8fafc;
@@ -372,7 +384,6 @@ document.querySelectorAll('.premium-toggle').forEach(el => {
 }
 .btn-create-premium:hover { transform: translateY(-1px); box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3); }
 
-/* Switch Toggle */
 .premium-toggle-group {
     display: flex; align-items: center; gap: 0.5rem; background: white; border: 1px solid #cbd5e1;
     height: 40px; padding: 0 0.75rem; border-radius: 8px;
@@ -387,7 +398,6 @@ input:checked + .slider:before { transform: translateX(16px); }
 .slider.round:before { border-radius: 50%; }
 .toggle-label { font-size: 0.7rem; font-weight: 700; color: #64748b; }
 
-/* Filter Bar */
 .compact-toolbar {
     display: flex; justify-content: space-between; align-items: center;
     padding: 0.75rem 2rem; background: #eff6ff; border-bottom: 1px solid #bfdbfe;
@@ -398,10 +408,16 @@ input:checked + .slider:before { transform: translateX(16px); }
     font-size: 0.85rem; font-weight: 600; color: #1e40af; border: 1px solid #93c5fd;
     border-radius: 6px; padding: 0.25rem 2rem 0.25rem 0.5rem; background: white; outline: none; height: 32px;
 }
+.search-compact { position: relative; width: 100%; max-width: 300px; }
+.search-compact i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 0.85rem; }
+.search-compact input {
+    width: 100%; height: 36px; padding: 0 0.75rem 0 2.25rem; font-size: 0.85rem;
+    border: 1px solid #bfdbfe; border-radius: 6px; outline: none; background: white; color: #1e40af;
+}
+
 .drag-hint { font-size: 0.75rem; font-weight: 600; color: #64748b; display: flex; align-items: center; gap: 0.5rem; }
 .drag-hint.info { color: #f59e0b; }
 
-/* Table */
 .table-compact { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
 .table-compact th {
     background: white; padding: 0.75rem 1.5rem; text-align: left; font-weight: 600;
