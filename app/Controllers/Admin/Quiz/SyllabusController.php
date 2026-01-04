@@ -280,6 +280,53 @@ class SyllabusController extends Controller
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
+
+    public function duplicateLevel()
+    {
+        $oldLevel = $_POST['level'] ?? null;
+        $newLevel = $_POST['newLevel'] ?? null;
+
+        if (!$oldLevel || !$newLevel) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid parameters']);
+            return;
+        }
+
+        try {
+            $this->db->beginTransaction();
+            
+            // Fetch all nodes for the old level
+            $nodes = $this->db->find('syllabus_nodes', ['level' => $oldLevel], '`order` ASC');
+            
+            $idMapping = []; // old_id => new_id
+
+            // First pass: Insert all nodes without parent_id to get new IDs
+            foreach ($nodes as $node) {
+                $oldId = $node['id'];
+                $data = $node;
+                unset($data['id']);
+                $data['level'] = $newLevel;
+                $data['parent_id'] = null; // Temporary
+                
+                $this->db->insert('syllabus_nodes', $data);
+                $idMapping[$oldId] = $this->db->lastInsertId();
+            }
+
+            // Second pass: Update parent_id based on mapping
+            foreach ($nodes as $node) {
+                if ($node['parent_id'] && isset($idMapping[$node['parent_id']])) {
+                    $newId = $idMapping[$node['id']];
+                    $newParentId = $idMapping[$node['parent_id']];
+                    $this->db->update('syllabus_nodes', ['parent_id' => $newParentId], "id = :id", ['id' => $newId]);
+                }
+            }
+
+            $this->db->commit();
+            echo json_encode(['status' => 'success', 'message' => "Syllabus duplicated to '$newLevel'"]);
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
     
     public function toggleStatus($id)
     {

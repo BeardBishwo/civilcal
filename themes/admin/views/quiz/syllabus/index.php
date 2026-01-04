@@ -97,30 +97,31 @@
                     <?php else: ?>
                         <div class="table-wrapper">
                             <table class="table-compact">
-                                <thead>
-                                    <tr>
-                                        <th class="col-title ps-4">Position / Level</th>
-                                        <th class="col-status text-center">Structure</th>
-                                        <th class="col-status text-center">Active Nodes</th>
-                                        <th class="col-status text-center">Total Weight</th>
-                                        <th class="col-date">Last Modified</th>
-                                        <th class="col-actions pe-4">Actions</th>
-                                    </tr>
-                                </thead>
+                                        <thead>
+                                            <tr>
+                                                <th class="col-title ps-4">Position / Level</th>
+                                                <th class="col-status text-center">Structure</th>
+                                                <th class="col-status text-center">Active Nodes</th>
+                                                <th class="col-status text-center">Total Weight</th>
+                                                <th class="col-date text-center">Last Modified</th>
+                                                <th class="col-actions text-center pe-4">Actions</th>
+                                            </tr>
+                                        </thead>
                                 <tbody>
                                     <?php foreach ($positions as $pos): 
                                         $levelName = $pos['level'] ?? 'Unassigned / Draft';
                                         $safeLevel = urlencode($levelName);
                                     ?>
-                                        <tr class="page-row" onclick="window.location='<?php echo app_base_url('admin/quiz/syllabus/manage/' . $safeLevel); ?>'">
+                                        <tr class="page-row cursor-pointer transition hover:bg-slate-50" onclick="window.location='<?php echo app_base_url('admin/quiz/syllabus/manage/' . $safeLevel); ?>'">
                                             <td class="ps-4">
-                                                <div class="user-info-compact">
-                                                    <div class="icon-box" style="background: rgba(79, 70, 229, 0.1); color: #4f46e5;">
+                                                <div class="flex items-center gap-3 py-1">
+                                                    <div class="icon-box shrink-0" style="background: rgba(79, 70, 229, 0.1); color: #4f46e5;">
                                                         <i class="fas fa-user-graduate"></i>
                                                     </div>
-                                                    <div class="page-info">
-                                                        <div class="page-title-compact fw-bold"><?php echo htmlspecialchars($levelName); ?></div>
-                                                        <div class="small text-muted-extra" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">PSC Standard Curriculum</div>
+                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                        <div class="page-title-compact fw-bold whitespace-nowrap text-slate-800"><?php echo htmlspecialchars($levelName); ?></div>
+                                                        <span class="text-slate-300 font-light mx-1">|</span>
+                                                        <div class="small text-slate-400 font-medium italic truncate" style="font-size: 0.75rem;">PSC Standard Curriculum</div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -135,20 +136,23 @@
                                                 </div>
                                             </td>
                                             <td class="text-center">
-                                                <span class="badge-pill-fancy">
+                                                <span class="badge-pill-fancy bg-white border-slate-200 text-slate-600">
                                                     <?php echo $pos['total_weight']; ?> Marks
                                                 </span>
                                             </td>
-                                            <td>
-                                                <div class="date-compact text-slate-500">
+                                            <td class="text-center">
+                                                <div class="date-compact text-slate-500 font-medium" style="font-size: 0.8rem;">
                                                     <?php echo date('M j, Y', strtotime($pos['last_modified'] ?? 'now')); ?>
                                                 </div>
                                             </td>
                                             <td class="pe-4">
-                                                <div class="actions-compact">
+                                                <div class="actions-compact justify-center">
                                                     <a href="<?php echo app_base_url('admin/quiz/syllabus/manage/' . $safeLevel); ?>" class="action-btn-icon edit-btn" title="Edit Structure">
                                                         <i class="fas fa-pencil-alt"></i>
                                                     </a>
+                                                    <button class="action-btn-icon duplicate-btn text-amber-500 hover:bg-amber-50" onclick="event.stopPropagation(); duplicatePosition('<?php echo addslashes($levelName); ?>')" title="Duplicate Syllabus">
+                                                        <i class="fas fa-copy"></i>
+                                                    </button>
                                                     <button class="action-btn-icon delete-btn" onclick="event.stopPropagation(); deletePosition('<?php echo addslashes($levelName); ?>')" title="Delete Everything">
                                                         <i class="fas fa-trash-alt"></i>
                                                     </button>
@@ -188,6 +192,47 @@
             row.style.display = text.includes(query) ? '' : 'none';
         });
     });
+
+    function duplicatePosition(level) {
+        Swal.fire({
+            title: 'Duplicate Syllabus',
+            text: `Create a copy of "${level}"?`,
+            input: 'text',
+            inputLabel: 'New Syllabus Name',
+            inputValue: level + ' (Copy)',
+            showCancelButton: true,
+            confirmButtonText: 'Duplicate',
+            confirmButtonColor: '#4f46e5',
+            inputAttributes: { 'autocomplete': 'off' },
+            preConfirm: (newLevel) => {
+                if (!newLevel) return Swal.showValidationMessage('Name is required');
+                const fd = new FormData();
+                fd.append('level', level);
+                fd.append('newLevel', newLevel);
+                
+                return fetch('<?= app_base_url("admin/quiz/syllabus/duplicate-level") ?>', {
+                    method: 'POST',
+                    body: fd
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') return data;
+                    throw new Error(data.message);
+                })
+                .catch(err => Swal.showValidationMessage(err.message));
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Duplicated!',
+                    text: result.value.message,
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => location.reload());
+            }
+        });
+    }
 
     function deletePosition(level) {
         Swal.fire({
