@@ -1,204 +1,238 @@
+/**
+ * PREMIUM IMPORT MANAGER ENGINE
+ * Optimized for high-density UI interactions and real-time conflict handling.
+ */
 const ImportManager = {
     batchId: null,
+    currentTab: 'clean',
 
-    // 1. Initialize Upload Listener
     init: function () {
         const input = document.getElementById('fileInput');
         if (input) {
-            input.addEventListener('change', this.handleFileSelect);
+            input.addEventListener('change', this.handleFileSelect.bind(this));
         }
     },
 
-    // 2. Handle File & Start Chunking
     handleFileSelect: function (e) {
         const file = e.target.files[0];
         if (!file) return;
 
-        // UI Reset
-        document.getElementById('uploadProgress').classList.remove('d-none');
+        // UI Transition
+        const progressContainer = document.getElementById('uploadProgress');
+        if (progressContainer) progressContainer.style.display = 'block';
+
         document.getElementById('progressBar').style.width = '0%';
 
-        // Start Chunked Upload (Recursive)
-        ImportManager.uploadChunk(file, 2); // Start at row 2 (1 is header)
+        Swal.fire({
+            title: 'Initializing Ingestion',
+            text: 'Analyzing engineering questionnaire structure...',
+            didOpen: () => Swal.showLoading(),
+            allowOutsideClick: false
+        });
+
+        this.uploadChunk(file, 2); // Start at row 2
     },
 
-    // 3. Recursive Chunk Uploader (The "Low Resource" Secret)
     uploadChunk: function (file, startRow) {
         const formData = new FormData();
         formData.append('import_file', file);
         formData.append('start_row', startRow);
-        if (ImportManager.batchId) {
-            formData.append('batch_id', ImportManager.batchId);
+        if (this.batchId) {
+            formData.append('batch_id', this.batchId);
         }
 
-        // AJAX Call
-        fetch('/api/admin/quiz/import/process-chunk', {
+        fetch(`${baseUrl}/api/admin/quiz/import/process-chunk`, {
             method: 'POST',
             body: formData
         })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.error) {
-                    alert('Error: ' + data.error);
+                    Swal.fire('Ingestion Failed', data.error, 'error');
                     return;
                 }
 
-                // Sync batch ID from first chunk
-                if (!ImportManager.batchId && data.batch_id) {
-                    ImportManager.batchId = data.batch_id;
+                if (!this.batchId && data.batch_id) {
+                    this.batchId = data.batch_id;
                 }
 
-                // Update Progress Bar
                 const percent = Math.min(100, Math.round((data.current_row / data.total_rows) * 100));
                 document.getElementById('progressBar').style.width = percent + '%';
                 document.getElementById('progressText').innerText = percent + '%';
 
                 if (!data.eof) {
-                    // Not done? Call next chunk!
-                    ImportManager.uploadChunk(file, data.next_row);
+                    this.uploadChunk(file, data.next_row);
                 } else {
-                    // Done! Show Staging Area
-                    ImportManager.loadStagingData(ImportManager.batchId);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Analysis Complete',
+                        text: 'Questionnaire staged for verification.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        this.loadStagingData(this.batchId);
+                    });
                 }
             })
-            .catch(error => {
-                console.error(error);
-                alert('Upload Error. Check console.');
+            .catch(err => {
+                console.error(err);
+                Swal.fire('Network Core Error', 'System handshake failed.', 'error');
             });
     },
 
-    // 4. Load Data into Tables
     loadStagingData: function (batchId) {
-        document.getElementById('uploadSection').classList.add('d-none');
-        document.getElementById('stagingSection').classList.remove('d-none');
+        document.getElementById('uploadSection').style.display = 'none';
+        document.getElementById('stagingSection').style.display = 'block';
 
-        // Fetch Clean & Duplicates
-        fetch(`/api/admin/quiz/import/staging-stats/${batchId}`)
+        fetch(`${baseUrl}/api/admin/quiz/import/staging-stats/${batchId}`)
             .then(res => res.json())
             .then(data => {
-                // Update Badges
+                // Update Badge Counts
                 document.getElementById('cleanCount').innerText = data.clean_count;
                 document.getElementById('btnCleanCount').innerText = data.clean_count;
                 document.getElementById('dupCount').innerText = data.duplicate_count;
+                document.getElementById('statsStaged').innerText = data.clean_count + data.duplicate_count;
 
-                // 1. RENDER CLEAN ROWS (Matches your Table Style)
+                // Render Clean Table
                 const cleanBody = document.getElementById('cleanTableBody');
-                cleanBody.innerHTML = data.clean_rows.map(row => `
-                <tr>
-                    <td class="fw-bold text-primary">${row.category}</td>
-                    <td class="text-dark">${row.question_text.substring(0, 80)}...</td>
-                    <td><span class="badge bg-secondary rounded-pill px-3">${row.type}</span></td>
-                    <td>${this.getStatusBadge('ready')}</td>
-                </tr>
-            `).join('');
+                cleanBody.innerHTML = data.clean_rows.length > 0
+                    ? data.clean_rows.map(row => `
+                        <tr>
+                            <td><span class="cat-tag">${row.category}</span></td>
+                            <td><div class="q-preview" title="${row.question_text}">${row.question_text}</div></td>
+                            <td class="text-center"><span class="type-badge">${row.type.toUpperCase()}</span></td>
+                            <td class="text-center">
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-1 rounded-pill" style="font-size: 0.6rem;">
+                                    <i class="fas fa-check-circle me-1"></i> VERIFIED
+                                </span>
+                            </td>
+                        </tr>
+                    `).join('')
+                    : `<tr><td colspan="4" class="text-center py-5 text-muted small">No clean questions found in this batch.</td></tr>`;
 
-                // 2. RENDER DUPLICATE CARDS (Matches your Card Style)
+                // Render Duplicates Grid
                 const dupContainer = document.getElementById('duplicateContainer');
-                dupContainer.innerHTML = data.duplicate_rows.map(row => `
-                <div class="card mb-3 shadow-sm border-0 duplicate-card" id="card-${row.id}" style="border-left: 5px solid #e74a3b;">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between mb-3">
-                            <h6 class="fw-bold text-danger m-0">
-                                <i class="fas fa-exclamation-triangle me-2"></i>Duplicate Found
-                            </h6>
-                            <span class="badge bg-light text-dark border">Ref ID: #${row.match_id}</span>
-                        </div>
-
-                        <div class="row g-3">
-                            <div class="col-md-5">
-                                <div class="p-3 rounded bg-white border border-success border-2" style="border-style: dashed !important;">
-                                    <span class="badge bg-success mb-2">INCOMING UPLOAD</span>
-                                    <p class="mb-1 fw-bold text-dark">${row.new_question}</p>
-                                    <small class="text-muted">
-                                        <i class="fas fa-list-ul me-1"></i> ${row.new_options_count} Options
-                                    </small>
+                dupContainer.innerHTML = data.duplicate_rows.length > 0
+                    ? data.duplicate_rows.map(row => `
+                        <div class="conflict-card" id="card-${row.id}">
+                            <div class="conflict-header">
+                                <span class="conflict-title"><i class="fas fa-exclamation-triangle"></i> System Collision Detected</span>
+                                <span class="badge bg-white text-rose border border-rose-100 px-2 py-1 rounded small">REF ID: #${row.match_id}</span>
+                            </div>
+                            <div class="conflict-body">
+                                <div class="compare-box new">
+                                    <span class="compare-label">Incoming Ingestion</span>
+                                    <div class="compare-text">${row.new_question}</div>
+                                    <div class="mt-2 small text-emerald fw-bold"><i class="fas fa-list-ul"></i> ${row.new_options_count} Options</div>
                                 </div>
-                            </div>
-
-                            <div class="col-md-2 d-flex flex-column justify-content-center">
-                                <button class="btn btn-success w-100 mb-2 rounded-pill shadow-sm" onclick="ImportManager.resolveOne(${row.id}, 'overwrite')">
-                                    Use New <i class="fas fa-arrow-right ms-1"></i>
-                                </button>
-                                <button class="btn btn-light border w-100 rounded-pill" onclick="ImportManager.resolveOne(${row.id}, 'skip')">
-                                    <i class="fas fa-times me-1"></i> Keep Old
-                                </button>
-                            </div>
-
-                            <div class="col-md-5">
-                                <div class="p-3 rounded bg-light border">
-                                    <span class="badge bg-secondary mb-2">CURRENT DATABASE</span>
-                                    <p class="mb-1 text-muted">${row.old_question}</p>
-                                    <small class="text-muted">
-                                        <i class="fas fa-history me-1"></i> Used in ${row.usage_count} exams
-                                    </small>
+                                <div class="conflict-ops">
+                                    <button class="arch-btn primary success ultra-sm w-100" onclick="ImportManager.resolveOne(${row.id}, 'overwrite')">
+                                        USE NEW <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                    <button class="arch-btn secondary ultra-sm w-100" onclick="ImportManager.resolveOne(${row.id}, 'skip')">
+                                        KEEP CURRENT
+                                    </button>
+                                </div>
+                                <div class="compare-box old">
+                                    <span class="compare-label">Current Database Record</span>
+                                    <div class="compare-text text-muted">${row.old_question}</div>
+                                    <div class="mt-2 small text-slate-400 font-italic"><i class="fas fa-history"></i> Used in ${row.usage_count} sessions</div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            `).join('');
+                    `).join('')
+                    : `<div class="text-center py-5 text-muted small"><i class="fas fa-check-circle fa-3x mb-3 opacity-20"></i><br>Zero system collisions detected. Batch is clean.</div>`;
+
+                // Switch to duplicate tab if only duplicates exist
+                if (data.clean_count === 0 && data.duplicate_count > 0) {
+                    this.switchTab('duplicates');
+                }
             });
     },
 
-    // 5. Resolve Conflict Action
+    switchTab: function (tab) {
+        this.currentTab = tab;
+        document.getElementById('tabClean').classList.toggle('active', tab === 'clean');
+        document.getElementById('tabDup').classList.toggle('active', tab === 'duplicates');
+
+        document.getElementById('paneClean').style.display = tab === 'clean' ? 'block' : 'none';
+        document.getElementById('paneDuplicates').style.display = tab === 'duplicates' ? 'block' : 'none';
+
+        document.getElementById('cleanActions').style.display = tab === 'clean' ? 'block' : 'none';
+        document.getElementById('dupActions').style.display = tab === 'duplicates' ? 'block' : 'none';
+    },
+
     resolveOne: function (stagingId, action) {
-        fetch('/api/admin/quiz/import/resolve', {
+        fetch(`${baseUrl}/api/admin/quiz/import/resolve`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: stagingId, action: action })
         })
             .then(res => res.json())
             .then(data => {
-                // Remove the card visually with animation
                 const card = document.getElementById(`card-${stagingId}`);
-                card.style.transition = 'all 0.5s';
-                card.style.opacity = '0';
-                setTimeout(() => card.remove(), 500);
-
-                // Decrement counter
-                let count = parseInt(document.getElementById('dupCount').innerText);
-                document.getElementById('dupCount').innerText = count - 1;
+                if (card) {
+                    card.style.transition = '0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        card.remove();
+                        this.updateCounts();
+                    }, 400);
+                }
             });
     },
 
     resolveAll: function (action) {
-        if (!confirm(`Are you sure you want to ${action} ALL duplicates?`)) return;
-
-        // Fetch all IDs currently visible
-        const cards = document.querySelectorAll('.duplicate-card');
-        cards.forEach(card => {
-            const id = card.id.replace('card-', '');
-            ImportManager.resolveOne(id, action);
+        Swal.fire({
+            title: `Batch Resolution: ${action.toUpperCase()}`,
+            text: `Are you sure you want to apply this protocol to ALL staged conflicts?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Execute Protocol',
+            confirmButtonColor: action === 'overwrite' ? '#e11d48' : '#6366f1'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const cards = document.querySelectorAll('.conflict-card');
+                cards.forEach(card => {
+                    const id = card.id.replace('card-', '');
+                    this.resolveOne(id, action);
+                });
+                Swal.fire('Protocol Executed', 'Conflicts are being resolved in the background.', 'success');
+            }
         });
     },
 
-    // 6. Bulk Publish Clean
+    updateCounts: function () {
+        const count = document.querySelectorAll('.conflict-card').length;
+        document.getElementById('dupCount').innerText = count;
+        if (count === 0) {
+            document.getElementById('duplicateContainer').innerHTML = `<div class="text-center py-5 text-muted small"><i class="fas fa-check-circle fa-3x mb-3 opacity-20 text-emerald"></i><br>All collisions resolved.</div>`;
+        }
+    },
+
     publishClean: function () {
-        if (!confirm("Are you sure you want to publish all clean questions?")) return;
-
-        fetch('/api/admin/quiz/import/publish-clean', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ batch_id: this.batchId })
-        }).then(() => {
-            alert("Success! Questions are live.");
-            window.location.reload();
+        Swal.fire({
+            title: 'Deploy to Production?',
+            text: "All verified questions will be moved to the live question bank.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Publish All',
+            confirmButtonColor: '#10b981'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'Deploying...', didOpen: () => Swal.showLoading() });
+                fetch(`${baseUrl}/api/admin/quiz/import/publish-clean`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ batch_id: this.batchId })
+                }).then(() => {
+                    Swal.fire({ icon: 'success', title: 'Mission Success', text: 'Questions are now live.', timer: 1500, showConfirmButton: false })
+                        .then(() => window.location.reload());
+                });
+            }
         });
-    },
-
-    getStatusBadge: function (status) {
-        if (status === 'ready') {
-            return `<span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill">
-                        <i class="fas fa-check-circle me-1"></i> READY TO LIVE
-                    </span>`;
-        }
-        else if (status === 'duplicate') {
-            return `<span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill animate__animated animate__pulse animate__infinite">
-                        <i class="fas fa-exclamation-triangle me-1"></i> QUARANTINED
-                    </span>`;
-        }
     }
 };
 
-// Start the Engine
 document.addEventListener('DOMContentLoaded', () => ImportManager.init());

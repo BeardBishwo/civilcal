@@ -1,249 +1,248 @@
 <?php
 /**
- * PREMIUM BLUEPRINT DRAFTING SUITE
- * Sophisticated, multi-panel editor for advanced exam architecture.
+ * PREMIUM BLUEPRINT ARCHITECT SUITE
+ * High-performance, multi-panel editor for advanced examination frameworks.
  */
 $blueprint = $blueprint ?? null;
 $syllabusTree = $syllabus_tree ?? [];
 $isEdit = !empty($blueprint['id']);
 ?>
 
-<div class="admin-wrapper-container">
-    <div class="admin-content-wrapper pb-0">
+<!-- Architect Font & Main Styles -->
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-        <!-- Compact Page Header -->
-        <div class="compact-header">
-            <div class="header-left">
-                <div class="header-title">
-                    <i class="fas fa-drafting-compass"></i>
-                    <h1><?= $isEdit ? 'Template Architect' : 'Draft New Blueprint' ?></h1>
-                    <div id="validationPulse" class="valid-indicator" title="Validity Status"></div>
+<div class="arch-master-container">
+    <div class="arch-content-wrapper">
+
+        <!-- Phase 1: Interactive Header -->
+        <header class="arch-header">
+            <div class="header-main">
+                <div class="title-block">
+                    <div class="icon-orb">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <h1><?= $isEdit ? 'Template Architect' : 'Draft New Blueprint' ?></h1>
+                        <p class="subtitle"><?= $isEdit ? 'Refining dynamic rules for ' . htmlspecialchars($blueprint['title']) : 'Configure question distribution and exam parameters.' ?></p>
+                    </div>
+                    <div id="validationPulse" class="arch-pulse" title="Structure Validity"></div>
                 </div>
-                <div class="header-subtitle"><?= $isEdit ? 'Refining dynamic rules for ' . htmlspecialchars($blueprint['title']) : 'Configure question distribution and exam parameters.' ?></div>
+                
+                <div class="arch-stats">
+                    <div class="arch-pill">
+                        <span class="pill-label">QUESTIONS</span>
+                        <span class="pill-value" id="headerQty"><?= $blueprint['total_questions'] ?? 0 ?></span>
+                    </div>
+                    <div class="arch-pill">
+                        <span class="pill-label">DURATION</span>
+                        <span class="pill-value" id="headerTime"><?= $blueprint['duration_minutes'] ?? 0 ?>m</span>
+                    </div>
+                    <div class="arch-pill success">
+                        <span class="pill-label">TOTAL MARKS</span>
+                        <span class="pill-value" id="headerMarks"><?= $blueprint['total_marks'] ?? 0 ?></span>
+                    </div>
+                </div>
             </div>
+
+            <!-- Command Bar -->
+            <div class="arch-command-bar">
+                <div class="command-group">
+                    <button type="button" class="arch-btn secondary" onclick="validateBlueprint()">
+                        <i class="fas fa-microscope"></i> VALIDATE STRUCTURE
+                    </button>
+                    <a href="<?= app_base_url('admin/quiz/blueprints') ?>" class="arch-btn flat">
+                        <i class="fas fa-arrow-left"></i> RETURN TO VAULT
+                    </a>
+                </div>
+                <div class="command-group">
+                    <button type="button" class="arch-btn primary gradient" onclick="generateExam()">
+                        <i class="fas fa-rocket"></i> DEPLOY INSTANCE
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Phase 2: Dual-Panel Workbench -->
+        <main class="arch-workbench">
             
-            <div class="header-actions" style="display:flex; gap:10px;">
-                <div class="stat-pill">
-                    <span class="label">QUESTIONS</span>
-                    <span class="value" id="headerQty"><?= $blueprint['total_questions'] ?? 0 ?></span>
-                </div>
-                <div class="stat-pill">
-                    <span class="label">TIME</span>
-                    <span class="value" id="headerTime"><?= $blueprint['duration_minutes'] ?? 0 ?>m</span>
-                </div>
-                <div class="stat-pill success">
-                    <span class="label">MARKS</span>
-                    <span class="value" id="headerMarks"><?= $blueprint['total_marks'] ?? 0 ?></span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Utility Toolbar -->
-        <div class="compact-toolbar">
-            <div class="toolbar-left">
-                <button type="button" class="btn-create-premium secondary" onclick="validateBlueprint()">
-                    <i class="fas fa-shield-alt"></i> VALIDATE STRUCTURE
-                </button>
-            </div>
-            <div class="toolbar-right">
-                <button type="button" class="btn-create-premium" onclick="generateExam()">
-                    <i class="fas fa-bolt"></i> DEPLOY INSTANCE
-                </button>
-            </div>
-        </div>
-
-        <div class="row g-0 flex-nowrap" style="display: flex !important;">
-            <!-- Left Panel: Drafting Controls -->
-            <div class="col-lg-4 border-end">
-                <div class="panel-section">
-                    <h5 class="section-title">Global Parameters</h5>
-                    <form id="blueprintForm" class="drafting-form p-4">
+            <!-- Sideboard: Template Parameters -->
+            <aside class="arch-sideboard">
+                <div class="workbench-section">
+                    <h5 class="workbench-label">Global Parameters</h5>
+                    <form id="blueprintForm" class="arch-form">
                         <input type="hidden" id="blueprintId" value="<?= $blueprint['id'] ?? '' ?>">
                         
-                        <div class="premium-input-group mb-3">
-                            <label class="premium-label">Template Title</label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-heading icon"></i>
-                                <input type="text" id="blueprintTitle" class="premium-input" value="<?= htmlspecialchars($blueprint['title'] ?? '') ?>" placeholder="e.g., Civil Engineering Grade 7" required>
+                        <div class="arch-input-group">
+                            <label>Template Title</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-pen-nib"></i>
+                                <input type="text" id="blueprintTitle" value="<?= htmlspecialchars($blueprint['title'] ?? '') ?>" placeholder="e.g., Civil Level 5 Final" required>
                             </div>
                         </div>
 
-                        <div class="premium-input-group mb-3">
-                            <label class="premium-label">Target Level</label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-layer-group icon"></i>
-                                <select id="blueprintLevel" class="premium-input" required onchange="loadSyllabusForLevel(this.value)">
+                        <div class="arch-input-group">
+                            <label>Target Level</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-signal"></i>
+                                <select id="blueprintLevel" required onchange="loadSyllabusForLevel(this.value)">
                                     <option value="">Select Level</option>
-                                    <option value="Level 4" <?= ($blueprint['level'] ?? '') === 'Level 4' ? 'selected' : '' ?>>Level 4</option>
-                                    <option value="Level 5" <?= ($blueprint['level'] ?? '') === 'Level 5' ? 'selected' : '' ?>>Level 5</option>
-                                    <option value="Level 7" <?= ($blueprint['level'] ?? '') === 'Level 7' ? 'selected' : '' ?>>Level 7</option>
+                                    <?php 
+                                    $levels = ['Level 4', 'Level 5', 'Level 6', 'Level 7'];
+                                    foreach($levels as $lvl): ?>
+                                        <option value="<?= $lvl ?>" <?= ($blueprint['level'] ?? '') === $lvl ? 'selected' : '' ?>><?= $lvl ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="premium-input-group mb-3">
-                                    <label class="premium-label">Question Count</label>
-                                    <input type="number" id="blueprintTotalQuestions" class="premium-input px-3" value="<?= $blueprint['total_questions'] ?? 50 ?>" oninput="updateStats()">
-                                </div>
+                        <div class="arch-row">
+                            <div class="arch-input-group">
+                                <label>Qty</label>
+                                <input type="number" id="blueprintTotalQuestions" value="<?= $blueprint['total_questions'] ?? 50 ?>" oninput="updateStats()">
                             </div>
-                            <div class="col-6">
-                                <div class="premium-input-group mb-3">
-                                    <label class="premium-label">Total Marks</label>
-                                    <input type="number" id="blueprintTotalMarks" class="premium-input px-3" value="<?= $blueprint['total_marks'] ?? 100 ?>" oninput="updateStats()">
-                                </div>
+                            <div class="arch-input-group">
+                                <label>Marks</label>
+                                <input type="number" id="blueprintTotalMarks" value="<?= $blueprint['total_marks'] ?? 100 ?>" oninput="updateStats()">
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="premium-input-group mb-3">
-                                    <label class="premium-label">Duration (Min)</label>
-                                    <input type="number" id="blueprintDuration" class="premium-input px-3" value="<?= $blueprint['duration_minutes'] ?? 60 ?>" oninput="updateStats()">
-                                </div>
+                        <div class="arch-row">
+                            <div class="arch-input-group">
+                                <label>Time (m)</label>
+                                <input type="number" id="blueprintDuration" value="<?= $blueprint['duration_minutes'] ?? 60 ?>" oninput="updateStats()">
                             </div>
-                            <div class="col-6">
-                                <div class="premium-input-group mb-3">
-                                    <label class="premium-label">NEG Marking</label>
-                                    <input type="number" id="blueprintNegativeMarking" class="premium-input px-3" value="<?= $blueprint['negative_marking_rate'] ?? 0 ?>" step="0.01">
-                                </div>
+                            <div class="arch-input-group">
+                                <label>Neg Rate</label>
+                                <input type="number" id="blueprintNegativeMarking" value="<?= $blueprint['negative_marking_rate'] ?? 0 ?>" step="0.01">
                             </div>
                         </div>
 
-                        <div class="premium-input-group mb-3">
-                            <label class="premium-label">Wildcard % <small>(Practical/Extra)</small></label>
-                            <div class="range-wrapper d-flex align-items-center gap-3">
-                                <input type="range" id="blueprintWildcardRange" class="form-range" min="0" max="100" value="<?= $blueprint['wildcard_percentage'] ?? 10 ?>" oninput="document.getElementById('blueprintWildcard').value = this.value">
-                                <input type="number" id="blueprintWildcard" class="premium-input text-center" style="width: 70px;" value="<?= $blueprint['wildcard_percentage'] ?? 10 ?>" oninput="document.getElementById('blueprintWildcardRange').value = this.value">
+                        <div class="arch-input-group">
+                            <label>Wildcard Allocation (%)</label>
+                            <div class="range-box">
+                                <input type="range" id="blueprintWildcardRange" min="0" max="100" value="<?= $blueprint['wildcard_percentage'] ?? 10 ?>" oninput="document.getElementById('blueprintWildcard').value = this.value; updateStats();">
+                                <input type="number" id="blueprintWildcard" value="<?= $blueprint['wildcard_percentage'] ?? 10 ?>" oninput="document.getElementById('blueprintWildcardRange').value = this.value; updateStats();">
                             </div>
                         </div>
 
-                        <div class="premium-input-group mb-4">
-                            <label class="premium-label">Description</label>
-                            <textarea id="blueprintDescription" class="premium-input p-3" rows="2"><?= htmlspecialchars($blueprint['description'] ?? '') ?></textarea>
+                        <div class="arch-input-group">
+                            <label>Architectural Notes</label>
+                            <textarea id="blueprintDescription" rows="3"><?= htmlspecialchars($blueprint['description'] ?? '') ?></textarea>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div class="premium-toggle-group border-0 p-0">
-                                <label class="switch scale-sm">
-                                    <input type="checkbox" id="blueprintActive" <?= ($blueprint['is_active'] ?? 1) ? 'checked' : '' ?>>
-                                    <span class="slider round"></span>
-                                </label>
-                                <span class="toggle-label ps-2">ACTIVE TEMPLATE</span>
-                            </div>
-                            <button type="button" class="btn-create-premium" onclick="saveBlueprint()">
-                                <i class="fas fa-save"></i> UPDATE
+                        <div class="arch-footer-actions">
+                            <label class="arch-switch">
+                                <input type="checkbox" id="blueprintActive" <?= ($blueprint['is_active'] ?? 1) ? 'checked' : '' ?>>
+                                <span class="arch-slider"></span>
+                                <span class="switch-label">ACTIVE</span>
+                            </label>
+                            <button type="button" class="arch-btn primary" onclick="saveBlueprint()">
+                                <i class="fas fa-sync-alt"></i> UPDATE
                             </button>
                         </div>
                     </form>
                 </div>
-            </div>
+            </aside>
 
-            <!-- Right Panel: Distribution Rules -->
-            <div class="col-lg-8 bg-light-soft">
-                <div class="panel-section">
-                    <div class="section-header d-flex justify-content-between align-items-center p-4 pb-2">
-                        <h5 class="section-title m-0">Question Distribution Rules</h5>
-                        <button class="btn-create-premium sm" onclick="showAddRuleModal()">
+            <!-- Main Canvas: Rule Engine -->
+            <section class="arch-canvas">
+                <div class="workbench-section">
+                    <div class="canvas-header">
+                        <h5 class="workbench-label">Question Distribution Rules</h5>
+                        <button class="arch-btn ultra-sm primary" onclick="showAddRuleModal()">
                             <i class="fas fa-plus"></i> ADD SOURCE
                         </button>
                     </div>
 
-                    <div class="table-container p-4">
-                        <div class="table-wrapper premium-shadow">
-                            <table class="table-compact premium-table">
-                                <thead>
-                                    <tr>
-                                        <th>Syllabus Node</th>
-                                        <th class="text-center">Req. Qs</th>
-                                        <th>Difficulty Distribution</th>
-                                        <th class="text-center">Actions</th>
+                    <div class="arch-table-hull">
+                        <table class="arch-table">
+                            <thead>
+                                <tr>
+                                    <th>Syllabus Node</th>
+                                    <th class="text-center">Required</th>
+                                    <th>Distribution</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rulesContainer">
+                                <?php if (!empty($blueprint['rules'])): ?>
+                                    <?php foreach ($blueprint['rules'] as $rule): ?>
+                                        <?php echo renderRuleRow($rule); ?>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr id="noRulesRow">
+                                        <td colspan="4" class="arch-empty-row">
+                                            <i class="fas fa-project-diagram"></i>
+                                            <p>No distribution rules defined yet.</p>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody id="rulesContainer">
-                                    <?php if (!empty($blueprint['rules'])): ?>
-                                        <?php foreach ($blueprint['rules'] as $rule): ?>
-                                            <?php echo renderRuleRow($rule); ?>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <tr id="noRulesRow"><td colspan="4" class="text-center py-5 text-muted">No distribution rules defined yet.</td></tr>
-                                    <?php endif; ?>
-                                </tbody>
-                                <tfoot>
-                                    <tr class="table-summary-row">
-                                        <td class="text-end fw-bold">TOTAL COVERED:</td>
-                                        <td class="text-center fw-bold" id="totalRequired">0</td>
-                                        <td colspan="2" class="text-muted small italic" id="rulesTally">Calculating alignment...</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
+                                <?php endif; ?>
+                            </tbody>
+                            <tfoot>
+                                <tr class="arch-summary">
+                                    <td class="text-end">ALLOCATION TALLY:</td>
+                                    <td class="text-center font-bold" id="totalRequired">0</td>
+                                    <td colspan="2" class="arch-alignment-text" id="rulesTally">Calculating...</td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
 
-                    <!-- Visual Summary Progress -->
-                    <div class="p-4 pt-0">
-                        <div class="coverage-card">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="small fw-bold">Syllabus Coverage</span>
-                                <span class="small" id="coveragePercent">0%</span>
-                            </div>
-                            <div class="progress" style="height: 6px; background: #e2e8f0;">
-                                <div id="coverageBar" class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
-                            </div>
+                    <!-- Coverage Visualizer -->
+                    <div class="arch-coverage">
+                        <div class="coverage-header">
+                            <span>SYLLABUS COVERAGE</span>
+                            <span id="coveragePercent">0%</span>
+                        </div>
+                        <div class="arch-progress">
+                            <div id="coverageBar" class="progress-fill"></div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
+        </main>
     </div>
 </div>
 
+<!-- ========================================
+     MODALS: ISOLATED DOM ELEMENTS
+     ======================================== -->
+
 <!-- Add Rule Modal -->
-<div class="modal fade premium-modal" id="ruleModal" tabindex="-1">
+<div class="modal fade arch-modal" id="ruleModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header header-premium">
-                <h5 class="modal-title m-0 text-white">Project Rule Definition</h5>
+            <div class="modal-header">
+                <h5 class="modal-title">Engineering Source Definition</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="ruleForm" onsubmit="saveRule(event)">
-                <div class="modal-body p-4">
+                <div class="modal-body">
                     <input type="hidden" id="ruleId">
-                    
-                    <div class="premium-input-group mb-3">
-                        <label class="premium-label">Syllabus Target</label>
-                        <select id="ruleSyllabusNode" class="premium-input px-3" required>
+                    <div class="arch-input-group inverted">
+                        <label>Syllabus Target Node</label>
+                        <select id="ruleSyllabusNode" required>
                             <option value="">Select Section/Unit</option>
                             <?php echo renderSyllabusOptions($syllabusTree); ?>
                         </select>
                     </div>
 
-                    <div class="premium-input-group mb-3">
-                        <label class="premium-label">Quantity Required</label>
-                        <input type="number" id="ruleQuestionsRequired" class="premium-input px-3" min="1" required placeholder="Number of questions to pull">
+                    <div class="arch-input-group inverted">
+                        <label>Target Quantity</label>
+                        <input type="number" id="ruleQuestionsRequired" min="1" required placeholder="Number of questions">
                     </div>
 
-                    <div class="premium-input-group">
-                        <label class="premium-label">Hardness Targets <small>(Optional)</small></label>
-                        <div class="d-flex gap-2">
-                            <div class="diff-slot">
-                                <label class="tiny-label">Easy</label>
-                                <input type="number" id="difficultyEasy" class="premium-input px-2 text-center" placeholder="0">
-                            </div>
-                            <div class="diff-slot">
-                                <label class="tiny-label">Medium</label>
-                                <input type="number" id="difficultyMedium" class="premium-input px-2 text-center" placeholder="0">
-                            </div>
-                            <div class="diff-slot">
-                                <label class="tiny-label">Hard</label>
-                                <input type="number" id="difficultyHard" class="premium-input px-2 text-center" placeholder="0">
-                            </div>
+                    <div class="arch-input-group inverted">
+                        <label>Difficulty Balancing (Easy / Med / Hard)</label>
+                        <div class="triple-input">
+                            <input type="number" id="difficultyEasy" placeholder="0">
+                            <input type="number" id="difficultyMedium" placeholder="0">
+                            <input type="number" id="difficultyHard" placeholder="0">
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="submit" class="btn-create-premium w-100">CONFIRM SOURCE</button>
+                <div class="modal-footer">
+                    <button type="submit" class="arch-btn arch-btn-full primary">CONFIRM SYLLABUS SOURCE</button>
                 </div>
             </form>
         </div>
@@ -251,73 +250,324 @@ $isEdit = !empty($blueprint['id']);
 </div>
 
 <!-- Deployment Modal -->
-<div class="modal fade premium-modal" id="generateModal" tabindex="-1">
+<div class="modal fade arch-modal" id="generateModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header header-premium">
-                <h5 class="modal-title m-0 text-white">Instance Deployment</h5>
+            <div class="modal-header">
+                <h5 class="modal-title">Deployment Protocol</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="generateForm" onsubmit="confirmGenerate(event)">
-                <div class="modal-body p-4 text-center">
-                    <div class="deployment-icon mb-3">
-                        <i class="fas fa-rocket text-primary"></i>
+                <div class="modal-body text-center">
+                    <div class="rocket-orb">
+                        <i class="fas fa-rocket"></i>
                     </div>
-                    <h6>Ready to randomize questions?</h6>
-                    <p class="text-muted small">Generating an exam will lock current blueprint rules into a live instance.</p>
+                    <h4 class="mt-3">Initialize Exam Engine?</h4>
+                    <p class="text-muted small mb-4">This will lock current rules and generate a live session.</p>
                     
-                    <div class="premium-input-group mb-3 text-start">
-                        <label class="premium-label">Deployment Title</label>
-                        <input type="text" id="generateTitle" class="premium-input px-3" value="<?= htmlspecialchars($blueprint['title'] ?? '') ?> - <?= date('Y-m-d') ?>">
+                    <div class="arch-input-group inverted text-start">
+                        <label>Deployment Instance Title</label>
+                        <input type="text" id="generateTitle" value="<?= htmlspecialchars($blueprint['title'] ?? '') ?> - <?= date('Y-m-d') ?>">
                     </div>
 
-                    <div class="d-flex justify-content-center gap-4 py-2">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="generateShuffle" checked>
-                            <label class="form-check-label small" for="generateShuffle">Shuffle</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="generateWildcard" checked>
-                            <label class="form-check-label small" for="generateWildcard">Wildcards</label>
-                        </div>
+                    <div class="arch-checkbox-group">
+                        <label class="arch-checkbox">
+                            <input type="checkbox" id="generateShuffle" checked>
+                            <span>SHUFFLE SELECTION</span>
+                        </label>
+                        <label class="arch-checkbox">
+                            <input type="checkbox" id="generateWildcard" checked>
+                            <span>INCLUDE WILDCARDS</span>
+                        </label>
                     </div>
                 </div>
-                <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="submit" class="btn-create-premium w-100 success">DEPLOY NOW</button>
+                <div class="modal-footer">
+                    <button type="submit" class="arch-btn arch-btn-full primary success">DEPLOY LIVE SESSION</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<style>
+/* ========================================
+   ARCHITECT DESIGN SYSTEM
+   ======================================== */
+:root {
+    --arch-bg: #f3f4f6;
+    --arch-primary: #6366f1;
+    --arch-primary-dark: #4f46e5;
+    --arch-secondary: #ec4899;
+    --arch-dark: #0f172a;
+    --arch-border: #e2e8f0;
+    --arch-text-main: #1e293b;
+    --arch-text-muted: #64748b;
+    --arch-white: #ffffff;
+    --arch-success: #10b981;
+}
+
+.arch-master-container {
+    font-family: 'Outfit', sans-serif;
+    background: var(--arch-bg);
+    min-height: 100vh;
+    padding: 1.5rem;
+}
+
+.arch-content-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: var(--arch-white);
+    border-radius: 20px;
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Styles */
+.arch-header {
+    background: var(--arch-dark);
+    color: var(--arch-white);
+    padding: 2rem;
+}
+
+.header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.title-block {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.icon-orb {
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--arch-primary);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.title-block h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--arch-white);
+}
+
+.title-block .subtitle {
+    font-size: 0.9rem;
+    color: var(--arch-text-muted);
+    margin: 0.25rem 0 0;
+}
+
+/* Pulse State */
+.arch-pulse {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #475569;
+    margin-left: 10px;
+    box-shadow: 0 0 0 4px rgba(71, 85, 105, 0.2);
+}
+.arch-pulse.active { background: var(--arch-success); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2); animation: apulse 2s infinite; }
+.arch-pulse.error { background: #ef4444; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2); }
+
+@keyframes apulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+/* Stats */
+.arch-stats { display: flex; gap: 1rem; }
+.arch-pill {
+    background: rgba(255,255,255,0.05);
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    min-width: 100px;
+    text-align: center;
+}
+.arch-pill.success { background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2); }
+.pill-label { font-size: 0.65rem; font-weight: 700; color: var(--arch-text-muted); letter-spacing: 1px; }
+.pill-value { font-size: 1.25rem; font-weight: 800; }
+
+/* Command Bar */
+.arch-command-bar {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.command-group { display: flex; gap: 0.75rem; }
+
+/* Workbench */
+.arch-workbench {
+    display: flex;
+    min-height: 600px;
+}
+
+.arch-sideboard {
+    width: 380px;
+    background: #f8fafc;
+    border-right: 1px solid var(--arch-border);
+    padding: 2rem;
+}
+
+.arch-canvas {
+    flex: 1;
+    padding: 2rem;
+    background: var(--arch-white);
+}
+
+.workbench-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--arch-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 2rem;
+    display: block;
+}
+
+/* Forms */
+.arch-form { display: flex; flex-direction: column; gap: 1.5rem; }
+.arch-input-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.arch-input-group label { font-size: 0.75rem; font-weight: 700; color: var(--arch-text-main); }
+.arch-input-group input, .arch-input-group select, .arch-input-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--arch-border);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: 0.2s;
+}
+.arch-input-group input:focus { border-color: var(--arch-primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); outline: none; }
+
+.input-with-icon { position: relative; }
+.input-with-icon i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--arch-text-muted); }
+.input-with-icon input, .input-with-icon select { padding-left: 2.75rem; }
+
+.arch-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.range-box { display: flex; align-items: center; gap: 1rem; }
+.range-box input[type="number"] { width: 70px; text-align: center; }
+
+/* Buttons */
+.arch-btn {
+    height: 44px;
+    padding: 0 1.5rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: 0.2s;
+    border: none;
+    text-decoration: none;
+}
+.arch-btn.primary { background: var(--arch-primary); color: var(--arch-white); }
+.arch-btn.primary.gradient { background: linear-gradient(135deg, var(--arch-primary) 0%, var(--arch-primary-dark) 100%); }
+.arch-btn.secondary { background: rgba(255,255,255,0.1); color: var(--arch-white); border: 1px solid rgba(255,255,255,0.1); }
+.arch-btn.flat { background: transparent; color: var(--arch-text-muted); }
+.arch-btn.ultra-sm { height: 32px; padding: 0 1rem; font-size: 0.7rem; }
+.arch-btn.success { background: var(--arch-success); }
+.arch-btn.arch-btn-full { width: 100%; justify-content: center; height: 50px; font-size: 0.95rem; }
+
+.arch-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+
+/* Table */
+.canvas-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; }
+.arch-table-hull { background: var(--arch-white); border-radius: 12px; border: 1px solid var(--arch-border); overflow: hidden; }
+.arch-table { width: 100%; border-collapse: collapse; }
+.arch-table thead th { background: #f8fafc; padding: 1rem 1.5rem; text-align: left; font-size: 0.7rem; font-weight: 800; color: var(--arch-text-muted); text-transform: uppercase; }
+.arch-table td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--arch-border); vertical-align: middle; }
+
+.arch-empty-row { padding: 5rem !important; text-align: center; color: var(--arch-text-muted); }
+.arch-empty-row i { font-size: 3rem; margin-bottom: 1.5rem; opacity: 0.2; display: block; }
+.arch-empty-row p { font-weight: 600; margin: 0; }
+
+.arch-summary td { background: #f8fafc; font-weight: 800; font-size: 0.85rem; border: none; }
+.arch-alignment-text { color: var(--arch-text-muted); font-style: italic; font-weight: 500 !important; font-size: 0.8rem; }
+
+/* Modal Custom styling */
+.arch-modal .modal-content { border-radius: 20px; border: none; background: #f8fafc; overflow: hidden; }
+.arch-modal .modal-header { background: var(--arch-dark); border: none; padding: 1.5rem 2rem; }
+.arch-modal .modal-title { color: white; font-weight: 800; font-size: 1.1rem; }
+.arch-modal .modal-body { padding: 2rem; }
+.arch-modal .modal-footer { padding: 0 2rem 2rem; border: none; }
+
+.arch-input-group.inverted label { color: var(--arch-text-muted); font-weight: 800; text-transform: uppercase; font-size: 0.7rem; }
+.arch-input-group.inverted input, .arch-input-group.inverted select { background: white; border-color: #cbd5e1; }
+
+.triple-input { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+.triple-input input { text-align: center; font-weight: 800; font-size: 1.1rem; color: var(--arch-primary); }
+
+.rocket-orb { width: 80px; height: 80px; border-radius: 50%; background: #e0e7ff; color: var(--arch-primary); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto; }
+
+/* Switch */
+.arch-switch { position: relative; display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
+.arch-switch input { opacity: 0; width: 0; height: 0; }
+.arch-slider { width: 44px; height: 22px; background: #cbd5e1; border-radius: 20px; position: relative; transition: 0.3s; }
+.arch-slider:before { content: ""; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+input:checked + .arch-slider { background: var(--arch-success); }
+input:checked + .arch-slider:before { transform: translateX(22px); }
+.switch-label { font-size: 0.7rem; font-weight: 800; color: var(--arch-text-muted); }
+
+/* Progress */
+.arch-coverage { margin-top: 2rem; }
+.coverage-header { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; color: var(--arch-text-muted); margin-bottom: 0.5rem; }
+.arch-progress { height: 10px; background: #e2e8f0; border-radius: 20px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--arch-primary); transition: 0.5s; width: 0; }
+
+/* Checkbox */
+.arch-checkbox-group { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; }
+.arch-checkbox { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; font-weight: 800; color: var(--arch-text-main); cursor: pointer; }
+.arch-checkbox input { width: 18px; height: 18px; }
+</style>
+
 <script>
 const baseUrl = '<?= app_base_url() ?>';
 const blueprintId = <?= $blueprint['id'] ?? 'null' ?>;
 
-// Initialization
 document.addEventListener('DOMContentLoaded', () => {
     updateStats();
-    validateBlueprint(true); // Silent validation
+    validateBlueprint(true);
 });
 
 function updateStats() {
-    document.getElementById('headerQty').innerText = document.getElementById('blueprintTotalQuestions').value;
-    document.getElementById('headerTime').innerText = document.getElementById('blueprintDuration').value + 'm';
-    document.getElementById('headerMarks').innerText = document.getElementById('blueprintTotalMarks').value;
+    const qty = document.getElementById('blueprintTotalQuestions').value;
+    const time = document.getElementById('blueprintDuration').value;
+    const marks = document.getElementById('blueprintTotalMarks').value;
     
-    // Calculate Tally
-    let total = 0;
-    document.querySelectorAll('.rule-qty').forEach(el => total += parseInt(el.innerText) || 0);
-    document.getElementById('totalRequired').innerText = total;
+    document.getElementById('headerQty').innerText = qty;
+    document.getElementById('headerTime').innerText = time + 'm';
+    document.getElementById('headerMarks').innerText = marks;
     
-    const target = parseInt(document.getElementById('blueprintTotalQuestions').value) || 1;
+    let totalRulesQty = 0;
+    document.querySelectorAll('.rule-qty').forEach(el => totalRulesQty += parseInt(el.innerText) || 0);
+    document.getElementById('totalRequired', totalRulesQty); // Fallback for ID setter
+    if(document.getElementById('totalRequired')) document.getElementById('totalRequired').innerText = totalRulesQty;
+    
     const wildcard = parseInt(document.getElementById('blueprintWildcard').value) || 0;
-    const requiredBySyllabus = Math.ceil(target * (1 - (wildcard/100)));
+    const requiredBySyllabus = Math.ceil(qty * (1 - (wildcard/100)));
     
-    const percent = Math.min(100, (total / requiredBySyllabus) * 100);
-    document.getElementById('coverageBar').style.width = percent + '%';
-    document.getElementById('coveragePercent').innerText = Math.round(percent) + '%';
-    document.getElementById('rulesTally').innerText = `${total} of ${requiredBySyllabus} syllabus questions covered.`;
+    const percent = Math.min(100, (totalRulesQty / requiredBySyllabus) * 100);
+    if(document.getElementById('coverageBar')) document.getElementById('coverageBar').style.width = percent + '%';
+    if(document.getElementById('coveragePercent')) document.getElementById('coveragePercent').innerText = Math.round(percent) + '%';
+    if(document.getElementById('rulesTally')) document.getElementById('rulesTally').innerText = `${totalRulesQty} of ${requiredBySyllabus} syllabus questions assigned.`;
 }
 
 async function saveBlueprint() {
@@ -337,11 +587,13 @@ async function saveBlueprint() {
         ? `${baseUrl}/admin/quiz/blueprints/update/${blueprintId}`
         : `${baseUrl}/admin/quiz/blueprints/store`;
 
+    Swal.fire({ title: 'Architecting...', didOpen: () => Swal.showLoading() });
+
     try {
         const r = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: new URLSearchParams(data) });
         const res = await r.json();
         if (res.success) {
-            Swal.fire({ icon:'success', title: 'Architect Saved', timer: 1500, showConfirmButton: false }).then(() => {
+            Swal.fire({ icon:'success', title: 'Blueprint Synced', timer: 1500, showConfirmButton: false }).then(() => {
                 if (res.redirect) window.location = res.redirect;
             });
         } else {
@@ -353,12 +605,12 @@ async function saveBlueprint() {
 function showAddRuleModal() {
     document.getElementById('ruleForm').reset();
     document.getElementById('ruleId').value = '';
-    new bootstrap.Modal(document.getElementById('ruleModal')).show();
+    const modal = new bootstrap.Modal(document.getElementById('ruleModal'));
+    modal.show();
 }
 
 async function saveRule(event) {
     event.preventDefault();
-    
     const difficultyDist = {};
     const easy = parseInt(document.getElementById('difficultyEasy').value) || 0;
     const medium = parseInt(document.getElementById('difficultyMedium').value) || 0;
@@ -374,6 +626,8 @@ async function saveRule(event) {
         difficulty_distribution: JSON.stringify(difficultyDist)
     };
 
+    Swal.fire({ title: 'Mapping Source...', didOpen: () => Swal.showLoading() });
+
     try {
         const r = await fetch(`${baseUrl}/admin/quiz/blueprints/${blueprintId}/add-rule`, {
             method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: new URLSearchParams(data)
@@ -385,8 +639,8 @@ async function saveRule(event) {
 
 async function deleteRule(ruleId) {
     const res = await Swal.fire({
-        title: 'Delete Rule?', text: "This will remove this syllabus source from the blueprint.",
-        icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Delete'
+        title: 'Purge Rule?', text: "This will remove this syllabus mapping from the template.",
+        icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Purge'
     });
     if (!res.isConfirmed) return;
     
@@ -402,26 +656,26 @@ async function validateBlueprint(silent = false) {
         const r = await fetch(`${baseUrl}/admin/quiz/blueprints/${blueprintId}/validate`);
         const data = await r.json();
         const pulse = document.getElementById('validationPulse');
-        pulse.className = data.valid ? 'valid-indicator active' : 'valid-indicator error';
+        if(pulse) pulse.className = data.valid ? 'arch-pulse active' : 'arch-pulse error';
         
         if (!silent) {
             Swal.fire({
-                title: data.valid ? 'Architect Valid' : 'Architect Errors',
-                html: data.valid ? 'Template structure is sound and ready for deployment.' : `<div class="text-start small"><ul>${data.errors.map(e => `<li>${e}</li>`).join('')}</ul></div>`,
+                title: data.valid ? 'Architecture Verified' : 'Architecture Exceptions',
+                html: data.valid ? 'Design is stable and ready for deployment.' : `<div class="text-start small"><ul>${data.errors.map(e => `<li>${e}</li>`).join('')}</ul></div>`,
                 icon: data.valid ? 'success' : 'error',
-                confirmButtonColor: data.valid ? '#10b981' : '#667eea'
+                confirmButtonColor: data.valid ? '#10b981' : '#6366f1'
             });
         }
     } catch(e) {}
 }
 
 function generateExam() {
-    new bootstrap.Modal(document.getElementById('generateModal')).show();
+    const modal = new bootstrap.Modal(document.getElementById('generateModal'));
+    modal.show();
 }
 
 async function confirmGenerate(event) {
     event.preventDefault();
-    
     const data = {
         exam_title: document.getElementById('generateTitle').value,
         shuffle: document.getElementById('generateShuffle').checked ? 1 : 0,
@@ -429,7 +683,7 @@ async function confirmGenerate(event) {
         save: 1
     };
 
-    Swal.fire({ title: 'Generating Engine...', html: 'Selecting questions based on distribution rules...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    Swal.fire({ title: 'Executing Engine...', html: 'Selecting optimal question paths...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
     try {
         const r = await fetch(`${baseUrl}/admin/quiz/blueprints/${blueprintId}/generate`, {
@@ -437,12 +691,12 @@ async function confirmGenerate(event) {
         });
         const res = await r.json();
         if (res.success) {
-            Swal.fire({ icon:'success', title: 'Deployment Success', text: 'Exam has been generated.', timer: 1500, showConfirmButton:false })
+            Swal.fire({ icon:'success', title: 'Instance Deployed', text: 'Exam engine initialized.', timer: 1500, showConfirmButton:false })
             .then(() => { if (res.redirect) window.location = res.redirect; });
         } else {
-            Swal.fire('Architecture Error', res.error, 'error');
+            Swal.fire('Engine Error', res.error, 'error');
         }
-    } catch(e) { Swal.fire('Error', 'Fatal System Error', 'error'); }
+    } catch(e) { Swal.fire('Error', 'Fatal Core Error', 'error'); }
 }
 
 function loadSyllabusForLevel(level) {
@@ -450,89 +704,24 @@ function loadSyllabusForLevel(level) {
 }
 </script>
 
-<style>
-/* ========================================
-   PREMIUM EDITOR STYLES
-   ======================================== */
-:root {
-    --editor-bg: #f8fafc;
-    --editor-border: #e2e8f0;
-    --editor-primary: #667eea;
-    --editor-success: #10b981;
-}
-
-.bg-light-soft { background: #f1f5f9; }
-.panel-section { height: calc(100vh - 160px); overflow-y: auto; overflow-x: hidden; }
-/* Force Grid preservation */
-.row.g-0 { display: flex !important; flex-wrap: nowrap !important; width: 100% !important; }
-.col-lg-4 { width: 33.333333% !important; flex: 0 0 33.333333% !important; max-width: 33.333333% !important; }
-.col-lg-8 { width: 66.666667% !important; flex: 0 0 66.666667% !important; max-width: 66.666667% !important; }
-.section-title { font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding: 1.5rem 1.5rem 0.5rem; }
-
-/* Pulse Indicator */
-.valid-indicator { width: 12px; height: 12px; border-radius: 50%; background: #cbd5e1; margin-left: 10px; transition: 0.3s; }
-.valid-indicator.active { background: var(--editor-success); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2); animation: pulse-valid 2s infinite; }
-.valid-indicator.error { background: #ef4444; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2); }
-
-@keyframes pulse-valid { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-/* Inputs */
-.premium-input-group { display: flex; flex-direction: column; gap: 6px; }
-.premium-label { font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
-.input-wrapper { position: relative; }
-.input-wrapper .icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.9rem; }
-.premium-input {
-    width: 100%; height: 44px; border: 1px solid #cbd5e1; border-radius: 10px; padding: 0 1rem 0 2.5rem;
-    font-size: 0.9rem; font-weight: 600; color: #1e293b; background: white; transition: 0.2s; outline: none;
-}
-.premium-input:focus { border-color: var(--editor-primary); box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1); }
-textarea.premium-input { height: auto; padding-left: 1rem; }
-
-.btn-create-premium.secondary { background: white; border: 1px solid #cbd5e1; color: #64748b; box-shadow: none; }
-.btn-create-premium.sm { height: 32px; padding: 0 1rem; font-size: 0.75rem; }
-.btn-create-premium.success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2); }
-
-/* Table Improvements */
-.premium-shadow { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); border-radius: 12px; overflow: hidden; }
-.premium-table { background: white; border: none; }
-.premium-table thead th { background: #f8fafc; border: none; padding: 1rem 1.5rem; font-size: 0.65rem; }
-.premium-table td { padding: 1rem 1.5rem; border-bottom: 1px solid #f1f5f9; }
-
-.node-title { font-weight: 700; color: #1e293b; font-size: 0.85rem; }
-.node-type { font-size: 0.6rem; font-weight: 800; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
-.rule-qty { font-weight: 800; color: var(--editor-primary); font-size: 1rem; }
-
-.diff-badge { font-size: 0.6rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-right: 4px; }
-.diff-easy { background: #d1fae5; color: #065f46; }
-.diff-medium { background: #fef3c7; color: #92400e; }
-.diff-hard { background: #fee2e2; color: #991b1b; }
-
-.table-summary-row td { background: #f8fafc; border: none; border-top: 2px solid #e2e8f0; }
-
-.deployment-icon { width: 60px; height: 60px; border-radius: 50%; background: #f0f7ff; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto; }
-</style>
-
 <?php
 function renderRuleRow($rule) {
     $diffDist = $rule['difficulty_distribution'] ?? [];
     $html = '<tr class="rule-row">';
-    $html .= '<td><div class="node-title">' . htmlspecialchars($rule['node_title']) . '</div><div class="node-type d-inline-block mt-1">' . $rule['node_type'] . '</div></td>';
-    $html .= '<td class="text-center align-middle"><span class="rule-qty">' . $rule['questions_required'] . '</span></td>';
-    $html .= '<td class="align-middle">';
-    
+    $html .= '<td><div class="arch-node-title">' . htmlspecialchars($rule['node_title']) . '</div><div class="arch-node-type">' . $rule['node_type'] . '</div></td>';
+    $html .= '<td class="text-center"><span class="rule-qty">' . $rule['questions_required'] . '</span></td>';
+    $html .= '<td>';
     if (!empty($diffDist)) {
         foreach ($diffDist as $level => $count) {
-            $html .= '<span class="diff-badge diff-' . $level . '">' . ucfirst($level) . ': ' . $count . '</span>';
+            $html .= '<span class="arch-diff-badge arch-diff-' . $level . '">' . strtoupper($level) . ': ' . $count . '</span>';
         }
     } else {
-        $html .= '<span class="text-muted small italic">Random Selection</span>';
+        $html .= '<span class="arch-alignment-text">Random Select</span>';
     }
-    
     $html .= '</td>';
-    $html .= '<td class="text-center align-middle">';
-    $html .= '<div class="actions-compact justify-center">';
-    $html .= '<button onclick="deleteRule(' . $rule['id'] . ')" class="action-btn-icon delete-btn"><i class="fas fa-trash-alt"></i></button>';
-    $html .= '</div></td></tr>';
+    $html .= '<td class="text-center">';
+    $html .= '<button onclick="deleteRule(' . $rule['id'] . ')" class="arch-btn-icon-del"><i class="fas fa-trash-alt"></i></button>';
+    $html .= '</td></tr>';
     return $html;
 }
 
@@ -547,3 +736,16 @@ function renderSyllabusOptions($nodes, $prefix = '') {
     return $html;
 }
 ?>
+
+<style>
+/* Additional Table Inner Styles */
+.arch-node-title { font-weight: 700; color: var(--arch-text-main); font-size: 0.9rem; }
+.arch-node-type { font-size: 0.6rem; font-weight: 800; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; display: inline-block; margin-top: 4px; }
+.rule-qty { font-weight: 800; color: var(--arch-primary); font-size: 1.1rem; }
+.arch-diff-badge { font-size: 0.6rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-right: 4px; }
+.arch-diff-easy { background: #d1fae5; color: #065f46; }
+.arch-diff-medium { background: #fef3c7; color: #92400e; }
+.arch-diff-hard { background: #fee2e2; color: #991b1b; }
+.arch-btn-icon-del { width: 32px; height: 32px; border: 1px solid #e2e8f0; border-radius: 6px; background: white; color: #94a3b8; cursor: pointer; transition: 0.2s; }
+.arch-btn-icon-del:hover { background: #fee2e2; color: #ef4444; border-color: #fecaca; }
+</style>
