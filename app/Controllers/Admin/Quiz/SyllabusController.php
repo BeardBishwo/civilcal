@@ -44,8 +44,12 @@ class SyllabusController extends Controller
 
     public function manage($level = null)
     {
-        if (!$level) $level = $_GET['level'] ?? null;
-        if ($level) $level = urldecode($level);
+        // Prioritize query parameter for better compatibility with special characters
+        $level = $_GET['level'] ?? $level;
+        
+        if ($level) {
+            $level = urldecode($level);
+        }
 
         if (!$level) {
             $_SESSION['error'] = "Level not specified";
@@ -53,7 +57,7 @@ class SyllabusController extends Controller
             exit;
         }
 
-        $isUnassigned = ($level === 'Unassigned / Draft');
+        $isUnassigned = (str_contains($level, 'Unassigned'));
         
         // Fetch nodes with joined names for display
         $sql = "
@@ -63,7 +67,7 @@ class SyllabusController extends Controller
             FROM syllabus_nodes sn
             LEFT JOIN quiz_categories qc ON sn.linked_category_id = qc.id
             LEFT JOIN quiz_topics qt ON sn.linked_topic_id = qt.id
-            WHERE " . ($isUnassigned ? "(sn.level IS NULL OR sn.level = '' OR sn.level = 'Unassigned / Draft')" : "sn.level = :level") . "
+            WHERE " . ($isUnassigned ? "(sn.level IS NULL OR sn.level = '' OR sn.level LIKE '%Unassigned%')" : "sn.level = :level") . "
             ORDER BY sn.order ASC, sn.id ASC
         ";
         
@@ -77,11 +81,24 @@ class SyllabusController extends Controller
         $categories = $this->db->find('quiz_categories', ['is_active' => 1], 'name ASC');
         $topics = $this->db->find('quiz_topics', ['is_active' => 1], 'name ASC');
 
+        // Fetch global settings for this level
+        $settings = $this->db->findOne('syllabus_settings', ['level' => $level]);
+        if (!$settings) {
+            $settings = [
+                'level' => $level,
+                'total_time' => 0,
+                'full_marks' => 0,
+                'pass_marks' => 0,
+                'negative_rate' => 0.00
+            ];
+        }
+
         return $this->view('admin/quiz/syllabus/manage', [
             'page_title' => "Editing: $level",
             'nodes' => $nodes,
             'nodesTree' => $nodesTree,
             'level' => $level,
+            'settings' => $settings,
             'categories' => $categories,
             'topics' => $topics
         ]);
@@ -116,6 +133,8 @@ class SyllabusController extends Controller
             'linked_category_id' => !empty($_POST['linked_category_id']) ? $_POST['linked_category_id'] : null,
             'linked_topic_id' => !empty($_POST['linked_topic_id']) ? $_POST['linked_topic_id'] : null,
             'questions_weight' => (int)($_POST['questions_weight'] ?? 0),
+            'time_minutes' => (int)($_POST['time_minutes'] ?? 0),
+            'marks_per_question' => (float)($_POST['marks_per_question'] ?? 0),
             'is_active' => isset($_POST['is_active']) ? 1 : 0
         ];
 
@@ -139,6 +158,8 @@ class SyllabusController extends Controller
             'linked_category_id' => !empty($_POST['linked_category_id']) ? $_POST['linked_category_id'] : null,
             'linked_topic_id' => !empty($_POST['linked_topic_id']) ? $_POST['linked_topic_id'] : null,
             'questions_weight' => (int)($_POST['questions_weight'] ?? 0),
+            'time_minutes' => (int)($_POST['time_minutes'] ?? 0),
+            'marks_per_question' => (float)($_POST['marks_per_question'] ?? 0),
             'is_active' => isset($_POST['is_active']) ? 1 : 0
         ];
 
@@ -172,6 +193,111 @@ class SyllabusController extends Controller
         if (!$node) return;
         $newStatus = $node['is_active'] ? 0 : 1;
         $this->db->update('syllabus_nodes', ['is_active' => $newStatus], "id = :id", ['id' => $id]);
+    }
+
+    /**
+     * AJAX: Delete all nodes for a specific level
+     */
+    public function deleteLevel()
+    {
+        $level = $_POST['level'] ?? null;
+        if (!$level) {
+            echo json_encode(['status' => 'error', 'message' => 'Level missing']);
+            return;
+        }
+
+        $isUnassigned = (str_contains($level, 'Unassigned'));
+        
+        if ($isUnassigned) {
+            $this->db->query("DELETE FROM syllabus_nodes WHERE level IS NULL OR level = '' OR level LIKE '%Unassigned%'");
+        } else {
+            $this->db->delete('syllabus_nodes', "level = :level", ['level' => $level]);
+        }
+        
+        // Also remove settings
+        $this->db->delete('syllabus_settings', "level = :level", ['level' => $level]);
+
+        echo json_encode(['status' => 'success', 'message' => 'Syllabus structure cleared']);
+    }
+
+    /**
+     * AJAX: Save global syllabus settings
+     */
+    public function saveSettings()
+    {
+        $level = $_POST['level'] ?? null;
+        if (!$level) {
+            echo json_encode(['status' => 'error', 'message' => 'Level missing']);
+            return;
+        }
+
+        $data = [
+            'level' => $level,
+            'total_time' => (int)($_POST['total_time'] ?? 0),
+            'full_marks' => (int)($_POST['full_marks'] ?? 0),
+            'pass_marks' => (int)($_POST['pass_marks'] ?? 0),
+            'negative_rate' => (float)($_POST['negative_rate'] ?? 0.00)
+        ];
+
+        $existing = $this->db->findOne('syllabus_settings', ['level' => $level]);
+        if ($existing) {
+            $this->db->update('syllabus_settings', $data, "level = :level", ['level' => $level]);
+        } else {
+            $this->db->create('syllabus_settings', $data);
+        }
+
+        echo json_encode(['status' => 'success', 'message' => 'Settings updated']);
+    }
+
+    /**
+     * AJAX: Duplicate a node
+     */
+    public function duplicate($id)
+    {
+        $node = $this->db->findOne('syllabus_nodes', ['id' => $id]);
+        if (!$node) {
+            echo json_encode(['status' => 'error', 'message' => 'Node not found']);
+            return;
+        }
+
+        $newNode = $node;
+        unset($newNode['id']);
+        unset($newNode['created_at']);
+        unset($newNode['updated_at']);
+        $newNode['title'] .= ' (Copy)';
+        $newNode['order'] = $node['order'] + 1;
+
+        if ($this->db->create('syllabus_nodes', $newNode)) {
+            echo json_encode(['status' => 'success', 'message' => 'Node duplicated']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Duplication failed']);
+        }
+    }
+
+    /**
+     * AJAX: Move node up/down
+     */
+    public function move($id, $direction)
+    {
+        $node = $this->db->findOne('syllabus_nodes', ['id' => $id]);
+        if (!$node) return;
+
+        $currentOrder = $node['order'];
+        $level = $node['level'];
+
+        if ($direction === 'up') {
+            $neighbor = $this->db->query("SELECT * FROM syllabus_nodes WHERE level = ? AND `order` < ? ORDER BY `order` DESC LIMIT 1", [$level, $currentOrder])->fetch();
+        } else {
+            $neighbor = $this->db->query("SELECT * FROM syllabus_nodes WHERE level = ? AND `order` > ? ORDER BY `order` ASC LIMIT 1", [$level, $currentOrder])->fetch();
+        }
+
+        if ($neighbor) {
+            $this->db->update('syllabus_nodes', ['order' => $neighbor['order']], "id = :id", ['id' => $node['id']]);
+            $this->db->update('syllabus_nodes', ['order' => $currentOrder], "id = :id", ['id' => $neighbor['id']]);
+            echo json_encode(['status' => 'success']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Boundary reached']);
+        }
     }
 
     /**

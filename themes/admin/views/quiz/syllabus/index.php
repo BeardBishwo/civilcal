@@ -111,7 +111,7 @@
                                         $levelName = $pos['level'] ?? 'Unassigned / Draft';
                                         $safeLevel = urlencode($levelName);
                                     ?>
-                                        <tr class="page-row" onclick="window.location='<?php echo app_base_url('admin/quiz/syllabus/manage/' . $safeLevel); ?>'" style="cursor: pointer;">
+                                        <tr class="page-row" onclick="window.location='<?php echo app_base_url('admin/quiz/syllabus/manage?level=' . $safeLevel); ?>'" style="cursor: pointer;">
                                             <td class="ps-4">
                                                 <div class="user-info-compact" style="display:flex; align-items:center; gap:0.75rem;">
                                                     <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--admin-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight:600;">
@@ -145,7 +145,7 @@
                                             </td>
                                             <td class="pe-4">
                                                 <div class="actions-compact">
-                                                    <a href="<?php echo app_base_url('admin/quiz/syllabus/manage/' . $safeLevel); ?>" class="action-btn-icon" title="Edit">
+                                                    <a href="<?php echo app_base_url('admin/quiz/syllabus/manage?level=' . $safeLevel); ?>" class="action-btn-icon" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                     <button class="action-btn-icon text-danger" onclick="event.stopPropagation(); deletePosition('<?php echo addslashes($levelName); ?>')" title="Delete">
@@ -179,11 +179,29 @@
     function deletePosition(level) {
         Swal.fire({
             title: 'Delete Syllabus?',
-            text: `This will remove the entire structure for "${level}".`,
+            text: `This will remove the entire structure for "${level}". This action cannot be undone!`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
-            confirmButtonText: 'Yes, Delete'
+            confirmButtonText: 'Yes, Delete Everything'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const fd = new FormData();
+                fd.append('level', level);
+                
+                fetch('<?= app_base_url("admin/quiz/syllabus/delete-level") ?>', {
+                    method: 'POST',
+                    body: fd
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        Swal.fire('Deleted!', data.message, 'success').then(() => location.reload());
+                    } else {
+                        Swal.fire('Error', data.message, 'error');
+                    }
+                });
+            }
         });
     }
 
@@ -197,7 +215,7 @@
             confirmButtonText: 'Create structure',
             preConfirm: (level) => {
                 if (!level) return Swal.showValidationMessage('Name is required');
-                window.location.href = '<?= app_base_url("admin/quiz/syllabus/manage/") ?>' + encodeURIComponent(level);
+                window.location.href = '<?= app_base_url("admin/quiz/syllabus/manage?level=") ?>' + encodeURIComponent(level);
             }
         });
     }
