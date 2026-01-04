@@ -11,6 +11,7 @@ use App\Services\Security;
 use App\Services\Quiz\DailyQuizService;
 use App\Services\Quiz\StreakService;
 use App\Services\Quiz\ShuffleService;
+use App\Services\Quiz\ScoringService;
 
 class ExamEngineController extends Controller
 {
@@ -18,6 +19,7 @@ class ExamEngineController extends Controller
     private $gamificationService;
     private $dailyQuizService;
     private $streakService;
+    private $scoringService;
     private NonceService $nonceService;
     private $storagePath;
 
@@ -29,6 +31,7 @@ class ExamEngineController extends Controller
         $this->gamificationService = new GamificationService();
         $this->dailyQuizService = new DailyQuizService();
         $this->streakService = new StreakService();
+        $this->scoringService = new ScoringService();
         $this->nonceService = new NonceService();
         $this->storagePath = __DIR__ . '/../../../storage/app/exams/';
         
@@ -43,7 +46,7 @@ class ExamEngineController extends Controller
     public function start($slug)
     {
         // 1. Get Exam ID
-        $stmt = $this->db->getPdo()->prepare("SELECT id, title, duration_minutes, is_premium, shuffle_questions, mode FROM quiz_exams WHERE slug = :slug");
+        $stmt = $this->db->getPdo()->prepare("SELECT id, title, duration_minutes, is_premium, shuffle_questions, mode, negative_marking_rate, negative_marking_unit, negative_marking_basis FROM quiz_exams WHERE slug = :slug");
         $stmt->execute(['slug' => $slug]);
         $exam = $stmt->fetch();
 
@@ -335,48 +338,13 @@ class ExamEngineController extends Controller
         foreach ($data['questions'] as $q) {
             $qId = $q['id'];
             $userAns = $data['answers'][$qId] ?? null;
-            $isCorrect = false;
             
-            // Get Correct Options from JSON data
-            $correctOpts = array_filter($q['options'] ?? [], function($o) { return !empty($o['is_correct']); });
+            // Delegate to Scoring Engine
+            $result = $this->scoringService->gradeQuestion($q, $userAns, $data['exam']);
             
-            // 1. MCQ / TF
-            if (($q['type'] == 'MCQ' || $q['type'] == 'TF' || $q['type'] == 'mcq_single' || $q['type'] == 'true_false') && $userAns !== null) {
-                // MCQ stored simple correct_answer idx? 
-                // Wait, if shuffled, correct_answer was updated in ShuffleService.
-                if ((string)$userAns === (string)$q['correct_answer']) {
-                     $isCorrect = true;     
-                }
-            } 
-            // 2. MULTI-SELECT
-            elseif ($q['type'] == 'MULTI' && $userAns !== null) {
-                // userAns is expected to be an array of selected indices (strings or ints)
-                $ansArray = is_array($userAns) ? $userAns : json_decode($userAns, true);
-                $correctArray = json_decode($q['correct_answer_json'] ?? '[]', true);
-                
-                if (is_array($ansArray) && is_array($correctArray)) {
-                    sort($ansArray);
-                    sort($correctArray);
-                    if (json_encode($ansArray) === json_encode($correctArray)) {
-                        $isCorrect = true;
-                    }
-                }
-            }
-            // 3. SEQUENCE ORDERING
-            elseif ($q['type'] == 'ORDER' && $userAns !== null) {
-                // userAns is the sequence of IDs or names?
-                // In my ShuffleService, ORDER type correct_answer_json is the sequence of original IDs.
-                // Frontend should submit the sequence of IDs.
-                $ansArray = is_array($userAns) ? $userAns : json_decode($userAns, true);
-                $correctArray = json_decode($q['correct_answer_json'] ?? '[]', true);
-
-                if (is_array($ansArray) && is_array($correctArray)) {
-                    if (json_encode($ansArray) === json_encode($correctArray)) {
-                        $isCorrect = true;
-                    }
-                }
-            }            
-            $marks = $isCorrect ? $q['default_marks'] : ($userAns !== null ? (-1 * abs($q['default_negative_marks'] ?? 0)) : 0);
+            $isCorrect = $result['isCorrect'];
+            $marks = $result['marks'];
+            
             $totalScore += $marks;
 
             if ($isCorrect) {

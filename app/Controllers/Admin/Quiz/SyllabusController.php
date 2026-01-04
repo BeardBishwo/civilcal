@@ -77,13 +77,18 @@ class SyllabusController extends Controller
         $categories = $this->db->find('quiz_categories', ['is_active' => 1], 'name ASC');
         $topics = $this->db->find('quiz_topics', ['is_active' => 1], 'name ASC');
 
+        // Fetch level-wide settings
+        $settingsRow = $this->db->findOne('syllabus_settings', ['level' => $level]);
+        $settings = $settingsRow ? json_decode($settingsRow['settings'], true) : [];
+
         return $this->view('admin/quiz/syllabus/manage', [
             'page_title' => "Editing: $level",
             'nodes' => $nodes,
             'nodesTree' => $nodesTree,
             'level' => $level,
             'categories' => $categories,
-            'topics' => $topics
+            'topics' => $topics,
+            'settings' => $settings
         ]);
     }
 
@@ -188,6 +193,17 @@ class SyllabusController extends Controller
                 // Clear deeper stack if we went up
                 // (e.g. if we are at depth 1, stack[2], stack[3] are invalid)
                 for($i = $currentDepth + 1; $i < 10; $i++) unset($parentStack[$i]);
+            }
+
+            // 3. Save Level Statistics/Settings
+            if (!empty($settings)) {
+                $settingsJson = json_encode($settings);
+                $existing = $this->db->findOne('syllabus_settings', ['level' => $level]);
+                if ($existing) {
+                    $this->db->update('syllabus_settings', ['settings' => $settingsJson], "level = :level", ['level' => $level]);
+                } else {
+                    $this->db->insert('syllabus_settings', ['level' => $level, 'settings' => $settingsJson]);
+                }
             }
 
             $this->db->commit();

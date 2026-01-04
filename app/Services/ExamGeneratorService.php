@@ -128,6 +128,10 @@ class ExamGeneratorService
             shuffle($selectedQuestions);
         }
 
+        // 3. Fetch Level-Wide Settings for Negative Marking
+        $settingsRow = $this->db->findOne('syllabus_settings', ['level' => $level]);
+        $settings = $settingsRow ? json_decode($settingsRow['settings'], true) : [];
+
         return [
             'blueprint_id' => null,
             'blueprint_title' => "Auto-Syllabus Exam ($level)",
@@ -136,9 +140,11 @@ class ExamGeneratorService
             'wildcard_questions' => 0,
             'questions' => $selectedQuestions,
             'metadata' => [
-                'duration_minutes' => $options['duration'] ?? 45,
-                'total_marks' => count($selectedQuestions) * 2, // 2 marks each by default for PSC
-                'negative_marking_rate' => $options['negative_rate'] ?? 20.00,
+                'duration_minutes' => $settings['time'] ?? ($options['duration'] ?? 45),
+                'total_marks' => $settings['marks'] ?? (count($selectedQuestions) * 2), // Use syllabus target if set
+                'negative_marking_rate' => $settings['negValue'] ?? ($options['negative_rate'] ?? 20.00),
+                'negative_marking_unit' => $settings['negUnit'] ?? 'percent',
+                'negative_marking_basis' => $settings['negScope'] ?? 'per-q',
                 'level' => $level
             ]
         ];
@@ -291,6 +297,8 @@ class ExamGeneratorService
                 'duration_minutes' => $generatedExam['metadata']['duration_minutes'],
                 'total_marks' => $generatedExam['metadata']['total_marks'],
                 'negative_marking_rate' => $generatedExam['metadata']['negative_marking_rate'],
+                'negative_marking_unit' => $generatedExam['metadata']['negative_marking_unit'] ?? 'percent',
+                'negative_marking_basis' => $generatedExam['metadata']['negative_marking_basis'] ?? 'per-q',
                 'status' => 'published'
             ], $examData);
 

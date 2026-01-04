@@ -317,7 +317,7 @@ if (!empty($nodesTree)) {
     }
 
     let currentLevel = '<?php echo addslashes($level); ?>';
-    let manualSettings = { 
+    let manualSettings = <?php echo !empty($settings) ? json_encode($settings) : "{ 
         marks: null, 
         time: null, 
         pass: 40, 
@@ -325,7 +325,18 @@ if (!empty($nodesTree)) {
         negUnit: 'percent',
         negScope: 'per-q',
         description: 'Elevate your curriculum with our high-precision syllabus engine.'
-    };
+    }"; ?>;
+
+    // --- INITIALIZATION ---
+    function initSettings() {
+        if(manualSettings.marks) document.getElementById('global-marks-input').value = manualSettings.marks;
+        if(manualSettings.time) document.getElementById('global-time-input').value = manualSettings.time;
+        if(manualSettings.pass) document.getElementById('global-pass-input').value = manualSettings.pass;
+        if(manualSettings.negValue) document.getElementById('global-neg-input').value = manualSettings.negValue;
+        if(manualSettings.negUnit) document.getElementById('neg-unit-select').value = manualSettings.negUnit;
+        if(manualSettings.negScope) document.getElementById('neg-scope-select').value = manualSettings.negScope;
+        if(manualSettings.description) document.getElementById('syllabus-description-el').innerText = manualSettings.description;
+    }
     let draggedItemIndex = null;
 
     // --- GRID RENDERING ---
@@ -585,5 +596,5 @@ if (!empty($nodesTree)) {
         .catch(err => alert('Communication error'));
     }
 
-    document.addEventListener('DOMContentLoaded', () => { renderGrid(); });
+    document.addEventListener('DOMContentLoaded', () => { initSettings(); renderGrid(); });
 </script>
