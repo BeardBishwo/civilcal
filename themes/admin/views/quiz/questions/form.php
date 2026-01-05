@@ -1,285 +1,502 @@
-<div class="content-wrapper p-4">
+<?php
+/**
+ * PREMIUM CREATE QUESTION UI - GAMENTA STYLE
+ * Compact, Tabbed, and Modern
+ */
+?>
 
-    <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
-        <div class="card-body p-4 text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-            <h2 class="fw-bold mb-1">Create Question</h2>
-            <p class="mb-0 text-white-50">Add new content to your bank. Supports LaTeX math & Images.</p>
+<!-- Load Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+<style>
+    /* Custom Scrollbar for sleek look */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    /* Tab Active State */
+    .tab-btn.active {
+        color: #4F46E5; /* Indigo-600 */
+        background-color: #EEF2FF; /* Indigo-50 */
+        border-bottom-color: #4F46E5;
+    }
+    
+    /* Smooth Transitions */
+    .transition-all-300 { transition: all 0.3s ease; }
+</style>
+
+<div class="admin-wrapper-container bg-slate-50 min-h-screen font-sans">
+    <div class="admin-content-wrapper p-6 max-w-[1600px] mx-auto">
+
+        <!-- Page Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800 tracking-tight flex items-center gap-3">
+                    <span class="bg-indigo-100 text-indigo-600 w-10 h-10 rounded-lg flex items-center justify-center text-lg">
+                        <i class="fas fa-pen-nib"></i>
+                    </span>
+                    Create Question
+                </h1>
+                <p class="text-sm text-slate-500 mt-1 ml-14">Add a new question to your bank with precise categorization.</p>
+            </div>
+            <div class="flex gap-3">
+                <a href="<?php echo app_base_url('admin/quiz/questions'); ?>" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition shadow-sm">
+                    Cancel
+                </a>
+                <button type="submit" form="createQuestionForm" class="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition flex items-center">
+                    <i class="fas fa-save mr-2"></i> Save Question
+                </button>
+            </div>
         </div>
-    </div>
 
-    <form id="questionForm" action="/admin/quiz/questions/store" method="POST">
-        
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
-                    <div class="card-body p-4">
+        <form id="createQuestionForm" action="<?php echo app_base_url('admin/quiz/questions/store'); ?>" method="POST" class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- LEFT COLUMN: Main Editor (65%) -->
+            <div class="w-full lg:w-[65%] space-y-6">
+                
+                <!-- 1. Question Type Tabs & Content -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <!-- Tabs -->
+                    <div class="flex border-b border-slate-100 overflow-x-auto no-scrollbar" id="typeTabs">
+                        <input type="hidden" name="type" id="selectedType" value="MCQ">
+
+                        <button type="button" class="tab-btn active flex-1 min-w-[120px] py-4 px-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-all" onclick="switchType('MCQ', this)">
+                            <i class="fas fa-list-ul mb-1 block text-lg"></i> MCQ
+                        </button>
+
+                        <button type="button" class="tab-btn flex-1 min-w-[120px] py-4 px-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-all" onclick="switchType('TF', this)">
+                            <i class="fas fa-check-circle mb-1 block text-lg"></i> True/False
+                        </button>
+
+                        <button type="button" class="tab-btn flex-1 min-w-[120px] py-4 px-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-all" onclick="switchType('MULTI', this)">
+                            <i class="fas fa-check-double mb-1 block text-lg"></i> Multi-Select
+                        </button>
+
+                        <button type="button" class="tab-btn flex-1 min-w-[120px] py-4 px-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-all" onclick="switchType('ORDER', this)">
+                            <i class="fas fa-sort-amount-down mb-1 block text-lg"></i> Sequence
+                        </button>
+                    </div>
+
+                    <!-- Editor Area -->
+                    <div class="p-6">
+                        <div class="mb-3 flex justify-between items-center">
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Question Stem</label>
+                            <div class="flex gap-2">
+                                <button type="button" class="text-xs font-bold text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-lg transition" onclick="MediaManager.open('q_img')">
+                                    <i class="fas fa-image mr-1"></i> Add Media
+                                </button>
+                                <button type="button" class="text-xs font-bold text-slate-600 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition" onclick="toggleHint()">
+                                    <i class="fas fa-lightbulb mr-1"></i> Add Hint
+                                </button>
+                            </div>
+                        </div>
                         
-                        <div class="mb-4">
-                            <label class="form-label fw-bold text-uppercase small text-muted">Question Stem</label>
-                            <div class="position-relative">
-                                <textarea name="question" class="form-control form-control-lg border-0 bg-light" 
-                                          rows="4" placeholder="Type your question here... (e.g. What is the density of steel?)" required></textarea>
-                                
-                                <div class="position-absolute bottom-0 end-0 p-2">
-                                    <button type="button" class="btn btn-sm btn-white shadow-sm rounded-circle" title="Insert Image" onclick="MediaManager.open('q_img')"><i class="fas fa-image text-primary"></i></button>
-                                    <button type="button" class="btn btn-sm btn-white shadow-sm rounded-circle" title="Insert Math" onclick="insertMath()"><i class="fas fa-square-root-alt text-danger"></i></button>
+                        <div class="relative group">
+                            <textarea name="question_text" id="q_editor" class="w-full min-h-[140px] p-5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition resize-y text-slate-700 text-base leading-relaxed placeholder:text-slate-400" placeholder="Type your question here..." required></textarea>
+                            
+                            <!-- Simple Toolbar -->
+                            <div class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-slate-200 rounded-lg shadow-sm flex overflow-hidden">
+                                <button type="button" class="p-1.5 hover:bg-slate-50 text-slate-500 text-xs w-8" title="Bold"><i class="fas fa-bold"></i></button>
+                                <button type="button" class="p-1.5 hover:bg-slate-50 text-slate-500 text-xs w-8 border-l border-slate-100" title="Italic"><i class="fas fa-italic"></i></button>
+                                <button type="button" class="p-1.5 hover:bg-slate-50 text-slate-500 text-xs w-8 border-l border-slate-100" title="Code"><i class="fas fa-code"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Optional Hint Field -->
+                        <div id="hint_field" class="mt-4 hidden animate__animated animate__fadeIn">
+                            <label class="text-xs font-bold text-amber-500 uppercase tracking-wider mb-2 block">Answer Explanation</label>
+                            <div class="relative">
+                                <div class="absolute top-3 left-3 text-amber-400"><i class="fas fa-info-circle"></i></div>
+                                <textarea name="answer_explanation" class="w-full pl-10 p-3 bg-amber-50/50 border border-amber-200 rounded-xl text-sm text-slate-700 focus:border-amber-400 outline-none transition" rows="2" placeholder="Explain why the answer is correct..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Options Area -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm">A</div>
+                            <h3 class="text-lg font-bold text-slate-800">Answer Options</h3>
+                        </div>
+                        <div id="options_toolbar">
+                            <button type="button" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg transition" onclick="addOption()">
+                                <i class="fas fa-plus-circle mr-2"></i> Add Option
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="options_container" class="space-y-4">
+                        <!-- Options injected via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Settings Sidebar (35%) -->
+            <div class="w-full lg:w-[35%] space-y-6">
+                
+                <!-- Org Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Categorization</h4>
+                    
+                    <div class="space-y-5">
+                        
+                        <!-- Course / Stream -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">
+                                <i class="fas fa-graduation-cap mr-1.5 text-indigo-400"></i> Course / Stream
+                            </label>
+                            <div class="relative">
+                                <select name="stream" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition appearance-none">
+                                    <?php if(!empty($streams)): ?>
+                                        <?php foreach($streams as $val => $label): ?>
+                                            <option value="<?= $val ?>"><?= $label ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                                    <i class="fas fa-chevron-down text-xs"></i>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="d-flex align-items-center justify-content-center bg-light p-2 rounded-pill mb-4" style="width: fit-content; margin: 0 auto;">
-                            <input type="radio" class="btn-check" name="type" id="type_mcq" value="MCQ" checked onchange="toggleType('MCQ')">
-                            <label class="btn btn-outline-primary border-0 rounded-pill px-4 fw-bold" for="type_mcq">
-                                <i class="fas fa-list-ul me-2"></i> Multiple Choice
+                        <!-- Education Level -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">
+                                <i class="fas fa-layer-group mr-1.5 text-indigo-400"></i> Academic Level
                             </label>
-
-                            <input type="radio" class="btn-check" name="type" id="type_tf" value="TF" onchange="toggleType('TF')">
-                            <label class="btn btn-outline-primary border-0 rounded-pill px-4 fw-bold" for="type_tf">
-                                <i class="fas fa-check-circle me-2"></i> True / False
-                            </label>
-
-                            <input type="radio" class="btn-check" name="type" id="type_multi" value="MULTI" onchange="toggleType('MULTI')">
-                            <label class="btn btn-outline-primary border-0 rounded-pill px-4 fw-bold" for="type_multi">
-                                <i class="fas fa-check-double me-2"></i> Multi-Select
-                            </label>
-
-                            <input type="radio" class="btn-check" name="type" id="type_order" value="ORDER" onchange="toggleType('ORDER')">
-                            <label class="btn btn-outline-primary border-0 rounded-pill px-4 fw-bold" for="type_order">
-                                <i class="fas fa-sort-amount-down me-2"></i> Sequence
-                            </label>
+                            <div class="relative">
+                                <select name="education_level" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition appearance-none">
+                                    <?php if(!empty($educationLevels)): ?>
+                                        <?php foreach($educationLevels as $val => $label): ?>
+                                            <option value="<?= $val ?>"><?= $label ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></div>
+                            </div>
                         </div>
 
-                        <div id="options_area">
-                            </div>
+                        <hr class="border-slate-100">
 
+                        <!-- Main Category (Subject) -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">
+                                <i class="fas fa-folder mr-1.5 text-indigo-400"></i> Subject (Main)
+                            </label>
+                            <div class="relative">
+                                <select name="syllabus_main_id" id="main_cat" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition appearance-none" onchange="filterSubTopics()">
+                                    <?php if(!empty($mainCategories)): ?>
+                                        <?php foreach($mainCategories as $cat): ?>
+                                            <option value="<?= $cat['id'] ?>" <?= (isset($last_main_id) && $last_main_id == $cat['id']) ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($cat['title']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <option value="">No subjects found</option>
+                                    <?php endif; ?>
+                                </select>
+                                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub Category (Topic) -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">
+                                <i class="fas fa-tag mr-1.5 text-indigo-400"></i> Topic (Sub)
+                            </label>
+                            <div class="relative">
+                                <select name="syllabus_node_id" id="sub_cat" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition appearance-none disabled:opacity-50 disabled:cursor-not-allowed" required>
+                                    <option value="">-- Select Subject First --</option>
+                                    <?php if(!empty($subCategories)): ?>
+                                        <?php foreach($subCategories as $parentId => $nodes): ?>
+                                            <?php foreach($nodes as $sub): ?>
+                                                <option value="<?= $sub['id'] ?>" data-parent="<?= $parentId ?>" 
+                                                    <?= (isset($last_sub_id) && $last_sub_id == $sub['id']) ? 'selected' : '' ?>>
+                                                    <?= htmlspecialchars($sub['title']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-lg-4">
-                <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
-                    <div class="card-header bg-white fw-bold text-uppercase small text-muted border-0 pt-4">
-                        Categorization
+                <!-- Target Position Level Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 pl-2">Target Position Level</h4>
+                    <p class="text-[10px] text-slate-400 mb-3 pl-2 italic">Select all exams this question is suitable for:</p>
+                    
+                    <div class="space-y-2 pl-2">
+                        <?php if(!empty($pscLevels)): ?>
+                            <?php foreach($pscLevels as $level): ?>
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="checkbox" name="level_tags[]" value="<?= $level['id'] ?>" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                                <span class="text-sm text-slate-600 group-hover:text-indigo-600 transition font-medium"><?= htmlspecialchars($level['name']) ?></span>
+                            </label>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
-                    <div class="card-body p-4">
+                </div>
+
+                <!-- Configuration Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Settings</h4>
+                    
+                    <!-- Difficulty Slider -->
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-3">
+                            <label class="text-sm font-bold text-slate-700">Difficulty</label>
+                            <span id="diff_label" class="text-xs font-bold px-2.5 py-1 rounded-md bg-yellow-100 text-yellow-700 border border-yellow-200">Medium</span>
+                        </div>
+                        <input type="range" name="difficulty_level" min="1" max="5" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" oninput="updateDiffLabel(this.value)">
+                        <div class="flex justify-between text-[10px] font-bold text-slate-400 mt-2">
+                            <span>Easy</span>
+                            <span>Expert</span>
+                        </div>
+                    </div>
+
+                    <!-- Marks Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-5">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Marks</label>
+                            <div class="relative">
+                                <input type="number" name="default_marks" value="1.0" step="0.1" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold text-slate-700 focus:border-indigo-500 outline-none">
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Neg. Marks</label>
+                            <div class="relative">
+                                <input type="number" name="default_negative_marks" value="0.2" step="0.01" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold text-red-600 focus:border-red-500 outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Toggles -->
+                    <div class="space-y-3">
+                        <label class="flex items-center justify-between p-3 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer transition group">
+                            <span class="text-sm font-semibold text-slate-700 group-hover:text-indigo-600 transition">Active Status</span>
+                            <div class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_active" value="1" checked class="sr-only peer">
+                                <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                            </div>
+                        </label>
                         
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Main Stream</label>
-                            <select class="form-select bg-light border-0 fw-bold" name="syllabus_main_id" id="main_cat" onchange="filterSubCats()">
-                                <?php foreach($mainCategories as $cat): ?>
-                                    <option value="<?= $cat['id'] ?>" <?= (isset($_SESSION['last_q_main_id']) && $_SESSION['last_q_main_id'] == $cat['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($cat['title']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Topic</label>
-                            <select class="form-select bg-light border-0" name="syllabus_node_id" id="sub_cat">
-                                <option>-- Select Stream First --</option>
-                                <?php foreach($subCategories as $sub): ?>
-                                    <option value="<?= $sub['id'] ?>" data-parent="<?= $sub['parent_id'] ?>" 
-                                        <?= (isset($_SESSION['last_q_sub_id']) && $_SESSION['last_q_sub_id'] == $sub['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($sub['title']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <hr class="text-muted opacity-25">
-
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold d-flex justify-content-between">
-                                Difficulty Level <span class="badge bg-warning text-dark" id="diff_val">Medium</span>
-                            </label>
-                            <input type="range" class="form-range" min="1" max="3" step="1" id="difficulty" name="level" oninput="updateDiffLabel(this.value)">
-                            <div class="d-flex justify-content-between small text-muted px-1">
-                                <span>Easy</span>
-                                <span>Medium</span>
-                                <span>Hard</span>
+                        <label class="flex items-center justify-between p-3 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer transition group">
+                            <span class="text-sm font-semibold text-slate-700 group-hover:text-indigo-600 transition">Shuffle Options</span>
+                            <div class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="shuffle_options" value="1" checked class="sr-only peer">
+                                <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
                             </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 fw-bold rounded-pill py-3 shadow-sm mt-2" 
-                                style="background: #764ba2; border:none; letter-spacing: 0.5px;">
-                            SAVE QUESTION
-                        </button>
-
+                        </label>
                     </div>
                 </div>
+
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
-</div>
+<!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
-    // 1. Templates for the UI
-    const templates = {
-        // Standard 4 Options
-        MCQ: `
-            <div class="row g-3 animate__animated animate__fadeIn">
-                ${[1, 2, 3, 4].map(n => `
-                <div class="col-md-6">
-                    <div class="input-group shadow-sm" style="border-radius: 10px; overflow: hidden;">
-                        <span class="input-group-text bg-white border-0 text-muted fw-bold ps-3">Option ${String.fromCharCode(64 + n)}</span>
-                        <input type="text" name="option_${n}" class="form-control border-0 bg-white" placeholder="Answer..." required>
-                        <div class="input-group-text bg-white border-0">
-                            <input class="form-check-input" type="radio" name="correct_answer" value="${n}" required>
-                        </div>
-                    </div>
-                </div>
-                `).join('')}
-                <div class="col-12 text-center mt-3">
-                    <small class="text-muted"><i class="fas fa-info-circle"></i> Click the radio button next to the correct answer.</small>
-                </div>
-            </div>
-        `,
-
-        // Enterprise True/False Toggle
-        TF: `
-            <div class="p-5 bg-light rounded-3 text-center animate__animated animate__flipInX border border-dashed">
-                <h5 class="text-muted fw-bold mb-4">Select the Correct Answer</h5>
-                
-                <div class="btn-group" role="group">
-                    <input type="radio" class="btn-check" name="correct_answer" id="btn_true" value="1" autocomplete="off">
-                    <label class="btn btn-outline-success btn-lg px-5 py-3 fw-bold" for="btn_true">
-                        <i class="fas fa-check me-2"></i> TRUE
-                    </label>
-
-                    <input type="radio" class="btn-check" name="correct_answer" id="btn_false" value="2" autocomplete="off">
-                    <label class="btn btn-outline-danger btn-lg px-5 py-3 fw-bold" for="btn_false">
-                        <i class="fas fa-times me-2"></i> FALSE
-                    </label>
-                </div>
-
-                <input type="hidden" name="option_1" value="True">
-                <input type="hidden" name="option_2" value="False">
-                <input type="hidden" name="option_3" value="">
-                <input type="hidden" name="option_4" value="">
-            </div>
-            </div>
-        `,
-
-        // 3. MULTI-SELECT (Brainstorming)
-        MULTI: `
-            <div class="row g-3 animate__animated animate__fadeIn">
-                <div class="col-12"><div class="alert alert-info py-2 small"><i class="fas fa-check-double me-2"></i> Select ALL correct options.</div></div>
-                ${[1, 2, 3, 4].map(n => `
-                <div class="col-md-6">
-                    <div class="input-group shadow-sm" style="border-radius: 10px; overflow: hidden;">
-                        <span class="input-group-text bg-white border-0 text-primary fw-bold ps-3">Option ${String.fromCharCode(64 + n)}</span>
-                        <input type="text" name="option_${n}" class="form-control border-0 bg-white" placeholder="Option Text..." required>
-                        <div class="input-group-text bg-white border-0">
-                            <input class="form-check-input" type="checkbox" name="options[${n-1}][is_correct]" value="1">
-                        </div>
-                    </div>
-                </div>
-                `).join('')}
-            </div>
-        `,
-
-        // 4. SEQUENCE / ORDERING (The "Drag" Interface)
-        ORDER: `
-            <div class="p-4 bg-light rounded-3 border border-dashed animate__animated animate__fadeIn">
-                <h6 class="text-muted fw-bold mb-3"><i class="fas fa-sort-amount-down me-2"></i> Define Correct Sequence</h6>
-                <p class="small text-muted mb-3">Enter options, then DRAG the handles on the right to set the correct order.</p>
-                
-                <ul class="list-group" id="sequence_list">
-                    ${[1, 2, 3, 4].map((n, idx) => `
-                    <li class="list-group-item d-flex align-items-center p-2 border-0 mb-2 shadow-sm rounded">
-                        <span class="badge bg-secondary me-3">${n}</span>
-                        <input type="text" name="option_${n}" class="form-control border-0" placeholder="Step ${n}..." required>
-                        <input type="hidden" name="options[${idx}][order]" value="${idx}"> <!-- Implicit Order by List Position via JS? No, logic needed -->
-                        <!-- Wait, if we drag, the input order changes in DOM? Yes. -->
-                        <!-- So if we submit, key 'option_1' corresponds to name='option_1'. -->
-                        <!-- But we need to submit the ORDER. -->
-                        <!-- Strategy: Use JS to update hidden inputs or rely on Controller to parse order based on submitted array sequence? -->
-                        <!-- Controller uses 'options' array from POST. -->
-                        <!-- So we should name inputs 'options[key][text]'? -->
-                    </li>
-                    `).join('')}
-                </ul>
-                <div class="alert alert-warning small mt-3"><i class="fas fa-exclamation-triangle"></i> Note: Drag items to set the Correct Answer sequence (Top = 1st).</div>
-            </div>
-        `
+    // Config
+    const state = {
+        type: 'MCQ',
+        optionCount: 4
     };
 
-    // 2. Logic Controller
-    function toggleType(type) {
-        const container = document.getElementById('options_area');
+    // UI Templates
+    const UI = {
+        renderOptionRow: (idx, type) => {
+            const letter = String.fromCharCode(65 + idx); // A, B, C...
+            let inputControl = '';
+            
+            // Logic for Correct Answer Selection
+            if (type === 'MCQ') {
+                inputControl = `<input type="radio" name="correct_answer_dummy" class="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer" 
+                                onclick="setSingleCorrect(${idx})" required>`;
+                inputControl += `<input type="hidden" name="options[${idx}][is_correct]" class="is_correct_val" value="0">`;
+            } else if (type === 'TF') {
+               // Handled separately
+            } else if (type === 'MULTI') {
+                inputControl = `<input type="checkbox" name="options[${idx}][is_correct]" value="1" class="w-5 h-5 text-amber-600 rounded border-gray-300 focus:ring-amber-500 cursor-pointer">`;
+            } else if (type === 'ORDER') {
+                inputControl = `<div class="handle cursor-grab text-slate-300 hover:text-slate-500"><i class="fas fa-grip-vertical"></i></div>
+                                <input type="hidden" name="options[${idx}][is_correct]" value="1">`; // Sequence uses order index automatically
+            }
+
+            return `
+            <div class="option-row group flex items-start gap-3 animate__animated animate__fadeIn mb-3">
+                <div class="pt-3">
+                    ${inputControl}
+                </div>
+                <div class="flex-1">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-slate-400 font-bold text-sm">${letter}.</span>
+                        </div>
+                        <input type="text" name="options[${idx}][text]" 
+                               class="w-full pl-8 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition placeholder:text-slate-400"
+                               placeholder="Enter option text..." required>
+                        
+                        <!-- Actions -->
+                        <div class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-white rounded-lg shadow-sm border border-slate-100">
+                            <button type="button" class="p-1.5 text-slate-400 hover:text-indigo-500 transition" title="Add Image"><i class="fas fa-image"></i></button>
+                            ${state.optionCount > 2 ? `<button type="button" class="p-1.5 text-slate-400 hover:text-red-500 transition border-l border-slate-100" onclick="removeOption(this)"><i class="fas fa-times"></i></button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+    };
+
+    // Logic
+    function switchType(newType, btn) {
+        state.type = newType;
+        document.getElementById('selectedType').value = newType;
         
-        // Instant visual switch
-        container.innerHTML = templates[type];
-        
-        // Initialize Sortable if ORDER type
-        if (type === 'ORDER') {
-            setTimeout(initSequenceSorter, 100);
+        // Tab Styling
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-600');
+            b.classList.add('text-slate-500', 'border-transparent');
+        });
+        if(btn) {
+            btn.classList.remove('text-slate-500', 'border-transparent');
+            btn.classList.add('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-600');
+        }
+
+        const container = document.getElementById('options_container');
+        const toolbar = document.getElementById('options_toolbar');
+        container.innerHTML = '';
+
+        if (newType === 'TF') {
+            // True/False Special Layout
+            container.innerHTML = `
+                <div class="grid grid-cols-2 gap-4">
+                    <label class="cursor-pointer relative group">
+                        <input type="radio" name="tf_selection" value="1" class="peer sr-only" onchange="setTFCorrect(0)">
+                        <div class="p-6 rounded-2xl border-2 border-slate-200 hover:border-emerald-200 bg-slate-50 peer-checked:bg-emerald-50 peer-checked:border-emerald-500 text-center transition-all group-hover:shadow-md">
+                            <div class="text-emerald-600 font-bold text-xl"><i class="fas fa-check-circle mb-2 block text-3xl"></i> TRUE</div>
+                        </div>
+                        <input type="hidden" name="options[0][text]" value="True">
+                        <input type="hidden" name="options[0][is_correct]" id="tf_0_val" value="0">
+                    </label>
+                    <label class="cursor-pointer relative group">
+                        <input type="radio" name="tf_selection" value="0" class="peer sr-only" onchange="setTFCorrect(1)">
+                        <div class="p-6 rounded-2xl border-2 border-slate-200 hover:border-red-200 bg-slate-50 peer-checked:bg-red-50 peer-checked:border-red-500 text-center transition-all group-hover:shadow-md">
+                            <div class="text-red-600 font-bold text-xl"><i class="fas fa-times-circle mb-2 block text-3xl"></i> FALSE</div>
+                        </div>
+                        <input type="hidden" name="options[1][text]" value="False">
+                        <input type="hidden" name="options[1][is_correct]" id="tf_1_val" value="0">
+                    </label>
+                </div>
+            `;
+            toolbar.style.display = 'none'; 
+        } else {
+            // Standard Options List
+            state.optionCount = 4;
+            renderOptionsList();
+            toolbar.style.display = 'block';
+        }
+
+        // Setup Drag for Order
+        if (newType === 'ORDER') {
+            new Sortable(container, { handle: '.handle', animation: 150 });
         }
     }
 
-    // Sortable Helper
-    function initSequenceSorter() {
-        if (typeof Sortable === 'undefined') return;
-        new Sortable(document.getElementById('sequence_list'), {
-            handle: '.handle',
-            animation: 150
+    function setSingleCorrect(selectedIndex) {
+        document.querySelectorAll('.is_correct_val').forEach((el, idx) => {
+            el.value = (idx === selectedIndex) ? '1' : '0';
         });
     }
 
-    // 3. Helper: Difficulty Label Update
-    function updateDiffLabel(val) {
-        const labels = {1: 'Easy', 2: 'Medium', 3: 'Hard'};
-        const colors = {1: 'success', 2: 'warning', 3: 'danger'};
-        const badge = document.getElementById('diff_val');
-        
-        badge.innerText = labels[val];
-        badge.className = `badge bg-${colors[val]} text-${val === '2' ? 'dark' : 'white'}`;
+    function setTFCorrect(idx) {
+        document.getElementById('tf_0_val').value = (idx === 0) ? '1' : '0';
+        document.getElementById('tf_1_val').value = (idx === 1) ? '1' : '0';
     }
 
-    // 4. Smart Category Filter (Inherited from Phase 9)
-    function filterSubCats() {
+    function renderOptionsList() {
+        const container = document.getElementById('options_container');
+        let html = '';
+        for (let i = 0; i < state.optionCount; i++) {
+            html += UI.renderOptionRow(i, state.type);
+        }
+        container.innerHTML = html;
+    }
+
+    function addOption() {
+        state.optionCount++;
+        const container = document.getElementById('options_container');
+        const div = document.createElement('div');
+        div.innerHTML = UI.renderOptionRow(state.optionCount - 1, state.type);
+        container.appendChild(div.firstElementChild); // Extract from wrapper
+    }
+
+    function removeOption(btn) {
+        if (state.optionCount <= 2) return;
+        btn.closest('.option-row').remove();
+        state.optionCount--;
+        renderOptionsList(); 
+    }
+
+    function updateDiffLabel(val) {
+        const map = {1: ['Easy', 'bg-green-100 text-green-700'], 2: ['Easy-Med', 'bg-lime-100 text-lime-700'], 3: ['Medium', 'bg-yellow-100 text-yellow-700'], 4: ['Hard', 'bg-orange-100 text-orange-700'], 5: ['Expert', 'bg-red-100 text-red-700']};
+        const el = document.getElementById('diff_label');
+        el.innerText = map[val][0];
+        el.className = `text-xs font-bold px-2.5 py-1 rounded-md ${map[val][1]}`;
+    }
+
+    function filterSubTopics() {
         const mainId = document.getElementById('main_cat').value;
-        const subOptions = document.querySelectorAll('#sub_cat option');
-        let firstVisible = null;
+        const subSelect = document.getElementById('sub_cat');
+        const subs = document.querySelectorAll('#sub_cat option');
+        let hasVisible = false;
         
-        subOptions.forEach(opt => {
-            if (opt.value === "") return; // Skip placeholder
+        subs.forEach(opt => {
+            if (opt.value === "") return;
+            const parent = opt.getAttribute('data-parent');
             
-            if (opt.dataset.parent == mainId) {
+            if (parent == mainId || !mainId) { 
                 opt.style.display = 'block';
-                if (!firstVisible) firstVisible = opt;
+                if (!hasVisible) hasVisible = true; 
             } else {
                 opt.style.display = 'none';
             }
         });
-
-        // Auto-select first valid option
-        if (firstVisible) {
-            document.getElementById('sub_cat').value = firstVisible.value;
-        } else {
-            document.getElementById('sub_cat').value = "";
-        }
+        
+        subSelect.value = ""; // Reset sub selection on main change
+        subSelect.disabled = !hasVisible; // Disable if no subs
     }
 
-    // Initialize on Load
+    function toggleHint() {
+        document.getElementById('hint_field').classList.toggle('hidden');
+    }
+
+    // Init
     document.addEventListener('DOMContentLoaded', () => {
-        toggleType('MCQ');
-        filterSubCats(); // Initialize filter
+        // Initial Tab Selection Styling
+        const firstBtn = document.querySelector('#typeTabs button');
+        switchType('MCQ', firstBtn);
+        
+        // Trigger filter init
+        filterSubTopics();
     });
 </script>
-
-<style>
-    /* Premium UI Tweaks */
-    .btn-check:checked + .btn-outline-primary {
-        background-color: #6f42c1;
-        color: white;
-        border-color: #6f42c1;
-        box-shadow: 0 4px 6px rgba(111, 66, 193, 0.3);
-    }
-    .form-control:focus {
-        box-shadow: none;
-        border: 2px solid #bba3e8 !important; /* Soft Purple Focus */
-    }
-</style>

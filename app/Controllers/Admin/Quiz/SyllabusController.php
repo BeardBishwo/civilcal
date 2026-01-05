@@ -108,7 +108,8 @@ class SyllabusController extends Controller
     }
 
     /**
-     * NEW: Bulk Save for Pro Grid UI
+     * BULK SAVE: Handles the Grid UI payload
+     * Transactional save that reconstructs the tree hierarchy from flat grid depth.
      */
     public function bulkSave()
     {
@@ -118,100 +119,77 @@ class SyllabusController extends Controller
         $settings = $input['settings'] ?? [];
 
         if (!$level || empty($nodes)) {
-            echo json_encode(['status' => 'error', 'message' => 'No data provided']);
+            $this->jsonResponse(['status' => 'error', 'message' => 'No data provided']);
             return;
         }
 
         $this->db->beginTransaction();
         try {
-            // 1. Clear existing for this level (Simplest way to handle re-ordering/deletes)
-            // Note: In production, consider soft-deletes or smarter diffing to preserve IDs if needed
+            // 1. Clear existing structure for this level
+            // We use DELETE/INSERT strategy to ensure clean ordering and hierarchy reconstruction
             $this->db->delete('syllabus_nodes', "level = :level", ['level' => $level]);
 
-            // 2. Re-insert all nodes
-            // We need to map the flat JS array back to parent_id logic based on depth
-            // This is complex because JS grid relies on order + depth, DB needs parent_id.
+            // 2. Reconstruct Hierarchy & Save Nodes
+            // The Grid provides a flat list with 'depth' (0,1,2,3).
+            // We use a stack references to reconstruct parent_id relationships.
             
-            $parentStack = [null]; // Depth 0 parent is null
-            $previousDepth = -1;
-
+            $parentStack = [null]; // Stack: depth => parent_node_id
+            
             foreach ($nodes as $index => $node) {
                 $currentDepth = (int)$node['depth'];
                 
-                // Adjust stack based on depth change
-                if ($currentDepth > $previousDepth) {
-                    // Going deeper: Parent is previous node (which we haven't saved ID for yet? We need to save IDs)
-                    // This logic requires saving parent first. 
-                    // Let's assume nodes come in linear order.
-                } 
-                // Actually, simplest way: The UI sends depth. We can reconstruct parent_id on read or write.
-                // The Grid UI doesn't explicitly track parent_id visually, it implies it by depth order.
-                
-                // Simplified Logic: 
-                // If depth = 0, parent = null.
-                // If depth > prevDepth, parent = prevNodeId.
-                // If depth < prevDepth, pop from stack.
-                
-                // Better approach: Let's trust the JS structure is ordered.
-                // We need to generate NEW IDs or map old ones.
-                // For simplicity in this demo, we'll just save them as flat list with depth, 
-                // and use a helper to reconstruct parent_ids if the DB schema strictly requires it.
-                // Assuming DB schema has `parent_id`.
-                
-                // Stack to keep track of the last ID at each depth
-                // $stack[0] = id_of_last_depth_0_item
-                // $stack[1] = id_of_last_depth_1_item
-                
+                // Determine Parent ID
+                // If depth is 0, parent is null (Stack[0-1] is undefined/null logic)
+                // If depth is 2, parent is at Stack[1]
+                $parentId = ($currentDepth > 0 && isset($parentStack[$currentDepth - 1])) 
+                            ? $parentStack[$currentDepth - 1] 
+                            : null;
+
+                // Create Slug
                 $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $node['title']), '-'));
+                
+                // Prepare Data
                 $data = [
                     'level' => $level,
                     'title' => $node['title'],
                     'slug' => $slug,
-                    'type' => $node['type'],
-                    'questions_weight' => $node['weight'],
+                    'type' => $node['type'] ?? 'unit',
+                    'parent_id' => $parentId,
+                    'questions_weight' => $node['weight'] ?? 0,
                     'time_minutes' => $node['time'] ?? 0,
                     'question_count' => $node['qCount'] ?? 0,
                     'order' => $index,
+                    'is_active' => 1
                 ];
                 
-                // Insert and get ID
+                // Insert
                 $this->db->insert('syllabus_nodes', $data);
                 $newId = $this->db->lastInsertId();
                 
-                // Logic to update parent_id for the *next* items? 
-                // Or better: update THIS item's parent_id based on stack.
-                $parentId = null;
-                if ($currentDepth > 0 && isset($parentStack[$currentDepth - 1])) {
-                    $parentId = $parentStack[$currentDepth - 1];
-                    // Update this node with parent
-                    $this->db->update('syllabus_nodes', ['parent_id' => $parentId], "id = :id", ['id' => $newId]);
-                }
-                
-                // Update stack for children
+                // Update Stack: This node becomes the potential parent for the next depth (currentDepth + 1)
                 $parentStack[$currentDepth] = $newId;
                 
-                // Clear deeper stack if we went up
-                // (e.g. if we are at depth 1, stack[2], stack[3] are invalid)
+                // Clean stack for deeper levels to avoid stale references if we jump back up
                 for($i = $currentDepth + 1; $i < 10; $i++) unset($parentStack[$i]);
             }
 
-            // 3. Save Level Statistics/Settings
+            // 3. Save Level Meta-Settings
             if (!empty($settings)) {
                 $settingsJson = json_encode($settings);
                 $existing = $this->db->findOne('syllabus_settings', ['level' => $level]);
                 if ($existing) {
-                    $this->db->update('syllabus_settings', ['settings' => $settingsJson], "level = :level", ['level' => $level]);
+                    $this->db->update('syllabus_settings', ['settings' => $settingsJson, 'updated_at' => date('Y-m-d H:i:s')], "level = :level", ['level' => $level]);
                 } else {
-                    $this->db->insert('syllabus_settings', ['level' => $level, 'settings' => $settingsJson]);
+                    $this->db->insert('syllabus_settings', ['level' => $level, 'settings' => $settingsJson, 'updated_at' => date('Y-m-d H:i:s')]);
                 }
             }
 
             $this->db->commit();
-            echo json_encode(['status' => 'success']);
+            $this->jsonResponse(['status' => 'success']);
 
         } catch (\Exception $e) {
             $this->db->rollBack();
-            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+            $this->jsonResponse(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
 
