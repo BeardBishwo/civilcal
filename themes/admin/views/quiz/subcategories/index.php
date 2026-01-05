@@ -137,8 +137,8 @@ $stats = [
                             <th style="width: 50px;" class="text-center">#</th>
                             <th style="width: 60px;" class="text-center">ID</th>
                             <th style="width: 60px;" class="text-center">Order</th>
-                            <th>Sub Category Info</th>
-                            <th class="text-center" style="min-width: 350px;">Main Category</th>
+                            <th style="width: 35%;">Sub Category Info</th>
+                            <th class="text-center" style="width: 35%;">Main Category</th>
                             <th class="text-center" style="width: 100px;">Questions</th>
                             <th class="text-center" style="width: 100px;">Premium</th>
                             <th class="text-center" style="width: 100px;">Actions</th>
@@ -509,8 +509,11 @@ input:checked + .slider:before { transform: translateX(16px); }
 .item-slug { font-size: 0.75rem; color: #94a3b8; font-family: monospace; }
 
 .badge-pill {
-    background: #e0e7ff; color: #4338ca; padding: 2px 10px; border-radius: 12px;
-    font-size: 0.7rem; font-weight: 700; border: 1px solid #c7d2fe; white-space: nowrap;
+    background: #e0e7ff; color: #4338ca; padding: 6px 12px; border-radius: 12px;
+    font-size: 0.7rem; font-weight: 700; border: 1px solid #c7d2fe; 
+    white-space: normal; line-height: 1.4; max-width: 100%; 
+    display: inline-block; text-align: center; word-wrap: break-word;
+    min-height: 24px; vertical-align: middle;
 }
 .metric-text { font-weight: 700; color: #64748b; font-size: 0.8rem; }
 

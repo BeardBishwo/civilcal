@@ -130,9 +130,9 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                             </th>
                             <th style="width: 40px;"></th>
                             <th style="width: 60px;">#</th>
-                            <th>Title</th>
-                            <th style="min-width: 220px;">Course</th>
-                            <th style="min-width: 350px;">Education Level</th>
+                            <th style="width: 30%;">Title</th>
+                            <th style="width: 30%;">Course</th>
+                            <th style="width: 30%;">Education Level</th>
                             <th style="width: 80px;">Level #</th>
                             <th style="width: 80px;">Color</th>
                             <th style="width: 80px;">Icon</th>
@@ -463,9 +463,18 @@ document.querySelectorAll('.status-toggle').forEach(el => {
     background-color: #667eea;
 }
 
+
 .select2-container--default .select2-results__option[aria-selected=true] {
     background-color: #e0e7ff;
     color: #4338ca;
+}
+
+.badge-pill {
+    background: #e0e7ff; color: #4338ca; padding: 6px 12px; border-radius: 12px;
+    font-size: 0.7rem; font-weight: 700; border: 1px solid #c7d2fe; 
+    white-space: normal; line-height: 1.4; max-width: 100%; 
+    display: inline-block; text-align: center; word-wrap: break-word;
+    min-height: 24px; vertical-align: middle;
 }
 
 .select2-container--default.select2-container--focus .select2-selection--single {
