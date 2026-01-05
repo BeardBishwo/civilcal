@@ -215,7 +215,8 @@ class CategoryController extends Controller
             $check = $this->db->findOne('syllabus_nodes', [
                 'title' => $newTitle, 
                 'type' => $original['type'], 
-                'parent_id' => $original['parent_id']
+                'parent_id' => $original['parent_id'],
+                'is_active' => 0
             ]);
             if (!$check) break;
             $counter++;

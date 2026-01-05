@@ -35,7 +35,7 @@ class AdminController extends Controller
             $stats = [
                 'users' => [
                     'total' => count($users),
-                    'active' => count(array_filter($users, fn($u) => $u['is_active'])),
+                    'active' => count(array_filter($users, fn($u) => ($u['is_active'] ?? 0) == 1)),
                     'new_today' => $this->getNewUsersToday($users),
                     'roles' => $this->getUserRoleDistribution($users)
                 ],
@@ -55,9 +55,10 @@ class AdminController extends Controller
             
             echo json_encode(['success' => true, 'stats' => $stats]);
             
-        } catch (Exception $e) {
-            http_response_code(403);
-            echo json_encode(['error' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            error_log("Dashboard Stats Error: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
         }
     }
     

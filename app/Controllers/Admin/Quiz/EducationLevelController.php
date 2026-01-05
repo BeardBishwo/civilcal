@@ -26,7 +26,7 @@ class EducationLevelController extends Controller
     {
         // Fetch Education Levels with Parent Course Name
         // Assumes Education Levels are children of Courses in syllabus_nodes
-        $sql = "SELECT el.*, c.title as course_title 
+        $sql = "SELECT el.*, c.title as parent_title 
                 FROM syllabus_nodes el 
                 LEFT JOIN syllabus_nodes c ON el.parent_id = c.id
                 WHERE el.type = 'education_level' 
@@ -177,7 +177,8 @@ class EducationLevelController extends Controller
             $check = $this->db->findOne('syllabus_nodes', [
                 'title' => $newTitle, 
                 'type' => $original['type'], 
-                'parent_id' => $original['parent_id']
+                'parent_id' => $original['parent_id'],
+                'is_active' => 0
             ]);
             if (!$check) break;
             $counter++;

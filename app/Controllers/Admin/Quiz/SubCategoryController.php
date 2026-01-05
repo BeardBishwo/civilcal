@@ -48,8 +48,7 @@ class SubCategoryController extends Controller
         $subCategories = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         // 2. Fetch Main Categories (For the Dropdown Filter & Modal)
-        // Main categories are roots
-        $parents = $this->db->query("SELECT * FROM syllabus_nodes WHERE parent_id IS NULL ORDER BY title ASC")->fetchAll();
+        $parents = $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'category' ORDER BY title ASC")->fetchAll();
 
         return $this->view('admin/quiz/subcategories/index', [
             'subCategories' => $subCategories,
@@ -64,7 +63,7 @@ class SubCategoryController extends Controller
     public function store()
     {
         $title = $_POST['title'] ?? '';
-        $parentId = $_POST['parent_id'] ?? null;
+        $parentId = $_POST['parent_id'] ?? $_POST['category_id'] ?? null;
         $isPremium = isset($_POST['is_premium']) ? 1 : 0;
         $unlockPrice = $_POST['unlock_price'] ?? 0;
         $image = $_POST['image'] ?? null;
@@ -218,7 +217,8 @@ class SubCategoryController extends Controller
             $check = $this->db->findOne('syllabus_nodes', [
                 'title' => $newTitle, 
                 'type' => $original['type'], 
-                'parent_id' => $original['parent_id']
+                'parent_id' => $original['parent_id'],
+                'is_active' => 0
             ]);
             if (!$check) break;
             $counter++;
