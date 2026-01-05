@@ -40,8 +40,8 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
             <div class="toolbar-left">
                 <div class="filter-group">
                     <span class="filter-label">FILTER DATA:</span>
-                    <form method="GET" style="margin:0; display:flex; gap:0.5rem;">
-                        <select name="course_id" onchange="this.form.submit()" class="filter-select">
+                    <form method="GET" id="filterForm" style="margin:0; display:flex; gap:0.5rem;">
+                        <select name="course_id" id="courseFilter" class="filter-select-search" style="width: 250px;">
                             <option value="">All Courses</option>
                             <?php foreach ($courses as $c): ?>
                                 <option value="<?php echo $c['id']; ?>" <?php echo $selectedCourse == $c['id'] ? 'selected' : ''; ?>>
@@ -49,7 +49,7 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <select name="education_level_id" onchange="this.form.submit()" class="filter-select">
+                        <select name="education_level_id" id="educationLevelFilter" class="filter-select-search" style="width: 350px;">
                             <option value="">All Education Levels</option>
                             <?php foreach ($educationLevels as $el): ?>
                                 <option value="<?php echo $el['id']; ?>" <?php echo $selectedEducationLevel == $el['id'] ? 'selected' : ''; ?>>
@@ -70,7 +70,7 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                 <!-- Course Select -->
                 <div class="input-group-premium" style="flex: 2; min-width: 150px;">
                     <i class="fas fa-university icon"></i>
-                    <select name="course_id" class="form-input-premium">
+                    <select name="course_id" id="courseSelect" class="form-input-premium form-select-search" style="padding-left: 2.25rem;">
                         <option value="">Select Course...</option>
                         <?php foreach ($courses as $c): ?>
                             <option value="<?php echo $c['id']; ?>"><?php echo htmlspecialchars($c['title']); ?></option>
@@ -81,7 +81,7 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                 <!-- Education Level Select -->
                 <div class="input-group-premium" style="flex: 2; min-width: 150px;">
                     <i class="fas fa-graduation-cap icon"></i>
-                    <select name="education_level_id" class="form-input-premium">
+                    <select name="education_level_id" id="educationLevelSelect" class="form-input-premium form-select-search" style="padding-left: 2.25rem;">
                         <option value="">Select Education Level...</option>
                         <?php foreach ($educationLevels as $el): ?>
                             <option value="<?php echo $el['id']; ?>"><?php echo htmlspecialchars($el['title']); ?></option>
@@ -234,9 +234,65 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
     </div>
 </div>
 
+<!-- Select2 for Searchable Dropdowns -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 <script>
+// Initialize Select2 on page load
+$(document).ready(function() {
+    // Filter dropdowns with auto-focus
+    $('#courseFilter').select2({
+        placeholder: 'All Courses',
+        allowClear: true,
+        width: '250px'
+    }).on('select2:open', function() {
+        // Auto-focus search input when dropdown opens
+        setTimeout(() => {
+            document.querySelector('.select2-search__field').focus();
+        }, 100);
+    }).on('change', function() {
+        document.getElementById('filterForm').submit();
+    });
+    
+    $('#educationLevelFilter').select2({
+        placeholder: 'All Education Levels',
+        allowClear: true,
+        width: '350px'
+    }).on('select2:open', function() {
+        // Auto-focus search input when dropdown opens
+        setTimeout(() => {
+            document.querySelector('.select2-search__field').focus();
+        }, 100);
+    }).on('change', function() {
+        document.getElementById('filterForm').submit();
+    });
+    
+    // Creation form dropdowns with auto-focus
+    $('#courseSelect').select2({
+        placeholder: 'Select Course...',
+        allowClear: true,
+        dropdownParent: $('.creation-toolbar')
+    }).on('select2:open', function() {
+        setTimeout(() => {
+            document.querySelector('.select2-search__field').focus();
+        }, 100);
+    });
+    
+    $('#educationLevelSelect').select2({
+        placeholder: 'Select Education Level...',
+        allowClear: true,
+        dropdownParent: $('.creation-toolbar')
+    }).on('select2:open', function() {
+        setTimeout(() => {
+            document.querySelector('.select2-search__field').focus();
+        }, 100);
+    });
+});
+
 async function saveLevel() {
     const form = document.getElementById('addLevelForm');
     const title = form.querySelector('input[name="title"]').value;
@@ -368,6 +424,55 @@ document.querySelectorAll('.status-toggle').forEach(el => {
     --admin-gray-600: #4b5563;
     --admin-gray-800: #1f2937;
 }
+
+/* Select2 Custom Styling */
+.select2-container--default .select2-selection--single {
+    height: 40px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 40px;
+    padding-left: 0;
+    color: #334155;
+    font-size: 0.875rem;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 38px;
+}
+
+.select2-dropdown {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #667eea;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: #e0e7ff;
+    color: #4338ca;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
 
 .admin-wrapper-container {
     padding: 1rem;

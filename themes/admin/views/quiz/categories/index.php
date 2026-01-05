@@ -42,7 +42,7 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
                 <!-- Level Select -->
                 <div class="input-group-premium" style="flex: 2; min-width: 200px;">
                     <i class="fas fa-graduation-cap icon"></i>
-                    <select name="parent_id" class="form-input-premium" required>
+                    <select name="parent_id" id="parentLevelSelect" class="form-input-premium" required style="padding-left: 2.25rem;">
                         <option value="" disabled <?php echo !$selectedLevel ? 'selected' : ''; ?>>Select Education Level...</option>
                         <?php foreach ($levels as $l): ?>
                             <option value="<?php echo $l['id']; ?>" <?php echo $selectedLevel == $l['id'] ? 'selected' : ''; ?>>
@@ -98,7 +98,7 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
                 <div class="filter-group">
                     <span class="filter-label">FILTER DATA:</span>
                     <form method="GET" style="margin:0;">
-                        <select name="level_id" onchange="this.form.submit()" class="filter-select">
+                        <select name="level_id" id="levelFilter" class="filter-select" style="width: 300px;">
                             <option value="">All Levels</option>
                             <?php foreach ($levels as $l): ?>
                                 <option value="<?php echo $l['id']; ?>" <?php echo $selectedLevel == $l['id'] ? 'selected' : ''; ?>>
@@ -560,5 +560,48 @@ input:checked + .slider:before { transform: translateX(16px); }
 @media (max-width: 1024px) {
     .creation-form { flex-direction: column; align-items: stretch; }
     .input-group-premium { width: 100% !important; }
+}
+</style>
+
+<!-- Select2 for Searchable Dropdowns -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#levelFilter').select2({
+        placeholder: 'All Levels',
+        allowClear: true,
+        width: '300px'
+    }).on('select2:open', function() {
+        setTimeout(() => document.querySelector('.select2-search__field').focus(), 100);
+    }).on('change', function() {
+        this.form.submit();
+    });
+    
+    $('#parentLevelSelect').select2({
+        placeholder: 'Select Education Level...',
+        dropdownParent: $('.creation-toolbar')
+    }).on('select2:open', function() {
+        setTimeout(() => document.querySelector('.select2-search__field').focus(), 100);
+    });
+});
+</script>
+<style>
+.select2-container--default .select2-selection--single {
+    height: 40px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 0.75rem; display: flex; align-items: center;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 40px; padding-left: 0; color: #334155; font-size: 0.875rem;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow { height: 38px; }
+.select2-dropdown { border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1px solid #cbd5e1; border-radius: 6px; padding: 0.5rem; font-size: 0.875rem;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] { background-color: #667eea; }
+.select2-container--default .select2-results__option[aria-selected=true] { background-color: #e0e7ff; color: #4338ca; }
+.select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 </style>
