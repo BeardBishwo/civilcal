@@ -21,8 +21,43 @@ class PositionLevelController extends Controller
      */
     public function index()
     {
-        $sql = "SELECT * FROM position_levels ORDER BY order_index ASC, level_number ASC";
-        $levels = $this->db->query($sql)->fetchAll();
+        $courseId = $_GET['course_id'] ?? null;
+        $educationLevelId = $_GET['education_level_id'] ?? null;
+
+        // Fetch all courses for dropdown
+        $courses = $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC")->fetchAll();
+
+        // Fetch education levels for dropdown (filtered by course if selected)
+        $eduLevelSql = "SELECT id, title FROM syllabus_nodes WHERE type = 'education_level'";
+        $eduLevelParams = [];
+        if ($courseId) {
+            $eduLevelSql .= " AND parent_id = :course_id";
+            $eduLevelParams['course_id'] = $courseId;
+        }
+        $eduLevelSql .= " ORDER BY order_index ASC";
+        $educationLevels = $this->db->query($eduLevelSql, $eduLevelParams)->fetchAll();
+
+        // Build query with filters
+        $sql = "SELECT pl.*, 
+                       c.title as course_title,
+                       el.title as education_level_title
+                FROM position_levels pl
+                LEFT JOIN syllabus_nodes c ON pl.course_id = c.id
+                LEFT JOIN syllabus_nodes el ON pl.education_level_id = el.id
+                WHERE 1=1";
+        
+        $params = [];
+        if ($courseId) {
+            $sql .= " AND pl.course_id = :course_id";
+            $params['course_id'] = $courseId;
+        }
+        if ($educationLevelId) {
+            $sql .= " AND pl.education_level_id = :education_level_id";
+            $params['education_level_id'] = $educationLevelId;
+        }
+        
+        $sql .= " ORDER BY pl.order_index ASC, pl.level_number ASC";
+        $levels = $this->db->query($sql, $params)->fetchAll();
 
         $stats = [
             'total' => count($levels),
@@ -31,7 +66,11 @@ class PositionLevelController extends Controller
 
         return $this->view('admin/quiz/position_levels/index', [
             'levels' => $levels,
-            'stats' => $stats
+            'stats' => $stats,
+            'courses' => $courses,
+            'educationLevels' => $educationLevels,
+            'selectedCourse' => $courseId,
+            'selectedEducationLevel' => $educationLevelId
         ]);
     }
 
@@ -45,6 +84,8 @@ class PositionLevelController extends Controller
         $levelNumber = $_POST['level_number'] ?? 0;
         $color = $_POST['color'] ?? '#667eea';
         $icon = $_POST['icon'] ?? 'fa-user';
+        $courseId = $_POST['course_id'] ?? null;
+        $educationLevelId = $_POST['education_level_id'] ?? null;
 
         if (empty($title)) {
             echo json_encode(['status' => 'error', 'message' => 'Title is required']);
@@ -66,6 +107,8 @@ class PositionLevelController extends Controller
             'level_number' => $levelNumber,
             'color' => $color,
             'icon' => $icon,
+            'course_id' => $courseId,
+            'education_level_id' => $educationLevelId,
             'order_index' => $maxOrder + 1,
             'is_active' => 1
         ];

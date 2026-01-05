@@ -1,10 +1,14 @@
 <?php
 /**
  * PREMIUM POSITION LEVELS MANAGEMENT
- * Professional, high-density layout with integrated creation form.
+ * With Course and Education Level filtering
  */
 $levels = $levels ?? [];
 $stats = $stats ?? ['total' => 0, 'active' => 0];
+$courses = $courses ?? [];
+$educationLevels = $educationLevels ?? [];
+$selectedCourse = $selectedCourse ?? null;
+$selectedEducationLevel = $selectedEducationLevel ?? null;
 ?>
 
 <div class="admin-wrapper-container">
@@ -31,10 +35,59 @@ $stats = $stats ?? ['total' => 0, 'active' => 0];
             </div>
         </div>
 
+        <!-- Filter Toolbar -->
+        <div class="compact-toolbar">
+            <div class="toolbar-left">
+                <div class="filter-group">
+                    <span class="filter-label">FILTER DATA:</span>
+                    <form method="GET" style="margin:0; display:flex; gap:0.5rem;">
+                        <select name="course_id" onchange="this.form.submit()" class="filter-select">
+                            <option value="">All Courses</option>
+                            <?php foreach ($courses as $c): ?>
+                                <option value="<?php echo $c['id']; ?>" <?php echo $selectedCourse == $c['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($c['title']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select name="education_level_id" onchange="this.form.submit()" class="filter-select">
+                            <option value="">All Education Levels</option>
+                            <?php foreach ($educationLevels as $el): ?>
+                                <option value="<?php echo $el['id']; ?>" <?php echo $selectedEducationLevel == $el['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($el['title']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- Single Row Creation Toolbar -->
         <div class="creation-toolbar">
             <h5 class="toolbar-title">Create New Position Level</h5>
             <form id="addLevelForm" class="creation-form">
+                
+                <!-- Course Select -->
+                <div class="input-group-premium" style="flex: 2; min-width: 150px;">
+                    <i class="fas fa-university icon"></i>
+                    <select name="course_id" class="form-input-premium">
+                        <option value="">Select Course...</option>
+                        <?php foreach ($courses as $c): ?>
+                            <option value="<?php echo $c['id']; ?>"><?php echo htmlspecialchars($c['title']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Education Level Select -->
+                <div class="input-group-premium" style="flex: 2; min-width: 150px;">
+                    <i class="fas fa-graduation-cap icon"></i>
+                    <select name="education_level_id" class="form-input-premium">
+                        <option value="">Select Education Level...</option>
+                        <?php foreach ($educationLevels as $el): ?>
+                            <option value="<?php echo $el['id']; ?>"><?php echo htmlspecialchars($el['title']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
                 
                 <!-- Title Input -->
                 <div class="input-group-premium" style="flex: 3; min-width: 200px;">
@@ -43,19 +96,19 @@ $stats = $stats ?? ['total' => 0, 'active' => 0];
                 </div>
                 
                 <!-- Level Number -->
-                <div class="input-group-premium" style="flex: 1; min-width: 100px;">
+                <div class="input-group-premium" style="flex: 1; min-width: 80px;">
                     <i class="fas fa-sort-numeric-up icon"></i>
                     <input type="number" name="level_number" class="form-input-premium" placeholder="Level #" min="0" value="0">
                 </div>
 
                 <!-- Color Picker -->
-                <div class="input-group-premium" style="flex: 1; min-width: 100px;">
+                <div class="input-group-premium" style="flex: 1; min-width: 80px;">
                     <i class="fas fa-palette icon"></i>
                     <input type="color" name="color" class="form-input-premium" value="#667eea" style="padding-left: 0.5rem;">
                 </div>
 
                 <!-- Icon -->
-                <div class="input-group-premium" style="flex: 1; min-width: 120px;">
+                <div class="input-group-premium" style="flex: 1; min-width: 100px;">
                     <i class="fas fa-icons icon"></i>
                     <input type="text" name="icon" class="form-input-premium" placeholder="fa-user" value="fa-user">
                 </div>
@@ -78,11 +131,13 @@ $stats = $stats ?? ['total' => 0, 'active' => 0];
                             <th style="width: 40px;"></th>
                             <th style="width: 60px;">#</th>
                             <th>Title</th>
-                            <th style="width: 100px;">Level #</th>
-                            <th style="width: 100px;">Color</th>
-                            <th style="width: 100px;">Icon</th>
-                            <th style="width: 100px; text-align: center;">Status</th>
-                            <th style="width: 120px; text-align: center;">Actions</th>
+                            <th style="width: 150px;">Course</th>
+                            <th style="width: 150px;">Education Level</th>
+                            <th style="width: 80px;">Level #</th>
+                            <th style="width: 80px;">Color</th>
+                            <th style="width: 80px;">Icon</th>
+                            <th style="width: 80px; text-align: center;">Status</th>
+                            <th style="width: 100px; text-align: center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="levelSortable">
@@ -107,6 +162,20 @@ $stats = $stats ?? ['total' => 0, 'active' => 0];
                                                 <?php endif; ?>
                                             </div>
                                         </div>
+                                    </td>
+                                    <td>
+                                        <?php if (!empty($l['course_title'])): ?>
+                                            <span class="badge-pill"><?php echo htmlspecialchars($l['course_title']); ?></span>
+                                        <?php else: ?>
+                                            <span style="color: #94a3b8; font-size: 0.75rem;">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php if (!empty($l['education_level_title'])): ?>
+                                            <span class="badge-pill" style="background: #fef3c7; color: #92400e; border-color: #fde68a;"><?php echo htmlspecialchars($l['education_level_title']); ?></span>
+                                        <?php else: ?>
+                                            <span style="color: #94a3b8; font-size: 0.75rem;">-</span>
+                                        <?php endif; ?>
                                     </td>
                                     <td class="text-center">
                                         <span class="badge-pill"><?php echo $l['level_number']; ?></span>
@@ -136,7 +205,7 @@ $stats = $stats ?? ['total' => 0, 'active' => 0];
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="9" class="empty-state-compact">
+                                <td colspan="11" class="empty-state-compact">
                                     <i class="fas fa-layer-group"></i>
                                     <h3>No Position Levels Yet</h3>
                                     <p>Create your first position level above</p>
@@ -339,6 +408,17 @@ document.querySelectorAll('.status-toggle').forEach(el => {
 .stat-pill.warning { background: rgba(252, 211, 77, 0.15); border-color: rgba(252, 211, 77, 0.3); }
 .stat-pill .label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.9; }
 .stat-pill .value { font-size: 1.1rem; font-weight: 800; line-height: 1.1; }
+
+.compact-toolbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.75rem 2rem; background: #eff6ff; border-bottom: 1px solid #bfdbfe;
+}
+.filter-group { display: flex; align-items: center; gap: 0.75rem; }
+.filter-label { font-size: 0.7rem; font-weight: 700; color: #1e40af; letter-spacing: 0.5px; }
+.filter-select {
+    font-size: 0.85rem; font-weight: 600; color: #1e40af; border: 1px solid #93c5fd;
+    border-radius: 6px; padding: 0.25rem 2rem 0.25rem 0.5rem; background: white; outline: none; height: 32px;
+}
 
 .creation-toolbar {
     padding: 1rem 2rem;
