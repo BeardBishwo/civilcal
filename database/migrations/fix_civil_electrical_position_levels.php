@@ -61,6 +61,12 @@ try {
                 $targetCourses = ['Agriculture Engineering'];
             } elseif (stripos($title, 'Architect') !== false) {
                 $targetCourses = ['Architecture'];
+            } elseif (stripos($title, 'Electrical') !== false) {
+                $targetCourses = ['Electrical Engineering'];
+            } elseif (stripos($title, 'Mechanical') !== false) {
+                $targetCourses = ['Mechanical Engineering'];
+            } elseif (stripos($title, 'Civil') !== false) {
+                $targetCourses = ['Civil Engineering'];
             } else {
                 // Generic engineering - link to Civil, Electrical, Mechanical
                 $targetCourses = ['Civil Engineering', 'Electrical Engineering', 'Mechanical Engineering'];
@@ -118,14 +124,21 @@ try {
                     $newTitle = $title . " ({$courseName})";
                     $newSlug = strtolower(str_replace([' ', '(', ')', '-'], ['', '', '', ''], $newTitle));
                     
-                    $stmt = $pdo->prepare("
-                        INSERT INTO position_levels 
-                        (title, slug, level_number, color, icon, course_id, education_level_id, order_index, is_active)
-                        SELECT ?, ?, level_number, color, icon, ?, ?, order_index, is_active
-                        FROM position_levels WHERE id = ?
-                    ");
-                    $stmt->execute([$newTitle, $newSlug, $courseId, $eduLevel['id'], $level['id']]);
-                    echo "  ✅ Created '{$newTitle}' → {$courseName}\n";
+                    // Check if exists first
+                    $check = $pdo->prepare("SELECT id FROM position_levels WHERE slug = ?");
+                    $check->execute([$newSlug]);
+                    if ($check->fetch()) {
+                        echo "  ⏭️  Skipping duplicate '{$newTitle}'\n";
+                    } else {
+                        $stmt = $pdo->prepare("
+                            INSERT INTO position_levels 
+                            (title, slug, level_number, color, icon, course_id, education_level_id, order_index, is_active)
+                            SELECT ?, ?, level_number, color, icon, ?, ?, order_index, is_active
+                            FROM position_levels WHERE id = ?
+                        ");
+                        $stmt->execute([$newTitle, $newSlug, $courseId, $eduLevel['id'], $level['id']]);
+                        echo "  ✅ Created '{$newTitle}' → {$courseName}\n";
+                    }
                 }
             }
         }

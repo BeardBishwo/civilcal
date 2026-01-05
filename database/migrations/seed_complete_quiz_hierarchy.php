@@ -2,6 +2,7 @@
 /**
  * Seed Complete Loksewa Engineering Hierarchy Data
  * Populates: Courses → Education Levels → Categories → Sub Categories → Position Levels
+ * AND ensures Position Levels are correctly linked to Courses/Education Levels
  */
 
 require_once __DIR__ . '/../../app/Core/Database.php';
@@ -12,7 +13,7 @@ try {
     $db = Database::getInstance();
     $pdo = $db->getPdo();
     
-    echo "🌱 Starting Loksewa Engineering Data Seeding...\n\n";
+    echo "🌱 Starting Complete Loksewa Engineering Data Seeding...\n\n";
     
     // ==========================================
     // 1. COURSES (Engineering Disciplines)
@@ -30,7 +31,6 @@ try {
     
     $courseIds = [];
     foreach ($courses as $course) {
-        // Check if exists
         $stmt = $pdo->prepare("SELECT id FROM syllabus_nodes WHERE slug = ? AND type = 'course'");
         $stmt->execute([$course['slug']]);
         $existing = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -43,6 +43,18 @@ try {
              $stmt->execute([$course['title'], $course['slug'], $course['order']]);
              $courseIds[$course['slug']] = $pdo->lastInsertId();
              echo "  ✓ {$course['title']} (Created)\n";
+        }
+    }
+    
+    // Create reverse lookup for ID -> Title
+    $courseTitleById = [];
+    foreach ($courseIds as $slug => $id) {
+        // Find title from original array or DB query (simplest to map back if consistent)
+        foreach ($courses as $c) {
+            if ($c['slug'] === $slug) {
+                $courseTitleById[$id] = $c['title'];
+                break;
+            }
         }
     }
     
@@ -59,14 +71,13 @@ try {
         ['title' => 'Level 8 - Chief Engineer', 'slug' => 'level-8-chief', 'order' => 5],
     ];
     
-    $levelIds = [];
+    $levelIds = []; // $levelIds[course_slug][base_slug] = db_id
     foreach ($courses as $course) {
         foreach ($educationLevels as $level) {
             $parentId = $courseIds[$course['slug']];
             $title = $level['title'] . ' (' . $course['title'] . ')';
             $slug = $level['slug'] . '-' . $course['slug'];
             
-            // Check if exists
             $stmt = $pdo->prepare("SELECT id FROM syllabus_nodes WHERE slug = ? AND type = 'education_level'");
             $stmt->execute([$slug]);
             $existing = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -89,7 +100,6 @@ try {
     echo "\n📖 Creating Main Categories (Subject Areas)...\n";
     
     $categories = [
-        // Civil Engineering Categories
         'civil-engineering' => [
             ['title' => 'Structural Engineering', 'slug' => 'structural-engineering'],
             ['title' => 'Transportation Engineering', 'slug' => 'transportation-engineering'],
@@ -97,7 +107,6 @@ try {
             ['title' => 'Geotechnical Engineering', 'slug' => 'geotechnical-engineering'],
             ['title' => 'Construction Management', 'slug' => 'construction-management'],
         ],
-        // Electrical Engineering Categories
         'electrical-engineering' => [
             ['title' => 'Power Systems', 'slug' => 'power-systems'],
             ['title' => 'Control Systems', 'slug' => 'control-systems'],
@@ -105,7 +114,6 @@ try {
             ['title' => 'Electrical Machines', 'slug' => 'electrical-machines'],
             ['title' => 'Power Electronics', 'slug' => 'power-electronics'],
         ],
-        // Computer/IT Engineering Categories
         'computer-it-engineering' => [
             ['title' => 'Programming & Algorithms', 'slug' => 'programming-algorithms'],
             ['title' => 'Database Management', 'slug' => 'database-management'],
@@ -113,7 +121,6 @@ try {
             ['title' => 'Web Development', 'slug' => 'web-development'],
             ['title' => 'Operating Systems', 'slug' => 'operating-systems'],
         ],
-        // Mechanical Engineering Categories
         'mechanical-engineering' => [
             ['title' => 'Thermodynamics', 'slug' => 'thermodynamics'],
             ['title' => 'Fluid Mechanics', 'slug' => 'fluid-mechanics'],
@@ -121,7 +128,6 @@ try {
             ['title' => 'Manufacturing Processes', 'slug' => 'manufacturing-processes'],
             ['title' => 'Mechanics of Materials', 'slug' => 'mechanics-materials'],
         ],
-        // Agriculture Engineering Categories
         'agriculture-engineering' => [
             ['title' => 'Crop Science', 'slug' => 'crop-science'],
             ['title' => 'Soil Science', 'slug' => 'soil-science'],
@@ -129,7 +135,6 @@ try {
             ['title' => 'Agricultural Economics', 'slug' => 'agricultural-economics'],
             ['title' => 'Farm Machinery', 'slug' => 'farm-machinery'],
         ],
-        // Architecture Categories
         'architecture' => [
             ['title' => 'Architectural Design', 'slug' => 'architectural-design'],
             ['title' => 'Building Construction', 'slug' => 'building-construction'],
@@ -143,14 +148,12 @@ try {
     $order = 1;
     foreach ($categories as $courseSlug => $cats) {
         foreach ($cats as $cat) {
-            // Add to Level 5 (most common level for Loksewa)
             if (!isset($levelIds[$courseSlug]['level-5-sub-engineer'])) {
                 echo "  ⚠️ Skipping {$cat['title']} - Parent not found\n";
                 continue;
             }
             $parentId = $levelIds[$courseSlug]['level-5-sub-engineer'];
             
-            // Check if exists
             $stmt = $pdo->prepare("SELECT id FROM syllabus_nodes WHERE slug = ? AND type = 'category'");
             $stmt->execute([$cat['slug']]);
             $existing = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -164,7 +167,6 @@ try {
                 $categoryIds[$courseSlug][$cat['slug']] = $pdo->lastInsertId();
                 echo "  ✓ {$cat['title']} ({$courseSlug}) (Created)\n";
             }
-            
             $order++;
         }
     }
@@ -175,59 +177,21 @@ try {
     echo "\n📝 Creating Sub Categories (Topics)...\n";
     
     $subCategories = [
-        // Civil - Structural Engineering
-        'structural-engineering' => [
-            'Analysis of Structures',
-            'Design of RCC Structures',
-            'Steel Structures',
-            'Foundation Engineering',
-            'Earthquake Engineering',
-        ],
-        // Civil - Transportation
-        'transportation-engineering' => [
-            'Highway Engineering',
-            'Traffic Engineering',
-            'Pavement Design',
-            'Railway Engineering',
-            'Airport Engineering',
-        ],
-        // Electrical - Power Systems
-        'power-systems' => [
-            'Power Generation',
-            'Transmission & Distribution',
-            'Power System Protection',
-            'Load Flow Analysis',
-            'Renewable Energy Systems',
-        ],
-        // Computer - Programming
-        'programming-algorithms' => [
-            'Data Structures',
-            'Algorithm Design',
-            'Object-Oriented Programming',
-            'Problem Solving Techniques',
-            'Complexity Analysis',
-        ],
-        // Mechanical - Thermodynamics
-        'thermodynamics' => [
-            'Laws of Thermodynamics',
-            'Heat Transfer',
-            'Refrigeration & Air Conditioning',
-            'IC Engines',
-            'Gas Turbines',
-        ],
+        'structural-engineering' => ['Analysis of Structures', 'Design of RCC Structures', 'Steel Structures', 'Foundation Engineering', 'Earthquake Engineering'],
+        'transportation-engineering' => ['Highway Engineering', 'Traffic Engineering', 'Pavement Design', 'Railway Engineering', 'Airport Engineering'],
+        'power-systems' => ['Power Generation', 'Transmission & Distribution', 'Power System Protection', 'Load Flow Analysis', 'Renewable Energy Systems'],
+        'programming-algorithms' => ['Data Structures', 'Algorithm Design', 'Object-Oriented Programming', 'Problem Solving Techniques', 'Complexity Analysis'],
+        'thermodynamics' => ['Laws of Thermodynamics', 'Heat Transfer', 'Refrigeration & Air Conditioning', 'IC Engines', 'Gas Turbines'],
     ];
     
     $subOrder = 1;
     foreach ($subCategories as $catSlug => $topics) {
-        // Find the category ID
         foreach ($categoryIds as $courseSlug => $cats) {
             if (isset($cats[$catSlug])) {
                 $parentId = $cats[$catSlug];
-                
                 foreach ($topics as $topic) {
                     $slug = strtolower(str_replace([' ', '&'], ['-', 'and'], $topic));
 
-                    // Check if exists
                     $stmt = $pdo->prepare("SELECT id FROM syllabus_nodes WHERE slug = ? AND type = 'sub_category'");
                     $stmt->execute([$slug]);
                     $existing = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -247,56 +211,92 @@ try {
     }
     
     // ==========================================
-    // 5. POSITION LEVELS (Already created, just update)
+    // 5. POSITION LEVELS (Directly Linked)
     // ==========================================
-    echo "\n🏆 Updating Position Levels...\n";
+    echo "\n🏆 Creating Linked Position Levels...\n";
     
-    $positionLevels = [
-        ['title' => 'Level 4 - Assistant Sub-Engineer', 'level_number' => 4, 'color' => '#10b981', 'icon' => 'fa-user'],
-        ['title' => 'Level 5 - Sub-Engineer', 'level_number' => 5, 'color' => '#3b82f6', 'icon' => 'fa-user-tie'],
-        ['title' => 'Level 6 - Engineer', 'level_number' => 6, 'color' => '#8b5cf6', 'icon' => 'fa-user-graduate'],
-        ['title' => 'Level 7 - Senior Engineer', 'level_number' => 7, 'color' => '#f59e0b', 'icon' => 'fa-user-shield'],
-        ['title' => 'Level 8 - Chief Engineer', 'level_number' => 8, 'color' => '#ef4444', 'icon' => 'fa-crown'],
+    $abstractPositionLevels = [
+        ['title' => 'Level 4 (Assistant)', 'level_number' => 4, 'color' => '#10b981', 'icon' => 'fa-user'],
+        ['title' => 'Level 5 (Sub-Engineer)', 'level_number' => 5, 'color' => '#3b82f6', 'icon' => 'fa-user-tie'],
+        ['title' => 'Level 6 (Engineer)', 'level_number' => 6, 'color' => '#8b5cf6', 'icon' => 'fa-user-graduate'],
+        ['title' => 'Level 7 (Senior)', 'level_number' => 7, 'color' => '#f59e0b', 'icon' => 'fa-user-shield'],
+        ['title' => 'Level 8 (Chief Engineer)', 'level_number' => 8, 'color' => '#ef4444', 'icon' => 'fa-crown'],
         ['title' => 'Computer Operator (Level 4)', 'level_number' => 4, 'color' => '#06b6d4', 'icon' => 'fa-desktop'],
         ['title' => 'IT Officer (Level 5)', 'level_number' => 5, 'color' => '#14b8a6', 'icon' => 'fa-laptop-code'],
         ['title' => 'Agriculture Officer (Level 5)', 'level_number' => 5, 'color' => '#84cc16', 'icon' => 'fa-seedling'],
         ['title' => 'Architect (Level 6)', 'level_number' => 6, 'color' => '#a855f7', 'icon' => 'fa-drafting-compass'],
     ];
     
-    foreach ($positionLevels as $pos) {
-        $slug = strtolower(str_replace([' ', '(', ')', '-'], ['', '', '', ''], $pos['title']));
-        $slug = preg_replace('/\s+/', '-', trim($slug));
+    // Course Slug to ID lookup
+    $courseIdBySlug = $courseIds; 
+    
+    foreach ($abstractPositionLevels as $pos) {
+        $title = $pos['title'];
+        $levelNumber = $pos['level_number'];
         
-        $stmt = $pdo->prepare("INSERT INTO position_levels (title, slug, level_number, color, icon, order_index, is_active) 
-                               VALUES (?, ?, ?, ?, ?, ?, 1)
-                               ON DUPLICATE KEY UPDATE 
-                               title = VALUES(title), 
-                               level_number = VALUES(level_number),
-                               color = VALUES(color),
-                               icon = VALUES(icon)");
-        $stmt->execute([$pos['title'], $slug, $pos['level_number'], $pos['color'], $pos['icon'], $pos['level_number']]);
-        echo "  ✓ {$pos['title']}\n";
+        $targetCourses = [];
+        // Determine mapping logic
+        if (stripos($title, 'Computer') !== false || stripos($title, 'IT') !== false) {
+            $targetCourses = ['computer-it-engineering'];
+        } elseif (stripos($title, 'Agriculture') !== false) {
+            $targetCourses = ['agriculture-engineering'];
+        } elseif (stripos($title, 'Architect') !== false) {
+            $targetCourses = ['architecture'];
+        } elseif (stripos($title, 'Electrical') !== false) {
+             $targetCourses = ['electrical-engineering'];
+        } elseif (stripos($title, 'Mechanical') !== false) {
+             $targetCourses = ['mechanical-engineering'];
+        } elseif (stripos($title, 'Civil') !== false) {
+             $targetCourses = ['civil-engineering'];
+        } else {
+             // Generic fallbacks
+             $targetCourses = ['civil-engineering', 'electrical-engineering', 'mechanical-engineering'];
+        }
+        
+        foreach ($targetCourses as $courseSlug) {
+            if (!isset($courseIdBySlug[$courseSlug])) {
+                echo "  ⚠️ Skipping {$title} for {$courseSlug} (Course not found)\n";
+                continue;
+            }
+            
+            $courseId = $courseIdBySlug[$courseSlug];
+            $courseName = $courseTitleById[$courseId] ?? $courseSlug; // Fallback
+            
+            // Generate Specific Title & Slug
+            $specificTitle = $title . " (" . $courseName . ")";
+            $specificSlug = strtolower(str_replace([' ', '(', ')', '-'], ['', '', '', ''], $specificTitle));
+             // Ensure uniqueness if multiple spaces etc
+            $specificSlug = preg_replace('/\s+/', '-', trim($specificSlug));
+
+            // Find Education Level ID
+            // Logic: type=education_level, parent_id = courseId, title LIKE %Level X%
+            $stmt = $pdo->prepare("SELECT id FROM syllabus_nodes WHERE type = 'education_level' AND parent_id = ? AND title LIKE ? LIMIT 1");
+            $stmt->execute([$courseId, "%Level {$levelNumber}%"]);
+            $eduLevel = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$eduLevel) {
+                 echo "  ⚠️ Education Level {$levelNumber} not found for {$courseSlug}\n";
+                 continue;
+            }
+            $eduLevelId = $eduLevel['id'];
+
+            // Check if Position Level exists
+            $check = $pdo->prepare("SELECT id FROM position_levels WHERE slug = ?");
+            $check->execute([$specificSlug]);
+            if ($check->fetch()) {
+                echo "  ✓ {$specificTitle} (Existing)\n";
+            } else {
+                $stmt = $pdo->prepare("INSERT INTO position_levels (title, slug, level_number, color, icon, course_id, education_level_id, order_index, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)");
+                $stmt->execute([$specificTitle, $specificSlug, $levelNumber, $pos['color'], $pos['icon'], $courseId, $eduLevelId, $levelNumber]);
+                 echo "  ✓ {$specificTitle} (Created)\n";
+            }
+        }
     }
     
-    // ==========================================
-    // SUMMARY
-    // ==========================================
     echo "\n" . str_repeat("=", 50) . "\n";
-    echo "✅ DATA SEEDING COMPLETED SUCCESSFULLY!\n";
+    echo "✅ COMPLETE QUIZ HIERARCHY SEEDING FINISHED!\n";
     echo str_repeat("=", 50) . "\n\n";
-    
-    echo "📊 Summary:\n";
-    echo "  • Courses: " . count($courses) . " engineering disciplines\n";
-    echo "  • Education Levels: " . (count($courses) * count($educationLevels)) . " position levels\n";
-    echo "  • Main Categories: " . array_sum(array_map('count', $categories)) . " subject areas\n";
-    echo "  • Sub Categories: " . array_sum(array_map('count', $subCategories)) . " topics\n";
-    echo "  • Position Levels: " . count($positionLevels) . " position tags\n\n";
-    
-    echo "🎯 Next Steps:\n";
-    echo "  1. Visit: http://localhost/Bishwo_Calculator/admin/quiz/courses\n";
-    echo "  2. Verify all data is populated correctly\n";
-    echo "  3. Start creating questions!\n\n";
-    
+
 } catch (Exception $e) {
     echo "❌ Seeding failed: " . $e->getMessage() . "\n";
     echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
