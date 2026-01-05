@@ -46,7 +46,7 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
                         <option value="" disabled <?php echo !$selectedLevel ? 'selected' : ''; ?>>Select Education Level...</option>
                         <?php foreach ($levels as $l): ?>
                             <option value="<?php echo $l['id']; ?>" <?php echo $selectedLevel == $l['id'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($l['title']); ?>
+                                <?php echo htmlspecialchars($l['title'] ?? ''); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -102,7 +102,7 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
                             <option value="">All Levels</option>
                             <?php foreach ($levels as $l): ?>
                                 <option value="<?php echo $l['id']; ?>" <?php echo $selectedLevel == $l['id'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($l['title']); ?>
+                                    <?php echo htmlspecialchars($l['title'] ?? ''); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -166,14 +166,14 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
                                         <div class="item-info">
                                             <div class="item-icon">
                                                 <?php if (!empty($cat['image_path'])): ?>
-                                                    <img src="<?php echo htmlspecialchars($cat['image_path']); ?>">
+                                                    <img src="<?php echo htmlspecialchars($cat['image_path'] ?? ''); ?>">
                                                 <?php else: ?>
                                                     <i class="fas fa-folder"></i>
                                                 <?php endif; ?>
                                             </div>
                                             <div class="item-text">
-                                                <div class="item-title"><?php echo htmlspecialchars($cat['title']); ?></div>
-                                                <div class="item-slug"><?php echo htmlspecialchars($cat['slug']); ?></div>
+                                                <div class="item-title"><?php echo htmlspecialchars($cat['title'] ?? ''); ?></div>
+                                                <div class="item-slug"><?php echo htmlspecialchars($cat['slug'] ?? ''); ?></div>
                                             </div>
                                         </div>
                                     </td>

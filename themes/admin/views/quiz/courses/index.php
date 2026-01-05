@@ -129,14 +129,14 @@ $stats = [
                                         <div class="item-info">
                                             <div class="item-icon">
                                                 <?php if (!empty($c['image_path'])): ?>
-                                                    <img src="<?php echo htmlspecialchars($c['image_path']); ?>">
+                                                    <img src="<?php echo htmlspecialchars($c['image_path'] ?? ''); ?>">
                                                 <?php else: ?>
                                                     <i class="fas <?php echo $c['icon'] ?? 'fa-graduation-cap'; ?>"></i>
                                                 <?php endif; ?>
                                             </div>
                                             <div class="item-text">
-                                                <div class="item-title"><?php echo htmlspecialchars($c['title']); ?></div>
-                                                <div class="item-slug"><?php echo htmlspecialchars($c['slug']); ?></div>
+                                                <div class="item-title"><?php echo htmlspecialchars($c['title'] ?? ''); ?></div>
+                                                <div class="item-slug"><?php echo htmlspecialchars($c['slug'] ?? ''); ?></div>
                                             </div>
                                         </div>
                                     </td>

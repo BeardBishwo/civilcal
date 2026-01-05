@@ -52,7 +52,7 @@ $stats = [
                         <option value="" disabled <?php echo !$selectedParent ? 'selected' : ''; ?>>Select Main Category...</option>
                         <?php foreach ($parents as $p): ?>
                             <option value="<?php echo $p['id']; ?>" <?php echo $selectedParent == $p['id'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($p['title']); ?>
+                                <?php echo htmlspecialchars($p['title'] ?? ''); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -108,7 +108,7 @@ $stats = [
                             <option value="">All Main Categories</option>
                             <?php foreach ($parents as $p): ?>
                                 <option value="<?php echo $p['id']; ?>" <?php echo $selectedParent == $p['id'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($p['title']); ?>
+                                    <?php echo htmlspecialchars($p['title'] ?? ''); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -172,20 +172,20 @@ $stats = [
                                         <div class="item-info">
                                             <div class="item-icon">
                                                 <?php if (!empty($sub['image_path'])): ?>
-                                                    <img src="<?php echo htmlspecialchars($sub['image_path']); ?>">
+                                                    <img src="<?php echo htmlspecialchars($sub['image_path'] ?? ''); ?>">
                                                 <?php else: ?>
                                                     <i class="fas fa-folder"></i>
                                                 <?php endif; ?>
                                             </div>
                                             <div class="item-text">
-                                                <div class="item-title"><?php echo htmlspecialchars($sub['title']); ?></div>
-                                                <div class="item-slug"><?php echo htmlspecialchars($sub['slug']); ?></div>
+                                                <div class="item-title"><?php echo htmlspecialchars($sub['title'] ?? ''); ?></div>
+                                                <div class="item-slug"><?php echo htmlspecialchars($sub['slug'] ?? ''); ?></div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="text-center">
                                         <span class="badge-pill">
-                                            <?php echo htmlspecialchars($sub['parent_title']); ?>
+                                            <?php echo htmlspecialchars($sub['parent_title'] ?? 'N/A'); ?>
                                         </span>
                                     </td>
                                     <td class="text-center">

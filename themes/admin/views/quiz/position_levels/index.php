@@ -45,7 +45,7 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                             <option value="">All Courses</option>
                             <?php foreach ($courses as $c): ?>
                                 <option value="<?php echo $c['id']; ?>" <?php echo $selectedCourse == $c['id'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($c['title']); ?>
+                                    <?php echo htmlspecialchars($c['title'] ?? ''); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -53,7 +53,7 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                             <option value="">All Education Levels</option>
                             <?php foreach ($educationLevels as $el): ?>
                                 <option value="<?php echo $el['id']; ?>" <?php echo $selectedEducationLevel == $el['id'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($el['title']); ?>
+                                    <?php echo htmlspecialchars($el['title'] ?? ''); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -73,7 +73,7 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                     <select name="course_id" id="courseSelect" class="form-input-premium form-select-search" style="padding-left: 2.25rem;">
                         <option value="">Select Course...</option>
                         <?php foreach ($courses as $c): ?>
-                            <option value="<?php echo $c['id']; ?>"><?php echo htmlspecialchars($c['title']); ?></option>
+                            <option value="<?php echo $c['id']; ?>"><?php echo htmlspecialchars($c['title'] ?? ''); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -84,7 +84,7 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                     <select name="education_level_id" id="educationLevelSelect" class="form-input-premium form-select-search" style="padding-left: 2.25rem;">
                         <option value="">Select Education Level...</option>
                         <?php foreach ($educationLevels as $el): ?>
-                            <option value="<?php echo $el['id']; ?>"><?php echo htmlspecialchars($el['title']); ?></option>
+                            <option value="<?php echo $el['id']; ?>"><?php echo htmlspecialchars($el['title'] ?? ''); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -156,23 +156,23 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                                     <td>
                                         <div class="item-info">
                                             <div>
-                                                <div class="item-title"><?php echo htmlspecialchars($l['title']); ?></div>
+                                                <div class="item-title"><?php echo htmlspecialchars($l['title'] ?? ''); ?></div>
                                                 <?php if (!empty($l['description'])): ?>
-                                                    <div class="item-slug"><?php echo htmlspecialchars($l['description']); ?></div>
+                                                    <div class="item-slug"><?php echo htmlspecialchars($l['description'] ?? ''); ?></div>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
                                         <?php if (!empty($l['course_title'])): ?>
-                                            <span class="badge-pill"><?php echo htmlspecialchars($l['course_title']); ?></span>
+                                            <span class="badge-pill"><?php echo htmlspecialchars($l['course_title'] ?? 'N/A'); ?></span>
                                         <?php else: ?>
                                             <span style="color: #94a3b8; font-size: 0.75rem;">-</span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
                                         <?php if (!empty($l['education_level_title'])): ?>
-                                            <span class="badge-pill" style="background: #fef3c7; color: #92400e; border-color: #fde68a;"><?php echo htmlspecialchars($l['education_level_title']); ?></span>
+                                            <span class="badge-pill" style="background: #fef3c7; color: #92400e; border-color: #fde68a;"><?php echo htmlspecialchars($l['education_level_title'] ?? 'N/A'); ?></span>
                                         <?php else: ?>
                                             <span style="color: #94a3b8; font-size: 0.75rem;">-</span>
                                         <?php endif; ?>

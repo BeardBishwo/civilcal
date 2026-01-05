@@ -52,7 +52,7 @@ $stats = [
                         <option value="" disabled <?php echo !$selectedCourse ? 'selected' : ''; ?>>Select Course...</option>
                         <?php foreach ($courses as $c): ?>
                             <option value="<?php echo $c['id']; ?>" <?php echo $selectedCourse == $c['id'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($c['title']); ?>
+                                <?php echo htmlspecialchars($c['title'] ?? ''); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -86,7 +86,7 @@ $stats = [
                             <option value="">All Courses</option>
                             <?php foreach ($courses as $c): ?>
                                 <option value="<?php echo $c['id']; ?>" <?php echo $selectedCourse == $c['id'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($c['title']); ?>
+                                    <?php echo htmlspecialchars($c['title'] ?? ''); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -144,14 +144,14 @@ $stats = [
                                     <td>
                                         <div class="item-info">
                                             <div class="item-text">
-                                                <div class="item-title"><?php echo htmlspecialchars($l['title']); ?></div>
-                                                <div class="item-slug"><?php echo htmlspecialchars($l['slug']); ?></div>
+                                                <div class="item-title"><?php echo htmlspecialchars($l['title'] ?? ''); ?></div>
+                                                <div class="item-slug"><?php echo htmlspecialchars($l['slug'] ?? ''); ?></div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="text-center">
                                         <span class="badge-pill">
-                                            <?php echo htmlspecialchars($l['parent_title']); ?>
+                                            <?php echo htmlspecialchars($l['parent_title'] ?? 'N/A'); ?>
                                         </span>
                                     </td>
                                     <td class="text-center">
