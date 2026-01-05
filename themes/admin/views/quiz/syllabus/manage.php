@@ -169,7 +169,7 @@ if (!empty($nodesTree)) {
     <div id="hierarchy-modal" class="fixed inset-0 z-[100] hidden" aria-hidden="true">
         <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeHierarchyModal()"></div>
         <div class="absolute inset-0 flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl transform transition-all flex flex-col max-h-[90vh]">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden transform transition-all relative flex flex-col max-h-[90vh]">
                 <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
                     <h3 class="text-lg font-bold text-slate-800">Link Hierarchy</h3>
                     <div class="flex items-center gap-3">
@@ -184,41 +184,94 @@ if (!empty($nodesTree)) {
                         <input type="text" id="hierarchy-search" class="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none text-sm font-medium transition" placeholder="Search categories, topics..." onkeyup="filterHierarchyList()">
                     </div>
                 </div>
-                <!-- Filter Data Row (5 Filters in one row) -->
-                <div class="link-filter-row">
-                    <span class="filter-label">Filter:</span>
-                    <div class="flex items-center gap-2 flex-1 no-scrollbar overflow-x-auto">
-                        <select id="modal-filter-course" class="filter-select" onchange="filterHierarchyList()">
-                            <option value="">Course</option>
-                            <?php foreach($allCourses as $c): ?>
-                                <option value="<?php echo $c['id']; ?>"><?php echo htmlspecialchars($c['title']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <select id="modal-filter-edu" class="filter-select" onchange="filterHierarchyList()">
-                            <option value="">Level</option>
-                            <?php foreach($allEduLevels as $e): ?>
-                                <option value="<?php echo $e['id']; ?>"><?php echo htmlspecialchars($e['title']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <select id="modal-filter-pos" class="filter-select" onchange="filterHierarchyList()">
-                            <option value="">Position</option>
-                            <?php foreach($allPosLevels as $p): ?>
-                                <option value="<?php echo $p['id']; ?>" data-course="<?php echo $p['course_id']; ?>" data-edu="<?php echo $p['education_level_id']; ?>"><?php echo htmlspecialchars($p['title']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <select id="modal-filter-cat" class="filter-select" onchange="filterHierarchyList()">
-                            <option value="">Category</option>
-                            <?php foreach($categories as $cat): ?>
-                                <option value="<?php echo $cat['id']; ?>" data-course="<?php echo $cat['course_id']; ?>" data-edu="<?php echo $cat['edu_level_id']; ?>"><?php echo htmlspecialchars($cat['name']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <select id="modal-filter-topic" class="filter-select" onchange="filterHierarchyList()">
-                            <option value="">Sub-Cat</option>
-                            <?php foreach($topics as $t): ?>
-                                <option value="<?php echo $t['id']; ?>" data-cat="<?php echo $t['category_id']; ?>"><?php echo htmlspecialchars($t['name']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                <!-- Filters Row (Searchable Selects) -->
+                <div class="link-filter-row flex items-center justify-between gap-3 mb-4 sticky top-0 z-30">
+                    
+                    <!-- Course Filter -->
+                    <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-course">
+                        <button type="button" class="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('course')">
+                            <span class="truncate dropdown-label">Course</span>
+                            <i class="fas fa-chevron-down text-xs opacity-50 ml-2"></i>
+                        </button>
+                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
+                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
+                                <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('course', this.value)">
+                             </div>
+                             <ul class="max-h-56 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-course">
+                                <!-- JS Populated -->
+                             </ul>
+                        </div>
+                        <input type="hidden" id="modal-filter-course" value="">
                     </div>
+
+                    <!-- Education Level Filter -->
+                    <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-edu">
+                        <button type="button" class="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('edu')">
+                            <span class="truncate dropdown-label">Level</span>
+                            <i class="fas fa-chevron-down text-xs opacity-50 ml-2"></i>
+                        </button>
+                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
+                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
+                                <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('edu', this.value)">
+                             </div>
+                             <ul class="max-h-56 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-edu">
+                                <!-- JS Populated -->
+                             </ul>
+                        </div>
+                         <input type="hidden" id="modal-filter-edu" value="">
+                    </div>
+
+                    <!-- Position Level Filter -->
+                    <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-pos">
+                        <button type="button" class="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('pos')">
+                            <span class="truncate dropdown-label">Position</span>
+                            <i class="fas fa-chevron-down text-xs opacity-50 ml-2"></i>
+                        </button>
+                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
+                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
+                                <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('pos', this.value)">
+                             </div>
+                             <ul class="max-h-56 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-pos">
+                                <!-- JS Populated -->
+                             </ul>
+                        </div>
+                         <input type="hidden" id="modal-filter-pos" value="">
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-cat">
+                         <button type="button" class="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('cat')">
+                            <span class="truncate dropdown-label">Category</span>
+                            <i class="fas fa-chevron-down text-xs opacity-50 ml-2"></i>
+                        </button>
+                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
+                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
+                                <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('cat', this.value)">
+                             </div>
+                             <ul class="max-h-56 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-cat">
+                                <!-- JS Populated -->
+                             </ul>
+                        </div>
+                        <input type="hidden" id="modal-filter-cat" value="">
+                    </div>
+
+                     <!-- Sub-Category Filter -->
+                    <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-topic">
+                        <button type="button" class="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('topic')">
+                            <span class="truncate dropdown-label">Sub-Cat</span>
+                             <i class="fas fa-chevron-down text-xs opacity-50 ml-2"></i>
+                        </button>
+                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
+                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
+                                <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('topic', this.value)">
+                             </div>
+                             <ul class="max-h-56 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-topic">
+                                <!-- JS Populated -->
+                             </ul>
+                        </div>
+                        <input type="hidden" id="modal-filter-topic" value="">
+                     </div>
+
                 </div>
                 <div class="px-6 py-3 bg-white border-b border-slate-100 flex gap-2">
                     <button onclick="switchHierarchyTab('category')" class="h-tab px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm active-tab" data-tab="category">Categories</button>
@@ -489,6 +542,9 @@ if (!empty($nodesTree)) {
     }
 
     let currentLevel = '<?php echo addslashes($level); ?>';
+    const coursesData = <?php echo json_encode($allCourses); ?>;
+    const eduData = <?php echo json_encode($allEduLevels); ?>;
+    const posData = <?php echo json_encode($allPosLevels); ?>;
     let manualSettings = <?php echo !empty($settings) ? json_encode($settings) : "{ 
         marks: null, 
         time: null, 
@@ -854,58 +910,58 @@ if (!empty($nodesTree)) {
         const topicId = document.getElementById('modal-filter-topic').value;
         
         const container = document.getElementById('hierarchy-list-container');
+        if (!container) return;
         container.innerHTML = '';
         
-        // --- Cascaded Dropdown Filtering ---
+        // --- Cascaded Dropdown Filtering (Custom Lists) ---
+        const filterList = (listId, filterFn) => {
+            const list = document.getElementById(listId);
+            if (!list) return;
+            Array.from(list.querySelectorAll('li')).forEach(li => {
+                const val = li.dataset.val;
+                if (!val) return; // Skip "All" option if needed or handle logic
+                li.style.display = filterFn(li, val) ? '' : 'none';
+            });
+        };
+
         // Education Select
-        Array.from(document.getElementById('modal-filter-edu').options).forEach(opt => {
-            if (!opt.value) return;
-            // Allow items with null course_id to be visible if no course filter is applied
-            const belongsToCourse = categoriesDB.some(c => c.edu_level_id == opt.value && (!courseId || !c.course_id || c.course_id == courseId));
-            opt.style.display = belongsToCourse ? '' : 'none';
+        filterList('list-edu', (li, val) => {
+            return categoriesDB.some(c => c.edu_level_id == val && (!courseId || !c.course_id || c.course_id == courseId));
         });
 
         // Position Select
-        Array.from(document.getElementById('modal-filter-pos').options).forEach(opt => {
-            if (!opt.value) return;
-            // Allow items with null course_id or edu_level_id to be visible if no filter is applied
-            const courseMatch = !courseId || !opt.dataset.course || opt.dataset.course == courseId;
-            const eduMatch = !eduId || !opt.dataset.edu || opt.dataset.edu == eduId;
-            opt.style.display = (courseMatch && eduMatch) ? '' : 'none';
+        filterList('list-pos', (li, val) => {
+            const cMatch = !courseId || !li.dataset.course || li.dataset.course == courseId;
+            const eMatch = !eduId || !li.dataset.edu || li.dataset.edu == eduId;
+            return cMatch && eMatch;
         });
 
         // Category Select
-        Array.from(document.getElementById('modal-filter-cat').options).forEach(opt => {
-            if (!opt.value) return;
-            // Allow items with null position_level_id to be visible if no filter is applied
-            const belongsToPos = categoriesDB.some(c => c.id == opt.value && (!posId || !c.position_level_id || c.position_level_id == posId));
-            opt.style.display = belongsToPos ? '' : 'none';
+        filterList('list-cat', (li, val) => {
+            return categoriesDB.some(c => c.id == val && (!posId || !c.position_level_id || c.position_level_id == posId));
         });
 
         // Topic Select
-        Array.from(document.getElementById('modal-filter-topic').options).forEach(opt => {
-            if (!opt.value) return;
-            // Allow items with null category_id to be visible if no filter is applied
-            opt.style.display = (!catId || !opt.dataset.cat || opt.dataset.cat == catId) ? '' : 'none';
+        filterList('list-topic', (li, val) => {
+            return !catId || !li.dataset.cat || li.dataset.cat == catId;
         });
 
-        const sourceData = currentHierarchyTab === 'category' ? categoriesDB : topicsDB; // Use currentHierarchyTab
-        const typeLabel = currentHierarchyTab === 'category' ? 'Category' : 'Sub-Category';
-        const linkKey = currentHierarchyTab === 'category' ? 'linked_category_id' : 'linked_topic_id';
+        const curTab = typeof currentHierarchyTab !== 'undefined' ? currentHierarchyTab : 'category';
+        const sourceData = curTab === 'category' ? categoriesDB : topicsDB; // Use currentHierarchyTab
+        const typeLabel = curTab === 'category' ? 'Category' : 'Sub-Category';
+        const linkKey = curTab === 'category' ? 'linked_category_id' : 'linked_topic_id';
 
         const matches = sourceData.filter(item => {
             if (query && !item.name.toLowerCase().includes(query)) return false;
             
-            // For topics, filter by category if catId is set. Allow null category_id if no filter.
-            if (currentHierarchyTab === 'topic' && catId && item.category_id != catId && item.category_id !== null) return false;
-            // Also if topicId is set, match specific topic. Allow null id if no filter.
-            if (currentHierarchyTab === 'topic' && topicId && item.id != topicId && item.id !== null) return false;
+            // For topics, filter by category if catId is set.
+            if (curTab === 'topic' && catId && item.category_id != catId && item.category_id !== null) return false;
+            // Also if topicId is set, match specific topic.
+            if (curTab === 'topic' && topicId && item.id != topicId && item.id !== null) return false;
 
-            // Allow items with null course_id to be visible if no course filter is applied
+            // Allow items with null hierarchy to be visible
             if (courseId && item.course_id != courseId && item.course_id !== null) return false;
-            // Allow items with null edu_level_id to be visible if no edu filter is applied
             if (eduId && item.edu_level_id != eduId && item.edu_level_id !== null) return false;
-            // Allow items with null position_level_id to be visible if no pos filter is applied
             if (posId && item.position_level_id != posId && item.position_level_id !== null) return false;
             
             return true;
@@ -923,12 +979,12 @@ if (!empty($nodesTree)) {
             
             const textClass = isSelected ? 'text-white' : 'text-slate-700';
             const labelClass = isSelected ? 'bg-blue-500/50 text-blue-100' : 'bg-slate-100 text-slate-500';
-            const parentName = currentHierarchyTab === 'topic' ? item.category_name : item.parent_name;
+            const parentName = curTab === 'topic' ? item.category_name : item.parent_name;
 
             el.innerHTML = `
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 flex items-center justify-center rounded-lg ${isSelected ? 'bg-white/20' : 'bg-blue-50 text-blue-500'}">
-                        <i class="fas ${currentHierarchyTab === 'category' ? 'fa-layer-group' : 'fa-tag'} text-xs"></i>
+                        <i class="fas ${curTab === 'category' ? 'fa-layer-group' : 'fa-tag'} text-xs"></i>
                     </div>
                     <div>
                         <div class="font-bold text-sm ${textClass}">${item.name}</div>
@@ -937,7 +993,7 @@ if (!empty($nodesTree)) {
                 </div>
                 <div class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-widest ${labelClass}">${typeLabel}</div>
             `;
-            el.onclick = () => selectHierarchyItem(currentHierarchyTab, item.id, item.name);
+            el.onclick = () => selectHierarchyItem(curTab, item.id, item.name);
             container.appendChild(el);
         });
     }
@@ -971,5 +1027,98 @@ if (!empty($nodesTree)) {
         closeHierarchyModal();
     }
 
-    document.addEventListener('DOMContentLoaded', () => { initSettings(); renderGrid(); });
+    // --- SEARCHABLE DROPDOWNS LOGIC ---
+    function initCustomDropdowns() {
+        populateDropdown('course', coursesData, 'id', 'title');
+        populateDropdown('edu', eduData, 'id', 'title');
+        populateDropdown('pos', posData, 'id', 'title');
+        
+        // Categories & Topics might be large, limit initial render or render all?
+        // Rendering all for now as browser handles 1-2k nodes okay usually.
+        populateDropdown('cat', categoriesDB, 'id', 'name');
+        populateDropdown('topic', topicsDB, 'id', 'name');
+        
+        initBodyClick();
+    }
+
+    function populateDropdown(type, data, idKey, titleKey) {
+        const list = document.getElementById(`list-${type}`);
+        if (!list) return;
+        list.innerHTML = `<li class="px-3 py-2 text-xs text-slate-500 hover:bg-slate-50 cursor-pointer" onclick="selectCustomOption('${type}', '', 'Filter ${type.charAt(0).toUpperCase() + type.slice(1)}')">All ${type.charAt(0).toUpperCase() + type.slice(1)}s</li>`;
+        
+        data.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 truncate transition-colors';
+            li.innerText = item[titleKey];
+            li.dataset.val = item[idKey];
+            
+            // Store hierarchy data for cascading (optional visual dimming)
+            if(type === 'pos') {
+                li.dataset.course = item.course_id;
+                li.dataset.edu = item.education_level_id;
+            }
+            if(type === 'cat') li.dataset.pos = item.position_level_id;
+            if(type === 'topic') li.dataset.cat = item.category_id;
+
+            li.onclick = () => selectCustomOption(type, item[idKey], item[titleKey]);
+            list.appendChild(li);
+        });
+    }
+
+    function toggleCustomDropdown(type) {
+        const dd = document.querySelector(`#dropdown-${type} .dropdown-menu`);
+        const isOpen = !dd.classList.contains('hidden');
+        
+        // Close all others
+        document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.add('hidden'));
+        
+        if (!isOpen) {
+            dd.classList.remove('hidden');
+            // Auto focus search
+            setTimeout(() => {
+                const input = dd.querySelector('.dropdown-search');
+                if(input) input.focus();
+            }, 50);
+        }
+    }
+
+    function filterCustomDropdown(type, query) {
+        const filter = query.toLowerCase();
+        const list = document.getElementById(`list-${type}`);
+        const items = list.getElementsByTagName('li');
+        
+        for (let i = 1; i < items.length; i++) { // Skip first "All" option
+            const txt = items[i].textContent || items[i].innerText;
+            if (txt.toLowerCase().indexOf(filter) > -1) {
+                items[i].style.display = "";
+            } else {
+                items[i].style.display = "none";
+            }
+        }
+    }
+
+    function selectCustomOption(type, value, name) {
+        // Update Hidden Input
+        document.getElementById(`modal-filter-${type}`).value = value;
+        
+        // Update Trigger Label
+        const trigger = document.querySelector(`#dropdown-${type} .dropdown-trigger span`);
+        if(trigger) trigger.innerText = name;
+        
+        // Close Dropdown
+        document.querySelector(`#dropdown-${type} .dropdown-menu`).classList.add('hidden');
+        
+        // Trigger Main Filter
+        filterHierarchyList();
+    }
+
+    function initBodyClick() {
+        document.body.addEventListener('click', (e) => {
+            if (!e.target.closest('.custom-dropdown')) {
+                document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.add('hidden'));
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => { initSettings(); renderGrid(); initCustomDropdowns(); });
 </script>
