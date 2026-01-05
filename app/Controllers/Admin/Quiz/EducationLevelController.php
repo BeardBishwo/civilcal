@@ -80,11 +80,10 @@ class EducationLevelController extends Controller
     public function store()
     {
         $title = $_POST['title'] ?? '';
-        $courseId = $_POST['course_id'] ?? null;
-        $icon = $_POST['icon'] ?? 'fa-user-graduate';
-
+        $courseId = $_POST['parent_id'] ?? $_POST['course_id'] ?? null;
+        
         if (empty($title) || empty($courseId)) {
-            echo json_encode(['status' => 'error', 'message' => 'Title and Course are required']);
+            echo json_encode(['status' => 'error', 'message' => 'Title and Course (Parent) are required']);
             return;
         }
 
@@ -99,7 +98,6 @@ class EducationLevelController extends Controller
             'title' => $title,
             'slug' => $slug,
             'type' => 'education_level',
-            'icon' => $icon,
             'order_index' => $maxOrder + 1,
             'is_active' => 1
         ];
@@ -118,5 +116,84 @@ class EducationLevelController extends Controller
         } else {
             echo json_encode(['status' => 'error']);
         }
+    }
+
+    /**
+     * Bulk Delete
+     */
+    public function bulkDelete()
+    {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        $ids = $data['ids'] ?? [];
+
+        if (empty($ids)) {
+            echo json_encode(['status' => 'error', 'message' => 'No items selected']);
+            return;
+        }
+
+        foreach ($ids as $id) {
+            $this->syllabusService->deleteNode($id);
+        }
+
+        echo json_encode(['status' => 'success']);
+    }
+
+    /**
+     * Bulk Duplicate
+     */
+    public function duplicate()
+    {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        $ids = $data['ids'] ?? [];
+
+        if (empty($ids)) {
+            echo json_encode(['status' => 'error', 'message' => 'No items selected']);
+            return;
+        }
+
+        foreach ($ids as $id) {
+            $this->duplicateSingleNode($id);
+        }
+
+        echo json_encode(['status' => 'success']);
+    }
+
+    private function duplicateSingleNode($id)
+    {
+        // 1. Fetch Original
+        $original = $this->db->findOne('syllabus_nodes', ['id' => $id]);
+        if (!$original) return;
+
+        // 2. Determine New Name (Handle V1, V2)
+        $baseTitle = $original['title'];
+        $baseTitle = preg_replace('/\s*\(V\d+\)$/', '', $baseTitle);
+        
+        $newTitle = $baseTitle . ' (V1)';
+        $counter = 1;
+
+        while (true) {
+            $check = $this->db->findOne('syllabus_nodes', [
+                'title' => $newTitle, 
+                'type' => $original['type'], 
+                'parent_id' => $original['parent_id']
+            ]);
+            if (!$check) break;
+            $counter++;
+            $newTitle = $baseTitle . ' (V' . $counter . ')';
+        }
+
+        // 3. Insert New Record
+        $data = $original;
+        unset($data['id']);
+        unset($data['created_at']);
+        unset($data['updated_at']);
+        $data['title'] = $newTitle;
+        $data['slug'] = $this->syllabusService->slugify($newTitle);
+        $data['is_active'] = 0; 
+        $data['order_index'] = $original['order_index'] + 1;
+
+        $this->syllabusService->createNode($data);
     }
 }

@@ -1966,6 +1966,8 @@ $router->add("POST", "/admin/quiz/courses/store", "Admin\\Quiz\\CourseController
 $router->add("POST", "/admin/quiz/courses/delete/{id}", "Admin\\Quiz\\CourseController@delete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/courses/reorder", "Admin\\Quiz\\CourseController@reorder", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/courses/toggle-status", "Admin\\Quiz\\CourseController@toggleStatus", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/courses/bulk-delete", "Admin\\Quiz\\CourseController@bulkDelete", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/courses/duplicate", "Admin\\Quiz\\CourseController@duplicate", ["auth", "admin"]);
 
 // Education Levels
 $router->add("GET", "/admin/quiz/education-levels", "Admin\\Quiz\\EducationLevelController@index", ["auth", "admin"]);
@@ -1973,6 +1975,8 @@ $router->add("POST", "/admin/quiz/education-levels/store", "Admin\\Quiz\\Educati
 $router->add("POST", "/admin/quiz/education-levels/delete/{id}", "Admin\\Quiz\\EducationLevelController@delete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/education-levels/reorder", "Admin\\Quiz\\EducationLevelController@reorder", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/education-levels/toggle-status", "Admin\\Quiz\\EducationLevelController@toggleStatus", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/education-levels/bulk-delete", "Admin\\Quiz\\EducationLevelController@bulkDelete", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/education-levels/duplicate", "Admin\\Quiz\\EducationLevelController@duplicate", ["auth", "admin"]);
 
 // Main Categories
 $router->add("GET", "/admin/quiz/categories", "Admin\\Quiz\\CategoryController@index", ["auth", "admin"]);
@@ -1980,6 +1984,8 @@ $router->add("POST", "/admin/quiz/categories/store", "Admin\\Quiz\\CategoryContr
 $router->add("POST", "/admin/quiz/categories/delete/{id}", "Admin\\Quiz\\CategoryController@delete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/categories/reorder", "Admin\\Quiz\\CategoryController@reorder", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/categories/toggle-premium", "Admin\\Quiz\\CategoryController@togglePremium", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/categories/bulk-delete", "Admin\\Quiz\\CategoryController@bulkDelete", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/categories/duplicate", "Admin\\Quiz\\CategoryController@duplicate", ["auth", "admin"]);
 
 // Sub Categories
 $router->add("GET", "/admin/quiz/subcategories", "Admin\\Quiz\\SubCategoryController@index", ["auth", "admin"]);
@@ -1987,6 +1993,8 @@ $router->add("POST", "/admin/quiz/subcategories/store", "Admin\\Quiz\\SubCategor
 $router->add("POST", "/admin/quiz/subcategories/delete/{id}", "Admin\\Quiz\\SubCategoryController@delete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/subcategories/reorder", "Admin\\Quiz\\SubCategoryController@reorder", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/subcategories/toggle-premium", "Admin\\Quiz\\SubCategoryController@togglePremium", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/subcategories/bulk-delete", "Admin\\Quiz\\SubCategoryController@bulkDelete", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/subcategories/duplicate", "Admin\\Quiz\\SubCategoryController@duplicate", ["auth", "admin"]);
 
 // Legacy Helpers (Optional - kept if needed by other modules, otherwise can be removed)
 // $router->add("GET", "/admin/quiz/get-subjects/{id}", "Admin\\Quiz\\SyllabusController@getSubjects", ["auth", "admin"]);

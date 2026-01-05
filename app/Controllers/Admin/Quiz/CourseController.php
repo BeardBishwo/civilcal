@@ -98,8 +98,7 @@ class CourseController extends Controller
             'title' => $title,
             'slug' => $slug,
             'type' => 'course', // New Type
-            'icon' => $icon,
-            'image_path' => $image,
+            'image_path' => $image, // Removed icon
             'order_index' => $maxOrder + 1,
             'is_active' => 1
         ];
@@ -121,5 +120,81 @@ class CourseController extends Controller
         } else {
             echo json_encode(['status' => 'error']);
         }
+    }
+
+    /**
+     * Bulk Delete Courses
+     */
+    public function bulkDelete()
+    {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        $ids = $data['ids'] ?? [];
+
+        if (empty($ids)) {
+            echo json_encode(['status' => 'error', 'message' => 'No items selected']);
+            return;
+        }
+
+        foreach ($ids as $id) {
+            $this->syllabusService->deleteNode($id);
+        }
+
+        echo json_encode(['status' => 'success']);
+    }
+
+    /**
+     * Bulk Duplicate Courses
+     */
+    public function duplicate()
+    {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        $ids = $data['ids'] ?? [];
+
+        if (empty($ids)) {
+            echo json_encode(['status' => 'error', 'message' => 'No items selected']);
+            return;
+        }
+
+        foreach ($ids as $id) {
+            $this->duplicateSingleNode($id);
+        }
+
+        echo json_encode(['status' => 'success']);
+    }
+
+    private function duplicateSingleNode($id)
+    {
+        // 1. Fetch Original
+        $original = $this->db->findOne('syllabus_nodes', ['id' => $id]);
+        if (!$original) return;
+
+        // 2. Determine New Name (Handle V1, V2)
+        $baseTitle = $original['title'];
+        // Remove existing version suffix if any (e.g., "Course (V1)" -> "Course")
+        $baseTitle = preg_replace('/\s*\(V\d+\)$/', '', $baseTitle);
+        
+        $newTitle = $baseTitle . ' (V1)';
+        $counter = 1;
+
+        while (true) {
+            $check = $this->db->findOne('syllabus_nodes', ['title' => $newTitle, 'type' => $original['type']]);
+            if (!$check) break;
+            $counter++;
+            $newTitle = $baseTitle . ' (V' . $counter . ')';
+        }
+
+        // 3. Insert New Record
+        $data = $original;
+        unset($data['id']);
+        unset($data['created_at']);
+        unset($data['updated_at']);
+        $data['title'] = $newTitle;
+        $data['slug'] = $this->syllabusService->slugify($newTitle);
+        $data['is_active'] = 0; // Default to inactive for safety
+        $data['order_index'] = $original['order_index'] + 1;
+
+        $this->syllabusService->createNode($data);
     }
 }

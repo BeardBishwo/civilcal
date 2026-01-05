@@ -4,7 +4,13 @@
  * Professional, high-density layout with integrated creation form.
  */
 $courses = $courses ?? [];
-$stats = $stats ?? ['total' => 0, 'active' => 0];
+
+// Calculate Stats 
+$stats = [
+    'total' => count($courses),
+    'active' => count(array_filter($courses, fn($c) => $c['is_active'] == 1)),
+    'inactive' => count(array_filter($courses, fn($c) => $c['is_active'] == 0))
+];
 ?>
 
 <div class="admin-wrapper-container">
@@ -14,12 +20,12 @@ $stats = $stats ?? ['total' => 0, 'active' => 0];
         <div class="compact-header">
             <div class="header-left">
                 <div class="header-title">
-                    <i class="fas fa-university"></i>
-                    <h1>Courses Manager</h1>
+                    <i class="fas fa-book"></i>
+                    <h1>Courses</h1>
                 </div>
-                <div class="header-subtitle"><?php echo $stats['total']; ?> Courses • <?php echo $stats['active']; ?> Active</div>
+                <div class="header-subtitle"><?php echo $stats['total']; ?> Courses • <?php echo $stats['active']; ?> Active • Admin Managed</div>
             </div>
-            <!-- Stats in Header for Space Efficiency -->
+            <!-- Stats -->
             <div class="header-actions" style="display:flex; gap:10px;">
                 <div class="stat-pill">
                     <span class="label">TOTAL</span>
@@ -32,27 +38,32 @@ $stats = $stats ?? ['total' => 0, 'active' => 0];
             </div>
         </div>
 
-        <!-- Single Row Creation Toolbar -->
+        <!-- Creation Toolbar -->
         <div class="creation-toolbar">
             <h5 class="toolbar-title">Create New Course</h5>
             <form id="addCourseForm" class="creation-form">
-                
                 <!-- Title Input -->
                 <div class="input-group-premium" style="flex: 3; min-width: 200px;">
                     <i class="fas fa-heading icon"></i>
-                    <input type="text" name="title" class="form-input-premium" placeholder="Course Name (e.g. Civil Engineering)" required>
+                    <input type="text" name="title" class="form-input-premium" placeholder="Course Name (e.g. Engineering)" required>
                 </div>
                 
+                <!-- Slug Input -->
+                <div class="input-group-premium" style="flex: 2; min-width: 150px;">
+                    <i class="fas fa-link icon"></i>
+                    <input type="text" name="slug" class="form-input-premium" placeholder="Slug (Optional)">
+                </div>
+
                 <!-- Icon Input -->
                 <div class="input-group-premium" style="flex: 2; min-width: 150px;">
                     <i class="fas fa-icons icon"></i>
-                    <input type="text" name="icon" class="form-input-premium" placeholder="Icon (fa-graduation-cap)" value="fa-graduation-cap">
+                    <input type="text" name="icon" class="form-input-premium" placeholder="Icon (e.g. fa-book)" value="fa-graduation-cap">
                 </div>
 
                 <!-- Image Input -->
                 <div class="input-group-premium" style="flex: 2; min-width: 150px;">
-                    <input type="text" name="image" id="catImage" class="form-input-premium" placeholder="Image URL (Optional)" style="padding-left: 10px;">
-                    <button type="button" class="btn-icon-inside" onclick="MediaManager.open('catImage')">
+                    <input type="text" name="image" id="courseImage" class="form-input-premium" placeholder="Image URL" style="padding-left: 10px;">
+                    <button type="button" class="btn-icon-inside" onclick="MediaManager.open('courseImage')">
                         <i class="fas fa-image"></i>
                     </button>
                 </div>
@@ -66,13 +77,14 @@ $stats = $stats ?? ['total' => 0, 'active' => 0];
         <!-- Filter & Toolbar -->
         <div class="compact-toolbar">
             <div class="toolbar-left">
+                <!-- Search Input -->
                 <div class="search-compact">
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Search courses..." id="course-search" onkeyup="filterCourses()">
                 </div>
             </div>
             <div class="toolbar-right">
-                <div class="drag-hint"><i class="fas fa-arrows-alt"></i> Drag handle to reorder</div>
+                <div class="drag-hint"><i class="fas fa-arrows-alt"></i> Drag handle to reorder (Global)</div>
             </div>
         </div>
 
@@ -82,8 +94,10 @@ $stats = $stats ?? ['total' => 0, 'active' => 0];
                 <table class="table-compact">
                     <thead>
                         <tr>
+                            <th style="width: 40px;" class="text-center">
+                                <input type="checkbox" id="selectAll" onclick="toggleSelectAll()">
+                            </th>
                             <th style="width: 50px;" class="text-center">#</th>
-                            <th style="width: 60px;" class="text-center">ID</th>
                             <th style="width: 60px;" class="text-center">Order</th>
                             <th>Course Info</th>
                             <th class="text-center" style="width: 150px;">Status</th>
@@ -94,7 +108,7 @@ $stats = $stats ?? ['total' => 0, 'active' => 0];
                         <?php if (empty($courses)): ?>
                             <tr><td colspan="6" class="empty-cell">
                                 <div class="empty-state-compact">
-                                    <i class="fas fa-folder-open"></i>
+                                    <i class="fas fa-book-open"></i>
                                     <h3>No courses found</h3>
                                     <p>Create your first course above.</p>
                                 </div>
@@ -103,13 +117,13 @@ $stats = $stats ?? ['total' => 0, 'active' => 0];
                             <?php foreach ($courses as $c): ?>
                                 <tr class="course-item group" data-id="<?php echo $c['id']; ?>">
                                     <td class="text-center align-middle">
+                                        <input type="checkbox" class="row-checkbox" value="<?php echo $c['id']; ?>" onchange="updateBulkToolbar()">
+                                    </td>
+                                    <td class="text-center align-middle">
                                         <div class="handle"><i class="fas fa-grip-vertical"></i></div>
                                     </td>
                                     <td class="text-center align-middle">
-                                        <span class="text-xs font-bold text-slate-400"><?php echo $c['id']; ?></span>
-                                    </td>
-                                    <td class="text-center align-middle">
-                                        <span class="text-xs font-bold text-slate-500"><?php echo $c['order_index']; ?></span>
+                                        <span class="text-xs font-bold text-slate-400"><?php echo $c['order_index']; ?></span>
                                     </td>
                                     <td>
                                         <div class="item-info">
@@ -151,9 +165,25 @@ $stats = $stats ?? ['total' => 0, 'active' => 0];
                 </table>
             </div>
         </div>
+
+        <!-- Float Bulk Toolbar -->
+        <div id="bulkToolbar" class="bulk-toolbar">
+            <div class="bulk-info">
+                <span class="bulk-count">0</span> Selected
+            </div>
+            <div class="bulk-actions">
+                <button onclick="bulkDuplicate()" class="btn-bulk-duplicate">
+                    <i class="fas fa-copy"></i> Duplicate
+                </button>
+                <button onclick="bulkDelete()" class="btn-bulk-delete">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 <script>
 async function saveCourse() {
@@ -186,6 +216,52 @@ function deleteCourse(id) {
             if(d.status==='success') location.reload();
         }
     });
+}
+
+// Bulk Actions
+function toggleSelectAll() {
+    const checked = document.getElementById('selectAll').checked;
+    document.querySelectorAll('.row-checkbox').forEach(el => el.checked = checked);
+    updateBulkToolbar();
+}
+
+function updateBulkToolbar() {
+    const selected = document.querySelectorAll('.row-checkbox:checked').length;
+    const toolbar = document.getElementById('bulkToolbar');
+    document.querySelector('.bulk-count').innerText = selected;
+    
+    if (selected > 0) {
+        toolbar.classList.add('active');
+    } else {
+        toolbar.classList.remove('active');
+    }
+}
+
+async function bulkDelete() {
+    const ids = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(el => el.value);
+    if(ids.length === 0) return;
+
+    Swal.fire({
+        title: `Delete ${ids.length} Courses?`, text: "This cannot be undone.", icon: 'warning',
+        showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Delete All'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            await fetch('<?php echo app_base_url('admin/quiz/courses/bulk-delete'); ?>', {
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ids: ids})
+            });
+            location.reload();
+        }
+    });
+}
+
+async function bulkDuplicate() {
+    const ids = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(el => el.value);
+    if(ids.length === 0) return;
+
+    await fetch('<?php echo app_base_url('admin/quiz/courses/duplicate'); ?>', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ids: ids})
+    });
+    location.reload();
 }
 
 new Sortable(document.getElementById('courseSortable'), {
@@ -382,4 +458,28 @@ input:checked + .slider:before { transform: translateX(16px); }
 .empty-state-compact i { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.5; }
 .empty-state-compact h3 { margin: 0 0 0.5rem 0; color: #64748b; font-size: 1.1rem; }
 .empty-state-compact p { font-size: 0.9rem; margin: 0; }
+
+/* Bulk Toolbar */
+.bulk-toolbar {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: #1e293b; color: white; padding: 0.75rem 1.5rem; border-radius: 50px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 2rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0; z-index: 100;
+}
+.bulk-toolbar.active { transform: translateX(-50%) translateY(0); opacity: 1; }
+.bulk-info { font-weight: 600; font-size: 0.9rem; }
+.bulk-count { color: #818cf8; font-weight: 800; }
+.bulk-actions { display: flex; gap: 0.5rem; }
+.btn-bulk-duplicate {
+    background: #4f46e5; color: white; border: none; padding: 0.5rem 1rem; border-radius: 20px;
+    font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;
+    transition: 0.2s;
+}
+.btn-bulk-duplicate:hover { background: #4338ca; }
+.btn-bulk-delete {
+    background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 20px;
+    font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;
+    transition: 0.2s;
+}
+.btn-bulk-delete:hover { background: #dc2626; }
 </style>

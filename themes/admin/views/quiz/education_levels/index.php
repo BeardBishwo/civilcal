@@ -109,8 +109,10 @@ $stats = [
                 <table class="table-compact">
                     <thead>
                         <tr>
+                            <th style="width: 40px;" class="text-center">
+                                <input type="checkbox" id="selectAll" onclick="toggleSelectAll()">
+                            </th>
                             <th style="width: 50px;" class="text-center">#</th>
-                            <th style="width: 60px;" class="text-center">ID</th>
                             <th style="width: 60px;" class="text-center">Order</th>
                             <th>Level Info</th>
                             <th class="text-center" style="width: 200px;">Course</th>
@@ -131,10 +133,10 @@ $stats = [
                             <?php foreach ($levels as $l): ?>
                                 <tr class="level-item group" data-id="<?php echo $l['id']; ?>">
                                     <td class="text-center">
-                                        <div class="handle"><i class="fas fa-grip-vertical"></i></div>
+                                        <input type="checkbox" class="row-checkbox" value="<?php echo $l['id']; ?>" onchange="updateBulkToolbar()">
                                     </td>
                                     <td class="text-center">
-                                        <span class="order-idx" style="color:#94a3b8;"><?php echo $l['id']; ?></span>
+                                        <div class="handle"><i class="fas fa-grip-vertical"></i></div>
                                     </td>
                                     <td class="text-center">
                                         <span class="order-idx" style="color:#64748b; font-weight:700;"><?php echo $l['order_index']; ?></span>
@@ -177,9 +179,25 @@ $stats = [
                 </table>
             </div>
         </div>
+
+        <!-- Float Bulk Toolbar -->
+        <div id="bulkToolbar" class="bulk-toolbar">
+            <div class="bulk-info">
+                <span class="bulk-count">0</span> Selected
+            </div>
+            <div class="bulk-actions">
+                <button onclick="bulkDuplicate()" class="btn-bulk-duplicate">
+                    <i class="fas fa-copy"></i> Duplicate
+                </button>
+                <button onclick="bulkDelete()" class="btn-bulk-delete">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 <script>
 async function saveLevel() {
@@ -216,14 +234,61 @@ function deleteLevel(id) {
     });
 }
 
+// Bulk Actions
+function toggleSelectAll() {
+    const checked = document.getElementById('selectAll').checked;
+    document.querySelectorAll('.row-checkbox').forEach(el => el.checked = checked);
+    updateBulkToolbar();
+}
+
+function updateBulkToolbar() {
+    const selected = document.querySelectorAll('.row-checkbox:checked').length;
+    const toolbar = document.getElementById('bulkToolbar');
+    document.querySelector('.bulk-count').innerText = selected;
+    
+    if (selected > 0) {
+        toolbar.classList.add('active');
+    } else {
+        toolbar.classList.remove('active');
+    }
+}
+
+async function bulkDelete() {
+    const ids = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(el => el.value);
+    if(ids.length === 0) return;
+
+    Swal.fire({
+        title: `Delete ${ids.length} Levels?`, text: "This cannot be undone.", icon: 'warning',
+        showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Delete All'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            await fetch('<?php echo app_base_url('admin/quiz/education-levels/bulk-delete'); ?>', {
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ids: ids})
+            });
+            location.reload();
+        }
+    });
+}
+
+async function bulkDuplicate() {
+    const ids = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(el => el.value);
+    if(ids.length === 0) return;
+
+    await fetch('<?php echo app_base_url('admin/quiz/education-levels/duplicate'); ?>', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ids: ids})
+    });
+    location.reload();
+}
+
 new Sortable(document.getElementById('levelSortable'), {
     animation: 150, handle: '.handle', ghostClass: 'bg-indigo-50',
     onEnd: function() {
         const rows = document.querySelectorAll('.level-item');
         const order = Array.from(rows).map(el => el.getAttribute('data-id'));
         
+        // Update visual Order indices
         rows.forEach((row, index) => {
-            const orderCell = row.querySelectorAll('td')[2].querySelector('span'); 
+            const orderCell = row.querySelectorAll('td')[2].querySelector('span'); // Index 2 is Order col (Checkbox=0, Handle=1, Order=2)
             if(orderCell) orderCell.innerText = index + 1;
         });
 
@@ -420,6 +485,30 @@ input:checked + .slider:before { transform: translateX(16px); }
 .empty-state-compact i { font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.5; }
 .empty-state-compact h3 { font-size: 1rem; font-weight: 600; color: #64748b; margin: 0; }
 .empty-state-compact p { font-size: 0.8rem; margin: 0; }
+
+/* Bulk Toolbar */
+.bulk-toolbar {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: #1e293b; color: white; padding: 0.75rem 1.5rem; border-radius: 50px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 2rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0; z-index: 100;
+}
+.bulk-toolbar.active { transform: translateX(-50%) translateY(0); opacity: 1; }
+.bulk-info { font-weight: 600; font-size: 0.9rem; }
+.bulk-count { color: #818cf8; font-weight: 800; }
+.bulk-actions { display: flex; gap: 0.5rem; }
+.btn-bulk-duplicate {
+    background: #4f46e5; color: white; border: none; padding: 0.5rem 1rem; border-radius: 20px;
+    font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;
+    transition: 0.2s;
+}
+.btn-bulk-duplicate:hover { background: #4338ca; }
+.btn-bulk-delete {
+    background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 20px;
+    font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;
+    transition: 0.2s;
+}
+.btn-bulk-delete:hover { background: #dc2626; }
 
 @media (max-width: 1024px) {
     .creation-form { flex-direction: column; align-items: stretch; }
