@@ -172,17 +172,59 @@ if (!empty($nodesTree)) {
             <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl transform transition-all flex flex-col max-h-[90vh]">
                 <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
                     <h3 class="text-lg font-bold text-slate-800">Link Hierarchy</h3>
-                    <button onclick="closeHierarchyModal()" class="text-slate-400 hover:text-slate-600 transition"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="p-4 bg-slate-50 border-b border-slate-200 shrink-0 space-y-3">
-                    <input type="text" id="hierarchy-search" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-sm font-medium" placeholder="Search categories, topics..." onkeyup="filterHierarchyList()">
-                    <div class="flex gap-2 text-sm font-bold">
-                        <button onclick="switchHierarchyTab('category')" class="h-tab px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 transition shadow-sm active-tab" data-tab="category">Categories</button>
-                        <button onclick="switchHierarchyTab('topic')" class="h-tab px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 transition shadow-sm" data-tab="topic">Sub-Categories</button>
-                        <button onclick="removeLink()" class="ml-auto text-rose-500 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition"><i class="fas fa-unlink mr-1"></i> Unlink</button>
+                    <div class="flex items-center gap-3">
+                        <button onclick="removeLink()" class="text-rose-500 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition text-xs font-bold flex items-center"><i class="fas fa-unlink mr-1"></i> Unlink</button>
+                        <button onclick="closeHierarchyModal()" class="text-slate-400 hover:text-slate-600 transition"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
-                <div class="flex-1 overflow-y-auto p-2" id="hierarchy-list-container"></div>
+                <!-- Search -->
+                <div class="px-6 py-4 border-b border-slate-100">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="hierarchy-search" class="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none text-sm font-medium transition" placeholder="Search categories, topics..." onkeyup="filterHierarchyList()">
+                    </div>
+                </div>
+                <!-- Filter Data Row (5 Filters in one row) -->
+                <div class="link-filter-row">
+                    <span class="filter-label">Filter:</span>
+                    <div class="flex items-center gap-2 flex-1 no-scrollbar overflow-x-auto">
+                        <select id="modal-filter-course" class="filter-select" onchange="filterHierarchyList()">
+                            <option value="">Course</option>
+                            <?php foreach($allCourses as $c): ?>
+                                <option value="<?php echo $c['id']; ?>"><?php echo htmlspecialchars($c['title']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select id="modal-filter-edu" class="filter-select" onchange="filterHierarchyList()">
+                            <option value="">Level</option>
+                            <?php foreach($allEduLevels as $e): ?>
+                                <option value="<?php echo $e['id']; ?>"><?php echo htmlspecialchars($e['title']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select id="modal-filter-pos" class="filter-select" onchange="filterHierarchyList()">
+                            <option value="">Position</option>
+                            <?php foreach($allPosLevels as $p): ?>
+                                <option value="<?php echo $p['id']; ?>" data-course="<?php echo $p['course_id']; ?>" data-edu="<?php echo $p['education_level_id']; ?>"><?php echo htmlspecialchars($p['title']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select id="modal-filter-cat" class="filter-select" onchange="filterHierarchyList()">
+                            <option value="">Category</option>
+                            <?php foreach($categories as $cat): ?>
+                                <option value="<?php echo $cat['id']; ?>" data-course="<?php echo $cat['course_id']; ?>" data-edu="<?php echo $cat['edu_level_id']; ?>"><?php echo htmlspecialchars($cat['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select id="modal-filter-topic" class="filter-select" onchange="filterHierarchyList()">
+                            <option value="">Sub-Cat</option>
+                            <?php foreach($topics as $t): ?>
+                                <option value="<?php echo $t['id']; ?>" data-cat="<?php echo $t['category_id']; ?>"><?php echo htmlspecialchars($t['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="px-6 py-3 bg-white border-b border-slate-100 flex gap-2">
+                    <button onclick="switchHierarchyTab('category')" class="h-tab px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm active-tab" data-tab="category">Categories</button>
+                    <button onclick="switchHierarchyTab('topic')" class="h-tab px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm" data-tab="topic">Sub-Categories</button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 space-y-2 bg-slate-50/50" id="hierarchy-list-container"></div>
             </div>
         </div>
     </div>
@@ -285,6 +327,61 @@ if (!empty($nodesTree)) {
     .badge-phase { background: #1e293b; color: white; }
     .badge-section { background: #e0e7ff; color: #4338ca; }
     .badge-unit { background: #f1f5f9; color: #64748b; }
+
+    /* Modal Filters */
+    .link-filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        background: #f8fafc;
+        padding: 10px 14px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex: 1;
+        min-width: 0;
+    }
+    .filter-label {
+        font-size: 9px;
+        font-weight: 800;
+        color: #1e40af;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+        opacity: 0.8;
+    }
+    .filter-select {
+        flex: 1;
+        min-width: 110px;
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background-color: white;
+        font-size: 11px;
+        color: #475569;
+        outline: none;
+        transition: all 0.2s;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 12px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    .filter-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .filter-select::placeholder {
+        color: #94a3b8;
+    }
 
     .hierarchy-btn {
         width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #f8fafc; color: #64748b; transition: 0.2s; border: 1px solid #e2e8f0;
@@ -697,10 +794,19 @@ if (!empty($nodesTree)) {
     function openHierarchyModal(index) {
         activeRowIndex = index;
         const row = syllabusData[index];
+        
+        // Reset 5 Filters
+        document.getElementById('modal-filter-course').value = '';
+        document.getElementById('modal-filter-edu').value = '';
+        document.getElementById('modal-filter-pos').value = '';
+        document.getElementById('modal-filter-cat').value = '';
+        document.getElementById('modal-filter-topic').value = '';
+        document.getElementById('hierarchy-search').value = '';
+
         if (row.linked_topic_id) switchHierarchyTab('topic');
         else switchHierarchyTab('category');
+        
         document.getElementById('hierarchy-modal').classList.remove('hidden');
-        document.getElementById('hierarchy-search').value = '';
         filterHierarchyList();
         setTimeout(() => document.getElementById('hierarchy-search').focus(), 50);
     }
@@ -711,41 +817,127 @@ if (!empty($nodesTree)) {
     }
 
     function switchHierarchyTab(tab) {
-        activeTab = tab;
-        document.querySelectorAll('.h-tab').forEach(el => {
-            if(el.dataset.tab === tab) {
-                 el.classList.add('bg-blue-50', 'border-blue-200', 'text-blue-700');
-                 el.classList.remove('bg-white', 'text-slate-600');
-            } else {
-                 el.classList.remove('bg-blue-50', 'border-blue-200', 'text-blue-700');
-                 el.classList.add('bg-white', 'text-slate-600');
-            }
+        currentHierarchyTab = tab;
+        document.querySelectorAll('.h-tab').forEach(btn => {
+            btn.classList.remove('active', 'bg-blue-600', 'text-white');
+            btn.classList.add('bg-gray-100', 'text-gray-600');
         });
+        const activeBtn = document.querySelector(`.h-tab[data-tab="${tab}"]`); // Changed selector to data-tab
+        if (activeBtn) {
+            activeBtn.classList.add('active', 'bg-blue-600', 'text-white');
+            activeBtn.classList.remove('bg-gray-100', 'text-gray-600');
+        }
+
+        // Keep all 5 filters visible to maintain the 5-column grid layout
+        // but maybe disable the Category filter when on the Categories tab
+        const catFilter = document.getElementById('modal-filter-cat');
+        if (catFilter) {
+            if (tab === 'category') { // Changed 'categories' to 'category' to match the tab name
+                catFilter.disabled = true;
+                catFilter.classList.add('opacity-50', 'bg-gray-50');
+                catFilter.value = ""; // Reset it
+            } else {
+                catFilter.disabled = false;
+                catFilter.classList.remove('opacity-50', 'bg-gray-50');
+            }
+        }
+
         filterHierarchyList();
     }
 
     function filterHierarchyList() {
         const query = document.getElementById('hierarchy-search').value.toLowerCase();
+        const courseId = document.getElementById('modal-filter-course').value;
+        const eduId = document.getElementById('modal-filter-edu').value;
+        const posId = document.getElementById('modal-filter-pos').value;
+        const catId = document.getElementById('modal-filter-cat').value;
+        const topicId = document.getElementById('modal-filter-topic').value;
+        
         const container = document.getElementById('hierarchy-list-container');
         container.innerHTML = '';
         
-        const sourceData = activeTab === 'category' ? categoriesDB : topicsDB;
-        const typeLabel = activeTab === 'category' ? 'Category' : 'Sub-Category';
-        const linkKey = activeTab === 'category' ? 'linked_category_id' : 'linked_topic_id';
+        // --- Cascaded Dropdown Filtering ---
+        // Education Select
+        Array.from(document.getElementById('modal-filter-edu').options).forEach(opt => {
+            if (!opt.value) return;
+            // Allow items with null course_id to be visible if no course filter is applied
+            const belongsToCourse = categoriesDB.some(c => c.edu_level_id == opt.value && (!courseId || !c.course_id || c.course_id == courseId));
+            opt.style.display = belongsToCourse ? '' : 'none';
+        });
 
-        const matches = sourceData.filter(item => item.name.toLowerCase().includes(query));
+        // Position Select
+        Array.from(document.getElementById('modal-filter-pos').options).forEach(opt => {
+            if (!opt.value) return;
+            // Allow items with null course_id or edu_level_id to be visible if no filter is applied
+            const courseMatch = !courseId || !opt.dataset.course || opt.dataset.course == courseId;
+            const eduMatch = !eduId || !opt.dataset.edu || opt.dataset.edu == eduId;
+            opt.style.display = (courseMatch && eduMatch) ? '' : 'none';
+        });
+
+        // Category Select
+        Array.from(document.getElementById('modal-filter-cat').options).forEach(opt => {
+            if (!opt.value) return;
+            // Allow items with null position_level_id to be visible if no filter is applied
+            const belongsToPos = categoriesDB.some(c => c.id == opt.value && (!posId || !c.position_level_id || c.position_level_id == posId));
+            opt.style.display = belongsToPos ? '' : 'none';
+        });
+
+        // Topic Select
+        Array.from(document.getElementById('modal-filter-topic').options).forEach(opt => {
+            if (!opt.value) return;
+            // Allow items with null category_id to be visible if no filter is applied
+            opt.style.display = (!catId || !opt.dataset.cat || opt.dataset.cat == catId) ? '' : 'none';
+        });
+
+        const sourceData = currentHierarchyTab === 'category' ? categoriesDB : topicsDB; // Use currentHierarchyTab
+        const typeLabel = currentHierarchyTab === 'category' ? 'Category' : 'Sub-Category';
+        const linkKey = currentHierarchyTab === 'category' ? 'linked_category_id' : 'linked_topic_id';
+
+        const matches = sourceData.filter(item => {
+            if (query && !item.name.toLowerCase().includes(query)) return false;
+            
+            // For topics, filter by category if catId is set. Allow null category_id if no filter.
+            if (currentHierarchyTab === 'topic' && catId && item.category_id != catId && item.category_id !== null) return false;
+            // Also if topicId is set, match specific topic. Allow null id if no filter.
+            if (currentHierarchyTab === 'topic' && topicId && item.id != topicId && item.id !== null) return false;
+
+            // Allow items with null course_id to be visible if no course filter is applied
+            if (courseId && item.course_id != courseId && item.course_id !== null) return false;
+            // Allow items with null edu_level_id to be visible if no edu filter is applied
+            if (eduId && item.edu_level_id != eduId && item.edu_level_id !== null) return false;
+            // Allow items with null position_level_id to be visible if no pos filter is applied
+            if (posId && item.position_level_id != posId && item.position_level_id !== null) return false;
+            
+            return true;
+        });
 
         if (matches.length === 0) {
-            container.innerHTML = `<div class="text-center py-8 text-slate-400 italic">No ${typeLabel} found matching "${query}"</div>`;
+            container.innerHTML = `<div class="text-center py-12 bg-white rounded-xl border border-dashed border-slate-200 text-slate-400 italic font-medium">No results matching criteria</div>`;
             return;
         }
 
         matches.forEach(item => {
             const isSelected = syllabusData[activeRowIndex] && syllabusData[activeRowIndex][linkKey] == item.id;
             const el = document.createElement('div');
-            el.className = `flex items-center justify-between p-3 mb-1 rounded-lg cursor-pointer transition group ${isSelected ? 'bg-blue-600 text-white shadow-md' : 'hover:bg-slate-50 border border-transparent hover:border-slate-200'}`;
-            el.innerHTML = `<div class="font-bold text-sm text-[#1e293b] ${isSelected ? 'text-white' : ''}">${item.name}</div><div class="text-[10px] uppercase tracking-wider opacity-60 font-mono group-hover:opacity-100">${typeLabel}</div>`;
-            el.onclick = () => selectHierarchyItem(activeTab, item.id, item.name);
+            el.className = `flex items-center justify-between p-4 mb-2 rounded-xl cursor-pointer transition-all duration-200 group ${isSelected ? 'bg-blue-600 shadow-lg shadow-blue-100' : 'bg-white border border-slate-100 hover:border-blue-300 hover:shadow-md'}`;
+            
+            const textClass = isSelected ? 'text-white' : 'text-slate-700';
+            const labelClass = isSelected ? 'bg-blue-500/50 text-blue-100' : 'bg-slate-100 text-slate-500';
+            const parentName = currentHierarchyTab === 'topic' ? item.category_name : item.parent_name;
+
+            el.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 flex items-center justify-center rounded-lg ${isSelected ? 'bg-white/20' : 'bg-blue-50 text-blue-500'}">
+                        <i class="fas ${currentHierarchyTab === 'category' ? 'fa-layer-group' : 'fa-tag'} text-xs"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-sm ${textClass}">${item.name}</div>
+                        ${parentName ? `<div class="text-[10px] opacity-70 ${textClass}">${parentName}</div>` : ''}
+                    </div>
+                </div>
+                <div class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-widest ${labelClass}">${typeLabel}</div>
+            `;
+            el.onclick = () => selectHierarchyItem(currentHierarchyTab, item.id, item.name);
             container.appendChild(el);
         });
     }

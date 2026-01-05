@@ -73,9 +73,40 @@ class SyllabusController extends Controller
         // Recursively build tree
         $nodesTree = $this->buildSyllabusTree($nodes);
 
-        // Fetch dropdown data
-        $categories = $this->db->find('quiz_categories', ['is_active' => 1], 'name ASC');
-        $topics = $this->db->find('quiz_topics', ['is_active' => 1], 'name ASC');
+        // Fetch enriched categories (linked to syllabus hierarchy)
+        // Join quiz_categories -> syllabus_nodes (category) -> position_levels (via level)
+        $categoriesSql = "
+            SELECT qc.*, sn.parent_id as edu_level_id, p.parent_id as course_id, p.title as parent_name,
+                   pl.id as position_level_id
+            FROM quiz_categories qc
+            LEFT JOIN syllabus_nodes sn ON sn.linked_category_id = qc.id AND sn.type = 'category'
+            LEFT JOIN syllabus_nodes p ON sn.parent_id = p.id
+            LEFT JOIN position_levels pl ON sn.level = pl.slug OR sn.level = pl.title
+            WHERE qc.is_active = 1
+            GROUP BY qc.id, sn.parent_id, p.parent_id, p.title, pl.id
+            ORDER BY qc.name ASC
+        ";
+        $categories = $this->db->query($categoriesSql)->fetchAll();
+
+        // Fetch enriched topics
+        // Join quiz_topics -> quiz_subjects -> quiz_categories
+        $topicsSql = "
+            SELECT qt.*, qs.category_id, qc.name as category_name
+            FROM quiz_topics qt
+            LEFT JOIN quiz_subjects qs ON qt.subject_id = qs.id
+            LEFT JOIN quiz_categories qc ON qs.category_id = qc.id
+            WHERE qt.is_active = 1
+            GROUP BY qt.id, qs.category_id, qc.name
+            ORDER BY qt.name ASC
+        ";
+        $topics = $this->db->query($topicsSql)->fetchAll();
+
+        // Fetch Position Levels for Filtering
+        $allPosLevels = $this->db->find('position_levels', [], 'title ASC');
+
+        // Fetch Courses and Education Levels for Modal Filters
+        $allCourses = $this->db->find('syllabus_nodes', ['type' => 'course', 'is_active' => 1], 'title ASC');
+        $allEduLevels = $this->db->find('syllabus_nodes', ['type' => 'education_level', 'is_active' => 1], 'title ASC');
 
         // Fetch level-wide settings
         $settingsRow = $this->db->findOne('syllabus_settings', ['level' => $level]);
@@ -102,7 +133,10 @@ class SyllabusController extends Controller
             'categories' => $categories,
             'topics' => $topics,
             'settings' => $settings,
-            'breadcrumbBase' => $breadcrumbBase
+            'breadcrumbBase' => $breadcrumbBase,
+            'allCourses' => $allCourses,
+            'allEduLevels' => $allEduLevels,
+            'allPosLevels' => $allPosLevels
         ]);
     }
 
