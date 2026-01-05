@@ -115,7 +115,7 @@ $stats = [
                             <th style="width: 50px;" class="text-center">#</th>
                             <th style="width: 60px;" class="text-center">Order</th>
                             <th>Level Info</th>
-                            <th class="text-center" style="width: 200px;">Course</th>
+                            <th class="text-center" style="min-width: 250px;">Course</th>
                             <th class="text-center" style="width: 150px;">Status</th>
                             <th class="text-center" style="width: 100px;">Actions</th>
                         </tr>

@@ -131,8 +131,8 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                             <th style="width: 40px;"></th>
                             <th style="width: 60px;">#</th>
                             <th>Title</th>
-                            <th style="width: 150px;">Course</th>
-                            <th style="width: 150px;">Education Level</th>
+                            <th style="min-width: 220px;">Course</th>
+                            <th style="min-width: 350px;">Education Level</th>
                             <th style="width: 80px;">Level #</th>
                             <th style="width: 80px;">Color</th>
                             <th style="width: 80px;">Icon</th>

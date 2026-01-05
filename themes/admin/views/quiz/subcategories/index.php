@@ -138,7 +138,7 @@ $stats = [
                             <th style="width: 60px;" class="text-center">ID</th>
                             <th style="width: 60px;" class="text-center">Order</th>
                             <th>Sub Category Info</th>
-                            <th class="text-center" style="width: 200px;">Main Category</th>
+                            <th class="text-center" style="min-width: 350px;">Main Category</th>
                             <th class="text-center" style="width: 100px;">Questions</th>
                             <th class="text-center" style="width: 100px;">Premium</th>
                             <th class="text-center" style="width: 100px;">Actions</th>

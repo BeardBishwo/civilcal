@@ -132,7 +132,7 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
                             <th style="width: 60px;" class="text-center">ID</th>
                             <th style="width: 60px;" class="text-center">Order</th>
                             <th>Category Info</th>
-                            <th class="text-center" style="width: 200px;">Level</th>
+                            <th class="text-center" style="min-width: 350px;">Level</th>
                             <th class="text-center" style="width: 150px;">Questions</th>
                             <th class="text-center" style="width: 150px;">Premium</th>
                             <th class="text-center" style="width: 100px;">Actions</th>
