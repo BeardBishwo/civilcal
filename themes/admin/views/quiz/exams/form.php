@@ -62,6 +62,66 @@ $title = $isEdit ? 'Edit Exam Settings' : 'Create New Exam';
                             </div>
                         </div>
 
+                        <!-- Categorization Card -->
+                        <div class="card-premium mt-4">
+                            <div class="card-header-simple">
+                                <h3>Categorization</h3>
+                            </div>
+                            <div class="card-body-premium">
+                                <div class="row-flex">
+                                    <div class="col-flex">
+                                        <label>Course / Stream</label>
+                                        <div class="select-wrapper">
+                                            <select name="course_id" id="courseSelect" class="w-full">
+                                                <option value="">Select Course</option>
+                                                <?php foreach ($courses as $c): ?>
+                                                    <option value="<?php echo $c['id']; ?>" <?php echo ($exam['course_id'] ?? '') == $c['id'] ? 'selected' : ''; ?> data-id="<?php echo $c['id']; ?>">
+                                                        <?php echo htmlspecialchars($c['title']); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-flex">
+                                        <label>Education Level</label>
+                                        <div class="select-wrapper">
+                                            <select name="education_level_id" id="eduSelect" class="w-full">
+                                                <option value="">Select Level</option>
+                                                <?php foreach ($educationLevels as $l): ?>
+                                                    <option value="<?php echo $l['id']; ?>" <?php echo ($exam['education_level_id'] ?? '') == $l['id'] ? 'selected' : ''; ?> data-parent="<?php echo $l['parent_id']; ?>">
+                                                        <?php echo htmlspecialchars($l['title']); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4">
+                                    <label class="block mb-2 font-semibold text-gray-700">Target Position Levels</label>
+                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar border border-gray-200 rounded-lg p-3 bg-gray-50">
+                                        <?php 
+                                            $selectedPos = $existingPositionLevels ?? []; 
+                                        ?>
+                                        <?php if (!empty($positionLevels)): ?>
+                                            <?php foreach ($positionLevels as $level): ?>
+                                                <label class="flex items-center p-2 rounded hover:bg-white border border-transparent hover:border-gray-200 cursor-pointer transition">
+                                                    <input type="checkbox" name="position_levels[]" value="<?php echo $level['id']; ?>" 
+                                                        <?php echo in_array($level['id'], $selectedPos) ? 'checked' : ''; ?>
+                                                        class="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                                                    <div class="ml-2">
+                                                        <span class="text-sm font-medium text-gray-700"><?php echo htmlspecialchars($level['title']); ?></span>
+                                                    </div>
+                                                </label>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <p class="text-xs text-gray-400 col-span-2">No position levels found.</p>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="card-premium mt-4">
                             <div class="card-header-simple">
                                 <h3>Configuration</h3>
@@ -217,6 +277,41 @@ $title = $isEdit ? 'Edit Exam Settings' : 'Create New Exam';
 
     // Optional: Add a simple confirmation or toast on submit if needed, 
     // but standard form submission via controller redirect is fine.
+</script>
+
+<!-- Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+    /* Select2 Tweaks */
+    .select2-container .select2-selection--single {
+        height: 38px !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 8px !important;
+        padding-top: 5px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px !important;
+    }
+    .select-wrapper i { display: none; } /* Hide icon when using select2 */
+    
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+</style>
+
+<script>
+    $(document).ready(function() {
+        $('#courseSelect, #eduSelect').select2({
+            width: '100%'
+        });
+        
+        // Auto-focus Course
+        <?php if(!$isEdit): // Only auto-focus on create ?>
+        setTimeout(() => $('#courseSelect').select2('open'), 100);
+        <?php endif; ?>
+    });
 </script>
 
 <style>

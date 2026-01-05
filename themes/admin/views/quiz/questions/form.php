@@ -177,35 +177,32 @@
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">
                                 <i class="fas fa-graduation-cap mr-1.5 text-indigo-400"></i> Course / Stream
-                            </label>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Course / Stream</label>
                             <div class="relative">
-                                <select name="stream" id="stream_select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition appearance-none" onchange="persistData('stream', this.value)">
-                                    <?php if(!empty($streams)): ?>
-                                        <?php foreach($streams as $val => $label): ?>
-                                            <option value="<?= $val ?>"><?= $label ?></option>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
+                                <select name="stream" id="streamSelect" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                    <option value="">Select Course</option>
+                                    <?php foreach ($courses as $course): ?>
+                                        <option value="<?php echo htmlspecialchars($course['title']); ?>" data-id="<?php echo $course['id']; ?>">
+                                            <?php echo htmlspecialchars($course['title']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
                                 </select>
-                                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                                    <i class="fas fa-chevron-down text-xs"></i>
-                                </div>
                             </div>
                         </div>
 
                         <!-- Education Level -->
                         <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">
-                                <i class="fas fa-layer-group mr-1.5 text-indigo-400"></i> Academic Level
-                            </label>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Academic Level</label>
                             <div class="relative">
-                                <select name="education_level" id="level_select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition appearance-none" onchange="persistData('level', this.value)">
-                                    <?php if(!empty($educationLevels)): ?>
-                                        <?php foreach($educationLevels as $val => $label): ?>
-                                            <option value="<?= $val ?>"><?= $label ?></option>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
+                                <select name="education_level" id="eduLevelSelect" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                    <option value="">Select Level</option>
+                                    <!-- Populated via JS based on Course -->
+                                    <?php foreach ($educationLevels as $el): ?>
+                                        <option value="<?php echo htmlspecialchars($el['title']); ?>" data-parent="<?php echo $el['parent_id']; ?>" style="display:none;">
+                                            <?php echo htmlspecialchars($el['title']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
                                 </select>
-                                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></div>
                             </div>
                         </div>
 
@@ -213,49 +210,25 @@
 
                         <!-- Main Category (Subject) -->
                         <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">
-                                <i class="fas fa-folder mr-1.5 text-indigo-400"></i> Subject (Main)
-                            </label>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Subject (Main)</label>
                             <div class="relative">
-                                <select name="syllabus_main_id" id="main_cat" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition appearance-none" onchange="filterSubTopics()">
-                                    <?php if(!empty($mainCategories)): ?>
-                                        <?php foreach($mainCategories as $cat): ?>
-                                            <option value="<?= $cat['id'] ?>" <?= (isset($last_main_id) && $last_main_id == $cat['id']) ? 'selected' : '' ?>>
-                                                <?= htmlspecialchars($cat['title']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <option value="">No subjects found</option>
-                                    <?php endif; ?>
+                                <select name="syllabus_main_id" id="mainCatSelect" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" onchange="filterSubTopics(this.value)">
+                                    <option value="">Select Subject</option>
+                                    <?php foreach ($mainCategories as $node): ?>
+                                        <option value="<?php echo $node['id']; ?>"><?php echo htmlspecialchars($node['title']); ?></option>
+                                    <?php endforeach; ?>
                                 </select>
-                                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                                    <i class="fas fa-chevron-down text-xs"></i>
-                                </div>
                             </div>
                         </div>
 
                         <!-- Sub Category (Topic) -->
                         <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">
-                                <i class="fas fa-tag mr-1.5 text-indigo-400"></i> Topic (Sub)
-                            </label>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Topic (Sub)</label>
                             <div class="relative">
-                                <select name="syllabus_node_id" id="sub_cat" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition appearance-none disabled:opacity-50 disabled:cursor-not-allowed" required>
-                                    <option value="">-- Select Subject First --</option>
-                                    <?php if(!empty($subCategories)): ?>
-                                        <?php foreach($subCategories as $parentId => $nodes): ?>
-                                            <?php foreach($nodes as $sub): ?>
-                                                <option value="<?= $sub['id'] ?>" data-parent="<?= $parentId ?>" 
-                                                    <?= (isset($last_sub_id) && $last_sub_id == $sub['id']) ? 'selected' : '' ?>>
-                                                    <?= htmlspecialchars($sub['title']) ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
+                                <select name="syllabus_node_id" id="subCatSelect" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                    <option value="">Select Topic</option>
+                                    <!-- JS populated -->
                                 </select>
-                                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                                    <i class="fas fa-chevron-down text-xs"></i>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -269,17 +242,22 @@
                         </button>
                     </div>
                     <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 pl-2">Target Position Level</h4>
-                    <p class="text-[10px] text-slate-400 mb-3 pl-2 italic">Select all exams this question is suitable for:</p>
-                    
-                    <div class="space-y-2 pl-2">
-                        <?php if(!empty($pscLevels)): ?>
-                            <?php foreach($pscLevels as $level): ?>
-                            <label class="flex items-center space-x-3 cursor-pointer group">
-                                <input type="checkbox" name="level_tags[]" class="target-level-checkbox w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" value="<?= $level['id'] ?>" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
-                                <span class="text-sm text-slate-600 group-hover:text-indigo-600 transition font-medium"><?= htmlspecialchars($level['name']) ?></span>
-                            </label>
+                    <h3 class="font-bold text-slate-700 mb-2 flex items-center">
+                        <i class="fas fa-crosshairs text-indigo-500 mr-2"></i> Target Position Level
+                    </h3>
+                    <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+                        <?php if (!empty($positionLevels)): ?>
+                            <?php foreach ($positionLevels as $level): ?>
+                                <label class="flex items-center p-2 rounded hover:bg-slate-50 border border-transparent hover:border-slate-100 cursor-pointer transition">
+                                    <input type="checkbox" name="position_levels[]" value="<?php echo $level['id']; ?>" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                                    <div class="ml-2">
+                                        <span class="text-sm font-medium text-slate-700"><?php echo htmlspecialchars($level['title']); ?></span>
+                                        <span class="text-xs text-slate-400 block">Level <?php echo $level['level_number']; ?></span>
+                                    </div>
+                                </label>
                             <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="text-xs text-slate-400 col-span-2">No position levels found.</p>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -349,6 +327,37 @@
 
 <!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<!-- Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+    /* Select2 Customization to match Tailwind */
+    .select2-container .select2-selection--single {
+        height: 42px !important;
+        background-color: #f8fafc !important; /* bg-slate-50 */
+        border-color: #e2e8f0 !important; /* border-slate-200 */
+        border-radius: 0.5rem !important; /* rounded-lg */
+        padding-top: 6px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 40px !important;
+    }
+    .select2-dropdown {
+        border-color: #e2e8f0 !important;
+        border-radius: 0.5rem !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    }
+    .select2-search__field {
+        border-radius: 0.375rem !important; /* rounded-md */
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+</style>
+
 <script>
     // Config
     const state = {
@@ -403,6 +412,11 @@
         }
     };
 
+    // Sub-category Data
+    const subCategories = <?php echo json_encode($subCategories); ?>;
+    const educationLevelsData = <?php echo json_encode($educationLevels); ?>;
+
+
     // Logic
     function switchType(newType, btn) {
         state.type = newType;
@@ -427,9 +441,6 @@
         });
 
         const container = document.getElementById('options_container');
-        const toolbar = document.getElementById('typeTabs') ? document.getElementById('options_toolbar') : null; 
-        // Note: toolbar element might be inside the card_opts block which is static HTML now
-        // Let's rely on ID existence
         const optsToolbar = document.getElementById('options_toolbar');
 
         container.innerHTML = '';
@@ -479,32 +490,23 @@
         const btn = document.getElementById('pin_btn_' + id);
         if(!el || !btn) return;
 
-        // Unpin current if different
-        if (state.pinnedId && state.pinnedId !== id) {
-             const currEl = document.getElementById(state.pinnedId);
-             const currBtn = document.getElementById('pin_btn_' + state.pinnedId);
-             if(currEl) currEl.classList.remove('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20');
-             if(currBtn) {
-                 currBtn.classList.remove('text-indigo-600', '-rotate-45');
-                 currBtn.classList.add('text-slate-300');
-             }
-        }
+        let pins = JSON.parse(localStorage.getItem('q_form_pinned_ids') || '[]');
+        const isPinned = pins.includes(id);
 
-        if (state.pinnedId === id) {
-            // Unpin Self
+        if (isPinned) {
+            // Unpin
             el.classList.remove('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20', 'w-full');
             btn.classList.remove('text-indigo-600', '-rotate-45');
             btn.classList.add('text-slate-300');
-            state.pinnedId = null;
-            localStorage.removeItem('q_form_pinned_id');
+            pins = pins.filter(pid => pid !== id);
         } else {
-            // Pin Self
+            // Pin
             el.classList.add('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20', 'w-full');
             btn.classList.add('text-indigo-600', '-rotate-45');
             btn.classList.remove('text-slate-300');
-            state.pinnedId = id;
-            localStorage.setItem('q_form_pinned_id', id);
+            if(!pins.includes(id)) pins.push(id);
         }
+        localStorage.setItem('q_form_pinned_ids', JSON.stringify(pins));
     }
 
     function setSingleCorrect(selectedIndex) {
@@ -549,23 +551,6 @@
         el.className = `text-xs font-bold px-2.5 py-1 rounded-md ${map[val][1]}`;
     }
 
-    function filterSubTopics() {
-        const mainId = document.getElementById('main_cat').value;
-        const subSelect = document.getElementById('sub_cat');
-        const subs = document.querySelectorAll('#sub_cat option');
-        let hasVisible = false;
-        
-        subs.forEach(opt => {
-            if (opt.value === "") return;
-            const parent = opt.getAttribute('data-parent');
-            
-            if (parent == mainId || !mainId) { 
-                opt.style.display = 'block';
-                if (!hasVisible) hasVisible = true; 
-            } else {
-                opt.style.display = 'none';
-            }
-        });
         
         subSelect.value = ""; // Reset sub selection on main change
         subSelect.disabled = !hasVisible; // Disable if no subs

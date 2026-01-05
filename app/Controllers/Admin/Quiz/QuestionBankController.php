@@ -56,10 +56,10 @@ class QuestionBankController extends Controller
             $params['edu_level'] = '"' . $_GET['education_level'] . '"';
         }
 
-        // Filter by Position Level (PSC Level)
+        // Filter by Position Level (Junction Table)
         if (!empty($_GET['level_tag'])) {
-            $where[] = "JSON_CONTAINS(q.level_tags, :level_tag)"; 
-            $params['level_tag'] = '"' . $_GET['level_tag'] . '"';
+            $where[] = "EXISTS (SELECT 1 FROM question_position_levels qpl WHERE qpl.question_id = q.id AND qpl.position_level_id = :level_tag)";
+            $params['level_tag'] = $_GET['level_tag']; // ID integer
         }
         
         // Search
@@ -109,7 +109,11 @@ class QuestionBankController extends Controller
             'stats' => $stats,
             'page' => $page,
             'limit' => $limit,
-            'mainCategories' => $mainCategories
+            'limit' => $limit,
+            'mainCategories' => $mainCategories,
+            'courses' => $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC")->fetchAll(),
+            'educationLevels' => $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'education_level' ORDER BY order_index ASC")->fetchAll(),
+            'positionLevels' => $this->db->query("SELECT id, title FROM position_levels WHERE is_active = 1 ORDER BY order_index ASC")->fetchAll()
         ]);
     }
 
@@ -154,9 +158,10 @@ class QuestionBankController extends Controller
             'page_title' => 'Add New Question',
             'mainCategories' => $mainCategories,
             'subCategories' => $groupedSub,
-            'streams' => $streams, // Pass
-            'educationLevels' => $educationLevels, // Pass
-            'pscLevels' => $pscLevels,
+            'subCategories' => $groupedSub,
+            'courses' => $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC")->fetchAll(),
+            'educationLevels' => $this->db->query("SELECT id, title, parent_id FROM syllabus_nodes WHERE type = 'education_level' ORDER BY order_index ASC")->fetchAll(),
+            'positionLevels' => $this->db->query("SELECT id, title, level_number FROM position_levels WHERE is_active = 1 ORDER BY order_index ASC")->fetchAll(),
             'question' => null,
             'action' => app_base_url('admin/quiz/questions/store')
         ]);
@@ -213,11 +218,26 @@ class QuestionBankController extends Controller
                 'default_marks' => $_POST['default_marks'] ?? 1.0,
                 'default_negative_marks' => $_POST['default_negative_marks'] ?? 0.0,
                 'is_active' => isset($_POST['is_active']) ? 1 : 0,
+                'default_negative_marks' => $_POST['default_negative_marks'] ?? 0.0,
+                'is_active' => isset($_POST['is_active']) ? 1 : 0,
                 'created_by' => $_SESSION['user']['id'] ?? null
             ];
             
             if (!$this->db->insert('quiz_questions', $data)) {
                 throw new Exception("Failed to insert");
+            }
+
+            $questionId = $this->db->lastInsertId();
+
+            // Sync Junction Table: question_position_levels
+            if (!empty($_POST['position_levels'])) {
+                $posLevels = is_array($_POST['position_levels']) ? $_POST['position_levels'] : [];
+                foreach ($posLevels as $plId) {
+                    $this->db->insert('question_position_levels', [
+                        'question_id' => $questionId,
+                        'position_level_id' => $plId
+                    ]);
+                }
             }
 
             // Map to Syllabus

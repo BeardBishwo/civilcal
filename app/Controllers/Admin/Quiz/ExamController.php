@@ -21,15 +21,50 @@ class ExamController extends Controller
         $page = $_GET['page'] ?? 1;
         $limit = 20;
         $offset = ($page - 1) * $limit;
+
+        // Build Query
+        $params = [];
+        $where = ["1=1"];
         
-        $exams = $this->db->find('quiz_exams', [], 'id DESC', "$limit OFFSET $offset");
-        $total = $this->db->count('quiz_exams');
-        
+        if (!empty($_GET['status'])) {
+            $where[] = "e.status = ?";
+            $params[] = $_GET['status'];
+        }
+        if (!empty($_GET['course_id'])) {
+            $where[] = "e.course_id = ?";
+            $params[] = $_GET['course_id'];
+        }
+        if (!empty($_GET['education_level_id'])) {
+            $where[] = "e.education_level_id = ?";
+            $params[] = $_GET['education_level_id'];
+        }
+        if (!empty($_GET['position_level_id'])) {
+            // Check existence in junction table
+            $where[] = "EXISTS (SELECT 1 FROM exam_position_levels epl WHERE epl.exam_id = e.id AND epl.position_level_id = ?)";
+            $params[] = $_GET['position_level_id'];
+        }
+        if (!empty($_GET['search'])) {
+            $where[] = "e.title LIKE ?";
+            $params[] = "%" . $_GET['search'] . "%";
+        }
+
+        $whereSql = implode(' AND ', $where);
+
+        // Count
+        $total = $this->db->query("SELECT COUNT(*) FROM quiz_exams e WHERE $whereSql", $params)->fetchColumn();
+
+        // Fetch
+        $exams = $this->db->query("SELECT e.* FROM quiz_exams e WHERE $whereSql ORDER BY e.id DESC LIMIT $limit OFFSET $offset", $params)->fetchAll();
+
         $this->view->render('admin/quiz/exams/index', [
             'page_title' => 'Exam Manager',
             'exams' => $exams,
             'total' => $total,
-            'page' => $page
+            'page' => $page,
+            'limit' => $limit,
+            'courses' => $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC")->fetchAll(),
+            'educationLevels' => $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'education_level' ORDER BY order_index ASC")->fetchAll(),
+            'positionLevels' => $this->db->query("SELECT id, title FROM position_levels WHERE is_active = 1 ORDER BY order_index ASC")->fetchAll()
         ]);
     }
 
@@ -38,6 +73,9 @@ class ExamController extends Controller
         $this->view->render('admin/quiz/exams/form', [
             'page_title' => 'Create New Exam/Mock Test',
             'exam' => null,
+            'courses' => $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC")->fetchAll(),
+            'educationLevels' => $this->db->query("SELECT id, title, parent_id FROM syllabus_nodes WHERE type = 'education_level' ORDER BY order_index ASC")->fetchAll(),
+            'positionLevels' => $this->db->query("SELECT id, title FROM position_levels WHERE is_active = 1 ORDER BY order_index ASC")->fetchAll(),
             'action' => app_base_url('admin/quiz/exams/store')
         ]);
     }
@@ -63,7 +101,10 @@ class ExamController extends Controller
                 'shuffle_questions' => isset($_POST['shuffle_questions']) ? 1 : 0,
                 'is_premium' => isset($_POST['is_premium']) ? 1 : 0,
                 'price' => (float)($_POST['price'] ?? 0),
-                'status' => $_POST['status'] ?? 'draft'
+                'price' => (float)($_POST['price'] ?? 0),
+                'status' => $_POST['status'] ?? 'draft',
+                'course_id' => !empty($_POST['course_id']) ? $_POST['course_id'] : null,
+                'education_level_id' => !empty($_POST['education_level_id']) ? $_POST['education_level_id'] : null
             ];
             
             if (!empty($_POST['start_datetime'])) $data['start_datetime'] = $_POST['start_datetime'];
@@ -71,6 +112,16 @@ class ExamController extends Controller
             
             $this->db->insert('quiz_exams', $data);
             $examId = $this->db->lastInsertId();
+
+            // Sync Position Levels
+            if (!empty($_POST['position_levels'])) {
+                foreach ($_POST['position_levels'] as $plId) {
+                    $this->db->insert('exam_position_levels', [
+                        'exam_id' => $examId,
+                        'position_level_id' => $plId
+                    ]);
+                }
+            }
             
             $this->jsonResponse(['success' => true, 'message' => 'Exam Created', 'redirect' => app_base_url('admin/quiz/exams/builder/' . $examId)]);
         } catch (Exception $e) {
@@ -89,6 +140,10 @@ class ExamController extends Controller
         $this->view->render('admin/quiz/exams/form', [
             'page_title' => 'Edit Exam',
             'exam' => $exam,
+            'courses' => $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC")->fetchAll(),
+            'educationLevels' => $this->db->query("SELECT id, title, parent_id FROM syllabus_nodes WHERE type = 'education_level' ORDER BY order_index ASC")->fetchAll(),
+            'positionLevels' => $this->db->query("SELECT id, title FROM position_levels WHERE is_active = 1 ORDER BY order_index ASC")->fetchAll(),
+            'existingPositionLevels' => $this->db->query("SELECT position_level_id FROM exam_position_levels WHERE exam_id = ?", [$id])->fetchAll(7), // FETCH_COLUMN
             'action' => app_base_url('admin/quiz/exams/update/' . $id)
         ]);
     }
@@ -110,7 +165,10 @@ class ExamController extends Controller
                 'shuffle_questions' => isset($_POST['shuffle_questions']) ? 1 : 0,
                 'is_premium' => isset($_POST['is_premium']) ? 1 : 0,
                 'price' => (float)($_POST['price'] ?? 0),
-                'status' => $_POST['status'] ?? 'draft'
+                'price' => (float)($_POST['price'] ?? 0),
+                'status' => $_POST['status'] ?? 'draft',
+                'course_id' => !empty($_POST['course_id']) ? $_POST['course_id'] : null,
+                'education_level_id' => !empty($_POST['education_level_id']) ? $_POST['education_level_id'] : null
             ];
             
             if (!empty($_POST['slug'])) $data['slug'] = $_POST['slug'];
@@ -118,6 +176,17 @@ class ExamController extends Controller
             if (!empty($_POST['end_datetime'])) $data['end_datetime'] = $_POST['end_datetime'];
 
             $this->db->update('quiz_exams', $data, "id = :id", ['id' => $id]);
+            
+            // Sync Position Levels
+            $this->db->delete('exam_position_levels', "exam_id = :id", ['id' => $id]);
+            if (!empty($_POST['position_levels'])) {
+                foreach ($_POST['position_levels'] as $plId) {
+                    $this->db->insert('exam_position_levels', [
+                        'exam_id' => $id,
+                        'position_level_id' => $plId
+                    ]);
+                }
+            }
             
             $this->jsonResponse(['success' => true, 'message' => 'Exam Updated', 'redirect' => app_base_url('admin/quiz/exams')]);
         } catch (Exception $e) {

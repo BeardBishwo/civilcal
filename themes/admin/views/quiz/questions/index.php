@@ -59,23 +59,63 @@
                     <input type="text" name="search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" placeholder="Search questions..." class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 outline-none transition">
                 </div>
                 
-                <select name="type" class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 outline-none cursor-pointer hover:border-slate-300 transition" onchange="this.form.submit()">
-                    <option value="">All Types</option>
-                    <option value="MCQ" <?php echo ($_GET['type'] ?? '') == 'MCQ' ? 'selected' : ''; ?>>MCQ</option>
-                    <option value="TF" <?php echo ($_GET['type'] ?? '') == 'TF' ? 'selected' : ''; ?>>True/False</option>
-                </select>
-
-                <select name="topic_id" class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 outline-none cursor-pointer hover:border-slate-300 transition max-w-[200px]" onchange="this.form.submit()">
-                    <option value="">All Topics</option>
-                    <?php if(!empty($mainCategories)): ?>
-                        <?php foreach($mainCategories as $cat): ?>
-                            <option value="<?php echo $cat['id']; ?>" <?php echo ($_GET['topic_id'] ?? '') == $cat['id'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($cat['title']); ?>
+                <!-- Filters Row -->
+                <div class="flex gap-2 items-center flex-wrap">
+                    <select name="stream" class="select2-filter w-40" data-placeholder="Course">
+                        <option value="">All Courses</option>
+                        <?php foreach($courses as $c): ?>
+                            <option value="<?php echo $c['title']; ?>" <?php echo ($_GET['stream'] ?? '') == $c['title'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($c['title']); ?>
                             </option>
                         <?php endforeach; ?>
+                    </select>
+
+                    <select name="education_level" class="select2-filter w-40" data-placeholder="Level">
+                        <option value="">All Levels</option>
+                        <?php foreach($educationLevels as $l): ?>
+                            <option value="<?php echo $l['title']; ?>" <?php echo ($_GET['education_level'] ?? '') == $l['title'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($l['title']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <select name="level_tag" class="select2-filter w-40" data-placeholder="Position">
+                        <option value="">All Positions</option>
+                        <?php foreach($positionLevels as $p): ?>
+                            <option value="<?php echo $p['id']; ?>" <?php echo ($_GET['level_tag'] ?? '') == $p['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($p['title']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <select name="type" class="select2-filter w-32" data-placeholder="Type">
+                        <option value="">All Types</option>
+                        <option value="MCQ" <?php echo ($_GET['type'] ?? '') == 'MCQ' ? 'selected' : ''; ?>>MCQ</option>
+                        <option value="TF" <?php echo ($_GET['type'] ?? '') == 'TF' ? 'selected' : ''; ?>>True/False</option>
+                    </select>
+
+                    <select name="topic_id" class="select2-filter w-48" data-placeholder="Topic">
+                        <option value="">All Topics</option>
+                        <?php if(!empty($mainCategories)): ?>
+                            <?php foreach($mainCategories as $cat): ?>
+                                <option value="<?php echo $cat['id']; ?>" <?php echo ($_GET['topic_id'] ?? '') == $cat['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($cat['title']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                    
+                    <button type="submit" class="w-10 h-[42px] flex items-center justify-center bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" title="Apply Filters">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                    <?php if(!empty($_GET['search']) || !empty($_GET['stream']) || !empty($_GET['type'])): ?>
+                        <a href="<?php echo app_base_url('admin/quiz/questions'); ?>" class="w-10 h-[42px] flex items-center justify-center bg-slate-200 text-slate-600 rounded-lg hover:bg-slate-300 transition" title="Clear Filters">
+                            <i class="fas fa-times"></i>
+                        </a>
                     <?php endif; ?>
-                </select>
+                </div>
             </form>
+        </div>
 
             <div class="flex gap-3">
                 <a href="<?php echo app_base_url('admin/quiz/questions/create'); ?>" class="btn-create text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md flex items-center">
@@ -186,3 +226,28 @@
     </div>
 
 </div>
+
+<!-- Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+    .select2-container .select2-selection--single {
+        height: 42px !important;
+        background-color: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+        border-radius: 0.5rem !important;
+        padding-top: 6px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 40px !important;
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        $('.select2-filter').select2({
+            width: 'style' // Use CSS width
+        });
+    });
+</script>

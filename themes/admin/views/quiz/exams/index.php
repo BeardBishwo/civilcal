@@ -86,17 +86,46 @@ $stats = [
             <div class="toolbar-left">
                 <div class="filter-group">
                     <span class="filter-label">FILTER:</span>
-                    <form method="GET" style="margin:0; display:flex; gap:10px;" id="filter-form">
-                        <select name="status" class="filter-select" onchange="document.getElementById('filter-form').submit()">
-                            <option value="">All Status</option>
+                    <form method="GET" style="margin:0; display:flex; gap:10px; flex-wrap: wrap;" id="filter-form">
+                        <select name="status" class="filter-select w-32" onchange="this.form.submit()">
+                            <option value="">Status</option>
                             <option value="published" <?php echo ($_GET['status'] ?? '') == 'published' ? 'selected' : ''; ?>>Published</option>
                             <option value="draft" <?php echo ($_GET['status'] ?? '') == 'draft' ? 'selected' : ''; ?>>Draft</option>
                             <option value="archived" <?php echo ($_GET['status'] ?? '') == 'archived' ? 'selected' : ''; ?>>Archived</option>
                         </select>
+
+                        <select name="course_id" class="select2-filter w-40" data-placeholder="Course">
+                            <option value="">All Courses</option>
+                            <?php foreach($courses as $c): ?>
+                                <option value="<?php echo $c['id']; ?>" <?php echo ($_GET['course_id'] ?? '') == $c['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($c['title']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+
+                        <select name="education_level_id" class="select2-filter w-40" data-placeholder="Level">
+                            <option value="">All Levels</option>
+                            <?php foreach($educationLevels as $l): ?>
+                                <option value="<?php echo $l['id']; ?>" <?php echo ($_GET['education_level_id'] ?? '') == $l['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($l['title']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+
+                        <select name="position_level_id" class="select2-filter w-40" data-placeholder="Position">
+                            <option value="">All Positions</option>
+                            <?php foreach($positionLevels as $p): ?>
+                                <option value="<?php echo $p['id']; ?>" <?php echo ($_GET['position_level_id'] ?? '') == $p['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($p['title']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+
                         <div class="search-compact">
                             <i class="fas fa-search"></i>
                             <input type="text" name="search" placeholder="Search exams..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
                         </div>
+                        <button type="submit" class="hidden"></button>
                     </form>
                 </div>
             </div>
@@ -234,6 +263,37 @@ async function saveExam() {
         }
     } catch(e) { Swal.fire('Error', 'Server Error', 'error'); }
 }
+</script>
+
+<!-- Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+    .select2-container .select2-selection--single {
+        height: 32px !important; /* Compact functionality for filters */
+        background-color: white !important;
+        border-color: #93c5fd !important;
+        border-radius: 6px !important;
+        padding-top: 2px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 30px !important;
+    }
+    .compact-toolbar .select2-container { margin-right: 5px; }
+</style>
+
+<script>
+    $(document).ready(function() {
+        $('.select2-filter').select2({
+            width: 'style'
+        });
+        
+        // Auto-submit on change
+        $('.select2-filter').on('change', function() {
+            $('#filter-form').submit();
+        });
+    });
 </script>
 
 <style>
