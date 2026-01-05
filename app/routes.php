@@ -1996,6 +1996,16 @@ $router->add("POST", "/admin/quiz/subcategories/toggle-premium", "Admin\\Quiz\\S
 $router->add("POST", "/admin/quiz/subcategories/bulk-delete", "Admin\\Quiz\\SubCategoryController@bulkDelete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/subcategories/duplicate", "Admin\\Quiz\\SubCategoryController@duplicate", ["auth", "admin"]);
 
+// Position Levels
+$router->add("GET", "/admin/quiz/position-levels", "Admin\\Quiz\\PositionLevelController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/position-levels/store", "Admin\\Quiz\\PositionLevelController@store", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/position-levels/delete/{id}", "Admin\\Quiz\\PositionLevelController@delete", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/position-levels/reorder", "Admin\\Quiz\\PositionLevelController@reorder", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/position-levels/toggle-status", "Admin\\Quiz\\PositionLevelController@toggleStatus", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/position-levels/bulk-delete", "Admin\\Quiz\\PositionLevelController@bulkDelete", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/position-levels/duplicate", "Admin\\Quiz\\PositionLevelController@duplicate", ["auth", "admin"]);
+
+
 // Legacy Helpers (Optional - kept if needed by other modules, otherwise can be removed)
 // $router->add("GET", "/admin/quiz/get-subjects/{id}", "Admin\\Quiz\\SyllabusController@getSubjects", ["auth", "admin"]);
 

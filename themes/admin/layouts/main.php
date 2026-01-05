@@ -913,6 +913,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                             <li><a href="<?php echo app_base_url('admin/quiz/education-levels'); ?>">Education Levels</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/categories'); ?>">Main Categories</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/subcategories'); ?>">Sub-Categories</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/position-levels'); ?>">Position Levels</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/exams'); ?>">Exam Manager</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/daily'); ?>">Daily Quest Scheduler</a></li>
                              <li><a href="<?php echo app_base_url('admin/quiz/blueprints'); ?>">Exam Blueprints</a></li>
