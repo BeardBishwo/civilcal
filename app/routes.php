@@ -1960,6 +1960,20 @@ $router->add("POST", "/admin/quiz/syllabus/duplicate-level", "Admin\\Quiz\\Sylla
 $router->add("POST", "/admin/quiz/syllabus/delete-level", "Admin\\Quiz\SyllabusController@deleteLevel", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/syllabus/generate-exam", "Admin\\Quiz\\SyllabusController@generateExam", ["auth", "admin"]);
 
+// Courses
+$router->add("GET", "/admin/quiz/courses", "Admin\\Quiz\\CourseController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/courses/store", "Admin\\Quiz\\CourseController@store", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/courses/delete/{id}", "Admin\\Quiz\\CourseController@delete", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/courses/reorder", "Admin\\Quiz\\CourseController@reorder", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/courses/toggle-status", "Admin\\Quiz\\CourseController@toggleStatus", ["auth", "admin"]);
+
+// Education Levels
+$router->add("GET", "/admin/quiz/education-levels", "Admin\\Quiz\\EducationLevelController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/education-levels/store", "Admin\\Quiz\\EducationLevelController@store", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/education-levels/delete/{id}", "Admin\\Quiz\\EducationLevelController@delete", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/education-levels/reorder", "Admin\\Quiz\\EducationLevelController@reorder", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/education-levels/toggle-status", "Admin\\Quiz\\EducationLevelController@toggleStatus", ["auth", "admin"]);
+
 // Main Categories
 $router->add("GET", "/admin/quiz/categories", "Admin\\Quiz\\CategoryController@index", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/categories/store", "Admin\\Quiz\\CategoryController@store", ["auth", "admin"]);
