@@ -5,13 +5,17 @@ use App\Core\Database;
 try {
     $db = Database::getInstance();
     $pdo = $db->getPdo();
-    $stmt = $pdo->query("SHOW COLUMNS FROM position_levels LIKE 'course_id'");
-    $col = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($col) {
-        echo "EXISTS";
-    } else {
-        echo "MISSING";
+    
+    echo "--- Schema Check ---\n";
+    
+    $tables = ['syllabus_nodes', 'syllabus_settings'];
+    foreach ($tables as $table) {
+        $stmt = $pdo->query("SHOW CREATE TABLE $table");
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        echo "Table: $table\n";
+        echo $row['Create Table'] . "\n\n";
     }
+
 } catch (Exception $e) {
-    echo "ERROR: " . $e->getMessage();
+    echo "Error: " . $e->getMessage() . "\n";
 }

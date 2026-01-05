@@ -175,12 +175,26 @@ class SyllabusController extends Controller
 
             // 3. Save Level Meta-Settings
             if (!empty($settings)) {
-                $settingsJson = json_encode($settings);
+                // Map settings to actual table columns: total_time, full_marks, pass_marks, negative_rate
+                $settingsData = [
+                    'level' => $level,
+                    'total_time' => $settings['total_time'] ?? 0,
+                    'full_marks' => $settings['full_marks'] ?? 0,
+                    'pass_marks' => $settings['pass_marks'] ?? 0,
+                    'negative_rate' => $settings['negative_rate'] ?? 0.00
+                ];
+
                 $existing = $this->db->findOne('syllabus_settings', ['level' => $level]);
                 if ($existing) {
-                    $this->db->update('syllabus_settings', ['settings' => $settingsJson, 'updated_at' => date('Y-m-d H:i:s')], "level = :level", ['level' => $level]);
+                    // Update existing settings
+                    // Remove 'level' from data for update (it's in WHERE clause)
+                    $updateData = $settingsData;
+                    unset($updateData['level']);
+                    
+                    $this->db->update('syllabus_settings', $updateData, "level = :level", ['level' => $level]);
                 } else {
-                    $this->db->insert('syllabus_settings', ['level' => $level, 'settings' => $settingsJson, 'updated_at' => date('Y-m-d H:i:s')]);
+                    // Insert new settings
+                    $this->db->insert('syllabus_settings', $settingsData);
                 }
             }
 
@@ -245,6 +259,13 @@ class SyllabusController extends Controller
 
     public function delete($id)
     {
+        // Safety Check: Prevent deletion of Hierarchy Nodes via Syllabus Controller
+        $node = $this->db->findOne('syllabus_nodes', ['id' => $id]);
+        if ($node && in_array($node['type'], ['course', 'education_level', 'category', 'sub_category'])) {
+             echo json_encode(['status' => 'error', 'message' => 'Protected Item: Cannot delete hierarchy nodes from Syllabus Manager.']);
+             return;
+        }
+
         // Basic delete (in production, you might want to check for children first)
         if ($this->db->delete('syllabus_nodes', "id = :id", ['id' => $id])) {
             // Also delete children to prevent orphans
@@ -264,10 +285,22 @@ class SyllabusController extends Controller
         }
 
         try {
+            // Protect shared hierarchy types from being deleted when clearing a level
+            $protectedTypes = "type NOT IN ('course', 'education_level', 'category', 'sub_category')";
+
             if ($level === 'Unassigned / Draft' || empty($level)) {
-                $this->db->delete('syllabus_nodes', "level IS NULL OR level = '' OR level = 'Unassigned / Draft'");
+                // Delete only non-protected nodes that are unassigned
+                $this->db->delete('syllabus_nodes', "(level IS NULL OR level = '' OR level = 'Unassigned / Draft') AND $protectedTypes");
             } else {
-                $this->db->delete('syllabus_nodes', "level = :level", ['level' => $level]);
+                // 1. Delete Settings for this level (This removes it from the list if it's based on settings)
+                $this->db->delete('syllabus_settings', "level = :target_level", ['target_level' => $level]);
+
+                // 2. Unassign Protected Hierarchy Nodes (Don't delete them, just detach from this syllabus)
+                // Fix: Use 'target_level' for WHERE clause to avoid collision with 'level' => null in SET data
+                $this->db->update('syllabus_nodes', ['level' => null], "level = :target_level AND NOT ($protectedTypes)", ['target_level' => $level]);
+
+                // 3. Delete Everything Else (Units, Chapters, Questions)
+                $this->db->delete('syllabus_nodes', "level = :target_level AND $protectedTypes", ['target_level' => $level]);
             }
             echo json_encode(['status' => 'success', 'message' => "Syllabus for '$level' deleted successfully"]);
         } catch (\Exception $e) {

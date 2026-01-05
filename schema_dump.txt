@@ -1,0 +1,47 @@
+--- Schema Check ---
+Table: syllabus_nodes
+CREATE TABLE `syllabus_nodes` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` bigint unsigned DEFAULT NULL COMMENT 'NULL for root nodes (Papers)',
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `image_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `order` int DEFAULT '0',
+  `level` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'e.g., Level 4, Level 5, Level 7',
+  `linked_category_id` int unsigned DEFAULT NULL,
+  `linked_subject_id` int unsigned DEFAULT NULL,
+  `linked_topic_id` int unsigned DEFAULT NULL,
+  `questions_weight` int DEFAULT '0',
+  `is_active` tinyint(1) DEFAULT '1',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `is_premium` tinyint(1) DEFAULT '0' COMMENT 'If true, requires coins to unlock',
+  `unlock_price` int DEFAULT '0' COMMENT 'Cost in BB Coins',
+  `order_index` int DEFAULT '0' COMMENT 'For custom sorting',
+  `question_count` int DEFAULT '0',
+  `time_minutes` int DEFAULT '0',
+  `marks_per_question` decimal(5,2) DEFAULT '0.00',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_node` (`parent_id`,`slug`),
+  KEY `parent_id` (`parent_id`),
+  KEY `type` (`type`),
+  KEY `level` (`level`),
+  KEY `idx_slug` (`slug`),
+  KEY `idx_linked_cat` (`linked_category_id`),
+  KEY `idx_linked_sub` (`linked_subject_id`),
+  KEY `idx_linked_top` (`linked_topic_id`),
+  CONSTRAINT `fk_syllabus_nodes_parent` FOREIGN KEY (`parent_id`) REFERENCES `syllabus_nodes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=395 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+
+Table: syllabus_settings
+CREATE TABLE `syllabus_settings` (
+  `level` varchar(255) NOT NULL,
+  `total_time` int DEFAULT '0',
+  `full_marks` int DEFAULT '0',
+  `pass_marks` int DEFAULT '0',
+  `negative_rate` decimal(5,2) DEFAULT '0.00',
+  PRIMARY KEY (`level`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
