@@ -139,6 +139,7 @@ if (!empty($nodesTree)) {
                         <div class="grid-header border-r border-slate-200">Time (m)</div>
                         <div class="grid-header border-r border-slate-200">Node Type</div>
                         <div class="grid-header border-r border-slate-200">Qty</div>
+                        <div class="grid-header border-r border-slate-200" title="Optional Questions">Opt</div>
                         <div class="grid-header border-r border-slate-200">Each</div>
                         <div class="grid-header border-r border-slate-200">Marks</div>
                         <div class="grid-header border-r border-slate-200 text-center">Hierarchy</div>
@@ -287,7 +288,7 @@ if (!empty($nodesTree)) {
     /* Premium Grid Styles */
     .syllabus-grid {
         display: grid;
-        grid-template-columns: 50px 40px 45px 1.5fr 70px 100px 55px 55px 70px 80px 80px 2.5fr;
+            grid-template-columns: 40px 40px 35px 1fr 85px 120px 60px 60px 60px 75px 75px 80px 180px;
         background-color: #f1f5f9;
         min-width: 1400px;
     }
@@ -537,7 +538,7 @@ if (!empty($nodesTree)) {
     
     if(syllabusData.length === 0) {
         syllabusData = [
-            { id: Date.now(), title: "Paper I: General", type: "paper", depth: 0, weight: 100, time: 0, qCount: 0, qEach: 0, selected: false }
+            { id: Date.now(), title: "Paper I: General", type: "paper", depth: 0, weight: 100, time: 0, qCount: 0, qOptional: 0, qEach: 0, selected: false }
         ];
     }
 
@@ -642,6 +643,10 @@ if (!empty($nodesTree)) {
             const qtyDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400">${formatNumber(row.qCount)}</div>` : `<input type="number" class="input-premium qty-input" value="${row.qCount || 0}" onchange="updateRow(${index}, 'qCount', this.value)">`;
             container.appendChild(createCell(qtyDisplay, 'justify-center border-r border-slate-100'));
 
+            // Optional (new column)
+            const optDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400">${row.qOptional || 0}</div>` : `<input type="number" class="input-premium opt-input bg-amber-50" value="${row.qOptional || 0}" onchange="updateRow(${index}, 'qOptional', this.value)" placeholder="0">`;
+            container.appendChild(createCell(optDisplay, 'justify-center border-r border-slate-100'));
+
             // Each (with formatted display)
             const eachDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400">${formatNumber(row.qEach)}</div>` : `<input type="number" class="input-premium each-input" value="${row.qEach || 0}" onchange="updateRow(${index}, 'qEach', this.value)">`;
             container.appendChild(createCell(eachDisplay, 'justify-center border-r border-slate-100'));
@@ -743,7 +748,7 @@ if (!empty($nodesTree)) {
     }
 
     function addTopic() {
-        syllabusData.push({ id: Date.now(), title: "New Syllabus Item", type: "unit", depth: 2, weight: 0, time: 0, qCount: 0, qEach: 0, selected: false });
+        syllabusData.push({ id: Date.now(), title: "New Syllabus Item", type: "unit", depth: 2, weight: 0, time: 0, qCount: 0, qOptional: 0, qEach: 0, selected: false });
         renderGrid();
     }
 

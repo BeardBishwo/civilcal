@@ -206,6 +206,8 @@ class SyllabusController extends Controller
                     'questions_weight' => $node['weight'] ?? 0,
                     'time_minutes' => $node['time'] ?? 0,
                     'question_count' => $node['qCount'] ?? 0,
+                    'question_optional' => $node['qOptional'] ?? 0,
+                    'question_marks_each' => $node['qEach'] ?? 0,
                     'order' => $index,
                     'is_active' => 1,
                     // Hierarchy Links
