@@ -79,7 +79,7 @@ class SyllabusController extends Controller
 
         // Fetch level-wide settings
         $settingsRow = $this->db->findOne('syllabus_settings', ['level' => $level]);
-        $settings = $settingsRow ? json_decode($settingsRow['settings'], true) : [];
+        $settings = ($settingsRow && isset($settingsRow['settings'])) ? json_decode($settingsRow['settings'], true) : [];
 
         return $this->view('admin/quiz/syllabus/manage', [
             'page_title' => "Editing: $level",
@@ -159,7 +159,10 @@ class SyllabusController extends Controller
                     'time_minutes' => $node['time'] ?? 0,
                     'question_count' => $node['qCount'] ?? 0,
                     'order' => $index,
-                    'is_active' => 1
+                    'is_active' => 1,
+                    // Hierarchy Links
+                    'linked_category_id' => !empty($node['linked_category_id']) ? $node['linked_category_id'] : null,
+                    'linked_topic_id' => !empty($node['linked_topic_id']) ? $node['linked_topic_id'] : null
                 ];
                 
                 // Insert

@@ -20,7 +20,14 @@ function flattenTreeForGrid($tree, $depth = 0, &$result = []) {
             'qEach' => (float)($node['questions_weight'] > 0 ? ($node['questions_weight'] / ($node['question_count'] ?: 1)) : 0),
             'selected' => false,
             // Keep DB references if needed
-            'parent_id' => $node['parent_id'] ?? null
+            'parent_id' => $node['parent_id'] ?? null,
+            // Hierarchy Links
+            'linked_category_id' => $node['linked_category_id'] ?? null,
+            'category_name' => $node['category_name'] ?? null,
+            'linked_topic_id' => $node['linked_topic_id'] ?? null,
+            'topic_name' => $node['topic_name'] ?? null,
+            'linked_subject_id' => $node['linked_subject_id'] ?? null,
+            'subject_name' => $node['subject_name'] ?? null 
         ];
         
         $result[] = $flatNode;
@@ -135,7 +142,8 @@ if (!empty($nodesTree)) {
                         <div class="grid-header border-r border-slate-200">Each</div>
                         <div class="grid-header border-r border-slate-200">Marks</div>
                         <div class="grid-header border-r border-slate-200 text-center">Hierarchy</div>
-                        <div class="grid-header">Actions</div>
+                        <div class="grid-header border-r border-slate-200">Actions</div>
+                        <div class="grid-header text-center">Linked</div>
                         <!-- Rows via JS -->
                     </div>
                 </div>
@@ -156,18 +164,40 @@ if (!empty($nodesTree)) {
         </div>
 
     </div>
+
+    <!-- === HIERARCHY SELECTION MODAL === -->
+    <div id="hierarchy-modal" class="fixed inset-0 z-[100] hidden" aria-hidden="true">
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeHierarchyModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl transform transition-all flex flex-col max-h-[90vh]">
+                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+                    <h3 class="text-lg font-bold text-slate-800">Link Hierarchy</h3>
+                    <button onclick="closeHierarchyModal()" class="text-slate-400 hover:text-slate-600 transition"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="p-4 bg-slate-50 border-b border-slate-200 shrink-0 space-y-3">
+                    <input type="text" id="hierarchy-search" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-sm font-medium" placeholder="Search categories, topics..." onkeyup="filterHierarchyList()">
+                    <div class="flex gap-2 text-sm font-bold">
+                        <button onclick="switchHierarchyTab('category')" class="h-tab px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 transition shadow-sm active-tab" data-tab="category">Categories</button>
+                        <button onclick="switchHierarchyTab('topic')" class="h-tab px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 transition shadow-sm" data-tab="topic">Sub-Categories</button>
+                        <button onclick="removeLink()" class="ml-auto text-rose-500 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition"><i class="fas fa-unlink mr-1"></i> Unlink</button>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-y-auto p-2" id="hierarchy-list-container"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
     /* Premium Grid Styles */
     .syllabus-grid {
         display: grid;
-        grid-template-columns: 50px 40px 50px 3.5fr 100px 120px 80px 80px 90px 120px 100px;
+        grid-template-columns: 50px 40px 50px 3.5fr 100px 120px 80px 80px 90px 100px 100px 120px;
         background-color: #f1f5f9;
-        min-width: 1200px;
+        min-width: 1300px;
     }
     .grid-header {
-        background-color: #f8fafc; color: #64748b; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; padding: 14px 4px; display: flex; align-items: center; justify-content: center;
+        background-color: #f8fafc; color: #64748b; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; padding: 8px 4px; display: flex; align-items: center; justify-content: center;
     }
     .grid-row { background-color: white; border-bottom: 1px solid #f1f5f9; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
     .grid-row:hover { background-color: #f8fafc; }
@@ -180,10 +210,10 @@ if (!empty($nodesTree)) {
     .grid-row[data-type="section"] { background-color: #f8fafc; }
     .grid-row[data-type="section"] .grid-cell { font-weight: 700; color: #334155; }
     
-    .grid-cell { padding: 8px 10px; display: flex; align-items: center; font-size: 0.9rem; color: #334155; position: relative; }
+    .grid-cell { padding: 4px 10px; display: flex; align-items: center; font-size: 0.85rem; color: #334155; position: relative; }
     
     .input-premium {
-        width: 100%; padding: 6px; border: 1px solid #e2e8f0; border-radius: 8px; text-align: center; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.85rem; transition: 0.2s;
+        width: 100%; padding: 3px 6px; border: 1px solid #e2e8f0; border-radius: 6px; text-align: center; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.8rem; transition: 0.2s;
         background-color: white;
     }
     .input-premium:focus { border-color: #6366f1; ring: 3px rgba(99, 102, 241, 0.1); outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
@@ -205,7 +235,7 @@ if (!empty($nodesTree)) {
     #bulk-action-bar.visible { transform: translate(-50%, 0); }
     
     .node-badge {
-        padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; width: 100%; text-align: center;
+        padding: 2px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; display: inline-block; width: 100%; text-align: center;
     }
     .badge-phase { background: #1e293b; color: white; }
     .badge-section { background: #e0e7ff; color: #4338ca; }
@@ -342,7 +372,7 @@ if (!empty($nodesTree)) {
     // --- GRID RENDERING ---
     function renderGrid() {
         const container = document.getElementById('syllabus-container');
-        while(container.children.length > 11) container.removeChild(container.lastChild);
+        while(container.children.length > 12) container.removeChild(container.lastChild);
 
         syllabusData.forEach((row, index) => {
             // Checkbox
@@ -415,10 +445,21 @@ if (!empty($nodesTree)) {
             container.appendChild(createCell(`
                 <button onclick="handleRowDuplicate(${index})" class="text-slate-300 hover:text-blue-500 transition px-2" title="Duplicate"><i class="fas fa-clone text-sm"></i></button>
                 <button onclick="deleteRow(${index})" class="text-slate-300 hover:text-rose-500 transition px-2" title="Delete"><i class="fas fa-trash-alt text-sm"></i></button>
-            `, 'justify-center'));
+            `, 'justify-center border-r border-slate-100'));
+
+            // Linked
+            let linkedHtml = '';
+            if (row.linked_category_id) {
+                linkedHtml = `<div class="node-badge badge-section cursor-pointer truncate max-w-[110px]" title="${row.category_name}" onclick="openHierarchyModal(${index})"><span class="opacity-70 mr-1">Cat:</span>${row.category_name}</div>`;
+            } else if (row.linked_topic_id) {
+                 linkedHtml = `<div class="node-badge badge-unit cursor-pointer truncate max-w-[110px]" title="${row.topic_name}" onclick="openHierarchyModal(${index})"><span class="opacity-70 mr-1">Sub:</span>${row.topic_name}</div>`;
+            } else {
+                linkedHtml = `<button onclick="openHierarchyModal(${index})" class="hierarchy-btn text-blue-500 hover:bg-blue-50 hover:border-blue-200" title="Link Category/Topic"><i class="fas fa-plus text-xs"></i></button>`;
+            }
+            container.appendChild(createCell(linkedHtml, 'justify-center px-1'));
             
             // Set depth and type attributes for styling
-            const rowElements = container.querySelectorAll('.grid-cell:nth-last-child(-n+11)');
+            const rowElements = container.querySelectorAll('.grid-cell:nth-last-child(-n+12)');
             rowElements.forEach(cell => {
                 cell.setAttribute('data-depth', row.depth);
                 cell.setAttribute('data-type', row.type);
@@ -594,6 +635,97 @@ if (!empty($nodesTree)) {
             }
         })
         .catch(err => alert('Communication error'));
+    }
+
+    // --- HIERARCHY MODAL LOGIC ---
+    let activeRowIndex = null;
+    let activeTab = 'category';
+    const categoriesDB = <?php echo !empty($categories) ? json_encode($categories) : '[]'; ?>;
+    const topicsDB = <?php echo !empty($topics) ? json_encode($topics) : '[]'; ?>;
+
+    function openHierarchyModal(index) {
+        activeRowIndex = index;
+        const row = syllabusData[index];
+        if (row.linked_topic_id) switchHierarchyTab('topic');
+        else switchHierarchyTab('category');
+        document.getElementById('hierarchy-modal').classList.remove('hidden');
+        document.getElementById('hierarchy-search').value = '';
+        filterHierarchyList();
+        setTimeout(() => document.getElementById('hierarchy-search').focus(), 50);
+    }
+
+    function closeHierarchyModal() {
+        document.getElementById('hierarchy-modal').classList.add('hidden');
+        activeRowIndex = null;
+    }
+
+    function switchHierarchyTab(tab) {
+        activeTab = tab;
+        document.querySelectorAll('.h-tab').forEach(el => {
+            if(el.dataset.tab === tab) {
+                 el.classList.add('bg-blue-50', 'border-blue-200', 'text-blue-700');
+                 el.classList.remove('bg-white', 'text-slate-600');
+            } else {
+                 el.classList.remove('bg-blue-50', 'border-blue-200', 'text-blue-700');
+                 el.classList.add('bg-white', 'text-slate-600');
+            }
+        });
+        filterHierarchyList();
+    }
+
+    function filterHierarchyList() {
+        const query = document.getElementById('hierarchy-search').value.toLowerCase();
+        const container = document.getElementById('hierarchy-list-container');
+        container.innerHTML = '';
+        
+        const sourceData = activeTab === 'category' ? categoriesDB : topicsDB;
+        const typeLabel = activeTab === 'category' ? 'Category' : 'Sub-Category';
+        const linkKey = activeTab === 'category' ? 'linked_category_id' : 'linked_topic_id';
+
+        const matches = sourceData.filter(item => item.name.toLowerCase().includes(query));
+
+        if (matches.length === 0) {
+            container.innerHTML = `<div class="text-center py-8 text-slate-400 italic">No ${typeLabel} found matching "${query}"</div>`;
+            return;
+        }
+
+        matches.forEach(item => {
+            const isSelected = syllabusData[activeRowIndex] && syllabusData[activeRowIndex][linkKey] == item.id;
+            const el = document.createElement('div');
+            el.className = `flex items-center justify-between p-3 mb-1 rounded-lg cursor-pointer transition group ${isSelected ? 'bg-blue-600 text-white shadow-md' : 'hover:bg-slate-50 border border-transparent hover:border-slate-200'}`;
+            el.innerHTML = `<div class="font-bold text-sm text-[#1e293b] ${isSelected ? 'text-white' : ''}">${item.name}</div><div class="text-[10px] uppercase tracking-wider opacity-60 font-mono group-hover:opacity-100">${typeLabel}</div>`;
+            el.onclick = () => selectHierarchyItem(activeTab, item.id, item.name);
+            container.appendChild(el);
+        });
+    }
+
+    function selectHierarchyItem(type, id, name) {
+        if (activeRowIndex === null) return;
+        syllabusData[activeRowIndex].linked_category_id = null;
+        syllabusData[activeRowIndex].category_name = null;
+        syllabusData[activeRowIndex].linked_topic_id = null;
+        syllabusData[activeRowIndex].topic_name = null;
+        syllabusData[activeRowIndex].linked_subject_id = null;
+
+        if (type === 'category') {
+            syllabusData[activeRowIndex].linked_category_id = id;
+            syllabusData[activeRowIndex].category_name = name;
+        } else {
+            syllabusData[activeRowIndex].linked_topic_id = id;
+            syllabusData[activeRowIndex].topic_name = name;
+        }
+        renderGrid();
+        closeHierarchyModal();
+    }
+
+    function removeLink() {
+        if (activeRowIndex === null) return;
+        syllabusData[activeRowIndex].linked_category_id = null;
+        syllabusData[activeRowIndex].category_name = null;
+        syllabusData[activeRowIndex].linked_topic_id = null;
+        syllabusData[activeRowIndex].topic_name = null;
+        renderGrid();
+        closeHierarchyModal();
     }
 
     document.addEventListener('DOMContentLoaded', () => { initSettings(); renderGrid(); });
