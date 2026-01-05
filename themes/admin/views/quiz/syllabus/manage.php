@@ -567,6 +567,12 @@ if (!empty($nodesTree)) {
     }
     let draggedItemIndex = null;
 
+    // --- HELPER FUNCTIONS ---
+    function formatNumber(num) {
+        if (!num || num === 0) return '0';
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
     // --- GRID RENDERING ---
     function renderGrid() {
         const container = document.getElementById('syllabus-container');
@@ -585,23 +591,37 @@ if (!empty($nodesTree)) {
             // Level
             container.appendChild(createCell(row.depth, `justify-center depth-${row.depth} bg-slate-50 border-r border-slate-100 font-mono text-xs`));
 
-            // Topic / Title
+            // Topic / Title (with depth-based styling)
             const padding = 20 + (row.depth * 32);
             let icon = 'fa-folder';
-            if(row.type === 'paper') icon = 'fa-layer-group text-slate-500';
-            else if(row.type === 'section') icon = 'fa-folder-open text-slate-400';
+            let titleClass = '';
+            let titleStyle = '';
+            
+            if(row.depth === 0) {
+                icon = 'fa-layer-group text-white';
+                titleClass = 'font-bold text-white';
+                titleStyle = 'background: linear-gradient(135deg, #1e293b 0%, #334155 100%);';
+            } else if(row.depth === 1) {
+                icon = 'fa-folder-open text-blue-600';
+                titleClass = 'font-semibold text-blue-700';
+                titleStyle = 'background: #eff6ff;';
+            } else {
+                icon = 'fa-folder text-slate-400';
+                titleClass = 'text-slate-700';
+            }
             
             container.appendChild(createCell(
                 `<div class="flex items-center w-full">
-                    <i class="fas ${icon} mr-3 opacity-60 text-xs"></i> 
-                    <span contenteditable="true" class="w-full outline-none focus:bg-white rounded px-1 transition duration-200" onblur="updateRow(${index}, 'title', this.innerText)">${row.title}</span>
+                    <i class="fas ${icon} mr-3 opacity-80 text-xs"></i> 
+                    <span contenteditable="true" class="w-full outline-none focus:bg-white rounded px-1 transition duration-200 ${titleClass}" onblur="updateRow(${index}, 'title', this.innerText)">${row.title}</span>
                  </div>`,
-                `depth-${row.depth} border-r border-slate-100`, `padding-left: ${padding}px;`
+                `depth-${row.depth} border-r border-slate-100`, `padding-left: ${padding}px; ${titleStyle}`
             ));
 
-            // Time
+            // Time (with formatted display)
             const timeBg = row.depth === 0 ? "bg-amber-100" : "bg-white";
-            container.appendChild(createCell(`<input type="number" class="input-premium time-input ${timeBg}" value="${row.time || 0}" onchange="updateRow(${index}, 'time', this.value)">`, 'justify-center border-r border-slate-100'));
+            const timeDisplay = row.depth === 0 ? `<div class="font-bold text-amber-800">${formatNumber(row.time)}</div>` : `<input type="number" class="input-premium time-input ${timeBg}" value="${row.time || 0}" onchange="updateRow(${index}, 'time', this.value)">`;
+            container.appendChild(createCell(timeDisplay, 'justify-center border-r border-slate-100'));
 
             // Node Type (Styled visible select)
             let typeColor = "bg-slate-100 text-slate-600 border border-slate-200";
@@ -617,16 +637,19 @@ if (!empty($nodesTree)) {
                 </select>
             `, 'justify-center border-r border-slate-100 px-1'));
 
-            // Qty
+            // Qty (with formatted display)
             const qtyDisabled = (row.type !== 'unit' && row.depth !== 0) ? 'disabled style="background:#f8fafc; color:#cbd5e1;"' : '';
-            container.appendChild(createCell(`<input type="number" class="input-premium qty-input" value="${row.qCount || 0}" onchange="updateRow(${index}, 'qCount', this.value)" ${qtyDisabled}>`, 'justify-center border-r border-slate-100'));
+            const qtyDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400">${formatNumber(row.qCount)}</div>` : `<input type="number" class="input-premium qty-input" value="${row.qCount || 0}" onchange="updateRow(${index}, 'qCount', this.value)">`;
+            container.appendChild(createCell(qtyDisplay, 'justify-center border-r border-slate-100'));
 
-            // Each
-            container.appendChild(createCell(`<input type="number" class="input-premium each-input" value="${row.qEach || 0}" onchange="updateRow(${index}, 'qEach', this.value)" ${qtyDisabled}>`, 'justify-center border-r border-slate-100'));
+            // Each (with formatted display)
+            const eachDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400">${formatNumber(row.qEach)}</div>` : `<input type="number" class="input-premium each-input" value="${row.qEach || 0}" onchange="updateRow(${index}, 'qEach', this.value)">`;
+            container.appendChild(createCell(eachDisplay, 'justify-center border-r border-slate-100'));
 
-            // Marks
+            // Marks (with formatted display)
             const marksBg = row.depth === 0 ? "bg-slate-100" : "bg-white";
-            container.appendChild(createCell(`<input type="number" class="input-premium font-bold ${marksBg}" value="${row.weight}" onchange="updateRow(${index}, 'weight', this.value)">`, 'justify-center border-r border-slate-100'));
+            const marksDisplay = `<div class="font-bold ${row.depth === 0 ? 'text-slate-800' : 'text-slate-700'}">${formatNumber(row.weight)}</div>`;
+            container.appendChild(createCell(marksDisplay, 'justify-center border-r border-slate-100'));
 
             // Hierarchy
             container.appendChild(createCell(`
@@ -686,6 +709,20 @@ if (!empty($nodesTree)) {
     function updateRow(index, field, value) {
         if(field !== 'title' && field !== 'type') value = parseFloat(value) || 0;
         syllabusData[index][field] = value;
+        
+        // Auto-adjust depth based on node type
+        if(field === 'type') {
+            const typeDepthMap = {
+                'paper': 0,
+                'phase': 0,
+                'section': 1,
+                'unit': 2,
+                'topic': 3
+            };
+            if(typeDepthMap[value] !== undefined) {
+                syllabusData[index].depth = typeDepthMap[value];
+            }
+        }
         
         // Auto-calculation logic: QTY * EACH = MARKS
         if(field === 'qCount' || field === 'qEach') {
