@@ -1,44 +1,55 @@
-<?php
-// themes/default/views/quiz/gamification/city.php
-?>
-
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --city-bg: #0a0e1a;
+    --city-bg: #0f172a;
     --city-card: rgba(255, 255, 255, 0.03);
     --city-border: rgba(255, 255, 255, 0.08);
-    --city-primary: #7c5dff;
+    --city-primary: #667eea;
+    --city-primary-grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --city-accent: #00d1ff;
-    --city-success: #2ee6a8;
-    --city-danger: #ff4d4d;
-    --city-text: #e8ecf2;
-    --city-muted: #9aa4b5;
-    --city-glow: 0 8px 32px rgba(124, 93, 255, 0.2);
+    --city-success: #10b981;
+    --city-danger: #ef4444;
+    --city-text: #ffffff;
+    --city-muted: #94a3b8;
+    --city-glow: 0 8px 32px rgba(102, 126, 234, 0.15);
 }
 
 .city-wrapper {
-    background: radial-gradient(circle at top right, #1a1f3c, #0a0e1a 60%);
+    background: var(--city-bg);
     min-height: 100vh;
     color: var(--city-text);
-    font-family: 'Outfit', sans-serif;
-    padding: 40px 20px;
+    font-family: 'Inter', system-ui, sans-serif;
+    padding: 0 0 40px;
+    position: relative;
+    overflow-x: hidden;
 }
+
+/* Background Effects */
+.city-bg-glow {
+    position: fixed;
+    top: -10%; right: -10%;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(118, 75, 162, 0.15), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.city-content { position: relative; z-index: 1; }
 
 .premium-card {
     background: var(--city-card);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--city-border);
-    border-radius: 24px;
+    border-radius: 20px;
     padding: 24px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .premium-card:hover {
-    border-color: rgba(124, 93, 255, 0.3);
-    transform: translateY(-5px);
+    border-color: rgba(102, 126, 234, 0.3);
+    transform: translateY(-4px);
     box-shadow: var(--city-glow);
 }
 
@@ -46,7 +57,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 .resource-card {
@@ -57,10 +68,10 @@
 }
 
 .resource-icon-shell {
-    width: 50px;
-    height: 50px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 14px;
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -68,49 +79,69 @@
 }
 
 .resource-icon-shell img {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     object-fit: contain;
 }
 
 .resource-info h4 {
     margin: 0;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--city-muted);
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
 }
 
 .resource-info .amount {
     font-size: 24px;
-    font-weight: 800;
+    font-weight: 700;
     color: #fff;
+    line-height: 1.2;
 }
 
-.city-header {
-    text-align: center;
-    margin-bottom: 50px;
+/* Header */
+.gamification-header {
+    padding: 20px 0;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--city-border);
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
+.header-inner { display: flex; align-items: center; justify-content: space-between; }
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--city-muted);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+.back-link:hover { color: white; }
+
+.header-title-group { text-align: right; }
 .city-title {
-    font-size: 42px;
+    font-size: 1.5rem;
     font-weight: 800;
-    margin-bottom: 10px;
-    background: linear-gradient(135deg, #fff, #9aa4b5);
+    margin: 0;
+    background: var(--city-primary-grad);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-
-.city-subtitle {
-    font-size: 18px;
-    color: var(--city-muted);
-}
+.city-subtitle { font-size: 0.85rem; color: var(--city-muted); margin: 0; }
 
 .construction-grid {
     display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 30px;
+    grid-template-columns: 350px 1fr;
+    gap: 25px;
 }
 
 @media (max-width: 992px) {
@@ -120,7 +151,7 @@
 .build-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
 }
 
 .build-item {
@@ -131,57 +162,65 @@
     background: rgba(255, 255, 255, 0.02);
     border-radius: 16px;
     border: 1px solid var(--city-border);
+    transition: background 0.2s;
 }
+.build-item:hover { background: rgba(255, 255, 255, 0.04); }
 
 .build-icon {
-    width: 45px;
-    height: 45px;
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .cost-tag {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     color: var(--city-accent);
     background: rgba(0, 209, 255, 0.1);
-    padding: 4px 10px;
+    padding: 3px 8px;
     border-radius: 20px;
     margin-top: 4px;
     display: inline-block;
 }
 
 .btn-build {
-    background: var(--city-primary);
+    background: var(--city-primary-grad);
     border: none;
     color: white;
-    padding: 8px 20px;
-    border-radius: 12px;
-    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
     transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
 .btn-build:hover:not(:disabled) {
-    filter: brightness(1.2);
-    transform: scale(1.05);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
 }
 
 .btn-build:disabled {
-    background: var(--city-muted);
-    opacity: 0.5;
+    background: var(--city-card);
+    color: var(--city-muted);
+    cursor: not-allowed;
+    box-shadow: none;
+    border: 1px solid var(--city-border);
 }
 
 .map-container {
-    min-height: 500px;
+    min-height: 600px;
     position: relative;
     background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     background-size: 40px 40px;
-    border-radius: 24px;
+    border-radius: 20px;
     overflow: auto;
     padding: 30px;
 }
@@ -202,8 +241,9 @@
 }
 
 .building-card:hover {
-    background: rgba(124, 93, 255, 0.1);
+    background: rgba(102, 126, 234, 0.1);
     border-color: var(--city-primary);
+    transform: translateY(-5px);
 }
 
 .building-icon {
@@ -214,24 +254,35 @@
 
 .building-name {
     display: block;
-    font-weight: 700;
+    font-weight: 600;
+    font-size: 0.95rem;
     text-transform: capitalize;
 }
 
 .building-level {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--city-muted);
 }
 </style>
 
 <div class="city-wrapper">
-    <div class="container">
-        <header class="city-header">
-            <h1 class="city-title">Civil Empire Designer</h1>
-            <p class="city-subtitle">Convert your engineering brilliance into the city of the future.</p>
-        </header>
+    <div class="city-bg-glow"></div>
+    
+    <!-- Header -->
+    <header class="gamification-header">
+        <div class="container header-inner">
+            <a href="<?php echo app_base_url('quiz'); ?>" class="back-link">
+                <i class="fas fa-arrow-left"></i> <span>Back to Portal</span>
+            </a>
+            <div class="header-title-group">
+                <h1 class="city-title">Architect's Studio</h1>
+                <p class="city-subtitle">Design the future of civil engineering</p>
+            </div>
+        </div>
+    </header>
 
-        <!-- Premium Resource Wallet -->
+    <div class="container city-content">
+
         <div class="wallet-grid">
             <div class="premium-card resource-card">
                 <div class="resource-icon-shell">

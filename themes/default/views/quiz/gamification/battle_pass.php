@@ -1,4 +1,16 @@
 <div class="bp-page">
+    <!-- Header -->
+    <header class="gamification-header" style="padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(10, 14, 26, 0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100;">
+        <div class="container d-flex align-items-center justify-content-between">
+            <a href="<?php echo app_base_url('quiz'); ?>" style="color: #94a3b8; text-decoration: none; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-arrow-left"></i> <span>Back to Portal</span>
+            </a>
+            <div style="text-align: right;">
+                <h2 style="font-size: 1.25rem; font-weight: 800; margin: 0; background: linear-gradient(135deg, #ffffff 0%, #a8b3cf 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Season 1</h2>
+            </div>
+        </div>
+    </header>
+
     <!-- Compact Hero Section -->
     <div class="bp-hero-shell">
         <div class="bp-hero-glow"></div>

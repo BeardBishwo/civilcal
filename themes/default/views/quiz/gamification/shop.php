@@ -6,30 +6,90 @@ $economyResources = \App\Services\SettingsService::get('economy_resources', []);
 $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'themes/default/assets/resources/currency/coin.webp'];
 ?>
 
-<div class="market-container">
-    <!-- Premium Header -->
-    <div class="market-header text-center">
-        <div class="header-icon-float">🛕</div>
-        <h1 class="market-title">Pashupati Nath Temple Market</h1>
-        <p class="market-subtitle">Sacred trading grounds for engineering artifacts and construction materials.</p>
-    </div>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap');
 
-    <!-- Dynamic Wallet Display -->
-    <div class="wallet-section">
-        <div class="wallet-card">
-            <div class="wallet-info">
-                <span class="wallet-label text-uppercase">Treasury Capital</span>
-                <div class="wallet-balance">
-                    <img src="<?php echo app_base_url($coinConfig['icon']); ?>" class="coin-glow">
-                    <span id="current-coins" class="counter-value"><?php echo number_format($wallet['coins']); ?></span>
-                    <span class="coin-name"><?php echo htmlspecialchars($coinConfig['name']); ?></span>
-                </div>
-            </div>
-            <div class="wallet-visual">
-                <i class="fas fa-gopuram"></i>
+.market-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #e2e8f0;
+    min-height: 100vh;
+}
+
+/* Unified Header */
+.gamification-header {
+    padding: 20px 0;
+    margin-bottom: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-inner { display: flex; align-items: center; justify-content: space-between; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+.back-link:hover { color: white; }
+
+.header-title-group { text-align: right; }
+.market-mini-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+    color: #fbbf24;
+}
+</style>
+
+<div class="market-page-wrapper" style="background: #0f172a; min-height: 100vh;">
+    <!-- Unified Header -->
+    <header class="gamification-header">
+        <div class="header-inner">
+            <a href="<?php echo app_base_url('quiz'); ?>" class="back-link">
+                <i class="fas fa-arrow-left"></i> <span>Back to Portal</span>
+            </a>
+            <div class="header-title-group">
+                <h2 class="market-mini-title">Pashupati Nath Market</h2>
             </div>
         </div>
-    </div>
+    </header>
+
+    <div class="market-container px-4 pb-5">
+        <!-- Premium Hero -->
+        <div class="market-header text-center pt-4">
+            <div class="header-icon-float">🛕</div>
+            <h1 class="market-title">Pashupati Nath Temple Market</h1>
+            <p class="market-subtitle">Sacred trading grounds for engineering artifacts and construction materials.</p>
+        </div>
+
+        <!-- Dynamic Wallet Display -->
+        <div class="wallet-section">
+            <div class="wallet-card">
+                <div class="wallet-info">
+                    <span class="wallet-label text-uppercase">Treasury Capital</span>
+                    <div class="wallet-balance">
+                        <img src="<?php echo app_base_url($coinConfig['icon']); ?>" class="coin-glow">
+                        <span id="current-coins" class="counter-value"><?php echo number_format($wallet['coins']); ?></span>
+                        <span class="coin-name"><?php echo htmlspecialchars($coinConfig['name']); ?></span>
+                    </div>
+                </div>
+                <div class="wallet-visual">
+                    <i class="fas fa-gopuram"></i>
+                </div>
+            </div>
+        </div>
 
     <!-- Market Navigation -->
     <div class="market-nav">

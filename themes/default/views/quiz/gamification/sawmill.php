@@ -1,19 +1,93 @@
 
-<div class="premium-sawmill-wrapper py-5">
-    <!-- Header Section -->
-    <div class="container mb-5">
-        <div class="row align-items-center">
+<style>
+/* PREMIUM DESIGN SYSTEM - STANDARDIZED */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+
+:root {
+    --saw-bg: #0f172a;
+    --saw-card: rgba(255, 255, 255, 0.03);
+    --saw-border: rgba(255, 255, 255, 0.08);
+    --saw-primary: #f59e0b; /* Amber 500 */
+    --saw-text: #ffffff;
+    --saw-muted: #94a3b8;
+}
+
+.premium-sawmill-wrapper {
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+    min-height: 100vh;
+    color: var(--saw-text);
+    padding-bottom: 50px;
+}
+
+/* Header */
+.gamification-header {
+    padding: 20px 0;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--saw-border);
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-inner { display: flex; align-items: center; justify-content: space-between; }
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--saw-muted);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+.back-link:hover { color: white; }
+
+.header-title-group { text-align: right; }
+.saw-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.saw-subtitle { font-size: 0.85rem; color: var(--saw-muted); margin: 0; }
+</style>
+
+<div class="premium-sawmill-wrapper">
+    <!-- Header -->
+    <header class="gamification-header">
+        <div class="container header-inner">
+            <a href="<?php echo app_base_url('quiz'); ?>" class="back-link">
+                <i class="fas fa-arrow-left"></i> <span>Back to Portal</span>
+            </a>
+            <div class="header-title-group">
+                <h1 class="saw-title">Industrial Estate</h1>
+                <p class="saw-subtitle">The BB Sawmill</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="row align-items-center mb-5">
             <div class="col-lg-7">
                 <div class="d-flex align-items-center mb-3">
                     <div class="icon-box-premium mr-3 animate-pulse-slow">
-                        <img src="<?php echo app_base_url('themes/default/assets/resources/buildings/saw_farm.webp'); ?>" width="70">
+                        <img src="<?php echo app_base_url('themes/default/assets/resources/buildings/saw_farm.webp'); ?>" width="60">
                     </div>
                     <div>
-                        <h6 class="text-amber mb-0 text-uppercase letter-spacing-2 font-weight-bold">Industrial Estate</h6>
-                        <h1 class="display-4 font-weight-black text-white glow-text">The BB Sawmill</h1>
+                        <h6 class="text-amber mb-0 text-uppercase letter-spacing-2 font-weight-bold" style="font-size: 0.75rem;">Production Unit</h6>
+                        <h2 class="font-weight-black text-white glow-text m-0">Sawmill Operations</h2>
                     </div>
                 </div>
-                <p class="lead text-platinum opacity-75">Maximize your timber yields. Transform raw logs into high-grade polished planks using advanced industrial processing.</p>
+                <p class="text-platinum opacity-75 small" style="max-width: 500px;">Transform raw logs into high-grade polished planks using advanced industrial processing.</p>
             </div>
             <div class="col-lg-5 text-lg-right">
                 <div class="p-3 glass-card-dark rounded-xl d-inline-block border-gold shadow-gold">

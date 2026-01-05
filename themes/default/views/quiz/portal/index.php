@@ -1,22 +1,17 @@
 <?php
 /**
- * Quiz Portal View - Premium "Quiz Gamenta" Design
- * 
- * Features:
- * - Modern 4-column responsive grid
- * - Glassmorphism effects with backdrop blur
- * - Vibrant gradient-styled cards
- * - High-quality FontAwesome 6 icons
- * - Hero section with dynamic typography
- * - Mobile app promotion footer
+ * PREMIUM QUIZ PORTAL - SAAS EDITION
+ * Ultra-fast, fully dynamic, next-level animations
+ * All resources controlled from admin panel
  */
 ?>
 
+<!-- Daily Bonus Toast (Dynamic) -->
 <?php if (isset($dailyBonus) && $dailyBonus && $dailyBonus['success']): ?>
-<div class="daily-bonus-toast animate__animated animate__bounceIn">
+<div class="daily-bonus-toast" id="bonusToast">
     <div class="bonus-icon"><?php echo isset($dailyBonus['rewards']['steel']) ? '🛡️' : '🪵'; ?></div>
     <div class="bonus-details">
-        <h5>Daily Civil Reward! (Day <?php echo $dailyBonus['rewards']['streak']; ?>)</h5>
+        <h5>Daily Reward! (Day <?php echo $dailyBonus['rewards']['streak']; ?>)</h5>
         <p>
             <?php if (isset($dailyBonus['rewards']['steel'])): ?>
                 You received a <strong>Steel Bundle (+10 Steel)</strong> for your 7-day streak!
@@ -25,167 +20,233 @@
             <?php endif; ?>
         </p>
     </div>
-    <button class="close-toast" onclick="this.parentElement.remove()">×</button>
+    <button class="close-toast" onclick="document.getElementById('bonusToast').remove()">×</button>
 </div>
-<style>
-.daily-bonus-toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
-    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-    color: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.1);
-}
-.bonus-icon { font-size: 2.5rem; }
-.bonus-details h5 { margin: 0; font-weight: 800; color: #f59e0b; }
-.bonus-details p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
-.close-toast { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
-</style>
 <?php endif; ?>
 
-<div class="portal-container">
-    <!-- Hero Section -->
-    <section class="portal-hero">
-        <div class="hero-content">
-            <h1 class="hero-title">Master the <span class="gradient-text">Next Generation</span> of Learning</h1>
-            <p class="hero-subtitle">Join 50,000+ engineers preparing for Loksewa, License, and Entrance exams with AI-powered analytics and gamified battles.</p>
-            <div class="hero-actions">
-                <a href="#streams" class="premium-btn btn-primary">
-                    <i class="fas fa-play-circle"></i> Start Learning
-                </a>
-                <a href="<?php echo app_base_url('quiz/leaderboard'); ?>" class="premium-btn btn-secondary">
-                    <i class="fas fa-trophy"></i> Global Ranking
-                </a>
+<div class="quiz-portal-premium">
+    
+    <!-- HERO SECTION - Ultra Premium -->
+    <section class="hero-section">
+        <div class="hero-bg-gradient"></div>
+        <div class="hero-particles" id="particles"></div>
+        
+        <div class="hero-content-wrapper">
+            <div class="hero-text">
+                <div class="hero-badge">
+                    <i class="fas fa-bolt"></i>
+                    <span>50,000+ Active Learners</span>
+                </div>
+                <h1 class="hero-title">
+                    Master Your <span class="gradient-text">Engineering Dreams</span>
+                </h1>
+                <p class="hero-subtitle">
+                    AI-powered mock tests, real-time analytics, and gamified learning for Loksewa, License & Entrance exams.
+                </p>
+                <div class="hero-cta">
+                    <a href="#categories" class="btn-hero-primary">
+                        <i class="fas fa-rocket"></i>
+                        <span>Start Learning</span>
+                        <div class="btn-glow"></div>
+                    </a>
+                    <a href="<?php echo app_base_url('quiz/leaderboard'); ?>" class="btn-hero-secondary">
+                        <i class="fas fa-trophy"></i>
+                        <span>Leaderboard</span>
+                    </a>
+                </div>
+                
+                <!-- Live Stats Counter -->
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" data-count="50000">0</div>
+                        <div class="stat-label">Students</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-value" data-count="1200">0</div>
+                        <div class="stat-label">Mock Tests</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-value" data-count="98">0</div>
+                        <div class="stat-label">% Success</div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="hero-visual">
-            <div class="floating-icons">
-                <i class="fas fa-hard-hat icon-1"></i>
-                <i class="fas fa-bolt icon-2"></i>
-                <i class="fas fa-calculator icon-3"></i>
+            
+            <div class="hero-visual">
+                <div class="floating-card card-1">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Live Exams</span>
+                </div>
+                <div class="floating-card card-2">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </div>
+                <div class="floating-card card-3">
+                    <i class="fas fa-users"></i>
+                    <span>Multiplayer</span>
+                </div>
+                <div class="hero-glow-orb"></div>
             </div>
-            <div class="hero-glow"></div>
         </div>
     </section>
 
-    <!-- Categories / Streams Grid -->
+    <!-- CATEGORIES SECTION - Dynamic from Admin -->
     <?php if (!empty($categories)): ?>
-    <section id="streams" class="streams-section">
+    <section id="categories" class="categories-section">
         <div class="section-header">
-            <h2 class="section-title">Explore Your <span class="gradient-text">Stream</span></h2>
-            <p class="section-subtitle">Select a category to view specialized mock tests and practice sets.</p>
+            <div class="section-badge">
+                <i class="fas fa-layer-group"></i>
+                <span>Explore Streams</span>
+            </div>
+            <h2 class="section-title">Choose Your <span class="gradient-text">Engineering Path</span></h2>
+            <p class="section-subtitle">Select your specialization and start practicing with curated mock tests</p>
         </div>
-        <div class="streams-grid">
-            <?php 
-            $streamIcons = ['fa-hard-hat', 'fa-bolt', 'fa-faucet', 'fa-wind', 'fa-fire-extinguisher', 'fa-map-marked-alt', 'fa-building', 'fa-tools'];
-            $streamGradients = [
-                'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', // Indigo-Purple
-                'linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%)', // Blue-Teal
-                'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)', // Amber-Red
-                'linear-gradient(135deg, #10b981 0%, #3b82f6 100%)'  // Emerald-Blue
-            ];
-            foreach ($categories as $index => $cat): 
-                $icon = $streamIcons[$index % count($streamIcons)];
-                $gradient = $streamGradients[$index % count($streamGradients)];
+
+        <div class="categories-grid">
+            <?php foreach ($categories as $index => $cat): 
+                // Dynamic icon from admin or fallback
+                $icon = !empty($cat['icon']) ? $cat['icon'] : 'fa-folder';
+                // Dynamic image from admin
+                $bgImage = !empty($cat['image_path']) ? $cat['image_path'] : '';
             ?>
-            <div class="stream-card-wrapper">
-                <a href="<?php echo app_base_url('quiz?category=' . $cat['slug']); ?>" class="stream-card">
-                    <div class="stream-icon-box" style="background: <?php echo $gradient; ?>">
-                        <i class="fas <?php echo $icon; ?>"></i>
+            <a href="<?php echo app_base_url('quiz?category=' . $cat['slug']); ?>" class="category-card" data-index="<?php echo $index; ?>">
+                <?php if ($bgImage): ?>
+                <div class="category-bg" style="background-image: url('<?php echo htmlspecialchars($bgImage); ?>')"></div>
+                <?php endif; ?>
+                <div class="category-overlay"></div>
+                <div class="category-content">
+                    <div class="category-icon">
+                        <i class="fas <?php echo htmlspecialchars($icon); ?>"></i>
                     </div>
-                    <h3 class="stream-name"><?php echo htmlspecialchars($cat['name']); ?></h3>
-                    <div class="stream-hover-arrow">
+                    <h3 class="category-name"><?php echo htmlspecialchars($cat['name']); ?></h3>
+                    <?php if (!empty($cat['description'])): ?>
+                    <p class="category-desc"><?php echo htmlspecialchars(substr($cat['description'], 0, 60)) . '...'; ?></p>
+                    <?php endif; ?>
+                    <div class="category-arrow">
                         <i class="fas fa-arrow-right"></i>
                     </div>
-                </a>
-            </div>
+                </div>
+                <?php if (!empty($cat['is_premium'])): ?>
+                <div class="category-premium-badge">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <?php endif; ?>
+            </a>
             <?php endforeach; ?>
         </div>
     </section>
     <?php endif; ?>
 
-    <!-- Popular Exams Section -->
+    <!-- FEATURED EXAMS - Dynamic -->
     <section class="exams-section">
         <div class="section-header">
             <div class="header-left">
-                <h2 class="section-title">Popular <span class="gradient-text">Exams</span></h2>
-                <p class="section-subtitle">The most attempted mock tests this week.</p>
+                <div class="section-badge">
+                    <i class="fas fa-fire"></i>
+                    <span>Trending Now</span>
+                </div>
+                <h2 class="section-title">Popular <span class="gradient-text">Mock Tests</span></h2>
+                <p class="section-subtitle">Most attempted exams this week</p>
             </div>
-            <div class="header-right">
-                <a href="#" class="view-all-link">View All Exams <i class="fas fa-chevron-right"></i></a>
-            </div>
+            <a href="#" class="view-all-btn">
+                View All <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
 
         <?php if (empty($exams)): ?>
-            <div class="empty-state">
-                <i class="fas fa-folder-open"></i>
-                <p>No featured exams available right now. Check back soon!</p>
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-inbox"></i>
             </div>
+            <h3>No Exams Available</h3>
+            <p>Check back soon for new mock tests!</p>
+        </div>
         <?php else: ?>
-            <div class="exams-grid">
-                <?php foreach ($exams as $exam): ?>
-                <div class="exam-card">
-                    <div class="exam-card-badge <?php echo $exam['type']; ?>">
-                        <?php echo ucfirst(str_replace('_', ' ', $exam['type'])); ?>
-                    </div>
-                    <?php if($exam['is_premium']): ?>
-                        <div class="exam-premium-icon" title="Premium Access Required">
-                            <i class="fas fa-crown"></i>
-                        </div>
-                    <?php endif; ?>
+        <div class="exams-grid">
+            <?php foreach ($exams as $exam): ?>
+            <div class="exam-card">
+                <!-- Type Badge -->
+                <div class="exam-type-badge <?php echo $exam['type']; ?>">
+                    <?php echo ucfirst(str_replace('_', ' ', $exam['type'])); ?>
+                </div>
+                
+                <!-- Premium Icon -->
+                <?php if(!empty($exam['is_premium'])): ?>
+                <div class="exam-premium-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <?php endif; ?>
 
-                    <div class="exam-info">
-                        <h3 class="exam-title"><?php echo htmlspecialchars($exam['title']); ?></h3>
-                        <p class="exam-desc"><?php echo htmlspecialchars(substr($exam['description'], 0, 90)) . (strlen($exam['description']) > 90 ? '...' : ''); ?></p>
-                        
-                        <div class="exam-meta">
-                            <div class="meta-item"><i class="fas fa-clock"></i> <?php echo $exam['duration_minutes'] > 0 ? $exam['duration_minutes'] . ' min' : '∞'; ?></div>
-                            <div class="meta-item"><i class="fas fa-list-check"></i> <?php echo $exam['question_count']; ?> Qs</div>
-                            <div class="meta-item"><i class="fas fa-star"></i> <?php echo $exam['total_marks']; ?></div>
-                        </div>
-                    </div>
+                <div class="exam-header">
+                    <h3 class="exam-title"><?php echo htmlspecialchars($exam['title']); ?></h3>
+                    <p class="exam-description"><?php echo htmlspecialchars(substr($exam['description'], 0, 100)) . '...'; ?></p>
+                </div>
 
-                    <div class="exam-footer">
-                        <a href="<?php echo app_base_url('quiz/overview/' . $exam['slug']); ?>" class="btn-start-exam">
-                            Practice Now <i class="fas fa-arrow-right"></i>
-                        </a>
+                <div class="exam-stats">
+                    <div class="stat-pill">
+                        <i class="fas fa-clock"></i>
+                        <span><?php echo $exam['duration_minutes'] > 0 ? $exam['duration_minutes'] . ' min' : 'Unlimited'; ?></span>
+                    </div>
+                    <div class="stat-pill">
+                        <i class="fas fa-list-check"></i>
+                        <span><?php echo $exam['question_count']; ?> Questions</span>
+                    </div>
+                    <div class="stat-pill">
+                        <i class="fas fa-star"></i>
+                        <span><?php echo $exam['total_marks']; ?> Marks</span>
                     </div>
                 </div>
-                <?php endforeach; ?>
+
+                <a href="<?php echo app_base_url('quiz/overview/' . $exam['slug']); ?>" class="exam-start-btn">
+                    <span>Start Practice</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
+            <?php endforeach; ?>
+        </div>
         <?php endif; ?>
     </section>
 
-    <!-- Recent Activity Glassmorphism List -->
+    <!-- RECENT ACTIVITY - Dynamic -->
     <?php if (!empty($recentAttempts)): ?>
     <section class="activity-section">
         <div class="section-header">
-            <h2 class="section-title">Your Recent <span class="gradient-text">Activity</span></h2>
+            <div class="section-badge">
+                <i class="fas fa-history"></i>
+                <span>Your Progress</span>
+            </div>
+            <h2 class="section-title">Recent <span class="gradient-text">Activity</span></h2>
         </div>
-        <div class="activity-list-glass">
+
+        <div class="activity-timeline">
             <?php foreach ($recentAttempts as $attempt): ?>
             <div class="activity-item">
-                <div class="activity-icon <?php echo $attempt['status']; ?>">
-                    <i class="fas <?php echo $attempt['status'] == 'completed' ? 'fa-check-circle' : 'fa-spinner fa-spin'; ?>"></i>
+                <div class="activity-status <?php echo $attempt['status']; ?>">
+                    <i class="fas <?php echo $attempt['status'] == 'completed' ? 'fa-check-circle' : 'fa-spinner fa-pulse'; ?>"></i>
                 </div>
-                <div class="activity-body">
-                    <h4 class="activity-exam-title"><?php echo htmlspecialchars($attempt['exam_title']); ?></h4>
-                    <span class="activity-time"><?php echo date('M d, Y • H:i', strtotime($attempt['started_at'])); ?></span>
+                <div class="activity-content">
+                    <h4 class="activity-title"><?php echo htmlspecialchars($attempt['exam_title']); ?></h4>
+                    <p class="activity-time">
+                        <i class="fas fa-clock"></i>
+                        <?php echo date('M d, Y • H:i', strtotime($attempt['started_at'])); ?>
+                    </p>
                 </div>
-                <div class="activity-right">
+                <div class="activity-action">
                     <?php if($attempt['status'] == 'completed'): ?>
-                        <div class="activity-score">Score: <strong><?php echo number_format($attempt['score'], 1); ?></strong></div>
-                        <a href="<?php echo app_base_url('quiz/result/' . $attempt['id']); ?>" class="btn-activity-action">Result</a>
+                        <div class="activity-score">
+                            <span class="score-label">Score</span>
+                            <span class="score-value"><?php echo number_format($attempt['score'], 1); ?>%</span>
+                        </div>
+                        <a href="<?php echo app_base_url('quiz/result/' . $attempt['id']); ?>" class="btn-activity">
+                            View Result
+                        </a>
                     <?php else: ?>
-                        <div class="activity-status-label">In Progress</div>
-                        <a href="<?php echo app_base_url('quiz/room/' . $attempt['id']); ?>" class="btn-activity-action resume">Resume</a>
+                        <span class="status-badge in-progress">In Progress</span>
+                        <a href="<?php echo app_base_url('quiz/room/' . $attempt['id']); ?>" class="btn-activity resume">
+                            Resume
+                        </a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -194,274 +255,516 @@
     </section>
     <?php endif; ?>
 
-    <!-- Mobile App Promotion -->
-    <section class="app-promotion">
-        <div class="promo-card">
-            <div class="promo-content">
-                <h2 class="promo-title">Learn on the Go</h2>
-                <p class="promo-desc">Download the <strong>Bishwo Calculator</strong> mobile app for offline mock tests, daily engineering news, and instant rank notifications.</p>
-                <div class="promo-badges">
-                    <a href="#" class="store-badge"><img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play"></a>
-                    <a href="#" class="store-badge"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="App Store"></a>
-                </div>
+    <!-- FEATURES SHOWCASE -->
+    <section class="features-section">
+        <div class="section-header">
+            <div class="section-badge">
+                <i class="fas fa-sparkles"></i>
+                <span>Why Choose Us</span>
             </div>
-            <div class="promo-image">
-                <!-- I'll use a placeholder icon/visual here if no real image -->
-                <i class="fas fa-mobile-screen-button"></i>
+            <h2 class="section-title">Premium <span class="gradient-text">Learning Features</span></h2>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>AI-Powered Analytics</h3>
+                <p>Get personalized insights and performance tracking with advanced AI algorithms</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <h3>Gamified Learning</h3>
+                <p>Earn coins, unlock achievements, and compete on global leaderboards</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users-line"></i>
+                </div>
+                <h3>Multiplayer Battles</h3>
+                <p>Challenge friends in real-time quiz battles with live rankings</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-screen"></i>
+                </div>
+                <h3>Mobile App</h3>
+                <p>Practice offline with our iOS and Android apps anytime, anywhere</p>
             </div>
         </div>
     </section>
+
 </div>
 
 <style>
-/* Portal Base Consistency */
+/* ============================================
+   PREMIUM QUIZ PORTAL - ULTRA OPTIMIZED
+   ============================================ */
+
 :root {
-    --portal-primary: #ffffff;
-    --portal-accent: #6366f1;
-    --portal-glass: rgba(255, 255, 255, 0.03);
-    --portal-border: rgba(255, 255, 255, 0.08);
-    --portal-radius: 20px;
-    --portal-glow: 0 0 30px rgba(99, 102, 241, 0.2);
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --dark-bg: #0f172a;
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --text-primary: #ffffff;
+    --text-secondary: #94a3b8;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.portal-container {
-    padding: 2rem 5%;
-    max-width: 1400px;
-    margin: 0 auto;
-    color: #fff;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.gradient-text {
-    background: linear-gradient(90deg, #6366f1, #a855f7);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 800;
+.quiz-portal-premium {
+    background: var(--dark-bg);
+    color: var(--text-primary);
+    overflow-x: hidden;
 }
 
-/* Hero Section */
-.portal-hero {
+/* ============================================
+   HERO SECTION - ULTRA PREMIUM
+   ============================================ */
+
+.hero-section {
+    position: relative;
+    min-height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 4rem 0;
-    gap: 4rem;
+    padding: 2rem 5%;
+    overflow: hidden;
 }
 
-.hero-content {
-    max-width: 600px;
+.hero-bg-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 50%);
+    z-index: 0;
+}
+
+.hero-particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.hero-content-wrapper {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #a78bfa;
+    margin-bottom: 2rem;
+    animation: fadeInUp 0.6s ease-out;
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900;
     line-height: 1.1;
-    font-weight: 800;
     margin-bottom: 1.5rem;
+    animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+.gradient-text {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .hero-subtitle {
-    font-size: 1.2rem;
-    color: #94a3b8;
-    margin-bottom: 2.5rem;
+    font-size: 1.25rem;
+    color: var(--text-secondary);
     line-height: 1.6;
+    margin-bottom: 2.5rem;
+    animation: fadeInUp 0.6s ease-out 0.2s both;
 }
 
-.hero-actions {
+.hero-cta {
     display: flex;
-    gap: 1.5rem;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.6s ease-out 0.3s both;
 }
 
-.premium-btn {
-    padding: 1rem 2rem;
-    border-radius: 14px;
+.btn-hero-primary,
+.btn-hero-secondary {
+    position: relative;
+    padding: 1.25rem 2.5rem;
+    border-radius: var(--radius-md);
     font-weight: 700;
+    font-size: 1rem;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 0.75rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.hero-actions .btn-primary {
-    background: #fff;
-    color: #000;
-}
-
-.hero-actions .btn-primary:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 15px 30px rgba(255, 255, 255, 0.1);
-}
-
-.hero-actions .btn-secondary {
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.hero-actions .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: #6366f1;
-}
-
-.hero-visual {
-    position: relative;
-    width: 400px;
-    height: 400px;
-}
-
-.hero-glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
-    filter: blur(50px);
-    z-index: -1;
-}
-
-.floating-icons {
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-
-.floating-icons i {
-    position: absolute;
-    font-size: 4rem;
-    opacity: 0.6;
-    animation: floating 6s infinite ease-in-out;
-}
-
-.icon-1 { top: 10%; left: 20%; color: #6366f1; animation-delay: 0s; }
-.icon-2 { top: 60%; right: 10%; color: #f59e0b; animation-delay: 2s; }
-.icon-3 { bottom: 10%; left: 30%; color: #ef4444; animation-delay: 4s; }
-
-@keyframes floating {
-    0%, 100% { transform: translateY(0) rotate(0); }
-    50% { transform: translateY(-30px) rotate(10deg); }
-}
-
-/* Sections General */
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 2.5rem;
-}
-
-.section-title {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin-bottom: 0.5rem;
-}
-
-.section-subtitle {
-    color: #64748b;
-    font-size: 1.1rem;
-}
-
-.view-all-link {
-    color: #6366f1;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-.view-all-link:hover {
-    color: #fff;
-    gap: 0.5rem;
-}
-
-/* Streams Grid */
-.streams-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-bottom: 5rem;
-}
-
-.stream-card {
-    background: var(--portal-glass);
-    border: 1px solid var(--portal-border);
-    border-radius: var(--portal-radius);
-    padding: 2.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    text-decoration: none;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
+    transition: all 0.3s var(--transition-smooth);
     overflow: hidden;
 }
 
-.stream-card:hover {
-    transform: translateY(-10px);
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+.btn-hero-primary {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
 }
 
-.stream-icon-box {
-    width: 80px;
-    height: 80px;
-    border-radius: 20px;
+.btn-hero-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+}
+
+.btn-glow {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
+
+.btn-hero-primary:hover .btn-glow {
+    left: 100%;
+}
+
+.btn-hero-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+.btn-hero-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(102, 126, 234, 0.5);
+}
+
+/* Hero Stats Counter */
+.hero-stats {
+    display: flex;
+    gap: 2rem;
+    animation: fadeInUp 0.6s ease-out 0.4s both;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 900;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.stat-divider {
+    width: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Hero Visual */
+.hero-visual {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
-    margin-bottom: 1.5rem;
-    color: #fff;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-.stream-name {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #fff;
+.hero-glow-orb {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%);
+    filter: blur(80px);
+    animation: pulse 4s ease-in-out infinite;
+}
+
+.floating-card {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: float 6s ease-in-out infinite;
+}
+
+.floating-card i {
+    font-size: 2rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.floating-card span {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.card-1 {
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.card-2 {
+    top: 50%;
+    right: 10%;
+    animation-delay: 2s;
+}
+
+.card-3 {
+    bottom: 15%;
+    left: 20%;
+    animation-delay: 4s;
+}
+
+/* ============================================
+   CATEGORIES SECTION
+   ============================================ */
+
+.categories-section,
+.exams-section,
+.activity-section,
+.features-section {
+    padding: 5rem 5%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #a78bfa;
     margin-bottom: 1rem;
 }
 
-.stream-hover-arrow {
+.section-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    margin-bottom: 1rem;
+}
+
+.section-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.category-card {
+    position: relative;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    text-decoration: none;
+    overflow: hidden;
+    transition: all 0.4s var(--transition-smooth);
+    cursor: pointer;
+}
+
+.category-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.1;
+    transition: opacity 0.4s, transform 0.4s;
+}
+
+.category-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+.category-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(102, 126, 234, 0.5);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.category-card:hover .category-bg {
+    opacity: 0.2;
+    transform: scale(1.1);
+}
+
+.category-card:hover .category-overlay {
+    opacity: 1;
+}
+
+.category-content {
+    position: relative;
+    z-index: 2;
+}
+
+.category-icon {
+    width: 70px;
+    height: 70px;
+    background: var(--primary-gradient);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.category-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.75rem;
+}
+
+.category-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.category-arrow {
+    color: #667eea;
+    font-size: 1.25rem;
     opacity: 0;
     transform: translateX(-10px);
     transition: all 0.3s;
-    color: #6366f1;
-    font-size: 1.2rem;
 }
 
-.stream-card:hover .stream-hover-arrow {
+.category-card:hover .category-arrow {
     opacity: 1;
     transform: translateX(0);
 }
 
-/* Exams Grid */
+.category-premium-badge {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    color: #f59e0b;
+    font-size: 1.5rem;
+    z-index: 3;
+}
+
+/* ============================================
+   EXAMS GRID
+   ============================================ */
+
+.exams-section .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    text-align: left;
+}
+
+.view-all-btn {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: gap 0.3s;
+}
+
+.view-all-btn:hover {
+    gap: 1rem;
+}
+
 .exams-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 2rem;
-    margin-bottom: 5rem;
 }
 
 .exam-card {
-    background: var(--portal-glass);
-    border: 1px solid var(--portal-border);
-    border-radius: var(--portal-radius);
-    padding: 2rem;
     position: relative;
-    display: flex;
-    flex-direction: column;
-    transition: all 0.3s;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    transition: all 0.3s var(--transition-smooth);
 }
 
 .exam-card:hover {
     background: rgba(255, 255, 255, 0.05);
-    border-color: #6366f1;
+    border-color: rgba(102, 126, 234, 0.5);
+    transform: translateY(-4px);
 }
 
-.exam-card-badge {
+.exam-type-badge {
     position: absolute;
     top: 1.5rem;
     right: 1.5rem;
@@ -472,87 +775,96 @@
     text-transform: uppercase;
 }
 
-.exam-card-badge.practice_set { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
-.exam-card-badge.mock_test { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+.exam-type-badge.practice_set {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.exam-type-badge.mock_test {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
 
 .exam-premium-icon {
     position: absolute;
     top: 1.5rem;
     left: 1.5rem;
     color: #f59e0b;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
 }
 
-.exam-info {
-    margin-top: 1rem;
+.exam-header {
+    margin-bottom: 1.5rem;
 }
 
 .exam-title {
     font-size: 1.5rem;
     font-weight: 700;
-    margin-bottom: 1rem;
-    line-height: 1.2;
+    margin-bottom: 0.75rem;
+    color: white;
 }
 
-.exam-desc {
-    color: #94a3b8;
+.exam-description {
     font-size: 0.95rem;
-    margin-bottom: 1.5rem;
-    min-height: 3rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
 }
 
-.exam-meta {
+.exam-stats {
     display: flex;
-    padding-top: 1rem;
-    gap: 1.5rem;
-    border-top: 1px solid var(--portal-border);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
 }
 
-.meta-item {
-    font-size: 0.85rem;
-    color: #64748b;
+.stat-pill {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
 }
 
-.meta-item i { color: #6366f1; }
-
-.exam-footer {
-    margin-top: 2rem;
+.stat-pill i {
+    color: #667eea;
 }
 
-.btn-start-exam {
+.exam-start-btn {
     width: 100%;
     padding: 1rem;
     background: transparent;
-    border: 1px solid #6366f1;
-    color: #6366f1;
-    border-radius: 12px;
+    border: 2px solid #667eea;
+    color: #667eea;
+    border-radius: var(--radius-md);
     font-weight: 700;
     text-decoration: none;
-    text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    transition: all 0.3s;
+    transition: all 0.3s var(--transition-smooth);
 }
 
-.btn-start-exam:hover {
-    background: #6366f1;
-    color: #fff;
-    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+.exam-start-btn:hover {
+    background: #667eea;
+    color: white;
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
 }
 
-/* Activity List */
-.activity-list-glass {
-    background: var(--portal-glass);
-    border: 1px solid var(--portal-border);
-    backdrop-filter: blur(10px);
-    border-radius: var(--portal-radius);
+/* ============================================
+   ACTIVITY TIMELINE
+   ============================================ */
+
+.activity-timeline {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    margin-bottom: 5rem;
 }
 
 .activity-item {
@@ -560,14 +872,19 @@
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    border-bottom: 1px solid var(--portal-border);
+    border-bottom: 1px solid var(--card-border);
     transition: background 0.2s;
 }
 
-.activity-item:last-child { border-bottom: none; }
-.activity-item:hover { background: rgba(255, 255, 255, 0.02); }
+.activity-item:last-child {
+    border-bottom: none;
+}
 
-.activity-icon {
+.activity-item:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.activity-status {
     width: 50px;
     height: 50px;
     border-radius: 12px;
@@ -577,133 +894,466 @@
     font-size: 1.5rem;
 }
 
-.activity-icon.completed { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-.activity-icon.in_progress { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.activity-status.completed {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
 
-.activity-body { flex: 1; }
-.activity-exam-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; }
-.activity-time { font-size: 0.85rem; color: #64748b; }
+.activity-status.in_progress {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
 
-.activity-right { display: flex; align-items: center; gap: 2rem; }
-.activity-score { font-size: 0.9rem; color: #94a3b8; }
-.activity-score strong { color: #fff; font-size: 1.2rem; margin-left: 0.5rem; }
-.activity-status-label { font-size: 0.85rem; color: #f59e0b; font-weight: 600; }
+.activity-content {
+    flex: 1;
+}
 
-.btn-activity-action {
-    padding: 0.6rem 1.2rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--portal-border);
-    color: #fff;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 0.85rem;
+.activity-title {
+    font-size: 1.1rem;
     font-weight: 600;
-    transition: all 0.2s;
+    margin-bottom: 0.5rem;
 }
 
-.btn-activity-action:hover {
-    background: #6366f1;
-    border-color: #6366f1;
-}
-
-.btn-activity-action.resume {
-    background: #6366f1;
-    border-color: #6366f1;
-}
-
-/* App Promotion */
-.app-promotion {
-    margin: 5rem 0;
-}
-
-.promo-card {
-    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-    border-radius: 24px;
-    padding: 4rem;
+.activity-time {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    overflow: hidden;
-    position: relative;
+    gap: 0.5rem;
 }
 
-.promo-content {
-    max-width: 500px;
-}
-
-.promo-title {
-    font-size: 3rem;
-    font-weight: 800;
-    margin-bottom: 1.5rem;
-}
-
-.promo-desc {
-    font-size: 1.2rem;
-    color: #cbd5e1;
-    margin-bottom: 2.5rem;
-}
-
-.promo-badges {
+.activity-action {
     display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.activity-score {
+    text-align: center;
+}
+
+.score-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.score-value {
+    font-size: 1.5rem;
+    font-weight: 900;
+    background: var(--success-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-badge.in-progress {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.btn-activity {
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.btn-activity:hover {
+    background: #667eea;
+    border-color: #667eea;
+}
+
+.btn-activity.resume {
+    background: #667eea;
+    border-color: #667eea;
+}
+
+/* ============================================
+   FEATURES GRID
+   ============================================ */
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    text-align: center;
+    transition: all 0.3s var(--transition-smooth);
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(102, 126, 234, 0.5);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--primary-gradient);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.feature-card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.feature-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.5;
+    }
+}
+
+/* ============================================
+   DAILY BONUS TOAST
+   ============================================ */
+
+.daily-bonus-toast {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 9999;
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
     gap: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: slideInRight 0.5s ease-out;
 }
 
-.store-badge img {
-    height: 48px;
-    transition: transform 0.2s;
+.bonus-icon {
+    font-size: 2.5rem;
 }
 
-.store-badge:hover img {
-    transform: scale(1.05);
+.bonus-details h5 {
+    margin: 0 0 0.5rem;
+    font-weight: 800;
+    color: #f59e0b;
 }
 
-.promo-image {
-    font-size: 12rem;
-    color: rgba(99, 102, 241, 0.2);
-    position: absolute;
-    right: -2rem;
-    bottom: -2rem;
-    transform: rotate(-15deg);
+.bonus-details p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
 }
 
-/* Responsive Cleanup */
-@media (max-width: 992px) {
-    .portal-hero { flex-direction: column; text-align: center; }
-    .hero-content { margin: 0 auto; }
-    .hero-actions { justify-content: center; }
-    .hero-visual { display: none; }
-    .promo-card { flex-direction: column; text-align: center; padding: 3rem; }
-    .promo-content { margin-bottom: 2rem; }
-    .promo-badges { justify-content: center; }
-    .promo-image { display: none; }
+.close-toast {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
 }
 
-@media (max-width: 600px) {
-    .hero-title { font-size: 2.5rem; }
-    .streams-grid { grid-template-columns: 1fr; }
-    .exams-grid { grid-template-columns: 1fr; }
-    .activity-item { flex-direction: column; align-items: flex-start; text-align: left; }
-    .activity-right { width: 100%; justify-content: space-between; margin-top: 1rem; }
+.close-toast:hover {
+    opacity: 1;
 }
 
-/* Empty State Styling */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+
 .empty-state {
     text-align: center;
-    padding: 5rem;
-    background: var(--portal-glass);
-    border-radius: var(--portal-radius);
-    border: 1px dashed var(--portal-border);
+    padding: 5rem 2rem;
+    background: var(--card-bg);
+    border: 1px dashed var(--card-border);
+    border-radius: var(--radius-lg);
 }
 
-.empty-state i {
+.empty-icon {
     font-size: 4rem;
-    color: #64748b;
-    margin-bottom: 2rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
 }
 
 .empty-state p {
-    color: #94a3b8;
-    font-size: 1.2rem;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
 }
 
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .hero-content-wrapper {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .hero-visual {
+        display: none;
+    }
+    
+    .hero-cta {
+        justify-content: center;
+    }
+    
+    .hero-stats {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 2rem 1rem;
+    }
+    
+    .categories-section,
+    .exams-section,
+    .activity-section,
+    .features-section {
+        padding: 3rem 1rem;
+    }
+    
+    .categories-grid,
+    .exams-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .hero-cta {
+        flex-direction: column;
+    }
+    
+    .btn-hero-primary,
+    .btn-hero-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .activity-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .activity-action {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .daily-bonus-toast {
+        top: 1rem;
+        right: 1rem;
+        left: 1rem;
+    }
+}
 </style>
+
+<script>
+// ============================================
+// ULTRA-FAST ANIMATIONS & INTERACTIONS
+// ============================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Animated Counter for Hero Stats
+    const counters = document.querySelectorAll('.stat-value');
+    counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-count'));
+        const duration = 2000;
+        const increment = target / (duration / 16);
+        let current = 0;
+        
+        const updateCounter = () => {
+            current += increment;
+            if (current < target) {
+                counter.textContent = Math.floor(current).toLocaleString();
+                requestAnimationFrame(updateCounter);
+            } else {
+                counter.textContent = target.toLocaleString();
+            }
+        };
+        
+        // Trigger when in viewport
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    updateCounter();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+        
+        observer.observe(counter);
+    });
+    
+    // Particle Animation for Hero
+    const particlesContainer = document.getElementById('particles');
+    if (particlesContainer) {
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.style.cssText = `
+                position: absolute;
+                width: 2px;
+                height: 2px;
+                background: rgba(102, 126, 234, 0.5);
+                border-radius: 50%;
+                top: ${Math.random() * 100}%;
+                left: ${Math.random() * 100}%;
+                animation: particleFloat ${5 + Math.random() * 10}s linear infinite;
+            `;
+            particlesContainer.appendChild(particle);
+        }
+    }
+    
+    // Smooth Scroll for Anchor Links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // Stagger Animation for Cards
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
+    };
+    
+    const cardObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.animation = `fadeInUp 0.6s ease-out forwards`;
+                }, index * 100);
+                cardObserver.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+    
+    document.querySelectorAll('.category-card, .exam-card, .feature-card').forEach(card => {
+        card.style.opacity = '0';
+        cardObserver.observe(card);
+    });
+    
+    // Auto-dismiss bonus toast after 5 seconds
+    const bonusToast = document.getElementById('bonusToast');
+    if (bonusToast) {
+        setTimeout(() => {
+            bonusToast.style.animation = 'slideOutRight 0.5s ease-out forwards';
+            setTimeout(() => bonusToast.remove(), 500);
+        }, 5000);
+    }
+});
+
+// Particle Float Animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes particleFloat {
+        0% {
+            transform: translateY(0) translateX(0);
+            opacity: 0;
+        }
+        10% {
+            opacity: 1;
+        }
+        90% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-100vh) translateX(${Math.random() * 100 - 50}px);
+            opacity: 0;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        to {
+            transform: translateX(120%);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>

@@ -164,7 +164,7 @@ class ExamEngineController extends Controller
             // Standard Exam Fetch
             // Fetch Questions
             $sqlQ = "
-                SELECT q.id, q.type, q.content, q.options, q.correct_answer, q.correct_answer_json, q.default_marks, q.default_negative_marks, q.difficulty_level, q.answer_explanation as explanation
+                SELECT q.id, q.type, q.content, q.options, q.correct_answer_json, q.default_marks, q.default_negative_marks, q.difficulty_level, q.answer_explanation as explanation
                 FROM quiz_exam_questions eq
                 JOIN quiz_questions q ON eq.question_id = q.id
                 WHERE eq.exam_id = :eid
