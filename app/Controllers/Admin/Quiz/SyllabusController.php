@@ -81,6 +81,19 @@ class SyllabusController extends Controller
         $settingsRow = $this->db->findOne('syllabus_settings', ['level' => $level]);
         $settings = ($settingsRow && isset($settingsRow['settings'])) ? json_decode($settingsRow['settings'], true) : [];
 
+        // Fetch position level metadata for breadcrumbs
+        $posLevel = $this->db->findOne('position_levels', ['slug' => $level]);
+        if (!$posLevel) $posLevel = $this->db->findOne('position_levels', ['title' => $level]);
+        
+        $breadcrumbBase = [];
+        if ($posLevel) {
+            $course = $this->db->findOne('syllabus_nodes', ['id' => $posLevel['course_id']]);
+            $edu = $this->db->findOne('syllabus_nodes', ['id' => $posLevel['education_level_id']]);
+            if ($course) $breadcrumbBase[] = ['id' => $course['id'], 'name' => $course['title'], 'type' => 'course'];
+            if ($edu) $breadcrumbBase[] = ['id' => $edu['id'], 'name' => $edu['title'], 'type' => 'education_level'];
+            $breadcrumbBase[] = ['id' => $posLevel['id'], 'name' => $posLevel['title'], 'type' => 'position'];
+        }
+
         return $this->view('admin/quiz/syllabus/manage', [
             'page_title' => "Editing: $level",
             'nodes' => $nodes,
@@ -88,7 +101,8 @@ class SyllabusController extends Controller
             'level' => $level,
             'categories' => $categories,
             'topics' => $topics,
-            'settings' => $settings
+            'settings' => $settings,
+            'breadcrumbBase' => $breadcrumbBase
         ]);
     }
 

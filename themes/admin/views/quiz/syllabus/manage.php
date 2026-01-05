@@ -192,9 +192,9 @@ if (!empty($nodesTree)) {
     /* Premium Grid Styles */
     .syllabus-grid {
         display: grid;
-        grid-template-columns: 50px 40px 50px 3.5fr 100px 120px 80px 80px 90px 100px 100px 120px;
+        grid-template-columns: 50px 40px 45px 1.5fr 70px 100px 55px 55px 70px 80px 80px 2.5fr;
         background-color: #f1f5f9;
-        min-width: 1300px;
+        min-width: 1400px;
     }
     .grid-header {
         background-color: #f8fafc; color: #64748b; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; padding: 8px 4px; display: flex; align-items: center; justify-content: center;
@@ -234,9 +234,54 @@ if (!empty($nodesTree)) {
 
     #bulk-action-bar.visible { transform: translate(-50%, 0); }
     
+    /* Node Types & Breadcrumbs */
     .node-badge {
-        padding: 2px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; display: inline-block; width: 100%; text-align: center;
+        padding: 4px 10px;
+        border-radius: 9999px;
+        font-size: 10px;
+        font-weight: 600;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.2s;
+        justify-content: center;
     }
+    .badge-breadcrumb {
+        background-color: #eff6ff;
+        color: #2563eb;
+        border: 1px solid #dbeafe;
+        margin: 2px;
+    }
+    .breadcrumb-separator {
+        color: #94a3b8;
+        font-size: 8px;
+        margin: 0 2px;
+    }
+    .linked-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2px;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 4px;
+    }
+    .type-select-styled {
+        appearance: none;
+        background-image: none;
+        border: 1px solid transparent;
+        outline: none;
+        cursor: pointer;
+        font-size: 9px;
+        font-weight: 800;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        text-align: center;
+        width: 85px !important;
+        transition: all 0.2s;
+    }
+    .type-select-styled:hover { border-color: rgba(99, 102, 241, 0.3); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
     .badge-phase { background: #1e293b; color: white; }
     .badge-section { background: #e0e7ff; color: #4338ca; }
     .badge-unit { background: #f1f5f9; color: #64748b; }
@@ -405,22 +450,19 @@ if (!empty($nodesTree)) {
             const timeBg = row.depth === 0 ? "bg-amber-100" : "bg-white";
             container.appendChild(createCell(`<input type="number" class="input-premium time-input ${timeBg}" value="${row.time || 0}" onchange="updateRow(${index}, 'time', this.value)">`, 'justify-center border-r border-slate-100'));
 
-            // Node Type (Badge Style)
-            let badgeClass = 'badge-unit';
-            let typeLabel = row.type.toUpperCase();
-            if(row.type === 'paper') { badgeClass = 'badge-phase'; typeLabel = 'PHASE'; }
-            if(row.type === 'section') badgeClass = 'badge-section';
+            // Node Type (Styled visible select)
+            let typeColor = "bg-slate-100 text-slate-600 border border-slate-200";
+            if(row.type === 'paper') typeColor = "bg-indigo-100 text-indigo-700 border border-indigo-200";
+            if(row.type === 'section') typeColor = "bg-sky-100 text-sky-700 border border-sky-200";
+            if(row.type === 'unit') typeColor = "bg-white text-slate-400 border border-slate-200";
 
             container.appendChild(createCell(`
-                <select class="hidden" id="select-type-${index}" onchange="updateRow(${index}, 'type', this.value)">
-                    <option value="paper" ${row.type==='paper'?'selected':''}>Phase</option>
-                    <option value="section" ${row.type==='section'?'selected':''}>Section</option>
-                    <option value="unit" ${row.type==='unit'?'selected':''}>Unit</option>
+                <select class="type-select-styled ${typeColor}" onchange="updateRow(${index}, 'type', this.value)">
+                    <option value="paper" ${row.type==='paper'?'selected':''}>PHASE</option>
+                    <option value="section" ${row.type==='section'?'selected':''}>SECTION</option>
+                    <option value="unit" ${row.type==='unit'?'selected':''}>UNIT</option>
                 </select>
-                <div class="node-badge ${badgeClass} cursor-pointer hover:opacity-80 transition" onclick="document.getElementById('select-type-${index}').click()">
-                    ${typeLabel}
-                </div>
-            `, 'justify-center border-r border-slate-100 px-3'));
+            `, 'justify-center border-r border-slate-100 px-1'));
 
             // Qty
             const qtyDisabled = (row.type !== 'unit' && row.depth !== 0) ? 'disabled style="background:#f8fafc; color:#cbd5e1;"' : '';
@@ -447,12 +489,21 @@ if (!empty($nodesTree)) {
                 <button onclick="deleteRow(${index})" class="text-slate-300 hover:text-rose-500 transition px-2" title="Delete"><i class="fas fa-trash-alt text-sm"></i></button>
             `, 'justify-center border-r border-slate-100'));
 
-            // Linked
+            // Linked (Breadcrumbs)
             let linkedHtml = '';
-            if (row.linked_category_id) {
-                linkedHtml = `<div class="node-badge badge-section cursor-pointer truncate max-w-[110px]" title="${row.category_name}" onclick="openHierarchyModal(${index})"><span class="opacity-70 mr-1">Cat:</span>${row.category_name}</div>`;
-            } else if (row.linked_topic_id) {
-                 linkedHtml = `<div class="node-badge badge-unit cursor-pointer truncate max-w-[110px]" title="${row.topic_name}" onclick="openHierarchyModal(${index})"><span class="opacity-70 mr-1">Sub:</span>${row.topic_name}</div>`;
+            const breadcrumbBase = <?php echo json_encode($breadcrumbBase ?? []); ?>;
+            
+            if (row.linked_category_id || row.linked_topic_id) {
+                let crumbs = [...breadcrumbBase];
+                if (row.category_name) crumbs.push({name: row.category_name, type: 'category'});
+                if (row.topic_name) crumbs.push({name: row.topic_name, type: 'topic'});
+                
+                let crumbsHtml = crumbs.map((c, i) => `
+                    <div class="node-badge badge-breadcrumb" title="${c.type.toUpperCase()}">${c.name}</div>
+                    ${i < crumbs.length - 1 ? '<i class="fas fa-chevron-right breadcrumb-separator"></i>' : ''}
+                `).join('');
+                
+                linkedHtml = `<div class="linked-container cursor-pointer hover:opacity-80" onclick="openHierarchyModal(${index})">${crumbsHtml}</div>`;
             } else {
                 linkedHtml = `<button onclick="openHierarchyModal(${index})" class="hierarchy-btn text-blue-500 hover:bg-blue-50 hover:border-blue-200" title="Link Category/Topic"><i class="fas fa-plus text-xs"></i></button>`;
             }
