@@ -4,6 +4,8 @@
  * Professional, high-density layout with integrated creation form.
  */
 $categories = $categories ?? [];
+$levels = $levels ?? [];
+$selectedLevel = $selectedLevel ?? null;
 $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
 ?>
 
@@ -37,6 +39,19 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
             <h5 class="toolbar-title">Create New Category</h5>
             <form id="addCategoryForm" class="creation-form">
                 
+                <!-- Level Select -->
+                <div class="input-group-premium" style="flex: 2; min-width: 200px;">
+                    <i class="fas fa-graduation-cap icon"></i>
+                    <select name="parent_id" class="form-input-premium" required>
+                        <option value="" disabled <?php echo !$selectedLevel ? 'selected' : ''; ?>>Select Education Level...</option>
+                        <?php foreach ($levels as $l): ?>
+                            <option value="<?php echo $l['id']; ?>" <?php echo $selectedLevel == $l['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($l['title']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
                 <!-- Title Input -->
                 <div class="input-group-premium" style="flex: 3; min-width: 200px;">
                     <i class="fas fa-heading icon"></i>
@@ -80,13 +95,27 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
         <!-- Filter & Toolbar -->
         <div class="compact-toolbar">
             <div class="toolbar-left">
-                <div class="search-compact">
+                <div class="filter-group">
+                    <span class="filter-label">FILTER DATA:</span>
+                    <form method="GET" style="margin:0;">
+                        <select name="level_id" onchange="this.form.submit()" class="filter-select">
+                            <option value="">All Levels</option>
+                            <?php foreach ($levels as $l): ?>
+                                <option value="<?php echo $l['id']; ?>" <?php echo $selectedLevel == $l['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($l['title']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
+                </div>
+                <!-- Search Input -->
+                <div class="search-compact" style="margin-left: 1rem;">
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Search categories..." id="category-search" onkeyup="filterCategories()">
                 </div>
             </div>
             <div class="toolbar-right">
-                <div class="drag-hint"><i class="fas fa-arrows-alt"></i> Drag handle to reorder</div>
+                <div class="drag-hint"><i class="fas fa-arrows-alt"></i> Drag handle to reorder (Global)</div>
             </div>
         </div>
 
@@ -100,6 +129,7 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
                             <th style="width: 60px;" class="text-center">ID</th>
                             <th style="width: 60px;" class="text-center">Order</th>
                             <th>Category Info</th>
+                            <th class="text-center" style="width: 200px;">Level</th>
                             <th class="text-center" style="width: 150px;">Questions</th>
                             <th class="text-center" style="width: 150px;">Premium</th>
                             <th class="text-center" style="width: 100px;">Actions</th>
@@ -107,11 +137,11 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
                     </thead>
                     <tbody id="categorySortable">
                         <?php if (empty($categories)): ?>
-                            <tr><td colspan="5" class="empty-cell">
+                            <tr><td colspan="8" class="empty-cell">
                                 <div class="empty-state-compact">
                                     <i class="fas fa-folder-open"></i>
                                     <h3>No categories found</h3>
-                                    <p>Create your first root-level category above.</p>
+                                    <p>Select an education level or add a new category above.</p>
                                 </div>
                             </td></tr>
                         <?php else: ?>
@@ -140,6 +170,11 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
                                                 <div class="item-slug"><?php echo htmlspecialchars($cat['slug']); ?></div>
                                             </div>
                                         </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge-pill">
+                                            <?php echo htmlspecialchars($cat['parent_title'] ?? 'N/A'); ?>
+                                        </span>
                                     </td>
                                     <td class="text-center align-middle">
                                         <span class="metric-text"><?php echo $cat['question_count'] ?? 0; ?></span>
@@ -183,8 +218,10 @@ function togglePrice(el) {
 
 async function saveCategory() {
     const form = document.getElementById('addCategoryForm');
+    const parent = form.querySelector('select[name="parent_id"]').value;
     const title = form.querySelector('input[name="title"]').value;
     
+    if(!parent) { Swal.fire({ icon:'warning', title:'Missing Info', text:'Select Education Level first.', timer:2000, showConfirmButton:false}); return; }
     if(!title) { Swal.fire({ icon:'warning', title:'Missing Info', text:'Category Name is required.', timer:2000, showConfirmButton: false}); return; }
 
     const formData = new FormData(form);
@@ -216,19 +253,14 @@ function deleteCategory(id) {
 new Sortable(document.getElementById('categorySortable'), {
     animation: 150, handle: '.handle', ghostClass: 'bg-indigo-50',
     onEnd: function() {
-        // 1. Get new order of IDs
         const rows = document.querySelectorAll('.category-item');
         const order = Array.from(rows).map(el => el.getAttribute('data-id'));
         
-        // 2. Update visual Order indices immediately
         rows.forEach((row, index) => {
-            // The Order column is the 3rd column (index 2)
-            // We use querySelector to be safe or assuming strict structure
             const orderCell = row.querySelectorAll('td')[2].querySelector('span'); 
             if(orderCell) orderCell.innerText = index + 1;
         });
 
-        // 3. Send to backend
         fetch('<?php echo app_base_url('admin/quiz/categories/reorder'); ?>', {
             method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({order: order})
         });
@@ -371,6 +403,12 @@ input:checked + .slider:before { transform: translateX(16px); }
     display: flex; justify-content: space-between; align-items: center;
     padding: 0.75rem 2rem; background: #eff6ff; border-bottom: 1px solid #bfdbfe;
 }
+.filter-group { display: flex; align-items: center; gap: 0.75rem; }
+.filter-label { font-size: 0.7rem; font-weight: 700; color: #1e40af; letter-spacing: 0.5px; }
+.filter-select {
+    font-size: 0.85rem; font-weight: 600; color: #1e40af; border: 1px solid #93c5fd;
+    border-radius: 6px; padding: 0.25rem 2rem 0.25rem 0.5rem; background: white; outline: none; height: 32px;
+}
 .search-compact { position: relative; width: 100%; max-width: 300px; }
 .search-compact i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 0.85rem; }
 .search-compact input {
@@ -399,6 +437,10 @@ input:checked + .slider:before { transform: translateX(16px); }
 .item-icon img { width: 100%; height: 100%; object-fit: cover; }
 .item-title { font-weight: 600; color: #334155; line-height: 1.2; }
 .item-slug { font-size: 0.75rem; color: #94a3b8; font-family: monospace; }
+.badge-pill {
+    background: #e0e7ff; color: #4338ca; padding: 2px 10px; border-radius: 12px;
+    font-size: 0.7rem; font-weight: 700; border: 1px solid #c7d2fe; white-space: nowrap;
+}
 
 .metric-text { font-weight: 700; color: #64748b; font-size: 0.8rem; }
 
@@ -415,13 +457,13 @@ input:checked + .slider:before { transform: translateX(16px); }
     justify-content: center; transition: 0.2s;
 }
 .action-btn-icon:hover { transform: translateY(-1px); }
-.edit-btn:hover { background: #667eea; color: white; border-color: #667eea; }
-.delete-btn:hover { background: #fee2e2; color: #ef4444; border-color: #fecaca; }
+.edit-btn:hover { color: #3b82f6; background: #eff6ff; }
+.delete-btn:hover { color: #ef4444; background: #fef2f2; }
 
-.empty-state-compact { padding: 3rem; text-align: center; color: #94a3b8; }
-.empty-state-compact i { font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.5; }
-.empty-state-compact h3 { font-size: 1rem; font-weight: 600; color: #64748b; margin: 0; }
-.empty-state-compact p { font-size: 0.8rem; margin: 0; }
+.empty-state-compact { text-align: center; padding: 3rem 1rem; color: #94a3b8; }
+.empty-state-compact i { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.5; }
+.empty-state-compact h3 { margin: 0 0 0.5rem 0; color: #64748b; font-size: 1.1rem; }
+.empty-state-compact p { font-size: 0.9rem; margin: 0; }
 
 @media (max-width: 1024px) {
     .creation-form { flex-direction: column; align-items: stretch; }

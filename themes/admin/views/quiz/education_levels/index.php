@@ -1,274 +1,428 @@
 <?php
 /**
- * EDUCATION LEVELS MANAGER - PREMIUM ADMIN VIEW
+ * PREMIUM EDUCATION LEVELS MANAGEMENT
+ * Professional, high-density layout with integrated creation form.
  */
+$levels = $levels ?? [];
+$courses = $courses ?? [];
+$selectedCourse = $selectedCourse ?? null;
+
+// Calculate Stats 
+$stats = [
+    'total' => count($levels),
+    'active' => count(array_filter($levels, fn($l) => $l['is_active'] == 1)),
+    'courses' => count(array_unique(array_column($levels, 'parent_id')))
+];
 ?>
 
-<div class="premium-dashboard-wrapper">
-    <!-- Header -->
-    <div class="premium-header">
-        <div class="header-left">
-            <div class="breadcrumb-item">
-                <i class="fas fa-cubes text-indigo-400"></i>
-                <span>Quiz System</span>
+<div class="admin-wrapper-container">
+    <div class="admin-content-wrapper">
+
+        <!-- Compact Page Header -->
+        <div class="compact-header">
+            <div class="header-left">
+                <div class="header-title">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h1>Education Levels</h1>
+                </div>
+                <div class="header-subtitle"><?php echo $stats['total']; ?> Levels • <?php echo $stats['active']; ?> Active • <?php echo $stats['courses']; ?> Courses</div>
             </div>
-            <h1>Education Levels</h1>
-            <p>Define qualification levels (Bachelor, Diploma, TSLC) per course.</p>
-        </div>
-        <div class="header-actions">
-            <div class="stat-pill-group">
+            <!-- Stats in Header for Space Efficiency -->
+            <div class="header-actions" style="display:flex; gap:10px;">
                 <div class="stat-pill">
                     <span class="label">TOTAL</span>
                     <span class="value"><?php echo $stats['total']; ?></span>
                 </div>
-            </div>
-            
-            <button class="btn-premium-primary" onclick="openCreateModal()">
-                <i class="fas fa-plus"></i> New Level
-            </button>
-        </div>
-    </div>
-
-    <!-- Content Grid -->
-    <div class="premium-content-body">
-        
-        <!-- Table Card -->
-        <div class="glass-card table-section">
-            <div class="card-header-row">
-                <h3><i class="fas fa-graduation-cap"></i> Qualification Levels</h3>
-                <div class="filter-actions">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="levelSearch" placeholder="Search levels...">
-                    </div>
+                <div class="stat-pill warning">
+                    <span class="label">ACTIVE</span>
+                    <span class="value"><?php echo $stats['active']; ?></span>
                 </div>
             </div>
+        </div>
 
-            <div class="table-responsive">
-                <table class="premium-table" id="levelsTable">
+        <!-- Single Row Creation Toolbar -->
+        <div class="creation-toolbar">
+            <h5 class="toolbar-title">Create New Level</h5>
+            <form id="addLevelForm" class="creation-form">
+                
+                <!-- Course Select -->
+                <div class="input-group-premium" style="flex: 2; min-width: 200px;">
+                    <i class="fas fa-university icon"></i>
+                    <select name="parent_id" class="form-input-premium" required>
+                        <option value="" disabled <?php echo !$selectedCourse ? 'selected' : ''; ?>>Select Course...</option>
+                        <?php foreach ($courses as $c): ?>
+                            <option value="<?php echo $c['id']; ?>" <?php echo $selectedCourse == $c['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($c['title']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Title Input -->
+                <div class="input-group-premium" style="flex: 3; min-width: 200px;">
+                    <i class="fas fa-heading icon"></i>
+                    <input type="text" name="title" class="form-input-premium" placeholder="Level Name (e.g. Bachelor)" required>
+                </div>
+                
+                <!-- Slug Input -->
+                <div class="input-group-premium" style="flex: 2; min-width: 150px;">
+                    <i class="fas fa-link icon"></i>
+                    <input type="text" name="slug" class="form-input-premium" placeholder="Slug (Optional)">
+                </div>
+
+                <button type="button" onclick="saveLevel()" class="btn-create-premium">
+                    <i class="fas fa-plus"></i> ADD
+                </button>
+            </form>
+        </div>
+
+        <!-- Filter & Toolbar -->
+        <div class="compact-toolbar">
+            <div class="toolbar-left">
+                <div class="filter-group">
+                    <span class="filter-label">FILTER DATA:</span>
+                    <form method="GET" style="margin:0;">
+                        <select name="course_id" onchange="this.form.submit()" class="filter-select">
+                            <option value="">All Courses</option>
+                            <?php foreach ($courses as $c): ?>
+                                <option value="<?php echo $c['id']; ?>" <?php echo $selectedCourse == $c['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($c['title']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
+                </div>
+                <!-- Search Input -->
+                <div class="search-compact" style="margin-left: 1rem;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search levels..." id="level-search" onkeyup="filterLevels()">
+                </div>
+            </div>
+            <div class="toolbar-right">
+                <div class="drag-hint"><i class="fas fa-arrows-alt"></i> Drag handle to reorder (Global)</div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table class="table-compact">
                     <thead>
                         <tr>
-                            <th width="50" class="text-center"><i class="fas fa-bars"></i></th>
-                            <th>Level Name</th>
-                            <th>Parent Course</th>
-                            <th>Slug</th>
-                            <th>Status</th>
-                            <th class="text-right">Actions</th>
+                            <th style="width: 50px;" class="text-center">#</th>
+                            <th style="width: 60px;" class="text-center">ID</th>
+                            <th style="width: 60px;" class="text-center">Order</th>
+                            <th>Level Info</th>
+                            <th class="text-center" style="width: 200px;">Course</th>
+                            <th class="text-center" style="width: 150px;">Status</th>
+                            <th class="text-center" style="width: 100px;">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="sortable-levels">
+                    <tbody id="levelSortable">
                         <?php if (empty($levels)): ?>
-                        <tr>
-                            <td colspan="6" class="empty-cell">
-                                <div class="empty-state">
-                                    <i class="fas fa-layer-group"></i>
-                                    <p>No education levels defined.</p>
+                            <tr><td colspan="7" class="empty-cell">
+                                <div class="empty-state-compact">
+                                    <i class="fas fa-folder-open"></i>
+                                    <h3>No levels found</h3>
+                                    <p>Select a course or add a new level above.</p>
                                 </div>
-                            </td>
-                        </tr>
+                            </td></tr>
                         <?php else: ?>
-                            <?php foreach ($levels as $level): ?>
-                            <tr data-id="<?php echo $level['id']; ?>">
-                                <td class="drag-handle text-center"><i class="fas fa-grip-vertical"></i></td>
-                                <td>
-                                    <div class="cell-flex-row">
-                                        <div class="cell-icon-box" style="background: #ecfdf5; color: #059669;">
-                                            <i class="fas <?php echo $level['icon'] ?? 'fa-user-graduate'; ?>"></i>
+                            <?php foreach ($levels as $l): ?>
+                                <tr class="level-item group" data-id="<?php echo $l['id']; ?>">
+                                    <td class="text-center">
+                                        <div class="handle"><i class="fas fa-grip-vertical"></i></div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="order-idx" style="color:#94a3b8;"><?php echo $l['id']; ?></span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="order-idx" style="color:#64748b; font-weight:700;"><?php echo $l['order_index']; ?></span>
+                                    </td>
+                                    <td>
+                                        <div class="item-info">
+                                            <div class="item-text">
+                                                <div class="item-title"><?php echo htmlspecialchars($l['title']); ?></div>
+                                                <div class="item-slug"><?php echo htmlspecialchars($l['slug']); ?></div>
+                                            </div>
                                         </div>
-                                        <div class="cell-info">
-                                            <span class="text-main fw-bold"><?php echo htmlspecialchars($level['title']); ?></span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge-pill">
+                                            <?php echo htmlspecialchars($l['parent_title']); ?>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="premium-control">
+                                            <label class="switch scale-sm">
+                                                <input type="checkbox" class="status-toggle" data-id="<?php echo $l['id']; ?>" <?php echo $l['is_active'] ? 'checked' : ''; ?>>
+                                                <span class="slider round"></span>
+                                            </label>
                                         </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge-status" style="background: #eff6ff; color: #2563eb;">
-                                        <?php echo htmlspecialchars($level['course_title'] ?? 'Unknown'); ?>
-                                    </span>
-                                </td>
-                                <td><span class="badge-code"><?php echo $level['slug']; ?></span></td>
-                                <td>
-                                    <div class="toggle-switch-wrapper">
-                                        <label class="toggle-switch">
-                                            <input type="checkbox" onchange="toggleStatus(<?php echo $level['id']; ?>, this)" <?php echo $level['is_active'] ? 'checked' : ''; ?>>
-                                            <span class="slider round"></span>
-                                        </label>
-                                    </div>
-                                </td>
-                                <td class="text-right">
-                                    <button class="btn-icon-danger" onclick="deleteLevel(<?php echo $level['id']; ?>)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="actions-compact justify-center">
+                                            <button onclick="editLevel(<?php echo $l['id']; ?>)" class="action-btn-icon edit-btn" title="Edit">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </button>
+                                            <button onclick="deleteLevel(<?php echo $l['id']; ?>)" class="action-btn-icon delete-btn" title="Delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
                 </table>
             </div>
         </div>
-
     </div>
 </div>
-
-<!-- Modal -->
-<div id="createModal" class="premium-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Add Education Level</h3>
-            <button class="close-btn" onclick="closeCreateModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-            <form id="createForm" onsubmit="handleCreate(event)">
-                <div class="form-group">
-                    <label>Level Title <span class="text-danger">*</span></label>
-                    <input type="text" name="title" class="form-control" placeholder="e.g. Bachelor in Civil Engineering" required autofocus>
-                </div>
-
-                <div class="form-group">
-                    <label>Select Course <span class="text-danger">*</span></label>
-                    <div class="input-with-icon">
-                        <i class="fas fa-book"></i>
-                        <select name="course_id" class="form-control" required>
-                            <option value="">-- Select Course --</option>
-                            <?php foreach($courses as $c): ?>
-                            <option value="<?php echo $c['id']; ?>"><?php echo htmlspecialchars($c['title']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Icon Class</label>
-                    <div class="input-with-icon">
-                        <i class="fas fa-icons"></i>
-                        <input type="text" name="icon" class="form-control" value="fa-user-graduate">
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn-ghost" onclick="closeCreateModal()">Cancel</button>
-                    <button type="submit" class="btn-premium-primary">Create Level</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-<div class="modal-backdrop" id="modalBackdrop" onclick="closeCreateModal()"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 <script>
-const BASE_URL = '<?php echo app_base_url(); ?>';
-
-function openCreateModal() {
-    document.getElementById('createModal').classList.add('active');
-    document.getElementById('modalBackdrop').classList.add('active');
-}
-
-function closeCreateModal() {
-    document.getElementById('createModal').classList.remove('active');
-    document.getElementById('modalBackdrop').classList.remove('active');
-}
-
-function toggleStatus(id, checkbox) {
-    const val = checkbox.checked ? 1 : 0;
-    fetch(BASE_URL + 'admin/quiz/education-levels/toggle-status', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `id=${id}&val=${val}`
-    });
-}
-
-async function handleCreate(e) {
-    e.preventDefault();
-    const form = e.target;
-    const btn = form.querySelector('button[type="submit"]');
+async function saveLevel() {
+    const form = document.getElementById('addLevelForm');
+    const parent = form.querySelector('select[name="parent_id"]').value;
+    const title = form.querySelector('input[name="title"]').value;
     
-    if(!form.title.value || !form.course_id.value) return;
+    if(!parent) { Swal.fire({ icon:'warning', title:'Missing Info', text:'Select Course first.', timer:2000, showConfirmButton:false}); return; }
+    if(!title) { Swal.fire({ icon:'warning', title:'Missing Info', text:'Level Name is required.', timer:2000, showConfirmButton: false}); return; }
 
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
-    btn.disabled = true;
-
+    const formData = new FormData(form);
     try {
-        const formData = new FormData(form);
-        const res = await fetch(BASE_URL + 'admin/quiz/education-levels/store', {
-            method: 'POST',
-            body: formData
-        });
-        const data = await res.json();
-        
-        if (data.status === 'success') {
-            window.location.reload();
+        const response = await fetch('<?php echo app_base_url('admin/quiz/education-levels/store'); ?>', { method: 'POST', body: formData });
+        const d = await response.json();
+        if(d.status === 'success') {
+            const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, timerProgressBar: true });
+            Toast.fire({ icon: 'success', title: 'Level Created' }).then(() => location.reload());
         } else {
-            alert(data.message || 'Error creating level');
-            btn.innerHTML = 'Create Level';
-            btn.disabled = false;
+            Swal.fire('Error', d.message, 'error');
         }
-    } catch (err) {
-        console.error(err);
-        alert('System error');
-    }
+    } catch(e) { Swal.fire('Error', 'Server Error', 'error'); }
 }
 
 function deleteLevel(id) {
-    if(!confirm('Are you sure? This will delete all data linked to this level!')) return;
-    
-    fetch(BASE_URL + 'admin/quiz/education-levels/delete/' + id, { method: 'POST' })
-        .then(res => res.json())
-        .then(data => {
-            if(data.status === 'success') window.location.reload();
-            else alert('Error deleting');
-        });
+    Swal.fire({
+        title: 'Delete Level?', text: "This cannot be undone.", icon: 'warning',
+        showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#cbd5e1', confirmButtonText: 'Delete'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            const res = await fetch('<?php echo app_base_url('admin/quiz/education-levels/delete/'); ?>' + id, {method:'POST'});
+            const d = await res.json();
+            if(d.status==='success') location.reload();
+        }
+    });
 }
 
-// Drag & Drop
-new Sortable(document.getElementById('sortable-levels'), {
-    handle: '.drag-handle',
-    animation: 150,
+new Sortable(document.getElementById('levelSortable'), {
+    animation: 150, handle: '.handle', ghostClass: 'bg-indigo-50',
     onEnd: function() {
-        const order = Array.from(this.el.children).map(tr => tr.dataset.id);
-        fetch(BASE_URL + 'admin/quiz/education-levels/reorder', {
-            method: 'POST',
-            body: JSON.stringify({order}),
-            headers: {'Content-Type': 'application/json'}
+        const rows = document.querySelectorAll('.level-item');
+        const order = Array.from(rows).map(el => el.getAttribute('data-id'));
+        
+        rows.forEach((row, index) => {
+            const orderCell = row.querySelectorAll('td')[2].querySelector('span'); 
+            if(orderCell) orderCell.innerText = index + 1;
+        });
+
+        fetch('<?php echo app_base_url('admin/quiz/education-levels/reorder'); ?>', {
+            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({order: order})
         });
     }
 });
+
+document.querySelectorAll('.status-toggle').forEach(el => {
+    el.addEventListener('change', async function() {
+        const formData = new URLSearchParams();
+        formData.append('id', this.dataset.id);
+        formData.append('val', this.checked ? 1 : 0);
+        await fetch('<?php echo app_base_url('admin/quiz/education-levels/toggle-status'); ?>', {
+           method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:formData
+        });
+    });
+});
+
+function filterLevels() {
+    const query = document.getElementById('level-search').value.toLowerCase();
+    document.querySelectorAll('.level-item').forEach(el => {
+        const text = el.innerText.toLowerCase();
+        el.style.display = text.indexOf(query) > -1 ? '' : 'none';
+    });
+}
+
+function editLevel(id) {
+    Swal.fire('Information', 'Inline editing coming soon.', 'info');
+}
 </script>
 
 <style>
-/* PREMIUM STYLES */
-.premium-dashboard-wrapper { font-family: 'Inter', sans-serif; padding: 2rem; background: #f8fafc; min-height: 100vh; }
-.premium-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; }
-.premium-header h1 { font-size: 2rem; font-weight: 800; color: #1e293b; margin: 0.5rem 0 0.5rem 0; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.stat-pill { background: white; padding: 0.5rem 1rem; border-radius: 50px; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: inline-flex; align-items: center; gap: 0.5rem; }
-.stat-pill .label { font-size: 0.7rem; color: #64748b; font-weight: 700; }
-.stat-pill .value { font-size: 1.1rem; color: #10b981; }
-.glass-card { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; overflow: hidden; }
-.premium-table { width: 100%; border-collapse: collapse; }
-.premium-table th { background: #f8fafc; padding: 1rem; text-align: left; font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e2e8f0; }
-.premium-table td { padding: 1rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-.btn-premium-primary { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-.btn-premium-primary:hover { box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); transform: translateY(-1px); }
-.modal-backdrop { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 99; }
-.modal-backdrop.active { display: block; }
-.premium-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; min-width: 400px; }
-.premium-modal.active { display: block; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.modal-content { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
-@keyframes popIn { from { opacity: 0; transform: translate(-50%, -40%); } to { opacity: 1; transform: translate(-50%, -50%); } }
-.cell-icon-box { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-.cell-flex-row { display: flex; align-items: center; gap: 1rem; }
-.badge-code { background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
-.badge-status { font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+/* ========================================
+   PREMIUM CORE STYLES (MATCHING SUBCATEGORIES)
+   ======================================== */
+:root {
+    --admin-primary: #667eea;
+    --admin-secondary: #764ba2;
+    --admin-gray-50: #f8f9fa;
+    --admin-gray-200: #e5e7eb;
+    --admin-gray-300: #d1d5db;
+    --admin-gray-400: #9ca3af;
+    --admin-gray-600: #4b5563;
+    --admin-gray-800: #1f2937;
+}
 
-/* Form Controls */
-.form-group { margin-bottom: 1.25rem; }
-.form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 0.5rem; }
-.form-control { width: 100%; padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; transition: border-color 0.2s; }
-.form-control:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
-.input-with-icon { position: relative; }
-.input-with-icon i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8; }
-.input-with-icon .form-control { padding-left: 2.75rem; }
-.btn-ghost { background: transparent; color: #64748b; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; }
-.btn-ghost:hover { background: #f1f5f9; color: #1e293b; }
-.modal-footer { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
+.admin-wrapper-container {
+    padding: 1rem;
+    background: var(--admin-gray-50);
+    min-height: calc(100vh - 70px);
+}
+
+.admin-content-wrapper {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    overflow: hidden;
+    padding-bottom: 2rem;
+}
+
+/* Header */
+.compact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-secondary) 100%);
+    color: white;
+}
+.header-title { display: flex; align-items: center; gap: 0.75rem; }
+.header-title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; color: white; }
+.header-title i { font-size: 1.25rem; opacity: 0.9; }
+.header-subtitle { font-size: 0.85rem; opacity: 0.8; margin-top: 4px; font-weight: 500; }
+
+.stat-pill {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    display: flex; flex-direction: column; align-items: center;
+    min-width: 80px;
+}
+.stat-pill.warning { background: rgba(252, 211, 77, 0.15); border-color: rgba(252, 211, 77, 0.3); }
+.stat-pill .label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.9; }
+.stat-pill .value { font-size: 1.1rem; font-weight: 800; line-height: 1.1; }
+
+.creation-toolbar {
+    padding: 1rem 2rem;
+    background: #f8fafc;
+    border-bottom: 1px solid var(--admin-gray-200);
+}
+.toolbar-title {
+    font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem;
+}
+.creation-form {
+    display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+}
+
+.input-group-premium { position: relative; }
+.input-group-premium .icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.85rem; pointer-events: none; }
+.form-input-premium {
+    width: 100%; height: 40px; padding: 0 0.75rem 0 2.25rem; font-size: 0.875rem; 
+    border: 1px solid #cbd5e1; border-radius: 8px; outline: none; transition: all 0.2s;
+    background: white; color: #334155;
+}
+.form-input-premium:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+.btn-icon-inside {
+    position: absolute; right: 4px; top: 4px; bottom: 4px; width: 32px; 
+    border: none; background: #f1f5f9; border-radius: 6px; color: #64748b; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: 0.2s;
+}
+.btn-icon-inside:hover { background: #e2e8f0; color: #4338ca; }
+
+.btn-create-premium {
+    height: 40px; padding: 0 1.5rem; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    color: white; font-weight: 600; font-size: 0.875rem; border: none; border-radius: 8px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s;
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2); white-space: nowrap;
+}
+.btn-create-premium:hover { transform: translateY(-1px); box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3); }
+
+/* Switch Toggle */
+.premium-toggle-group {
+    display: flex; align-items: center; gap: 0.5rem; background: white; border: 1px solid #cbd5e1;
+    height: 40px; padding: 0 0.75rem; border-radius: 8px;
+}
+.switch { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 2px; bottom: 2px; background-color: white; transition: .4s; }
+input:checked + .slider { background-color: #4f46e5; }
+input:checked + .slider:before { transform: translateX(16px); }
+.slider.round { border-radius: 34px; }
+.slider.round:before { border-radius: 50%; }
+
+.compact-toolbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.75rem 2rem; background: #eff6ff; border-bottom: 1px solid #bfdbfe;
+}
+.filter-group { display: flex; align-items: center; gap: 0.75rem; }
+.filter-label { font-size: 0.7rem; font-weight: 700; color: #1e40af; letter-spacing: 0.5px; }
+.filter-select {
+    font-size: 0.85rem; font-weight: 600; color: #1e40af; border: 1px solid #93c5fd;
+    border-radius: 6px; padding: 0.25rem 2rem 0.25rem 0.5rem; background: white; outline: none; height: 32px;
+}
+.search-compact { position: relative; width: 100%; max-width: 300px; }
+.search-compact i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 0.85rem; }
+.search-compact input {
+    width: 100%; height: 36px; padding: 0 0.75rem 0 2.25rem; font-size: 0.85rem;
+    border: 1px solid #bfdbfe; border-radius: 6px; outline: none; background: white; color: #1e40af;
+}
+
+.drag-hint { font-size: 0.75rem; font-weight: 600; color: #64748b; display: flex; align-items: center; gap: 0.5rem; }
+
+.table-compact { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.table-compact th {
+    background: white; padding: 0.75rem 1.5rem; text-align: left; font-weight: 600;
+    color: #94a3b8; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
+}
+.table-compact td {
+    padding: 0.6rem 1.5rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle;
+}
+.level-item:hover { background: #f8fafc; }
+
+.item-info { display: flex; align-items: center; gap: 0.75rem; }
+.item-title { font-weight: 600; color: #334155; line-height: 1.2; }
+.item-slug { font-size: 0.75rem; color: #94a3b8; font-family: monospace; }
+
+.badge-pill {
+    background: #e0e7ff; color: #4338ca; padding: 2px 10px; border-radius: 12px;
+    font-size: 0.7rem; font-weight: 700; border: 1px solid #c7d2fe; white-space: nowrap;
+}
+
+.premium-control { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.scale-sm { transform: scale(0.8); }
+
+.handle { cursor: grab; color: #cbd5e1; }
+.handle:hover { color: #667eea; }
+.order-idx { color: #cbd5e1; font-size: 0.75rem; font-family: monospace; }
+
+.action-btn-icon {
+    width: 32px; height: 32px; border: 1px solid #e2e8f0; border-radius: 6px;
+    background: white; color: #94a3b8; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: 0.2s;
+}
+.action-btn-icon:hover { transform: translateY(-1px); }
+.delete-btn:hover { background: #fee2e2; color: #ef4444; border-color: #fecaca; }
+.edit-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+
+.empty-state-compact { padding: 3rem; text-align: center; color: #94a3b8; }
+.empty-state-compact i { font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.5; }
+.empty-state-compact h3 { font-size: 1rem; font-weight: 600; color: #64748b; margin: 0; }
+.empty-state-compact p { font-size: 0.8rem; margin: 0; }
+
+@media (max-width: 1024px) {
+    .creation-form { flex-direction: column; align-items: stretch; }
+    .input-group-premium { width: 100% !important; }
+}
 </style>

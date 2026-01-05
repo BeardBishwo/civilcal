@@ -24,9 +24,26 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        // Fetch only Root Level Categories (Main Categories)
-        $sql = "SELECT * FROM syllabus_nodes WHERE parent_id IS NULL ORDER BY order_index ASC";
-        $categories = $this->db->query($sql)->fetchAll();
+        $levelId = $_GET['level_id'] ?? null;
+
+        // Fetch all Education Levels for dropdown
+        $levels = $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'education_level' ORDER BY order_index ASC")->fetchAll();
+
+        // Base Query
+        $sql = "SELECT c.*, p.title as parent_title 
+                FROM syllabus_nodes c 
+                LEFT JOIN syllabus_nodes p ON c.parent_id = p.id 
+                WHERE c.type = 'category'";
+
+        $params = [];
+        if ($levelId) {
+            $sql .= " AND c.parent_id = :level_id";
+            $params['level_id'] = $levelId;
+        }
+
+        $sql .= " ORDER BY c.order_index ASC";
+
+        $categories = $this->db->query($sql, $params)->fetchAll();
 
         // Calculate Stats
         $stats = [
@@ -37,7 +54,9 @@ class CategoryController extends Controller
 
         return $this->view('admin/quiz/categories/index', [
             'categories' => $categories,
-            'stats' => $stats
+            'stats' => $stats,
+            'levels' => $levels,
+            'selectedLevel' => $levelId
         ]);
     }
 
@@ -79,6 +98,7 @@ class CategoryController extends Controller
     public function store()
     {
         $title = $_POST['title'] ?? '';
+        $parentId = $_POST['parent_id'] ?? null;
         $isPremium = isset($_POST['is_premium']) ? 1 : 0;
         $unlockPrice = $_POST['unlock_price'] ?? 0;
         $image = $_POST['image'] ?? null;
@@ -92,14 +112,24 @@ class CategoryController extends Controller
         $slug = $this->syllabusService->slugify($title);
         
         // Get Max Order
-        $stmt = $this->db->getPdo()->query("SELECT MAX(order_index) FROM syllabus_nodes WHERE parent_id IS NULL");
+        $sql = "SELECT MAX(order_index) FROM syllabus_nodes WHERE type = 'category'";
+        $params = [];
+        if($parentId) {
+            $sql .= " AND parent_id = :pid";
+            $params['pid'] = $parentId;
+        } else {
+            $sql .= " AND parent_id IS NULL";
+        }
+
+        $stmt = $this->db->getPdo()->prepare($sql);
+        $stmt->execute($params);
         $maxOrder = $stmt->fetchColumn();
 
         $data = [
-            'parent_id' => null, // Root
+            'parent_id' => !empty($parentId) ? $parentId : null, 
             'title' => $title,
             'slug' => $slug,
-            'type' => 'paper', // Assuming 'paper' is the root type
+            'type' => 'category', 
             'is_premium' => $isPremium,
             'unlock_price' => $unlockPrice,
             'image_path' => $image,
