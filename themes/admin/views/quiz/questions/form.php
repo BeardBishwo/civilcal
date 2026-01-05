@@ -672,30 +672,23 @@
         const btn = document.getElementById('pin_btn_' + id);
         if (!el || !btn) return;
 
-        // Reset others manually (exclusive pin)
-        document.querySelectorAll('[id^="pin_btn_"]').forEach(b => {
-             if(b.id !== 'pin_btn_' + id && b.id !== 'pin_btn_hint') {
-                 const otherId = b.id.replace('pin_btn_', '');
-                 const otherEl = document.getElementById(otherId);
-                 if(otherEl) otherEl.classList.remove('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20', 'w-full');
-                 b.classList.remove('text-indigo-600', '-rotate-45');
-                 b.classList.add('text-slate-300');
-             }
-        });
+        let pins = JSON.parse(localStorage.getItem('q_form_pinned_ids') || '[]');
+        const isPinned = pins.includes(id);
 
-        if (state.pinnedId === id) {
+        if (isPinned) {
+            // Unpin
             el.classList.remove('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20', 'w-full');
             btn.classList.remove('text-indigo-600', '-rotate-45');
             btn.classList.add('text-slate-300');
-            state.pinnedId = null;
-            localStorage.removeItem('q_form_pinned_id');
+            pins = pins.filter(pid => pid !== id);
         } else {
+            // Pin
             el.classList.add('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20', 'w-full');
             btn.classList.add('text-indigo-600', '-rotate-45');
             btn.classList.remove('text-slate-300');
-            state.pinnedId = id;
-            localStorage.setItem('q_form_pinned_id', id);
+            if(!pins.includes(id)) pins.push(id);
         }
+        localStorage.setItem('q_form_pinned_ids', JSON.stringify(pins));
     }
 
     // Init
@@ -711,16 +704,29 @@
             ['input', 'change'].forEach(evt => {
                 qForm.addEventListener(evt, saveFormState);
             });
+
+            // Auto-clear on submit
+            qForm.addEventListener('submit', () => {
+                localStorage.removeItem('q_form_data_v3');
+                localStorage.removeItem('q_form_type');
+                localStorage.removeItem('q_form_pinned_ids');
+                localStorage.removeItem('q_hint_pinned');
+            });
         }
 
-        const savedPin = localStorage.getItem('q_form_pinned_id');
-        if(savedPin) {
+        // Restore Multi-Pins
+        const savedPins = JSON.parse(localStorage.getItem('q_form_pinned_ids') || '[]');
+        savedPins.forEach(pid => {
             setTimeout(() => {
-                const el = document.getElementById(savedPin);
-                const btn = document.getElementById('pin_btn_' + savedPin);
-                if(el && btn && !state.pinnedId) togglePin(savedPin);
-            }, 200);
-        }
+                const el = document.getElementById(pid);
+                const btn = document.getElementById('pin_btn_' + pid);
+                if (el && btn) {
+                    el.classList.add('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20', 'w-full');
+                    btn.classList.add('text-indigo-600', '-rotate-45');
+                    btn.classList.remove('text-slate-300');
+                }
+            }, 300);
+        });
 
         const savedHintPin = localStorage.getItem('q_hint_pinned');
         if (savedHintPin === '1' && typeof toggleHintPin === 'function') toggleHintPin();
