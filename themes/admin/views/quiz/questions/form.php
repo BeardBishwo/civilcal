@@ -60,26 +60,33 @@
             <div class="w-full lg:w-[65%] space-y-6">
                 
                 <!-- 1. Question Type Tabs & Content -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <!-- Tabs -->
-                    <div class="flex border-b border-slate-100 overflow-x-auto no-scrollbar" id="typeTabs">
-                        <input type="hidden" name="type" id="selectedType" value="MCQ">
+                <div id="card_main" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all duration-300">
+                    <!-- Tabs Header with Pin -->
+                    <div class="flex items-center justify-between border-b border-slate-100 bg-white relative z-10">
+                        <div class="flex overflow-x-auto no-scrollbar flex-1" id="typeTabs">
+                            <input type="hidden" name="type" id="selectedType" value="MCQ">
 
-                        <button type="button" class="tab-btn active flex-1 min-w-[120px] py-4 px-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-all" onclick="switchType('MCQ', this)">
-                            <i class="fas fa-list-ul mb-1 block text-lg"></i> MCQ
-                        </button>
+                            <button type="button" class="tab-btn active flex-1 min-w-[120px] py-4 px-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-all" onclick="switchType('MCQ', this)">
+                                <i class="fas fa-list-ul mb-1 block text-lg"></i> MCQ
+                            </button>
 
-                        <button type="button" class="tab-btn flex-1 min-w-[120px] py-4 px-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-all" onclick="switchType('TF', this)">
-                            <i class="fas fa-check-circle mb-1 block text-lg"></i> True/False
-                        </button>
+                            <button type="button" class="tab-btn flex-1 min-w-[120px] py-4 px-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-all" onclick="switchType('TF', this)">
+                                <i class="fas fa-check-circle mb-1 block text-lg"></i> True/False
+                            </button>
 
-                        <button type="button" class="tab-btn flex-1 min-w-[120px] py-4 px-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-all" onclick="switchType('MULTI', this)">
-                            <i class="fas fa-check-double mb-1 block text-lg"></i> Multi-Select
-                        </button>
+                            <button type="button" class="tab-btn flex-1 min-w-[120px] py-4 px-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-all" onclick="switchType('MULTI', this)">
+                                <i class="fas fa-check-double mb-1 block text-lg"></i> Multi-Select
+                            </button>
 
-                        <button type="button" class="tab-btn flex-1 min-w-[120px] py-4 px-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-all" onclick="switchType('ORDER', this)">
-                            <i class="fas fa-sort-amount-down mb-1 block text-lg"></i> Sequence
-                        </button>
+                            <button type="button" class="tab-btn flex-1 min-w-[120px] py-4 px-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-all" onclick="switchType('ORDER', this)">
+                                <i class="fas fa-sort-amount-down mb-1 block text-lg"></i> Sequence
+                            </button>
+                        </div>
+                        <div class="px-3 border-l border-slate-100">
+                            <button type="button" id="pin_btn_card_main" onclick="togglePin('card_main')" class="text-slate-300 hover:text-slate-500 transition p-2" title="Pin Section">
+                                <i class="fas fa-thumbtack"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Editor Area -->
@@ -108,8 +115,13 @@
                         </div>
 
                         <!-- Optional Hint Field -->
-                        <div id="hint_field" class="mt-4 hidden animate__animated animate__fadeIn">
-                            <label class="text-xs font-bold text-amber-500 uppercase tracking-wider mb-2 block">Answer Explanation</label>
+                        <div id="hint_field" class="mt-4 hidden animate__animated animate__fadeIn border-t border-dashed border-slate-200 pt-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-xs font-bold text-amber-500 uppercase tracking-wider">Answer Explanation</label>
+                                <button type="button" id="pin_btn_hint" onclick="toggleHintPin()" class="text-slate-300 hover:text-amber-500 transition p-1" title="Pin Explanation (Keep Open)">
+                                    <i class="fas fa-thumbtack"></i>
+                                </button>
+                            </div>
                             <div class="relative">
                                 <div class="absolute top-3 left-3 text-amber-400"><i class="fas fa-info-circle"></i></div>
                                 <textarea name="answer_explanation" class="w-full pl-10 p-3 bg-amber-50/50 border border-amber-200 rounded-xl text-sm text-slate-700 focus:border-amber-400 outline-none transition" rows="2" placeholder="Explain why the answer is correct..."></textarea>
@@ -119,16 +131,23 @@
                 </div>
 
                 <!-- 2. Options Area -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div id="card_opts" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 transition-all duration-300">
                     <div class="flex justify-between items-center mb-6">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm">A</div>
                             <h3 class="text-lg font-bold text-slate-800">Answer Options</h3>
                         </div>
-                        <div id="options_toolbar">
-                            <button type="button" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg transition" onclick="addOption()">
-                                <i class="fas fa-plus-circle mr-2"></i> Add Option
-                            </button>
+                        <div class="flex items-center gap-2">
+                             <div id="pin_wrapper_card_opts">
+                                <button type="button" id="pin_btn_card_opts" onclick="togglePin('card_opts')" class="text-slate-300 hover:text-slate-500 transition p-2 mr-2" title="Pin Section">
+                                    <i class="fas fa-thumbtack"></i>
+                                </button>
+                             </div>
+                             <div id="options_toolbar" class="flex items-center gap-2">
+                                <button type="button" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg transition" onclick="addOption()">
+                                    <i class="fas fa-plus-circle mr-2"></i> Add Option
+                                </button>
+                             </div>
                         </div>
                     </div>
                     
@@ -143,7 +162,12 @@
             <div class="w-full lg:w-[35%] space-y-6">
                 
                 <!-- Org Card -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
+                <div id="card_org" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden transition-all duration-300">
+                    <div class="absolute top-0 right-0 p-3 z-10">
+                        <button type="button" id="pin_btn_card_org" onclick="togglePin('card_org')" class="text-slate-300 hover:text-slate-500 transition p-1" title="Pin Section">
+                            <i class="fas fa-thumbtack"></i>
+                        </button>
+                    </div>
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Categorization</h4>
                     
@@ -155,7 +179,7 @@
                                 <i class="fas fa-graduation-cap mr-1.5 text-indigo-400"></i> Course / Stream
                             </label>
                             <div class="relative">
-                                <select name="stream" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition appearance-none">
+                                <select name="stream" id="stream_select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition appearance-none" onchange="persistData('stream', this.value)">
                                     <?php if(!empty($streams)): ?>
                                         <?php foreach($streams as $val => $label): ?>
                                             <option value="<?= $val ?>"><?= $label ?></option>
@@ -174,7 +198,7 @@
                                 <i class="fas fa-layer-group mr-1.5 text-indigo-400"></i> Academic Level
                             </label>
                             <div class="relative">
-                                <select name="education_level" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition appearance-none">
+                                <select name="education_level" id="level_select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition appearance-none" onchange="persistData('level', this.value)">
                                     <?php if(!empty($educationLevels)): ?>
                                         <?php foreach($educationLevels as $val => $label): ?>
                                             <option value="<?= $val ?>"><?= $label ?></option>
@@ -238,7 +262,12 @@
                 </div>
 
                 <!-- Target Position Level Card -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
+                <div id="card_target" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden transition-all duration-300">
+                    <div class="absolute top-0 right-0 p-3 z-10">
+                        <button type="button" id="pin_btn_card_target" onclick="togglePin('card_target')" class="text-slate-300 hover:text-slate-500 transition p-1" title="Pin Section">
+                            <i class="fas fa-thumbtack"></i>
+                        </button>
+                    </div>
                     <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 pl-2">Target Position Level</h4>
                     <p class="text-[10px] text-slate-400 mb-3 pl-2 italic">Select all exams this question is suitable for:</p>
@@ -247,7 +276,7 @@
                         <?php if(!empty($pscLevels)): ?>
                             <?php foreach($pscLevels as $level): ?>
                             <label class="flex items-center space-x-3 cursor-pointer group">
-                                <input type="checkbox" name="level_tags[]" value="<?= $level['id'] ?>" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                                <input type="checkbox" name="level_tags[]" class="target-level-checkbox w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" value="<?= $level['id'] ?>" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
                                 <span class="text-sm text-slate-600 group-hover:text-indigo-600 transition font-medium"><?= htmlspecialchars($level['name']) ?></span>
                             </label>
                             <?php endforeach; ?>
@@ -256,7 +285,12 @@
                 </div>
 
                 <!-- Configuration Card -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div id="card_settings" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 transition-all duration-300 relative">
+                    <div class="absolute top-0 right-0 p-3 z-10">
+                        <button type="button" id="pin_btn_card_settings" onclick="togglePin('card_settings')" class="text-slate-300 hover:text-slate-500 transition p-1" title="Pin Section">
+                            <i class="fas fa-thumbtack"></i>
+                        </button>
+                    </div>
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Settings</h4>
                     
                     <!-- Difficulty Slider -->
@@ -293,7 +327,7 @@
                         <label class="flex items-center justify-between p-3 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer transition group">
                             <span class="text-sm font-semibold text-slate-700 group-hover:text-indigo-600 transition">Active Status</span>
                             <div class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" name="is_active" value="1" checked class="sr-only peer">
+                                <input type="checkbox" id="active_status_toggle" name="is_active" value="1" checked class="sr-only peer">
                                 <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
                             </div>
                         </label>
@@ -301,7 +335,7 @@
                         <label class="flex items-center justify-between p-3 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer transition group">
                             <span class="text-sm font-semibold text-slate-700 group-hover:text-indigo-600 transition">Shuffle Options</span>
                             <div class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" name="shuffle_options" value="1" checked class="sr-only peer">
+                                <input type="checkbox" id="shuffle_options_toggle" name="shuffle_options" value="1" checked class="sr-only peer">
                                 <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
                             </div>
                         </label>
@@ -319,7 +353,9 @@
     // Config
     const state = {
         type: 'MCQ',
-        optionCount: 4
+        optionCount: 4,
+        pinnedId: null,
+        hintPinned: false
     };
 
     // UI Templates
@@ -371,19 +407,31 @@
     function switchType(newType, btn) {
         state.type = newType;
         document.getElementById('selectedType').value = newType;
-        
+        localStorage.setItem('q_form_type', newType); // Persist Type
+
         // Tab Styling
         document.querySelectorAll('.tab-btn').forEach(b => {
-            b.classList.remove('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-600');
-            b.classList.add('text-slate-500', 'border-transparent');
+             b.classList.remove('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-600');
+             b.classList.add('text-slate-500', 'border-transparent');
+             
+             // If manual button passed
+             if(btn && b === btn) {
+                 b.classList.remove('text-slate-500', 'border-transparent');
+                 b.classList.add('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-600');
+             } 
+             // If restored from storage (no btn passed), match loosely
+             else if(!btn && b.getAttribute('onclick').includes(`'${newType}'`)) {
+                 b.classList.remove('text-slate-500', 'border-transparent');
+                 b.classList.add('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-600');
+             }
         });
-        if(btn) {
-            btn.classList.remove('text-slate-500', 'border-transparent');
-            btn.classList.add('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-600');
-        }
 
         const container = document.getElementById('options_container');
-        const toolbar = document.getElementById('options_toolbar');
+        const toolbar = document.getElementById('typeTabs') ? document.getElementById('options_toolbar') : null; 
+        // Note: toolbar element might be inside the card_opts block which is static HTML now
+        // Let's rely on ID existence
+        const optsToolbar = document.getElementById('options_toolbar');
+
         container.innerHTML = '';
 
         if (newType === 'TF') {
@@ -408,17 +456,54 @@
                     </label>
                 </div>
             `;
-            toolbar.style.display = 'none'; 
+            if(optsToolbar) optsToolbar.style.display = 'none'; 
         } else {
             // Standard Options List
             state.optionCount = 4;
             renderOptionsList();
-            toolbar.style.display = 'block';
+            if(optsToolbar) optsToolbar.style.display = 'flex';
         }
+
+        // Ensure Pin Button remains visible
+        const pinWrapper = document.getElementById('pin_wrapper_card_opts');
+        if(pinWrapper) pinWrapper.style.display = 'block';
 
         // Setup Drag for Order
         if (newType === 'ORDER') {
             new Sortable(container, { handle: '.handle', animation: 150 });
+        }
+    }
+
+    function togglePin(id) {
+        const el = document.getElementById(id);
+        const btn = document.getElementById('pin_btn_' + id);
+        if(!el || !btn) return;
+
+        // Unpin current if different
+        if (state.pinnedId && state.pinnedId !== id) {
+             const currEl = document.getElementById(state.pinnedId);
+             const currBtn = document.getElementById('pin_btn_' + state.pinnedId);
+             if(currEl) currEl.classList.remove('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20');
+             if(currBtn) {
+                 currBtn.classList.remove('text-indigo-600', '-rotate-45');
+                 currBtn.classList.add('text-slate-300');
+             }
+        }
+
+        if (state.pinnedId === id) {
+            // Unpin Self
+            el.classList.remove('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20', 'w-full');
+            btn.classList.remove('text-indigo-600', '-rotate-45');
+            btn.classList.add('text-slate-300');
+            state.pinnedId = null;
+            localStorage.removeItem('q_form_pinned_id');
+        } else {
+            // Pin Self
+            el.classList.add('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20', 'w-full');
+            btn.classList.add('text-indigo-600', '-rotate-45');
+            btn.classList.remove('text-slate-300');
+            state.pinnedId = id;
+            localStorage.setItem('q_form_pinned_id', id);
         }
     }
 
@@ -485,18 +570,159 @@
         subSelect.value = ""; // Reset sub selection on main change
         subSelect.disabled = !hasVisible; // Disable if no subs
     }
-
+    
     function toggleHint() {
-        document.getElementById('hint_field').classList.toggle('hidden');
+        const hintEl = document.getElementById('hint_field');
+        if (state.hintPinned) {
+            // If pinned, we only allow un-hiding if it somehow got hidden, but we should not hide it.
+            // Actually, if pinned, clicking "Add Hint" shouldn't toggle it to hidden.
+            // We just ensure it's visible.
+            hintEl.classList.remove('hidden');
+        } else {
+            // Normal toggle behavior
+            hintEl.classList.toggle('hidden');
+        }
+    }
+
+    function toggleHintPin() {
+        const btn = document.getElementById('pin_btn_hint');
+        const hintEl = document.getElementById('hint_field');
+        
+        if (state.hintPinned) {
+            // Unpin
+            state.hintPinned = false;
+            btn.classList.remove('text-amber-500', '-rotate-45');
+            btn.classList.add('text-slate-300');
+            localStorage.removeItem('q_hint_pinned');
+        } else {
+            // Pin
+            state.hintPinned = true;
+            btn.classList.add('text-amber-500', '-rotate-45');
+            btn.classList.remove('text-slate-300');
+            // Ensure visible
+            hintEl.classList.remove('hidden');
+            localStorage.setItem('q_hint_pinned', '1');
+        }
+    }
+
+    function persistData(key, val) {
+        saveFormState();
+    }
+
+    function saveFormState() {
+        const data = {
+            stream: document.getElementById('stream_select')?.value,
+            level: document.getElementById('level_select')?.value,
+            main_cat: document.getElementById('main_cat')?.value,
+            sub_cat: document.getElementById('sub_cat')?.value,
+            diff: document.querySelector('input[name="difficulty_level"]')?.value,
+            marks: document.querySelector('input[name="default_marks"]')?.value,
+            neg: document.querySelector('input[name="default_negative_marks"]')?.value,
+            active: document.getElementById('active_status_toggle')?.checked,
+            shuffle: document.getElementById('shuffle_options_toggle')?.checked,
+            targets: Array.from(document.querySelectorAll('.target-level-checkbox')).map(cb => ({ id: cb.value, checked: cb.checked }))
+        };
+        localStorage.setItem('q_form_data_v3', JSON.stringify(data));
+    }
+
+    function restoreFormState() {
+        const raw = localStorage.getItem('q_form_data_v3');
+        if (!raw) return;
+        try {
+            const data = JSON.parse(raw);
+            if (data.stream) document.getElementById('stream_select').value = data.stream;
+            if (data.level) document.getElementById('level_select').value = data.level;
+            if (data.main_cat) {
+                 document.getElementById('main_cat').value = data.main_cat;
+                 if(typeof filterSubTopics === 'function') filterSubTopics();
+                 if (data.sub_cat) {
+                    setTimeout(() => { 
+                         const sc = document.getElementById('sub_cat');
+                         if(sc) sc.value = data.sub_cat; 
+                    }, 200);
+                 }
+            }
+            if (data.diff) {
+                const el = document.querySelector('input[name="difficulty_level"]');
+                if (el) { el.value = data.diff; if(typeof updateDiffLabel === 'function') updateDiffLabel(data.diff); }
+            }
+            const marksEl = document.querySelector('input[name="default_marks"]');
+            if (data.marks && marksEl) marksEl.value = data.marks;
+            
+            const negEl = document.querySelector('input[name="default_negative_marks"]');
+            if (data.neg && negEl) negEl.value = data.neg;
+            
+            const activeEl = document.getElementById('active_status_toggle');
+            if (data.active !== undefined && activeEl) activeEl.checked = data.active;
+            
+            const shuffleEl = document.getElementById('shuffle_options_toggle');
+            if (data.shuffle !== undefined && shuffleEl) shuffleEl.checked = data.shuffle;
+            
+            if (data.targets) {
+                data.targets.forEach(t => {
+                    const cb = document.querySelector('.target-level-checkbox[value="' + t.id + '"]');
+                    if (cb) cb.checked = t.checked;
+                });
+            }
+        } catch (e) { console.error("Restore failed", e); }
+    }
+
+    function togglePin(id) {
+        const el = document.getElementById(id);
+        const btn = document.getElementById('pin_btn_' + id);
+        if (!el || !btn) return;
+
+        // Reset others manually (exclusive pin)
+        document.querySelectorAll('[id^="pin_btn_"]').forEach(b => {
+             if(b.id !== 'pin_btn_' + id && b.id !== 'pin_btn_hint') {
+                 const otherId = b.id.replace('pin_btn_', '');
+                 const otherEl = document.getElementById(otherId);
+                 if(otherEl) otherEl.classList.remove('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20', 'w-full');
+                 b.classList.remove('text-indigo-600', '-rotate-45');
+                 b.classList.add('text-slate-300');
+             }
+        });
+
+        if (state.pinnedId === id) {
+            el.classList.remove('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20', 'w-full');
+            btn.classList.remove('text-indigo-600', '-rotate-45');
+            btn.classList.add('text-slate-300');
+            state.pinnedId = null;
+            localStorage.removeItem('q_form_pinned_id');
+        } else {
+            el.classList.add('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20', 'w-full');
+            btn.classList.add('text-indigo-600', '-rotate-45');
+            btn.classList.remove('text-slate-300');
+            state.pinnedId = id;
+            localStorage.setItem('q_form_pinned_id', id);
+        }
     }
 
     // Init
     document.addEventListener('DOMContentLoaded', () => {
-        // Initial Tab Selection Styling
-        const firstBtn = document.querySelector('#typeTabs button');
-        switchType('MCQ', firstBtn);
+        const savedType = localStorage.getItem('q_form_type') || 'MCQ';
+        if (typeof switchType === 'function') switchType(savedType, null); 
         
-        // Trigger filter init
-        filterSubTopics();
+        restoreFormState();
+
+        // Attach Global Listener
+        const qForm = document.getElementById('createQuestionForm');
+        if (qForm) {
+            ['input', 'change'].forEach(evt => {
+                qForm.addEventListener(evt, saveFormState);
+            });
+        }
+
+        const savedPin = localStorage.getItem('q_form_pinned_id');
+        if(savedPin) {
+            setTimeout(() => {
+                const el = document.getElementById(savedPin);
+                const btn = document.getElementById('pin_btn_' + savedPin);
+                if(el && btn && !state.pinnedId) togglePin(savedPin);
+            }, 200);
+        }
+
+        const savedHintPin = localStorage.getItem('q_hint_pinned');
+        if (savedHintPin === '1' && typeof toggleHintPin === 'function') toggleHintPin();
     });
 </script>
