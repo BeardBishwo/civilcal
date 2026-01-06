@@ -75,10 +75,11 @@ class SyllabusController extends Controller
 
         // Fetch Categories (Syllabus Nodes of type 'category')
         $categoriesSql = "
-            SELECT id, title as name
-            FROM syllabus_nodes 
-            WHERE type = 'category' AND is_active = 1
-            ORDER BY title ASC
+            SELECT cn.id, cn.title as name, cn.parent_id as edu_level_id, edu.parent_id as course_id
+            FROM syllabus_nodes cn
+            LEFT JOIN syllabus_nodes edu ON cn.parent_id = edu.id
+            WHERE cn.type = 'category' AND cn.is_active = 1
+            ORDER BY cn.title ASC
         ";
         $categories = $this->db->query($categoriesSql)->fetchAll();
 
@@ -86,11 +87,14 @@ class SyllabusController extends Controller
         // Fetch Sub-Categories (Syllabus Nodes with a parent)
         // Aliasing fields to match JS expectations (id, name, category_id, category_name)
         $subjectsSql = "
-            SELECT child.id, child.title as name, child.parent_id as category_id, parent.title as category_name
-            FROM syllabus_nodes child
-            JOIN syllabus_nodes parent ON child.parent_id = parent.id
-            WHERE child.parent_id IS NOT NULL AND child.is_active = 1
-            ORDER BY child.title ASC
+            SELECT sn.id, sn.title as name, sn.parent_id as category_id, 
+                   cat.title as category_name, cat.parent_id as edu_level_id, edu.parent_id as course_id
+            FROM syllabus_nodes sn
+            JOIN syllabus_nodes cat ON sn.parent_id = cat.id
+            LEFT JOIN syllabus_nodes edu ON cat.parent_id = edu.id
+            WHERE sn.parent_id IS NOT NULL AND sn.is_active = 1
+              AND sn.type NOT IN ('course', 'education_level', 'category', 'position')
+            ORDER BY sn.title ASC
         ";
         $subjects = $this->db->query($subjectsSql)->fetchAll();
 

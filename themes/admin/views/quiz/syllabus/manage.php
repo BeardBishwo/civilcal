@@ -182,6 +182,9 @@ if (!empty($nodesTree)) {
                 <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
                     <h3 class="text-lg font-bold text-slate-800">Link Hierarchy</h3>
                     <div class="flex items-center gap-3">
+                        <button onclick="toggleLinkedOnly()" id="btn-show-linked" class="text-slate-400 hover:text-blue-600 px-3 py-1.5 rounded-lg transition text-xs font-bold flex items-center border border-transparent hover:border-blue-100 hover:bg-blue-50" title="Show Linked Only">
+                            <i class="fas fa-link mr-1"></i> Linked
+                        </button>
                         <button onclick="removeLink()" class="text-rose-500 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition text-xs font-bold flex items-center"><i class="fas fa-unlink mr-1"></i> Unlink</button>
                         <button onclick="closeHierarchyModal()" class="text-slate-400 hover:text-slate-600 transition"><i class="fas fa-times"></i></button>
                     </div>
@@ -273,12 +276,23 @@ if (!empty($nodesTree)) {
                         <div class="absolute top-full right-0 min-w-full w-auto mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
                              <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('pos', this.value)">
-                             </div>
-                             <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-pos">
-                                <!-- JS Populated -->
-                             </ul>
-                        </div>
-                         <input type="hidden" id="modal-filter-pos" value="">
+                                 </div>
+
+                        <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-pos">
+                            <!-- JS Populated -->
+                        </ul>
+                    </div>
+                    <input type="hidden" id="modal-filter-pos" value="">
+                </div>
+
+                    <!-- Filter Actions -->
+                    <div class="flex items-center gap-1 ml-2">
+                        <button onclick="saveLinkFromFilter()" class="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition" title="Link Selected Item">
+                            <i class="fas fa-plus text-xs"></i>
+                        </button>
+                        <button onclick="resetHierarchyFilters()" class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition" title="Clear Filters">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
                     </div>
 
                 </div>
@@ -896,6 +910,7 @@ if (!empty($nodesTree)) {
     let activeTab = 'category';
     const categoriesDB = <?php echo !empty($categories) ? json_encode($categories) : '[]'; ?>;
     const subjectsDB = <?php echo !empty($subjects) ? json_encode($subjects) : '[]'; ?>;
+    let showLinkedOnly = false;
 
     function openHierarchyModal(index) {
         activeRowIndex = index;
@@ -908,6 +923,16 @@ if (!empty($nodesTree)) {
         document.getElementById('modal-filter-cat').value = '';
         document.getElementById('modal-filter-topic').value = '';
         document.getElementById('hierarchy-search').value = '';
+        
+        // Reset Dropdown UI Text
+        resetDropdownUI('dropdown-course', 'Course');
+        resetDropdownUI('dropdown-edu', 'Edu. Level');
+        resetDropdownUI('dropdown-cat', 'Category');
+        resetDropdownUI('dropdown-topic', 'Sub-Cat');
+        resetDropdownUI('dropdown-pos', 'Pos. Level');
+
+        showLinkedOnly = false;
+        updateLinkedBtnState();
 
         if (row.linked_topic_id) switchHierarchyTab('topic');
         else switchHierarchyTab('category');
@@ -953,9 +978,7 @@ if (!empty($nodesTree)) {
 
     function filterHierarchyList() {
         const query = document.getElementById('hierarchy-search').value.toLowerCase();
-        const courseId = document.getElementById('modal-filter-course').value;
-        const eduId = document.getElementById('modal-filter-edu').value;
-        const posId = document.getElementById('modal-filter-pos').value;
+        // Filters not applied to list items directly due to data simplification, but we keep Search and Linked logic.
         const catId = document.getElementById('modal-filter-cat').value;
         const topicId = document.getElementById('modal-filter-topic').value;
         
@@ -963,74 +986,36 @@ if (!empty($nodesTree)) {
         if (!container) return;
         container.innerHTML = '';
         
-        // --- Cascaded Dropdown Filtering (Custom Lists) ---
-        const filterList = (listId, filterFn) => {
-            const list = document.getElementById(listId);
-            if (!list) return;
-            Array.from(list.querySelectorAll('li')).forEach(li => {
-                const val = li.dataset.val;
-                if (!val) return; // Skip "All" option if needed or handle logic
-                li.style.display = filterFn(li, val) ? '' : 'none';
-            });
-        };
-
-        // Education Select
-        // Education Select - DISABLED cascaded filtering to show all options by default
-        /*
-        filterList('list-edu', (li, val) => {
-            return categoriesDB.some(c => c.edu_level_id == val && (!courseId || !c.course_id || c.course_id == courseId));
-        });
-        */
-
-        // Position Select - DISABLED
-        /*
-        filterList('list-pos', (li, val) => {
-            const courseMatch = !courseId || !li.dataset.course || li.dataset.course == courseId;
-            const eduMatch = !eduId || !li.dataset.edu || li.dataset.edu == eduId;
-            return courseMatch && eduMatch;
-        });
-        */
-
-        // Category Select
-        filterList('list-cat', (li, val) => {
-            return categoriesDB.some(c => c.id == val && (!posId || !c.position_level_id || c.position_level_id == posId));
-        });
-
-        // Topic Select
-        filterList('list-topic', (li, val) => {
-            // Show all if no category selected, otherwise filter by category
-            if (!catId) return true; 
-            return !li.dataset.cat || li.dataset.cat == catId;
-        });
-
         const curTab = typeof currentHierarchyTab !== 'undefined' ? currentHierarchyTab : 'category';
-        const sourceData = curTab === 'category' ? categoriesDB : subjectsDB; // Use currentHierarchyTab
+        const sourceData = curTab === 'category' ? categoriesDB : subjectsDB;
         const typeLabel = curTab === 'category' ? 'Category' : 'Sub-Category';
         const linkKey = curTab === 'category' ? 'linked_category_id' : 'linked_topic_id';
+        
+        // Active Row for Linking Check
+        const row = syllabusData[activeRowIndex];
 
         const matches = sourceData.filter(item => {
+            // SHOW LINKED ONLY LOGIC
+            if (showLinkedOnly) {
+                if (!row) return false;
+                if (row[linkKey] != item.id) return false;
+            }
+
             if (query && !item.name.toLowerCase().includes(query)) return false;
             
             // For topics, filter by category if catId is set.
             if (curTab === 'topic' && catId && item.category_id != catId && item.category_id !== null) return false;
-            // Also if topicId is set, match specific topic.
-            if (curTab === 'topic' && topicId && item.id != topicId && item.id !== null) return false;
-
-            // Allow items with null hierarchy to be visible
-            if (courseId && item.course_id != courseId && item.course_id !== null) return false;
-            if (eduId && item.edu_level_id != eduId && item.edu_level_id !== null) return false;
-            if (posId && item.position_level_id != posId && item.position_level_id !== null) return false;
             
             return true;
         });
 
         if (matches.length === 0) {
-            container.innerHTML = `<div class="text-center py-12 bg-white rounded-xl border border-dashed border-slate-200 text-slate-400 italic font-medium">No results matching criteria</div>`;
+            container.innerHTML = `<div class="p-8 text-center text-slate-400 italic">No items found matching criteria</div>`;
             return;
         }
 
         matches.forEach(item => {
-            const isSelected = syllabusData[activeRowIndex] && syllabusData[activeRowIndex][linkKey] == item.id;
+            const isSelected = row && row[linkKey] == item.id;
             const el = document.createElement('div');
             el.className = `flex items-center justify-between p-4 mb-2 rounded-xl cursor-pointer transition-all duration-200 group ${isSelected ? 'bg-blue-600 shadow-lg shadow-blue-100' : 'bg-white border border-slate-100 hover:border-blue-300 hover:shadow-md'}`;
             
@@ -1084,6 +1069,52 @@ if (!empty($nodesTree)) {
         closeHierarchyModal();
     }
 
+    function toggleLinkedOnly() {
+        showLinkedOnly = !showLinkedOnly;
+        updateLinkedBtnState();
+        filterHierarchyList();
+    }
+    
+    function updateLinkedBtnState() {
+        const btn = document.getElementById('btn-show-linked');
+        if (!btn) return;
+        if (showLinkedOnly) {
+            btn.classList.add('text-blue-600', 'bg-blue-50', 'border-blue-100');
+            btn.classList.remove('text-slate-400', 'border-transparent');
+        } else {
+            btn.classList.remove('text-blue-600', 'bg-blue-50', 'border-blue-100');
+            btn.classList.add('text-slate-400', 'border-transparent');
+        }
+    }
+    
+    function resetHierarchyFilters() {
+        document.getElementById('modal-filter-course').value = '';
+        document.getElementById('modal-filter-edu').value = '';
+        document.getElementById('modal-filter-pos').value = '';
+        document.getElementById('modal-filter-cat').value = '';
+        document.getElementById('modal-filter-topic').value = '';
+        
+        resetDropdownUI('dropdown-course', 'Course');
+        resetDropdownUI('dropdown-edu', 'Edu. Level');
+        resetDropdownUI('dropdown-cat', 'Category');
+        resetDropdownUI('dropdown-topic', 'Sub-Cat');
+        resetDropdownUI('dropdown-pos', 'Pos. Level');
+        
+        filterHierarchyList();
+    }
+    
+    function resetDropdownUI(id, label) {
+        const el = document.getElementById(id);
+        if(el) {
+            const labelEl = el.querySelector('.dropdown-label');
+            if(labelEl) labelEl.innerText = label;
+        }
+    }
+    
+    function applyFilters() { 
+        filterHierarchyList(); 
+    }
+
     // --- SEARCHABLE DROPDOWNS LOGIC ---
     function initCustomDropdowns() {
         populateDropdown('course', coursesData, 'id', 'title');
@@ -1098,7 +1129,7 @@ if (!empty($nodesTree)) {
         initBodyClick();
     }
 
-    function populateDropdown(type, data, idKey, titleKey) {
+    function populateDropdown_OLD(type, data, idKey, titleKey) {
         const list = document.getElementById(`list-${type}`);
         if (!list) return;
         
@@ -1161,7 +1192,7 @@ if (!empty($nodesTree)) {
         }
     }
 
-    function selectCustomOption(type, value, name) {
+    function selectCustomOption_OLD(type, value, name) {
         // Update Hidden Input
         document.getElementById(`modal-filter-${type}`).value = value;
         
@@ -1176,11 +1207,244 @@ if (!empty($nodesTree)) {
         filterHierarchyList();
     }
 
-    function initBodyClick() {
-        document.body.addEventListener('click', (e) => {
-            if (!e.target.closest('.custom-dropdown')) {
-                document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.add('hidden'));
+    // --- NEW LOGIC FOR CASCADING & SAVING ---
+
+    function populateDropdown(type, data, idKey, titleKey) {
+        const list = document.getElementById(`list-${type}`);
+        if (!list) return;
+        
+        let html = `<li class="px-3 py-2 text-xs text-slate-500 hover:bg-slate-50 cursor-pointer" 
+                    onclick="selectCustomOption('${type}', '', 'Filter ${type.charAt(0).toUpperCase() + type.slice(1)}')"
+                    data-val="">All ${type.charAt(0).toUpperCase() + type.slice(1)}s</li>`;
+        
+        if (data.length === 0) {
+            html += `<li class="px-3 py-2 text-xs text-slate-400 italic cursor-default">No items found</li>`;
+        }
+
+        list.innerHTML = html;
+        
+        data.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 whitespace-nowrap transition-colors';
+            li.innerText = item[titleKey];
+            li.dataset.val = item[idKey];
+            
+            // Store Hierarchy IDs for Cascading Logic
+            if(type === 'edu') {
+                li.dataset.course = item.parent_id;
             }
+            if(type === 'cat') {
+                li.dataset.edu = item.edu_level_id;
+                li.dataset.course = item.course_id;
+            }
+            if(type === 'topic') {
+                li.dataset.cat = item.category_id;
+                li.dataset.edu = item.edu_level_id;
+                li.dataset.course = item.course_id;
+            }
+            if(type === 'pos') {
+                li.dataset.course = item.course_id;
+                li.dataset.edu = item.education_level_id;
+            }
+
+            li.onclick = () => selectCustomOption(type, item[idKey], item[titleKey]);
+            list.appendChild(li);
+        });
+    }
+
+    function selectCustomOption(type, value, name) {
+        // Update Hidden Input
+        document.getElementById(`modal-filter-${type}`).value = value;
+        
+        // Update Trigger Label
+        const trigger = document.querySelector(`#dropdown-${type} .dropdown-trigger span`);
+        if(trigger) trigger.innerText = name;
+        
+        // CASCADING RESET LOGIC
+        const resetChild = (childType, defaultLabel) => {
+             const input = document.getElementById(`modal-filter-${childType}`);
+             if(input) input.value = '';
+             resetDropdownUI(`dropdown-${childType}`, defaultLabel);
+        };
+
+        if(type === 'course') {
+            resetChild('edu', 'Edu. Level');
+            resetChild('cat', 'Category');
+            resetChild('topic', 'Sub-Cat');
+            resetChild('pos', 'Pos. Level');
+        } else if (type === 'edu') {
+            resetChild('cat', 'Category');
+            resetChild('topic', 'Sub-Cat');
+            resetChild('pos', 'Pos. Level');
+        } else if (type === 'cat') {
+            resetChild('topic', 'Sub-Cat');
+        }
+
+        // Apply Cascading Visibility
+        updateCascadingFilters();
+        
+        // Close Dropdown
+        document.querySelector(`#dropdown-${type} .dropdown-menu`).classList.add('hidden');
+        
+        // Trigger Main Filter List
+        filterHierarchyList();
+    }
+    
+    function updateCascadingFilters() {
+        const courseId = document.getElementById('modal-filter-course').value;
+        const eduId = document.getElementById('modal-filter-edu').value;
+        const catId = document.getElementById('modal-filter-cat').value;
+
+        const applyVisibility = (listId, predicate) => {
+            const list = document.getElementById(listId);
+            if(!list) return;
+            const items = list.querySelectorAll('li');
+            items.forEach(li => {
+                if(li.dataset.val === '') return; 
+                li.style.display = predicate(li) ? '' : 'none';
+            });
+        };
+
+        applyVisibility('list-edu', (li) => {
+            if (courseId && li.dataset.course && li.dataset.course != courseId) return false;
+            return true;
+        });
+
+        applyVisibility('list-cat', (li) => {
+            if (courseId && li.dataset.course && li.dataset.course != courseId) return false;
+            if (eduId && li.dataset.edu && li.dataset.edu != eduId) return false;
+            return true;
+        });
+
+        applyVisibility('list-topic', (li) => {
+            if (courseId && li.dataset.course && li.dataset.course != courseId) return false;
+            if (eduId && li.dataset.edu && li.dataset.edu != eduId) return false;
+            if (catId && li.dataset.cat && li.dataset.cat != catId) return false;
+            return true;
+        });
+
+        applyVisibility('list-pos', (li) => {
+            if (courseId && li.dataset.course && li.dataset.course != courseId) return false;
+            if (eduId && li.dataset.edu && li.dataset.edu != eduId) return false;
+            return true;
+        });
+    }
+
+    function saveLinkFromFilter() {
+        if(activeRowIndex === null || !syllabusData[activeRowIndex]) return;
+        const curTab = currentHierarchyTab;
+        
+        if (curTab === 'category') {
+            const catId = document.getElementById('modal-filter-cat').value;
+            if(catId) {
+                const li = document.querySelector(`#list-cat li[data-val="${catId}"]`);
+                const name = li ? li.innerText : 'Unknown';
+                selectHierarchyItem('category', catId, name);
+            } else {
+                alert("Please select a Category from the dropdown first.");
+            }
+        } else {
+            const topicId = document.getElementById('modal-filter-topic').value;
+            if(topicId) {
+                 const li = document.querySelector(`#list-topic li[data-val="${topicId}"]`);
+                 const name = li ? li.innerText : 'Unknown';
+                 selectHierarchyItem('topic', topicId, name);
+            } else {
+                 alert("Please select a Sub-Category from the dropdown first.");
+            }
+        }
+    }
+
+    function filterHierarchyList() {
+        const query = document.getElementById('hierarchy-search').value.toLowerCase();
+        const curTab = currentHierarchyTab; // global
+        const sourceData = curTab === 'category' ? categoriesDB : subjectsDB;
+        const linkKey = curTab === 'category' ? 'linked_category_id' : 'linked_topic_id';
+        const typeLabel = curTab === 'category' ? 'Category' : 'Sub-Category';
+        const row = syllabusData[activeRowIndex];
+        
+        // Filter Values
+        const courseId = document.getElementById('modal-filter-course').value;
+        const eduId = document.getElementById('modal-filter-edu').value;
+        const posId = document.getElementById('modal-filter-pos').value;
+        const catId = document.getElementById('modal-filter-cat').value;
+        const topicId = document.getElementById('modal-filter-topic').value;
+        
+        const container = document.getElementById('hierarchy-list-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const matches = sourceData.filter(item => {
+            // SHOW LINKED ONLY LOGIC
+            if (showLinkedOnly) {
+                if (!row) return false;
+                if (row[linkKey] != item.id) return false;
+            }
+
+            // Search Text
+            if (query && !item.name.toLowerCase().includes(query)) return false;
+            
+            // Course Filter
+            if (courseId && item.course_id && item.course_id != courseId) return false;
+            
+            // Edu Filter
+            if (eduId && item.edu_level_id && item.edu_level_id != eduId) return false;
+            
+            // Category Filter
+            if (catId) {
+                if (curTab === 'category') {
+                     if (item.id != catId) return false;
+                } else {
+                     if (item.category_id && item.category_id != catId) return false;
+                }
+            }
+            
+            // Topic Filter (Only relevant for Topic Tab really, or specific item match)
+            if (topicId && curTab === 'topic') {
+                if (item.id != topicId) return false;
+            }
+            
+            // Pos Level Filter (Optional, checking if Item belongs to pos level? Usually Position is Child of Sub-Cat, or orthogonal?)
+            // Controller for Subjects didn't join Position.
+            // But Categories check `position_level_id`?
+            // Existing `manage.php` previously had no Pos logic, except disabled code.
+            // I'll skip Pos logic for List Filtering unless data supports it.
+            // (Controller does NOT return position_level_id for categories/subjects).
+            
+            return true;
+        });
+
+        if (matches.length === 0) {
+            container.innerHTML = `<div class="p-8 text-center text-slate-400 italic">No items found matching criteria</div>`;
+            return;
+        }
+
+        matches.forEach(item => {
+            const isSelected = row && row[linkKey] == item.id;
+            const el = document.createElement('div');
+            el.className = `flex items-center justify-between p-4 mb-2 rounded-xl cursor-pointer transition-all duration-200 group ${isSelected ? 'bg-blue-600 shadow-lg shadow-blue-100' : 'bg-white border border-slate-100 hover:border-blue-300 hover:shadow-md'}`;
+            
+            const textClass = isSelected ? 'text-white' : 'text-slate-700';
+            const labelClass = isSelected ? 'bg-blue-500/50 text-blue-100' : 'bg-slate-100 text-slate-500';
+            const parentName = curTab === 'topic' ? item.category_name : (item.edu_level_id ? 'Edu Level ' + item.edu_level_id : ''); 
+            // Better parent name? Categories have edu_level_id. Subjects have category_name.
+            // For Categories, we don't have edu level NAME, just ID.
+            // We can leave parent name empty for Categories or show ID. User didn't ask.
+
+            el.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 flex items-center justify-center rounded-lg ${isSelected ? 'bg-white/20' : 'bg-blue-50 text-blue-500'}">
+                        <i class="fas ${curTab === 'category' ? 'fa-layer-group' : 'fa-tag'} text-xs"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-sm ${textClass}">${item.name}</div>
+                        ${curTab === 'topic' && item.category_name ? `<div class="text-[10px] opacity-70 ${textClass}">${item.category_name}</div>` : ''}
+                    </div>
+                </div>
+                <div class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-widest ${labelClass}">${typeLabel}</div>
+            `;
+            el.onclick = () => selectHierarchyItem(curTab, item.id, item.name);
+            container.appendChild(el);
         });
     }
 
