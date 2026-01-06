@@ -94,10 +94,10 @@ if (!empty($nodesTree)) {
                             <i class="fas fa-check-circle mr-2 text-emerald-500"></i>
                             <span id="tally-display" class="font-bold">230/230</span>
                         </div>
-                        <!-- Pass -->
                         <div class="flex-shrink-0 bg-emerald-50 text-emerald-900 border border-emerald-200 px-3 py-1.5 rounded-lg text-[11px] font-bold shadow-sm flex items-center">
                             <i class="fas fa-flag mr-2 text-emerald-500"></i> <span class="text-emerald-700/70 mr-1 uppercase tracking-wide">Pass:</span>
-                            <input type="text" id="global-pass-input" class="header-input text-emerald-900 w-8 bg-transparent border-b border-emerald-300 text-center focus:outline-none font-bold" placeholder="40" onblur="updateGlobalSetting('pass', this.value)">
+                            <span id="global-pass-display" class="font-bold text-emerald-900">40</span>
+                            <input type="hidden" id="global-pass-input" value="40">
                         </div>
                         <!-- Neg -->
                         <div class="flex-shrink-0 bg-rose-50 text-rose-900 border border-rose-200 px-3 py-1.5 rounded-lg text-[11px] font-bold shadow-sm flex items-center gap-1.5">
@@ -115,14 +115,17 @@ if (!empty($nodesTree)) {
                         </div>
                     </div>
 
-                    <!-- Actions -->
-                    <div class="flex items-center gap-2 shrink-0 print:hidden">
-                        <button onclick="addTopic()" class="h-9 px-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
-                            <i class="fas fa-plus mr-2 text-blue-500"></i> Row
-                        </button>
-                        <button onclick="openCloneModal()" class="h-9 px-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition flex items-center shadow-sm" title="Clone as new version">
-                            <i class="fas fa-copy mr-2 text-blue-500"></i> Clone
-                        </button>
+                    <!-- Right Actions -->
+                <div class="flex items-center gap-2 print:hidden ml-auto">
+                    <button onclick="loadSubEngineerTemplate()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold transition-all border border-slate-200">
+                        <i class="fas fa-magic text-blue-500"></i> Sub-Engineer
+                    </button>
+                    <button onclick="addTopic()" class="flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold transition-all border border-slate-200 shadow-sm">
+                        <i class="fas fa-plus text-blue-500"></i> Row
+                    </button>
+                    <button onclick="openCloneModal()" class="flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold transition-all border border-slate-200 shadow-sm">
+                        <i class="fas fa-copy text-indigo-500"></i> Clone
+                    </button>
                         <button onclick="saveSyllabus()" class="h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition shadow-md flex items-center">
                             <i class="fas fa-save mr-2"></i> Save Changes
                         </button>
@@ -960,6 +963,65 @@ if (!empty($nodesTree)) {
             recalculateTotals();
             renderGrid();
         }
+    }
+
+    function loadSubEngineerTemplate() {
+        Swal.fire({
+            title: 'Sub-Engineer Template',
+            text: "This will clear your current grid and load the standard Sub-Engineer Syllabus (Paper I, II, III). Proceed?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1e293b',
+            cancelButtonColor: '#f1f5f9',
+            confirmButtonText: 'Yes, Load Template',
+            customClass: { confirmButton: 'text-white', cancelButton: 'text-slate-600' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                syllabusData = [
+                    // PAPER I
+                    { id: 'p1', title: "Paper I: General Subject (MCQ)", type: "paper", depth: 0, weight: 100, time: 45, qCount: 100, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "any", selected: false },
+                    { id: 's1', title: "Part I: Gen. Awareness & Reasoning", type: "section", depth: 1, weight: 20, time: 0, qCount: 20, qOptional: 0, qEach: 1, selected: false },
+                    { id: 'u1', title: "General Awareness", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
+                    { id: 'u2', title: "Public Management & Reasoning", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
+                    { id: 's2', title: "Part II: General Technical Subject", type: "section", depth: 1, weight: 80, time: 0, qCount: 80, qOptional: 0, qEach: 1, selected: false },
+                    { id: 'u3', title: "Surveying", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
+                    { id: 'u4', title: "Construction Materials", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
+                    { id: 'u5', title: "Soil Mechanics", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
+                    { id: 'u6', title: "Hydraulics", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
+                    { id: 'u7', title: "Structural Engineering", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
+                    { id: 'u8', title: "Water Supply & Sanitary", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
+                    { id: 'u9', title: "Highway Engineering", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
+                    { id: 'u10', title: "Estimating & Costing", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
+                    
+                    // PAPER II
+                    { id: 'p2', title: "Paper II: Technical Subjective (Theoretical)", type: "paper", depth: 0, weight: 100, time: 135, qCount: 14, qOptional: 0, qEach: 0, qType: "subjective", difficulty: "any", selected: false },
+                    { id: 's3', title: "Section A: Structures", type: "section", depth: 1, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, selected: false },
+                    { id: 'u11', title: "Structural Analysis (Subjective)", type: "unit", depth: 2, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, qType: "subjective", difficulty: "hard", selected: false },
+                    { id: 's4', title: "Section B: Water Resources", type: "section", depth: 1, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, selected: false },
+                    { id: 'u12', title: "Irrigation Engineering", type: "unit", depth: 2, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, qType: "subjective", difficulty: "hard", selected: false },
+                    { id: 's5', title: "Section C: Transportation", type: "section", depth: 1, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, selected: false },
+                    { id: 'u13', title: "Highway Design", type: "unit", depth: 2, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, qType: "subjective", difficulty: "hard", selected: false },
+                    { id: 's6', title: "Section D: Public Health", type: "section", depth: 1, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, selected: false },
+                    { id: 'u14', title: "Sanitary Engineering", type: "unit", depth: 2, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, qType: "subjective", difficulty: "hard", selected: false },
+                    { id: 's7', title: "Section E: Management", type: "section", depth: 1, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, selected: false },
+                    { id: 'u15', title: "Project Planning", type: "unit", depth: 2, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, qType: "subjective", difficulty: "hard", selected: false },
+                    
+                    // PHASE III
+                    { id: 'p3', title: "Phase III: Interview", type: "paper", depth: 0, weight: 30, time: 30, qCount: 1, qOptional: 0, qEach: 30, qType: "oral", difficulty: "medium", selected: false },
+                    { id: 'u16', title: "Personal Interview", type: "unit", depth: 1, weight: 30, time: 30, qCount: 1, qOptional: 0, qEach: 30, qType: "oral", difficulty: "medium", selected: false }
+                ];
+                
+                // Update global metrics from images
+                document.getElementById('global-marks-input').value = 230;
+                document.getElementById('global-time-input').value = "3h 30m";
+                document.getElementById('global-pass-display').innerText = 40;
+                document.getElementById('global-pass-input').value = 40;
+                
+                recalculateTotals();
+                renderGrid();
+                Swal.fire('Loaded!', 'Standard Sub-Engineer curriculum has been generated.', 'success');
+            }
+        });
     }
 
     function addTopic() {
