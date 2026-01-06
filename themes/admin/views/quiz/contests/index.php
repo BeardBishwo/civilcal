@@ -252,7 +252,7 @@ function processContest(id) {
 }
 
 .admin-wrapper-container { padding: 1rem; background: #f1f5f9; min-height: calc(100vh - 70px); }
-.admin-content-wrapper { background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; padding-bottom: 2rem; }
+.admin-content-wrapper { background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; /* padding-bottom: 2rem; REMOVED FOR CLEANER UI */ }
 
 /* Font Branding */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');

@@ -296,7 +296,7 @@ $content = '
     border-radius: 12px;
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
     overflow: hidden;
-    padding-bottom: 2rem;
+    /* padding-bottom: 2rem; REMOVED FOR CLEANER UI */
 }
 
 /* Header */

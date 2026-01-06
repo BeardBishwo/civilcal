@@ -140,7 +140,7 @@ const baseUrl = '<?= app_base_url() ?>';
    IMPORT SUITE STYLES
    ======================================== */
 .admin-wrapper-container { padding: 1rem; background: #f1f5f9; min-height: calc(100vh - 70px); }
-.admin-content-wrapper { background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; padding-bottom: 2rem; }
+.admin-content-wrapper { background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; /* padding-bottom: 2rem; REMOVED FOR CLEANER UI */ }
 
 /* Header Sync */
 .compact-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2rem; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; }
