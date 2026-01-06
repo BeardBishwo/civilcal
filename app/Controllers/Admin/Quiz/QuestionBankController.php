@@ -26,7 +26,15 @@ class QuestionBankController extends Controller
     public function index()
     {
         $page = $_GET['page'] ?? 1;
-        $limit = 20;
+        $perPage = $_GET['per_page'] ?? 10;
+        
+        // Validate per_page to prevent abuse
+        $allowedPerPage = [5, 10, 20, 50, 100, 200];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 10;
+        }
+        
+        $limit = (int)$perPage;
         $offset = ($page - 1) * $limit;
         
         $where = [];
@@ -44,16 +52,22 @@ class QuestionBankController extends Controller
             $params['type'] = $_GET['type'];
         }
 
-        // Filter by Course/Stream (NEW)
+        // Filter by Course/Stream (OPTIMIZED)
         if (!empty($_GET['stream'])) {
-            $where[] = "JSON_CONTAINS(q.tags, :stream)";
-            $params['stream'] = '"' . $_GET['stream'] . '"';
+            $where[] = "q.course_id = :course_id";
+            $params['course_id'] = $_GET['stream'];
         }
 
-        // Filter by Education Level (NEW)
+        // Filter by Education Level (OPTIMIZED)
         if (!empty($_GET['education_level'])) {
-            $where[] = "JSON_CONTAINS(q.tags, :edu_level)";
-            $params['edu_level'] = '"' . $_GET['education_level'] . '"';
+            $where[] = "q.edu_level_id = :edu_level";
+            $params['edu_level'] = $_GET['education_level'];
+        }
+
+        // Filter by Category (NEW)
+        if (!empty($_GET['category_id'])) {
+            $where[] = "q.category_id = :category_id";
+            $params['category_id'] = $_GET['category_id'];
         }
 
         // Filter by Position Level (Junction Table)
@@ -109,7 +123,8 @@ class QuestionBankController extends Controller
             'stats' => $stats,
             'page' => $page,
             'limit' => $limit,
-            'limit' => $limit,
+            'offset' => $offset,
+            'totalPages' => ceil($total / $limit),
             'mainCategories' => $mainCategories,
             'courses' => $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC")->fetchAll(),
             'educationLevels' => $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'education_level' ORDER BY order_index ASC")->fetchAll(),
@@ -248,9 +263,30 @@ class QuestionBankController extends Controller
             
             $levelTags = !empty($_POST['level_tags']) ? json_encode($_POST['level_tags']) : json_encode([]);
 
+            // NEW: Relational Filter Persistence
+            $filterContext = [
+                'course_id' => null,
+                'edu_level_id' => null,
+                'category_id' => null,
+                'sub_category_id' => null
+            ];
+
+            if (!empty($_POST['mappings']) && is_array($_POST['mappings'])) {
+                foreach ($_POST['mappings'] as $m) {
+                    if (!empty($m['unit_id'])) {
+                        $filterContext = $this->syllabusService->resolveFilterContext($m['unit_id']);
+                        break; // Use the first valid unit for master filtering
+                    }
+                }
+            }
+
             $data = [
                 'unique_code' => 'Q-' . time(),
                 'topic_id' => 0, 
+                'course_id' => $filterContext['course_id'],
+                'edu_level_id' => $filterContext['edu_level_id'],
+                'category_id' => $filterContext['category_id'],
+                'sub_category_id' => $filterContext['sub_category_id'],
                 'type' => $type,
                 'content' => json_encode($content),
                 'options' => json_encode($options),
@@ -338,8 +374,29 @@ class QuestionBankController extends Controller
             
             $levelTags = !empty($_POST['level_tags']) ? json_encode($_POST['level_tags']) : json_encode([]);
 
+            // NEW: Relational Filter Persistence
+            $filterContext = [
+                'course_id' => null,
+                'edu_level_id' => null,
+                'category_id' => null,
+                'sub_category_id' => null
+            ];
+
+            if (!empty($_POST['mappings']) && is_array($_POST['mappings'])) {
+                foreach ($_POST['mappings'] as $m) {
+                    if (!empty($m['unit_id'])) {
+                        $filterContext = $this->syllabusService->resolveFilterContext($m['unit_id']);
+                        break; 
+                    }
+                }
+            }
+
             $data = [
                 'type' => $type,
+                'course_id' => $filterContext['course_id'],
+                'edu_level_id' => $filterContext['edu_level_id'],
+                'category_id' => $filterContext['category_id'],
+                'sub_category_id' => $filterContext['sub_category_id'],
                 'content' => json_encode($content),
                 'options' => json_encode($options),
                 'answer_explanation' => $_POST['answer_explanation'] ?? '',
@@ -388,6 +445,91 @@ class QuestionBankController extends Controller
 
         } catch (Exception $e) {
             $this->jsonResponse(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    public function delete($id)
+    {
+        try {
+            // Check if question exists
+            $question = $this->db->findOne('quiz_questions', ['id' => $id]);
+            if (!$question) {
+                return $this->jsonResponse(['success' => false, 'status' => 'error', 'message' => 'Question not found']);
+            }
+
+            // 1. Delete syllabus mappings (Primary/Secondary)
+            $this->db->delete('question_stream_map', "question_id = :qid", ['qid' => $id]);
+
+            // 2. Delete position levels (Junction)
+            $this->db->delete('question_position_levels', "question_id = :qid", ['qid' => $id]);
+            
+            // 3. Finally delete the question
+            $this->db->delete('quiz_questions', "id = :id", ['id' => $id]);
+
+            return $this->jsonResponse(['success' => true, 'status' => 'success', 'message' => 'Question deleted successfully']);
+        } catch (Exception $e) {
+            return $this->jsonResponse(['success' => false, 'status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function bulkDelete()
+    {
+        try {
+            // Get IDs from POST
+            $input = json_decode(file_get_contents('php://input'), true);
+            $ids = $input['ids'] ?? [];
+            
+            if (empty($ids) || !is_array($ids)) {
+                return $this->jsonResponse(['success' => false, 'status' => 'error', 'message' => 'No questions selected']);
+            }
+            
+            // Validate IDs are integers
+            $ids = array_filter($ids, 'is_numeric');
+            $ids = array_map('intval', $ids);
+            
+            if (empty($ids)) {
+                return $this->jsonResponse(['success' => false, 'status' => 'error', 'message' => 'Invalid question IDs']);
+            }
+            
+            $successCount = 0;
+            $failCount = 0;
+            
+            // Use transaction for better performance
+            $this->db->beginTransaction();
+            
+            try {
+                $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                
+                // 1. Delete all mappings in one query
+                $stmt = $this->db->prepare("DELETE FROM question_stream_map WHERE question_id IN ($placeholders)");
+                $stmt->execute($ids);
+                
+                // 2. Delete all position levels in one query
+                $stmt = $this->db->prepare("DELETE FROM question_position_levels WHERE question_id IN ($placeholders)");
+                $stmt->execute($ids);
+                
+                // 3. Delete all questions in one query
+                $stmt = $this->db->prepare("DELETE FROM quiz_questions WHERE id IN ($placeholders)");
+                $stmt->execute($ids);
+                
+                $successCount = $stmt->rowCount();
+                
+                $this->db->commit();
+                
+                return $this->jsonResponse([
+                    'success' => true, 
+                    'status' => 'success', 
+                    'message' => "Successfully deleted $successCount question(s)",
+                    'deleted' => $successCount
+                ]);
+                
+            } catch (Exception $e) {
+                $this->db->rollBack();
+                throw $e;
+            }
+            
+        } catch (Exception $e) {
+            return $this->jsonResponse(['success' => false, 'status' => 'error', 'message' => $e->getMessage()]);
         }
     }
 

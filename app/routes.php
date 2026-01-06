@@ -2057,9 +2057,20 @@ $router->add("POST", "/admin/quiz/blueprints/rule/{id}/delete", "Admin\\Quiz\\Bl
 
 $router->add("POST", "/admin/quiz/questions/update/{id}", "Admin\\Quiz\\QuestionBankController@update", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/questions/delete/{id}", "Admin\\Quiz\\QuestionBankController@delete", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/questions/bulk-delete", "Admin\\Quiz\\QuestionBankController@bulkDelete", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/questions/search", "Admin\\Quiz\\QuestionBankController@searchJson", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/import", "Admin\\Quiz\\QuestionImportController@index", ["auth", "admin"]);
-$router->add("POST", "/admin/quiz/import/upload", "Admin\\Quiz\\QuestionImportController@upload", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/import/template", "Admin\\Quiz\\QuestionImportController@downloadTemplate", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/import/upload", "Admin\\Quiz\\QuestionImportController@processChunk", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/import/staging/{batchId}", "Admin\\Quiz\\QuestionImportController@stagingStats", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/import/resolve", "Admin\\Quiz\\QuestionImportController@resolve", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/import/publish", "Admin\\Quiz\\QuestionImportController@publishClean", ["auth", "admin"]);
+
+// Staging Queue Management
+$router->add("GET", "/admin/quiz/staging", "Admin\\Quiz\\StagingQueueController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/staging/batch/{batchId}", "Admin\\Quiz\\StagingQueueController@viewBatch", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/staging/delete", "Admin\\Quiz\\StagingQueueController@deleteBatch", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/staging/clean-old", "Admin\\Quiz\\StagingQueueController@cleanOldBatches", ["auth", "admin"]);
 
 
 // Terminology Manager (Word Bank)

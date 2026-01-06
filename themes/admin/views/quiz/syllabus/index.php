@@ -79,7 +79,7 @@
                             </td></tr>
                         <?php else: ?>
                             <?php foreach ($positions as $pos): 
-                                $levelName = $pos['level'] ?? 'Unassigned / Draft';
+                                $levelName = $pos['level'];
                                 $safeLevel = urlencode($levelName);
                                 $completeness = ($pos['active_nodes'] / max(1, $pos['total_nodes'])) * 100;
                             ?>
@@ -132,15 +132,9 @@
                                              <button class="action-btn-icon" onclick="duplicatePosition('<?php echo addslashes($levelName); ?>')" title="Duplicate" style="color: #f59e0b;">
                                                  <i class="fas fa-copy"></i>
                                              </button>
-                                             <?php if ($levelName !== 'Unassigned / Draft'): ?>
-                                                <button class="action-btn-icon" onclick="deletePosition('<?php echo addslashes($levelName); ?>')" title="Delete" style="color: #ef4444;">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                             <?php else: ?>
-                                                <button class="action-btn-icon opacity-30 cursor-not-allowed" title="System Protected" onclick="Swal.fire('Protected', 'This is the master draft item and cannot be deleted.', 'info')">
-                                                    <i class="fas fa-lock text-slate-400"></i>
-                                                </button>
-                                             <?php endif; ?>
+                                             <button class="action-btn-icon" onclick="deletePosition('<?php echo addslashes($levelName); ?>')" title="Delete" style="color: #ef4444;">
+                                                 <i class="fas fa-trash-alt"></i>
+                                             </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -209,17 +203,13 @@
     }
 
     function deletePosition(level) {
-        if (level === 'Unassigned / Draft') {
-            Swal.fire('System Protected', 'The Master Draft curriculum is linked to your core data and cannot be deleted.', 'error');
-            return;
-        }
         Swal.fire({
             title: 'Delete Syllabus?',
-            html: `Permanently delete <strong>${level}</strong> and all its nodes?`,
+            html: `This will delete the structural <strong>${level}</strong> syllabus.<br><br>Master filters (Sections/Units) will be preserved.`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
-            confirmButtonText: 'Delete All',
+            confirmButtonText: 'Delete Syllabus',
         }).then((result) => {
             if(result.isConfirmed) {
                 const fd = new FormData(); fd.append('level', level);

@@ -1,238 +1,467 @@
 /**
- * PREMIUM IMPORT MANAGER ENGINE
- * Optimized for high-density UI interactions and real-time conflict handling.
+ * IMPORT MANAGER - Enterprise Question Ingestion System
+ * Handles chunked uploads, staging queue, and conflict resolution
  */
-const ImportManager = {
-    batchId: null,
-    currentTab: 'clean',
 
-    init: function () {
-        const input = document.getElementById('fileInput');
-        if (input) {
-            input.addEventListener('change', this.handleFileSelect.bind(this));
+const ImportManager = {
+    currentBatch: null,
+    currentFile: null,
+    totalRows: 0,
+    processedRows: 0,
+
+    /**
+     * Initialize the import manager
+     */
+    init() {
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    this.handleFileSelect(e.target.files[0]);
+                }
+            });
+        }
+
+        // Drag and drop support
+        const uploadCard = document.querySelector('.upload-card');
+        if (uploadCard) {
+            uploadCard.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadCard.style.borderColor = '#6366f1';
+                uploadCard.style.background = '#f5f3ff';
+            });
+
+            uploadCard.addEventListener('dragleave', () => {
+                uploadCard.style.borderColor = '#e2e8f0';
+                uploadCard.style.background = '#f8fafc';
+            });
+
+            uploadCard.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadCard.style.borderColor = '#e2e8f0';
+                uploadCard.style.background = '#f8fafc';
+                
+                if (e.dataTransfer.files.length > 0) {
+                    this.handleFileSelect(e.dataTransfer.files[0]);
+                }
+            });
         }
     },
 
-    handleFileSelect: function (e) {
-        const file = e.target.files[0];
-        if (!file) return;
+    /**
+     * Handle file selection
+     */
+    handleFileSelect(file) {
+        // Validate file type
+        const validTypes = [
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.ms-excel',
+            'text/csv'
+        ];
 
-        // UI Transition
-        const progressContainer = document.getElementById('uploadProgress');
-        if (progressContainer) progressContainer.style.display = 'block';
+        if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls|csv)$/i)) {
+            Swal.fire('Invalid File', 'Please upload an Excel (.xlsx, .xls) or CSV file.', 'error');
+            return;
+        }
 
-        document.getElementById('progressBar').style.width = '0%';
+        // Validate file size (10MB max)
+        if (file.size > 10 * 1024 * 1024) {
+            Swal.fire('File Too Large', 'Maximum file size is 10MB. Please split your data into smaller files.', 'error');
+            return;
+        }
 
-        Swal.fire({
-            title: 'Initializing Ingestion',
-            text: 'Analyzing engineering questionnaire structure...',
-            didOpen: () => Swal.showLoading(),
-            allowOutsideClick: false
+        this.currentFile = file;
+        this.startUpload();
+    },
+
+    /**
+     * Start chunked upload process
+     */
+    async startUpload() {
+        // Show progress UI
+        document.getElementById('uploadProgress').style.display = 'block';
+        
+        this.processedRows = 0;
+        let startRow = 2; // Skip header
+        let eof = false;
+
+        try {
+            while (!eof) {
+                const result = await this.uploadChunk(startRow);
+                
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+
+                this.currentBatch = result.batch_id;
+                this.processedRows = result.current_row - 1; // -1 because we skip header
+                
+                // Update progress
+                const progress = Math.min(100, (this.processedRows / 1000) * 100); // Estimate
+                this.updateProgress(progress, `Processed ${this.processedRows} rows...`);
+
+                eof = result.eof;
+                startRow = result.next_row;
+
+                // Small delay to prevent overwhelming the server
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            // Upload complete - load staging
+            this.updateProgress(100, 'Upload complete! Loading staging queue...');
+            
+            setTimeout(() => {
+                this.loadStaging(this.currentBatch);
+            }, 1000);
+
+        } catch (error) {
+            console.error('Upload error:', error);
+            Swal.fire('Upload Failed', error.message || 'An error occurred during upload', 'error');
+            document.getElementById('uploadProgress').style.display = 'none';
+        }
+    },
+
+    /**
+     * Upload single chunk
+     */
+    async uploadChunk(startRow) {
+        const formData = new FormData();
+        formData.append('import_file', this.currentFile);
+        formData.append('start_row', startRow);
+
+        const response = await fetch(`${baseUrl}/admin/quiz/import/upload`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
         });
 
-        this.uploadChunk(file, 2); // Start at row 2
-    },
-
-    uploadChunk: function (file, startRow) {
-        const formData = new FormData();
-        formData.append('import_file', file);
-        formData.append('start_row', startRow);
-        if (this.batchId) {
-            formData.append('batch_id', this.batchId);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        fetch(`${baseUrl}/api/admin/quiz/import/process-chunk`, {
-            method: 'POST',
-            body: formData
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) {
-                    Swal.fire('Ingestion Failed', data.error, 'error');
-                    return;
-                }
-
-                if (!this.batchId && data.batch_id) {
-                    this.batchId = data.batch_id;
-                }
-
-                const percent = Math.min(100, Math.round((data.current_row / data.total_rows) * 100));
-                document.getElementById('progressBar').style.width = percent + '%';
-                document.getElementById('progressText').innerText = percent + '%';
-
-                if (!data.eof) {
-                    this.uploadChunk(file, data.next_row);
-                } else {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Analysis Complete',
-                        text: 'Questionnaire staged for verification.',
-                        timer: 1500,
-                        showConfirmButton: false
-                    }).then(() => {
-                        this.loadStagingData(this.batchId);
-                    });
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                Swal.fire('Network Core Error', 'System handshake failed.', 'error');
-            });
+        return await response.json();
     },
 
-    loadStagingData: function (batchId) {
-        document.getElementById('uploadSection').style.display = 'none';
-        document.getElementById('stagingSection').style.display = 'block';
+    /**
+     * Update progress bar
+     */
+    updateProgress(percent, statusText) {
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const statusTextEl = document.querySelector('.status-text');
 
-        fetch(`${baseUrl}/api/admin/quiz/import/staging-stats/${batchId}`)
-            .then(res => res.json())
-            .then(data => {
-                // Update Badge Counts
-                document.getElementById('cleanCount').innerText = data.clean_count;
-                document.getElementById('btnCleanCount').innerText = data.clean_count;
-                document.getElementById('dupCount').innerText = data.duplicate_count;
-                document.getElementById('statsStaged').innerText = data.clean_count + data.duplicate_count;
+        if (progressBar) progressBar.style.width = `${percent}%`;
+        if (progressText) progressText.textContent = `${Math.round(percent)}%`;
+        if (statusTextEl) statusTextEl.textContent = statusText;
+    },
 
-                // Render Clean Table
-                const cleanBody = document.getElementById('cleanTableBody');
-                cleanBody.innerHTML = data.clean_rows.length > 0
-                    ? data.clean_rows.map(row => `
-                        <tr>
-                            <td><span class="cat-tag">${row.category}</span></td>
-                            <td><div class="q-preview" title="${row.question_text}">${row.question_text}</div></td>
-                            <td class="text-center"><span class="type-badge">${row.type.toUpperCase()}</span></td>
-                            <td class="text-center">
-                                <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-1 rounded-pill" style="font-size: 0.6rem;">
-                                    <i class="fas fa-check-circle me-1"></i> VERIFIED
-                                </span>
-                            </td>
-                        </tr>
-                    `).join('')
-                    : `<tr><td colspan="4" class="text-center py-5 text-muted small">No clean questions found in this batch.</td></tr>`;
+    /**
+     * Load staging data
+     */
+    async loadStaging(batchId) {
+        try {
+            const response = await fetch(`${baseUrl}/admin/quiz/import/staging/${batchId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
 
-                // Render Duplicates Grid
-                const dupContainer = document.getElementById('duplicateContainer');
-                dupContainer.innerHTML = data.duplicate_rows.length > 0
-                    ? data.duplicate_rows.map(row => `
-                        <div class="conflict-card" id="card-${row.id}">
-                            <div class="conflict-header">
-                                <span class="conflict-title"><i class="fas fa-exclamation-triangle"></i> System Collision Detected</span>
-                                <span class="badge bg-white text-rose border border-rose-100 px-2 py-1 rounded small">REF ID: #${row.match_id}</span>
-                            </div>
-                            <div class="conflict-body">
-                                <div class="compare-box new">
-                                    <span class="compare-label">Incoming Ingestion</span>
-                                    <div class="compare-text">${row.new_question}</div>
-                                    <div class="mt-2 small text-emerald fw-bold"><i class="fas fa-list-ul"></i> ${row.new_options_count} Options</div>
-                                </div>
-                                <div class="conflict-ops">
-                                    <button class="arch-btn primary success ultra-sm w-100" onclick="ImportManager.resolveOne(${row.id}, 'overwrite')">
-                                        USE NEW <i class="fas fa-arrow-right"></i>
-                                    </button>
-                                    <button class="arch-btn secondary ultra-sm w-100" onclick="ImportManager.resolveOne(${row.id}, 'skip')">
-                                        KEEP CURRENT
-                                    </button>
-                                </div>
-                                <div class="compare-box old">
-                                    <span class="compare-label">Current Database Record</span>
-                                    <div class="compare-text text-muted">${row.old_question}</div>
-                                    <div class="mt-2 small text-slate-400 font-italic"><i class="fas fa-history"></i> Used in ${row.usage_count} sessions</div>
-                                </div>
-                            </div>
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // Update stats
+            document.getElementById('cleanCount').textContent = data.clean_count;
+            document.getElementById('dupCount').textContent = data.duplicate_count;
+            document.getElementById('btnCleanCount').textContent = data.clean_count;
+            document.getElementById('statsStaged').textContent = data.clean_count + data.duplicate_count;
+
+            // Populate tables
+            this.populateCleanTable(data.clean_rows);
+            this.populateDuplicateCards(data.duplicate_rows);
+
+            // Show staging section
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('stagingSection').style.display = 'block';
+
+        } catch (error) {
+            console.error('Load staging error:', error);
+            Swal.fire('Error', 'Failed to load staging data', 'error');
+        }
+    },
+
+    /**
+     * Populate clean questions table
+     */
+    populateCleanTable(rows) {
+        const tbody = document.getElementById('cleanTableBody');
+        tbody.innerHTML = '';
+
+        if (rows.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 3rem; color: #94a3b8;">
+                        <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                        No clean questions found
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        rows.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><span class="cat-tag">${row.category}</span></td>
+                <td><div class="q-preview">${row.question_text}</div></td>
+                <td class="text-center"><span class="type-badge">${row.type}</span></td>
+                <td class="text-center"><i class="fas fa-check-circle" style="color: #10b981;"></i></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    },
+
+    /**
+     * Populate duplicate conflict cards
+     */
+    populateDuplicateCards(rows) {
+        const container = document.getElementById('duplicateContainer');
+        container.innerHTML = '';
+
+        if (rows.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 3rem; color: #94a3b8;">
+                    <i class="fas fa-check-double" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                    <h3 style="color: #64748b;">No Conflicts Found</h3>
+                    <p>All questions are unique and ready to publish!</p>
+                </div>
+            `;
+            return;
+        }
+
+        rows.forEach(row => {
+            const card = document.createElement('div');
+            card.className = 'conflict-card';
+            card.innerHTML = `
+                <div class="conflict-header">
+                    <div class="conflict-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Duplicate Detected (Used in ${row.usage_count} exams)
+                    </div>
+                </div>
+                <div class="conflict-body">
+                    <div class="compare-box new">
+                        <div class="compare-label">📥 New Import</div>
+                        <div class="compare-text">${row.new_question}</div>
+                        <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #64748b;">
+                            ${row.new_options_count} options • Answer: ${row.new_answer}
                         </div>
-                    `).join('')
-                    : `<div class="text-center py-5 text-muted small"><i class="fas fa-check-circle fa-3x mb-3 opacity-20"></i><br>Zero system collisions detected. Batch is clean.</div>`;
-
-                // Switch to duplicate tab if only duplicates exist
-                if (data.clean_count === 0 && data.duplicate_count > 0) {
-                    this.switchTab('duplicates');
-                }
-            });
+                    </div>
+                    <div class="conflict-ops">
+                        <button class="arch-btn secondary ultra-sm" onclick="ImportManager.resolveConflict(${row.id}, 'skip')">
+                            <i class="fas fa-times"></i> Skip New
+                        </button>
+                        <button class="arch-btn danger-outline ultra-sm" onclick="ImportManager.resolveConflict(${row.id}, 'overwrite')">
+                            <i class="fas fa-sync"></i> Overwrite
+                        </button>
+                    </div>
+                    <div class="compare-box old">
+                        <div class="compare-label">💾 Existing Question</div>
+                        <div class="compare-text">${row.old_question}</div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
     },
 
-    switchTab: function (tab) {
-        this.currentTab = tab;
-        document.getElementById('tabClean').classList.toggle('active', tab === 'clean');
-        document.getElementById('tabDup').classList.toggle('active', tab === 'duplicates');
+    /**
+     * Switch between tabs
+     */
+    switchTab(tab) {
+        // Update tab buttons
+        document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+        document.getElementById(tab === 'clean' ? 'tabClean' : 'tabDup').classList.add('active');
 
+        // Update content panes
         document.getElementById('paneClean').style.display = tab === 'clean' ? 'block' : 'none';
         document.getElementById('paneDuplicates').style.display = tab === 'duplicates' ? 'block' : 'none';
 
+        // Update action buttons
         document.getElementById('cleanActions').style.display = tab === 'clean' ? 'block' : 'none';
         document.getElementById('dupActions').style.display = tab === 'duplicates' ? 'block' : 'none';
     },
 
-    resolveOne: function (stagingId, action) {
-        fetch(`${baseUrl}/api/admin/quiz/import/resolve`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: stagingId, action: action })
-        })
-            .then(res => res.json())
-            .then(data => {
-                const card = document.getElementById(`card-${stagingId}`);
-                if (card) {
-                    card.style.transition = '0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-                    card.style.opacity = '0';
-                    card.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        card.remove();
-                        this.updateCounts();
-                    }, 400);
-                }
+    /**
+     * Resolve single conflict
+     */
+    async resolveConflict(id, action) {
+        try {
+            const response = await fetch(`${baseUrl}/admin/quiz/import/resolve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ id, action })
             });
-    },
 
-    resolveAll: function (action) {
-        Swal.fire({
-            title: `Batch Resolution: ${action.toUpperCase()}`,
-            text: `Are you sure you want to apply this protocol to ALL staged conflicts?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Execute Protocol',
-            confirmButtonColor: action === 'overwrite' ? '#e11d48' : '#6366f1'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const cards = document.querySelectorAll('.conflict-card');
-                cards.forEach(card => {
-                    const id = card.id.replace('card-', '');
-                    this.resolveOne(id, action);
-                });
-                Swal.fire('Protocol Executed', 'Conflicts are being resolved in the background.', 'success');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        });
-    },
 
-    updateCounts: function () {
-        const count = document.querySelectorAll('.conflict-card').length;
-        document.getElementById('dupCount').innerText = count;
-        if (count === 0) {
-            document.getElementById('duplicateContainer').innerHTML = `<div class="text-center py-5 text-muted small"><i class="fas fa-check-circle fa-3x mb-3 opacity-20 text-emerald"></i><br>All collisions resolved.</div>`;
+            // Reload staging
+            await this.loadStaging(this.currentBatch);
+
+            Swal.fire({
+                icon: 'success',
+                title: action === 'skip' ? 'Skipped' : 'Overwritten',
+                timer: 1000,
+                showConfirmButton: false
+            });
+
+        } catch (error) {
+            console.error('Resolve error:', error);
+            Swal.fire('Error', 'Failed to resolve conflict', 'error');
         }
     },
 
-    publishClean: function () {
-        Swal.fire({
-            title: 'Deploy to Production?',
-            text: "All verified questions will be moved to the live question bank.",
+    /**
+     * Publish all clean questions
+     */
+    async publishClean() {
+        const cleanCount = parseInt(document.getElementById('btnCleanCount').textContent);
+        
+        if (cleanCount === 0) {
+            Swal.fire('No Questions', 'There are no clean questions to publish', 'info');
+            return;
+        }
+
+        const result = await Swal.fire({
+            title: `Publish ${cleanCount} Questions?`,
+            text: 'This will move all clean questions to the live question bank.',
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'Publish All',
-            confirmButtonColor: '#10b981'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({ title: 'Deploying...', didOpen: () => Swal.showLoading() });
-                fetch(`${baseUrl}/api/admin/quiz/import/publish-clean`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ batch_id: this.batchId })
-                }).then(() => {
-                    Swal.fire({ icon: 'success', title: 'Mission Success', text: 'Questions are now live.', timer: 1500, showConfirmButton: false })
-                        .then(() => window.location.reload());
-                });
+            confirmButtonColor: '#10b981',
+            confirmButtonText: 'Publish All'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            Swal.fire({
+                title: 'Publishing...',
+                text: `Moving ${cleanCount} questions to live database...`,
+                didOpen: () => { Swal.showLoading(); },
+                allowOutsideClick: false
+            });
+
+            const response = await fetch(`${baseUrl}/admin/quiz/import/publish`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ batch_id: this.currentBatch })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Published!',
+                text: `Successfully published ${cleanCount} questions to the question bank.`,
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                // Reload page or redirect to question bank
+                window.location.href = `${baseUrl}/admin/quiz/questions`;
+            });
+
+        } catch (error) {
+            console.error('Publish error:', error);
+            Swal.fire('Error', 'Failed to publish questions', 'error');
+        }
+    },
+
+    /**
+     * Resolve all conflicts with same action
+     */
+    async resolveAll(action) {
+        const dupCount = parseInt(document.getElementById('dupCount').textContent);
+        
+        if (dupCount === 0) return;
+
+        const result = await Swal.fire({
+            title: `${action === 'skip' ? 'Skip' : 'Overwrite'} All ${dupCount} Conflicts?`,
+            text: action === 'skip' ? 'New questions will be discarded' : 'Existing questions will be updated',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: action === 'skip' ? '#64748b' : '#ef4444',
+            confirmButtonText: action === 'skip' ? 'Skip All' : 'Overwrite All'
+        });
+
+        if (!result.isConfirmed) return;
+
+        // Get all duplicate IDs from the DOM
+        const cards = document.querySelectorAll('.conflict-card');
+        const promises = [];
+
+        cards.forEach(card => {
+            const button = card.querySelector(`button[onclick*="${action}"]`);
+            if (button) {
+                const onclick = button.getAttribute('onclick');
+                const idMatch = onclick.match(/resolveConflict\((\d+),/);
+                if (idMatch) {
+                    const id = parseInt(idMatch[1]);
+                    promises.push(
+                        fetch(`${baseUrl}/admin/quiz/import/resolve`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({ id, action })
+                        })
+                    );
+                }
             }
         });
+
+        try {
+            Swal.fire({
+                title: 'Processing...',
+                didOpen: () => { Swal.showLoading(); },
+                allowOutsideClick: false
+            });
+
+            await Promise.all(promises);
+
+            // Reload staging
+            await this.loadStaging(this.currentBatch);
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Complete!',
+                text: `All conflicts ${action === 'skip' ? 'skipped' : 'overwritten'}`,
+                timer: 1500,
+                showConfirmButton: false
+            });
+
+        } catch (error) {
+            console.error('Resolve all error:', error);
+            Swal.fire('Error', 'Failed to resolve all conflicts', 'error');
+        }
     }
 };
 
-document.addEventListener('DOMContentLoaded', () => ImportManager.init());
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    ImportManager.init();
+});

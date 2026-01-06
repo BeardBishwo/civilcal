@@ -265,6 +265,9 @@ class ExamGeneratorService
                 )
                 -- 4. Direct QSM Linkage (Level Mapping)
                 OR qsm.syllabus_node_id IN ($nodeIdsStr)
+                -- 5. RELATIONAL Persistence Linkage (NEW - FAST)
+                OR q.sub_category_id IN ($nodeIdsStr)
+                OR q.category_id IN ($nodeIdsStr)
             )
         ";
 

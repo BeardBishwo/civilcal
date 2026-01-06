@@ -388,27 +388,59 @@ $totalRecords = $filters['total_records'] ?? count($users);
 
     function confirmBulkDelete() {
         const checked = document.querySelectorAll('.user-checkbox:checked');
-        const ids = Array.from(checked).map(cb => cb.value);
+        const ids = Array.from(checked).map(cb => parseInt(cb.value));
         if(ids.length === 0) return;
 
         Swal.fire({
             title: `Delete ${ids.length} Users?`,
+            text: "This action cannot be undone.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             confirmButtonText: 'Delete All'
         }).then((result) => {
             if(result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'Processing...',
+                    text: `Deleting ${ids.length} users...`,
+                    didOpen: () => { Swal.showLoading(); },
+                    allowOutsideClick: false
+                });
+
                 const token = getCsrfToken();
                 fetch('<?= app_base_url('/admin/users/bulk-delete') ?>', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-Token': token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
                     body: JSON.stringify({ ids: ids, csrf_token: token })
                 })
-                .then(r => r.json())
+                .then(r => {
+                    if (!r.ok) {
+                        throw new Error(`HTTP error! status: ${r.status}`);
+                    }
+                    return r.json();
+                })
                 .then(d => {
-                    if(d.success) location.reload();
-                    else Swal.fire('Error', d.message, 'error');
+                    if(d.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: d.message || `Deleted ${ids.length} users successfully`,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire('Error', d.message || 'Failed to delete users', 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error('Bulk Delete Error:', err);
+                    Swal.fire('System Error', 'Could not connect to the server. Please check console for details.', 'error');
                 });
             }
         });

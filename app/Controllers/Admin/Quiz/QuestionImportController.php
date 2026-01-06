@@ -40,82 +40,357 @@ class QuestionImportController extends Controller
     }
 
     /**
-     * Generates the "Smart" Excel Template
+     * Generates Enterprise-Level Excel Template
+     * With full PSC hierarchy and smart dropdowns
      */
     public function downloadTemplate()
     {
         $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $mode = $_GET['mode'] ?? 'simple'; // 'simple' or 'advanced'
-
-        // 1. EXACT COLUMNS from your 'data-format.csv'
-        if ($mode == 'advanced') {
-            // --- ADVANCED TEMPLATE (For Multi/Order) ---
-            $headers = [
-                'category', 'subcategory', 'language_id', 
-                'answer_type', // Special Column: 1=Multi, 2=Sequence
-                'question', 
-                'option 1', 'option 2', 'option 3', 'option 4', 'option 5', 
-                'answer1', 'answer2', 'answer3', 'answer4', 'answer5', // Multiple Answers
-                'level', 'note', 'level_map_syntax', 'contest_id'
-            ];
-        } else {
-            // --- STANDARD TEMPLATE (For MCQ/TF) ---
-            $headers = [
-                'category', 'subcategory', 'language_id', 'question_type', 
-                'question', 'option 1', 'option 2', 'option 3', 'option 4', 'option 5', 
-                'answer', 'level', 'note', 'level_map_syntax', 'contest_id'
-            ];
-        }
-        $sheet->fromArray($headers, NULL, 'A1');
-
-        // 2. MAKE IT SMART (Dropdowns)
         
-        // A. Question Type Dropdown
-        if($mode == 'advanced') {
-             // For Col D: Answer Type
-             // 1=Multi, 2=Sequence. We put it in dropdown.
-             $this->addDropdown($sheet, 'D', ['1 (Multi-Select)', '2 (Sequence Order)']);
-             
-             // Initial hint (Multi default)
-             $sheet->setCellValue('D2', '1');
-        } else {
-             // For Col D: Question Type
-             $this->addDropdown($sheet, 'D', ['1 (MCQ)', '2 (True/False)']);
-        }
-
-        // B. Answer Dropdown (Col K)
-        $this->addDropdown($sheet, 'K', ['a', 'b', 'c', 'd', 'e']);
-
-        // C. Level Dropdown (Col L)
-        $this->addDropdown($sheet, 'L', ['1 (Easy)', '2 (Medium)', '3 (Hard)']);
-
-        // D. Category Dropdown (Col A) - Fetch from DB
-        $cats = $this->db->find('syllabus_nodes', ['type' => 'part']); // Assuming 'part' is main category
-        $catTitles = array_column($cats, 'title');
-        // Limit to prevent excel crash if too many
-        $catTitles = array_slice($catTitles, 0, 100); 
-        $this->addDropdown($sheet, 'A', $catTitles);
-
-        // 3. STYLE THE HEADER (Visual Polish)
-        if ($mode == 'advanced') {
-            $sheet->getStyle('A1:Q1')->getFont()->setBold(true);
-            $sheet->getStyle('A1:Q1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FF2D3748'); // Dark Grey
-            $sheet->getStyle('A1:Q1')->getFont()->getColor()->setARGB('FFFFFFFF');
-        } else {
-            $sheet->getStyle('A1:M1')->getFont()->setBold(true);
-            $sheet->getStyle('A1:M1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FF667EEA'); // Civil Cal Purple
-            $sheet->getStyle('A1:M1')->getFont()->getColor()->setARGB('FFFFFFFF');
-        }
-
+        // ========================================
+        // SHEET 1: QUESTIONS (Main Data Entry)
+        // ========================================
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Questions');
+        
+        $headers = [
+            'Course Code', 'Education Level Code', 'Main Category Code', 'Sub-Category Code',
+            'Position Level Code', 'Question Type', 'Question Text',
+            'Option A', 'Option B', 'Option C', 'Option D', 'Option E',
+            'Correct Answer(s)', 'Explanation', 'Difficulty',
+            'Marks', 'Negative Marks', 'Governance Status',
+            'Active Status', 'Shuffle Options', 'Target Audience', 'Tags', 'Unique Code'
+        ];
+        $sheet->fromArray($headers, NULL, 'A1');
+        
+        // Style header row
+        $headerStyle = [
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF'], 'size' => 11],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '667EEA']],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER]
+        ];
+        $sheet->getStyle('A1:W1')->applyFromArray($headerStyle);
+        $sheet->getRowDimension(1)->setRowHeight(30);
+        
+        // Set column widths
+        $sheet->getColumnDimension('A')->setWidth(15); // Course Code
+        $sheet->getColumnDimension('B')->setWidth(18); // Edu Level Code
+        $sheet->getColumnDimension('C')->setWidth(18); // Category Code
+        $sheet->getColumnDimension('D')->setWidth(18); // Sub-Category Code
+        $sheet->getColumnDimension('E')->setWidth(18); // Position Level
+        $sheet->getColumnDimension('F')->setWidth(15); // Question Type
+        $sheet->getColumnDimension('G')->setWidth(50); // Question Text
+        $sheet->getColumnDimension('H')->setWidth(25); // Option A
+        $sheet->getColumnDimension('I')->setWidth(25); // Option B
+        $sheet->getColumnDimension('J')->setWidth(25); // Option C
+        $sheet->getColumnDimension('K')->setWidth(25); // Option D
+        $sheet->getColumnDimension('L')->setWidth(25); // Option E
+        $sheet->getColumnDimension('M')->setWidth(15); // Correct Answer
+        $sheet->getColumnDimension('N')->setWidth(40); // Explanation
+        $sheet->getColumnDimension('O')->setWidth(12); // Difficulty
+        $sheet->getColumnDimension('P')->setWidth(10); // Marks
+        $sheet->getColumnDimension('Q')->setWidth(15); // Negative Marks
+        $sheet->getColumnDimension('R')->setWidth(18); // Governance
+        $sheet->getColumnDimension('S')->setWidth(12); // Active
+        $sheet->getColumnDimension('T')->setWidth(15); // Shuffle
+        $sheet->getColumnDimension('U')->setWidth(15); // Target Audience
+        $sheet->getColumnDimension('V')->setWidth(30); // Tags
+        $sheet->getColumnDimension('W')->setWidth(15); // Unique Code
+        
+        // Add dropdowns with database data
+        $this->addEnterpriseDropdowns($sheet);
+        
+        // Add sample row with defaults
+        $sheet->fromArray([
+            'civil-eng', 'bachelor', 'structural', 'rcc-design', 'sub-engineer',
+            'MCQ', 'What is the minimum grade of concrete for RCC work?',
+            'M10', 'M15', 'M20', 'M25', '',
+            'c', 'M20 is the minimum grade as per IS 456', '2',
+            '1', '0.25', 'approved', 'Yes', 'Yes', 'universal', 'concrete,rcc,design', 'Q001'
+        ], NULL, 'A2');
+        
+        // ========================================
+        // SHEET 2: COURSES (Reference Data)
+        // ========================================
+        $this->addCourseReferenceSheet($spreadsheet);
+        
+        // ========================================
+        // SHEET 3: EDUCATION LEVELS (Reference)
+        // ========================================
+        $this->addEducationLevelReferenceSheet($spreadsheet);
+        
+        // ========================================
+        // SHEET 4: CATEGORIES (Reference)
+        // ========================================
+        $this->addCategoryReferenceSheet($spreadsheet);
+        
+        // ========================================
+        // SHEET 5: SUB-CATEGORIES (Reference)
+        // ========================================
+        $this->addSubCategoryReferenceSheet($spreadsheet);
+        
+        // ========================================
+        // SHEET 6: POSITION LEVELS (Reference)
+        // ========================================
+        $this->addPositionLevelReferenceSheet($spreadsheet);
+        
+        // ========================================
+        // SHEET 7: INSTRUCTIONS
+        // ========================================
+        $this->addInstructionsSheet($spreadsheet);
+        
         // Export
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="CivilCity_Question_Template.xlsx"');
+        header('Content-Disposition: attachment;filename="PSC_Enterprise_Question_Import_Template.xlsx"');
+        header('Cache-Control: max-age=0');
         
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
+    }
+
+    private function addEnterpriseDropdowns($sheet)
+    {
+        // Question Type
+        $this->addDropdown($sheet, 'F', ['MCQ', 'TF', 'MULTI', 'SEQUENCE', 'NUMERICAL', 'TEXT']);
+        
+        // Difficulty
+        $this->addDropdown($sheet, 'O', ['1', '2', '3']);
+        
+        // Governance Status
+        $this->addDropdown($sheet, 'R', ['draft', 'approved', 'archive']);
+        
+        // Active Status
+        $this->addDropdown($sheet, 'S', ['Yes', 'No']);
+        
+        // Shuffle Options
+        $this->addDropdown($sheet, 'T', ['Yes', 'No']);
+        
+        // Target Audience
+        $this->addDropdown($sheet, 'U', ['universal', 'psc_only', 'world_only']);
+        
+        // Correct Answer (for MCQ)
+        $this->addDropdown($sheet, 'M', ['a', 'b', 'c', 'd', 'e', 'a,b', 'a,c', 'b,c', 'a,b,c']);
+    }
+
+    private function addCourseReferenceSheet($spreadsheet)
+    {
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setTitle('Courses');
+        
+        $sheet->fromArray(['Course Code', 'Course Name'], NULL, 'A1');
+        $sheet->getStyle('A1:B1')->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E2E8F0']]
+        ]);
+        
+        $courses = $this->db->query("SELECT slug, title FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC")->fetchAll();
+        $row = 2;
+        foreach ($courses as $course) {
+            $sheet->setCellValue('A' . $row, $course['slug']);
+            $sheet->setCellValue('B' . $row, $course['title']);
+            $row++;
+        }
+        
+        $sheet->getColumnDimension('A')->setWidth(20);
+        $sheet->getColumnDimension('B')->setWidth(40);
+    }
+
+    private function addEducationLevelReferenceSheet($spreadsheet)
+    {
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setTitle('Education Levels');
+        
+        $sheet->fromArray(['Level Code', 'Level Name', 'Parent Course'], NULL, 'A1');
+        $sheet->getStyle('A1:C1')->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E2E8F0']]
+        ]);
+        
+        $levels = $this->db->query("
+            SELECT el.slug, el.title, c.slug as parent_slug
+            FROM syllabus_nodes el
+            LEFT JOIN syllabus_nodes c ON el.parent_id = c.id
+            WHERE el.type = 'education_level'
+            ORDER BY c.order_index ASC, el.order_index ASC
+        ")->fetchAll();
+        
+        $row = 2;
+        foreach ($levels as $level) {
+            $sheet->setCellValue('A' . $row, $level['slug']);
+            $sheet->setCellValue('B' . $row, $level['title']);
+            $sheet->setCellValue('C' . $row, $level['parent_slug']);
+            $row++;
+        }
+        
+        $sheet->getColumnDimension('A')->setWidth(20);
+        $sheet->getColumnDimension('B')->setWidth(40);
+        $sheet->getColumnDimension('C')->setWidth(20);
+    }
+
+    private function addCategoryReferenceSheet($spreadsheet)
+    {
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setTitle('Main Categories');
+        
+        $sheet->fromArray(['Category Code', 'Category Name', 'Parent Level'], NULL, 'A1');
+        $sheet->getStyle('A1:C1')->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E2E8F0']]
+        ]);
+        
+        $categories = $this->db->query("
+            SELECT cat.slug, cat.title, el.slug as parent_slug
+            FROM syllabus_nodes cat
+            LEFT JOIN syllabus_nodes el ON cat.parent_id = el.id
+            WHERE cat.type = 'category'
+            ORDER BY el.order_index ASC, cat.order_index ASC
+        ")->fetchAll();
+        
+        $row = 2;
+        foreach ($categories as $cat) {
+            $sheet->setCellValue('A' . $row, $cat['slug']);
+            $sheet->setCellValue('B' . $row, $cat['title']);
+            $sheet->setCellValue('C' . $row, $cat['parent_slug']);
+            $row++;
+        }
+        
+        $sheet->getColumnDimension('A')->setWidth(20);
+        $sheet->getColumnDimension('B')->setWidth(40);
+        $sheet->getColumnDimension('C')->setWidth(20);
+    }
+
+    private function addSubCategoryReferenceSheet($spreadsheet)
+    {
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setTitle('Sub-Categories');
+        
+        $sheet->fromArray(['Sub-Category Code', 'Sub-Category Name', 'Parent Category'], NULL, 'A1');
+        $sheet->getStyle('A1:C1')->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E2E8F0']]
+        ]);
+        
+        $subCats = $this->db->query("
+            SELECT sc.slug, sc.title, cat.slug as parent_slug
+            FROM syllabus_nodes sc
+            LEFT JOIN syllabus_nodes cat ON sc.parent_id = cat.id
+            WHERE sc.type = 'sub_category'
+            ORDER BY cat.order_index ASC, sc.order_index ASC
+        ")->fetchAll();
+        
+        $row = 2;
+        foreach ($subCats as $sc) {
+            $sheet->setCellValue('A' . $row, $sc['slug']);
+            $sheet->setCellValue('B' . $row, $sc['title']);
+            $sheet->setCellValue('C' . $row, $sc['parent_slug']);
+            $row++;
+        }
+        
+        $sheet->getColumnDimension('A')->setWidth(20);
+        $sheet->getColumnDimension('B')->setWidth(40);
+        $sheet->getColumnDimension('C')->setWidth(20);
+    }
+
+    private function addPositionLevelReferenceSheet($spreadsheet)
+    {
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setTitle('Position Levels');
+        
+        $sheet->fromArray(['Position Code', 'Position Name', 'Order'], NULL, 'A1');
+        $sheet->getStyle('A1:C1')->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E2E8F0']]
+        ]);
+        
+        $positions = $this->db->query("SELECT slug, title, order_index FROM position_levels WHERE is_active = 1 ORDER BY order_index ASC")->fetchAll();
+        
+        $row = 2;
+        foreach ($positions as $pos) {
+            $sheet->setCellValue('A' . $row, $pos['slug']);
+            $sheet->setCellValue('B' . $row, $pos['title']);
+            $sheet->setCellValue('C' . $row, $pos['order_index']);
+            $row++;
+        }
+        
+        $sheet->getColumnDimension('A')->setWidth(20);
+        $sheet->getColumnDimension('B')->setWidth(40);
+        $sheet->getColumnDimension('C')->setWidth(10);
+    }
+
+    private function addInstructionsSheet($spreadsheet)
+    {
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setTitle('Instructions');
+        
+        $instructions = [
+            ['PSC ENTERPRISE QUESTION IMPORT - USER GUIDE'],
+            [''],
+            ['QUICK START (5 Minutes)'],
+            ['1. Review reference sheets (Courses, Education Levels, Categories, etc.)'],
+            ['2. Copy the codes from reference sheets to the Questions sheet'],
+            ['3. Fill in your questions following the sample row'],
+            ['4. Save and upload the file'],
+            ['5. Review staging queue and publish'],
+            [''],
+            ['COLUMN DESCRIPTIONS'],
+            [''],
+            ['Course Code: Must match a code from "Courses" sheet (e.g., civil-eng)'],
+            ['Education Level Code: Must match a code from "Education Levels" sheet (e.g., bachelor)'],
+            ['Main Category Code: Must match a code from "Main Categories" sheet (e.g., structural)'],
+            ['Sub-Category Code: Must match a code from "Sub-Categories" sheet (e.g., rcc-design)'],
+            ['Position Level Code: Must match a code from "Position Levels" sheet (e.g., sub-engineer)'],
+            ['Question Type: MCQ, TF, MULTI, SEQUENCE, NUMERICAL, or TEXT'],
+            ['Question Text: The actual question (max 5000 characters)'],
+            ['Options A-E: Answer options (A & B required for MCQ/MULTI, only A & B for TF)'],
+            ['Correct Answer(s): Single letter (a,b,c,d,e) or comma-separated for MULTI (a,b,c)'],
+            ['Explanation: Answer explanation (optional)'],
+            ['Difficulty: 1=Easy, 2=Medium, 3=Hard'],
+            ['Marks: Default marks for correct answer (e.g., 1)'],
+            ['Negative Marks: Penalty for wrong answer (e.g., 0.25)'],
+            ['Governance Status: draft, approved, or archive'],
+            ['Active Status: Yes or No'],
+            ['Shuffle Options: Yes or No (randomize option order)'],
+            ['Target Audience: universal, psc_only, or world_only'],
+            ['Tags: Comma-separated tags (e.g., concrete,rcc,design)'],
+            ['Unique Code: Optional admin reference code (auto-generated if empty)'],
+            [''],
+            ['VALIDATION RULES'],
+            [''],
+            ['✓ All codes must exist in reference sheets'],
+            ['✓ Hierarchy must be valid (Sub-Category must belong to Category, etc.)'],
+            ['✓ For MCQ/MULTI: Options A & B are required'],
+            ['✓ For TF: Only 2 options allowed (True/False)'],
+            ['✓ Correct answer must exist in options'],
+            ['✓ Marks must be between 0.25 and 10'],
+            ['✓ Negative marks must be between 0 and 5'],
+            [''],
+            ['TIPS FOR SUCCESS'],
+            [''],
+            ['• Use reference sheets to find valid codes'],
+            ['• Copy-paste codes to avoid typos'],
+            ['• Fill sample row first to understand format'],
+            ['• Start with 10-20 questions to test'],
+            ['• Review staging queue before publishing'],
+            ['• Use meaningful tags for better filtering'],
+            [''],
+            ['SUPPORT'],
+            ['For questions or issues, contact your system administrator.']
+        ];
+        
+        $row = 1;
+        foreach ($instructions as $line) {
+            $sheet->fromArray($line, NULL, 'A' . $row);
+            $row++;
+        }
+        
+        $sheet->getColumnDimension('A')->setWidth(100);
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+        $sheet->getStyle('A3')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A10')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A33')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A44')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A53')->getFont()->setBold(true)->setSize(14);
     }
 
     private function addDropdown($sheet, $col, $options) {
@@ -446,13 +721,20 @@ class QuestionImportController extends Controller
                 $content = json_encode(['text' => $staging['question_text']]);
                 // Options JSON is already in staging['options']
                 
+                // NEW: Relational Filter Persistence
+                $filterContext = $this->syllabusService->resolveFilterContext($staging['syllabus_node_id']);
+                
                 $this->db->update('quiz_questions', [
                     'content' => $content,
                     'type' => $staging['type'],
+                    'course_id' => $filterContext['course_id'],
+                    'edu_level_id' => $filterContext['edu_level_id'],
+                    'category_id' => $filterContext['category_id'],
+                    'sub_category_id' => $filterContext['sub_category_id'],
                     'options' => $staging['options'],
                     'correct_answer' => $staging['correct_answer'],
-                    'correct_answer_json' => $staging['correct_answer_json'],
-                    'explanation' => $staging['explanation']
+                    'correct_answer_json' => $staging['correct_answer_json'], // Staging Field: correct_answer_json
+                    'answer_explanation' => $staging['explanation']
                 ], "id = :id", ['id' => $staging['duplicate_match_id']]);
 
                 // Process Level Map for Overwrite
@@ -481,15 +763,22 @@ class QuestionImportController extends Controller
         foreach ($cleanRows as $row) {
              $content = json_encode(['text' => $row['question_text']]);
              
+             // NEW: Relational Filter Persistence
+             $filterContext = $this->syllabusService->resolveFilterContext($row['syllabus_node_id']);
+             
              $this->db->insert('quiz_questions', [
                  'content' => $content,
                  'type' => $row['type'],
+                 'course_id' => $filterContext['course_id'],
+                 'edu_level_id' => $filterContext['edu_level_id'],
+                 'category_id' => $filterContext['category_id'],
+                 'sub_category_id' => $filterContext['sub_category_id'],
                  'options' => $row['options'],
                  'correct_answer' => $row['correct_answer'],
                  'correct_answer_json' => $row['correct_answer_json'],
-                 'explanation' => $row['explanation'],
+                 'answer_explanation' => $row['explanation'],
                  'content_hash' => $row['content_hash'],
-                 'status' => 1,
+                 'status' => 'approved',
                  'created_at' => date('Y-m-d H:i:s')
              ]);
              $newQId = $this->db->lastInsertId();

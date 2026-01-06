@@ -301,6 +301,43 @@ class SyllabusService
     }
 
     /**
+     * Resolve full filter context from a leaf node (e.g. Unit/Topic)
+     * Traces ancestry to find IDs for Course, Level, and Category.
+     */
+    public function resolveFilterContext($nodeId)
+    {
+        $context = [
+            'course_id' => null,
+            'edu_level_id' => null,
+            'category_id' => null,
+            'sub_category_id' => $nodeId
+        ];
+
+        $currId = $nodeId;
+        $maxSafeDepth = 10;
+        $depthCount = 0;
+
+        while ($currId && $depthCount < $maxSafeDepth) {
+            $node = $this->db->findOne('syllabus_nodes', ['id' => $currId]);
+            if (!$node) break;
+
+            if ($node['type'] === 'course') {
+                $context['course_id'] = $currId;
+            } elseif ($node['type'] === 'education_level') {
+                $context['edu_level_id'] = $currId;
+            } elseif ($node['type'] === 'category' || $node['type'] === 'section') {
+                // In this system, Section behaves like Main Category in structural views
+                if (!$context['category_id']) $context['category_id'] = $currId;
+            }
+
+            $currId = $node['parent_id'];
+            $depthCount++;
+        }
+
+        return $context;
+    }
+
+    /**
      * Helper: Slugify text
      */
     public function slugify($text)

@@ -22,10 +22,16 @@ class SyllabusController extends Controller
     public function index()
     {
         // Positioning Dashboard (High-level View)
+        // Exclude "Unassigned / Draft" from the main listing (it's an internal pool, not a curriculum)
         $sql = "SELECT level, COUNT(*) as total_nodes, 
                 SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active_nodes,
                 SUM(questions_weight) as total_weight, MAX(updated_at) as last_modified
-                FROM syllabus_nodes GROUP BY level ORDER BY level ASC";
+                FROM syllabus_nodes 
+                WHERE level IS NOT NULL 
+                  AND level != '' 
+                  AND level != 'Unassigned / Draft'
+                GROUP BY level 
+                ORDER BY level ASC";
         $positions = $this->db->query($sql)->fetchAll();
         
         $stats = [
@@ -346,24 +352,21 @@ class SyllabusController extends Controller
         }
 
         try {
-            // Protect shared hierarchy types from being deleted when clearing a level
-            $protectedTypes = "type NOT IN ('course', 'education_level', 'category', 'sub_category')";
+            // Section/Unit nodes are PERMANENT master filters - they should never be deleted
+            // Only Phase (paper) nodes are structural and can be deleted
+            $protectedTypes = "type IN ('course', 'education_level', 'category', 'sub_category', 'section', 'unit')";
 
-            if ($level === 'Unassigned / Draft' || empty($level)) {
-                // Delete only non-protected nodes that are unassigned
-                $this->db->delete('syllabus_nodes', "(level IS NULL OR level = '' OR level = 'Unassigned / Draft') AND $protectedTypes");
-            } else {
-                // 1. Delete Settings for this level (This removes it from the list if it's based on settings)
-                $this->db->delete('syllabus_settings', "level = :target_level", ['target_level' => $level]);
+            // 1. Delete Settings for this level
+            $this->db->delete('syllabus_settings', "level = :target_level", ['target_level' => $level]);
 
-                // 2. Unassign Protected Hierarchy Nodes (Don't delete them, just detach from this syllabus)
-                // Fix: Use 'target_level' for WHERE clause to avoid collision with 'level' => null in SET data
-                $this->db->update('syllabus_nodes', ['level' => null], "level = :target_level AND NOT ($protectedTypes)", ['target_level' => $level]);
+            // 2. Detach Protected Master Filters (set level to NULL so they become independent)
+            // These nodes remain in the database as permanent master data
+            $this->db->update('syllabus_nodes', ['level' => null], "level = :target_level AND ($protectedTypes)", ['target_level' => $level]);
 
-                // 3. Delete Everything Else (Units, Chapters, Questions)
-                $this->db->delete('syllabus_nodes', "level = :target_level AND $protectedTypes", ['target_level' => $level]);
-            }
-            echo json_encode(['status' => 'success', 'message' => "Syllabus for '$level' deleted successfully"]);
+            // 3. Delete Structural Nodes (Only Phase/Paper nodes)
+            $this->db->delete('syllabus_nodes', "level = :target_level AND NOT ($protectedTypes)", ['target_level' => $level]);
+
+            echo json_encode(['status' => 'success', 'message' => "Syllabus '$level' deleted. Master filters preserved."]);
         } catch (\Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
