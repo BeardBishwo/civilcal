@@ -166,10 +166,18 @@ if (!empty($nodesTree)) {
 
     </div>
 
+<style>
+    /* Link Hierarchy Modal Responsive Positioning */
+    .hierarchy-modal-position { left: 280px; transition: left 0.3s ease; }
+    .sidebar-collapsed .hierarchy-modal-position,
+    .admin-main.sidebar-collapsed .hierarchy-modal-position { left: 70px !important; }
+    @media (max-width: 991px) { .hierarchy-modal-position { left: 0 !important; } }
+</style>
+
     <!-- === HIERARCHY SELECTION MODAL === -->
     <div id="hierarchy-modal" class="fixed inset-0 z-[100] hidden" aria-hidden="true">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" onclick="closeHierarchyModal()"></div>
-        <div class="fixed top-[70px] left-[280px] right-0 bottom-0 flex items-center justify-center p-8">
+        <div class="fixed top-[70px] right-0 bottom-0 flex items-center justify-center p-8 hierarchy-modal-position">
             <div class="bg-white rounded-2xl shadow-2xl w-full h-full overflow-hidden transform transition-all relative flex flex-col ring-1 ring-black/5">
                 <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
                     <h3 class="text-lg font-bold text-slate-800">Link Hierarchy</h3>
@@ -194,8 +202,8 @@ if (!empty($nodesTree)) {
                             <span class="truncate dropdown-label">Course</span>
                              <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
-                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
-                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
+                        <div class="absolute top-full left-0 min-w-full w-auto mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
+                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('course', this.value)">
                              </div>
                              <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-course">
@@ -211,8 +219,8 @@ if (!empty($nodesTree)) {
                             <span class="truncate dropdown-label">Edu. Level</span>
                              <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
-                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
-                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
+                        <div class="absolute top-full left-0 min-w-full w-auto mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
+                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('edu', this.value)">
                              </div>
                              <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-edu">
@@ -228,8 +236,8 @@ if (!empty($nodesTree)) {
                             <span class="truncate dropdown-label">Category</span>
                              <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
-                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
-                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
+                        <div class="absolute top-full left-0 min-w-full w-auto mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
+                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('cat', this.value)">
                              </div>
                              <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-cat">
@@ -245,8 +253,8 @@ if (!empty($nodesTree)) {
                             <span class="truncate dropdown-label">Sub-Cat</span>
                              <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
-                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
-                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
+                        <div class="absolute top-full left-0 min-w-full w-auto mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
+                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('topic', this.value)">
                              </div>
                              <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-topic">
@@ -262,8 +270,8 @@ if (!empty($nodesTree)) {
                             <span class="truncate dropdown-label">Pos. Level</span>
                              <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
-                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
-                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
+                        <div class="absolute top-full right-0 min-w-full w-auto mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
+                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('pos', this.value)">
                              </div>
                              <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-pos">
@@ -1104,7 +1112,7 @@ if (!empty($nodesTree)) {
         
         data.forEach(item => {
             const li = document.createElement('li');
-            li.className = 'px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 truncate transition-colors';
+            li.className = 'px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 whitespace-nowrap transition-colors';
             li.innerText = item[titleKey];
             li.dataset.val = item[idKey];
             
