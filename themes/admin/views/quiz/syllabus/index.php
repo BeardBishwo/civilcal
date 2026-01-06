@@ -129,12 +129,18 @@
                                             <a href="<?php echo app_base_url('admin/quiz/syllabus/manage/' . $safeLevel); ?>" class="action-btn-icon" title="Edit Structure" style="color: #6366f1;">
                                                 <i class="fas fa-pencil-alt"></i>
                                             </a>
-                                            <button class="action-btn-icon" onclick="duplicatePosition('<?php echo addslashes($levelName); ?>')" title="Duplicate" style="color: #f59e0b;">
-                                                <i class="fas fa-copy"></i>
-                                            </button>
-                                            <button class="action-btn-icon" onclick="deletePosition('<?php echo addslashes($levelName); ?>')" title="Delete" style="color: #ef4444;">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
+                                             <button class="action-btn-icon" onclick="duplicatePosition('<?php echo addslashes($levelName); ?>')" title="Duplicate" style="color: #f59e0b;">
+                                                 <i class="fas fa-copy"></i>
+                                             </button>
+                                             <?php if ($levelName !== 'Unassigned / Draft'): ?>
+                                                <button class="action-btn-icon" onclick="deletePosition('<?php echo addslashes($levelName); ?>')" title="Delete" style="color: #ef4444;">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                             <?php else: ?>
+                                                <button class="action-btn-icon opacity-30 cursor-not-allowed" title="System Protected" onclick="Swal.fire('Protected', 'This is the master draft item and cannot be deleted.', 'info')">
+                                                    <i class="fas fa-lock text-slate-400"></i>
+                                                </button>
+                                             <?php endif; ?>
                                         </div>
                                     </td>
                                 </tr>
@@ -203,6 +209,10 @@
     }
 
     function deletePosition(level) {
+        if (level === 'Unassigned / Draft') {
+            Swal.fire('System Protected', 'The Master Draft curriculum is linked to your core data and cannot be deleted.', 'error');
+            return;
+        }
         Swal.fire({
             title: 'Delete Syllabus?',
             html: `Permanently delete <strong>${level}</strong> and all its nodes?`,
@@ -237,8 +247,8 @@
     --admin-gray-800: #1f2937;
 }
 
-.admin-wrapper-container { padding: 1rem; background: var(--admin-gray-50); min-height: calc(100vh - 70px); }
-.admin-content-wrapper { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow: hidden; padding-bottom: 2rem; }
+.admin-wrapper-container { padding: 1rem; background: var(--admin-gray-50); min-height: calc(100vh - 120px); }
+.admin-content-wrapper { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow: hidden; /* padding-bottom: 2rem; REMOVED FOR CLEANER BOTTOM */ }
 
 /* Header */
 .compact-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2rem; background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-secondary) 100%); color: white; }
