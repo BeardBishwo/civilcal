@@ -112,26 +112,71 @@ class ExamGeneratorService
 
         $selectedQuestions = [];
         $totalTarget = 0;
+        $generationLogs = [];
 
         // 2. Process each weighted node as a rule
         foreach ($nodes as $node) {
             $targetCount = $node['questions_weight'];
             $totalTarget += $targetCount;
+            $nodeId = $node['id'];
+            $nodeTitle = $node['title'];
 
             // Get questions using our refined query (handles linked_cat/sub/top)
-            $qs = $this->queryQuestions([$node['id']], $level, null, $targetCount);
+            // Pass node constraints for type and difficulty filtering
+            $qs = $this->queryQuestions(
+                [$nodeId], 
+                $level, 
+                $node['difficulty_constraint'] ?? null, 
+                $targetCount,
+                $node['question_type'] ?? null
+            );
+
+            // Fallback Logic: Relax constraints if we didn't find enough questions
+            if (count($qs) < $targetCount) {
+                $found = count($qs);
+                $needed = $targetCount - $found;
+                $generationLogs[] = "Node [$nodeTitle]: Found $found/$targetCount with strict constraints. Relaxing filters.";
+                
+                // Fallback 1: Relax Difficulty
+                $qs2 = $this->queryQuestions([$nodeId], $level, 'any', $needed, $node['question_type'] ?? null);
+                // Ensure no duplicates
+                $ids = array_column($qs, 'id');
+                foreach($qs2 as $q) {
+                    if(!in_array($q['id'], $ids)) {
+                        $qs[] = $q;
+                        $ids[] = $q['id'];
+                    }
+                }
+
+                // Fallback 2: Relax Type if still not enough
+                if (count($qs) < $targetCount) {
+                    $needed = $targetCount - count($qs);
+                    $qs3 = $this->queryQuestions([$nodeId], $level, 'any', $needed, 'any');
+                    foreach($qs3 as $q) {
+                        if(!in_array($q['id'], $ids)) {
+                            $qs[] = $q;
+                            $ids[] = $q['id'];
+                        }
+                    }
+                }
+            } else {
+                $generationLogs[] = "Node [$nodeTitle]: Successfully found $targetCount questions.";
+            }
+
             $selectedQuestions = array_merge($selectedQuestions, $qs);
         }
+
+        // Log results (Optional: can be saved to DB or log file)
+        // file_put_contents(STDOUT, implode("\n", $generationLogs));
 
         // Shuffle if requested
         if ($options['shuffle'] ?? true) {
             shuffle($selectedQuestions);
         }
 
-        // 3. Fetch Level-Wide Settings for Negative Marking
-        $settingsRow = $this->db->findOne('syllabus_settings', ['level' => $level]);
-        $settings = $settingsRow ? json_decode($settingsRow['settings'], true) : [];
-
+        // 3. Fetch Level-Wide Settings for Negative Marking and Exam Constraints
+        $settings = $this->db->findOne('syllabus_settings', ['level' => $level]);
+        
         return [
             'blueprint_id' => null,
             'blueprint_title' => "Auto-Syllabus Exam ($level)",
@@ -140,11 +185,11 @@ class ExamGeneratorService
             'wildcard_questions' => 0,
             'questions' => $selectedQuestions,
             'metadata' => [
-                'duration_minutes' => $settings['time'] ?? ($options['duration'] ?? 45),
-                'total_marks' => $settings['marks'] ?? (count($selectedQuestions) * 2), // Use syllabus target if set
-                'negative_marking_rate' => $settings['negValue'] ?? ($options['negative_rate'] ?? 20.00),
-                'negative_marking_unit' => $settings['negUnit'] ?? 'percent',
-                'negative_marking_basis' => $settings['negScope'] ?? 'per-q',
+                'duration_minutes' => $settings['total_time'] ?? ($options['duration'] ?? 45),
+                'total_marks' => $settings['full_marks'] ?? (count($selectedQuestions) * 2), 
+                'negative_marking_rate' => $settings['negative_rate'] ?? ($options['negative_rate'] ?? 20.00),
+                'negative_marking_unit' => 'percent',
+                'negative_marking_basis' => 'per-q',
                 'level' => $level
             ]
         ];
@@ -182,8 +227,14 @@ class ExamGeneratorService
 
     /**
      * Query questions from database
+     * 
+     * @param array $nodeIds Syllabus node IDs
+     * @param string $level Level filter
+     * @param mixed $difficultyLevel Difficulty constraint (easy, medium, hard, mixed, any)
+     * @param int $limit Number of questions to fetch
+     * @param string $questionType Question type constraint (mcq_single, true_false, multi_select, subjective, any)
      */
-    private function queryQuestions($nodeIds, $level, $difficultyLevel = null, $limit = 10)
+    private function queryQuestions($nodeIds, $level, $difficultyLevel = null, $limit = 10, $questionType = null)
     {
         $nodeIdsStr = implode(',', array_map('intval', $nodeIds));
 
@@ -224,9 +275,17 @@ class ExamGeneratorService
             $params['level'] = "%$level%";
         }
 
-        if ($difficultyLevel !== null) {
+        // Difficulty filtering with support for 'any' and 'mixed'
+        if ($difficultyLevel && $difficultyLevel !== 'any' && $difficultyLevel !== 'mixed') {
+            $difficultyNumeric = $this->mapDifficultyToLevel($difficultyLevel);
             $sql .= " AND (q.difficulty_level = :difficulty OR qsm.difficulty_in_stream = :difficulty)";
-            $params['difficulty'] = $difficultyLevel;
+            $params['difficulty'] = $difficultyNumeric;
+        }
+        
+        // Question Type filtering
+        if ($questionType && $questionType !== 'any') {
+            $sql .= " AND q.type = :question_type";
+            $params['question_type'] = $questionType;
         }
 
         $sql .= " ORDER BY RAND() LIMIT :limit";
@@ -331,8 +390,10 @@ class ExamGeneratorService
     {
         $map = [
             'easy' => 1,
+            'easy_mid' => 2,
             'medium' => 3,
-            'hard' => 5
+            'hard' => 4,
+            'expert' => 5
         ];
 
         return $map[strtolower($difficulty)] ?? 3;

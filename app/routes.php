@@ -1959,6 +1959,7 @@ $router->add("POST", "/admin/quiz/syllabus/bulk-save", "Admin\\Quiz\\SyllabusCon
 $router->add("POST", "/admin/quiz/syllabus/duplicate-level", "Admin\\Quiz\\SyllabusController@duplicateLevel", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/syllabus/delete-level", "Admin\\Quiz\SyllabusController@deleteLevel", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/syllabus/generate-exam", "Admin\\Quiz\\SyllabusController@generateExam", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/syllabus/getChildren", "Admin\\Quiz\\SyllabusController@getChildren", ["auth", "admin"]);
 
 // Courses
 $router->add("GET", "/admin/quiz/courses", "Admin\\Quiz\\CourseController@index", ["auth", "admin"]);

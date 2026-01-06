@@ -169,71 +169,24 @@
                         </button>
                     </div>
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Categorization</h4>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Syllabus Associations</h4>
                     
-                    <div class="space-y-5">
-                        
-                        <!-- Course / Stream -->
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">
-                                <i class="fas fa-graduation-cap mr-1.5 text-indigo-400"></i> Course / Stream
-                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Course / Stream</label>
-                            <div class="relative">
-                                <select name="stream" id="streamSelect" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
-                                    <option value="">Select Course</option>
-                                    <?php foreach ($courses as $course): ?>
-                                        <option value="<?php echo htmlspecialchars($course['title']); ?>" data-id="<?php echo $course['id']; ?>">
-                                            <?php echo htmlspecialchars($course['title']); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Education Level -->
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Academic Level</label>
-                            <div class="relative">
-                                <select name="education_level" id="eduLevelSelect" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
-                                    <option value="">Select Level</option>
-                                    <!-- Populated via JS based on Course -->
-                                    <?php foreach ($educationLevels as $el): ?>
-                                        <option value="<?php echo htmlspecialchars($el['title']); ?>" data-parent="<?php echo $el['parent_id']; ?>" style="display:none;">
-                                            <?php echo htmlspecialchars($el['title']); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
-
-                        <hr class="border-slate-100">
-
-                        <!-- Main Category (Subject) -->
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Subject (Main)</label>
-                            <div class="relative">
-                                <select name="syllabus_main_id" id="mainCatSelect" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" onchange="filterSubTopics(this.value)">
-                                    <option value="">Select Subject</option>
-                                    <?php foreach ($mainCategories as $node): ?>
-                                        <option value="<?php echo $node['id']; ?>"><?php echo htmlspecialchars($node['title']); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Sub Category (Topic) -->
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Topic (Sub)</label>
-                            <div class="relative">
-                                <select name="syllabus_node_id" id="subCatSelect" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
-                                    <option value="">Select Topic</option>
-                                    <!-- JS populated -->
-                                </select>
-                            </div>
-                        </div>
+                    <div id="syllabus-associations-container" class="space-y-4">
+                        <!-- Repeater rows will be added here -->
+                    </div>
+                    
+                    <button type="button" onclick="addSyllabusMapping()" class="w-full mt-4 px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-dashed border-indigo-200 text-indigo-600 rounded-xl text-sm font-bold hover:from-indigo-100 hover:to-purple-100 hover:border-indigo-300 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-plus-circle"></i> Add Syllabus Mapping
+                    </button>
+                    
+                    <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p class="text-xs text-blue-700 flex items-start gap-2">
+                            <i class="fas fa-info-circle mt-0.5"></i>
+                            <span>Link this question to multiple courses/levels. Higher priority mappings are preferred during exam generation.</span>
+                        </p>
                     </div>
                 </div>
-
+            
                 <!-- Target Position Level Card -->
                 <div id="card_target" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden transition-all duration-300">
                     <div class="absolute top-0 right-0 p-3 z-10">
@@ -245,14 +198,25 @@
                     <h3 class="font-bold text-slate-700 mb-2 flex items-center">
                         <i class="fas fa-crosshairs text-indigo-500 mr-2"></i> Target Position Level
                     </h3>
-                    <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+
+                    <!-- Search Input -->
+                    <div class="relative mb-4">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
+                        <input type="text" id="target_pos_search" placeholder="Search position levels..." 
+                            class="w-full pl-9 pr-3 py-2 text-[11px] bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all duration-200">
+                    </div>
+
+                    <div id="pos_level_list" class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
                         <?php if (!empty($positionLevels)): ?>
                             <?php foreach ($positionLevels as $level): ?>
-                                <label class="flex items-center p-2 rounded hover:bg-slate-50 border border-transparent hover:border-slate-100 cursor-pointer transition">
-                                    <input type="checkbox" name="position_levels[]" value="<?php echo $level['id']; ?>" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
-                                    <div class="ml-2">
-                                        <span class="text-sm font-medium text-slate-700"><?php echo htmlspecialchars($level['title']); ?></span>
-                                        <span class="text-xs text-slate-400 block">Level <?php echo $level['level_number']; ?></span>
+                                <label class="pos-level-label flex items-center p-3 rounded-xl border border-slate-100 cursor-pointer transition-all duration-200 hover:border-indigo-200 hover:bg-indigo-50/30 group relative">
+                                    <input type="checkbox" name="position_levels[]" value="<?php echo $level['id']; ?>" class="hidden peer">
+                                    <div class="flex-1">
+                                        <span class="text-[11px] font-bold text-slate-700 group-hover:text-indigo-600 transition-colors block leading-tight"><?php echo htmlspecialchars($level['title']); ?></span>
+                                        <span class="text-[9px] text-slate-400 block mt-0.5">Level <?php echo $level['level_number']; ?></span>
+                                    </div>
+                                    <div class="peer-checked:flex hidden w-5 h-5 items-center justify-center rounded-full bg-indigo-600 text-white shadow-sm shadow-indigo-100 transition-all scale-0 peer-checked:scale-100 absolute right-2 top-1/2 -translate-y-1/2">
+                                        <i class="fas fa-check text-[10px]"></i>
                                     </div>
                                 </label>
                             <?php endforeach; ?>
@@ -412,9 +376,11 @@
         }
     };
 
-    // Sub-category Data
+    // Unified Data Init
+    const coursesData = <?php echo json_encode($courses); ?>;
+    const eduLevelsData = <?php echo json_encode($educationLevels); ?>;
     const subCategories = <?php echo json_encode($subCategories); ?>;
-    const educationLevelsData = <?php echo json_encode($educationLevels); ?>;
+    const totalPositionLevels = <?php echo json_encode($positionLevels); ?>;
 
 
     // Logic
@@ -551,11 +517,7 @@
         el.className = `text-xs font-bold px-2.5 py-1 rounded-md ${map[val][1]}`;
     }
 
-        
-        subSelect.value = ""; // Reset sub selection on main change
-        subSelect.disabled = !hasVisible; // Disable if no subs
-    }
-    
+
     function toggleHint() {
         const hintEl = document.getElementById('hint_field');
         if (state.hintPinned) {
@@ -676,6 +638,160 @@
         localStorage.setItem('q_form_pinned_ids', JSON.stringify(pins));
     }
 
+    // === MULTI-SYLLABUS MAPPER ===
+    let mappingIndex = 0;
+
+    function addSyllabusMapping() {
+        const container = document.getElementById('syllabus-associations-container');
+        if (!container) return;
+        const idx = mappingIndex++;
+        
+        const row = document.createElement('div');
+        row.className = 'mapping-row p-4 bg-slate-50 border border-slate-200 rounded-xl animate__animated animate__fadeIn mb-4';
+        row.dataset.index = idx;
+        
+        row.innerHTML = `
+            <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold">
+                        ${idx + 1}
+                    </div>
+                    <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">Mapping Context</span>
+                    ${idx === 0 ? '<span class="bg-indigo-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm">PRIMARY</span>' : ''}
+                </div>
+                <button type="button" onclick="removeSyllabusMapping(${idx})" class="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 transition">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div class="space-y-1">
+                    <label class="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-tight ml-1">
+                        <i class="fas fa-graduation-cap text-indigo-400"></i> Course
+                    </label>
+                    <select name="mappings[${idx}][course_id]" class="mapping-course w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-lg p-2 focus:ring-4 focus:ring-indigo-500/10 transition" onchange="updateMappingCascade(${idx}, 'course')">
+                        <option value="">Select Course</option>
+                        ${coursesData.map(c => `<option value="${c.id}">${c.title}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div class="space-y-1">
+                    <label class="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-tight ml-1">
+                        <i class="fas fa-signal text-purple-400"></i> Level
+                    </label>
+                    <select name="mappings[${idx}][level_id]" class="mapping-level w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-lg p-2 focus:ring-4 focus:ring-indigo-500/10 transition" onchange="updateMappingCascade(${idx}, 'level')" disabled>
+                        <option value="">Select Level</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div class="space-y-1">
+                    <label class="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-tight ml-1">
+                        <i class="fas fa-tags text-sky-400"></i> Category
+                    </label>
+                    <select name="mappings[${idx}][category_id]" class="mapping-category w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-lg p-2 focus:ring-4 focus:ring-indigo-500/10 transition" onchange="updateMappingCascade(${idx}, 'category')" disabled>
+                        <option value="">Select Category</option>
+                    </select>
+                </div>
+                
+                <div class="space-y-1">
+                    <label class="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-tight ml-1">
+                        <i class="fas fa-book-open text-emerald-400"></i> Topic/Unit
+                    </label>
+                    <select name="mappings[${idx}][unit_id]" class="mapping-unit w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-lg p-2 focus:ring-4 focus:ring-indigo-500/10 transition" disabled>
+                        <option value="">Select Unit</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 p-2 bg-white border border-slate-100 rounded-lg shadow-sm">
+                <div class="flex-1 flex items-center gap-2">
+                    <i class="fas fa-star text-amber-400 text-xs"></i>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Importance / Priority</span>
+                </div>
+                <div class="w-16">
+                    <input type="number" name="mappings[${idx}][priority]" value="5" min="1" max="10" 
+                           class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold rounded-lg px-2 py-1 text-center focus:bg-white focus:border-amber-400 transition" 
+                           title="Priority (1-10)">
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(row);
+    }
+
+    function removeSyllabusMapping(idx) {
+        const row = document.querySelector(`.mapping-row[data-index="${idx}"]`);
+        if (row) {
+            row.classList.add('animate__fadeOut');
+            setTimeout(() => row.remove(), 300);
+        }
+    }
+
+    function updateMappingCascade(idx, changedLevel) {
+        const row = document.querySelector(`.mapping-row[data-index="${idx}"]`);
+        if (!row) return;
+        
+        const courseSelect = row.querySelector('.mapping-course');
+        const levelSelect = row.querySelector('.mapping-level');
+        const categorySelect = row.querySelector('.mapping-category');
+        const unitSelect = row.querySelector('.mapping-unit');
+        
+        let parentId = null;
+        let targetSelect = null;
+        
+        if (changedLevel === 'course') {
+            parentId = courseSelect.value;
+            targetSelect = levelSelect;
+            
+            // Reset children
+            levelSelect.innerHTML = '<option value="">Select Level</option>';
+            categorySelect.innerHTML = '<option value="">Select Category</option>';
+            unitSelect.innerHTML = '<option value="">Select Unit</option>';
+            categorySelect.disabled = true;
+            unitSelect.disabled = true;
+        } else if (changedLevel === 'level') {
+            parentId = levelSelect.value;
+            targetSelect = categorySelect;
+            
+            // Reset children
+            categorySelect.innerHTML = '<option value="">Select Category</option>';
+            unitSelect.innerHTML = '<option value="">Select Unit</option>';
+            unitSelect.disabled = true;
+        } else if (changedLevel === 'category') {
+            parentId = categorySelect.value;
+            targetSelect = unitSelect;
+            
+            // Reset children
+            unitSelect.innerHTML = '<option value="">Select Unit</option>';
+        }
+        
+        if (parentId && targetSelect) {
+            targetSelect.disabled = true;
+            targetSelect.innerHTML = '<option value="">Loading...</option>';
+            
+            fetch(`<?php echo app_base_url('admin/quiz/syllabus/getChildren'); ?>?parent_id=${parentId}`)
+                .then(res => res.json())
+                .then(data => {
+                    targetSelect.innerHTML = `<option value="">Select ${changedLevel === 'course' ? 'Level' : (changedLevel === 'level' ? 'Category' : 'Unit')}</option>`;
+                    if (data && data.length > 0) {
+                        data.forEach(item => {
+                            targetSelect.innerHTML += `<option value="${item.id}">${item.title}</option>`;
+                        });
+                        targetSelect.disabled = false;
+                    } else {
+                        targetSelect.innerHTML = '<option value="">No items found</option>';
+                        targetSelect.disabled = true;
+                    }
+                })
+                .catch(err => {
+                    console.error("Fetch failed", err);
+                    targetSelect.innerHTML = '<option value="">Error loading</option>';
+                });
+        }
+    }
+
     // Init
     document.addEventListener('DOMContentLoaded', () => {
         const savedType = localStorage.getItem('q_form_type') || 'MCQ';
@@ -715,5 +831,35 @@
 
         const savedHintPin = localStorage.getItem('q_hint_pinned');
         if (savedHintPin === '1' && typeof toggleHintPin === 'function') toggleHintPin();
+        
+        // Target Position Visibility & Search Logic
+        const targetSearch = document.getElementById('target_pos_search');
+        const posList = document.getElementById('pos_level_list');
+        
+        function filterTargetPositions() {
+            const query = targetSearch.value.toLowerCase();
+            const items = posList.querySelectorAll('.pos-level-label');
+            items.forEach(item => {
+                const isChecked = item.querySelector('input').checked;
+                const text = item.innerText.toLowerCase();
+                if (query.trim() === '') {
+                    item.style.display = isChecked ? 'flex' : 'none';
+                } else {
+                    item.style.display = text.includes(query) ? 'flex' : 'none';
+                }
+            });
+        }
+
+        if (targetSearch && posList) {
+            targetSearch.addEventListener('input', filterTargetPositions);
+            posList.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.addEventListener('change', filterTargetPositions);
+            });
+            // Initial run after a short delay for restoration
+            setTimeout(filterTargetPositions, 500);
+        }
+
+        // Add one default syllabus mapping row
+        if (typeof addSyllabusMapping === 'function') addSyllabusMapping();
     });
 </script>

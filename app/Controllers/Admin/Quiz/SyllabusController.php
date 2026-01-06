@@ -108,7 +108,15 @@ class SyllabusController extends Controller
 
         // Fetch level-wide settings
         $settingsRow = $this->db->findOne('syllabus_settings', ['level' => $level]);
-        $settings = ($settingsRow && isset($settingsRow['settings'])) ? json_decode($settingsRow['settings'], true) : [];
+        $settings = [];
+        if ($settingsRow) {
+            $settings = [
+                'marks' => $settingsRow['full_marks'] ?? 0,
+                'time' => $settingsRow['total_time'] ?? 0,
+                'pass' => $settingsRow['pass_marks'] ?? 0,
+                'negative_marking_rate' => $settingsRow['negative_rate'] ?? 0.00
+            ];
+        }
 
         // Fetch position level metadata for breadcrumbs
         $posLevel = $this->db->findOne('position_levels', ['slug' => $level]);
@@ -165,7 +173,7 @@ class SyllabusController extends Controller
         $settings = $input['settings'] ?? [];
 
         if (!$level || empty($nodes)) {
-            $this->jsonResponse(['status' => 'error', 'message' => 'No data provided']);
+            echo json_encode(['status' => 'error', 'message' => 'No data provided']);
             return;
         }
 
@@ -206,6 +214,8 @@ class SyllabusController extends Controller
                     'question_count' => $node['qCount'] ?? 0,
                     'question_optional' => $node['qOptional'] ?? 0,
                     'question_marks_each' => $node['qEach'] ?? 0,
+                    'question_type' => $node['qType'] ?? 'any',
+                    'difficulty_constraint' => $node['difficulty'] ?? 'any',
                     'order' => $index,
                     'is_active' => 1,
                     // Hierarchy Links
@@ -229,10 +239,10 @@ class SyllabusController extends Controller
                 // Map settings to actual table columns: total_time, full_marks, pass_marks, negative_rate
                 $settingsData = [
                     'level' => $level,
-                    'total_time' => $settings['total_time'] ?? 0,
-                    'full_marks' => $settings['full_marks'] ?? 0,
-                    'pass_marks' => $settings['pass_marks'] ?? 0,
-                    'negative_rate' => $settings['negative_rate'] ?? 0.00
+                    'total_time' => (int)($settings['time'] ?? 0),
+                    'full_marks' => (int)($settings['marks'] ?? 0),
+                    'pass_marks' => (int)($settings['pass'] ?? 0),
+                    'negative_rate' => (float)($settings['negValue'] ?? 0.00)
                 ];
 
                 $existing = $this->db->findOne('syllabus_settings', ['level' => $level]);
@@ -250,11 +260,11 @@ class SyllabusController extends Controller
             }
 
             $this->db->commit();
-            $this->jsonResponse(['status' => 'success']);
+            echo json_encode(['status' => 'success']);
 
         } catch (\Exception $e) {
             $this->db->rollBack();
-            $this->jsonResponse(['status' => 'error', 'message' => $e->getMessage()]);
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
 
@@ -444,5 +454,30 @@ class SyllabusController extends Controller
         } catch (\Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * AJAX: Get children of a specific node
+     */
+    public function getChildren()
+    {
+        header('Content-Type: application/json');
+        try {
+            $parentId = $_GET['parent_id'] ?? null;
+            if ($parentId === null) {
+                echo json_encode([]);
+                return;
+            }
+
+            $sql = "SELECT id, title, type FROM syllabus_nodes WHERE parent_id = :parent_id AND is_active = 1 ORDER BY `order` ASC";
+            $stmt = $this->db->getPdo()->prepare($sql);
+            $stmt->execute(['parent_id' => $parentId]);
+            $children = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            echo json_encode($children);
+        } catch (\Exception $e) {
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
     }
 }

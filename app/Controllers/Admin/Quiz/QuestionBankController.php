@@ -240,12 +240,22 @@ class QuestionBankController extends Controller
                 }
             }
 
-            // Map to Syllabus
-            $this->db->insert('question_stream_map', [
-                'question_id' => $this->db->lastInsertId(),
-                'syllabus_node_id' => $_POST['syllabus_node_id'],
-                'difficulty_in_stream' => $_POST['difficulty_level'] ?? 3
-            ]);
+            // Map to Syllabus (Multiple Mappings Support)
+            if (!empty($_POST['mappings']) && is_array($_POST['mappings'])) {
+                $isPrimary = true; // First mapping is primary
+                foreach ($_POST['mappings'] as $mapping) {
+                    if (!empty($mapping['unit_id'])) {
+                        $this->db->insert('question_stream_map', [
+                            'question_id' => $questionId,
+                            'syllabus_node_id' => $mapping['unit_id'],
+                            'difficulty_in_stream' => $_POST['difficulty_level'] ?? 3,
+                            'priority' => $mapping['priority'] ?? 1,
+                            'is_primary' => $isPrimary ? 1 : 0
+                        ]);
+                        $isPrimary = false; // Only first is primary
+                    }
+                }
+            }
 
             $this->jsonResponse(['success' => true, 'message' => 'Saved Successfully', 'redirect' => app_base_url('admin/quiz/questions')]);
 

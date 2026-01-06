@@ -17,7 +17,10 @@ function flattenTreeForGrid($tree, $depth = 0, &$result = []) {
             // Default missing fields since DB might not have them yet
             'time' => (int)($node['time_minutes'] ?? 0), 
             'qCount' => (int)($node['question_count'] ?? 0), 
-            'qEach' => (float)($node['questions_weight'] > 0 ? ($node['questions_weight'] / ($node['question_count'] ?: 1)) : 0),
+            'qOptional' => (int)($node['question_optional'] ?? 0),
+            'qType' => $node['question_type'] ?? 'any',
+            'difficulty' => $node['difficulty_constraint'] ?? 'any',
+            'qEach' => (float)($node['question_marks_each'] ?? 0),
             'selected' => false,
             // Keep DB references if needed
             'parent_id' => $node['parent_id'] ?? null,
@@ -141,6 +144,8 @@ if (!empty($nodesTree)) {
                         <div class="grid-header border-r border-slate-200">Qty</div>
                         <div class="grid-header border-r border-slate-200" title="Optional Questions">Opt</div>
                         <div class="grid-header border-r border-slate-200">Each</div>
+                        <div class="grid-header border-r border-slate-200" title="Question Type Constraint">Q-Type</div>
+                        <div class="grid-header border-r border-slate-200" title="Difficulty Constraint">Diff</div>
                         <div class="grid-header border-r border-slate-200">Marks</div>
                         <div class="grid-header border-r border-slate-200 text-center">Hierarchy</div>
                         <div class="grid-header border-r border-slate-200">Actions</div>
@@ -310,9 +315,9 @@ if (!empty($nodesTree)) {
     /* Premium Grid Styles */
     .syllabus-grid {
         display: grid;
-            grid-template-columns: 40px 40px 35px 1fr 85px 120px 60px 60px 60px 75px 75px 80px 180px;
+        grid-template-columns: 40px 40px 35px 1fr 85px 110px 60px 60px 60px 85px 85px 60px 70px 70px 250px;
         background-color: #f1f5f9;
-        min-width: 1400px;
+        min-width: 1450px;
     }
     .grid-header {
         background-color: #f8fafc; color: #64748b; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 2px; display: flex; align-items: center; justify-content: center;
@@ -599,7 +604,7 @@ if (!empty($nodesTree)) {
     // --- GRID RENDERING ---
     function renderGrid() {
         const container = document.getElementById('syllabus-container');
-        while(container.children.length > 13) container.removeChild(container.lastChild);
+        while(container.children.length > 15) container.removeChild(container.lastChild);
 
         syllabusData.forEach((row, index) => {
             // Checkbox
@@ -673,6 +678,41 @@ if (!empty($nodesTree)) {
             const eachDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400">${formatNumber(row.qEach)}</div>` : `<input type="number" class="input-premium each-input" value="${row.qEach || 0}" onchange="updateRow(${index}, 'qEach', this.value)">`;
             container.appendChild(createCell(eachDisplay, 'justify-center border-r border-slate-100'));
 
+            // Q-Type (Question Type dropdown)
+            const qTypeOptions = [
+                {value: 'any', label: 'Any', color: 'bg-slate-50 text-slate-600'},
+                {value: 'mcq_single', label: 'MCQ', color: 'bg-blue-50 text-blue-700'},
+                {value: 'true_false', label: 'T/F', color: 'bg-green-50 text-green-700'},
+                {value: 'multi_select', label: 'Multi', color: 'bg-purple-50 text-purple-700'},
+                {value: 'subjective', label: 'Theory', color: 'bg-amber-50 text-amber-700'}
+            ];
+            const selectedQType = row.qType || 'any';
+            const qTypeColor = qTypeOptions.find(opt => opt.value === selectedQType)?.color || 'bg-slate-50 text-slate-600';
+            const qTypeDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400 text-[10px]">-</div>` : `
+                <select class="type-select-styled ${qTypeColor} text-[10px] h-6 py-0 pl-1 pr-4" onchange="updateRow(${index}, 'qType', this.value)">
+                    ${qTypeOptions.map(opt => `<option value="${opt.value}" ${selectedQType === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('')}
+                </select>
+            `;
+            container.appendChild(createCell(qTypeDisplay, 'justify-center border-r border-slate-100 px-1'));
+
+            // Difficulty dropdown
+            const diffOptions = [
+                {value: 'any', label: 'Any', color: 'bg-slate-50 text-slate-600'},
+                {value: 'easy', label: 'Easy', color: 'bg-green-50 text-green-600 border-green-100'},
+                {value: 'easy_mid', label: 'Easy-Mid', color: 'bg-lime-50 text-lime-600 border-lime-100'},
+                {value: 'medium', label: 'Medium', color: 'bg-yellow-50 text-yellow-600 border-yellow-100'},
+                {value: 'hard', label: 'Hard', color: 'bg-orange-50 text-orange-600 border-orange-100'},
+                {value: 'expert', label: 'Expert', color: 'bg-red-50 text-red-600 border-red-100'}
+            ];
+            const selectedDiff = row.difficulty || 'any';
+            const diffColor = diffOptions.find(opt => opt.value === selectedDiff)?.color || 'bg-slate-50 text-slate-600';
+            const diffDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400 text-[10px]">-</div>` : `
+                <select class="type-select-styled ${diffColor} text-[10px] h-6 py-0 pl-1 pr-4" onchange="updateRow(${index}, 'difficulty', this.value)">
+                    ${diffOptions.map(opt => `<option value="${opt.value}" ${selectedDiff === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('')}
+                </select>
+            `;
+            container.appendChild(createCell(diffDisplay, 'justify-center border-r border-slate-100 px-1'));
+
             // Marks (with formatted display)
             const marksBg = row.depth === 0 ? "bg-slate-100" : "bg-white";
             const marksDisplay = `<div class="font-bold ${row.depth === 0 ? 'text-slate-800' : 'text-slate-700'}">${formatNumber(row.weight)}</div>`;
@@ -713,7 +753,7 @@ if (!empty($nodesTree)) {
             container.appendChild(createCell(linkedHtml, 'justify-center px-1'));
             
             // Set depth and type attributes for styling
-            const rowElements = container.querySelectorAll('.grid-cell:nth-last-child(-n+12)');
+            const rowElements = container.querySelectorAll('.grid-cell:nth-last-child(-n+14)');
             rowElements.forEach(cell => {
                 cell.setAttribute('data-depth', row.depth);
                 cell.setAttribute('data-type', row.type);
@@ -734,7 +774,8 @@ if (!empty($nodesTree)) {
 
     // --- LOGIC FUNCTIONS ---
     function updateRow(index, field, value) {
-        if(field !== 'title' && field !== 'type') value = parseFloat(value) || 0;
+        const stringFields = ['title', 'type', 'difficulty', 'qType'];
+        if(!stringFields.includes(field)) value = parseFloat(value) || 0;
         syllabusData[index][field] = value;
         
         // Auto-adjust depth based on node type
