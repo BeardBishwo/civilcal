@@ -190,9 +190,9 @@ if (!empty($nodesTree)) {
                     
                     <!-- Course Filter -->
                     <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-course">
-                        <button type="button" class="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('course')">
+                        <button type="button" class="w-full flex items-center justify-between px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('course')">
                             <span class="truncate dropdown-label">Course</span>
-                            <i class="fas fa-chevron-down text-xs opacity-50 ml-2"></i>
+                             <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
                         <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
                              <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
@@ -207,9 +207,9 @@ if (!empty($nodesTree)) {
 
                     <!-- Education Level Filter -->
                     <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-edu">
-                        <button type="button" class="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('edu')">
-                            <span class="truncate dropdown-label">Level</span>
-                            <i class="fas fa-chevron-down text-xs opacity-50 ml-2"></i>
+                        <button type="button" class="w-full flex items-center justify-between px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('edu')">
+                            <span class="truncate dropdown-label">Edu. Level</span>
+                             <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
                         <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
                              <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
@@ -224,9 +224,9 @@ if (!empty($nodesTree)) {
 
                     <!-- Position Level Filter -->
                     <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-pos">
-                        <button type="button" class="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('pos')">
-                            <span class="truncate dropdown-label">Position</span>
-                            <i class="fas fa-chevron-down text-xs opacity-50 ml-2"></i>
+                        <button type="button" class="w-full flex items-center justify-between px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('pos')">
+                            <span class="truncate dropdown-label">Pos. Level</span>
+                             <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
                         <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
                              <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
@@ -241,9 +241,9 @@ if (!empty($nodesTree)) {
 
                     <!-- Category Filter -->
                     <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-cat">
-                         <button type="button" class="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('cat')">
+                         <button type="button" class="w-full flex items-center justify-between px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('cat')">
                             <span class="truncate dropdown-label">Category</span>
-                            <i class="fas fa-chevron-down text-xs opacity-50 ml-2"></i>
+                             <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
                         <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
                              <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
@@ -258,9 +258,9 @@ if (!empty($nodesTree)) {
 
                      <!-- Sub-Category Filter -->
                     <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-topic">
-                        <button type="button" class="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('topic')">
+                        <button type="button" class="w-full flex items-center justify-between px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('topic')">
                             <span class="truncate dropdown-label">Sub-Cat</span>
-                             <i class="fas fa-chevron-down text-xs opacity-50 ml-2"></i>
+                             <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
                         <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
                              <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
@@ -293,7 +293,7 @@ if (!empty($nodesTree)) {
         min-width: 1400px;
     }
     .grid-header {
-        background-color: #f8fafc; color: #64748b; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; padding: 8px 4px; display: flex; align-items: center; justify-content: center;
+        background-color: #f8fafc; color: #64748b; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 2px; display: flex; align-items: center; justify-content: center;
     }
     .grid-row { background-color: white; border-bottom: 1px solid #f1f5f9; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
     .grid-row:hover { background-color: #f8fafc; }
@@ -306,11 +306,11 @@ if (!empty($nodesTree)) {
     .grid-row[data-type="section"] { background-color: #f8fafc; }
     .grid-row[data-type="section"] .grid-cell { font-weight: 700; color: #334155; }
     
-    .grid-cell { padding: 4px 10px; display: flex; align-items: center; font-size: 0.85rem; color: #334155; position: relative; }
+    .grid-cell { padding: 2px 6px; display: flex; align-items: center; font-size: 0.8rem; color: #334155; position: relative; height: 32px; }
     
     .input-premium {
-        width: 100%; padding: 3px 6px; border: 1px solid #e2e8f0; border-radius: 6px; text-align: center; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.8rem; transition: 0.2s;
-        background-color: white;
+        width: 100%; padding: 1px 4px; border: 1px solid #e2e8f0; border-radius: 4px; text-align: center; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.75rem; transition: 0.2s;
+        background-color: white; height: 24px;
     }
     .input-premium:focus { border-color: #6366f1; ring: 3px rgba(99, 102, 241, 0.1); outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
     
@@ -577,7 +577,7 @@ if (!empty($nodesTree)) {
     // --- GRID RENDERING ---
     function renderGrid() {
         const container = document.getElementById('syllabus-container');
-        while(container.children.length > 12) container.removeChild(container.lastChild);
+        while(container.children.length > 13) container.removeChild(container.lastChild);
 
         syllabusData.forEach((row, index) => {
             // Checkbox
@@ -590,7 +590,7 @@ if (!empty($nodesTree)) {
             container.appendChild(dragCell);
 
             // Level
-            container.appendChild(createCell(row.depth, `justify-center depth-${row.depth} bg-slate-50 border-r border-slate-100 font-mono text-xs`));
+            container.appendChild(createCell(row.depth, `justify-center depth-${row.depth} bg-slate-50 border-r border-slate-100 font-mono text-[10px]`));
 
             // Topic / Title (with depth-based styling)
             const padding = 20 + (row.depth * 32);
@@ -600,15 +600,15 @@ if (!empty($nodesTree)) {
             
             if(row.depth === 0) {
                 icon = 'fa-layer-group text-white';
-                titleClass = 'font-bold text-white';
+                titleClass = 'font-bold text-white text-xs';
                 titleStyle = 'background: linear-gradient(135deg, #1e293b 0%, #334155 100%);';
             } else if(row.depth === 1) {
                 icon = 'fa-folder-open text-blue-600';
-                titleClass = 'font-semibold text-blue-700';
+                titleClass = 'font-bold text-blue-700 text-xs';
                 titleStyle = 'background: #eff6ff;';
             } else {
                 icon = 'fa-folder text-slate-400';
-                titleClass = 'text-slate-700';
+                titleClass = 'text-slate-700 text-xs';
             }
             
             container.appendChild(createCell(
@@ -625,13 +625,13 @@ if (!empty($nodesTree)) {
             container.appendChild(createCell(timeDisplay, 'justify-center border-r border-slate-100'));
 
             // Node Type (Styled visible select)
-            let typeColor = "bg-slate-100 text-slate-600 border border-slate-200";
-            if(row.type === 'paper') typeColor = "bg-indigo-100 text-indigo-700 border border-indigo-200";
-            if(row.type === 'section') typeColor = "bg-sky-100 text-sky-700 border border-sky-200";
+            let typeColor = "bg-slate-50 text-slate-600 border border-slate-200";
+            if(row.type === 'paper') typeColor = "bg-indigo-50 text-indigo-700 border border-indigo-200";
+            if(row.type === 'section') typeColor = "bg-sky-50 text-sky-700 border border-sky-200";
             if(row.type === 'unit') typeColor = "bg-white text-slate-400 border border-slate-200";
 
             container.appendChild(createCell(`
-                <select class="type-select-styled ${typeColor}" onchange="updateRow(${index}, 'type', this.value)">
+                <select class="type-select-styled ${typeColor} text-[10px] h-6 py-0 pl-1 pr-4" onchange="updateRow(${index}, 'type', this.value)">
                     <option value="paper" ${row.type==='paper'?'selected':''}>PHASE</option>
                     <option value="section" ${row.type==='section'?'selected':''}>SECTION</option>
                     <option value="unit" ${row.type==='unit'?'selected':''}>UNIT</option>
