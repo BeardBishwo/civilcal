@@ -168,9 +168,9 @@ if (!empty($nodesTree)) {
 
     <!-- === HIERARCHY SELECTION MODAL === -->
     <div id="hierarchy-modal" class="fixed inset-0 z-[100] hidden" aria-hidden="true">
-        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeHierarchyModal()"></div>
-        <div class="absolute inset-0 flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden transform transition-all relative flex flex-col max-h-[90vh]">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" onclick="closeHierarchyModal()"></div>
+        <div class="fixed top-[70px] left-[280px] right-0 bottom-0 flex items-center justify-center p-8">
+            <div class="bg-white rounded-2xl shadow-2xl w-full h-full overflow-hidden transform transition-all relative flex flex-col ring-1 ring-black/5">
                 <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
                     <h3 class="text-lg font-bold text-slate-800">Link Hierarchy</h3>
                     <div class="flex items-center gap-3">
@@ -194,11 +194,11 @@ if (!empty($nodesTree)) {
                             <span class="truncate dropdown-label">Course</span>
                              <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
-                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
+                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
                              <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('course', this.value)">
                              </div>
-                             <ul class="max-h-56 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-course">
+                             <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-course">
                                 <!-- JS Populated -->
                              </ul>
                         </div>
@@ -211,32 +211,15 @@ if (!empty($nodesTree)) {
                             <span class="truncate dropdown-label">Edu. Level</span>
                              <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
-                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
+                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
                              <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('edu', this.value)">
                              </div>
-                             <ul class="max-h-56 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-edu">
+                             <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-edu">
                                 <!-- JS Populated -->
                              </ul>
                         </div>
                          <input type="hidden" id="modal-filter-edu" value="">
-                    </div>
-
-                    <!-- Position Level Filter -->
-                    <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-pos">
-                        <button type="button" class="w-full flex items-center justify-between px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('pos')">
-                            <span class="truncate dropdown-label">Pos. Level</span>
-                             <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
-                        </button>
-                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
-                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
-                                <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('pos', this.value)">
-                             </div>
-                             <ul class="max-h-56 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-pos">
-                                <!-- JS Populated -->
-                             </ul>
-                        </div>
-                         <input type="hidden" id="modal-filter-pos" value="">
                     </div>
 
                     <!-- Category Filter -->
@@ -245,11 +228,11 @@ if (!empty($nodesTree)) {
                             <span class="truncate dropdown-label">Category</span>
                              <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
-                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
+                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
                              <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('cat', this.value)">
                              </div>
-                             <ul class="max-h-56 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-cat">
+                             <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-cat">
                                 <!-- JS Populated -->
                              </ul>
                         </div>
@@ -262,16 +245,33 @@ if (!empty($nodesTree)) {
                             <span class="truncate dropdown-label">Sub-Cat</span>
                              <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
-                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200">
+                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
                              <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('topic', this.value)">
                              </div>
-                             <ul class="max-h-56 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-topic">
+                             <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-topic">
                                 <!-- JS Populated -->
                              </ul>
                         </div>
                         <input type="hidden" id="modal-filter-topic" value="">
                      </div>
+
+                    <!-- Position Level Filter (Moved to End) -->
+                    <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-pos">
+                        <button type="button" class="w-full flex items-center justify-between px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('pos')">
+                            <span class="truncate dropdown-label">Pos. Level</span>
+                             <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
+                        </button>
+                        <div class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
+                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10">
+                                <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('pos', this.value)">
+                             </div>
+                             <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-pos">
+                                <!-- JS Populated -->
+                             </ul>
+                        </div>
+                         <input type="hidden" id="modal-filter-pos" value="">
+                    </div>
 
                 </div>
                 <div class="px-6 py-3 bg-white border-b border-slate-100 flex gap-2">
@@ -887,7 +887,7 @@ if (!empty($nodesTree)) {
     let activeRowIndex = null;
     let activeTab = 'category';
     const categoriesDB = <?php echo !empty($categories) ? json_encode($categories) : '[]'; ?>;
-    const topicsDB = <?php echo !empty($topics) ? json_encode($topics) : '[]'; ?>;
+    const subjectsDB = <?php echo !empty($subjects) ? json_encode($subjects) : '[]'; ?>;
 
     function openHierarchyModal(index) {
         activeRowIndex = index;
@@ -967,16 +967,21 @@ if (!empty($nodesTree)) {
         };
 
         // Education Select
+        // Education Select - DISABLED cascaded filtering to show all options by default
+        /*
         filterList('list-edu', (li, val) => {
             return categoriesDB.some(c => c.edu_level_id == val && (!courseId || !c.course_id || c.course_id == courseId));
         });
+        */
 
-        // Position Select
+        // Position Select - DISABLED
+        /*
         filterList('list-pos', (li, val) => {
-            const cMatch = !courseId || !li.dataset.course || li.dataset.course == courseId;
-            const eMatch = !eduId || !li.dataset.edu || li.dataset.edu == eduId;
-            return cMatch && eMatch;
+            const courseMatch = !courseId || !li.dataset.course || li.dataset.course == courseId;
+            const eduMatch = !eduId || !li.dataset.edu || li.dataset.edu == eduId;
+            return courseMatch && eduMatch;
         });
+        */
 
         // Category Select
         filterList('list-cat', (li, val) => {
@@ -985,11 +990,13 @@ if (!empty($nodesTree)) {
 
         // Topic Select
         filterList('list-topic', (li, val) => {
-            return !catId || !li.dataset.cat || li.dataset.cat == catId;
+            // Show all if no category selected, otherwise filter by category
+            if (!catId) return true; 
+            return !li.dataset.cat || li.dataset.cat == catId;
         });
 
         const curTab = typeof currentHierarchyTab !== 'undefined' ? currentHierarchyTab : 'category';
-        const sourceData = curTab === 'category' ? categoriesDB : topicsDB; // Use currentHierarchyTab
+        const sourceData = curTab === 'category' ? categoriesDB : subjectsDB; // Use currentHierarchyTab
         const typeLabel = curTab === 'category' ? 'Category' : 'Sub-Category';
         const linkKey = curTab === 'category' ? 'linked_category_id' : 'linked_topic_id';
 
@@ -1078,7 +1085,7 @@ if (!empty($nodesTree)) {
         // Categories & Topics might be large, limit initial render or render all?
         // Rendering all for now as browser handles 1-2k nodes okay usually.
         populateDropdown('cat', categoriesDB, 'id', 'name');
-        populateDropdown('topic', topicsDB, 'id', 'name');
+        populateDropdown('topic', subjectsDB, 'id', 'name');
         
         initBodyClick();
     }
@@ -1086,7 +1093,14 @@ if (!empty($nodesTree)) {
     function populateDropdown(type, data, idKey, titleKey) {
         const list = document.getElementById(`list-${type}`);
         if (!list) return;
-        list.innerHTML = `<li class="px-3 py-2 text-xs text-slate-500 hover:bg-slate-50 cursor-pointer" onclick="selectCustomOption('${type}', '', 'Filter ${type.charAt(0).toUpperCase() + type.slice(1)}')">All ${type.charAt(0).toUpperCase() + type.slice(1)}s</li>`;
+        
+        let html = `<li class="px-3 py-2 text-xs text-slate-500 hover:bg-slate-50 cursor-pointer" onclick="selectCustomOption('${type}', '', 'Filter ${type.charAt(0).toUpperCase() + type.slice(1)}')">All ${type.charAt(0).toUpperCase() + type.slice(1)}s</li>`;
+        
+        if (data.length === 0) {
+            html += `<li class="px-3 py-2 text-xs text-slate-400 italic cursor-default">No items found</li>`;
+        }
+
+        list.innerHTML = html;
         
         data.forEach(item => {
             const li = document.createElement('li');

@@ -73,33 +73,27 @@ class SyllabusController extends Controller
         // Recursively build tree
         $nodesTree = $this->buildSyllabusTree($nodes);
 
-        // Fetch enriched categories (linked to syllabus hierarchy)
-        // Join quiz_categories -> syllabus_nodes (category) -> position_levels (via level)
+        // Fetch Categories (Syllabus Nodes of type 'category')
         $categoriesSql = "
-            SELECT qc.*, sn.parent_id as edu_level_id, p.parent_id as course_id, p.title as parent_name,
-                   pl.id as position_level_id
-            FROM quiz_categories qc
-            LEFT JOIN syllabus_nodes sn ON sn.linked_category_id = qc.id AND sn.type = 'category'
-            LEFT JOIN syllabus_nodes p ON sn.parent_id = p.id
-            LEFT JOIN position_levels pl ON sn.level = pl.slug OR sn.level = pl.title
-            WHERE qc.is_active = 1
-            GROUP BY qc.id, sn.parent_id, p.parent_id, p.title, pl.id
-            ORDER BY qc.name ASC
+            SELECT id, title as name
+            FROM syllabus_nodes 
+            WHERE type = 'category' AND is_active = 1
+            ORDER BY title ASC
         ";
         $categories = $this->db->query($categoriesSql)->fetchAll();
 
-        // Fetch enriched topics
-        // Join quiz_topics -> quiz_subjects -> quiz_categories
-        $topicsSql = "
-            SELECT qt.*, qs.category_id, qc.name as category_name
-            FROM quiz_topics qt
-            LEFT JOIN quiz_subjects qs ON qt.subject_id = qs.id
-            LEFT JOIN quiz_categories qc ON qs.category_id = qc.id
-            WHERE qt.is_active = 1
-            GROUP BY qt.id, qs.category_id, qc.name
-            ORDER BY qt.name ASC
+
+        // Fetch Sub-Categories (Syllabus Nodes with a parent)
+        // Aliasing fields to match JS expectations (id, name, category_id, category_name)
+        $subjectsSql = "
+            SELECT child.id, child.title as name, child.parent_id as category_id, parent.title as category_name
+            FROM syllabus_nodes child
+            JOIN syllabus_nodes parent ON child.parent_id = parent.id
+            WHERE child.parent_id IS NOT NULL AND child.is_active = 1
+            ORDER BY child.title ASC
         ";
-        $topics = $this->db->query($topicsSql)->fetchAll();
+        $subjects = $this->db->query($subjectsSql)->fetchAll();
+
 
         // Fetch Position Levels for Filtering
         $allPosLevels = $this->db->find('position_levels', [], 'title ASC');
@@ -131,7 +125,7 @@ class SyllabusController extends Controller
             'nodesTree' => $nodesTree,
             'level' => $level,
             'categories' => $categories,
-            'topics' => $topics,
+            'subjects' => $subjects,
             'settings' => $settings,
             'breadcrumbBase' => $breadcrumbBase,
             'allCourses' => $allCourses,
