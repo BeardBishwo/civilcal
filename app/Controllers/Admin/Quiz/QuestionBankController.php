@@ -158,12 +158,55 @@ class QuestionBankController extends Controller
             'page_title' => 'Add New Question',
             'mainCategories' => $mainCategories,
             'subCategories' => $groupedSub,
-            'subCategories' => $groupedSub,
             'courses' => $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC")->fetchAll(),
             'educationLevels' => $this->db->query("SELECT id, title, parent_id FROM syllabus_nodes WHERE type = 'education_level' ORDER BY order_index ASC")->fetchAll(),
             'positionLevels' => $this->db->query("SELECT id, title, level_number FROM position_levels WHERE is_active = 1 ORDER BY order_index ASC")->fetchAll(),
             'question' => null,
             'action' => app_base_url('admin/quiz/questions/store')
+        ]);
+    }
+
+    /**
+     * Show Edit Form
+     */
+    public function edit($id)
+    {
+        $question = $this->db->findOne('quiz_questions', ['id' => $id]);
+        if (!$question) {
+            header('Location: ' . app_base_url('admin/quiz/questions'));
+            exit;
+        }
+
+        // Decode JSON fields
+        $question['content'] = json_decode($question['content'], true);
+        $question['options'] = json_decode($question['options'], true);
+        $question['tags'] = json_decode($question['tags'] ?? '[]', true);
+        $question['level_tags'] = json_decode($question['level_tags'] ?? '[]', true);
+
+        // Fetch mappings
+        $question['mappings'] = $this->db->query("SELECT * FROM question_stream_map WHERE question_id = :id", ['id' => $id])->fetchAll();
+        
+        // Fetch current position levels
+        $selectedPosLevels = $this->db->query("SELECT position_level_id FROM question_position_levels WHERE question_id = :id", ['id' => $id])->fetchAll(\PDO::FETCH_COLUMN);
+        $question['position_levels'] = $selectedPosLevels;
+
+        $mainCategories = $this->db->query("SELECT * FROM syllabus_nodes WHERE parent_id IS NULL ORDER BY order_index ASC")->fetchAll();
+        $subNodes = $this->db->query("SELECT id, parent_id, title FROM syllabus_nodes WHERE parent_id IS NOT NULL ORDER BY order_index ASC")->fetchAll();
+        
+        $groupedSub = [];
+        foreach ($subNodes as $node) {
+            $groupedSub[$node['parent_id']][] = $node;
+        }
+
+        $this->view->render('admin/quiz/questions/form', [
+            'page_title' => 'Edit Question',
+            'mainCategories' => $mainCategories,
+            'subCategories' => $groupedSub,
+            'courses' => $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC")->fetchAll(),
+            'educationLevels' => $this->db->query("SELECT id, title, parent_id FROM syllabus_nodes WHERE type = 'education_level' ORDER BY order_index ASC")->fetchAll(),
+            'positionLevels' => $this->db->query("SELECT id, title, level_number FROM position_levels WHERE is_active = 1 ORDER BY order_index ASC")->fetchAll(),
+            'question' => $question,
+            'action' => app_base_url('admin/quiz/questions/update/' . $id)
         ]);
     }
 
@@ -217,8 +260,7 @@ class QuestionBankController extends Controller
                 'tags' => json_encode($tags), // Stream/Education context
                 'default_marks' => $_POST['default_marks'] ?? 1.0,
                 'default_negative_marks' => $_POST['default_negative_marks'] ?? 0.0,
-                'is_active' => isset($_POST['is_active']) ? 1 : 0,
-                'default_negative_marks' => $_POST['default_negative_marks'] ?? 0.0,
+                'status' => $_POST['status'] ?? 'approved',
                 'is_active' => isset($_POST['is_active']) ? 1 : 0,
                 'created_by' => $_SESSION['user']['id'] ?? null
             ];
@@ -258,6 +300,91 @@ class QuestionBankController extends Controller
             }
 
             $this->jsonResponse(['success' => true, 'message' => 'Saved Successfully', 'redirect' => app_base_url('admin/quiz/questions')]);
+
+        } catch (Exception $e) {
+            $this->jsonResponse(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Update Question
+     */
+    public function update($id)
+    {
+        try {
+            if (empty($_POST['question_text'])) throw new Exception("Question text is required");
+
+            $type = $_POST['type'];
+            $content = [
+                'text' => $_POST['question_text'],
+                'image' => $_POST['question_image'] ?? null
+            ];
+
+            $options = [];
+            if (!empty($_POST['options'])) {
+                 foreach ($_POST['options'] as $idx => $opt) {
+                     $isCorrect = (isset($opt['is_correct']) && $opt['is_correct'] == 1) ? 1 : 0;
+                     $options[] = [
+                         'id' => $idx + 1,
+                         'text' => $opt['text'] ?? '',
+                         'is_correct' => $isCorrect
+                     ];
+                 }
+            }
+
+            $tags = [];
+            if(!empty($_POST['stream'])) $tags[] = $_POST['stream'];
+            if(!empty($_POST['education_level'])) $tags[] = $_POST['education_level'];
+            
+            $levelTags = !empty($_POST['level_tags']) ? json_encode($_POST['level_tags']) : json_encode([]);
+
+            $data = [
+                'type' => $type,
+                'content' => json_encode($content),
+                'options' => json_encode($options),
+                'answer_explanation' => $_POST['answer_explanation'] ?? '',
+                'difficulty_level' => $_POST['difficulty_level'] ?? 1,
+                'level_tags' => $levelTags,
+                'tags' => json_encode($tags),
+                'status' => $_POST['status'] ?? 'approved',
+                'default_marks' => $_POST['default_marks'] ?? 1.0,
+                'default_negative_marks' => $_POST['default_negative_marks'] ?? 0.0,
+                'is_active' => isset($_POST['is_active']) ? 1 : 0,
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+            
+            $this->db->update('quiz_questions', $data, ['id' => $id]);
+
+            // Sync Position Levels
+            $this->db->delete('question_position_levels', ['question_id' => $id]);
+            if (!empty($_POST['position_levels'])) {
+                foreach ($_POST['position_levels'] as $plId) {
+                    $this->db->insert('question_position_levels', [
+                        'question_id' => $id,
+                        'position_level_id' => $plId
+                    ]);
+                }
+            }
+
+            // Sync Mappings
+            $this->db->delete('question_stream_map', ['question_id' => $id]);
+            if (!empty($_POST['mappings']) && is_array($_POST['mappings'])) {
+                $isPrimary = true;
+                foreach ($_POST['mappings'] as $mapping) {
+                    if (!empty($mapping['unit_id'])) {
+                        $this->db->insert('question_stream_map', [
+                            'question_id' => $id,
+                            'syllabus_node_id' => $mapping['unit_id'],
+                            'difficulty_in_stream' => $_POST['difficulty_level'] ?? 3,
+                            'priority' => $mapping['priority'] ?? 1,
+                            'is_primary' => $isPrimary ? 1 : 0
+                        ]);
+                        $isPrimary = false;
+                    }
+                }
+            }
+
+            $this->jsonResponse(['success' => true, 'message' => 'Updated Successfully', 'redirect' => app_base_url('admin/quiz/questions')]);
 
         } catch (Exception $e) {
             $this->jsonResponse(['success' => false, 'error' => $e->getMessage()]);

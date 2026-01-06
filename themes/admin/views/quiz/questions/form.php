@@ -104,7 +104,7 @@
                         </div>
                         
                         <div class="relative group">
-                            <textarea name="question_text" id="q_editor" class="w-full min-h-[140px] p-5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition resize-y text-slate-700 text-base leading-relaxed placeholder:text-slate-400" placeholder="Type your question here..." required></textarea>
+                            <textarea name="question_text" id="q_editor" class="w-full min-h-[140px] p-5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition resize-y text-slate-700 text-base leading-relaxed placeholder:text-slate-400" placeholder="Type your question here..." required><?php echo $question ? htmlspecialchars($question['content']['text']) : ''; ?></textarea>
                             
                             <!-- Simple Toolbar -->
                             <div class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-slate-200 rounded-lg shadow-sm flex overflow-hidden">
@@ -124,7 +124,7 @@
                             </div>
                             <div class="relative">
                                 <div class="absolute top-3 left-3 text-amber-400"><i class="fas fa-info-circle"></i></div>
-                                <textarea name="answer_explanation" class="w-full pl-10 p-3 bg-amber-50/50 border border-amber-200 rounded-xl text-sm text-slate-700 focus:border-amber-400 outline-none transition" rows="2" placeholder="Explain why the answer is correct..."></textarea>
+                                <textarea name="answer_explanation" class="w-full pl-10 p-3 bg-amber-50/50 border border-amber-200 rounded-xl text-sm text-slate-700 focus:border-amber-400 outline-none transition" rows="2" placeholder="Explain why the answer is correct..."><?php echo $question ? htmlspecialchars($question['answer_explanation']) : ''; ?></textarea>
                             </div>
                         </div>
                     </div>
@@ -235,13 +235,40 @@
                     </div>
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Settings</h4>
                     
+                    <!-- Question Status -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                            <i class="fas fa-shield-check text-indigo-500"></i> Governance Status
+                        </label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="status" value="draft" <?php echo ($question && $question['status'] === 'draft') ? 'checked' : ''; ?> class="peer sr-only">
+                                <div class="py-2.5 px-1 rounded-xl border border-slate-200 bg-slate-50 text-center peer-checked:bg-amber-50 peer-checked:border-amber-500 peer-checked:text-amber-700 transition shadow-sm group-hover:bg-slate-100">
+                                    <span class="text-[10px] font-extrabold uppercase tracking-tighter">Draft</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="status" value="approved" <?php echo (!$question || $question['status'] === 'approved') ? 'checked' : ''; ?> class="peer sr-only">
+                                <div class="py-2.5 px-1 rounded-xl border border-slate-200 bg-slate-50 text-center peer-checked:bg-emerald-50 peer-checked:border-emerald-500 peer-checked:text-emerald-700 transition shadow-sm group-hover:bg-slate-100">
+                                    <span class="text-[10px] font-extrabold uppercase tracking-tighter">Approved</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="status" value="archived" <?php echo ($question && $question['status'] === 'archived') ? 'checked' : ''; ?> class="peer sr-only">
+                                <div class="py-2.5 px-1 rounded-xl border border-slate-200 bg-slate-50 text-center peer-checked:bg-slate-100 peer-checked:border-slate-500 peer-checked:text-slate-700 transition shadow-sm group-hover:bg-slate-100">
+                                    <span class="text-[10px] font-extrabold uppercase tracking-tighter">Archive</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
                     <!-- Difficulty Slider -->
                     <div class="mb-6">
                         <div class="flex justify-between mb-3">
                             <label class="text-sm font-bold text-slate-700">Difficulty</label>
                             <span id="diff_label" class="text-xs font-bold px-2.5 py-1 rounded-md bg-yellow-100 text-yellow-700 border border-yellow-200">Medium</span>
                         </div>
-                        <input type="range" name="difficulty_level" min="1" max="5" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" oninput="updateDiffLabel(this.value)">
+                        <input type="range" name="difficulty_level" min="1" max="5" value="<?php echo $question['difficulty_level'] ?? 3; ?>" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" oninput="updateDiffLabel(this.value)">
                         <div class="flex justify-between text-[10px] font-bold text-slate-400 mt-2">
                             <span>Easy</span>
                             <span>Expert</span>
@@ -253,13 +280,13 @@
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Marks</label>
                             <div class="relative">
-                                <input type="number" name="default_marks" value="1.0" step="0.1" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold text-slate-700 focus:border-indigo-500 outline-none">
+                                <input type="number" name="default_marks" value="<?php echo $question['default_marks'] ?? 1.0; ?>" step="0.1" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold text-slate-700 focus:border-indigo-500 outline-none">
                             </div>
                         </div>
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Neg. Marks</label>
                             <div class="relative">
-                                <input type="number" name="default_negative_marks" value="0.2" step="0.01" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold text-red-600 focus:border-red-500 outline-none">
+                                <input type="number" name="default_negative_marks" value="<?php echo $question['default_negative_marks'] ?? 0.2; ?>" step="0.01" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold text-red-600 focus:border-red-500 outline-none">
                             </div>
                         </div>
                     </div>
@@ -269,7 +296,7 @@
                         <label class="flex items-center justify-between p-3 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer transition group">
                             <span class="text-sm font-semibold text-slate-700 group-hover:text-indigo-600 transition">Active Status</span>
                             <div class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="active_status_toggle" name="is_active" value="1" checked class="sr-only peer">
+                                <input type="checkbox" id="active_status_toggle" name="is_active" value="1" <?php echo (!$question || $question['is_active']) ? 'checked' : ''; ?> class="sr-only peer">
                                 <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
                             </div>
                         </label>
@@ -794,10 +821,45 @@
 
     // Init
     document.addEventListener('DOMContentLoaded', () => {
-        const savedType = localStorage.getItem('q_form_type') || 'MCQ';
+        const questionData = <?php echo json_encode($question); ?>;
+        const savedType = questionData ? questionData.type : (localStorage.getItem('q_form_type') || 'MCQ');
+        
         if (typeof switchType === 'function') switchType(savedType, null); 
         
-        restoreFormState();
+        // Populate options if editing
+        if (questionData && questionData.options) {
+            if (savedType !== 'TF') {
+                state.optionCount = questionData.options.length;
+                renderOptionsList();
+                
+                // Set values
+                const container = document.getElementById('options_container');
+                const optRows = container.querySelectorAll('.option-row');
+                questionData.options.forEach((opt, idx) => {
+                    if (optRows[idx]) {
+                        const input = optRows[idx].querySelector('input[type=\"text\"]');
+                        input.value = opt.text;
+                        
+                        // Set correct answer
+                        if (savedType === 'MCQ') {
+                            const radio = optRows[idx].querySelector('input[type=\"radio\"]');
+                            if (opt.is_correct) {
+                                radio.checked = true;
+                                setSingleCorrect(idx);
+                            }
+                        } else if (savedType === 'MULTI') {
+                            const cb = optRows[idx].querySelector('input[type=\"checkbox\"]');
+                            if (opt.is_correct) cb.checked = true;
+                        }
+                    }
+                });
+            } else {
+                // TF handles separately
+                const isCorrectTrue = questionData.options[0].is_correct == 1;
+                document.querySelector(`input[name=\"tf_selection\"][value=\"${isCorrectTrue ? '1' : '0'}\"]`).checked = true;
+                setTFCorrect(isCorrectTrue ? 0 : 1);
+            }
+        }
 
         // Attach Global Listener
         const qForm = document.getElementById('createQuestionForm');

@@ -243,7 +243,7 @@ class ExamGeneratorService
             SELECT DISTINCT q.*, qsm.difficulty_in_stream, qsm.stream
             FROM quiz_questions q
             LEFT JOIN question_stream_map qsm ON q.id = qsm.question_id
-            WHERE q.is_active = 1
+            WHERE q.is_active = 1 AND q.status = 'approved'
             AND (
                 -- 1. Direct Topic Linkage
                 q.topic_id IN (
@@ -313,7 +313,7 @@ class ExamGeneratorService
             SELECT q.*, qsm.difficulty_in_stream, qsm.stream
             FROM quiz_questions q
             LEFT JOIN question_stream_map qsm ON q.id = qsm.question_id
-            WHERE q.is_active = 1
+            WHERE q.is_active = 1 AND q.status = 'approved'
             AND q.id NOT IN ($excludeIdsStr)
             AND qsm.is_practical = 1
         ";

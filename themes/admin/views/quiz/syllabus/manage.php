@@ -53,6 +53,8 @@ if (!empty($nodesTree)) {
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- FontAwesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="admin-wrapper-container antialiased">
     <div class="admin-content-wrapper p-0 shadow-none bg-transparent">
@@ -117,6 +119,9 @@ if (!empty($nodesTree)) {
                     <div class="flex items-center gap-2 shrink-0 print:hidden">
                         <button onclick="addTopic()" class="h-9 px-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
                             <i class="fas fa-plus mr-2 text-blue-500"></i> Row
+                        </button>
+                        <button onclick="openCloneModal()" class="h-9 px-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition flex items-center shadow-sm" title="Clone as new version">
+                            <i class="fas fa-copy mr-2 text-blue-500"></i> Clone
                         </button>
                         <button onclick="saveSyllabus()" class="h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition shadow-md flex items-center">
                             <i class="fas fa-save mr-2"></i> Save Changes
@@ -315,9 +320,10 @@ if (!empty($nodesTree)) {
     /* Premium Grid Styles */
     .syllabus-grid {
         display: grid;
-        grid-template-columns: 40px 40px 35px 1fr 85px 110px 60px 60px 60px 85px 85px 60px 70px 70px 250px;
+        /* Columns: Ck(40), Drag(35), LVL(35), Title(1fr), Time(60), Type(100), Qty(55), Opt(55), Each(55), Q-Type(85), Diff(85), Marks(60), Hier(75), Act(85), Linked(250) */
+        grid-template-columns: 40px 35px 35px 1fr 60px 100px 55px 55px 55px 85px 85px 60px 75px 85px 250px;
         background-color: #f1f5f9;
-        min-width: 1450px;
+        min-width: 1400px;
     }
     .grid-header {
         background-color: #f8fafc; color: #64748b; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 2px; display: flex; align-items: center; justify-content: center;
@@ -325,21 +331,42 @@ if (!empty($nodesTree)) {
     .grid-row { background-color: white; border-bottom: 1px solid #f1f5f9; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
     .grid-row:hover { background-color: #f8fafc; }
     
-    /* Phase/Level 0 Row - Dark Slate from mockup */
-    .grid-row[data-type="paper"] { background-color: #f1f5f9; }
-    .grid-row[data-type="paper"] .grid-cell { color: #1e293b; font-weight: 800; font-size: 0.95rem; }
-    .grid-row[data-type="paper"] .input-premium { background-color: #fffbeb !important; border-color: #fef3c7; color: #92400e; }
+    .grid-row[data-type="paper"] { background-color: #f8fafc; }
+    .grid-row[data-type="paper"] .grid-cell { color: #1e293b; font-weight: 800; }
     
-    .grid-row[data-type="section"] { background-color: #f8fafc; }
-    .grid-row[data-type="section"] .grid-cell { font-weight: 700; color: #334155; }
+    /* Clean Title Cells - Matching Sample */
+    .cell-title-phase { 
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important; 
+        color: white !important;
+        border-right: 1px solid #111827 !important;
+    }
+    .cell-title-section { 
+        background-color: #f1f5f9 !important; 
+        color: #1d4ed8 !important;
+    }
     
-    .grid-cell { padding: 2px 6px; display: flex; align-items: center; font-size: 0.8rem; color: #334155; position: relative; height: 32px; }
+    .grid-cell { 
+        padding: 0 12px; 
+        display: flex; 
+        align-items: center; 
+        font-size: 0.8rem; 
+        color: #334155; 
+        position: relative; 
+        height: 48px; 
+        border-right: 1px solid #f1f5f9;
+        border-bottom: 1px solid #f1f5f9;
+        overflow: hidden; 
+    }
     
     .input-premium {
-        width: 100%; padding: 1px 4px; border: 1px solid #e2e8f0; border-radius: 4px; text-align: center; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.75rem; transition: 0.2s;
-        background-color: white; height: 24px;
+        width: 100%; padding: 0 4px; border: 1px solid #e2e8f0; border-radius: 4px; text-align: center; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.75rem; transition: 0.2s;
+        background-color: white; height: 26px;
     }
     .input-premium:focus { border-color: #6366f1; ring: 3px rgba(99, 102, 241, 0.1); outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    
+    .input-readonly { 
+        width: 100%; height: 26px; background-color: #f8fafc; border: 1px solid #f1f5f9; border-radius: 4px; color: #94a3b8; font-size: 0.7rem; text-align: center; display: flex; items-center justify-center; font-weight: 800; cursor: not-allowed;
+    }
     
     .time-input { color: #b45309; }
     .qty-input { color: #059669; }
@@ -349,6 +376,26 @@ if (!empty($nodesTree)) {
     .depth-1 { color: #1e293b; font-weight: 700; }
     .depth-2 { color: #334155; font-weight: 600; }
     .depth-3 { color: #64748b; font-weight: 500; }
+
+    /* Tree Guide Lines */
+    .tree-guide {
+        position: absolute;
+        left: var(--guide-x);
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background-color: #e2e8f0;
+        pointer-events: none;
+    }
+    .tree-guide-horizontal {
+        position: absolute;
+        left: var(--guide-x);
+        top: 50%;
+        width: 12px;
+        height: 1px;
+        background-color: #e2e8f0;
+        pointer-events: none;
+    }
     
     .row-checkbox { cursor: pointer; accent-color: #6366f1; }
     .drag-handle { cursor: grab; color: #cbd5e1; padding: 6px; transition: 0.2s; }
@@ -391,23 +438,41 @@ if (!empty($nodesTree)) {
     }
     .type-select-styled {
         appearance: none;
-        background-image: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 10px;
         border: 1px solid transparent;
         outline: none;
         cursor: pointer;
-        font-size: 9px;
+        font-size: 10px;
         font-weight: 800;
-        padding: 4px 12px;
+        padding: 0 20px 0 10px;
         border-radius: 9999px;
         text-align: center;
-        width: 85px !important;
+        width: 100% !important;
+        height: 28px;
         transition: all 0.2s;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
     .type-select-styled:hover { border-color: rgba(99, 102, 241, 0.3); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
     .badge-phase { background: #1e293b; color: white; }
     .badge-section { background: #e0e7ff; color: #4338ca; }
     .badge-unit { background: #f1f5f9; color: #64748b; }
+
+    /* Hierarchy Indicators - Subtle Bar on first cell only */
+    .row-phase-indicator { border-left: 4px solid #1e293b !important; }
+    .row-section-indicator { border-left: 4px solid #6366f1 !important; }
+    .row-unit-indicator { border-left: 4px solid #e2e8f0 !important; }
+    
+    .input-readonly { 
+        background-color: #f8fafc !important; 
+        color: #94a3b8 !important; 
+        font-weight: 800 !important;
+        border: 1px solid #f1f5f9 !important;
+        pointer-events: none;
+    }
 
     /* Modal Filters */
     .link-filter-row {
@@ -607,76 +672,95 @@ if (!empty($nodesTree)) {
         while(container.children.length > 15) container.removeChild(container.lastChild);
 
         syllabusData.forEach((row, index) => {
-            // Checkbox
-            container.appendChild(createCell(`<input type="checkbox" class="row-checkbox w-4 h-4 rounded" ${row.selected ? 'checked' : ''} onchange="toggleRowSelection(${index}, this.checked)">`, 'justify-center border-r border-slate-100'));
+            const rowIndicatorClass = row.type === 'paper' ? 'row-phase-indicator' : (row.type === 'section' ? 'row-section-indicator' : 'row-unit-indicator');
+            
+            // Checkbox (The first cell gets the indicator bar)
+            container.appendChild(createCell(`<input type="checkbox" class="row-checkbox w-4 h-4 rounded" ${row.selected ? 'checked' : ''} onchange="toggleRowSelection(${index}, this.checked)">`, `justify-center ${rowIndicatorClass}`));
             
             // Drag Handle
-            const dragCell = createCell(`<i class="fas fa-grip-vertical drag-handle"></i>`, 'justify-center border-r border-slate-100');
+            const dragCell = createCell(`<i class="fas fa-grip-vertical drag-handle"></i>`, 'justify-center');
             dragCell.draggable = true;
             setupDragEvents(dragCell, index);
             container.appendChild(dragCell);
 
             // Level
-            container.appendChild(createCell(row.depth, `justify-center depth-${row.depth} bg-slate-50 border-r border-slate-100 font-mono text-[10px]`));
+            container.appendChild(createCell(row.depth, `justify-center depth-${row.depth} bg-slate-50 font-mono text-[10px]`));
 
             // Topic / Title (with depth-based styling)
-            const padding = 20 + (row.depth * 32);
+            const indentSize = 38;
+            const padding = 16 + (row.depth * indentSize);
             let icon = 'fa-folder';
             let titleClass = '';
-            let titleStyle = '';
+            let extraCellClass = '';
             
-            if(row.depth === 0) {
-                icon = 'fa-layer-group text-white';
-                titleClass = 'font-bold text-white text-xs';
-                titleStyle = 'background: linear-gradient(135deg, #1e293b 0%, #334155 100%);';
-            } else if(row.depth === 1) {
-                icon = 'fa-folder-open text-blue-600';
-                titleClass = 'font-bold text-blue-700 text-xs';
-                titleStyle = 'background: #eff6ff;';
+            if(row.depth === 0 || row.type === 'paper') {
+                icon = 'fa-layer-group';
+                titleClass = 'font-bold text-white';
+                extraCellClass = 'cell-title-phase';
+            } else if(row.type === 'section' || row.depth === 1) {
+                icon = 'fa-folder-open text-blue-500';
+                titleClass = 'font-bold text-blue-700';
+                extraCellClass = 'cell-title-section';
             } else {
                 icon = 'fa-folder text-slate-400';
-                titleClass = 'text-slate-700 text-xs';
+                titleClass = 'text-slate-600';
             }
             
+            // Generate Tree Lines
+            let treeLinesHtml = '';
+            for(let i = 0; i < row.depth; i++) {
+                const xPos = 16 + (i * indentSize) + 6; // Center of icon position for that level
+                treeLinesHtml += `<div class="tree-guide" style="--guide-x: ${xPos}px;"></div>`;
+                if(i === row.depth - 1) {
+                    treeLinesHtml += `<div class="tree-guide-horizontal" style="--guide-x: ${xPos}px;"></div>`;
+                }
+            }
+
             container.appendChild(createCell(
-                `<div class="flex items-center w-full">
-                    <i class="fas ${icon} mr-3 opacity-80 text-xs"></i> 
+                `${treeLinesHtml}
+                 <div class="flex items-center w-full relative z-10">
+                    <i class="fas ${icon} mr-3 opacity-90 text-sm ${row.type === 'paper' ? 'text-white/60' : ''}"></i> 
                     <span contenteditable="true" class="w-full outline-none focus:bg-white rounded px-1 transition duration-200 ${titleClass}" onblur="updateRow(${index}, 'title', this.innerText)">${row.title}</span>
                  </div>`,
-                `depth-${row.depth} border-r border-slate-100`, `padding-left: ${padding}px; ${titleStyle}`
+                `depth-${row.depth} ${extraCellClass}`, `padding-left: ${padding}px;`
             ));
 
             // Time (with formatted display)
-            const timeBg = row.depth === 0 ? "bg-amber-100" : "bg-white";
+            const timeBg = row.depth === 0 ? "bg-amber-100/50" : "bg-white";
             const timeDisplay = row.depth === 0 ? `<div class="font-bold text-amber-800">${formatNumber(row.time)}</div>` : `<input type="number" class="input-premium time-input ${timeBg}" value="${row.time || 0}" onchange="updateRow(${index}, 'time', this.value)">`;
-            container.appendChild(createCell(timeDisplay, 'justify-center border-r border-slate-100'));
+            container.appendChild(createCell(timeDisplay, 'justify-center'));
 
             // Node Type (Styled visible select)
-            let typeColor = "bg-slate-50 text-slate-600 border border-slate-200";
-            if(row.type === 'paper') typeColor = "bg-indigo-50 text-indigo-700 border border-indigo-200";
-            if(row.type === 'section') typeColor = "bg-sky-50 text-sky-700 border border-sky-200";
-            if(row.type === 'unit') typeColor = "bg-white text-slate-400 border border-slate-200";
+            let typeColor = "bg-slate-100/50 text-slate-500";
+            if(row.type === 'paper') typeColor = "bg-slate-800 text-white font-bold";
+            if(row.type === 'section') typeColor = "bg-slate-200 text-slate-700 font-bold";
+            if(row.type === 'unit') typeColor = "bg-slate-50 text-slate-400";
 
             container.appendChild(createCell(`
-                <select class="type-select-styled ${typeColor} text-[10px] h-6 py-0 pl-1 pr-4" onchange="updateRow(${index}, 'type', this.value)">
+                <select class="type-select-styled ${typeColor}" onchange="updateRow(${index}, 'type', this.value)">
                     <option value="paper" ${row.type==='paper'?'selected':''}>PHASE</option>
                     <option value="section" ${row.type==='section'?'selected':''}>SECTION</option>
                     <option value="unit" ${row.type==='unit'?'selected':''}>UNIT</option>
                 </select>
-            `, 'justify-center border-r border-slate-100 px-1'));
+            `, 'justify-center px-2'));
 
             // Qty (with formatted display)
-            const qtyDisabled = (row.type !== 'unit' && row.depth !== 0) ? 'disabled style="background:#f8fafc; color:#cbd5e1;"' : '';
-            const qtyDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400">${formatNumber(row.qCount)}</div>` : `<input type="number" class="input-premium qty-input" value="${row.qCount || 0}" onchange="updateRow(${index}, 'qCount', this.value)">`;
-            container.appendChild(createCell(qtyDisplay, 'justify-center border-r border-slate-100'));
+            const isTopic = row.type === 'unit';
+            const qtyClass = isTopic ? 'input-premium' : 'input-readonly';
+            const qtyDisplay = `<input type="number" class="${qtyClass} qty-input" value="${row.qCount || 0}" ${!isTopic ? 'readonly' : ''} onchange="updateRow(${index}, 'qCount', this.value)">`;
+            container.appendChild(createCell(qtyDisplay, 'justify-center'));
 
             // Optional (new column)
-            const optDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400">${row.qOptional || 0}</div>` : `<input type="number" class="input-premium opt-input bg-amber-50" value="${row.qOptional || 0}" onchange="updateRow(${index}, 'qOptional', this.value)" placeholder="0">`;
-            container.appendChild(createCell(optDisplay, 'justify-center border-r border-slate-100'));
+            const optClass = isTopic ? 'input-premium bg-amber-50' : 'input-readonly';
+            const optDisplay = `<input type="number" class="${optClass} opt-input" value="${row.qOptional || 0}" ${!isTopic ? 'readonly' : ''} onchange="updateRow(${index}, 'qOptional', this.value)" placeholder="0">`;
+            container.appendChild(createCell(optDisplay, 'justify-center'));
 
             // Each (with formatted display)
-            const eachDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400">${formatNumber(row.qEach)}</div>` : `<input type="number" class="input-premium each-input" value="${row.qEach || 0}" onchange="updateRow(${index}, 'qEach', this.value)">`;
-            container.appendChild(createCell(eachDisplay, 'justify-center border-r border-slate-100'));
+            const eachClass = isTopic ? 'input-premium' : 'input-readonly';
+            const eachDisplay = isTopic 
+                ? `<input type="number" class="${eachClass} each-input" value="${row.qEach || 0}" onchange="updateRow(${index}, 'qEach', this.value)">`
+                : `<div class="text-slate-400 font-bold text-[10px]">-</div>`;
+            container.appendChild(createCell(eachDisplay, 'justify-center'));
 
             // Q-Type (Question Type dropdown)
             const qTypeOptions = [
@@ -689,11 +773,11 @@ if (!empty($nodesTree)) {
             const selectedQType = row.qType || 'any';
             const qTypeColor = qTypeOptions.find(opt => opt.value === selectedQType)?.color || 'bg-slate-50 text-slate-600';
             const qTypeDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400 text-[10px]">-</div>` : `
-                <select class="type-select-styled ${qTypeColor} text-[10px] h-6 py-0 pl-1 pr-4" onchange="updateRow(${index}, 'qType', this.value)">
+                <select class="type-select-styled ${qTypeColor} !text-slate-500 opacity-60 hover:opacity-100" onchange="updateRow(${index}, 'qType', this.value)">
                     ${qTypeOptions.map(opt => `<option value="${opt.value}" ${selectedQType === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('')}
                 </select>
             `;
-            container.appendChild(createCell(qTypeDisplay, 'justify-center border-r border-slate-100 px-1'));
+            container.appendChild(createCell(qTypeDisplay, 'justify-center px-2'));
 
             // Difficulty dropdown
             const diffOptions = [
@@ -707,16 +791,16 @@ if (!empty($nodesTree)) {
             const selectedDiff = row.difficulty || 'any';
             const diffColor = diffOptions.find(opt => opt.value === selectedDiff)?.color || 'bg-slate-50 text-slate-600';
             const diffDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400 text-[10px]">-</div>` : `
-                <select class="type-select-styled ${diffColor} text-[10px] h-6 py-0 pl-1 pr-4" onchange="updateRow(${index}, 'difficulty', this.value)">
+                <select class="type-select-styled ${diffColor} !text-slate-500 opacity-60 hover:opacity-100" onchange="updateRow(${index}, 'difficulty', this.value)">
                     ${diffOptions.map(opt => `<option value="${opt.value}" ${selectedDiff === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('')}
                 </select>
             `;
-            container.appendChild(createCell(diffDisplay, 'justify-center border-r border-slate-100 px-1'));
+            container.appendChild(createCell(diffDisplay, 'justify-center px-2'));
 
             // Marks (with formatted display)
             const marksBg = row.depth === 0 ? "bg-slate-100" : "bg-white";
             const marksDisplay = `<div class="font-bold ${row.depth === 0 ? 'text-slate-800' : 'text-slate-700'}">${formatNumber(row.weight)}</div>`;
-            container.appendChild(createCell(marksDisplay, 'justify-center border-r border-slate-100'));
+            container.appendChild(createCell(marksDisplay, 'justify-center'));
 
             // Hierarchy
             container.appendChild(createCell(`
@@ -724,13 +808,22 @@ if (!empty($nodesTree)) {
                     <button onclick="changeDepth(${index}, -1)" class="hierarchy-btn" title="Outdent"><i class="fas fa-chevron-left text-[10px]"></i></button>
                     <button onclick="changeDepth(${index}, 1)" class="hierarchy-btn" title="Indent"><i class="fas fa-chevron-right text-[10px]"></i></button>
                 </div>
-            `, 'justify-center border-r border-slate-100'));
+            `, 'justify-center'));
 
             // Actions
             container.appendChild(createCell(`
                 <button onclick="handleRowDuplicate(${index})" class="text-slate-300 hover:text-blue-500 transition px-2" title="Duplicate"><i class="fas fa-clone text-sm"></i></button>
                 <button onclick="deleteRow(${index})" class="text-slate-300 hover:text-rose-500 transition px-2" title="Delete"><i class="fas fa-trash-alt text-sm"></i></button>
-            `, 'justify-center border-r border-slate-100'));
+            `, 'justify-center'));
+
+            // Set depth and type attributes for styling
+            const rowElements = container.querySelectorAll('.grid-cell:nth-last-child(-n+15)');
+            const rowClass = row.type === 'paper' ? 'row-phase' : (row.type === 'section' ? 'row-section' : 'row-unit');
+            rowElements.forEach(cell => {
+                cell.setAttribute('data-depth', row.depth);
+                cell.setAttribute('data-type', row.type);
+                cell.className += ' ' + rowClass;
+            });
 
             // Linked (Breadcrumbs)
             let linkedHtml = '';
@@ -751,13 +844,6 @@ if (!empty($nodesTree)) {
                 linkedHtml = `<button onclick="openHierarchyModal(${index})" class="hierarchy-btn text-blue-500 hover:bg-blue-50 hover:border-blue-200" title="Link Category/Topic"><i class="fas fa-plus text-xs"></i></button>`;
             }
             container.appendChild(createCell(linkedHtml, 'justify-center px-1'));
-            
-            // Set depth and type attributes for styling
-            const rowElements = container.querySelectorAll('.grid-cell:nth-last-child(-n+14)');
-            rowElements.forEach(cell => {
-                cell.setAttribute('data-depth', row.depth);
-                cell.setAttribute('data-type', row.type);
-            });
         });
 
         validateSyllabus();
@@ -766,7 +852,7 @@ if (!empty($nodesTree)) {
 
     function createCell(html, classes = "", style = "") {
         const div = document.createElement('div');
-        div.className = `grid-cell grid-row ${classes}`;
+        div.className = `grid-cell ${classes}`;
         div.innerHTML = html;
         if(style) div.style = style;
         return div;
@@ -778,34 +864,100 @@ if (!empty($nodesTree)) {
         if(!stringFields.includes(field)) value = parseFloat(value) || 0;
         syllabusData[index][field] = value;
         
-        // Auto-adjust depth based on node type
+        // Auto-adjust depth based on node type (Enterprise Rule)
         if(field === 'type') {
-            const typeDepthMap = {
-                'paper': 0,
-                'phase': 0,
-                'section': 1,
-                'unit': 2,
-                'topic': 3
-            };
+            const typeDepthMap = { 'paper': 0, 'section': 1, 'unit': 2 };
             if(typeDepthMap[value] !== undefined) {
+                // If changing to 'unit', and current depth is < 2, force level 2
+                // If changing to 'section', force level 1
+                // If changing to 'paper', force level 0
                 syllabusData[index].depth = typeDepthMap[value];
             }
         }
         
-        // Auto-calculation logic: QTY * EACH = MARKS
-        if(field === 'qCount' || field === 'qEach') {
-            const count = parseFloat(syllabusData[index].qCount) || 0;
-            const each = parseFloat(syllabusData[index].qEach) || 0;
-            syllabusData[index].weight = count * each;
+        // Auto-calculation for Unit types: QTY * EACH = MARKS
+        if(syllabusData[index].type === 'unit') {
+            if(field === 'qCount' || field === 'qEach') {
+                const count = parseFloat(syllabusData[index].qCount) || 0;
+                const each = parseFloat(syllabusData[index].qEach) || 0;
+                syllabusData[index].weight = count * each;
+            }
         }
         
+        recalculateTotals();
         renderGrid();
+    }
+
+    /**
+     * Enterprise Intelligent Recalculation
+     * Aggregates totals from Topics up to Sections and Phases.
+     */
+    function recalculateTotals() {
+        for (let i = syllabusData.length - 1; i >= 0; i--) {
+            const row = syllabusData[i];
+            
+            // Phases and Sections are read-only containers for metrics
+            if (row.type !== 'unit') {
+                let totalQty = 0;
+                let totalMarks = 0;
+                let totalTime = 0;
+                let totalOptional = 0;
+                
+                // Scan descendants
+                for (let j = i + 1; j < syllabusData.length; j++) {
+                    // Stop if we hit a row at the same or higher (parent) level
+                    if (syllabusData[j].depth <= row.depth) break;
+                    
+                    // Only sum up Topic (unit) values to avoid double counting nested groups
+                    // (Phase sums its Topics, Section sums its Topics)
+                    // Actually, if we want Section to show sum of its Topics, 
+                    // and Phase to show sum of its Sections (which already have Topic sums),
+                    // we should sum DIRECT children.
+                    
+                    // But wait, the flat array might have nesting like: Section -> Unit, Unit.
+                    // Summing direct descendants that are units works.
+                    if (syllabusData[j].type === 'unit') {
+                        // Check if this Unit belongs to this specific parent i
+                        // (i.e., no other Parent of the same depth as i exists between i and j)
+                        let isDirectDescendant = true;
+                        for (let k = i + 1; k < j; k++) {
+                            if (syllabusData[k].depth === row.depth) {
+                                isDirectDescendant = false;
+                                break;
+                            }
+                        }
+                        
+                        if (isDirectDescendant) {
+                            totalQty += parseFloat(syllabusData[j].qCount) || 0;
+                            totalMarks += parseFloat(syllabusData[j].weight) || 0;
+                            totalTime += parseFloat(syllabusData[j].time) || 0;
+                            totalOptional += parseFloat(syllabusData[j].qOptional) || 0;
+                        }
+                    }
+                }
+                
+                row.qCount = totalQty;
+                row.weight = totalMarks;
+                row.time = totalTime;
+                row.qOptional = totalOptional;
+            }
+        }
     }
 
     function changeDepth(index, change) {
         let newDepth = syllabusData[index].depth + change;
-        if(newDepth >= 0 && newDepth <= 3) {
+        if(newDepth >= 0 && newDepth <= 5) { // Support deeper nesting
             syllabusData[index].depth = newDepth;
+            
+            // Auto-adjust node type based on indentation (Auto-Hierarchy Rule)
+            // Phase is strictly Level 0
+            if (newDepth === 0) syllabusData[index].type = 'paper';
+            // Section is strictly Level 1
+            else if (newDepth === 1) syllabusData[index].type = 'section';
+            // Valid units can be Level 2 or deeper
+            else syllabusData[index].type = 'unit';
+            
+            recalculateTotals();
             renderGrid();
         }
     }
@@ -923,27 +1075,97 @@ if (!empty($nodesTree)) {
     }
 
     function saveSyllabus() {
-        const payload = JSON.stringify({
-            level: currentLevel,
-            nodes: syllabusData,
-            settings: manualSettings
+        // Validation: Must have at least one node
+        if(syllabusData.length === 0) {
+            Swal.fire('Error', 'Syllabus cannot be empty.', 'error');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Saving...',
+            didOpen: () => { Swal.showLoading(); }
         });
 
-        fetch('<?php echo app_base_url("admin/quiz/syllabus/bulk-save"); ?>', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: payload
-        })
-        .then(r => r.json())
-        .then(d => {
-            if(d.status === 'success') {
-                // Use custom notification if available, else alert
-                alert('Changes saved successfully!');
-            } else {
-                alert('Error: ' + d.message);
+        const payload = {
+            level: "<?php echo $level; ?>",
+            nodes: syllabusData,
+            settings: {
+                time: document.getElementById('global-time-input').value,
+                marks: document.getElementById('global-marks-input').value,
+                pass: document.getElementById('global-pass-input').value,
+                negValue: document.getElementById('global-neg-input').value
             }
+        };
+
+        fetch('<?php echo get_app_url(); ?>/admin/quiz/syllabus/bulk-save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         })
-        .catch(err => alert('Communication error'));
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Saved!',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire('Error', data.message || 'Failed to save', 'error');
+            }
+        });
+    }
+
+    async function openCloneModal() {
+        const { value: newLabel } = await Swal.fire({
+            title: 'Clone Syllabus',
+            text: 'Enter a version label to identify this new clone (e.g., "Revision 2025")',
+            input: 'text',
+            inputValue: "Revision " + new Date().getFullYear(),
+            showCancelButton: true,
+            confirmButtonText: 'Create Clone',
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => {
+                if (!value) return 'Version label is required!';
+            }
+        });
+
+        if (!newLabel) return;
+
+        const currentLevel = "<?php echo $level; ?>";
+        
+        Swal.fire({
+            title: 'Creating Clone...',
+            text: 'Please wait while we duplicate the structure and settings.',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        fetch('<?php echo get_app_url(); ?>/admin/quiz/syllabus/clone', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                level: currentLevel,
+                version_label: newLabel
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Syllabus Cloned!',
+                    text: 'Redirecting to the new version...',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = '<?php echo get_app_url(); ?>/admin/quiz/syllabus/manage/' + data.new_level;
+                });
+            } else {
+                Swal.fire('Error', data.message || 'Clone failed', 'error');
+            }
+        });
     }
 
     // --- HIERARCHY MODAL LOGIC ---

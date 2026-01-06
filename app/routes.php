@@ -1957,6 +1957,7 @@ $router->add("POST", "/admin/quiz/syllabus/reorder", "Admin\\Quiz\\SyllabusContr
 $router->add("POST", "/admin/quiz/syllabus/toggle-status/{id}", "Admin\\Quiz\\SyllabusController@toggleStatus", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/syllabus/bulk-save", "Admin\\Quiz\\SyllabusController@bulkSave", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/syllabus/duplicate-level", "Admin\\Quiz\\SyllabusController@duplicateLevel", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/syllabus/clone", "Admin\\Quiz\\SyllabusController@cloneSyllabus", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/syllabus/delete-level", "Admin\\Quiz\SyllabusController@deleteLevel", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/syllabus/generate-exam", "Admin\\Quiz\\SyllabusController@generateExam", ["auth", "admin"]);
 $router->add("GET", "/admin/quiz/syllabus/getChildren", "Admin\\Quiz\\SyllabusController@getChildren", ["auth", "admin"]);

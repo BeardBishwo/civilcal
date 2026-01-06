@@ -213,9 +213,9 @@ class SyllabusController extends Controller
                     'time_minutes' => $node['time'] ?? 0,
                     'question_count' => $node['qCount'] ?? 0,
                     'question_optional' => $node['qOptional'] ?? 0,
-                    'question_marks_each' => $node['qEach'] ?? 0,
-                    'question_type' => $node['qType'] ?? 'any',
-                    'difficulty_constraint' => $node['difficulty'] ?? 'any',
+                    'question_marks_each' => ($node['type'] === 'unit') ? ($node['qEach'] ?? 0) : 0,
+                    'question_type' => ($node['type'] === 'unit') ? ($node['qType'] ?? 'any') : 'any',
+                    'difficulty_constraint' => ($node['type'] === 'unit') ? ($node['difficulty'] ?? 'any') : 'any',
                     'order' => $index,
                     'is_active' => 1,
                     // Hierarchy Links
@@ -479,5 +479,79 @@ class SyllabusController extends Controller
             echo json_encode(['error' => $e->getMessage()]);
         }
         exit;
+    }
+
+    /**
+     * Enterprise Clone Technique
+     * Deep copies settings and structural nodes with a new version label.
+     */
+    public function cloneSyllabus()
+    {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $oldLevel = $input['level'] ?? null;
+        $versionLabel = $input['version_label'] ?? null;
+
+        if (!$oldLevel || !$versionLabel) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid parameters']);
+            return;
+        }
+
+        // Generate New Level Slug (Original + Version)
+        $versionSlug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $versionLabel), '-'));
+        $newLevel = $oldLevel . '-' . $versionSlug;
+
+        try {
+            $this->db->beginTransaction();
+
+            // 1. Check if target already exists
+            $existing = $this->db->findOne('syllabus_settings', ['level' => $newLevel]);
+            if ($existing) {
+                throw new \Exception("A syllabus with slug '$newLevel' already exists.");
+            }
+
+            // 2. Clone Settings
+            $oldSettings = $this->db->findOne('syllabus_settings', ['level' => $oldLevel]);
+            if (!$oldSettings) {
+                throw new \Exception("Source syllabus '$oldLevel' not found.");
+            }
+
+            $newSettings = $oldSettings;
+            $newSettings['level'] = $newLevel;
+            $newSettings['version_label'] = $versionLabel;
+            $newSettings['is_active'] = 0; // New clones are inactive by default
+            $this->db->insert('syllabus_settings', $newSettings);
+
+            // 3. Clone Nodes (Hierarchical Deep Copy)
+            $nodes = $this->db->find('syllabus_nodes', ['level' => $oldLevel], '`order` ASC');
+            $idMapping = []; // old_id => new_id
+
+            // Pass 1: Creation
+            foreach ($nodes as $node) {
+                $oldId = $node['id'];
+                $data = $node;
+                unset($data['id']);
+                $data['level'] = $newLevel;
+                $data['parent_id'] = null; // Map correctly in Pass 2
+                
+                $this->db->insert('syllabus_nodes', $data);
+                $idMapping[$oldId] = $this->db->lastInsertId();
+            }
+
+            // Pass 2: Parental Reconstruction
+            foreach ($nodes as $node) {
+                if ($node['parent_id'] && isset($idMapping[$node['parent_id']])) {
+                    $newId = $idMapping[$node['id']];
+                    $newParentId = $idMapping[$node['parent_id']];
+                    $this->db->update('syllabus_nodes', ['parent_id' => $newParentId], "id = :id", ['id' => $newId]);
+                }
+            }
+
+            $this->db->commit();
+            echo json_encode(['status' => 'success', 'new_level' => $newLevel]);
+
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
     }
 }
