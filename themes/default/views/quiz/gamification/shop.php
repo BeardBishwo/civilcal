@@ -35,12 +35,23 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         <!-- Hero -->
-        <div class="text-center mb-10 relative">
-            <div class="w-20 h-20 mb-4 flex items-center justify-center">
-                <img src="<?php echo app_base_url('themes/default/assets/resources/buildings/shop.webp'); ?>" class="w-full h-full object-contain drop-shadow-lg">
+        <div class="flex flex-col md:flex-row items-center gap-8 md:gap-16 mb-20">
+            <!-- Floating Logo on Left -->
+            <div class="flex-shrink-0">
+                <div class="w-48 h-48 md:w-64 md:h-64 flex items-center justify-center transform hover:scale-110 motion-safe:hover:rotate-6 transition-all duration-700">
+                    <img src="<?php echo app_base_url('themes/default/assets/resources/buildings/shop.webp'); ?>" 
+                         class="w-full h-full object-contain drop-shadow-[0_20px_40px_rgba(255,193,7,0.5)]">
+                </div>
             </div>
-            <h1 class="text-4xl md:text-5xl font-black text-white mb-2 tracking-tight">Temple Market</h1>
-            <p class="text-gray-400 text-lg">Trade artifacts, engineering materials, and precious bundles.</p>
+            
+            <div class="text-center md:text-left flex-1 min-w-0">
+                <h1 class="text-5xl md:text-8xl font-black text-white mb-6 tracking-tighter leading-none italic uppercase">
+                    Temple <span class="bg-gradient-to-r from-amber-400 to-orange-600 bg-clip-text text-transparent underline decoration-amber-500/30 decoration-8">Market</span>
+                </h1>
+                <p class="text-gray-400 text-xl md:text-3xl max-w-4xl leading-relaxed font-bold">
+                    Trade sacred artifacts, rare engineering materials, and precious resource bundles to accelerate your city's progress.
+                </p>
+            </div>
         </div>
 
         <!-- Wallet Card -->
@@ -107,7 +118,7 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
                 foreach ($lifelineData as $item): 
                     $owned = $inventory[$item['id']] ?? 0;
                 ?>
-                <div class="glass-card p-1 rounded-3xl hover:-translate-y-2 transition-transform duration-300 group">
+                <div class="glass-card p-1 rounded-3xl hover:-translate-y-2 transition-transform duration-300 group" x-data="{ qty: 1 }">
                     <div class="bg-surface rounded-[20px] p-6 h-full flex flex-col border border-white/10">
                         <div class="w-16 h-16 rounded-2xl bg-gradient-to-br <?php echo $item['color']; ?> flex items-center justify-center text-white text-2xl shadow-lg mb-6">
                             <i class="<?php echo $item['icon']; ?>"></i>
@@ -115,14 +126,28 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
                         <h3 class="text-xl font-bold text-white mb-2"><?php echo $item['name']; ?></h3>
                         <p class="text-gray-400 text-sm mb-6 flex-grow"><?php echo $item['desc']; ?></p>
                         
-                        <div class="flex items-center justify-between mb-4 bg-white/5 px-4 py-2 rounded-lg">
+                        <div class="flex items-center justify-between mb-4 bg-white/5 p-3 rounded-lg border border-white/5">
                             <span class="text-xs uppercase font-bold text-gray-500">Owned</span>
                             <span class="font-mono font-bold text-white"><?php echo $owned; ?></span>
                         </div>
 
-                        <button @click="buyLifeline('<?php echo $item['id']; ?>', <?php echo $item['cost']; ?>, '<?php echo $item['name']; ?>')"
+                        <div class="flex items-center justify-between bg-white/5 p-1 rounded-xl border border-white/10 shadow-inner mb-4 w-full overflow-hidden">
+                            <button @click="qty = Math.max(1, qty - 1)" 
+                                    class="w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-amber-500 hover:text-black rounded-lg text-amber-500 transition-all active:scale-95 border border-white/5 flex-shrink-0">
+                                <i class="fas fa-minus text-sm"></i>
+                            </button>
+                            <input type="number" x-model.number="qty" 
+                                   class="w-12 bg-transparent text-center font-black text-white text-xl focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                                   min="1">
+                            <button @click="qty++" 
+                                    class="w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-amber-500 hover:text-black rounded-lg text-amber-500 transition-all active:scale-95 border border-white/5 flex-shrink-0">
+                                <i class="fas fa-plus text-sm"></i>
+                            </button>
+                        </div>
+
+                        <button @click="buyLifeline('<?php echo $item['id']; ?>', <?php echo $item['cost']; ?>, '<?php echo $item['name']; ?>', qty)"
                                 class="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 group-hover:border-primary/50 group-hover:text-primary">
-                            <span><?php echo $item['cost']; ?></span>
+                            <span x-text="<?php echo $item['cost']; ?> * qty"></span>
                             <img src="<?php echo app_base_url($coinConfig['icon']); ?>" class="w-5 h-5">
                         </button>
                     </div>
@@ -147,24 +172,32 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
                         <h3 class="font-bold text-white text-lg mb-1 truncate"><?php echo htmlspecialchars($res['name']); ?></h3>
                         <div class="text-xs font-mono text-gray-400 mb-4 bg-white/5 inline-block px-2 py-1 rounded">Stock: <?php echo number_format($owned); ?></div>
 
-                        <div class="flex items-center gap-2 mb-4 bg-black/20 p-1 rounded-lg">
-                            <button @click="qty = Math.max(1, qty - 1)" class="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded text-white font-bold transition-colors">-</button>
-                            <input type="number" x-model.number="qty" class="flex-1 bg-transparent text-center font-bold text-white text-sm focus:outline-none" min="1">
-                            <button @click="qty++" class="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded text-white font-bold transition-colors">+</button>
+                        <div class="flex items-center justify-between bg-white/5 p-1 rounded-xl border border-white/10 shadow-inner mb-4 w-full overflow-hidden">
+                            <button @click="qty = Math.max(1, qty - 1)" 
+                                    class="w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-amber-500 hover:text-black rounded-lg text-amber-500 transition-all active:scale-95 border border-white/5 flex-shrink-0">
+                                <i class="fas fa-minus text-sm"></i>
+                            </button>
+                            <input type="number" x-model.number="qty" 
+                                   class="w-12 bg-transparent text-center font-black text-white text-xl focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                                   min="1">
+                            <button @click="qty++" 
+                                    class="w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-amber-500 hover:text-black rounded-lg text-amber-500 transition-all active:scale-95 border border-white/5 flex-shrink-0">
+                                <i class="fas fa-plus text-sm"></i>
+                            </button>
                         </div>
 
                         <div class="grid grid-cols-2 gap-2 mt-auto">
                             <?php if ($res['buy'] > 0): ?>
                             <button @click="trade('buy', '<?php echo $id; ?>', <?php echo $res['buy']; ?>, qty, '<?php echo $res['name']; ?>')" 
                                     class="py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition-colors">
-                                BUY <?php echo $res['buy']; ?>
+                                BUY <span x-text="<?php echo $res['buy']; ?> * qty"></span>
                             </button>
                             <?php endif; ?>
                             <?php if ($res['sell'] > 0): ?>
                             <button @click="trade('sell', '<?php echo $id; ?>', <?php echo $res['sell']; ?>, qty, '<?php echo $res['name']; ?>')" 
                                     class="py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs transition-colors"
                                     :disabled="<?php echo $owned; ?> <= 0">
-                                SELL <?php echo $res['sell']; ?>
+                                SELL <span x-text="<?php echo $res['sell']; ?> * qty"></span>
                             </button>
                             <?php endif; ?>
                         </div>
@@ -176,7 +209,7 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
             <!-- Bundles Tab -->
             <div x-show="tab === 'bundles'" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <?php foreach ($bundles as $key => $bundle): ?>
-                <div class="glass-card p-1 rounded-3xl relative">
+                <div class="glass-card p-1 rounded-3xl relative" x-data="{ qty: 1 }">
                     <div class="absolute -top-3 -right-3 bg-green-500 text-black text-xs font-black uppercase py-1 px-3 rounded-full shadow-lg z-10">
                         Save <?php echo $bundle['savings']; ?>!
                     </div>
@@ -191,9 +224,23 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
                             <?php echo $bundle['qty']; ?>x <?php echo ucfirst($bundle['resource']); ?>
                         </div>
 
-                        <button @click="buyBundle('<?php echo $key; ?>', <?php echo $bundle['buy']; ?>, '<?php echo htmlspecialchars($bundle['name']); ?>')"
+                        <div class="flex items-center justify-between bg-white/5 p-1 rounded-xl border border-white/10 shadow-inner mb-4 w-full overflow-hidden">
+                            <button @click="qty = Math.max(1, qty - 1)" 
+                                    class="w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-amber-500 hover:text-black rounded-lg text-amber-500 transition-all active:scale-95 border border-white/5 flex-shrink-0">
+                                <i class="fas fa-minus text-sm"></i>
+                            </button>
+                            <input type="number" x-model.number="qty" 
+                                   class="w-12 bg-transparent text-center font-black text-white text-xl focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                                   min="1">
+                            <button @click="qty++" 
+                                    class="w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-amber-500 hover:text-black rounded-lg text-amber-500 transition-all active:scale-95 border border-white/5 flex-shrink-0">
+                                <i class="fas fa-plus text-sm"></i>
+                            </button>
+                        </div>
+
+                        <button @click="buyBundle('<?php echo $key; ?>', <?php echo $bundle['buy']; ?>, '<?php echo htmlspecialchars($bundle['name']); ?>', qty)"
                                 class="w-full py-3 bg-gradient-to-r from-primary to-accent hover:opacity-90 rounded-xl font-bold text-white transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
-                            <span><?php echo $bundle['buy']; ?></span>
+                            <span x-text="<?php echo $bundle['buy']; ?> * qty"></span>
                              <img src="<?php echo app_base_url($coinConfig['icon']); ?>" class="w-5 h-5">
                         </button>
                     </div>
@@ -236,10 +283,11 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
             return {
                 tab: 'lifelines',
                 
-                async buyLifeline(type, cost, name) {
+                async buyLifeline(type, cost, name, qty) {
+                    const totalCost = cost * qty;
                     const result = await Swal.fire({
                         title: 'Confirm Purchase',
-                        html: `Purchase <b>${name}</b> for <b class="text-amber-500">${cost} Coins</b>?`,
+                        html: `Purchase <b>${qty}x ${name}</b> for <b class="text-amber-500">${totalCost} Coins</b>?`,
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonText: 'Yes, Manifest it!',
@@ -249,7 +297,7 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
                     });
 
                     if (result.isConfirmed) {
-                        this.performTransaction('/api/shop/purchase', { type });
+                        this.performTransaction('/api/shop/purchase', { type, quantity: qty });
                     }
                 },
 
@@ -274,10 +322,11 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
                     }
                 },
 
-                async buyBundle(bundleKey, cost, name) {
+                async buyBundle(bundleKey, cost, name, qty) {
+                    const totalCost = cost * qty;
                     const result = await Swal.fire({
                         title: 'Confirm Bundle',
-                        html: `Purchase <b>${name}</b> for <b class="text-amber-500">${cost} Coins</b>?`,
+                        html: `Purchase <b>${qty}x ${name}</b> for <b class="text-amber-500">${totalCost} Coins</b>?`,
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonText: 'Unlock Bundle',
@@ -287,7 +336,7 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
                     });
 
                     if (result.isConfirmed) {
-                        this.performTransaction('/api/shop/purchase-bundle', { bundle: bundleKey });
+                        this.performTransaction('/api/shop/purchase-bundle', { bundle: bundleKey, quantity: qty });
                     }
                 },
 

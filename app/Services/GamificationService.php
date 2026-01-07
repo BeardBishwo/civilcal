@@ -345,7 +345,7 @@ class GamificationService
     /**
      * Purchase Bundle (Bulk Offer)
      */
-    public function purchaseBundle($userId, $bundleKey)
+    public function purchaseBundle($userId, $bundleKey, $quantity = 1)
     {
         $bundles = SettingsService::get('economy_bundles', []);
         
@@ -355,14 +355,14 @@ class GamificationService
         
         $bundle = $bundles[$bundleKey];
         $wallet = $this->getWallet($userId);
+        $cost = $bundle['buy'] * $quantity;
         
-        if ($wallet['coins'] < $bundle['buy']) {
+        if ($wallet['coins'] < $cost) {
             return ['success' => false, 'message' => 'Insufficient Coins'];
         }
         
         $resource = $bundle['resource'];
-        $qty = $bundle['qty'];
-        $cost = $bundle['buy'];
+        $qtyGained = $bundle['qty'] * $quantity;
         
         $sql = "UPDATE user_resources 
                 SET coins = coins - :cost, 
@@ -371,14 +371,14 @@ class GamificationService
         
         $this->db->query($sql, [
             'cost' => $cost,
-            'qty' => $qty,
+            'qty' => $qtyGained,
             'uid' => $userId
         ]);
         
         $this->logTransaction($userId, 'coins', -$cost, 'bundle_purchase');
-        $this->logTransaction($userId, $resource, $qty, 'bundle_purchase');
+        $this->logTransaction($userId, $resource, $qtyGained, 'bundle_purchase');
         
-        return ['success' => true, 'message' => "Purchased {$bundle['name']}! Saved {$bundle['savings']} coins."];
+        return ['success' => true, 'message' => "Purchased $quantity" . "x {$bundle['name']}!"];
     }
 
     /**

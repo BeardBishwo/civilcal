@@ -88,10 +88,11 @@ class GamificationController extends Controller
         }
 
         $type = $_POST['type'] ?? '';
+        $qty = (int)($_POST['quantity'] ?? 1);
         $lifelineService = new \App\Services\LifelineService();
         
         try {
-            $result = $lifelineService->purchase($_SESSION['user_id'], $type);
+            $result = $lifelineService->purchase($_SESSION['user_id'], $type, $qty);
             $this->json($result);
         } catch (\Exception $e) {
             $this->json(['success' => false, 'message' => $e->getMessage()], 400);
@@ -307,6 +308,7 @@ class GamificationController extends Controller
         }
         
         $bundleKey = $_POST['bundle'] ?? '';
+        $qty = (int)($_POST['quantity'] ?? 1);
         $nonce = $_POST['nonce'] ?? '';
 
         if (!$this->nonceService->validateAndConsume($nonce, $_SESSION['user_id'], 'shop')) {
@@ -320,7 +322,7 @@ class GamificationController extends Controller
             exit;
         }
         
-        $result = $this->gamificationService->purchaseBundle($_SESSION['user_id'], $bundleKey);
+        $result = $this->gamificationService->purchaseBundle($_SESSION['user_id'], $bundleKey, $qty);
         if ($result['success']) {
             $newNonce = $this->nonceService->generate($_SESSION['user_id'], 'shop');
             $result['nonce'] = $newNonce['nonce'] ?? null;

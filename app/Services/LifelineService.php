@@ -126,7 +126,7 @@ class LifelineService
     /**
      * Purchase a lifeline using coins
      */
-    public function purchase($userId, $type)
+    public function purchase($userId, $type, $quantity = 1)
     {
         $prices = [
             '50_50' => 100,
@@ -138,7 +138,7 @@ class LifelineService
             throw new Exception("Invalid lifeline type");
         }
 
-        $cost = $prices[$type];
+        $cost = $prices[$type] * $quantity;
         $wallet = $this->gamificationService->getWallet($userId);
 
         if ($wallet['coins'] < $cost) {
@@ -154,11 +154,12 @@ class LifelineService
         // Add to Inventory
         $this->db->query("
             INSERT INTO user_lifelines (user_id, lifeline_type, quantity) 
-            VALUES (:uid, :type, 1) 
-            ON DUPLICATE KEY UPDATE quantity = quantity + 1
+            VALUES (:uid, :type, :qty) 
+            ON DUPLICATE KEY UPDATE quantity = quantity + :qty
         ", [
             'uid' => $userId,
-            'type' => $type
+            'type' => $type,
+            'qty' => $quantity
         ]);
 
         return ['success' => true, 'message' => "Purchased " . str_replace('_', ' ', $type) . " successfully!"];
