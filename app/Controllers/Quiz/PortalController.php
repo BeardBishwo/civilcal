@@ -13,26 +13,91 @@ class PortalController extends Controller
     }
 
     /**
-     * Main Quiz Landing Page
+     * Main Quiz Landing Page - Enhanced Shop-Like Dashboard
      */
     public function index()
     {
-        // 1. Fetch Categories (Streams) for filtering
-        $sqlCats = "SELECT * FROM quiz_categories WHERE status = 1 ORDER BY `order` ASC";
+        // 1. Fetch Categories with exam counts
+        $sqlCats = "
+            SELECT c.*, 
+                   COUNT(e.id) as exam_count
+            FROM quiz_categories c
+            LEFT JOIN quiz_exams e ON e.course_id = c.id AND e.status = 'published'
+            WHERE c.status = 1
+            GROUP BY c.id
+            ORDER BY c.`order` ASC
+        ";
         $categories = $this->db->query($sqlCats)->fetchAll();
 
-        // 2. Fetch Featured/Latest Exams
+        // 2. Fetch ALL Published Exams with Stats for Badge Calculation
         $sqlExams = "
             SELECT e.*, 
-                   (SELECT COUNT(*) FROM quiz_exam_questions WHERE exam_id = e.id) as question_count
+                   (SELECT COUNT(*) FROM quiz_exam_questions WHERE exam_id = e.id) as question_count,
+                   COUNT(DISTINCT a.id) as attempt_count,
+                   AVG(a.accuracy) as avg_score,
+                   c.name as category_name,
+                   c.slug as category_slug
             FROM quiz_exams e 
+            LEFT JOIN quiz_attempts a ON e.id = a.exam_id
+            LEFT JOIN quiz_categories c ON e.course_id = c.id
             WHERE e.status = 'published' 
-            ORDER BY e.created_at DESC 
-            LIMIT 10
+            GROUP BY e.id
+            ORDER BY e.created_at DESC
         ";
-        $exams = $this->db->query($sqlExams)->fetchAll();
+        $allExams = $this->db->query($sqlExams)->fetchAll();
 
-        // 3. User's Recent Activity (if logged in)
+        // 3. Calculate Badges for Each Exam
+        $now = time();
+        foreach ($allExams as &$exam) {
+            $exam['badges'] = [];
+            
+            // NEW badge (created in last 7 days)
+            $createdTime = strtotime($exam['created_at']);
+            if (($now - $createdTime) < (7 * 86400)) {
+                $exam['badges'][] = ['label' => 'NEW', 'color' => 'blue'];
+            }
+            
+            // POPULAR badge (more than 10 attempts)
+            if ($exam['attempt_count'] > 10) {
+                $exam['badges'][] = ['label' => 'POPULAR', 'color' => 'red'];
+            }
+            
+            // PREMIUM badge
+            if ($exam['is_premium']) {
+                $exam['badges'][] = ['label' => 'PREMIUM', 'color' => 'yellow'];
+            }
+            
+            // EASY/HARD badge based on avg score
+            if ($exam['avg_score'] !== null) {
+                if ($exam['avg_score'] >= 75) {
+                    $exam['badges'][] = ['label' => 'EASY', 'color' => 'green'];
+                } elseif ($exam['avg_score'] < 50) {
+                    $exam['badges'][] = ['label' => 'HARD', 'color' => 'purple'];
+                }
+            }
+        }
+
+        // 4. Group Exams by Category
+        $examsByCategory = [];
+        foreach ($allExams as $exam) {
+            $catSlug = $exam['category_slug'] ?? 'uncategorized';
+            if (!isset($examsByCategory[$catSlug])) {
+                $examsByCategory[$catSlug] = [
+                    'name' => $exam['category_name'] ?? 'Uncategorized',
+                    'slug' => $catSlug,
+                    'exams' => []
+                ];
+            }
+            $examsByCategory[$catSlug]['exams'][] = $exam;
+        }
+
+        // 5. Featured/Editor's Choice (top 3 by attempts)
+        $featured = array_slice($allExams, 0, 3);
+        foreach ($featured as &$f) {
+            $f['badges'][] = ['label' => 'FEATURED', 'color' => 'pink'];
+        }
+
+        // 6. User's Recent Activity (if logged in)
         $recentAttempts = [];
         $dailyBonus = null;
 
@@ -56,7 +121,9 @@ class PortalController extends Controller
 
         $this->view('quiz/portal/index', [
             'categories' => $categories,
-            'exams' => $exams,
+            'examsByCategory' => $examsByCategory,
+            'featured' => $featured,
+            'allExams' => $allExams,
             'recentAttempts' => $recentAttempts,
             'dailyBonus' => $dailyBonus,
             'title' => 'Quiz Portal | Bishwo Calculator'

@@ -50,7 +50,7 @@
 
             <div class="flex justify-end">
                 <div class="glass-card p-1 rounded-2xl">
-                    <div class="bg-surface/80 backdrop-blur-xl rounded-[14px] px-8 py-4 border border-white/10 flex items-center gap-8">
+                    <div class="bg-surface rounded-[14px] px-8 py-4 border border-white/10 flex items-center gap-8">
                         <div>
                             <span class="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">Treasury</span>
                             <div class="flex items-center gap-2">
@@ -75,7 +75,7 @@
             <!-- Left: Resource Stockpile -->
             <div class="lg:col-span-4">
                 <div class="glass-card p-1 rounded-3xl h-full">
-                    <div class="bg-surface/50 backdrop-blur-xl rounded-[20px] p-8 h-full border border-white/5 relative overflow-hidden group">
+                    <div class="bg-surface rounded-[20px] p-8 h-full border border-white/10 relative overflow-hidden group">
                         <!-- Decor -->
                         <div class="absolute -top-20 -left-20 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
                         
@@ -119,7 +119,7 @@
             <!-- Right: Processing Unit -->
             <div class="lg:col-span-8">
                 <div class="glass-card p-1 rounded-3xl h-full">
-                    <div class="bg-surface/80 backdrop-blur-xl rounded-[20px] h-full border border-white/5 flex flex-col">
+                    <div class="bg-surface rounded-[20px] h-full border border-white/10 flex flex-col">
                         
                         <div class="p-6 border-b border-white/5 flex items-center justify-between">
                             <div>

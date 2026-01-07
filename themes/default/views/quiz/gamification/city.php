@@ -86,69 +86,69 @@
 
                     <div class="space-y-3">
                         <!-- House -->
-                        <div class="p-4 rounded-xl bg-surface/50 border border-white/5 hover:border-primary/30 hover:bg-surface/80 transition-all group">
+                        <div class="p-4 rounded-xl bg-surface border border-white/10 hover:border-primary/50 hover:bg-surface/80 transition-all group">
                             <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-500 text-lg">
+                                <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400 text-lg">
                                     <i class="fas fa-home"></i>
                                 </div>
                                 <div class="flex-1">
                                     <div class="font-bold text-white text-sm">Residential Unit</div>
-                                    <div class="text-[10px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full inline-block mt-1">100 Bricks</div>
+                                    <div class="text-[10px] font-bold text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full inline-block mt-1 border border-green-500/20">100 Bricks</div>
                                 </div>
                             </div>
                             <button @click="build('house', 100, 'bricks')" :disabled="loading" 
-                                    class="w-full py-2 bg-white/5 hover:bg-primary text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-white/10 hover:border-primary text-gray-400 hover:text-white group-hover:bg-white/10">
+                                    class="w-full py-2 bg-green-500/10 hover:bg-green-500 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-green-500/30 hover:border-green-500 text-green-400 hover:text-white">
                                 Construct
                             </button>
                         </div>
 
                         <!-- Road -->
-                        <div class="p-4 rounded-xl bg-surface/50 border border-white/5 hover:border-primary/30 hover:bg-surface/80 transition-all group">
+                        <div class="p-4 rounded-xl bg-surface border border-white/10 hover:border-primary/50 hover:bg-surface/80 transition-all group">
                             <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 text-lg">
+                                <div class="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-lg">
                                     <i class="fas fa-road"></i>
                                 </div>
                                 <div class="flex-1">
                                     <div class="font-bold text-white text-sm">Asphalt Road</div>
-                                    <div class="text-[10px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full inline-block mt-1">50 Cement</div>
+                                    <div class="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full inline-block mt-1 border border-indigo-500/20">50 Cement</div>
                                 </div>
                             </div>
                             <button @click="build('road', 50, 'cement')" :disabled="loading" 
-                                    class="w-full py-2 bg-white/5 hover:bg-primary text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-white/10 hover:border-primary text-gray-400 hover:text-white group-hover:bg-white/10">
+                                    class="w-full py-2 bg-indigo-500/10 hover:bg-indigo-500 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-indigo-500/30 hover:border-indigo-500 text-indigo-400 hover:text-white">
                                 Construct
                             </button>
                         </div>
 
                         <!-- Bridge -->
-                        <div class="p-4 rounded-xl bg-surface/50 border border-white/5 hover:border-primary/30 hover:bg-surface/80 transition-all group">
+                        <div class="p-4 rounded-xl bg-surface border border-white/10 hover:border-primary/50 hover:bg-surface/80 transition-all group">
                             <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 text-lg">
+                                <div class="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center text-red-400 text-lg">
                                     <i class="fas fa-archway"></i>
                                 </div>
                                 <div class="flex-1">
                                     <div class="font-bold text-white text-sm">Arch Bridge</div>
-                                    <div class="text-[10px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full inline-block mt-1">500 Br + 200 St</div>
+                                    <div class="text-[10px] font-bold text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full inline-block mt-1 border border-red-500/20">500 Br + 200 St</div>
                                 </div>
                             </div>
                             <button @click="build('bridge', 500, 'bricks')" :disabled="loading" 
-                                    class="w-full py-2 bg-white/5 hover:bg-primary text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-white/10 hover:border-primary text-gray-400 hover:text-white group-hover:bg-white/10">
+                                    class="w-full py-2 bg-red-500/10 hover:bg-red-500 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-red-500/30 hover:border-red-500 text-red-400 hover:text-white">
                                 Construct
                             </button>
                         </div>
 
                         <!-- Tower -->
-                        <div class="p-4 rounded-xl bg-surface/50 border border-white/5 hover:border-primary/30 hover:bg-surface/80 transition-all group">
+                        <div class="p-4 rounded-xl bg-surface border border-white/10 hover:border-primary/50 hover:bg-surface/80 transition-all group">
                             <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 text-lg">
+                                <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 text-lg">
                                     <i class="fas fa-building"></i>
                                 </div>
                                 <div class="flex-1">
                                     <div class="font-bold text-white text-sm">Corporate Tower</div>
-                                    <div class="text-[10px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full inline-block mt-1">1k Br + 500 St</div>
+                                    <div class="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full inline-block mt-1 border border-blue-500/20">1k Br + 500 St</div>
                                 </div>
                             </div>
                             <button @click="build('tower', 1000, 'bricks')" :disabled="loading" 
-                                    class="w-full py-2 bg-white/5 hover:bg-primary text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-white/10 hover:border-primary text-gray-400 hover:text-white group-hover:bg-white/10">
+                                    class="w-full py-2 bg-blue-500/10 hover:bg-blue-500 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-blue-500/30 hover:border-blue-500 text-blue-400 hover:text-white">
                                 Construct
                             </button>
                         </div>
@@ -159,9 +159,9 @@
 
             <!-- Main: City Map -->
             <div class="lg:col-span-3">
-                <div class="bg-surface/30 border border-white/5 rounded-3xl p-8 min-h-[600px] relative overflow-hidden backdrop-blur-sm">
+                <div class="bg-surface border border-white/10 rounded-3xl p-8 min-h-[600px] relative overflow-hidden">
                     <!-- Grid Background -->
-                    <div class="absolute inset-0 z-0 opacity-10" 
+                    <div class="absolute inset-0 z-0 opacity-20" 
                          style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 40px 40px;">
                     </div>
                 
