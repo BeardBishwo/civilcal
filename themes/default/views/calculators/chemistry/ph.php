@@ -1,111 +1,142 @@
-<?php $page_title = $title ?? 'pH Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/theme.css'); ?>?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/calculator-platform.css'); ?>?v=<?php echo time(); ?>">
-    <style>
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 700px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #00bfa5 0%, #1de9b6 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.1rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 12px; }
-        .calc-btn { background: linear-gradient(135deg, #00bfa5 0%, #1de9b6 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: #e0f2f1; border-radius: 12px; padding: 25px; margin-top: 30px; text-align: center; border: 1px solid #b2dfdb; }
-        .result-val { font-size: 2.5rem; font-weight: 700; color: #00695c; margin: 10px 0; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: var(--text-primary); text-decoration: none; font-weight: 600; }
-        .ph-scale { height: 20px; background: linear-gradient(to right, #e74c3c 0%, #f1c40f 35%, #2ecc71 50%, #3498db 65%, #9b59b6 100%); border-radius: 10px; position: relative; margin-top: 20px; }
-        .ph-marker { position: absolute; top: -5px; width: 4px; height: 30px; background: #000; transition: left 0.5s; }
-    </style>
-</head>
-<body>
-    <div class="layout-wrapper">
-        <?php include __DIR__ . '/../../partials/calculator_sidebar.php'; ?>
-        
-        <main class="main-content">
-            <div class="container-fluid">
-                <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Dashboard</a>
-                <div class="calc-card">
-                    <div class="calc-header">
-                        <i class="bi bi-droplet-half" style="font-size: 2.5rem;"></i>
-                        <h2>pH Calculator</h2>
-                        <p class="mb-0 mt-2">Hydrogen Ion Concentration</p>
+<?php
+// themes/default/views/calculators/chemistry/ph.php
+// PREMIUM pH CALCULATOR
+?>
+
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    .ph-gradient {
+        background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff);
+    }
+</style>
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="phCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[30%] right-[30%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px] animate-pulse-glow"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Chemistry</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+             <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-flask"></i>
+                <span>SOLUTIONS</span>
+            </div>
+            <h1 class="calc-title">pH <span class="text-gradient">Calculator</span></h1>
+            <p class="calc-subtitle">Calculate Acidity or Alkalinity from Hydrogen Ion Concentration.</p>
+        </div>
+
+        <div class="calc-grid max-w-3xl mx-auto">
+            
+            <div class="calc-card animate-scale-in">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <!-- Input -->
+                    <div class="space-y-6">
+                        <div>
+                            <label class="calc-label text-center mb-2">H+ Concentration (mol/L)</label>
+                            <input type="number" step="any" x-model.number="concentration" @input="calculate()" class="calc-input text-center text-lg" placeholder="0.0000001">
+                            <div class="text-center mt-2 flex gap-2 justify-center">
+                                <button @click="concentration = 0.1; calculate()" class="text-xs bg-white/5 px-2 py-1 rounded hover:bg-white/10 transition">0.1 (Acid)</button>
+                                <button @click="concentration = 0.0000001; calculate()" class="text-xs bg-white/5 px-2 py-1 rounded hover:bg-white/10 transition">1e-7 (Neutral)</button>
+                                <button @click="concentration = 0.00000000001; calculate()" class="text-xs bg-white/5 px-2 py-1 rounded hover:bg-white/10 transition">1e-11 (Base)</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="calc-body">
-                        <div class="row g-4 justify-content-center">
-                            <div class="col-md-8">
-                                <label class="form-label fw-bold">Concentration of H+ (mol/L)</label>
-                                <div class="input-group">
-                                    <input type="number" id="concentration" class="form-control calc-input" placeholder="e.g. 0.001" step="any" value="0.0000001">
-                                    <span class="input-group-text">M</span>
-                                </div>
-                                <div class="form-text">Enter in decimal (0.01) or scientific notation (1e-7)</div>
-                            </div>
-                        </div>
 
-                        <button class="calc-btn mt-4 w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Calculate pH</button>
-
-                        <div class="result-box" id="resultBox" style="display:none;">
-                            <div class="text-muted text-uppercase fw-bold small">pH Level</div>
-                            <div class="result-val" id="resultValue">7.00</div>
-                            <div class="fw-bold fs-5" id="phType" style="color: #2ecc71;">Neutral</div>
-                            
-                            <div class="ph-scale">
-                                <div class="ph-marker" id="marker" style="left: 50%;"></div>
-                            </div>
-                            <div class="d-flex justify-content-between small text-muted mt-1 fw-bold">
-                                <span>0 (Acidic)</span>
-                                <span>7</span>
-                                <span>14 (Basic)</span>
-                            </div>
+                    <!-- Result -->
+                    <div class="flex flex-col items-center justify-center bg-white/5 rounded-xl border border-white/5 p-6 relative overflow-hidden text-center" :class="borderColor">
+                        <div class="text-sm text-gray-400 uppercase tracking-widest mb-4 font-bold">pH Level</div>
+                         <div class="flex items-baseline gap-2 mb-2 z-10">
+                            <span class="text-6xl font-black transition-colors duration-500" :class="textColor" x-text="ph"></span>
                         </div>
+                        <div class="text-xl font-bold z-10 transition-colors duration-500" :class="textColor" x-text="type"></div>
+                        
+                         <!-- Background Glow -->
+                         <div class="absolute inset-0 opacity-10 blur-2xl transition-colors duration-500" :class="bgColor"></div>
                     </div>
                 </div>
+
+                <!-- Scale Visual -->
+                <div class="animate-slide-up mt-8">
+                     <div class="relative h-6 w-full ph-gradient rounded-full mb-2 shadow-inner">
+                         <!-- Marker -->
+                         <div class="absolute top-0 bottom-0 w-2 bg-white border border-black rounded-lg shadow-xl shadow-black transition-all duration-300 transform -translate-x-1/2" :style="`left: ${markerPos}%`"></div>
+                     </div>
+                     <div class="flex justify-between text-xs font-mono text-gray-400">
+                         <span class="text-red-500 font-bold">0 Acidic</span>
+                         <span class="text-green-500 font-bold">7 Neutral</span>
+                         <span class="text-purple-500 font-bold">14 Basic</span>
+                     </div>
+                </div>
+
             </div>
-        </main>
+        </div>
     </div>
-    <script>
-        function calculate() {
-            const h = parseFloat(document.getElementById('concentration').value);
-            
-            if (!h || h <= 0) {
-                alert("Concentration must be greater than 0");
-                return;
-            }
+</div>
 
-            const ph = -Math.log10(h);
-            
-            if (ph < 0 || ph > 14) {
-                 // Technically possible but rare in standard conditions for this basic calc
-            }
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('phCalculator', () => ({
+        concentration: 0.0000001,
+        ph: 7.00,
+        type: 'Neutral',
+        markerPos: 50,
+        
+        // Colors
+        textColor: 'text-green-400',
+        borderColor: 'border-green-500/30',
+        bgColor: 'bg-green-500',
 
-            document.getElementById('resultValue').textContent = ph.toFixed(2);
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+             if (!this.concentration || this.concentration <= 0) {
+                 this.ph = '---';
+                 return;
+             }
+
+             const val = -Math.log10(this.concentration);
+             this.ph = val.toFixed(2);
+             
+             // Update visuals
+             this.updateVisuals(val);
+        },
+        
+        updateVisuals(ph) {
+            // Pos
+            let p = (ph / 14) * 100;
+            if (p < 0) p = 0; if (p > 100) p = 100;
+            this.markerPos = p;
             
-            let type = '';
-            let color = '';
-            
-            if (ph < 6.9) { type = 'Acidic'; color = '#e74c3c'; }
-            else if (ph > 7.1) { type = 'Basic (Alkaline)'; color = '#9b59b6'; }
-            else { type = 'Neutral'; color = '#2ecc71'; }
-            
-            const typeEl = document.getElementById('phType');
-            typeEl.textContent = type;
-            typeEl.style.color = color;
-            
-            // Marker position (0-14 map to 0-100%)
-            let pos = (ph / 14) * 100;
-            if (pos < 0) pos = 0; if (pos > 100) pos = 100;
-            
-            document.getElementById('marker').style.left = pos + '%';
-            document.getElementById('resultBox').style.display = 'block';
+            if (ph < 6.9) {
+                this.type = 'Acidic';
+                this.textColor = 'text-red-400';
+                this.borderColor = 'border-red-500/30';
+                this.bgColor = 'bg-red-500';
+            } else if (ph > 7.1) {
+                this.type = 'Basic (Alkaline)';
+                this.textColor = 'text-purple-400';
+                this.borderColor = 'border-purple-500/30';
+                this.bgColor = 'bg-purple-500';
+            } else {
+                this.type = 'Neutral';
+                this.textColor = 'text-green-400';
+                this.borderColor = 'border-green-500/30';
+                this.bgColor = 'bg-green-500';
+            }
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

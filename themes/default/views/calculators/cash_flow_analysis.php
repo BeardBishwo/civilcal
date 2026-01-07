@@ -1,111 +1,191 @@
-<?php $page_title = $title ?? 'Cash Flow Analysis'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <style>
-        body { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); min-height: 100vh; padding: 40px 0; }
-        .calculator-card { background: white; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 1000px; margin: 0 auto; }
-        .card-header { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; }
-        .month-row { background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
-        .result-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; padding: 20px; margin-top: 20px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="calculator-card">
-            <div class="card-header">
-                <h2 class="mb-0"><i class="bi bi-graph-up me-2"></i><?php echo $page_title; ?></h2>
-                <p class="mb-0 mt-2 opacity-75">Project monthly cash flow projections</p>
+<?php
+// themes/default/views/calculators/cash_flow_analysis.php
+// PREMIUM CASH FLOW CALCULATOR
+?>
+
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="cashFlowCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute bottom-[20%] right-[30%] w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[100px] animate-float"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Cash Flow</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-chart-bar"></i>
+                <span>PROJECT FINANCE</span>
             </div>
-            <div class="card-body p-4">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Number of Months</label>
-                    <input type="number" id="num-months" class="form-control" value="12" min="1" max="60" onchange="generateMonths()">
+            <h1 class="calc-title">Cash Flow <span class="text-gradient">Analysis</span></h1>
+            <p class="calc-subtitle">Track inflows and outflows to determine net cash flow over time.</p>
+        </div>
+
+        <div class="calc-grid max-w-6xl mx-auto">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Inputs Table -->
+                <div class="calc-card animate-scale-in flex flex-col h-fit">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold text-white">Monthly Breakdown</h3>
+                        <div class="flex items-center gap-2">
+                             <span class="text-sm text-gray-400">Months:</span>
+                             <input type="number" x-model.number="monthCount" @change="updateMonths()" class="calc-input w-20 text-center py-1 px-2" min="1" max="60">
+                        </div>
+                    </div>
+
+                    <div class="max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                        <div class="grid grid-cols-12 gap-2 mb-2 text-xs text-gray-400 uppercase font-bold sticky top-0 bg-[#0F172A] z-10 py-2">
+                            <div class="col-span-2 pt-2">Month</div>
+                            <div class="col-span-5 text-center">Inflow ($)</div>
+                            <div class="col-span-5 text-center">Outflow ($)</div>
+                        </div>
+
+                        <template x-for="(m, index) in months" :key="index">
+                            <div class="grid grid-cols-12 gap-2 mb-3 bg-white/5 p-2 rounded-lg items-center border border-white/5">
+                                <div class="col-span-2 text-sm font-bold text-gray-300" x-text="'M-' + (index + 1)"></div>
+                                <div class="col-span-5">
+                                    <input type="number" x-model.number="m.in" @input="calculate()" class="calc-input w-full text-green-400 text-right pr-2" placeholder="0">
+                                </div>
+                                <div class="col-span-5">
+                                    <input type="number" x-model.number="m.out" @input="calculate()" class="calc-input w-full text-red-400 text-right pr-2" placeholder="0">
+                                </div>
+                            </div>
+                        </template>
+                    </div>
                 </div>
 
-                <div id="months-container"></div>
-
-                <button class="btn btn-primary btn-lg px-5 mt-3" onclick="calculateCashFlow()">
-                    <i class="bi bi-calculator me-2"></i>Calculate Cash Flow
-                </button>
-
-                <div id="results" style="display:none;">
-                    <div class="result-card">
-                        <h4 class="mb-3">Cash Flow Summary</h4>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <h6>Total Inflow</h6>
-                                <h3 id="total-inflow">Rs. 0</h3>
+                <!-- Summary & Chart -->
+                <div class="flex flex-col gap-6 animate-slide-up">
+                    
+                    <div class="bg-white/5 rounded-2xl p-6 border border-white/10">
+                         <div class="grid grid-cols-3 gap-4 text-center">
+                            <div>
+                                <div class="text-xs text-gray-400 uppercase mb-1">Total Inflow</div>
+                                <div class="text-xl font-bold text-green-400">$<span x-text="fmt(totalIn)"></span></div>
                             </div>
-                            <div class="col-md-4">
-                                <h6>Total Outflow</h6>
-                                <h3 id="total-outflow">Rs. 0</h3>
+                            <div>
+                                <div class="text-xs text-gray-400 uppercase mb-1">Total Outflow</div>
+                                <div class="text-xl font-bold text-red-400">$<span x-text="fmt(totalOut)"></span></div>
                             </div>
-                            <div class="col-md-4">
-                                <h6>Net Cash Flow</h6>
-                                <h3 id="net-flow">Rs. 0</h3>
+                            <div class="bg-primary/10 rounded-lg py-2">
+                                <div class="text-xs text-primary uppercase mb-1 font-bold">Net Cash Flow</div>
+                                <div class="text-2xl font-black text-white">$<span x-text="fmt(netFlow)"></span></div>
                             </div>
                         </div>
                     </div>
+
+                    <div class="flex-grow bg-black/20 rounded-2xl p-4 relative min-h-[300px] border border-white/5">
+                        <canvas id="cfChart"></canvas>
+                    </div>
+
                 </div>
+
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        generateMonths();
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('cashFlowCalculator', () => ({
+        monthCount: 12,
+        months: [],
+        totalIn: 0,
+        totalOut: 0,
+        netFlow: 0,
+        chart: null,
 
-        function generateMonths() {
-            const numMonths = parseInt(document.getElementById('num-months').value) || 12;
-            const container = document.getElementById('months-container');
-            container.innerHTML = '';
+        init() {
+            this.updateMonths();
+            this.initChart();
+        },
 
-            for (let i = 1; i <= numMonths; i++) {
-                const row = document.createElement('div');
-                row.className = 'month-row';
-                row.innerHTML = `
-                    <div class="row align-items-center">
-                        <div class="col-md-2"><strong>Month ${i}</strong></div>
-                        <div class="col-md-5">
-                            <input type="number" class="form-control form-control-sm inflow" placeholder="Inflow (Rs.)" step="0.01">
-                        </div>
-                        <div class="col-md-5">
-                            <input type="number" class="form-control form-control-sm outflow" placeholder="Outflow (Rs.)" step="0.01">
-                        </div>
-                    </div>
-                `;
-                container.appendChild(row);
+        updateMonths() {
+            // Adjust array size
+            const currentLen = this.months.length;
+            if (this.monthCount > currentLen) {
+                for(let i = currentLen; i < this.monthCount; i++) {
+                    this.months.push({ in: 0, out: 0 });
+                }
+            } else if (this.monthCount < currentLen) {
+                this.months.splice(this.monthCount);
             }
-        }
+            this.calculate();
+        },
 
-        function calculateCashFlow() {
-            const inflows = document.querySelectorAll('.inflow');
-            const outflows = document.querySelectorAll('.outflow');
+        calculate() {
+             let tIn = 0;
+             let tOut = 0;
+             
+             this.months.forEach(m => {
+                 tIn += (m.in || 0);
+                 tOut += (m.out || 0);
+             });
 
-            let totalInflow = 0;
-            let totalOutflow = 0;
+             this.totalIn = tIn;
+             this.totalOut = tOut;
+             this.netFlow = tIn - tOut;
 
-            inflows.forEach(input => {
-                totalInflow += parseFloat(input.value) || 0;
+             this.updateChart();
+        },
+
+        initChart() {
+            const ctx = document.getElementById('cfChart').getContext('2d');
+            this.chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: 'Net Flow', data: [], backgroundColor: [], borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                         x: { grid: { display: false }, ticks: { color: '#6B7280' } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#6B7280' } }
+                    }
+                }
+            });
+        },
+
+        updateChart() {
+            if (!this.chart) return;
+            
+            const labels = [];
+            const data = [];
+            const colors = [];
+
+            this.months.forEach((m, i) => {
+                labels.push(`M${i+1}`);
+                const net = (m.in || 0) - (m.out || 0);
+                data.push(net);
+                colors.push(net >= 0 ? '#10B981' : '#EF4444');
             });
 
-            outflows.forEach(input => {
-                totalOutflow += parseFloat(input.value) || 0;
-            });
+            this.chart.data.labels = labels;
+            this.chart.data.datasets[0].data = data;
+            this.chart.data.datasets[0].backgroundColor = colors;
+            this.chart.update();
+        },
 
-            const netFlow = totalInflow - totalOutflow;
-
-            document.getElementById('total-inflow').textContent = 'Rs. ' + totalInflow.toLocaleString();
-            document.getElementById('total-outflow').textContent = 'Rs. ' + totalOutflow.toLocaleString();
-            document.getElementById('net-flow').textContent = 'Rs. ' + netFlow.toLocaleString();
-            document.getElementById('net-flow').style.color = netFlow >= 0 ? '#38ef7d' : '#f5576c';
-            document.getElementById('results').style.display = 'block';
+        fmt(n) {
+            return n ? n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '0';
         }
-    </script>
-</body>
-</html>
+    }));
+});
+</script>

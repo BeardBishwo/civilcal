@@ -1,111 +1,175 @@
-<?php $page_title = $title ?? 'Statistics Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/floating-calculator.css'); ?>">
-    <style>
-        body { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); min-height: 100vh; padding: 40px 0; }
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 800px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.3rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px; min-height: 150px; }
-        .calc-btn { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-radius: 12px; padding: 30px; margin-top: 30px; }
-        .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-        .stat-item { text-align: center; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; }
-        .stat-value { font-size: 2rem; font-weight: 700; }
-        .stat-label { font-size: 0.9rem; opacity: 0.9; margin-top: 5px; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Back</a>
-        <div class="calc-card">
-            <div class="calc-header">
-                <i class="bi bi-bar-chart-line" style="font-size: 2.5rem;"></i>
-                <h2>Statistics Calculator</h2>
-                <p class="mb-0 mt-2">Calculate mean, median, std dev & more</p>
+<?php
+// themes/default/views/calculators/math/statistics.php
+// PREMIUM STATISTICS CALCULATOR
+?>
+
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="statsCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute bottom-0 right-0 w-[800px] h-[800px] bg-blue-500/5 rounded-full blur-[120px] animate-pulse-glow"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Statistics Calculator</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-chart-bar"></i>
+                <span>DATA ANALYSIS</span>
             </div>
-            <div class="calc-body">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Enter Numbers (comma-separated)</label>
-                    <textarea id="numbers" class="form-control calc-input" placeholder="e.g., 10, 20, 30, 40, 50">10, 20, 30, 40, 50</textarea>
-                    <small class="text-muted">Enter numbers separated by commas</small>
+            <h1 class="calc-title">Statistics <span class="text-gradient">Engine</span></h1>
+            <p class="calc-subtitle">Instant descriptive statistics: Mean, Median, Mode, Standard Deviation, and more.</p>
+        </div>
+
+        <div class="calc-grid max-w-6xl mx-auto">
+            
+            <!-- Input Panel -->
+            <div class="calc-card animate-scale-in col-span-1 md:col-span-1">
+                <h3 class="text-lg font-bold text-white mb-4">Input Data</h3>
+                <textarea x-model="input" @input="calculate()" class="calc-input h-64 font-mono text-sm leading-relaxed" placeholder="Enter numbers separated by commas, spaces, or newlines...&#10;Example:&#10;10, 25, 30&#10;45, 50"></textarea>
+                <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
+                    <span x-text="count + ' Data points'"></span>
+                    <button @click="input=''; calculate()" class="text-red-400 hover:text-red-300">Clear All</button>
                 </div>
-                <button class="calc-btn mt-4 w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Calculate Statistics</button>
-                <div class="result-box" id="resultBox" style="display:none;">
-                    <div class="stat-grid">
-                        <div class="stat-item">
-                            <div class="stat-value" id="count">0</div>
-                            <div class="stat-label">Count</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="sum">0</div>
-                            <div class="stat-label">Sum</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="mean">0</div>
-                            <div class="stat-label">Mean</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="median">0</div>
-                            <div class="stat-label">Median</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="min">0</div>
-                            <div class="stat-label">Minimum</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="max">0</div>
-                            <div class="stat-label">Maximum</div>
-                        </div>
-                        <div class="stat-item" style="grid-column: span 2;">
-                            <div class="stat-value" id="stdDev">0</div>
-                            <div class="stat-label">Standard Deviation</div>
-                        </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="calc-card animate-scale-in col-span-1 md:col-span-2">
+                <h3 class="text-lg font-bold text-white mb-6">Results Overview</h3>
+                
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    
+                    <!-- Mean -->
+                    <div class="glass-card p-4 text-center">
+                        <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">Mean</div>
+                        <div class="text-2xl font-bold text-white" x-text="fmt(mean)">-</div>
+                    </div>
+
+                     <!-- Median -->
+                     <div class="glass-card p-4 text-center">
+                        <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">Median</div>
+                        <div class="text-2xl font-bold text-white" x-text="fmt(median)">-</div>
+                    </div>
+
+                     <!-- Min -->
+                     <div class="glass-card p-4 text-center">
+                        <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">Minimum</div>
+                        <div class="text-2xl font-bold text-white" x-text="fmt(min)">-</div>
+                    </div>
+
+                     <!-- Max -->
+                     <div class="glass-card p-4 text-center">
+                        <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">Maximum</div>
+                        <div class="text-2xl font-bold text-white" x-text="fmt(max)">-</div>
+                    </div>
+
+                    <!-- Sum -->
+                     <div class="glass-card p-4 text-center">
+                        <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">Sum</div>
+                        <div class="text-2xl font-bold text-white" x-text="fmt(sum)">-</div>
+                    </div>
+
+                    <!-- Range -->
+                     <div class="glass-card p-4 text-center">
+                        <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">Range</div>
+                        <div class="text-2xl font-bold text-white" x-text="fmt(range)">-</div>
+                    </div>
+
+                    <!-- Std Dev -->
+                     <div class="glass-card p-4 text-center col-span-2">
+                        <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">Standard Deviation (Population)</div>
+                        <div class="text-2xl font-bold text-accent" x-text="fmt(stdDev)">-</div>
                     </div>
                 </div>
+
+                <!-- Mode Section -->
+                <div class="mt-6 p-4 rounded-xl bg-white/5 border border-white/10">
+                    <div class="text-xs text-gray-400 uppercase tracking-widest mb-2 font-bold">Mode (Most Frequent)</div>
+                    <div class="text-sm font-mono text-gray-300" x-text="mode || 'No mode (all unique or empty)'"></div>
+                </div>
+
+                <div x-show="sorted" class="mt-4 text-xs text-gray-500 font-mono break-all">
+                    Sorted: <span x-text="sorted"></span>
+                </div>
+
             </div>
         </div>
     </div>
-    <script>
-        const appBase = "<?php echo rtrim(app_base_url(), '/'); ?>";
-        
-        function calculate() {
-            const input = document.getElementById('numbers').value;
-            const numbers = input.split(',').map(n => parseFloat(n.trim())).filter(n => !isNaN(n));
-            
-            if (numbers.length === 0) {
-                alert('Please enter valid numbers');
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('statsCalculator', () => ({
+        input: '10, 20, 25, 30, 45, 50, 50',
+        count: 0,
+        mean: null, median: null, mode: null,
+        min: null, max: null, range: null, sum: null,
+        stdDev: null,
+        sorted: null,
+
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+             // Parse input (split by comma, space, newline)
+            const raw = this.input.split(/[\n, \t]+/).map(n => parseFloat(n)).filter(n => !isNaN(n));
+            this.count = raw.length;
+
+            if (this.count === 0) {
+                this.mean = this.median = this.mode = this.min = this.max = this.range = this.sum = this.stdDev = this.sorted = null;
                 return;
             }
-            
-            fetch(appBase + '/calculator/api/statistics', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: `numbers=${JSON.stringify(numbers)}`
-            })
-            .then(r => r.json())
-            .then(data => {
-                document.getElementById('resultBox').style.display = 'block';
-                document.getElementById('count').textContent = data.count;
-                document.getElementById('sum').textContent = data.sum;
-                document.getElementById('mean').textContent = data.mean;
-                document.getElementById('median').textContent = data.median;
-                document.getElementById('min').textContent = data.min;
-                document.getElementById('max').textContent = data.max;
-                document.getElementById('stdDev').textContent = data.stdDev;
-            });
+
+            // Calculations
+            // Sort
+            raw.sort((a,b) => a - b);
+            this.sorted = raw.join(', ');
+
+            this.sum = raw.reduce((a,b) => a + b, 0);
+            this.mean = this.sum / this.count;
+            this.min = raw[0];
+            this.max = raw[this.count - 1];
+            this.range = this.max - this.min;
+
+            // Median
+            const mid = Math.floor(this.count / 2);
+            if (this.count % 2 === 0) {
+                this.median = (raw[mid-1] + raw[mid]) / 2;
+            } else {
+                this.median = raw[mid];
+            }
+
+            // Mode
+            const freq = {};
+            let maxFreq = 0;
+            for(let n of raw) {
+                freq[n] = (freq[n] || 0) + 1;
+                if(freq[n] > maxFreq) maxFreq = freq[n];
+            }
+            if (maxFreq > 1) {
+                this.mode = Object.keys(freq).filter(k => freq[k] === maxFreq).join(', ');
+            } else {
+                this.mode = "All values unique";
+            }
+
+            // Std Dev (Population)
+            const sumSqDiff = raw.reduce((a, b) => a + Math.pow(b - this.mean, 2), 0);
+            this.stdDev = Math.sqrt(sumSqDiff / this.count);
+        },
+
+        fmt(n) {
+            return n !== null ? n.toLocaleString('en-US', { maximumFractionDigits: 4 }) : '-';
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

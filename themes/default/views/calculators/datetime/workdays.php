@@ -1,77 +1,115 @@
-<?php include_once __DIR__ . '/../../../../partials/calculator_sidebar.php'; ?>
+<?php
+// themes/default/views/calculators/datetime/workdays.php
+// PREMIUM BUSINESS DAYS CALCULATOR
+?>
 
-<main class="main-content">
-    <div class="row g-4 mb-4">
-        <div class="col-md-8 mx-auto">
-            <div class="glass-card">
-                <div class="d-flex align-items-center mb-4">
-                    <div class="icon-square bg-primary-gradient text-white me-3">
-                        <i class="bi bi-briefcase fs-4"></i>
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="workDaysCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute bottom-[20%] right-[10%] w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-[120px] animate-float"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Date & Time</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-briefcase"></i>
+                <span>BUSINESS</span>
+            </div>
+            <h1 class="calc-title">Work Days <span class="text-gradient">Calculator</span></h1>
+            <p class="calc-subtitle">Calculate number of business days between two dates (excluding weekends).</p>
+        </div>
+
+        <div class="calc-grid max-w-4xl mx-auto">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Input -->
+                <div class="calc-card animate-scale-in">
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="calc-label">Start Date</label>
+                            <input type="date" x-model="startDate" @input="calculate()" class="calc-input">
+                        </div>
+                        <div>
+                            <label class="calc-label">End Date</label>
+                            <input type="date" x-model="endDate" @input="calculate()" class="calc-input">
+                        </div>
+                        
+                         <div class="bg-orange-500/10 p-4 rounded-xl border border-orange-500/20 text-xs text-orange-200 flex gap-2">
+                             <i class="fas fa-exclamation-circle mt-1"></i>
+                             <p>Counts days excluding Saturday and Sunday. Holidays are not automatically excluded in this version.</p>
+                         </div>
                     </div>
-                    <h2 class="mb-0 fw-bold position-relative z-1"><?php echo htmlspecialchars($title); ?></h2>
                 </div>
 
-                <div class="alert alert-info border-glass text-white bg-white-5">
-                    <i class="bi bi-info-circle me-2"></i> This calculator excludes weekends (Saturday/Sunday) from the days count.
-                </div>
-
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <label class="form-label text-secondary small text-uppercase fw-bold ls-1">Start Date</label>
-                        <input type="date" class="form-control form-control-lg bg-dark text-white border-glass" id="start_date">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-secondary small text-uppercase fw-bold ls-1">End Date</label>
-                        <input type="date" class="form-control form-control-lg bg-dark text-white border-glass" id="end_date">
+                <!-- Result -->
+                <div class="calc-card animate-slide-up flex flex-col justify-center items-center text-center bg-gradient-to-br from-orange-900/20 to-black border border-orange-500/20">
+                    
+                    <div class="text-sm text-gray-400 uppercase tracking-widest mb-4 font-bold">Business Days</div>
+                    
+                    <div class="flex items-baseline gap-2 mb-2">
+                        <span class="text-8xl font-black text-white" x-text="workDays"></span>
+                        <span class="text-xl font-bold text-orange-400">days</span>
                     </div>
                     
-                    <div class="col-12 mt-4">
-                        <button class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-primary" onclick="calculateWorkDays()">
-                            Calculate Work Days
-                        </button>
+                    <div class="text-xs text-gray-500 mt-4 font-mono">
+                        Including start, Excluding weekend
                     </div>
                 </div>
 
-                <div id="result-section" class="mt-4" style="display: none;">
-                    <div class="border-glass rounded-4 p-4 text-center bg-white-5">
-                         <h5 class="text-secondary mb-3">Business Days</h5>
-                         <div class="display-3 fw-bold text-white mb-2" id="result-days"></div>
-                         <div class="text-muted">excludes weekends</div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
-</main>
+</div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('start_date').value = today;
-    document.getElementById('end_date').value = today;
+document.addEventListener('alpine:init', () => {
+    Alpine.data('workDaysCalculator', () => ({
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0],
+        workDays: 0,
+
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+             if (!this.startDate || !this.endDate) return;
+
+             const start = new Date(this.startDate);
+             const end = new Date(this.endDate);
+             
+             if (start > end) {
+                 this.workDays = 0;
+                 return;
+             }
+
+             let count = 0;
+             let cur = new Date(start);
+             
+             while (cur <= end) {
+                 const day = cur.getDay();
+                 // 0 = Sunday, 6 = Saturday
+                 if (day !== 0 && day !== 6) {
+                     count++;
+                 }
+                 cur.setDate(cur.getDate() + 1);
+             }
+             
+             this.workDays = count;
+        }
+    }));
 });
-
-function calculateWorkDays() {
-    const start = new Date(document.getElementById('start_date').value);
-    const end = new Date(document.getElementById('end_date').value);
-    
-    if (isNaN(start) || isNaN(end)) return;
-    
-    // Ensure start is before end
-    if (start > end) {
-        alert('End date must be after start date');
-        return;
-    }
-
-    let count = 0;
-    const curDate = new Date(start.getTime());
-    while (curDate <= end) {
-        const dayOfWeek = curDate.getDay();
-        if(dayOfWeek !== 0 && dayOfWeek !== 6) count++;
-        curDate.setDate(curDate.getDate() + 1);
-    }
-    
-    document.getElementById('result-days').textContent = count;
-    document.getElementById('result-section').style.display = 'block';
-}
 </script>

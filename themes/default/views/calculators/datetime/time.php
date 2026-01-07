@@ -1,80 +1,116 @@
-<?php include_once __DIR__ . '/../../../../partials/calculator_sidebar.php'; ?>
+<?php
+// themes/default/views/calculators/datetime/time.php
+// PREMIUM TIME DIFFERENCE CALCULATOR
+?>
 
-<main class="main-content">
-    <div class="row g-4 mb-4">
-        <div class="col-md-8 mx-auto">
-            <div class="glass-card">
-                <div class="d-flex align-items-center mb-4">
-                    <div class="icon-square bg-primary-gradient text-white me-3">
-                        <i class="bi bi-clock-history fs-4"></i>
-                    </div>
-                    <h2 class="mb-0 fw-bold position-relative z-1"><?php echo htmlspecialchars($title); ?></h2>
-                </div>
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <label class="form-label text-secondary small text-uppercase fw-bold ls-1">Start Time</label>
-                        <input type="time" class="form-control form-control-lg bg-dark text-white border-glass" id="start_time" value="09:00">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-secondary small text-uppercase fw-bold ls-1">End Time</label>
-                        <input type="time" class="form-control form-control-lg bg-dark text-white border-glass" id="end_time" value="17:00">
-                    </div>
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="timeCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[30%] left-[30%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse-glow"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Date & Time</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-clock"></i>
+                <span>CHRONOMETER</span>
+            </div>
+            <h1 class="calc-title">Time <span class="text-gradient">Difference</span></h1>
+            <p class="calc-subtitle">Calculate the duration between two times in a day.</p>
+        </div>
+
+        <div class="calc-grid max-w-4xl mx-auto">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Input -->
+                <div class="calc-card animate-scale-in">
                     
-                    <div class="col-12 mt-4">
-                        <button class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-primary" onclick="calculateTimeDifference()">
-                            Calculate Difference
-                        </button>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="calc-label">Start Time</label>
+                            <input type="time" x-model="startTime" @input="calculate()" class="calc-input text-2xl font-mono text-center">
+                        </div>
+                        <div>
+                            <label class="calc-label">End Time</label>
+                            <input type="time" x-model="endTime" @input="calculate()" class="calc-input text-2xl font-mono text-center">
+                        </div>
                     </div>
+
                 </div>
 
-                <div id="result-section" class="mt-4" style="display: none;">
-                    <div class="border-glass rounded-4 p-4 text-center bg-white-5">
-                         <h5 class="text-secondary mb-3">Duration</h5>
-                         <div class="display-4 fw-bold text-white mb-2" id="result-time"></div>
-                         <div class="row mt-4 pt-3 border-top border-secondary">
-                             <div class="col-6">
-                                 <div class="h4 text-info" id="total-hours"></div>
-                                 <div class="small text-muted">Hours</div>
-                             </div>
-                             <div class="col-6">
-                                 <div class="h4 text-success" id="total-minutes"></div>
-                                 <div class="small text-muted">Minutes</div>
-                             </div>
+                <!-- Result -->
+                <div class="calc-card animate-slide-up flex flex-col justify-center items-center text-center bg-gradient-to-br from-indigo-900/20 to-black border border-indigo-500/20">
+                    
+                    <div class="text-sm text-gray-400 uppercase tracking-widest mb-4 font-bold">Duration</div>
+                    
+                    <div class="flex items-baseline gap-2 mb-8">
+                        <span class="text-6xl font-black text-white" x-text="diffHours + 'h ' + diffMins + 'm'"></span>
+                    </div>
+
+                    <div class="w-full flex justify-between px-8 py-4 bg-white/5 rounded-xl border border-white/5">
+                         <div class="text-center">
+                             <div class="text-lg font-bold text-white" x-text="totalHours"></div>
+                             <div class="text-[10px] text-gray-500 uppercase">Total Hours</div>
+                         </div>
+                         <div class="w-px bg-white/10"></div>
+                         <div class="text-center">
+                             <div class="text-lg font-bold text-white" x-text="totalMinutes"></div>
+                             <div class="text-[10px] text-gray-500 uppercase">Total Minutes</div>
                          </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
-</main>
+</div>
 
 <script>
-function calculateTimeDifference() {
-    const start = document.getElementById('start_time').value;
-    const end = document.getElementById('end_time').value;
-    
-    if (!start || !end) return;
-    
-    const startDate = new Date(`2000-01-01T${start}`);
-    const endDate = new Date(`2000-01-01T${end}`);
-    
-    // Handle overnight (if end is before start, assume next day)
-    if (endDate < startDate) {
-        endDate.setDate(endDate.getDate() + 1);
-    }
-    
-    const diffMs = endDate - startDate;
-    const diffHrs = Math.floor(diffMs / 3600000);
-    const diffMins = Math.floor((diffMs % 3600000) / 60000);
-    
-    const totalMinutes = Math.floor(diffMs / 60000);
-    const totalHours = (diffMs / 3600000).toFixed(2);
-    
-    document.getElementById('result-time').textContent = `${diffHrs}h ${diffMins}m`;
-    document.getElementById('total-hours').textContent = totalHours;
-    document.getElementById('total-minutes').textContent = totalMinutes;
-    
-    document.getElementById('result-section').style.display = 'block';
-}
+document.addEventListener('alpine:init', () => {
+    Alpine.data('timeCalculator', () => ({
+        startTime: '09:00',
+        endTime: '17:00',
+        
+        diffHours: 0,
+        diffMins: 0,
+        totalHours: 0,
+        totalMinutes: 0,
+
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+             if (!this.startTime || !this.endTime) return;
+
+             const d1 = new Date(`2000-01-01T${this.startTime}`);
+             let d2 = new Date(`2000-01-01T${this.endTime}`);
+             
+             // If d2 < d1, assume next day
+             if (d2 < d1) {
+                 d2.setDate(d2.getDate() + 1);
+             }
+             
+             const diffMs = d2 - d1;
+             
+             this.totalMinutes = Math.floor(diffMs / 60000);
+             this.totalHours = (diffMs / 3600000).toFixed(2);
+             
+             this.diffHours = Math.floor(diffMs / 3600000);
+             this.diffMins = Math.floor((diffMs % 3600000) / 60000);
+        }
+    }));
+});
 </script>

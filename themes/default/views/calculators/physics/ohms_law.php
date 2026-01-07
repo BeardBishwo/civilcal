@@ -1,138 +1,170 @@
-<?php $page_title = $title ?? "Ohm's Law Calculator"; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/theme.css'); ?>?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/calculator-platform.css'); ?>?v=<?php echo time(); ?>">
-    <style>
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 800px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; color: #2c3e50; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.1rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 12px; }
-        .calc-btn { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; color: #2c3e50; }
-        .result-box { background: #fffde7; border-radius: 12px; padding: 25px; margin-top: 30px; text-align: center; border: 1px solid #fff9c4; }
-        .result-val { font-size: 2.5rem; font-weight: 700; color: #f39c12; margin: 10px 0; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: var(--text-primary); text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="layout-wrapper">
-        <?php include __DIR__ . '/../../partials/calculator_sidebar.php'; ?>
-        
-        <main class="main-content">
-            <div class="container-fluid">
-                <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Dashboard</a>
-                <div class="calc-card">
-                    <div class="calc-header">
-                        <i class="bi bi-lightning-charge" style="font-size: 2.5rem; color: #2c3e50;"></i>
-                        <h2>Ohm's Law</h2>
-                        <p class="mb-0 mt-2 text-dark">Calculate Voltage, Current, or Resistance (V = I × R)</p>
-                    </div>
-                    <div class="calc-body">
-                        <div class="mb-4 text-center">
-                            <label class="form-label fw-bold">I want to calculate:</label>
-                            <div class="btn-group" role="group">
-                                <input type="radio" class="btn-check" name="target" id="calc_V" checked onchange="toggleInputs()">
-                                <label class="btn btn-outline-warning text-dark" for="calc_V">Voltage (V)</label>
-                                <input type="radio" class="btn-check" name="target" id="calc_I" onchange="toggleInputs()">
-                                <label class="btn btn-outline-warning text-dark" for="calc_I">Current (I)</label>
-                                <input type="radio" class="btn-check" name="target" id="calc_R" onchange="toggleInputs()">
-                                <label class="btn btn-outline-warning text-dark" for="calc_R">Resistance (R)</label>
-                            </div>
-                        </div>
+<?php
+// themes/default/views/calculators/physics/ohms_law.php
+// PREMIUM OHM'S LAW CALCULATOR
+?>
 
-                        <div class="row g-4 justify-content-center">
-                            <div class="col-md-6" id="grp_V" style="display:none;">
-                                <label class="form-label fw-bold">Voltage (V)</label>
-                                <div class="input-group">
-                                    <input type="number" id="val_V" class="form-control calc-input">
-                                    <span class="input-group-text">V</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6" id="grp_I">
-                                <label class="form-label fw-bold">Current (I)</label>
-                                <div class="input-group">
-                                    <input type="number" id="val_I" class="form-control calc-input" value="2">
-                                    <span class="input-group-text">A</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6" id="grp_R">
-                                <label class="form-label fw-bold">Resistance (R)</label>
-                                <div class="input-group">
-                                    <input type="number" id="val_R" class="form-control calc-input" value="10">
-                                    <span class="input-group-text">Ω</span>
-                                </div>
-                            </div>
-                        </div>
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-                        <button class="calc-btn mt-4 w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Calculate</button>
-
-                        <div class="result-box" id="resultBox" style="display:none;">
-                            <div class="text-muted text-uppercase fw-bold small">Result</div>
-                            <div class="result-val" id="resultValue">0</div>
-                            <div class="fw-bold fs-6 text-muted" id="resultUnit">V</div>
-                            
-                            <div class="mt-3 small text-muted">
-                                Power (P) = <span id="res_power" class="fw-bold">0</span> W
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="ohmsCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[20%] right-[10%] w-[500px] h-[500px] bg-yellow-400/10 rounded-full blur-[120px] animate-float"></div>
     </div>
-    <script>
-        function toggleInputs() {
-            const target = document.querySelector('input[name="target"]:checked').id;
-            document.getElementById('grp_V').style.display = target === 'calc_V' ? 'none' : 'block';
-            document.getElementById('grp_I').style.display = target === 'calc_I' ? 'none' : 'block';
-            document.getElementById('grp_R').style.display = target === 'calc_R' ? 'none' : 'block';
-            document.getElementById('resultBox').style.display = 'none';
-        }
 
-        function calculate() {
-            const target = document.querySelector('input[name="target"]:checked').id;
-            const V = parseFloat(document.getElementById('val_V').value);
-            const I = parseFloat(document.getElementById('val_I').value);
-            const R = parseFloat(document.getElementById('val_R').value);
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Physics</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+             <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-plug"></i>
+                <span>ELECTRONICS</span>
+            </div>
+            <h1 class="calc-title">Ohm's <span class="text-gradient">Law</span></h1>
+            <p class="calc-subtitle">Calculate Voltage, Current, Resistance, and Power.</p>
+        </div>
+
+        <div class="calc-grid max-w-4xl mx-auto">
             
-            let result = 0;
-            let unit = '';
-            let power = 0;
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Inputs -->
+                <div class="calc-card animate-scale-in">
+                    
+                     <div class="mb-6">
+                        <label class="calc-label text-center mb-4">Solve for:</label>
+                        <div class="grid grid-cols-3 gap-2 bg-white/5 p-1 rounded-xl border border-white/10">
+                            <button @click="mode = 'v'; calculate()" :class="mode === 'v' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="py-2 text-sm rounded-lg transition-all font-bold">Voltage</button>
+                            <button @click="mode = 'i'; calculate()" :class="mode === 'i' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="py-2 text-sm rounded-lg transition-all font-bold">Current</button>
+                            <button @click="mode = 'r'; calculate()" :class="mode === 'r' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="py-2 text-sm rounded-lg transition-all font-bold">Resist.</button>
+                        </div>
+                    </div>
 
-            if (target === 'calc_V') {
-                if (!I || !R) return;
-                result = I * R;
-                unit = 'V';
-                power = I * result;
-            } else if (target === 'calc_I') {
-                if (!V || !R) return;
-                result = V / R;
-                unit = 'A';
-                power = V * result;
-            } else if (target === 'calc_R') {
-                if (!V || !I) return;
-                result = V / I;
-                unit = 'Ω';
-                power = V * I;
-            }
+                    <div class="space-y-6">
+                        
+                        <!-- Inputs for V -->
+                        <div x-show="mode === 'v'" x-transition class="space-y-4">
+                            <div>
+                                <label class="calc-label">Current (A)</label>
+                                <input type="number" x-model.number="i" @input="calculate()" class="calc-input" placeholder="2">
+                            </div>
+                            <div>
+                                <label class="calc-label">Resistance (Ω)</label>
+                                <input type="number" x-model.number="r" @input="calculate()" class="calc-input" placeholder="10">
+                            </div>
+                        </div>
 
-            document.getElementById('resultValue').textContent = Number.isInteger(result) ? result : result.toFixed(2);
-            document.getElementById('resultUnit').textContent = unit;
-            document.getElementById('res_power').textContent = power.toFixed(2);
-            document.getElementById('resultBox').style.display = 'block';
-        }
+                        <!-- Inputs for I -->
+                        <div x-show="mode === 'i'" x-transition class="space-y-4">
+                            <div>
+                                <label class="calc-label">Voltage (V)</label>
+                                <input type="number" x-model.number="v" @input="calculate()" class="calc-input" placeholder="20">
+                            </div>
+                             <div>
+                                <label class="calc-label">Resistance (Ω)</label>
+                                <input type="number" x-model.number="r" @input="calculate()" class="calc-input" placeholder="10">
+                            </div>
+                        </div>
+
+                         <!-- Inputs for R -->
+                        <div x-show="mode === 'r'" x-transition class="space-y-4">
+                             <div>
+                                <label class="calc-label">Voltage (V)</label>
+                                <input type="number" x-model.number="v" @input="calculate()" class="calc-input" placeholder="20">
+                            </div>
+                            <div>
+                                <label class="calc-label">Current (A)</label>
+                                <input type="number" x-model.number="i" @input="calculate()" class="calc-input" placeholder="2">
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Result -->
+                <div class="calc-card animate-slide-up flex flex-col justify-center items-center text-center bg-gradient-to-br from-yellow-900/20 to-black border border-yellow-500/20">
+                     <div class="absolute top-0 right-0 p-4 opacity-5">
+                            <i class="fas fa-bolt text-9xl text-white"></i>
+                     </div>
+                    
+                    <div class="text-sm text-gray-400 uppercase tracking-widest mb-4 font-bold" x-text="resultLabel"></div>
+                    
+                    <div class="flex items-baseline gap-2 mb-2 z-10">
+                        <span class="text-6xl font-black text-white" x-text="result"></span>
+                        <span class="text-2xl font-bold text-yellow-400" x-text="unit"></span>
+                    </div>
+                    
+                    <div class="mt-8 p-4 bg-white/5 rounded-xl border border-white/5 w-full z-10">
+                        <div class="flex justify-between items-center text-sm mb-2">
+                             <span class="text-gray-400">Power (P)</span>
+                             <span class="font-bold text-white"><span x-text="power"></span> W</span>
+                        </div>
+                        <div class="text-[10px] text-gray-500 text-right uppercase">calculated</div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('ohmsCalculator', () => ({
+        mode: 'v',
+        v: 20,
+        i: 2,
+        r: 10,
         
-        // Init
-        toggleInputs();
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+        result: 0,
+        unit: 'V',
+        power: 0,
+        resultLabel: 'Result',
+
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+             let res = 0;
+             let p = 0;
+
+             if (this.mode === 'v') {
+                 this.resultLabel = 'Voltage';
+                 this.unit = 'V';
+                 if (this.i && this.r) {
+                     res = this.i * this.r;
+                     p = this.i * res; // P = IV
+                 }
+             } 
+             else if (this.mode === 'i') {
+                 this.resultLabel = 'Current';
+                 this.unit = 'A';
+                 if (this.v && this.r) {
+                     res = this.v / this.r;
+                     p = this.v * res;
+                 }
+             }
+             else if (this.mode === 'r') {
+                 this.resultLabel = 'Resistance';
+                 this.unit = 'Ω';
+                 if (this.v && this.i) {
+                     res = this.v / this.i;
+                     p = this.v * this.i;
+                 }
+             }
+
+             this.result = Number.isInteger(res) ? res : res.toFixed(2);
+             this.power = Number.isInteger(p) ? p : p.toFixed(2);
+        }
+    }));
+});
+</script>

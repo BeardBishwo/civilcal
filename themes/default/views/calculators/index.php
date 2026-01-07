@@ -163,6 +163,8 @@ document.addEventListener('alpine:init', () => {
         searchQuery: '',
         selectedCategory: '',
         calculators: [
+            // Core
+            { id: 0, title: 'Scientific Calculator', description: 'Advanced scientific calculator with trigonometry, logs, and exponential functions', category: 'math', icon: 'fas fa-atom', url: '<?= app_base_url("/calculators/scientific") ?>' },
             // Mathematics
             { id: 1, title: 'Area Calculator', description: 'Calculate area of various shapes including circles, rectangles, and triangles', category: 'math', icon: 'fas fa-square', url: '<?= app_base_url("/calculators/math/area") ?>' },
             { id: 2, title: 'Volume Calculator', description: 'Compute volume of 3D shapes like spheres, cubes, and cylinders', category: 'math', icon: 'fas fa-cube', url: '<?= app_base_url("/calculators/math/volume") ?>' },

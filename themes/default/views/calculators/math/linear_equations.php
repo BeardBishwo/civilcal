@@ -1,95 +1,144 @@
-<?php $page_title = $title ?? 'Linear Equations Solver'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/floating-calculator.css'); ?>">
-    <style>
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 40px 0; }
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 800px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.1rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 10px; text-align: center; width: 80px; display: inline-block;}
-        .calc-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-radius: 12px; padding: 30px; text-align: center; margin-top: 30px; }
-        .result-value { font-size: 1.5rem; font-weight: 700; margin: 10px 0; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; font-weight: 600; }
-        .equation-row { font-size: 1.5rem; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Back</a>
-        <div class="calc-card">
-            <div class="calc-header">
-                <i class="bi bi-list-ol" style="font-size: 2.5rem;"></i>
-                <h2>Linear Equations Solver</h2>
-                <p class="mb-0 mt-2">Solve system of two linear equations</p>
+<?php
+// themes/default/views/calculators/math/linear_equations.php
+// PREMIUM LINEAR EQUATIONS SOLVER
+?>
+
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="linearSolver()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[10%] content-center w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+        <div class="absolute left-[30%] top-0 h-full w-[1px] bg-gradient-to-b from-transparent via-white/5 to-transparent"></div>
+        <div class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-[120px] animate-float"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Linear Solver</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-equals"></i>
+                <span>ALGEBRA</span>
             </div>
-            <div class="calc-body">
-                <div class="text-center mb-4 text-muted">Enter coefficients for: ax + by = c</div>
-                
-                <div class="equation-row">
-                    <input type="number" id="a1" class="form-control calc-input" paceholder="a1" value="2"> x + 
-                    <input type="number" id="b1" class="form-control calc-input" placeholder="b1" value="3"> y = 
-                    <input type="number" id="c1" class="form-control calc-input" placeholder="c1" value="13">
-                </div>
-                
-                <div class="equation-row">
-                    <input type="number" id="a2" class="form-control calc-input" placeholder="a2" value="5"> x + 
-                    <input type="number" id="b2" class="form-control calc-input" placeholder="b2" value="-1"> y = 
-                    <input type="number" id="c2" class="form-control calc-input" placeholder="c2" value="7">
+            <h1 class="calc-title">System <span class="text-gradient">Solver</span></h1>
+            <p class="calc-subtitle">Solve systems of two linear equations using Cramer's Rule.</p>
+        </div>
+
+        <div class="calc-grid max-w-5xl mx-auto">
+            
+            <div class="calc-card animate-scale-in">
+                <div class="mb-6 text-center text-sm text-gray-400">Format: <span class="font-mono text-white">ax + by = c</span></div>
+
+                <!-- Equation 1 -->
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-4 p-4 rounded-xl bg-white/5 border border-white/5">
+                    <div class="font-bold text-gray-500 w-8 text-center">Eq 1</div>
+                    <div class="flex items-center gap-2">
+                        <input type="number" x-model.number="a1" @input="solve()" class="calc-input w-20 text-center font-bold" placeholder="a1">
+                        <span class="text-lg font-mono text-secondary">x</span>
+                    </div>
+                    <div class="text-xl text-gray-500 font-light">+</div>
+                    <div class="flex items-center gap-2">
+                        <input type="number" x-model.number="b1" @input="solve()" class="calc-input w-20 text-center font-bold" placeholder="b1">
+                        <span class="text-lg font-mono text-secondary">y</span>
+                    </div>
+                    <div class="text-xl text-gray-500 font-light">=</div>
+                    <input type="number" x-model.number="c1" @input="solve()" class="calc-input w-24 text-center font-bold bg-white/10" placeholder="c1">
                 </div>
 
-                <button class="calc-btn mt-4 w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Solve System</button>
-                <div class="result-box" id="resultBox" style="display:none;">
-                    <div class="mb-2">Solution</div>
-                    <div class="result-value" id="rootsValue">x = 2, y = 3</div>
+                <!-- Equation 2 -->
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-8 p-4 rounded-xl bg-white/5 border border-white/5">
+                    <div class="font-bold text-gray-500 w-8 text-center">Eq 2</div>
+                    <div class="flex items-center gap-2">
+                        <input type="number" x-model.number="a2" @input="solve()" class="calc-input w-20 text-center font-bold" placeholder="a2">
+                        <span class="text-lg font-mono text-secondary">x</span>
+                    </div>
+                    <div class="text-xl text-gray-500 font-light">+</div>
+                    <div class="flex items-center gap-2">
+                        <input type="number" x-model.number="b2" @input="solve()" class="calc-input w-20 text-center font-bold" placeholder="b2">
+                        <span class="text-lg font-mono text-secondary">y</span>
+                    </div>
+                    <div class="text-xl text-gray-500 font-light">=</div>
+                    <input type="number" x-model.number="c2" @input="solve()" class="calc-input w-24 text-center font-bold bg-white/10" placeholder="c2">
                 </div>
+
+                <!-- Results -->
+                <div x-show="xVal !== null && yVal !== null" class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-up" x-transition>
+                    
+                    <div class="glass-card p-6 border-l-4 border-l-primary flex items-center justify-between">
+                        <div>
+                            <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">Value of x</div>
+                            <div class="text-3xl font-mono font-bold text-white" x-text="fmt(xVal)"></div>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xl font-bold font-mono">x</div>
+                    </div>
+
+                    <div class="glass-card p-6 border-l-4 border-l-accent flex items-center justify-between">
+                         <div>
+                            <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">Value of y</div>
+                            <div class="text-3xl font-mono font-bold text-white" x-text="fmt(yVal)"></div>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xl font-bold font-mono">y</div>
+                    </div>
+
+                </div>
+
+                <div x-show="status" class="mt-8 text-center p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-500" x-text="status" x-transition></div>
+
             </div>
         </div>
     </div>
-    <script>
-        function calculate() {
-            const a1 = parseFloat(document.getElementById('a1').value);
-            const b1 = parseFloat(document.getElementById('b1').value);
-            const c1 = parseFloat(document.getElementById('c1').value);
-            
-            const a2 = parseFloat(document.getElementById('a2').value);
-            const b2 = parseFloat(document.getElementById('b2').value);
-            const c2 = parseFloat(document.getElementById('c2').value);
+</div>
 
-            if (isNaN(a1) || isNaN(b1) || isNaN(c1) || isNaN(a2) || isNaN(b2) || isNaN(c2)) return;
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('linearSolver', () => ({
+        a1: 2, b1: 3, c1: 13,
+        a2: 5, b2: -1, c2: 7,
+        xVal: null, yVal: null,
+        status: null,
 
-            // Using Cramer's Rule
-            const D = (a1 * b2) - (a2 * b1);
-            const Dx = (c1 * b2) - (c2 * b1);
-            const Dy = (a1 * c2) - (a2 * c1);
+        init() {
+            this.solve();
+        },
 
-            let resultText = '';
+        solve() {
+            if (this.a1==null || this.b1==null || this.c1==null || 
+                this.a2==null || this.b2==null || this.c2==null) {
+                this.xVal = null; this.yVal = null;
+                return;
+            }
+
+            // Cramer's Rule
+            const D = (this.a1 * this.b2) - (this.a2 * this.b1);
+            const Dx = (this.c1 * this.b2) - (this.c2 * this.b1);
+            const Dy = (this.a1 * this.c2) - (this.a2 * this.c1);
 
             if (D !== 0) {
-                const x = Dx / D;
-                const y = Dy / D;
-                resultText = `x = ${x.toFixed(4)}<br>y = ${y.toFixed(4)}`;
+                this.xVal = Dx / D;
+                this.yVal = Dy / D;
+                this.status = null;
             } else {
+                this.xVal = null;
+                this.yVal = null;
                 if (Dx === 0 && Dy === 0) {
-                    resultText = "Infinite Solutions (Dependent System)";
+                    this.status = "Infinite Solutions (Dependent System)";
                 } else {
-                    resultText = "No Solution (Inconsistent System)";
+                    this.status = "No Solution (Inconsistent System)";
                 }
             }
-            
-            document.getElementById('resultBox').style.display = 'block';
-            document.getElementById('rootsValue').innerHTML = resultText;
+        },
+
+        fmt(n) {
+            return n !== null ? Number(n.toFixed(4)).toString() : '';
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

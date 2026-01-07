@@ -1,144 +1,160 @@
-<?php $page_title = $title ?? 'Body Fat Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/theme.css'); ?>?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/calculator-platform.css'); ?>?v=<?php echo time(); ?>">
-    <style>
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 800px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.1rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 12px; }
-        .calc-btn { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: #e8f5e9; border-radius: 12px; padding: 25px; margin-top: 30px; text-align: center; border: 1px solid #c8e6c9; }
-        .result-val { font-size: 2.5rem; font-weight: 700; color: #2e7d32; margin: 10px 0; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: var(--text-primary); text-decoration: none; font-weight: 600; }
-        .gender-select .btn-check:checked + .btn { background-color: #2e7d32; border-color: #2e7d32; color: white; }
-    </style>
-</head>
-<body>
-    <div class="layout-wrapper">
-        <?php include __DIR__ . '/../../partials/calculator_sidebar.php'; ?>
-        
-        <main class="main-content">
-            <div class="container-fluid">
-                <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Dashboard</a>
-                <div class="calc-card">
-                    <div class="calc-header">
-                        <i class="bi bi-person-check" style="font-size: 2.5rem;"></i>
-                        <h2>Body Fat Calculator</h2>
-                        <p class="mb-0 mt-2">US Navy Method</p>
-                    </div>
-                    <div class="calc-body">
-                        <div class="row g-4 justify-content-center">
-                            <div class="col-md-12 text-center gender-select">
-                                <label class="form-label fw-bold d-block mb-2">Gender</label>
-                                <div class="btn-group" role="group">
-                                    <input type="radio" class="btn-check" name="gender" id="male" checked onchange="toggleGender()">
-                                    <label class="btn btn-outline-success px-4" for="male">Male</label>
-                                    <input type="radio" class="btn-check" name="gender" id="female" onchange="toggleGender()">
-                                    <label class="btn btn-outline-success px-4" for="female">Female</label>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-dark">Height</label>
-                                <div class="input-group">
-                                    <input type="number" id="height" class="form-control calc-input" value="175">
-                                    <span class="input-group-text">cm</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-dark">Neck Circumference</label>
-                                <div class="input-group">
-                                    <input type="number" id="neck" class="form-control calc-input" value="38">
-                                    <span class="input-group-text">cm</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-dark">Waist Circumference</label>
-                                <div class="input-group">
-                                    <input type="number" id="waist" class="form-control calc-input" value="85">
-                                    <span class="input-group-text">cm</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6" id="hip_con" style="display:none;">
-                                <label class="form-label fw-bold text-dark">Hip Circumference</label>
-                                <div class="input-group">
-                                    <input type="number" id="hip" class="form-control calc-input" value="95">
-                                    <span class="input-group-text">cm</span>
-                                </div>
-                            </div>
-                        </div>
+<?php
+// themes/default/views/calculators/health/body_fat.php
+// PREMIUM BODY FAT CALCULATOR
+?>
 
-                        <button class="calc-btn mt-4 w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Calculate Body Fat</button>
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-                        <div class="result-box" id="resultBox" style="display:none;">
-                            <div class="text-muted text-uppercase fw-bold small">Estimated Body Fat</div>
-                            <div class="result-val" id="bfValue">15%</div>
-                            <div class="fw-bold fs-6 text-muted" id="bfCategory">Fitness</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="bodyFatCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[30%] left-[20%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[100px] animate-pulse-glow"></div>
     </div>
-    <script>
-        function toggleGender() {
-            const isFemale = document.getElementById('female').checked;
-            document.getElementById('hip_con').style.display = isFemale ? 'block' : 'none';
-        }
 
-        function calculate() {
-            const isMale = document.getElementById('male').checked;
-            const height = parseFloat(document.getElementById('height').value);
-            const neck = parseFloat(document.getElementById('neck').value);
-            const waist = parseFloat(document.getElementById('waist').value);
-            const hip = parseFloat(document.getElementById('hip').value);
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+             <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Body Fat</li>
+            </ol>
+        </nav>
 
-            if (!height || !neck || !waist) return;
-            if (!isMale && !hip) return;
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-child"></i>
+                <span>COMPOSITION</span>
+            </div>
+            <h1 class="calc-title">Body Fat <span class="text-gradient">Percentage</span></h1>
+            <p class="calc-subtitle">Estimate body fat using the US Navy Method based on body measurements.</p>
+        </div>
 
-            let bf = 0;
-
-            if (isMale) {
-                // US Navy Method Male
-                bf = 495 / (1.0324 - 0.19077 * Math.log10(waist - neck) + 0.15456 * Math.log10(height)) - 450;
-            } else {
-                // US Navy Method Female
-                bf = 495 / (1.29579 - 0.35004 * Math.log10(waist + hip - neck) + 0.22100 * Math.log10(height)) - 450;
-            }
-
-            if (bf < 0) bf = 0; // Edge case
+        <div class="calc-grid max-w-4xl mx-auto">
             
-            document.getElementById('bfValue').textContent = bf.toFixed(1) + '%';
-            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Input -->
+                <div class="calc-card animate-scale-in">
+                    
+                     <div class="bg-white/5 p-1 rounded-xl border border-white/10 inline-flex w-full mb-8">
+                        <button @click="gender = 'male'; calculate()" :class="gender === 'male' ? 'bg-indigo-500 text-white shadow' : 'text-gray-400 hover:text-white'" class="flex-1 py-3 text-sm rounded-lg transition-all font-bold">Male</button>
+                        <button @click="gender = 'female'; calculate()" :class="gender === 'female' ? 'bg-indigo-500 text-white shadow' : 'text-gray-400 hover:text-white'" class="flex-1 py-3 text-sm rounded-lg transition-all font-bold">Female</button>
+                    </div>
+
+                    <div class="space-y-5">
+                        <!-- Measurements -->
+                         <div class="grid grid-cols-1 gap-4">
+                             <div>
+                                <label class="calc-label">Height (cm)</label>
+                                <input type="number" x-model.number="height" @input="calculate()" class="calc-input text-lg" placeholder="175">
+                            </div>
+                             <div>
+                                <label class="calc-label">Neck (cm)</label>
+                                <input type="number" x-model.number="neck" @input="calculate()" class="calc-input text-lg" placeholder="38">
+                            </div>
+                             <div>
+                                <label class="calc-label">Waist (cm)</label>
+                                <input type="number" x-model.number="waist" @input="calculate()" class="calc-input text-lg" placeholder="85">
+                            </div>
+                            <!-- Hip only for female -->
+                            <div x-show="gender === 'female'" x-transition>
+                                <label class="calc-label">Hip (cm)</label>
+                                <input type="number" x-model.number="hip" @input="calculate()" class="calc-input text-lg" placeholder="95">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Result -->
+                <div class="calc-card animate-slide-up flex flex-col justify-center items-center text-center bg-indigo-900/10 border border-indigo-500/20">
+                    
+                     <div class="flex items-center justify-center relative w-48 h-48 mb-6">
+                         <!-- Circular Progress Placeholder or just text? Let's use simple text with ring -->
+                         <div class="absolute inset-0 rounded-full border-8 border-white/5"></div>
+                         <div class="absolute inset-0 rounded-full border-8 border-indigo-500 border-l-transparent rotate-45"></div>
+                         
+                         <div class="flex flex-col items-center z-10">
+                             <div class="text-5xl font-black text-white" x-text="bodyFat"></div>
+                             <div class="text-xl text-indigo-400 font-bold">%</div>
+                         </div>
+                     </div>
+
+                     <div class="text-2xl font-bold text-white mb-2" x-text="category"></div>
+                     <div class="text-sm text-gray-400 max-w-xs leading-relaxed">
+                         Estimated body fat percentage based on circumferential measurements.
+                     </div>
+
+                     <div class="mt-8 w-full p-4 bg-white/5 rounded-xl border border-white/5 text-left text-xs text-gray-400 space-y-1">
+                         <div class="flex justify-between"><span>Esssential Fat:</span> <span class="text-white" x-text="gender==='male'?'2-5%':'10-13%'"></span></div>
+                         <div class="flex justify-between"><span>Athletes:</span> <span class="text-white" x-text="gender==='male'?'6-13%':'14-20%'"></span></div>
+                         <div class="flex justify-between"><span>Fitness:</span> <span class="text-white" x-text="gender==='male'?'14-17%':'21-24%'"></span></div>
+                         <div class="flex justify-between"><span>Average:</span> <span class="text-white" x-text="gender==='male'?'18-24%':'25-31%'"></span></div>
+                     </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('bodyFatCalculator', () => ({
+        gender: 'male',
+        height: 175,
+        neck: 38,
+        waist: 85,
+        hip: 95,
+        
+        bodyFat: 0,
+        category: '',
+
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+             if (!this.height || !this.neck || !this.waist) return;
+             if (this.gender === 'female' && !this.hip) return;
+
+             let bf = 0;
+
+             if (this.gender === 'male') {
+                 // 495 / (1.0324 - 0.19077 * log10(waist - neck) + 0.15456 * log10(height)) - 450
+                 if (this.waist - this.neck <= 0) return; // Prevent log error
+                 bf = 495 / (1.0324 - 0.19077 * Math.log10(this.waist - this.neck) + 0.15456 * Math.log10(this.height)) - 450;
+             } else {
+                 // 495 / (1.29579 - 0.35004 * log10(waist + hip - neck) + 0.22100 * log10(height)) - 450
+                  if (this.waist + this.hip - this.neck <= 0) return;
+                 bf = 495 / (1.29579 - 0.35004 * Math.log10(this.waist + this.hip - this.neck) + 0.22100 * Math.log10(this.height)) - 450;
+             }
+
+             if (bf < 0) bf = 0;
+             this.bodyFat = bf.toFixed(1);
+             this.updateCategory(bf);
+        },
+
+        updateCategory(bf) {
             let cat = '';
-            if (isMale) {
+            if (this.gender === 'male') {
                 if (bf < 6) cat = 'Essential Fat';
-                else if (bf < 14) cat = 'Athletes';
+                else if (bf < 14) cat = 'Athlete';
                 else if (bf < 18) cat = 'Fitness';
                 else if (bf < 25) cat = 'Average';
                 else cat = 'Obese';
             } else {
                 if (bf < 14) cat = 'Essential Fat';
-                else if (bf < 21) cat = 'Athletes';
+                else if (bf < 21) cat = 'Athlete';
                 else if (bf < 25) cat = 'Fitness';
                 else if (bf < 32) cat = 'Average';
                 else cat = 'Obese';
             }
-            
-            document.getElementById('bfCategory').textContent = cat;
-            document.getElementById('resultBox').style.display = 'block';
+            this.category = cat;
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+
+    }));
+});
+</script>

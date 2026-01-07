@@ -1,102 +1,124 @@
-<?php $page_title = $title ?? 'BMR Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/theme.css'); ?>?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/calculator-platform.css'); ?>?v=<?php echo time(); ?>">
-    <style>
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 800px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #FF512F 0%, #DD2476 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.1rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 12px; }
-        .calc-btn { background: linear-gradient(135deg, #FF512F 0%, #DD2476 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: #f8f9fa; border-radius: 12px; padding: 25px; margin-top: 30px; text-align: center; }
-        .result-val { font-size: 2.5rem; font-weight: 700; color: #DD2476; margin: 10px 0; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: var(--text-primary); text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="layout-wrapper">
-        <?php include __DIR__ . '/../../partials/calculator_sidebar.php'; ?>
-        
-        <main class="main-content">
-            <div class="container-fluid">
-                <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Dashboard</a>
-                <div class="calc-card">
-                    <div class="calc-header">
-                        <i class="bi bi-fire" style="font-size: 2.5rem;"></i>
-                        <h2>BMR Calculator</h2>
-                        <p class="mb-0 mt-2">Basal Metabolic Rate</p>
+<?php
+// themes/default/views/calculators/health/bmr.php
+// PREMIUM BMR CALCULATOR
+?>
+
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="bmrCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute bottom-[20%] left-[10%] w-[500px] h-[500px] bg-rose-500/10 rounded-full blur-[100px] animate-float"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">BMR Calculator</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-fire"></i>
+                <span>energy</span>
+            </div>
+            <h1 class="calc-title">Basal Metabolic <span class="text-gradient">Rate</span></h1>
+            <p class="calc-subtitle">Calculate the number of calories your body needs to accomplish its most basic life-sustaining functions.</p>
+        </div>
+
+        <div class="calc-grid max-w-3xl mx-auto">
+            
+            <div class="calc-card animate-scale-in">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <!-- Column 1 -->
+                    <div class="space-y-6">
+                        <div>
+                            <label class="calc-label">Gender</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button @click="gender = 'male'; calculate()" 
+                                    :class="gender === 'male' ? 'bg-primary text-white border-primary' : 'bg-white/5 text-gray-400 border-white/10 hover:border-primary/50'"
+                                    class="p-3 rounded-lg border transition-all flex items-center justify-center gap-2 font-bold">
+                                    <i class="fas fa-mars"></i> Male
+                                </button>
+                                <button @click="gender = 'female'; calculate()" 
+                                    :class="gender === 'female' ? 'bg-pink-500 text-white border-pink-500' : 'bg-white/5 text-gray-400 border-white/10 hover:border-pink-500/50'"
+                                    class="p-3 rounded-lg border transition-all flex items-center justify-center gap-2 font-bold">
+                                    <i class="fas fa-venus"></i> Female
+                                </button>
+                            </div>
+                        </div>
+
+                         <div>
+                            <label class="calc-label">Age</label>
+                            <input type="number" x-model.number="age" @input="calculate()" class="calc-input text-center" placeholder="25">
+                        </div>
                     </div>
-                    <div class="calc-body">
-                        <!-- Content -->
-                        <div class="row g-3 justify-content-center mb-3">
-                             <div class="col-md-6">
-                                 <div class="btn-group w-100" role="group">
-                                    <input type="radio" class="btn-check" name="gender" id="male" checked>
-                                    <label class="btn btn-outline-danger" for="male">Male</label>
-                                    <input type="radio" class="btn-check" name="gender" id="female">
-                                    <label class="btn btn-outline-danger" for="female">Female</label>
-                                </div>
-                            </div>
+
+                    <!-- Column 2 -->
+                    <div class="space-y-6">
+                         <div>
+                            <label class="calc-label">Height (cm)</label>
+                            <input type="number" x-model.number="height" @input="calculate()" class="calc-input text-center" placeholder="175">
                         </div>
 
-                        <div class="row g-4 justify-content-center">
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold text-dark">Height (cm)</label>
-                                <input type="number" id="height" class="form-control calc-input" value="175">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold text-dark">Weight (kg)</label>
-                                <input type="number" id="weight" class="form-control calc-input" value="70">
-                            </div>
-                             <div class="col-md-4">
-                                <label class="form-label fw-bold text-dark">Age</label>
-                                <input type="number" id="age" class="form-control calc-input" value="25">
-                            </div>
-                        </div>
-
-                        <button class="calc-btn mt-4 w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Calculate BMR</button>
-
-                        <div class="result-box" id="resultBox" style="display:none;">
-                            <div class="text-muted text-uppercase fw-bold small">Your BMR</div>
-                            <div class="result-val" id="bmrValue">1,700</div>
-                            <div class="text-muted">Calories / Day</div>
+                        <div>
+                            <label class="calc-label">Weight (kg)</label>
+                            <input type="number" x-model.number="weight" @input="calculate()" class="calc-input text-center" placeholder="70">
                         </div>
                     </div>
                 </div>
+
+                <!-- Result -->
+                <div class="mt-8 animate-slide-up">
+                    <div class="bg-gradient-to-br from-gray-800 to-black rounded-2xl p-8 border border-white/10 relative overflow-hidden text-center">
+                         <div class="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[50px] rounded-full pointer-events-none"></div>
+                         
+                         <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Your Daily BMR</h3>
+                         
+                         <div class="flex items-end justify-center gap-2 mb-2">
+                             <span class="text-6xl font-black text-white" x-text="bmr.toLocaleString()"></span>
+                             <span class="text-xl text-primary font-bold mb-3">kcal</span>
+                         </div>
+                         
+                         <p class="text-xs text-gray-500">Calories burned at complete rest</p>
+                    </div>
+                </div>
+
             </div>
-        </main>
+
+        </div>
     </div>
-    <script>
-        function calculate() {
-            const isMale = document.getElementById('male').checked;
-            const age = parseFloat(document.getElementById('age').value);
-            const height = parseFloat(document.getElementById('height').value);
-            const weight = parseFloat(document.getElementById('weight').value);
+</div>
 
-            if (!age || !height || !weight) return;
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('bmrCalculator', () => ({
+        gender: 'male',
+        age: 25,
+        height: 175,
+        weight: 70,
+        bmr: 0,
 
-            // Mifflin-St Jeor Equation
-            let bmr = (10 * weight) + (6.25 * height) - (5 * age);
-            
-            if (isMale) {
-                bmr += 5;
-            } else {
-                bmr -= 161;
-            }
+        init() {
+            this.calculate();
+        },
 
-            document.getElementById('bmrValue').textContent = Math.round(bmr).toLocaleString();
-            document.getElementById('resultBox').style.display = 'block';
+        calculate() {
+             if (!this.age || !this.height || !this.weight) return;
+
+             // Mifflin-St Jeor
+             let val = (10 * this.weight) + (6.25 * this.height) - (5 * this.age);
+             
+             if (this.gender === 'male') val += 5;
+             else val -= 161;
+
+             this.bmr = Math.round(val);
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

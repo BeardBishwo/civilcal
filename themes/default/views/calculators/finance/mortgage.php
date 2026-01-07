@@ -1,90 +1,192 @@
-<?php $page_title = $title ?? 'Mortgage Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/floating-calculator.css'); ?>">
-    <style>
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 40px 0; }
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 700px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.3rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px; }
-        .calc-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-radius: 12px; padding: 30px; margin-top: 30px; }
-        .result-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.2); }
-        .result-value { font-size: 1.5rem; font-weight: 700; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Back</a>
-        <div class="calc-card">
-            <div class="calc-header">
-                <i class="bi bi-house-door" style="font-size: 2.5rem;"></i>
-                <h2>Mortgage Calculator</h2>
-                <p class="mb-0 mt-2">Calculate monthly mortgage payments</p>
+<?php
+// themes/default/views/calculators/finance/mortgage.php
+// PREMIUM MORTGAGE CALCULATOR
+?>
+
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="mortgageCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[20%] left-[20%] w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[120px] animate-float"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Mortgage Calculator</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-home"></i>
+                <span>REAL ESTATE</span>
             </div>
-            <div class="calc-body">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Home Price ($)</label>
-                    <input type="number" id="principal" class="form-control calc-input" value="300000" step="any">
+            <h1 class="calc-title">Mortgage <span class="text-gradient">Planner</span></h1>
+            <p class="calc-subtitle">Estimate your monthly mortgage payments including tax and insurance.</p>
+        </div>
+
+        <div class="calc-grid max-w-5xl mx-auto">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                
+                <!-- Inputs -->
+                <div class="calc-card animate-scale-in">
+                    <h3 class="text-lg font-bold text-white mb-6">Property Details</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="calc-label">Home Price ($)</label>
+                            <input type="number" x-model.number="price" @input="calculate()" class="calc-input text-2xl" placeholder="300000">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="calc-label">Down Payment ($)</label>
+                                <input type="number" x-model.number="downPayment" @input="calculate()" class="calc-input" placeholder="60000">
+                            </div>
+                            <div>
+                                <label class="calc-label">Down Payment (%)</label>
+                                <div class="relative">
+                                     <input type="number" :value="((downPayment/price)*100).toFixed(1)" @input="downPayment = price * ($el.value/100); calculate()" class="calc-input text-center" placeholder="20">
+                                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                         <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="calc-label">Interest Rate (%)</label>
+                                <input type="number" x-model.number="rate" @input="calculate()" class="calc-input text-center" placeholder="3.5">
+                            </div>
+                            <div>
+                                <label class="calc-label">Term (Years)</label>
+                                <input type="number" x-model.number="term" @input="calculate()" class="calc-input text-center" placeholder="30">
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-white/10">
+                            <h4 class="text-sm font-bold text-gray-400 mb-4 uppercase">Allowances (Monthly)</h4>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label class="calc-label text-xs">Prop. Tax</label>
+                                    <input type="number" x-model.number="tax" @input="calculate()" class="calc-input text-sm p-2" placeholder="250">
+                                </div>
+                                <div>
+                                    <label class="calc-label text-xs">Insurance</label>
+                                    <input type="number" x-model.number="insurance" @input="calculate()" class="calc-input text-sm p-2" placeholder="100">
+                                </div>
+                                <div>
+                                    <label class="calc-label text-xs">HOA</label>
+                                    <input type="number" x-model.number="hoa" @input="calculate()" class="calc-input text-sm p-2" placeholder="50">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Interest Rate (%)</label>
-                        <input type="number" id="rate" class="form-control calc-input" value="3.5" step="any">
+
+                <!-- Results -->
+                <div class="flex flex-col gap-6 animate-slide-up">
+                    
+                    <div class="glass-card p-8 border-l-8 border-l-primary flex flex-col justify-center items-center text-center relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-8 opacity-5">
+                            <i class="fas fa-money-check-alt text-9xl text-white"></i>
+                        </div>
+                        <div class="text-sm text-gray-400 uppercase tracking-widest mb-2 font-bold z-10">Monthly Payment</div>
+                        <div class="text-6xl font-black text-white z-10">$<span x-text="fmt(totalMonthly)"></span></div>
+                        
+                        <div class="mt-6 w-full space-y-2 text-sm z-10">
+                             <div class="flex justify-between text-gray-400">
+                                <span>Principal & Interest</span>
+                                <span class="text-white">$<span x-text="fmt(pi)"></span></span>
+                            </div>
+                             <div class="flex justify-between text-gray-400">
+                                <span>Tax & Insurance & HOA</span>
+                                <span class="text-white">$<span x-text="fmt(extras)"></span></span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Loan Term (years)</label>
-                        <input type="number" id="years" class="form-control calc-input" value="30">
+
+                    <div class="p-6 rounded-2xl bg-white/5 border border-white/10 grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase">Loan Amount</div>
+                            <div class="text-xl font-bold text-white">$<span x-text="fmt(loanAmount)"></span></div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase">Total Interest</div>
+                            <div class="text-xl font-bold text-accent">$<span x-text="fmt(totalInterest)"></span></div>
+                        </div>
+                        <div class="col-span-2 pt-2 border-t border-white/5">
+                            <div class="text-xs text-gray-500 uppercase">Total Cost of Loan</div>
+                            <div class="text-2xl font-bold text-white">$<span x-text="fmt(totalCost)"></span></div>
+                        </div>
                     </div>
+
                 </div>
-                <button class="calc-btn mt-4 w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Calculate</button>
-                <div class="result-box" id="resultBox" style="display:none;">
-                    <div class="result-item">
-                        <span>Monthly Payment:</span>
-                        <span class="result-value">$<span id="monthly">0</span></span>
-                    </div>
-                    <div class="result-item">
-                        <span>Total Payment:</span>
-                        <span class="result-value">$<span id="total">0</span></span>
-                    </div>
-                    <div class="result-item">
-                        <span>Total Interest:</span>
-                        <span class="result-value">$<span id="interest">0</span></span>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>
-    <script>
-        const appBase = "<?php echo rtrim(app_base_url(), '/'); ?>";
-        function calculate() {
-            const principal = document.getElementById('principal').value;
-            const rate = document.getElementById('rate').value;
-            const years = document.getElementById('years').value;
-            fetch(appBase + '/calculator/api/mortgage', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: `principal=${principal}&rate=${rate}&years=${years}`
-            })
-            .then(r => r.json())
-            .then(data => {
-                document.getElementById('resultBox').style.display = 'block';
-                document.getElementById('monthly').textContent = data.monthly.toLocaleString();
-                document.getElementById('total').textContent = data.total.toLocaleString();
-                document.getElementById('interest').textContent = data.interest.toLocaleString();
-            });
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('mortgageCalculator', () => ({
+        price: 300000,
+        downPayment: 60000,
+        rate: 3.5,
+        term: 30,
+        tax: 250,
+        insurance: 100,
+        hoa: 0,
+        
+        pi: 0,
+        extras: 0,
+        totalMonthly: 0,
+        loanAmount: 0,
+        totalInterest: 0,
+        totalCost: 0,
+
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+             this.loanAmount = this.price - this.downPayment;
+             if (this.loanAmount < 0) this.loanAmount = 0;
+
+             const r = this.rate / 100 / 12;
+             const n = this.term * 12;
+
+             // P & I
+             if (r === 0) {
+                 this.pi = this.loanAmount / n;
+             } else {
+                 this.pi = this.loanAmount * ( (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1) );
+             }
+
+             if (!isFinite(this.pi)) this.pi = 0;
+
+             // Extras
+             this.extras = (this.tax || 0) + (this.insurance || 0) + (this.hoa || 0);
+
+             this.totalMonthly = this.pi + this.extras;
+
+             // Totals
+             const totalPayments = this.pi * n;
+             this.totalInterest = totalPayments - this.loanAmount;
+             this.totalCost = this.price + this.totalInterest + (this.extras * n); // Approx total over life including taxes? Maybe just loan cost.
+             // Usually "Total Cost of Loan" implies Principal + Interest. Let's stick to that for clarity + Downpayment maybe?
+             // Let's display Total Principal + Interest paid.
+             this.totalCost = totalPayments + this.downPayment; 
+        },
+
+        fmt(n) {
+            return n ? n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00';
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

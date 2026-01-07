@@ -1,147 +1,174 @@
-<?php $page_title = $title ?? 'Gas Laws Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/theme.css'); ?>?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/calculator-platform.css'); ?>?v=<?php echo time(); ?>">
-    <style>
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 800px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #7f8c8d 0%, #2c3e50 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.1rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 12px; }
-        .calc-btn { background: linear-gradient(135deg, #7f8c8d 0%, #2c3e50 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: #eceff1; border-radius: 12px; padding: 25px; margin-top: 30px; text-align: center; border: 1px solid #cfd8dc; }
-        .result-val { font-size: 2.5rem; font-weight: 700; color: #37474f; margin: 10px 0; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: var(--text-primary); text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="layout-wrapper">
-        <?php include __DIR__ . '/../../partials/calculator_sidebar.php'; ?>
-        
-        <main class="main-content">
-            <div class="container-fluid">
-                <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Dashboard</a>
-                <div class="calc-card">
-                    <div class="calc-header">
-                        <i class="bi bi-cloud-haze2" style="font-size: 2.5rem;"></i>
-                        <h2>Gas Laws Calculator</h2>
-                        <p class="mb-0 mt-2">Boyle's, Charles's, and Ideal Gas Laws</p>
-                    </div>
-                    <div class="calc-body">
-                        <ul class="nav nav-pills nav-fill mb-4" id="pills-tab" role="tablist">
-                            <li class="nav-item">
-                                <button class="nav-link active fw-bold border" id="boyle-tab" data-bs-toggle="pill" data-bs-target="#boyle-content">Boyle's Law</button>
-                            </li>
-                            <li class="nav-item">
-                                <button class="nav-link fw-bold border mx-2" id="charles-tab" data-bs-toggle="pill" data-bs-target="#charles-content">Charles's Law</button>
-                            </li>
-                            <li class="nav-item">
-                                <button class="nav-link fw-bold border" id="ideal-tab" data-bs-toggle="pill" data-bs-target="#ideal-content">Ideal Gas</button>
-                            </li>
-                        </ul>
-                        
-                        <div class="tab-content" id="pills-tabContent">
-                            <!-- Boyle's Law: P1V1 = P2V2 -->
-                            <div class="tab-pane fade show active" id="boyle-content">
-                                <h5 class="text-center mb-3">P₁V₁ = P₂V₂</h5>
-                                <div class="row g-3">
-                                    <div class="col-6"><label class="fw-bold">P1</label><input type="number" id="b_p1" class="form-control calc-input" placeholder="Initial Pressure"></div>
-                                    <div class="col-6"><label class="fw-bold">V1</label><input type="number" id="b_v1" class="form-control calc-input" placeholder="Initial Volume"></div>
-                                    <div class="col-6"><label class="fw-bold">P2</label><input type="number" id="b_p2" class="form-control calc-input" placeholder="Final Pressure"></div>
-                                    <div class="col-6"><label class="fw-bold">V2</label><input type="number" id="b_v2" class="form-control calc-input" placeholder="Final Volume (Leave empty)"></div>
-                                </div>
-                                <button class="calc-btn mt-4 w-100" onclick="calcBoyle()">Calculate Missing Value</button>
-                            </div>
+<?php
+// themes/default/views/calculators/chemistry/gas_laws.php
+// PREMIUM GAS LAWS CALCULATOR
+?>
 
-                            <!-- Charles's Law: V1/T1 = V2/T2 -->
-                            <div class="tab-pane fade" id="charles-content">
-                                <h5 class="text-center mb-3">V₁/T₁ = V₂/T₂</h5>
-                                 <div class="row g-3">
-                                    <div class="col-6"><label class="fw-bold">V1</label><input type="number" id="c_v1" class="form-control calc-input" placeholder="Initial Volume"></div>
-                                    <div class="col-6"><label class="fw-bold">T1 (K)</label><input type="number" id="c_t1" class="form-control calc-input" placeholder="Initial Temp (K)"></div>
-                                    <div class="col-6"><label class="fw-bold">V2</label><input type="number" id="c_v2" class="form-control calc-input" placeholder="Final Volume"></div>
-                                    <div class="col-6"><label class="fw-bold">T2 (K)</label><input type="number" id="c_t2" class="form-control calc-input" placeholder="Final Temp (K)"></div>
-                                </div>
-                                <button class="calc-btn mt-4 w-100" onclick="calcCharles()">Calculate Missing Value</button>
-                            </div>
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-                            <!-- Ideal Gas Law: PV = nRT -->
-                            <div class="tab-pane fade" id="ideal-content">
-                                <h5 class="text-center mb-3">PV = nRT</h5>
-                                 <div class="row g-3">
-                                    <div class="col-6"><label class="fw-bold">Pressure (P)</label><input type="number" id="i_p" class="form-control calc-input" placeholder="atm"></div>
-                                    <div class="col-6"><label class="fw-bold">Volume (V)</label><input type="number" id="i_v" class="form-control calc-input" placeholder="L"></div>
-                                    <div class="col-6"><label class="fw-bold">Moles (n)</label><input type="number" id="i_n" class="form-control calc-input" placeholder="mol"></div>
-                                    <div class="col-6"><label class="fw-bold">Temp (T)</label><input type="number" id="i_t" class="form-control calc-input" placeholder="K"></div>
-                                    <div class="col-12 text-center text-muted small">R = 0.0821 L·atm/(mol·K)</div>
-                                </div>
-                                <button class="calc-btn mt-4 w-100" onclick="calcIdeal()">Calculate Missing Value</button>
-                            </div>
-                        </div>
-
-                        <div class="result-box" id="resultBox" style="display:none;">
-                            <div class="text-muted text-uppercase fw-bold small">Result</div>
-                            <div class="result-val" id="resultValue">0</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="gasLawsCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute bottom-[20%] right-[10%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] animate-pulse-glow"></div>
     </div>
-    <script>
-        function showRes(val) {
-            document.getElementById('resultValue').textContent = parseFloat(val).toFixed(4).replace(/\.?0+$/, "");
-            document.getElementById('resultBox').style.display = 'block';
-        }
 
-        function calcBoyle() {
-            const p1 = document.getElementById('b_p1').value;
-            const v1 = document.getElementById('b_v1').value;
-            const p2 = document.getElementById('b_p2').value;
-            const v2 = document.getElementById('b_v2').value;
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Chemistry</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-cloud"></i>
+                <span>THERMODYNAMICS</span>
+            </div>
+            <h1 class="calc-title">Gas Laws <span class="text-gradient">Calculator</span></h1>
+            <p class="calc-subtitle">Solve problems using Boyle's, Charles's, and Ideal Gas Laws.</p>
+        </div>
+
+        <div class="calc-grid max-w-4xl mx-auto">
             
-            if (p1 && v1 && p2 && !v2) showRes((p1 * v1) / p2);
-            else if (p1 && v1 && !p2 && v2) showRes((p1 * v1) / v2);
-            else if (p1 && !v1 && p2 && v2) showRes((p2 * v2) / p1);
-            else if (!p1 && v1 && p2 && v2) showRes((p2 * v2) / v1);
-            else alert("Fill exactly 3 fields");
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Inputs -->
+                <div class="calc-card animate-scale-in">
+                    
+                     <div class="mb-6">
+                        <label class="calc-label text-center mb-4">Select Law:</label>
+                        <div class="flex gap-2 bg-white/5 p-1 rounded-xl border border-white/10 overflow-x-auto">
+                            <button @click="mode = 'boyle'; clear()" :class="mode === 'boyle' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="flex-1 px-4 py-2 text-sm rounded-lg transition-all font-bold whitespace-nowrap">Boyle's</button>
+                            <button @click="mode = 'charles'; clear()" :class="mode === 'charles' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="flex-1 px-4 py-2 text-sm rounded-lg transition-all font-bold whitespace-nowrap">Charles's</button>
+                            <button @click="mode = 'ideal'; clear()" :class="mode === 'ideal' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="flex-1 px-4 py-2 text-sm rounded-lg transition-all font-bold whitespace-nowrap">Ideal Gas</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        
+                        <!-- Boyle's: P1V1 = P2V2 -->
+                        <div x-show="mode === 'boyle'" x-transition class="space-y-4">
+                            <div class="text-center text-xs text-gray-400 font-mono mb-2 border-b border-white/5 pb-2">Formula: P₁V₁ = P₂V₂</div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="calc-label">P₁ (Initial Pressure)</label><input type="number" x-model.number="boyle.p1" @input="calculate()" class="calc-input"></div>
+                                <div><label class="calc-label">V₁ (Initial Volume)</label><input type="number" x-model.number="boyle.v1" @input="calculate()" class="calc-input"></div>
+                                <div><label class="calc-label">P₂ (Final Pressure)</label><input type="number" x-model.number="boyle.p2" @input="calculate()" class="calc-input"></div>
+                                <div><label class="calc-label">V₂ (Final Volume)</label><input type="number" x-model.number="boyle.v2" @input="calculate()" class="calc-input"></div>
+                            </div>
+                            <p class="text-[10px] text-gray-500 italic mt-2 text-center">Leave one field empty to calculate it.</p>
+                        </div>
+
+                        <!-- Charles's: V1/T1 = V2/T2 -->
+                        <div x-show="mode === 'charles'" x-transition class="space-y-4">
+                            <div class="text-center text-xs text-gray-400 font-mono mb-2 border-b border-white/5 pb-2">Formula: V₁/T₁ = V₂/T₂</div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="calc-label">V₁ (Initial Vol)</label><input type="number" x-model.number="charles.v1" @input="calculate()" class="calc-input"></div>
+                                <div><label class="calc-label">T₁ (Init Temp K)</label><input type="number" x-model.number="charles.t1" @input="calculate()" class="calc-input"></div>
+                                <div><label class="calc-label">V₂ (Final Vol)</label><input type="number" x-model.number="charles.v2" @input="calculate()" class="calc-input"></div>
+                                <div><label class="calc-label">T₂ (Final Temp K)</label><input type="number" x-model.number="charles.t2" @input="calculate()" class="calc-input"></div>
+                            </div>
+                             <p class="text-[10px] text-gray-500 italic mt-2 text-center">Leave one field empty to calculate it.</p>
+                        </div>
+
+                         <!-- Ideal: PV=nRT -->
+                        <div x-show="mode === 'ideal'" x-transition class="space-y-4">
+                            <div class="text-center text-xs text-gray-400 font-mono mb-2 border-b border-white/5 pb-2">Formula: PV = nRT</div>
+                             <div class="grid grid-cols-2 gap-4">
+                                <div><label class="calc-label">Pressure (P) atm</label><input type="number" x-model.number="ideal.p" @input="calculate()" class="calc-input"></div>
+                                <div><label class="calc-label">Volume (V) L</label><input type="number" x-model.number="ideal.v" @input="calculate()" class="calc-input"></div>
+                                <div><label class="calc-label">Moles (n)</label><input type="number" x-model.number="ideal.n" @input="calculate()" class="calc-input"></div>
+                                <div><label class="calc-label">Temp (T) K</label><input type="number" x-model.number="ideal.t" @input="calculate()" class="calc-input"></div>
+                            </div>
+                             <p class="text-[10px] text-gray-500 italic mt-2 text-center">Leave one field empty. R = 0.0821 L·atm/(mol·K)</p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Result -->
+                <div class="calc-card animate-slide-up flex flex-col justify-center items-center text-center bg-gradient-to-br from-cyan-900/20 to-black border border-cyan-500/20">
+                    
+                    <div class="text-sm text-gray-400 uppercase tracking-widest mb-4 font-bold" x-text="resultLabel"></div>
+                    
+                    <div class="flex items-baseline gap-2 mb-2">
+                        <span class="text-6xl font-black text-white" x-text="result"></span>
+                    </div>
+                     <div class="text-xl font-bold text-cyan-400 mb-8" x-text="unit"></div>
+                    
+                    <div class="w-full bg-white/5 p-4 rounded-xl border border-white/5">
+                        <div class="flex items-start gap-3 text-left">
+                            <i class="fas fa-info-circle text-cyan-400 mt-1"></i>
+                            <div class="text-xs text-gray-400 leading-relaxed">
+                                <span x-show="mode === 'boyle'">Boyle's Law states that pressure and volume are inversely proportional at constant temperature.</span>
+                                <span x-show="mode === 'charles'">Charles's Law states that volume is directly proportional to temperature (in Kelvin) at constant pressure.</span>
+                                <span x-show="mode === 'ideal'">The Ideal Gas Law relates the macroscopic properties of ideal gases.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('gasLawsCalculator', () => ({
+        mode: 'boyle',
+        boyle: { p1: null, v1: null, p2: null, v2: null },
+        charles: { v1: null, t1: null, v2: null, t2: null },
+        ideal: { p: null, v: null, n: null, t: null },
+        
+        result: '---',
+        unit: '',
+        resultLabel: 'Calculated Value',
+
+        clear() {
+            this.boyle = { p1: null, v1: null, p2: null, v2: null };
+            this.charles = { v1: null, t1: null, v2: null, t2: null };
+            this.ideal = { p: null, v: null, n: null, t: null };
+            this.result = '---';
+            this.unit = '';
+        },
+
+        calculate() {
+             let res = null;
+             
+             if (this.mode === 'boyle') {
+                 const { p1, v1, p2, v2 } = this.boyle;
+                 if (p1 && v1 && p2 && !v2) { res = (p1 * v1) / p2; this.resultLabel = 'Final Volume (V₂)'; this.unit = 'Units of V₁'; }
+                 else if (p1 && v1 && !p2 && v2) { res = (p1 * v1) / v2; this.resultLabel = 'Final Pressure (P₂)'; this.unit = 'Units of P₁'; }
+                 else if (p1 && !v1 && p2 && v2) { res = (p2 * v2) / p1; this.resultLabel = 'Initial Volume (V₁)'; this.unit = 'Units of V₂'; }
+                 else if (!p1 && v1 && p2 && v2) { res = (p2 * v2) / v1; this.resultLabel = 'Initial Pressure (P₁)'; this.unit = 'Units of P₂'; }
+             }
+             else if (this.mode === 'charles') {
+                 const { v1, t1, v2, t2 } = this.charles;
+                 if (v1 && t1 && v2 && !t2) { res = (v2 * t1) / v1; this.resultLabel = 'Final Temp (T₂)'; this.unit = 'K'; }
+                 else if (v1 && t1 && !v2 && t2) { res = (v1 * t2) / t1; this.resultLabel = 'Final Volume (V₂)'; this.unit = 'Units of V₁'; }
+                 else if (v1 && !t1 && v2 && t2) { res = (v1 * t2) / v2; this.resultLabel = 'Initial Temp (T₁)'; this.unit = 'K'; }
+                 else if (!v1 && t1 && v2 && t2) { res = (v2 * t1) / t2; this.resultLabel = 'Initial Volume (V₁)'; this.unit = 'Units of V₂'; }
+             }
+             else if (this.mode === 'ideal') {
+                 const { p, v, n, t } = this.ideal;
+                 const R = 0.0821;
+                 if (!p && v && n && t) { res = (n * R * t) / v; this.resultLabel = 'Pressure (P)'; this.unit = 'atm'; }
+                 else if (p && !v && n && t) { res = (n * R * t) / p; this.resultLabel = 'Volume (V)'; this.unit = 'L'; }
+                 else if (p && v && !n && t) { res = (p * v) / (R * t); this.resultLabel = 'Moles (n)'; this.unit = 'mol'; }
+                 else if (p && v && n && !t) { res = (p * v) / (n * R); this.resultLabel = 'Temp (T)'; this.unit = 'K'; }
+             }
+
+             if (res !== null) {
+                 this.result = Number.isInteger(res) ? res : res.toFixed(4);
+             } else {
+                 this.result = '---';
+                 this.unit = '';
+             }
         }
-
-        function calcCharles() {
-            const v1 = document.getElementById('c_v1').value;
-            const t1 = document.getElementById('c_t1').value;
-            const v2 = document.getElementById('c_v2').value;
-            const t2 = document.getElementById('c_t2').value;
-
-            if (v1 && t1 && v2 && !t2) showRes((v2 * t1) / v1);
-            else if (v1 && t1 && !v2 && t2) showRes((v1 * t2) / t1);
-            else if (v1 && !t1 && v2 && t2) showRes((v1 * t2) / v2);
-            else if (!v1 && t1 && v2 && t2) showRes((v2 * t1) / t2);
-            else alert("Fill exactly 3 fields");
-        }
-
-        function calcIdeal() {
-            const P = document.getElementById('i_p').value;
-            const V = document.getElementById('i_v').value;
-            const n = document.getElementById('i_n').value;
-            const T = document.getElementById('i_t').value;
-            const R = 0.0821;
-
-            if (!P && V && n && T) showRes((n * R * T) / V); // Find P
-            else if (P && !V && n && T) showRes((n * R * T) / P); // Find V
-            else if (P && V && !n && T) showRes((P * V) / (R * T)); // Find n
-            else if (P && V && n && !T) showRes((P * V) / (n * R)); // Find T
-            else alert("Fill exactly 3 fields");
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

@@ -1,80 +1,121 @@
-<?php $page_title = $title ?? 'GCD/LCM Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/floating-calculator.css'); ?>">
-    <style>
-        body { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); min-height: 100vh; padding: 40px 0; }
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 700px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.3rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px; }
-        .calc-btn { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; padding: 30px; margin-top: 30px; }
-        .result-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.2); }
-        .result-value { font-size: 2rem; font-weight: 700; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Back</a>
-        <div class="calc-card">
-            <div class="calc-header">
-                <i class="bi bi-diagram-3" style="font-size: 2.5rem;"></i>
-                <h2>GCD & LCM Calculator</h2>
-                <p class="mb-0 mt-2">Greatest Common Divisor & Least Common Multiple</p>
+<?php
+// themes/default/views/calculators/math/gcd_lcm.php
+// PREMIUM GCD/LCM CALCULATOR
+?>
+
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="gcdLcmCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[20%] left-[20%] w-[500px] h-[500px] bg-sky-500/10 rounded-full blur-[120px] animate-pulse-glow"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">GCD & LCM</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-project-diagram"></i>
+                <span>NUMBER THEORY</span>
             </div>
-            <div class="calc-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">First Number</label>
-                        <input type="number" id="num1" class="form-control calc-input" value="12">
+            <h1 class="calc-title">GCD & <span class="text-gradient">LCM</span></h1>
+            <p class="calc-subtitle">Calculate the Greatest Common Divisor and Least Common Multiple of two or more numbers.</p>
+        </div>
+
+        <div class="calc-grid max-w-4xl mx-auto">
+            
+            <div class="calc-card animate-scale-in">
+                <h3 class="text-lg font-bold text-white mb-6">Enter Numbers</h3>
+                
+                <div class="flex flex-col md:flex-row gap-4 mb-8">
+                     <div class="flex-1">
+                        <label class="calc-label">Number A</label>
+                        <input type="number" x-model.number="a" @input="calculate()" class="calc-input text-2xl font-bold" placeholder="12">
+                     </div>
+                     <div class="flex-1">
+                        <label class="calc-label">Number B</label>
+                        <input type="number" x-model.number="b" @input="calculate()" class="calc-input text-2xl font-bold" placeholder="18">
+                     </div>
+                </div>
+
+                <!-- Results -->
+                <div x-show="a && b" class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-up">
+                    
+                    <!-- GCD Result -->
+                    <div class="glass-card p-6 text-center border-l-4 border-l-primary relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-125 transition duration-500">
+                            <i class="fas fa-divide text-6xl"></i>
+                        </div>
+                        <div class="text-xs text-gray-400 uppercase tracking-widest mb-2 font-bold z-10 relative">Greatest Common Divisor</div>
+                        <div class="text-5xl font-mono font-black text-white z-10 relative" x-text="gcdVal">0</div>
+                        <div class="mt-2 text-xs text-gray-500">Highest number that divides both</div>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Second Number</label>
-                        <input type="number" id="num2" class="form-control calc-input" value="18">
+
+                    <!-- LCM Result -->
+                    <div class="glass-card p-6 text-center border-l-4 border-l-secondary relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-125 transition duration-500">
+                            <i class="fas fa-layer-group text-6xl"></i>
+                        </div>
+                        <div class="text-xs text-gray-400 uppercase tracking-widest mb-2 font-bold z-10 relative">Least Common Multiple</div>
+                        <div class="text-5xl font-mono font-black text-white z-10 relative" x-text="lcmVal">0</div>
+                        <div class="mt-2 text-xs text-gray-500">Smallest number divisible by both</div>
+                    </div>
+
+                </div>
+
+                <!-- Steps / Logic -->
+                <div x-show="a && b" class="mt-8 pt-6 border-t border-white/10" x-transition>
+                    <h4 class="text-sm font-bold text-gray-300 mb-2">Relationship</h4>
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/10 text-center font-mono text-gray-400 text-sm">
+                        <span x-text="a"></span> × <span x-text="b"></span> = GCD(<span x-text="gcdVal"></span>) × LCM(<span x-text="lcmVal"></span>) = <span x-text="a*b"></span>
                     </div>
                 </div>
-                <button class="calc-btn mt-4 w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Calculate</button>
-                <div class="result-box" id="resultBox" style="display:none;">
-                    <div class="result-item">
-                        <span>GCD (Greatest Common Divisor):</span>
-                        <span class="result-value" id="gcd">0</span>
-                    </div>
-                    <div class="result-item" style="border:none;">
-                        <span>LCM (Least Common Multiple):</span>
-                        <span class="result-value" id="lcm">0</span>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>
-    <script>
-        const appBase = "<?php echo rtrim(app_base_url(), '/'); ?>";
-        function calculate() {
-            const num1 = document.getElementById('num1').value;
-            const num2 = document.getElementById('num2').value;
-            fetch(appBase + '/calculator/api/gcd-lcm', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: `num1=${num1}&num2=${num2}`
-            })
-            .then(r => r.json())
-            .then(data => {
-                document.getElementById('resultBox').style.display = 'block';
-                document.getElementById('gcd').textContent = data.gcd;
-                document.getElementById('lcm').textContent = data.lcm;
-            });
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('gcdLcmCalculator', () => ({
+        a: 12, b: 18,
+        gcdVal: 0,
+        lcmVal: 0,
+
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+            if (!this.a || !this.b) {
+                this.gcdVal = 0;
+                this.lcmVal = 0;
+                return;
+            }
+            
+            this.gcdVal = this.gcd(this.a, this.b);
+            this.lcmVal = Math.abs(this.a * this.b) / this.gcdVal;
+        },
+
+        gcd(x, y) {
+            x = Math.abs(x);
+            y = Math.abs(y);
+            while(y) {
+                var t = y;
+                y = x % y;
+                x = t;
+            }
+            return x;
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

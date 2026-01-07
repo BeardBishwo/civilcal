@@ -1,105 +1,163 @@
-<?php $page_title = $title ?? 'Age Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/floating-calculator.css'); ?>">
-    <style>
-        body { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); min-height: 100vh; padding: 40px 0; }
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 700px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.3rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px; }
-        .calc-btn { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; padding: 30px; text-align: center; margin-top: 30px; }
-        .age-display { font-size: 3rem; font-weight: 700; margin: 20px 0; }
-        .age-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
-        .age-item { text-align: center; }
-        .age-value { font-size: 2rem; font-weight: 700; }
-        .age-label { font-size: 0.9rem; opacity: 0.9; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Back</a>
-        <div class="calc-card">
-            <div class="calc-header">
-                <i class="bi bi-calendar-event" style="font-size: 2.5rem;"></i>
-                <h2>Age Calculator</h2>
-                <p class="mb-0 mt-2">Calculate your exact age</p>
+<?php
+// themes/default/views/calculators/math/age.php
+// PREMIUM AGE CALCULATOR
+?>
+
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="ageCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[20%] left-[10%] w-[500px] h-[500px] bg-pink-500/10 rounded-full blur-[120px] animate-float"></div>
+        <div class="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[120px] animate-float" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Age Calculator</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-hourglass-half"></i>
+                <span>DATE & TIME</span>
             </div>
-            <div class="calc-body">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Date of Birth</label>
-                    <input type="date" id="birthdate" class="form-control calc-input" value="1990-01-01">
+            <h1 class="calc-title">Age <span class="text-gradient">Chronometer</span></h1>
+            <p class="calc-subtitle">Calculate your precise age in years, months, and days.</p>
+        </div>
+
+        <div class="calc-grid max-w-4xl mx-auto">
+            
+            <div class="calc-card animate-scale-in">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <label class="calc-label">Date of Birth</label>
+                        <input type="date" x-model="dob" @change="calculate()" class="calc-input w-full">
+                    </div>
+                    <div>
+                        <label class="calc-label">Calculate Age At</label>
+                        <input type="date" x-model="target" @change="calculate()" class="calc-input w-full">
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Calculate Age On</label>
-                    <input type="date" id="targetDate" class="form-control calc-input">
-                </div>
-                <button class="calc-btn mt-4 w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Calculate Age</button>
-                <div class="result-box" id="resultBox" style="display:none;">
-                    <div>Your Age</div>
-                    <div class="age-display" id="ageDisplay">0 years</div>
-                    <div class="age-details">
-                        <div class="age-item">
-                            <div class="age-value" id="years">0</div>
-                            <div class="age-label">Years</div>
+
+                <!-- Main Display -->
+                <div x-show="age" class="text-center animate-slide-up">
+                    <div class="text-sm text-gray-400 uppercase tracking-widest mb-4">You are currently</div>
+                    
+                    <div class="grid grid-cols-3 gap-4 mb-8">
+                        <div class="glass-card p-4 border-b-4 border-primary">
+                            <div class="text-4xl md:text-5xl font-black text-white" x-text="age.years">0</div>
+                            <div class="text-xs text-gray-400 uppercase font-bold mt-1">Years</div>
                         </div>
-                        <div class="age-item">
-                            <div class="age-value" id="months">0</div>
-                            <div class="age-label">Months</div>
+                        <div class="glass-card p-4 border-b-4 border-secondary">
+                            <div class="text-4xl md:text-5xl font-black text-white" x-text="age.months">0</div>
+                            <div class="text-xs text-gray-400 uppercase font-bold mt-1">Months</div>
                         </div>
-                        <div class="age-item">
-                            <div class="age-value" id="days">0</div>
-                            <div class="age-label">Days</div>
+                        <div class="glass-card p-4 border-b-4 border-accent">
+                            <div class="text-4xl md:text-5xl font-black text-white" x-text="age.days">0</div>
+                            <div class="text-xs text-gray-400 uppercase font-bold mt-1">Days</div>
                         </div>
                     </div>
-                    <div class="mt-3">Total: <span id="totalDays">0</span> days</div>
+
+                    <!-- Extra Stats -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div class="p-3 bg-white/5 rounded-lg">
+                            <div class="text-xs text-gray-500 uppercase">Total Days</div>
+                            <div class="text-lg font-bold text-white font-mono" x-text="fmt(stats.totalDays)"></div>
+                        </div>
+                        <div class="p-3 bg-white/5 rounded-lg">
+                            <div class="text-xs text-gray-500 uppercase">Total Weeks</div>
+                            <div class="text-lg font-bold text-white font-mono" x-text="fmt(stats.totalWeeks)"></div>
+                        </div>
+                         <div class="p-3 bg-white/5 rounded-lg">
+                            <div class="text-xs text-gray-500 uppercase">Total Hours</div>
+                            <div class="text-lg font-bold text-white font-mono" x-text="fmt(stats.totalHours)"></div>
+                        </div>
+                        <div class="p-3 bg-white/5 rounded-lg">
+                            <div class="text-xs text-gray-500 uppercase">Next Birthday</div>
+                            <div class="text-lg font-bold text-primary font-mono" x-text="stats.nextBirthday"></div>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
-    <script>
-        // Set today's date as default
-        document.getElementById('targetDate').valueAsDate = new Date();
-        
-        function calculate() {
-            const birth = new Date(document.getElementById('birthdate').value);
-            const target = new Date(document.getElementById('targetDate').value);
-            
-            let years = target.getFullYear() - birth.getFullYear();
-            let months = target.getMonth() - birth.getMonth();
-            let days = target.getDate() - birth.getDate();
-            
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('ageCalculator', () => ({
+        dob: '2000-01-01',
+        target: new Date().toISOString().split('T')[0],
+        age: null,
+        stats: {},
+
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+            if (!this.dob || !this.target) return;
+
+            const d1 = new Date(this.dob);
+            const d2 = new Date(this.target);
+
+            if (d1 > d2) {
+                this.age = { years: 0, months: 0, days: 0 };
+                this.stats = { totalDays: 0, totalWeeks: 0, totalHours: 0, nextBirthday: "Invalid Date" };
+                return;
+            }
+
+            // Years, Months, Days logic
+            let years = d2.getFullYear() - d1.getFullYear();
+            let months = d2.getMonth() - d1.getMonth();
+            let days = d2.getDate() - d1.getDate();
+
             if (days < 0) {
                 months--;
-                const prevMonth = new Date(target.getFullYear(), target.getMonth(), 0);
+                // Days in previous month
+                const prevMonth = new Date(d2.getFullYear(), d2.getMonth(), 0);
                 days += prevMonth.getDate();
             }
-            
+
             if (months < 0) {
                 years--;
                 months += 12;
             }
+
+            this.age = { years, months, days };
+
+            // Total Stats
+            const diffTime = Math.abs(d2 - d1);
+            const totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
             
-            const totalDays = Math.floor((target - birth) / (1000 * 60 * 60 * 24));
-            
-            document.getElementById('resultBox').style.display = 'block';
-            document.getElementById('ageDisplay').textContent = `${years} years`;
-            document.getElementById('years').textContent = years;
-            document.getElementById('months').textContent = months;
-            document.getElementById('days').textContent = days;
-            document.getElementById('totalDays').textContent = totalDays.toLocaleString();
+            this.stats = {
+                totalDays: totalDays,
+                totalWeeks: Math.floor(totalDays / 7),
+                totalHours: totalDays * 24,
+                nextBirthday: this.getNextBirthday(d1, d2)
+            };
+        },
+
+        getNextBirthday(dob, current) {
+            const next = new Date(current.getFullYear(), dob.getMonth(), dob.getDate());
+            if (next < current) {
+                next.setFullYear(current.getFullYear() + 1);
+            }
+            const diff = Math.ceil((next - current) / (1000 * 60 * 60 * 24));
+            return diff === 0 ? "Today!" : diff + " days";
+        },
+
+        fmt(n) {
+            return n.toLocaleString('en-US');
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

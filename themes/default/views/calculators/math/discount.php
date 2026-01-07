@@ -1,86 +1,136 @@
-<?php $page_title = $title ?? 'Discount Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/floating-calculator.css'); ?>">
-    <style>
-        body { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); min-height: 100vh; padding: 40px 0; }
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 700px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.3rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px; }
-        .calc-btn { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-radius: 12px; padding: 30px; margin-top: 30px; }
-        .result-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.2); }
-        .result-value { font-size: 1.5rem; font-weight: 700; }
-        .final-price { font-size: 3rem !important; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Back</a>
-        <div class="calc-card">
-            <div class="calc-header">
-                <i class="bi bi-tag" style="font-size: 2.5rem;"></i>
-                <h2>Discount Calculator</h2>
-                <p class="mb-0 mt-2">Calculate sale price & savings</p>
+<?php
+// themes/default/views/calculators/math/discount.php
+// PREMIUM DISCOUNT CALCULATOR
+?>
+
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="discountCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[30%] right-[10%] w-[400px] h-[400px] bg-red-500/10 rounded-full blur-[100px] animate-bounce-subtle"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Discount Calculator</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-percentage"></i>
+                <span>FINANCE & SHOPPING</span>
             </div>
-            <div class="calc-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Original Price ($)</label>
-                        <input type="number" id="price" class="form-control calc-input" value="100" step="any">
+            <h1 class="calc-title">Discount <span class="text-gradient">Hunter</span></h1>
+            <p class="calc-subtitle">Calculate final price after discount and see exactly how much you save.</p>
+        </div>
+
+        <div class="calc-grid max-w-4xl mx-auto">
+            
+            <div class="calc-card animate-scale-in grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                
+                <!-- Inputs -->
+                <div class="space-y-6">
+                    <div>
+                        <label class="calc-label">Original Price</label>
+                        <div class="calc-input-group">
+                            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">$</div>
+                            <input type="number" x-model.number="price" @input="calculate()" class="calc-input pl-10" placeholder="0.00">
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Discount (%)</label>
-                        <input type="number" id="discount" class="form-control calc-input" value="20" step="any">
+                    
+                    <div>
+                        <label class="calc-label">Discount Percentage</label>
+                        <div class="calc-input-group">
+                            <input type="number" x-model.number="discount" @input="calculate()" class="calc-input" placeholder="0">
+                            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">%</div>
+                        </div>
+                        <input type="range" x-model.number="discount" @input="calculate()" class="w-full mt-3 accent-primary" min="0" max="100">
+                    </div>
+
+                    <div>
+                        <label class="calc-label">Additional Discount (Optional)</label>
+                         <div class="calc-input-group">
+                            <input type="number" x-model.number="extraoff" @input="calculate()" class="calc-input" placeholder="0">
+                            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">%</div>
+                        </div>
                     </div>
                 </div>
-                <button class="calc-btn mt-4 w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Calculate</button>
-                <div class="result-box" id="resultBox" style="display:none;">
-                    <div class="result-item">
-                        <span>Discount Amount:</span>
-                        <span class="result-value">$<span id="discountAmount">0</span></span>
+
+                <!-- Results Ticket -->
+                <div class="relative bg-white text-gray-900 rounded-3xl p-8 shadow-2xl rotate-1 transform transition hover:rotate-0 duration-300">
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-background rounded-full"></div>
+                    <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-6 h-6 bg-background rounded-full"></div>
+                    
+                    <div class="text-center border-b-2 border-dashed border-gray-300 pb-6 mb-6">
+                        <div class="text-sm font-bold text-gray-400 uppercase tracking-widest">Final Price</div>
+                        <div class="text-5xl font-black text-gray-900 mt-2">$<span x-text="fmt(finalPrice)"></span></div>
                     </div>
-                    <div class="result-item">
-                        <span>You Save:</span>
-                        <span class="result-value">$<span id="savings">0</span></span>
+
+                    <div class="space-y-3 font-mono text-sm">
+                        <div class="flex justify-between text-gray-500">
+                            <span>Original</span>
+                            <span class="line-through">$<span x-text="fmt(price || 0)"></span></span>
+                        </div>
+                        <div class="flex justify-between text-red-500 font-bold">
+                            <span>Discount</span>
+                            <span>-$<span x-text="fmt(saved)"></span></span>
+                        </div>
+                        <div class="flex justify-between text-gray-500" x-show="extraoff > 0">
+                            <span>Extra Off</span>
+                            <span><span x-text="extraoff"></span>%</span>
+                        </div>
                     </div>
-                    <div class="result-item" style="border:none;">
-                        <span>Final Price:</span>
-                        <span class="result-value final-price">$<span id="finalPrice">0</span></span>
+
+                    <div class="mt-6 pt-6 border-t-2 border-dashed border-gray-300 text-center">
+                        <div class="text-xs font-bold text-green-600 uppercase bg-green-100 py-1 px-3 rounded-full inline-block">
+                             You Save $<span x-text="fmt(saved)"></span>
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
-    <script>
-        const appBase = "<?php echo rtrim(app_base_url(), '/'); ?>";
-        function calculate() {
-            const price = document.getElementById('price').value;
-            const discount = document.getElementById('discount').value;
-            fetch(appBase + '/calculator/api/discount', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: `price=${price}&discount=${discount}`
-            })
-            .then(r => r.json())
-            .then(data => {
-                document.getElementById('resultBox').style.display = 'block';
-                document.getElementById('discountAmount').textContent = data.discountAmount.toFixed(2);
-                document.getElementById('savings').textContent = data.savings.toFixed(2);
-                document.getElementById('finalPrice').textContent = data.finalPrice.toFixed(2);
-            });
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('discountCalculator', () => ({
+        price: 100,
+        discount: 20,
+        extraoff: 0,
+        finalPrice: 80,
+        saved: 20,
+
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+            let p = this.price || 0;
+            let d = this.discount || 0;
+            let e = this.extraoff || 0;
+
+            // First discount
+            let firstSave = p * (d / 100);
+            let afterFirst = p - firstSave;
+
+            // Second discount (Compound)
+            let secondSave = afterFirst * (e / 100);
+            
+            this.finalPrice = afterFirst - secondSave;
+            this.saved = firstSave + secondSave;
+        },
+
+        fmt(n) {
+            return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

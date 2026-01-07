@@ -1,129 +1,157 @@
-<?php $page_title = $title ?? 'Force Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/theme.css'); ?>?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/calculator-platform.css'); ?>?v=<?php echo time(); ?>">
-    <style>
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 800px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.1rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 12px; }
-        .calc-btn { background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: #f3e5f5; border-radius: 12px; padding: 25px; margin-top: 30px; text-align: center; border: 1px solid #e1bee7; }
-        .result-val { font-size: 2.5rem; font-weight: 700; color: #8e44ad; margin: 10px 0; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: var(--text-primary); text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="layout-wrapper">
-        <?php include __DIR__ . '/../../partials/calculator_sidebar.php'; ?>
-        
-        <main class="main-content">
-            <div class="container-fluid">
-                <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Dashboard</a>
-                <div class="calc-card">
-                    <div class="calc-header">
-                        <i class="bi bi-rocket-takeoff" style="font-size: 2.5rem;"></i>
-                        <h2>Force Calculator</h2>
-                        <p class="mb-0 mt-2">Newton's Second Law (F = m × a)</p>
-                    </div>
-                    <div class="calc-body">
-                        <div class="mb-4 text-center">
-                            <label class="form-label fw-bold">I want to calculate:</label>
-                            <div class="btn-group" role="group">
-                                <input type="radio" class="btn-check" name="target" id="calc_F" checked onchange="toggleInputs()">
-                                <label class="btn btn-outline-primary" for="calc_F">Force (F)</label>
-                                <input type="radio" class="btn-check" name="target" id="calc_m" onchange="toggleInputs()">
-                                <label class="btn btn-outline-primary" for="calc_m">Mass (m)</label>
-                                <input type="radio" class="btn-check" name="target" id="calc_a" onchange="toggleInputs()">
-                                <label class="btn btn-outline-primary" for="calc_a">Acceleration (a)</label>
-                            </div>
-                        </div>
+<?php
+// themes/default/views/calculators/physics/force.php
+// PREMIUM FORCE CALCULATOR
+?>
 
-                        <div class="row g-4 justify-content-center">
-                            <div class="col-md-6" id="grp_F" style="display:none;">
-                                <label class="form-label fw-bold">Force (F)</label>
-                                <div class="input-group">
-                                    <input type="number" id="val_F" class="form-control calc-input">
-                                    <span class="input-group-text">N</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6" id="grp_m">
-                                <label class="form-label fw-bold">Mass (m)</label>
-                                <div class="input-group">
-                                    <input type="number" id="val_m" class="form-control calc-input" value="10">
-                                    <span class="input-group-text">kg</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6" id="grp_a">
-                                <label class="form-label fw-bold">Acceleration (a)</label>
-                                <div class="input-group">
-                                    <input type="number" id="val_a" class="form-control calc-input" value="9.8">
-                                    <span class="input-group-text">m/s²</span>
-                                </div>
-                            </div>
-                        </div>
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-                        <button class="calc-btn mt-4 w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Calculate</button>
-
-                        <div class="result-box" id="resultBox" style="display:none;">
-                            <div class="text-muted text-uppercase fw-bold small">Result</div>
-                            <div class="result-val" id="resultValue">0</div>
-                            <div class="fw-bold fs-6 text-muted" id="resultUnit">N</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="forceCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute bottom-[20%] left-[10%] w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px] animate-float"></div>
     </div>
-    <script>
-        function toggleInputs() {
-            const target = document.querySelector('input[name="target"]:checked').id;
-            document.getElementById('grp_F').style.display = target === 'calc_F' ? 'none' : 'block';
-            document.getElementById('grp_m').style.display = target === 'calc_m' ? 'none' : 'block';
-            document.getElementById('grp_a').style.display = target === 'calc_a' ? 'none' : 'block';
-            document.getElementById('resultBox').style.display = 'none';
-        }
 
-        function calculate() {
-            const target = document.querySelector('input[name="target"]:checked').id;
-            const F = parseFloat(document.getElementById('val_F').value);
-            const m = parseFloat(document.getElementById('val_m').value);
-            const a = parseFloat(document.getElementById('val_a').value);
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Physics</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-rocket"></i>
+                <span>DYNAMICS</span>
+            </div>
+            <h1 class="calc-title">Force <span class="text-gradient">Calculator</span></h1>
+            <p class="calc-subtitle">Compute Force, Mass, or Acceleration using Newton's Second Law.</p>
+        </div>
+
+        <div class="calc-grid max-w-4xl mx-auto">
             
-            let result = 0;
-            let unit = '';
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Inputs -->
+                <div class="calc-card animate-scale-in">
+                    
+                     <div class="mb-6">
+                        <label class="calc-label text-center mb-4">Solve for:</label>
+                        <div class="grid grid-cols-3 gap-2 bg-white/5 p-1 rounded-xl border border-white/10">
+                            <button @click="mode = 'f'; calculate()" :class="mode === 'f' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="py-2 text-sm rounded-lg transition-all font-bold">Force</button>
+                            <button @click="mode = 'm'; calculate()" :class="mode === 'm' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="py-2 text-sm rounded-lg transition-all font-bold">Mass</button>
+                            <button @click="mode = 'a'; calculate()" :class="mode === 'a' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="py-2 text-sm rounded-lg transition-all font-bold">Accel.</button>
+                        </div>
+                    </div>
 
-            if (target === 'calc_F') {
-                if (!m || !a) return;
-                result = m * a;
-                unit = 'N';
-            } else if (target === 'calc_m') {
-                if (!F || !a) return;
-                result = F / a;
-                unit = 'kg';
-            } else if (target === 'calc_a') {
-                if (!F || !m) return;
-                result = F / m;
-                unit = 'm/s²';
-            }
+                    <div class="space-y-6">
+                        
+                        <!-- Inputs for F -->
+                        <div x-show="mode === 'f'" x-transition class="space-y-4">
+                            <div>
+                                <label class="calc-label">Mass (kg)</label>
+                                <input type="number" x-model.number="m" @input="calculate()" class="calc-input" placeholder="10">
+                            </div>
+                            <div>
+                                <label class="calc-label">Acceleration (m/s²)</label>
+                                <input type="number" x-model.number="a" @input="calculate()" class="calc-input" placeholder="9.8">
+                            </div>
+                        </div>
 
-            document.getElementById('resultValue').textContent = Number.isInteger(result) ? result : result.toFixed(2);
-            document.getElementById('resultUnit').textContent = unit;
-            document.getElementById('resultBox').style.display = 'block';
-        }
+                        <!-- Inputs for M -->
+                        <div x-show="mode === 'm'" x-transition class="space-y-4">
+                            <div>
+                                <label class="calc-label">Force (N)</label>
+                                <input type="number" x-model.number="f" @input="calculate()" class="calc-input" placeholder="100">
+                            </div>
+                             <div>
+                                <label class="calc-label">Acceleration (m/s²)</label>
+                                <input type="number" x-model.number="a" @input="calculate()" class="calc-input" placeholder="9.8">
+                            </div>
+                        </div>
+
+                         <!-- Inputs for A -->
+                        <div x-show="mode === 'a'" x-transition class="space-y-4">
+                             <div>
+                                <label class="calc-label">Force (N)</label>
+                                <input type="number" x-model.number="f" @input="calculate()" class="calc-input" placeholder="100">
+                            </div>
+                            <div>
+                                <label class="calc-label">Mass (kg)</label>
+                                <input type="number" x-model.number="m" @input="calculate()" class="calc-input" placeholder="10">
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Result -->
+                <div class="calc-card animate-slide-up flex flex-col justify-center items-center text-center bg-gradient-to-br from-purple-900/20 to-black border border-purple-500/20">
+                    
+                    <div class="text-sm text-gray-400 uppercase tracking-widest mb-4 font-bold" x-text="resultLabel"></div>
+                    
+                    <div class="flex items-baseline gap-2 mb-2">
+                        <span class="text-6xl font-black text-white" x-text="result"></span>
+                        <span class="text-2xl font-bold text-purple-400" x-text="unit"></span>
+                    </div>
+                    
+                    <div class="mt-8 p-4 bg-white/5 rounded-xl border border-white/5 w-full">
+                        <div class="flex justify-between text-xs text-gray-400 font-mono mb-2">
+                            <span>Equation</span>
+                            <span class="text-white" x-text="equation"></span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('forceCalculator', () => ({
+        mode: 'f',
+        f: 0,
+        m: 10,
+        a: 9.8,
         
-        // Init
-        toggleInputs();
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+        result: 0,
+        unit: 'N',
+        resultLabel: 'Force',
+        equation: 'F = m * a',
+
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+             let res = 0;
+             if (this.mode === 'f') {
+                 this.resultLabel = 'Force';
+                 this.unit = 'N';
+                 this.equation = 'F = m × a';
+                 if (this.m && this.a) res = this.m * this.a;
+             } 
+             else if (this.mode === 'm') {
+                 this.resultLabel = 'Mass';
+                 this.unit = 'kg';
+                 this.equation = 'm = F / a';
+                 if (this.f && this.a) res = this.f / this.a;
+             }
+             else if (this.mode === 'a') {
+                 this.resultLabel = 'Acceleration';
+                 this.unit = 'm/s²';
+                 this.equation = 'a = F / m';
+                 if (this.f && this.m) res = this.f / this.m;
+             }
+
+             this.result = Number.isInteger(res) ? res : res.toFixed(2);
+        }
+    }));
+});
+</script>

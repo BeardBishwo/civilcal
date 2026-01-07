@@ -238,6 +238,38 @@ class ApiController extends Controller
         echo json_encode($result);
     }
 
+    public function converterData($slug)
+    {
+        $category = $this->db->findOne('calc_unit_categories', ['slug' => $slug]);
+        
+        if (!$category) {
+            $this->jsonError('Category not found', 404);
+            return;
+        }
+
+        $units = $this->db->find('calc_units', ['category_id' => $category['id']], 'display_order ASC');
+        
+        // B2B: Fetch Campaign
+        $campaignModel = new \App\Models\Campaign();
+        $campaign = $campaignModel->getActiveForCalculator($slug);
+        
+        if ($campaign) {
+            $campaignModel->recordImpression(
+                $campaign['id'], 
+                $_SESSION['user_id'] ?? null, 
+                $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1', 
+                $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown'
+            );
+        }
+
+        echo json_encode([
+            'success' => true,
+            'category' => $category,
+            'units' => $units,
+            'campaign' => $campaign
+        ]);
+    }
+
     private function jsonError($message, $code = 400)
     {
         http_response_code($code);

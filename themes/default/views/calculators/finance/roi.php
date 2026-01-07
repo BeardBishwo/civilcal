@@ -1,72 +1,146 @@
-<?php $page_title = $title ?? 'ROI Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/floating-calculator.css'); ?>">
-    <style>
-        body { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); min-height: 100vh; padding: 40px 0; }
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 700px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.3rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px; }
-        .calc-btn { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-radius: 12px; padding: 30px; text-align: center; margin-top: 30px; }
-        .result-value { font-size: 3rem; font-weight: 700; margin: 10px 0; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Back</a>
-        <div class="calc-card">
-            <div class="calc-header">
-                <i class="bi bi-trophy" style="font-size: 2.5rem;"></i>
-                <h2>ROI Calculator</h2>
-                <p class="mb-0 mt-2">Return on Investment Calculator</p>
+<?php
+// themes/default/views/calculators/finance/roi.php
+// PREMIUM ROI CALCULATOR
+?>
+
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="roiCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[20%] right-[20%] w-[400px] h-[400px] bg-yellow-400/10 rounded-full blur-[100px] animate-float"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">ROI Calculator</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-trophy"></i>
+                <span>PROFITABILITY</span>
             </div>
-            <div class="calc-body">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Investment Amount ($)</label>
-                    <input type="number" id="investment" class="form-control calc-input" value="10000" step="any">
+            <h1 class="calc-title">Return on <span class="text-gradient">Investment</span></h1>
+            <p class="calc-subtitle">Calculate the efficiency of an investment or compare the efficiency of different investments.</p>
+        </div>
+
+        <div class="calc-grid max-w-4xl mx-auto">
+            
+            <div class="calc-card animate-scale-in">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <label class="calc-label">Initial Investment ($)</label>
+                        <input type="number" x-model.number="investment" @input="calculate()" class="calc-input text-2xl font-bold" placeholder="10000">
+                    </div>
+                    <div>
+                        <label class="calc-label">Returned Amount ($)</label>
+                        <input type="number" x-model.number="returned" @input="calculate()" class="calc-input text-2xl font-bold" placeholder="15000">
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Return Amount ($)</label>
-                    <input type="number" id="return" class="form-control calc-input" value="12000" step="any">
+
+                <!-- Length of Investment (Optional for Annualized ROI?) Let's keep it simple first as per original, or add time? Original didn't have time. Let's add Time optionally. -->
+                <div class="mb-8">
+                    <label class="calc-label">Investment Period (Optional, for Annualized ROI)</label>
+                    <div class="flex gap-4">
+                        <input type="number" x-model.number="years" @input="calculate()" class="calc-input w-full" placeholder="Period Length">
+                        <select x-model="periodUnit" @change="calculate()" class="calc-input w-1/3">
+                            <option value="years">Years</option>
+                            <option value="months">Months</option>
+                        </select>
+                    </div>
                 </div>
-                <button class="calc-btn mt-4 w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Calculate ROI</button>
-                <div class="result-box" id="resultBox" style="display:none;">
-                    <div>ROI</div>
-                    <div class="result-value"><span id="roi">0</span>%</div>
-                    <div>Profit: $<span id="profit">0</span></div>
+
+                <!-- Result -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-up">
+                    
+                    <div class="glass-card p-8 border-l-8 flex flex-col justify-center text-center transition-colors duration-300" 
+                         :class="roi >= 0 ? 'border-l-green-500 bg-green-500/5' : 'border-l-red-500 bg-red-500/5'">
+                        <div class="text-xs text-gray-400 uppercase tracking-widest mb-2 font-bold">Total ROI</div>
+                        <div class="text-6xl font-black transition-colors duration-300" 
+                             :class="roi >= 0 ? 'text-green-400' : 'text-red-400'">
+                            <span x-text="fmt(roi)"></span>%
+                        </div>
+                        <div class="mt-4 text-sm font-bold text-white">
+                            Profit: $<span x-text="fmt(profit)"></span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-4">
+                        <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center">
+                            <span class="text-gray-400 text-sm uppercase">Total Return</span>
+                            <span class="text-xl font-bold text-white">$<span x-text="fmt(returned)"></span></span>
+                        </div>
+                        
+                        <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center" x-show="annualizedRoi !== null">
+                             <span class="text-gray-400 text-sm uppercase">Annualized ROI</span>
+                            <span class="text-xl font-bold text-accent"><span x-text="fmt(annualizedRoi)"></span>%</span>
+                        </div>
+
+                         <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center" x-show="annualizedRoi !== null">
+                             <span class="text-gray-400 text-sm uppercase">Period</span>
+                             <span class="text-white font-mono"><span x-text="years"></span> <span x-text="periodUnit"></span></span>
+                        </div>
+                    </div>
+
                 </div>
+
             </div>
         </div>
     </div>
-    <script>
-        const appBase = "<?php echo rtrim(app_base_url(), '/'); ?>";
-        function calculate() {
-            const investment = document.getElementById('investment').value;
-            const returnVal = document.getElementById('return').value;
-            fetch(appBase + '/calculator/api/roi', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: `investment=${investment}&return=${returnVal}`
-            })
-            .then(r => r.json())
-            .then(data => {
-                document.getElementById('resultBox').style.display = 'block';
-                document.getElementById('roi').textContent = data.roi.toFixed(2);
-                document.getElementById('profit').textContent = data.profit.toLocaleString();
-            });
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('roiCalculator', () => ({
+        investment: 10000,
+        returned: 12500,
+        years: 1,
+        periodUnit: 'years',
+        
+        roi: 0,
+        profit: 0,
+        annualizedRoi: null,
+
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+             if (!this.investment) return;
+
+             this.profit = this.returned - this.investment;
+             this.roi = (this.profit / this.investment) * 100;
+
+             // Annualized ROI Formula: [(1 + ROI)^(1/n) - 1] * 100
+             if (this.years && this.years > 0) {
+                 let t = this.years;
+                 if (this.periodUnit === 'months') t = t / 12;
+                 
+                 const totalRoiDecimal = this.returned / this.investment;
+                 // Avoid complex number issues if total return is negative? No, total return is amount, usually positive.
+                 // If returned is < 0 (loss more than investment?), handled naturally.
+                 
+                 if (t > 0 && totalRoiDecimal > 0) {
+                    const annualized = (Math.pow(totalRoiDecimal, 1/t) - 1) * 100;
+                    this.annualizedRoi = annualized;
+                 } else {
+                     this.annualizedRoi = null;
+                 }
+             } else {
+                 this.annualizedRoi = null;
+             }
+        },
+
+        fmt(n) {
+            return n ? n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00';
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

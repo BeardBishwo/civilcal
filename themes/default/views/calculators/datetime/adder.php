@@ -1,101 +1,124 @@
-<?php include_once __DIR__ . '/../../../../partials/calculator_sidebar.php'; ?>
+<?php
+// themes/default/views/calculators/datetime/adder.php
+// PREMIUM DATE ADDER
+?>
 
-<main class="main-content">
-    <div class="row g-4 mb-4">
-        <div class="col-md-8 mx-auto">
-            <div class="glass-card">
-                <div class="d-flex align-items-center mb-4">
-                    <div class="icon-square bg-primary-gradient text-white me-3">
-                        <i class="bi bi-calendar-plus fs-4"></i>
-                    </div>
-                    <h2 class="mb-0 fw-bold position-relative z-1"><?php echo htmlspecialchars($title); ?></h2>
-                </div>
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-                <div class="row g-4">
-                    <div class="col-md-12">
-                        <label class="form-label text-secondary small text-uppercase fw-bold ls-1">Start Date</label>
-                        <input type="date" class="form-control form-control-lg bg-dark text-white border-glass" id="start_date">
-                    </div>
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="dateAdderCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[20%] left-[10%] w-[500px] h-[500px] bg-red-500/10 rounded-full blur-[120px] animate-float"></div>
+    </div>
 
-                    <div class="col-12">
-                        <div class="d-flex gap-2 justify-content-center my-2">
-                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="operation" id="op_add" value="add" checked>
-                                <label class="form-check-label text-white" for="op_add">Add</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="operation" id="op_sub" value="sub">
-                                <label class="form-check-label text-white" for="op_sub">Subtract</label>
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Date & Time</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-calendar-plus"></i>
+                <span>CALENDAR</span>
+            </div>
+            <h1 class="calc-title">Date <span class="text-gradient">Adder</span></h1>
+            <p class="calc-subtitle">Add or subtract Years, Months, and Days from a specific date.</p>
+        </div>
+
+        <div class="calc-grid max-w-4xl mx-auto">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Input -->
+                <div class="calc-card animate-scale-in">
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="calc-label">Start Date</label>
+                            <input type="date" x-model="startDate" @input="calculate()" class="calc-input">
+                        </div>
+
+                        <div>
+                            <label class="calc-label">Operation</label>
+                            <div class="grid grid-cols-2 gap-2 bg-white/5 p-1 rounded-xl border border-white/10">
+                                <button @click="operation = 'add'; calculate()" :class="operation === 'add' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="py-2 text-sm rounded-lg transition-all font-bold">Add (+)</button>
+                                <button @click="operation = 'sub'; calculate()" :class="operation === 'sub' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="py-2 text-sm rounded-lg transition-all font-bold">Subtract (-)</button>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="col-md-4">
-                        <label class="form-label text-secondary small text-uppercase fw-bold ls-1">Years</label>
-                        <input type="number" class="form-control form-control-lg bg-dark text-white border-glass" id="years" value="0">
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="calc-label">Years</label>
+                                <input type="number" x-model.number="years" @input="calculate()" class="calc-input" min="0">
+                            </div>
+                            <div>
+                                <label class="calc-label">Months</label>
+                                <input type="number" x-model.number="months" @input="calculate()" class="calc-input" min="0">
+                            </div>
+                            <div>
+                                <label class="calc-label">Days</label>
+                                <input type="number" x-model.number="days" @input="calculate()" class="calc-input" min="0">
+                            </div>
+                        </div>
+
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label text-secondary small text-uppercase fw-bold ls-1">Months</label>
-                        <input type="number" class="form-control form-control-lg bg-dark text-white border-glass" id="months" value="0">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label text-secondary small text-uppercase fw-bold ls-1">Days</label>
-                        <input type="number" class="form-control form-control-lg bg-dark text-white border-glass" id="days" value="0">
-                    </div>
+                </div>
+
+                <!-- Result -->
+                <div class="calc-card animate-slide-up flex flex-col justify-center items-center text-center bg-gradient-to-br from-red-900/20 to-black border border-red-500/20">
                     
-                    <div class="col-12 mt-4">
-                        <button class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-primary" onclick="calculateDate()">
-                            Calculate New Date
-                        </button>
+                    <div class="text-sm text-gray-400 uppercase tracking-widest mb-4 font-bold">Resulting Date</div>
+                    
+                    <div class="flex flex-col items-center gap-2 mb-2">
+                        <span class="text-4xl font-black text-white" x-text="resultDate"></span>
+                        <span class="text-xl font-bold text-red-400" x-text="resultDay"></span>
                     </div>
                 </div>
 
-                <div id="result-section" class="mt-4" style="display: none;">
-                    <div class="border-glass rounded-4 p-4 text-center bg-white-5">
-                         <h5 class="text-secondary mb-3">Resulting Date</h5>
-                         <div class="display-3 fw-bold text-white mb-2" id="result-date"></div>
-                         <div class="text-muted h5" id="result-weekday"></div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
-</main>
+</div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('start_date').value = today;
-});
+document.addEventListener('alpine:init', () => {
+    Alpine.data('dateAdderCalculator', () => ({
+        startDate: new Date().toISOString().split('T')[0],
+        operation: 'add',
+        years: 0,
+        months: 0,
+        days: 0,
+        
+        resultDate: '---',
+        resultDay: '---',
 
-async function calculateDate() {
-    const start = document.getElementById('start_date').value;
-    const op = document.querySelector('input[name="operation"]:checked').value;
-    const y = document.getElementById('years').value;
-    const m = document.getElementById('months').value;
-    const d = document.getElementById('days').value;
-    
-    try {
-        const response = await fetch('<?php echo app_base_url("/calculator/api/datetime/adder"); ?>', {
-            method: 'POST',
-            body: JSON.stringify({ 
-                start_date: start, 
-                operation: op,
-                years: y,
-                months: m,
-                days: d
-            })
-        });
-        
-        const data = await response.json();
-        const fullDate = new Date(data.result_date);
-        
-        document.getElementById('result-date').textContent = data.result_date;
-        document.getElementById('result-weekday').textContent = data.result_formatted;
-        
-        document.getElementById('result-section').style.display = 'block';
-    } catch (e) {
-        console.error(e);
-    }
-}
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+             if (!this.startDate) return;
+
+             const date = new Date(this.startDate);
+             const sign = this.operation === 'add' ? 1 : -1;
+
+             // Add/Sub Years
+             date.setFullYear(date.getFullYear() + (this.years * sign));
+             
+             // Add/Sub Months
+             date.setMonth(date.getMonth() + (this.months * sign));
+             
+             // Add/Sub Days
+             date.setDate(date.getDate() + (this.days * sign));
+
+             this.resultDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+             this.resultDay = date.toLocaleDateString('en-US', { weekday: 'long' });
+        }
+    }));
+});
 </script>

@@ -1,135 +1,125 @@
-<?php $page_title = $title ?? 'Trigonometric Functions'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/floating-calculator.css'); ?>">
-    <style>
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 40px 0; }
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 800px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.3rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px; }
-        .calc-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-radius: 12px; padding: 30px; text-align: center; margin-top: 30px; }
-        .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center; }
-        .result-item { background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; }
-        .result-label { font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px; }
-        .result-val { font-size: 1.4rem; font-weight: 700; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; font-weight: 600; }
-        .unit-toggle .btn { width: 50%; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Back</a>
-        <div class="calc-card">
-            <div class="calc-header">
-                <i class="bi bi-activity" style="font-size: 2.5rem;"></i>
-                <h2>Trigonometric Functions</h2>
-                <p class="mb-0 mt-2">Calculate Sin, Cos, Tan, Csc, Sec, Cot</p>
-            </div>
-            <div class="calc-body">
-                <div class="row g-3 justify-content-center">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Angle</label>
-                        <input type="number" id="angle_input" class="form-control calc-input" value="45" step="any">
+<?php
+// themes/default/views/calculators/math/trigonometry.php
+// PREMIUM TRIGONOMETRY CALCULATOR
+?>
+
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="trigCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+         <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+        <div class="absolute top-[-10%] right-[20%] w-[400px] h-[400px] bg-indigo-500/20 rounded-full blur-[100px] animate-pulse-glow"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Trigonometry</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <h1 class="calc-title">Trig <span class="text-gradient">Functions</span></h1>
+            <p class="calc-subtitle">Calculate Sine, Cosine, Tangent and more for any angle instantly.</p>
+        </div>
+
+        <div class="calc-grid max-w-5xl mx-auto">
+            
+            <!-- Input Panel -->
+            <div class="calc-card animate-scale-in">
+                <div class="flex flex-col md:flex-row gap-6 items-end">
+                    <div class="flex-grow w-full">
+                        <label class="calc-label">Enter Angle</label>
+                        <input type="number" x-model.number="angle" @input="calculate()" class="calc-input text-2xl font-bold" placeholder="Angle">
                     </div>
                 </div>
+                 
+                 <div class="flex mt-6 bg-white/5 p-1 rounded-lg border border-white/10 w-full md:w-auto self-start">
+                    <button @click="unit = 'deg'; calculate()" :class="unit === 'deg' ? 'bg-primary text-white shadow-lg' : 'text-gray-400 hover:text-white'" class="flex-1 py-2 px-6 rounded-md font-bold transition-all">Degree (°)</button>
+                    <button @click="unit = 'rad'; calculate()" :class="unit === 'rad' ? 'bg-primary text-white shadow-lg' : 'text-gray-400 hover:text-white'" class="flex-1 py-2 px-6 rounded-md font-bold transition-all">Radian (rad)</button>
+                </div>
+            </div>
+
+            <!-- Results Grid -->
+            <div class="col-span-1 md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-4 animate-slide-up">
                 
-                <div class="row mt-3 justify-content-center">
-                    <div class="col-md-6">
-                        <div class="btn-group w-100 unit-toggle" role="group">
-                            <input type="radio" class="btn-check" name="angle_unit" id="deg" autocomplete="off" checked onchange="calculate()">
-                            <label class="btn btn-outline-primary" for="deg">Degrees</label>
-
-                            <input type="radio" class="btn-check" name="angle_unit" id="rad" autocomplete="off" onchange="calculate()">
-                            <label class="btn btn-outline-primary" for="rad">Radians</label>
-                        </div>
-                    </div>
+                <div class="glass-card p-6 flex flex-col items-center justify-center text-center group hover:bg-primary/20 transition duration-500">
+                    <div class="text-xs text-gray-400 uppercase tracking-widest mb-2 font-bold">Sine (sin)</div>
+                    <div class="text-3xl font-mono font-black text-white group-hover:scale-110 transition" x-text="results.sin"></div>
                 </div>
 
-                <div class="result-box mt-4">
-                    <div class="result-grid">
-                        <div class="result-item">
-                            <div class="result-label">sin(θ)</div>
-                            <div class="result-val" id="val_sin">0</div>
-                        </div>
-                        <div class="result-item">
-                            <div class="result-label">cos(θ)</div>
-                            <div class="result-val" id="val_cos">0</div>
-                        </div>
-                        <div class="result-item">
-                            <div class="result-label">tan(θ)</div>
-                            <div class="result-val" id="val_tan">0</div>
-                        </div>
-                        <div class="result-item">
-                            <div class="result-label">csc(θ)</div>
-                            <div class="result-val" id="val_csc">0</div>
-                        </div>
-                        <div class="result-item">
-                            <div class="result-label">sec(θ)</div>
-                            <div class="result-val" id="val_sec">0</div>
-                        </div>
-                        <div class="result-item">
-                            <div class="result-label">cot(θ)</div>
-                            <div class="result-val" id="val_cot">0</div>
-                        </div>
-                    </div>
+                <div class="glass-card p-6 flex flex-col items-center justify-center text-center group hover:bg-secondary/20 transition duration-500">
+                    <div class="text-xs text-gray-400 uppercase tracking-widest mb-2 font-bold">Cosine (cos)</div>
+                    <div class="text-3xl font-mono font-black text-white group-hover:scale-110 transition" x-text="results.cos"></div>
                 </div>
+
+                <div class="glass-card p-6 flex flex-col items-center justify-center text-center group hover:bg-accent/20 transition duration-500">
+                    <div class="text-xs text-gray-400 uppercase tracking-widest mb-2 font-bold">Tangent (tan)</div>
+                    <div class="text-3xl font-mono font-black text-white group-hover:scale-110 transition" x-text="results.tan"></div>
+                </div>
+
+                <div class="glass-card p-6 flex flex-col items-center justify-center text-center opacity-75 hover:opacity-100 transition">
+                    <div class="text-xs text-gray-400 uppercase tracking-widest mb-2">Cosecant (csc)</div>
+                    <div class="text-xl font-mono font-bold text-gray-200" x-text="results.csc"></div>
+                </div>
+
+                <div class="glass-card p-6 flex flex-col items-center justify-center text-center opacity-75 hover:opacity-100 transition">
+                    <div class="text-xs text-gray-400 uppercase tracking-widest mb-2">Secant (sec)</div>
+                    <div class="text-xl font-mono font-bold text-gray-200" x-text="results.sec"></div>
+                </div>
+
+                <div class="glass-card p-6 flex flex-col items-center justify-center text-center opacity-75 hover:opacity-100 transition">
+                    <div class="text-xs text-gray-400 uppercase tracking-widest mb-2">Cotangent (cot)</div>
+                    <div class="text-xl font-mono font-bold text-gray-200" x-text="results.cot"></div>
+                </div>
+
             </div>
+
         </div>
     </div>
-    <script>
-        const input = document.getElementById('angle_input');
-        
-        input.addEventListener('input', calculate);
+</div>
 
-        function calculate() {
-            let angle = parseFloat(input.value);
-            if (isNaN(angle)) return;
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('trigCalculator', () => ({
+        angle: 45,
+        unit: 'deg',
+        results: { sin: 0, cos: 0, tan: 0, csc: 0, sec: 0, cot: 0 },
 
-            const isDegree = document.getElementById('deg').checked;
-            let rad = angle;
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+            if (this.angle === null) return;
             
-            if (isDegree) {
-                rad = angle * (Math.PI / 180);
+            let rad = this.angle;
+            if (this.unit === 'deg') {
+                rad = this.angle * (Math.PI / 180);
             }
 
             const sin = Math.sin(rad);
             const cos = Math.cos(rad);
             const tan = Math.tan(rad);
 
-            updateVal('val_sin', sin);
-            updateVal('val_cos', cos);
-            updateVal('val_tan', tan);
-            updateVal('val_csc', 1/sin);
-            updateVal('val_sec', 1/cos);
-            updateVal('val_cot', 1/tan);
-        }
+            this.results.sin = this.fmt(sin);
+            this.results.cos = this.fmt(cos);
+            this.results.tan = this.fmt(tan);
+            this.results.csc = this.fmt(1/sin);
+            this.results.sec = this.fmt(1/cos);
+            this.results.cot = this.fmt(1/tan);
+        },
 
-        function updateVal(id, val) {
-            const el = document.getElementById(id);
-            if (!isFinite(val)) {
-                el.textContent = "Undefined";
-            } else if (Math.abs(val) < 1e-10) {
-                el.textContent = "0"; // Handle practically zero
-            } else if (Math.abs(val) > 1e10) {
-                el.textContent = "∞"; // Handle huge numbers
-            } else {
-                el.textContent = val.toFixed(6).replace(/\.?0+$/, "");
-            }
+        fmt(val) {
+            if (!isFinite(val)) return "Undefined";
+            if (Math.abs(val) < 1e-10) return "0";
+            if (Math.abs(val) > 1e10) return "∞";
+            return val.toFixed(4).replace(/\.?0+$/, "");
         }
-        
-        // Init
-        calculate();
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

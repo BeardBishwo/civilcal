@@ -1,135 +1,136 @@
-<?php $page_title = $title ?? 'Energy Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/theme.css'); ?>?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/calculator-platform.css'); ?>?v=<?php echo time(); ?>">
-    <style>
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 800px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #16a085 0%, #f4d03f 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.1rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 12px; }
-        .calc-btn { background: linear-gradient(135deg, #16a085 0%, #f4d03f 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-        .result-box { background: #e0f2f1; border-radius: 12px; padding: 25px; margin-top: 30px; text-align: center; border: 1px solid #b2dfdb; }
-        .result-val { font-size: 2.5rem; font-weight: 700; color: #16a085; margin: 10px 0; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: var(--text-primary); text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="layout-wrapper">
-        <?php include __DIR__ . '/../../partials/calculator_sidebar.php'; ?>
-        
-        <main class="main-content">
-            <div class="container-fluid">
-                <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Dashboard</a>
-                <div class="calc-card">
-                    <div class="calc-header">
-                        <i class="bi bi-battery-charging" style="font-size: 2.5rem;"></i>
-                        <h2>Energy Calculator</h2>
-                        <p class="mb-0 mt-2">Kinetic (KE) & Potential (PE) Energy</p>
-                    </div>
-                    <div class="calc-body">
-                        <ul class="nav nav-pills nav-fill mb-4" id="pills-tab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active fw-bold" id="ke-tab" data-bs-toggle="pill" data-bs-target="#ke-content" type="button" role="tab">Kinetic Energy (Move)</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link fw-bold" id="pe-tab" data-bs-toggle="pill" data-bs-target="#pe-content" type="button" role="tab">Potential Energy (Height)</button>
-                            </li>
-                        </ul>
-                        
-                        <div class="tab-content" id="pills-tabContent">
-                            <!-- Kinetic Energy -->
-                            <div class="tab-pane fade show active" id="ke-content" role="tabpanel">
-                                <div class="row g-4 justify-content-center">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">Mass (m)</label>
-                                        <div class="input-group">
-                                            <input type="number" id="ke_m" class="form-control calc-input" value="10">
-                                            <span class="input-group-text">kg</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">Velocity (v)</label>
-                                        <div class="input-group">
-                                            <input type="number" id="ke_v" class="form-control calc-input" value="20">
-                                            <span class="input-group-text">m/s</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="calc-btn mt-4 w-100" onclick="calculateKE()"><i class="bi bi-lightning-fill me-2"></i>Calculate KE</button>
-                            </div>
+<?php
+// themes/default/views/calculators/physics/energy.php
+// PREMIUM ENERGY CALCULATOR
+?>
 
-                            <!-- Potential Energy -->
-                            <div class="tab-pane fade" id="pe-content" role="tabpanel">
-                                 <div class="row g-4 justify-content-center">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">Mass (m)</label>
-                                        <div class="input-group">
-                                            <input type="number" id="pe_m" class="form-control calc-input" value="10">
-                                            <span class="input-group-text">kg</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">Height (h)</label>
-                                        <div class="input-group">
-                                            <input type="number" id="pe_h" class="form-control calc-input" value="50">
-                                            <span class="input-group-text">m</span>
-                                        </div>
-                                    </div>
-                                     <div class="col-md-12">
-                                        <label class="form-label fw-bold text-muted small">Gravity (g) ≈ 9.8 m/s²</label>
-                                    </div>
-                                </div>
-                                <button class="calc-btn mt-4 w-100" onclick="calculatePE()"><i class="bi bi-arrow-up-circle-fill me-2"></i>Calculate PE</button>
-                            </div>
-                        </div>
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-                        <div class="result-box" id="resultBox" style="display:none;">
-                            <div class="text-muted text-uppercase fw-bold small" id="resLabel">Energy</div>
-                            <div class="result-val" id="resultValue">0</div>
-                            <div class="fw-bold fs-6 text-muted">Joules (J)</div>
-                        </div>
-                    </div>
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="energyCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[10%] left-[30%] w-[600px] h-[600px] bg-yellow-500/10 rounded-full blur-[120px] animate-pulse-glow"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Physics</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-atom"></i>
+                <span>MECHANICS</span>
+            </div>
+            <h1 class="calc-title">Energy <span class="text-gradient">Calculator</span></h1>
+            <p class="calc-subtitle">Calculate Kinetic Energy (motion) and Potential Energy (position).</p>
+        </div>
+
+        <div class="calc-grid max-w-4xl mx-auto">
+            
+            <!-- Type Toggle -->
+             <div class="flex justify-center mb-10 animate-scale-in">
+                <div class="bg-white/5 p-1 rounded-full border border-white/10 inline-flex">
+                    <button @click="type = 'ke'; calculate()" :class="type === 'ke' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="px-6 py-2 rounded-full transition-all font-bold flex items-center gap-2">
+                        <i class="fas fa-running"></i> Kinetic
+                    </button>
+                    <button @click="type = 'pe'; calculate()" :class="type === 'pe' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="px-6 py-2 rounded-full transition-all font-bold flex items-center gap-2">
+                        <i class="fas fa-arrow-up"></i> Potential
+                    </button>
                 </div>
             </div>
-        </main>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Inputs -->
+                <div class="calc-card animate-slide-right min-h-[300px] flex flex-col justify-center">
+                    
+                    <div x-show="type === 'ke'" class="space-y-6" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4">
+                        <h3 class="text-lg font-bold text-white mb-2">Kinetic Energy</h3>
+                        <p class="text-xs text-gray-400 mb-6">Energy possessed by an object due to its motion.</p>
+                        
+                        <div>
+                            <label class="calc-label">Mass (kg)</label>
+                            <input type="number" x-model.number="ke.m" @input="calculate()" class="calc-input" placeholder="10">
+                        </div>
+                        <div>
+                            <label class="calc-label">Velocity (m/s)</label>
+                            <input type="number" x-model.number="ke.v" @input="calculate()" class="calc-input" placeholder="20">
+                        </div>
+                    </div>
+
+                    <div x-show="type === 'pe'" class="space-y-6 hidden" :class="{ 'hidden': type !== 'pe' }" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-x-4">
+                         <h3 class="text-lg font-bold text-white mb-2">Potential Energy</h3>
+                        <p class="text-xs text-gray-400 mb-6">Energy held by an object because of its vertical position.</p>
+
+                        <div>
+                            <label class="calc-label">Mass (kg)</label>
+                            <input type="number" x-model.number="pe.m" @input="calculate()" class="calc-input" placeholder="10">
+                        </div>
+                        <div>
+                            <label class="calc-label">Height (m)</label>
+                            <input type="number" x-model.number="pe.h" @input="calculate()" class="calc-input" placeholder="50">
+                        </div>
+                         <div class="text-right text-xs text-gray-500 italic">g = 9.8 m/s²</div>
+                    </div>
+
+                </div>
+
+                <!-- Result -->
+                <div class="calc-card animate-slide-left flex flex-col justify-center items-center text-center bg-gradient-to-br from-yellow-900/20 to-black border border-yellow-500/20">
+                    
+                    <div class="text-sm text-gray-400 uppercase tracking-widest mb-4 font-bold" x-text="type === 'ke' ? 'Kinetic Energy' : 'Potential Energy'"></div>
+                    
+                    <div class="flex items-baseline gap-2 mb-2">
+                        <span class="text-6xl font-black text-white" x-text="result"></span>
+                        <span class="text-2xl font-bold text-yellow-400">J</span>
+                    </div>
+                    
+                    <div class="mt-8 p-4 bg-white/5 rounded-xl border border-white/5 w-full text-left">
+                        <div class="flex justify-between text-xs text-gray-400 font-mono mb-2">
+                            <span>Equation</span>
+                            <span class="text-white" x-text="type === 'ke' ? 'KE = 0.5 × m × v²' : 'PE = m × g × h'"></span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
     </div>
-    <script>
-        function calculateKE() {
-            const m = parseFloat(document.getElementById('ke_m').value);
-            const v = parseFloat(document.getElementById('ke_v').value);
-            
-            if (!m || (!v && v!==0)) return;
+</div>
 
-            const ke = 0.5 * m * v * v;
-            showResult('Kinetic Energy', ke);
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('energyCalculator', () => ({
+        type: 'ke',
+        ke: { m: 10, v: 20 },
+        pe: { m: 10, h: 50 },
+        
+        result: 0,
+
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+             let res = 0;
+             if (this.type === 'ke') {
+                 if (this.ke.m && this.ke.v) {
+                     res = 0.5 * this.ke.m * this.ke.v * this.ke.v;
+                 }
+             } else {
+                 if (this.pe.m && this.pe.h) {
+                     res = this.pe.m * 9.8 * this.pe.h;
+                 }
+             }
+
+             this.result = Number.isInteger(res) ? res : res.toFixed(2);
         }
-
-        function calculatePE() {
-            const m = parseFloat(document.getElementById('pe_m').value);
-            const h = parseFloat(document.getElementById('pe_h').value);
-            const g = 9.8;
-            
-            if (!m || (!h && h!==0)) return;
-
-            const pe = m * g * h;
-            showResult('Potential Energy', pe);
-        }
-
-        function showResult(label, val) {
-            document.getElementById('resLabel').textContent = label;
-            document.getElementById('resultValue').textContent = val.toFixed(2).replace(/\.?0+$/, "");
-            document.getElementById('resultBox').style.display = 'block';
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

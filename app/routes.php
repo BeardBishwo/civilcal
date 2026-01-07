@@ -483,13 +483,15 @@ $router->add("GET", "/calculator", "CalculatorController@index");
 $router->add("GET", "/calculator/converter/{slug}", "CalculatorController@converter");
 $router->add("POST", "/calculator/api/convert", "CalculatorController@convert");
 $router->add("POST", "/calculator/api/calculate", "CalculatorController@calculate");
+$router->add("GET", "/calculator/api/data/{slug}", "ApiController@converterData");
 $router->add("GET", "/calculator/scientific", "CalculatorController@scientific");
+$router->add("GET", "/calculators/scientific", "CalculatorController@scientific");
 
-// Legacy/Dynamic Tool Routes (Moved here to avoid intercepting /calculator/converter/*)
+// Legacy/Dynamic Tool Routes (Disabled to prevent shadowing specific routes)
 $router->add("GET", "/calculators", "CalculatorController@index");
-$router->add("GET", "/calculator/{category}", "CalculatorController@category");
-$router->add("GET", "/calculator/{category}/{tool}", "CalculatorController@tool");
-$router->add("POST", "/calculator/{category}/{tool}/calculate", "CalculatorController@calculate");
+// $router->add("GET", "/calculator/{category}", "CalculatorController@category");
+// $router->add("GET", "/calculator/{category}/{tool}", "CalculatorController@tool");
+// $router->add("POST", "/calculator/{category}/{tool}/calculate", "CalculatorController@calculate");
 
 // Mathematics Calculators
 $router->add("GET", "/calculator/math/percentage", "MathCalculatorController@percentage");

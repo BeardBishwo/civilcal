@@ -1,176 +1,191 @@
-<?php $page_title = $title ?? 'Investment Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/floating-calculator.css'); ?>">
-    <style>
-        body { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); min-height: 100vh; padding: 40px 0; }
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 900px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.1rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 12px; }
-        .calc-btn { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: #f8f9fa; border-radius: 12px; padding: 25px; margin-top: 30px; border-left: 5px solid #11998e; }
-        .result-val { font-size: 1.8rem; font-weight: 700; color: #11998e; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; font-weight: 600; }
-        .chart-container { position: relative; height: 350px; width: 100%; margin-top: 30px; }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div class="container">
-        <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Back</a>
-        <div class="calc-card">
-            <div class="calc-header">
-                <i class="bi bi-graph-up-arrow" style="font-size: 2.5rem;"></i>
-                <h2>Investment Calculator</h2>
-                <p class="mb-0 mt-2">Calculate compound interest and growth</p>
-            </div>
-            <div class="calc-body">
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Initial Investment</label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number" id="initial" class="form-control calc-input" value="10000">
+<?php
+// themes/default/views/calculators/finance/investment.php
+// PREMIUM INVESTMENT CALCULATOR
+?>
+
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="investmentCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute bottom-[0%] left-[0%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px] animate-pulse-glow"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Investment Calculator</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+            <h1 class="calc-title">Smart <span class="text-gradient">Investing</span></h1>
+            <p class="calc-subtitle">Simulate your portfolio growth with recurring contributions.</p>
+        </div>
+
+        <div class="calc-grid max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Inputs -->
+                <div class="calc-card animate-scale-in col-span-1">
+                    <h3 class="text-lg font-bold text-white mb-6">Plan Details</h3>
+                     <div class="space-y-6">
+                        <div>
+                            <label class="calc-label">Starting Amount ($)</label>
+                            <input type="number" x-model.number="initial" @input="calculate()" class="calc-input text-xl font-bold" placeholder="10000">
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Monthly Contribution</label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number" id="contribution" class="form-control calc-input" value="500">
+                        <div>
+                            <label class="calc-label">Monthly Contribution ($)</label>
+                            <input type="number" x-model.number="monthly" @input="calculate()" class="calc-input text-xl font-bold" placeholder="500">
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Annual Rate (%)</label>
-                        <div class="input-group">
-                            <input type="number" id="rate" class="form-control calc-input" value="7" step="0.1">
-                            <span class="input-group-text">%</span>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="calc-label">Annual Return (%)</label>
+                                <input type="number" x-model.number="rate" @input="calculate()" class="calc-input text-center" placeholder="7.0">
+                            </div>
+                            <div>
+                                <label class="calc-label">Years to Grow</label>
+                                <input type="number" x-model.number="years" @input="calculate()" class="calc-input text-center" placeholder="10">
+                            </div>
                         </div>
-                    </div>
-                     <div class="col-md-6">
-                        <label class="form-label fw-bold">Time Period (Years)</label>
-                        <input type="number" id="years" class="form-control calc-input" value="10">
                     </div>
                 </div>
 
-                <button class="calc-btn mt-4 w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Calculate Growth</button>
+                <!-- Results -->
+                <div class="calc-card animate-slide-up col-span-1 lg:col-span-2 flex flex-col">
+                    
+                     <div class="grid grid-cols-3 gap-4 mb-8">
+                        <div class="glass-card p-4 text-center">
+                            <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">Total Contributions</div>
+                            <div class="text-xl md:text-2xl font-bold text-white">$<span x-text="fmt(totalContr)"></span></div>
+                        </div>
+                        <div class="glass-card p-4 text-center">
+                            <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">Total Interest</div>
+                            <div class="text-xl md:text-2xl font-bold text-accent">$<span x-text="fmt(totalInterest)"></span></div>
+                        </div>
+                         <div class="glass-card p-4 text-center border border-primary/30 bg-primary/10">
+                            <div class="text-xs text-primary uppercase tracking-widest mb-1 font-bold">Future Value</div>
+                            <div class="text-xl md:text-3xl font-black text-white">$<span x-text="fmt(endBalance)"></span></div>
+                        </div>
+                    </div>
 
-                <div class="row mt-4" id="resultSection" style="display:none;">
-                    <div class="col-md-4">
-                        <div class="result-box">
-                            <h5 class="text-muted mb-3">Future Value</h5>
-                            <div class="result-val" id="future_value">$0.00</div>
-                            <hr>
-                            <div class="small text-muted mb-1">Total Contributions:</div>
-                            <div class="fw-bold fs-5 mb-3" id="total_invested">$0.00</div>
-                            <div class="small text-muted mb-1">Total Interest Earned:</div>
-                            <div class="fw-bold fs-5 text-success" id="total_interest">$0.00</div>
-                        </div>
+                     <div class="flex-grow bg-black/20 rounded-xl p-4 relative min-h-[350px]">
+                        <canvas id="investChart"></canvas>
                     </div>
-                    <div class="col-md-8">
-                        <div class="chart-container">
-                            <canvas id="growthChart"></canvas>
-                        </div>
-                    </div>
+
                 </div>
+
             </div>
         </div>
     </div>
-    <script>
-        let growthChart = null;
+</div>
 
-        function calculate() {
-            const initial = parseFloat(document.getElementById('initial').value);
-            const monthly = parseFloat(document.getElementById('contribution').value);
-            const rate = parseFloat(document.getElementById('rate').value) / 100;
-            const years = parseFloat(document.getElementById('years').value);
-            
-            const labels = [];
-            const dataInvested = [];
-            const dataGrowth = [];
-            
-            let currentBalance = initial;
-            let totalInvested = initial;
-            
-            for (let i = 0; i <= years; i++) {
-                labels.push('Year ' + i);
-                dataInvested.push(totalInvested);
-                dataGrowth.push(currentBalance);
-                
-                // Advance one year
-                if (i < years) {
-                    for(let m=0; m<12; m++) {
-                        currentBalance += monthly;
-                        currentBalance *= (1 + rate/12);
-                        totalInvested += monthly;
-                    }
-                }
-            }
-            
-            const interest = currentBalance - totalInvested;
-            
-            document.getElementById('future_value').textContent = formatMoney(currentBalance);
-            document.getElementById('total_invested').textContent = formatMoney(totalInvested);
-            document.getElementById('total_interest').textContent = formatMoney(interest);
-            document.getElementById('resultSection').style.display = 'flex';
-            
-            renderChart(labels, dataInvested, dataGrowth);
-        }
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('investmentCalculator', () => ({
+        initial: 10000,
+        monthly: 500,
+        rate: 8,
+        years: 20,
+        endBalance: 0,
+        totalContr: 0,
+        totalInterest: 0,
+        chart: null,
 
-        function formatMoney(amount) {
-            return '$' + amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        }
+        init() {
+            this.initChart();
+            this.calculate();
+        },
 
-        function renderChart(labels, invested, growth) {
-            const ctx = document.getElementById('growthChart').getContext('2d');
-            if(growthChart) growthChart.destroy();
-            
-            growthChart = new Chart(ctx, {
-                type: 'line',
+        calculate() {
+             const r = this.rate / 100 / 12; // Monthly rate
+             const n = this.years * 12; // Total months
+             
+             let balance = this.initial;
+             let totalC = this.initial;
+             
+             // Simple loop for final calculation? No, use formula for instant calc if possible, but for chart we need loop anyway.
+             // We'll regenerate chart data which serves both.
+             
+             this.updateChart();
+        },
+
+        initChart() {
+            const ctx = document.getElementById('investChart').getContext('2d');
+            this.chart = new Chart(ctx, {
+                type: 'bar', // Stacked bar often looks nice for invest vs interest
                 data: {
-                    labels: labels,
+                    labels: [],
                     datasets: [
-                        {
-                            label: 'Total Balance',
-                            data: growth,
-                            borderColor: '#38ef7d',
-                            backgroundColor: 'rgba(56, 239, 125, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Invested Capital',
-                            data: invested,
-                            borderColor: '#11998e',
-                            backgroundColor: 'rgba(17, 153, 142, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                        }
+                        { label: 'Interest', data: [], backgroundColor: '#F472B6', stack: 'Stack 0' },
+                        { label: 'Contributions', data: [], backgroundColor: '#60A5FA', stack: 'Stack 0' },
+                        { label: 'Initial', data: [], backgroundColor: '#34D399', stack: 'Stack 0' }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { color: '#9CA3AF' } } },
                     scales: {
-                        y: {
-                            ticks: {
-                                callback: function(value) { return '$' + value/1000 + 'k'; }
-                            }
-                        }
+                        x: { stacked: true, grid: { display: false }, ticks: { color: '#6B7280' } },
+                        y: { stacked: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#6B7280', callback: v => '$' + v/1000 + 'k' } }
                     }
                 }
             });
+        },
+
+        updateChart() {
+            if (!this.chart || !this.years) return;
+
+            const labels = [];
+            const dataInitial = [];
+            const dataContr = [];
+            const dataInterest = [];
+
+            let balance = this.initial;
+            let contrSum = 0;
+            
+            const r = this.rate / 100 / 12;
+
+            for(let y=0; y <= this.years; y++) {
+                labels.push('Year ' + y);
+                
+                // Current breakdown
+                const investBase = this.initial + contrSum;
+                const interestPart = balance - investBase;
+                
+                dataInitial.push(this.initial);
+                dataContr.push(contrSum);
+                dataInterest.push(interestPart);
+
+                // Advance 12 months for next iteration
+                if(y < this.years) {
+                    for(let m=0; m<12; m++) {
+                        balance += this.monthly;
+                        contrSum += this.monthly;
+                        balance *= (1 + r);
+                    }
+                }
+            }
+
+            this.endBalance = balance;
+            this.totalContr = this.initial + contrSum;
+            this.totalInterest = balance - this.totalContr;
+
+            this.chart.data.labels = labels;
+            this.chart.data.datasets[0].data = dataInterest;
+            this.chart.data.datasets[1].data = dataContr;
+            this.chart.data.datasets[2].data = dataInitial;
+            this.chart.update();
+        },
+
+        fmt(n) {
+             return n ? n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '0';
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

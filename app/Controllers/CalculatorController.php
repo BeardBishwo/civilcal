@@ -187,4 +187,14 @@ class CalculatorController extends Controller
             'message' => 'The calculator or page you are looking for does not exist.'
         ]);
     }
+
+    /**
+     * Scientific Calculator
+     */
+    public function scientific()
+    {
+        $this->view->render('calculators/scientific', [
+            'title' => 'Scientific Calculator'
+        ]);
+    }
 }

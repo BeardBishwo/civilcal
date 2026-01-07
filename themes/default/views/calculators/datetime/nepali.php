@@ -1,159 +1,164 @@
-<?php include_once __DIR__ . '/../../../../partials/calculator_sidebar.php'; ?>
+<?php
+// themes/default/views/calculators/datetime/nepali.php
+// PREMIUM NEPALI DATE CONVERTER (API Dependent)
+?>
 
-<main class="main-content">
-    <div class="row g-4 mb-4">
-        <div class="col-md-8 mx-auto">
-            <div class="glass-card">
-                <div class="d-flex align-items-center mb-4">
-                    <div class="icon-square bg-danger-gradient text-white me-3">
-                        <i class="bi bi-calendar-event fs-4"></i>
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="nepaliDateCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute bottom-[0%] left-[50%] -translate-x-1/2 w-[600px] h-[400px] bg-red-600/10 rounded-full blur-[120px] animate-pulse-glow"></div>
+    </div>
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Date & Time</li>
+            </ol>
+        </nav>
+
+        <div class="calc-header animate-slide-down">
+             <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-calendar-alt"></i>
+                <span>CONVERTER</span>
+            </div>
+            <h1 class="calc-title">Nepali <span class="text-gradient">Date</span></h1>
+            <p class="calc-subtitle">Convert between English (AD) and Nepali (BS) dates with precision.</p>
+        </div>
+
+        <div class="calc-grid max-w-3xl mx-auto">
+            
+            <div class="calc-card animate-scale-in">
+                
+                <!-- Toggle -->
+                <div class="flex justify-center mb-8">
+                     <div class="bg-white/5 p-1 rounded-full border border-white/10 inline-flex">
+                        <button @click="mode = 'ad_to_bs'; result = null" :class="mode === 'ad_to_bs' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="px-6 py-2 rounded-full transition-all font-bold text-sm">
+                            AD <i class="fas fa-arrow-right mx-1 text-xs"></i> BS
+                        </button>
+                        <button @click="mode = 'bs_to_ad'; result = null" :class="mode === 'bs_to_ad' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'" class="px-6 py-2 rounded-full transition-all font-bold text-sm">
+                            BS <i class="fas fa-arrow-right mx-1 text-xs"></i> AD
+                        </button>
                     </div>
-                    <h2 class="mb-0 fw-bold position-relative z-1"><?php echo htmlspecialchars($title); ?></h2>
                 </div>
 
-                <!-- Tabs -->
-                <ul class="nav nav-pills mb-4 nav-justified bg-white-5 p-2 rounded-4" id="pills-tab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active rounded-pill fw-bold" id="pills-ad-bs-tab" data-bs-toggle="pill" data-bs-target="#pills-ad-bs" type="button">
-                            English to Nepali (AD → BS)
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link rounded-pill fw-bold" id="pills-bs-ad-tab" data-bs-toggle="pill" data-bs-target="#pills-bs-ad" type="button">
-                            Nepali to English (BS → AD)
-                        </button>
-                    </li>
-                </ul>
-
-                <div class="tab-content" id="pills-tabContent">
-                    <!-- AD to BS -->
-                    <div class="tab-pane fade show active" id="pills-ad-bs" role="tabpanel">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="form-label text-secondary small text-uppercase fw-bold ls-1">English Date (AD)</label>
-                                <input type="date" class="form-control form-control-lg bg-dark text-white border-glass" id="ad_input_date">
-                            </div>
-                            <div class="col-12">
-                                <button class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-primary" onclick="convertAdToBs()">
-                                    Convert to Nepali
-                                </button>
-                            </div>
+                <div class="space-y-6">
+                    
+                    <!-- AD to BS Input -->
+                    <div x-show="mode === 'ad_to_bs'" x-transition class="space-y-4">
+                        <label class="calc-label text-center">Enter English Date (AD)</label>
+                        <div class="flex flex-col items-center">
+                            <input type="date" x-model="adDate" class="calc-input text-center text-xl max-w-xs">
                         </div>
+                        <button @click="convertAdToBs()" class="calc-btn w-full mt-4" :disabled="loading">
+                             <span x-show="!loading"><i class="fas fa-exchange-alt mr-2"></i> Convert to Nepali</span>
+                             <span x-show="loading"><i class="fas fa-spinner fa-spin mr-2"></i> Converting...</span>
+                        </button>
                     </div>
 
-                    <!-- BS to AD -->
-                    <div class="tab-pane fade" id="pills-bs-ad" role="tabpanel">
-                        <div class="row g-3">
-                            <div class="col-4">
-                                <label class="form-label text-secondary small text-uppercase fw-bold ls-1">Year (BS)</label>
-                                <input type="number" class="form-control form-control-lg bg-dark text-white border-glass" id="bs_year" placeholder="2080">
+                    <!-- BS to AD Input -->
+                    <div x-show="mode === 'bs_to_ad'" x-transition class="space-y-4">
+                        <label class="calc-label text-center">Enter Nepali Date (BS)</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Year</label>
+                                <input type="number" x-model="bsYear" class="calc-input text-center" placeholder="2080">
                             </div>
-                            <div class="col-4">
-                                <label class="form-label text-secondary small text-uppercase fw-bold ls-1">Month</label>
-                                <select class="form-select form-select-lg bg-dark text-white border-glass" id="bs_month">
-                                    <option value="1">Baishakh</option>
-                                    <option value="2">Jestha</option>
-                                    <option value="3">Ashad</option>
-                                    <option value="4">Shrawan</option>
-                                    <option value="5">Bhadra</option>
-                                    <option value="6">Ashwin</option>
-                                    <option value="7">Kartik</option>
-                                    <option value="8">Mangsir</option>
-                                    <option value="9">Poush</option>
-                                    <option value="10">Magh</option>
-                                    <option value="11">Falgun</option>
-                                    <option value="12">Chaitra</option>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Month</label>
+                                <select x-model="bsMonth" class="calc-input text-center appearance-none">
+                                    <template x-for="(m, i) in months" :key="i">
+                                        <option :value="i+1" x-text="m"></option>
+                                    </template>
                                 </select>
                             </div>
-                            <div class="col-4">
-                                <label class="form-label text-secondary small text-uppercase fw-bold ls-1">Day</label>
-                                <input type="number" class="form-control form-control-lg bg-dark text-white border-glass" id="bs_day" placeholder="1" min="1" max="32">
-                            </div>
-                            <div class="col-12">
-                                <button class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-primary" onclick="convertBsToAd()">
-                                    Convert to English
-                                </button>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Day</label>
+                                <input type="number" x-model="bsDay" class="calc-input text-center" placeholder="1" min="1" max="32">
                             </div>
                         </div>
+                         <button @click="convertBsToAd()" class="calc-btn w-full mt-4" :disabled="loading">
+                             <span x-show="!loading"><i class="fas fa-exchange-alt mr-2"></i> Convert to English</span>
+                             <span x-show="loading"><i class="fas fa-spinner fa-spin mr-2"></i> Converting...</span>
+                        </button>
                     </div>
+
                 </div>
 
-                <div id="result-section" class="mt-4" style="display: none;">
-                    <div class="border-glass rounded-4 p-4 text-center bg-white-5">
-                         <h5 class="text-secondary mb-3">Converted Date</h5>
-                         <div class="display-3 fw-bold text-white mb-2" id="result-date"></div>
-                         <div class="text-muted h4" id="result-dayname"></div>
-                         <div class="text-muted small mt-2 d-none" id="result-error"></div>
-                    </div>
+                <!-- Result Section -->
+                <div x-show="result" x-transition class="mt-8 pt-8 border-t border-white/5 text-center">
+                    <div class="text-sm text-gray-400 uppercase tracking-widest mb-4 font-bold">Converted Date</div>
+                    <div class="text-4xl font-black text-white mb-2" x-text="result"></div>
+                    <div class="text-lg font-bold text-red-400" x-text="resultDay"></div>
                 </div>
+                 <div x-show="error" x-transition class="mt-4 text-center text-red-500 text-sm font-bold" x-text="error"></div>
+
             </div>
         </div>
     </div>
-</main>
+</div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('ad_input_date').value = today;
+document.addEventListener('alpine:init', () => {
+    Alpine.data('nepaliDateCalculator', () => ({
+        mode: 'ad_to_bs',
+        adDate: new Date().toISOString().split('T')[0],
+        bsYear: 2081,
+        bsMonth: 1,
+        bsDay: 1,
+        
+        result: null,
+        resultDay: null,
+        error: null,
+        loading: false,
+        
+        months: ['Baishakh', 'Jestha', 'Ashad', 'Shrawan', 'Bhadra', 'Ashwin', 'Kartik', 'Mangsir', 'Poush', 'Magh', 'Falgun', 'Chaitra'],
+
+        async convertAdToBs() {
+            if (!this.adDate) return;
+            const [y, m, d] = this.adDate.split('-');
+            await this.performConversion('ad_to_bs', y, m, d);
+        },
+
+        async convertBsToAd() {
+            if (!this.bsYear || !this.bsMonth || !this.bsDay) return;
+            await this.performConversion('bs_to_ad', this.bsYear, this.bsMonth, this.bsDay);
+        },
+
+        async performConversion(type, y, m, d) {
+            this.loading = true;
+            this.error = null;
+            this.result = null;
+            
+            try {
+                const response = await fetch('<?= app_base_url("/calculator/api/datetime/nepali"); ?>', {
+                    method: 'POST',
+                    body: JSON.stringify({ type, year: y, month: m, day: d })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    this.error = data.error;
+                } else {
+                    if (type === 'ad_to_bs') {
+                        this.result = `${data.month_name} ${data.day}, ${data.year}`;
+                        this.resultDay = data.day_name;
+                    } else {
+                        this.result = data.formatted;
+                        this.resultDay = data.day_name; // API likely returns weekday name
+                    }
+                }
+            } catch (e) {
+                this.error = "Failed to connect to conversion service.";
+            } finally {
+                this.loading = false;
+            }
+        }
+    }));
 });
-
-async function convertAdToBs() {
-    const date = document.getElementById('ad_input_date').value;
-    if (!date) return;
-    
-    const [y, m, d] = date.split('-');
-    
-    await performConversion('ad_to_bs', y, m, d);
-}
-
-async function convertBsToAd() {
-    const y = document.getElementById('bs_year').value;
-    const m = document.getElementById('bs_month').value;
-    const d = document.getElementById('bs_day').value;
-    
-    if (!y || !m || !d) return;
-    
-    await performConversion('bs_to_ad', y, m, d);
-}
-
-async function performConversion(type, y, m, d) {
-    try {
-        const response = await fetch('<?php echo app_base_url("/calculator/api/datetime/nepali"); ?>', {
-            method: 'POST',
-            body: JSON.stringify({ 
-                type: type,
-                year: y,
-                month: m,
-                day: d
-            })
-        });
-        
-        const data = await response.json();
-        const resultSection = document.getElementById('result-section');
-        const resultDate = document.getElementById('result-date');
-        const resultDay = document.getElementById('result-dayname');
-        
-        if (data.error) {
-            resultDate.textContent = "Error";
-            resultDay.textContent = data.error;
-            resultDay.classList.add('text-danger');
-            resultSection.style.display = 'block';
-            return;
-        }
-        
-        resultDay.classList.remove('text-danger');
-        
-        if (type === 'ad_to_bs') {
-            resultDate.textContent = `${data.month_name} ${data.day}, ${data.year}`;
-            resultDay.textContent = data.day_name;
-        } else {
-            resultDate.textContent = data.formatted;
-            resultDay.textContent = `${data.day_name}`;
-        }
-        
-        resultSection.style.display = 'block';
-    } catch (e) {
-        console.error(e);
-    }
-}
 </script>

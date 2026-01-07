@@ -1,270 +1,288 @@
-<?php $page_title = $title ?? 'Percentage Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/floating-calculator.css'); ?>">
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 40px 0;
-        }
-        
-        .calc-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .calc-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 16px 16px 0 0;
-            text-align: center;
-        }
-        
-        .calc-header h2 {
-            margin: 0;
-            font-size: 2rem;
-            font-weight: 700;
-        }
-        
-        .calc-body {
-            padding: 40px;
-        }
-        
-        .calc-section {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-        
-        .calc-label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .calc-input {
-            font-size: 1.3rem;
-            font-weight: 600;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            padding: 15px;
-        }
-        
-        .calc-input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-        
-        .calc-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 15px 40px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .calc-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        .result-box {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            color: white;
-            border-radius: 12px;
-            padding: 30px;
-            text-align: center;
-            margin-top: 30px;
-        }
-        
-        .result-value {
-            font-size: 3rem;
-            font-weight: 700;
-            margin: 10px 0;
-        }
-        
-        .tab-btn {
-            background: #e9ecef;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px 8px 0 0;
-            margin-right: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        
-        .tab-btn.active {
-            background: #f8f9fa;
-            color: #667eea;
-        }
-        
-        .back-btn {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn">
-            <i class="bi bi-arrow-left me-2"></i>Back to Calculator Platform
-        </a>
-        
-        <div class="calc-card">
-            <div class="calc-header">
-                <i class="bi bi-percent" style="font-size: 2.5rem;"></i>
-                <h2>Percentage Calculator</h2>
-                <p class="mb-0 mt-2">Calculate percentages easily</p>
-            </div>
-            
-            <div class="calc-body">
-                <!-- Tabs -->
-                <div class="mb-3">
-                    <button class="tab-btn active" onclick="switchTab('what_is')">What is X% of Y?</button>
-                    <button class="tab-btn" onclick="switchTab('is_what_percent')">X is what % of Y?</button>
-                    <button class="tab-btn" onclick="switchTab('percent_change')">% Change</button>
-                </div>
-                
-                <!-- Tab 1: What is X% of Y? -->
-                <div id="tab_what_is" class="tab-content">
-                    <div class="calc-section">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="calc-label">Percentage (%)</label>
-                                <input type="number" id="percent1" class="form-control calc-input" value="10" step="any">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="calc-label">Of Value</label>
-                                <input type="number" id="value1" class="form-control calc-input" value="100" step="any">
-                            </div>
-                        </div>
-                        <button class="calc-btn mt-4 w-100" onclick="calculate('what_is')">
-                            <i class="bi bi-calculator me-2"></i>Calculate
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Tab 2: X is what % of Y? -->
-                <div id="tab_is_what_percent" class="tab-content" style="display:none;">
-                    <div class="calc-section">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="calc-label">Value X</label>
-                                <input type="number" id="value2a" class="form-control calc-input" value="25" step="any">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="calc-label">Of Value Y</label>
-                                <input type="number" id="value2b" class="form-control calc-input" value="100" step="any">
-                            </div>
-                        </div>
-                        <button class="calc-btn mt-4 w-100" onclick="calculate('is_what_percent')">
-                            <i class="bi bi-calculator me-2"></i>Calculate
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Tab 3: % Change -->
-                <div id="tab_percent_change" class="tab-content" style="display:none;">
-                    <div class="calc-section">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="calc-label">Original Value</label>
-                                <input type="number" id="value3a" class="form-control calc-input" value="100" step="any">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="calc-label">New Value</label>
-                                <input type="number" id="value3b" class="form-control calc-input" value="120" step="any">
-                            </div>
-                        </div>
-                        <button class="calc-btn mt-4 w-100" onclick="calculate('percent_change')">
-                            <i class="bi bi-calculator me-2"></i>Calculate
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Result -->
-                <div class="result-box" id="resultBox" style="display:none;">
-                    <div>Result</div>
-                    <div class="result-value" id="resultValue">0</div>
-                    <div id="resultFormula"></div>
-                </div>
-            </div>
-        </div>
+<?php
+// themes/default/views/calculators/math/percentage.php
+// PREMIUM PERCENTAGE CALCULATOR
+?>
+
+<!-- Load Calculators CSS -->
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<!-- Load Alpine.js -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="percentageCalculator()">
+    
+    <!-- Animated Background -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[-20%] left-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] animate-float"></div>
+        <div class="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-accent/10 rounded-full blur-[100px] animate-float" style="animation-delay: 2s;"></div>
     </div>
 
-    <script>
-        const appBase = "<?php echo rtrim(app_base_url(), '/'); ?>";
-        let currentTab = 'what_is';
+    <div class="calc-container">
         
-        function switchTab(tab) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        <!-- Breadcrumb -->
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/') ?>" class="hover:text-white transition"><i class="fas fa-home"></i></a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Percentage Calculator</li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-percent"></i>
+                <span>MATHEMATICS</span>
+            </div>
             
-            // Show selected tab
-            document.getElementById('tab_' + tab).style.display = 'block';
-            event.target.classList.add('active');
-            currentTab = tab;
-        }
-        
-        function calculate(type) {
-            let value1, value2;
+            <h1 class="calc-title">
+                Percentage <span class="text-gradient">Pro</span>
+            </h1>
+            <p class="calc-subtitle max-w-2xl mx-auto">
+                Comprehensive tool for all percentage calculations. Find percentages, percentage change, and reverse percentages instantly.
+            </p>
+        </div>
+
+        <!-- Main Calculator Card -->
+        <div class="calc-grid mb-12">
             
-            if (type === 'what_is') {
-                value1 = parseFloat(document.getElementById('percent1').value);
-                value2 = parseFloat(document.getElementById('value1').value);
-            } else if (type === 'is_what_percent') {
-                value1 = parseFloat(document.getElementById('value2a').value);
-                value2 = parseFloat(document.getElementById('value2b').value);
-            } else {
-                value1 = parseFloat(document.getElementById('value3a').value);
-                value2 = parseFloat(document.getElementById('value3b').value);
-            }
+            <!-- Input Section -->
+            <div class="calc-card animate-scale-in">
+                <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30 flex items-center justify-center">
+                        <i class="fas fa-keyboard text-primary"></i>
+                    </div>
+                    <span>Calculation Type</span>
+                </h2>
+
+                <!-- Type Selector -->
+                <div class="calc-section">
+                    <label class="calc-label">
+                        <i class="fas fa-list mr-2"></i> Select Mode
+                    </label>
+                    <select x-model="mode" @change="resetInputs()" class="calc-select">
+                        <option value="basic">What is X% of Y?</option>
+                        <option value="find_percent">X is what % of Y?</option>
+                        <option value="increase">Percentage Increase/Decrease</option>
+                        <option value="reverse">Reverse Percentage (Find Original)</option>
+                    </select>
+                </div>
+
+                <!-- Basic Percentage Inputs -->
+                <div x-show="mode === 'basic'" class="space-y-6 animate-slide-up">
+                    <div class="flex items-center gap-4 flex-wrap md:flex-nowrap">
+                        <span class="text-xl font-bold text-white">What is</span>
+                        <div class="calc-input-group flex-1">
+                            <input type="number" x-model.number="val1" @input="calculate()" class="calc-input text-center" placeholder="X" step="0.01">
+                            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">%</div>
+                        </div>
+                        <span class="text-xl font-bold text-white">of</span>
+                        <div class="calc-input-group flex-1">
+                            <input type="number" x-model.number="val2" @input="calculate()" class="calc-input text-center" placeholder="Y" step="0.01">
+                        </div>
+                        <span class="text-xl font-bold text-white">?</span>
+                    </div>
+                </div>
+
+                <!-- Find Percentage Inputs -->
+                <div x-show="mode === 'find_percent'" class="space-y-6 animate-slide-up">
+                     <div class="flex items-center gap-4 flex-wrap md:flex-nowrap">
+                        <div class="calc-input-group flex-1">
+                            <input type="number" x-model.number="val1" @input="calculate()" class="calc-input text-center" placeholder="X" step="0.01">
+                        </div>
+                        <span class="text-xl font-bold text-white">is what % of</span>
+                        <div class="calc-input-group flex-1">
+                            <input type="number" x-model.number="val2" @input="calculate()" class="calc-input text-center" placeholder="Y" step="0.01">
+                        </div>
+                        <span class="text-xl font-bold text-white">?</span>
+                    </div>
+                </div>
+
+                <!-- Increase/Decrease Inputs -->
+                <div x-show="mode === 'increase'" class="space-y-4 animate-slide-up">
+                    <div class="calc-section">
+                        <label class="calc-label">From Value</label>
+                        <input type="number" x-model.number="val1" @input="calculate()" class="calc-input" placeholder="Start Value" step="0.01">
+                    </div>
+                    <div class="calc-section">
+                        <label class="calc-label">To Value</label>
+                        <input type="number" x-model.number="val2" @input="calculate()" class="calc-input" placeholder="End Value" step="0.01">
+                    </div>
+                </div>
+
+                 <!-- Reverse Inputs -->
+                 <div x-show="mode === 'reverse'" class="space-y-6 animate-slide-up">
+                    <div class="flex items-center gap-4 flex-wrap md:flex-nowrap">
+                        <span class="text-xl font-bold text-white">Value is</span>
+                        <div class="calc-input-group flex-1">
+                            <input type="number" x-model.number="val1" @input="calculate()" class="calc-input text-center" placeholder="Total" step="0.01">
+                        </div>
+                        <span class="text-xl font-bold text-white">which is</span>
+                        <div class="calc-input-group flex-1">
+                            <input type="number" x-model.number="val2" @input="calculate()" class="calc-input text-center" placeholder="%" step="0.01">
+                            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">%</div>
+                        </div>
+                        <span class="text-xl font-bold text-white">of what?</span>
+                    </div>
+                </div>
+
+
+                <!-- Action Buttons -->
+                <div class="flex gap-4 mt-8">
+                    <button @click="calculate()" class="btn-primary flex-1">
+                        <i class="fas fa-calculator mr-2"></i> Calculate
+                    </button>
+                    <button @click="reset()" class="btn-secondary">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div class="calc-card animate-scale-in" style="animation-delay: 0.1s;">
+                <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 flex items-center justify-center">
+                        <i class="fas fa-equals text-green-500"></i>
+                    </div>
+                    <span>Answer</span>
+                </h2>
+
+                <!-- Dynamic Visualization (Bar) -->
+                <div class="mb-6 h-12 rounded-full bg-white/5 border border-white/10 relative overflow-hidden flex items-center px-4">
+                     <div class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-primary to-accent transition-all duration-700 ease-out" 
+                          :style="'width: ' + Math.min(Math.max((visualPercentage || 0), 0), 100) + '%'"></div>
+                     <span class="relative z-10 text-xs font-bold text-white mix-blend-difference" x-text="visualPercentage ? formatNumber(visualPercentage) + '%' : ''"></span>
+                </div>
+
+                <!-- Result Display -->
+                <div x-show="result !== null" class="calc-result" x-transition>
+                    <div class="calc-result-label" x-text="resultLabel">Result</div>
+                    <div class="calc-result-value" x-text="formatNumber(result) + (resultSuffix || '')"></div>
+                    <div class="calc-result-unit" x-text="resultSubtext"></div>
+                    
+                    <!-- Copy Button -->
+                    <button @click="copyResult()" class="mt-6 btn-secondary w-full">
+                        <i class="fas fa-copy mr-2"></i> Copy Answer
+                    </button>
+                </div>
+
+                <!-- Empty State -->
+                <div x-show="result === null" class="text-center py-8">
+                    <div class="text-4xl text-gray-700 mb-2 animate-bounce-subtle">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <p class="text-gray-500">Enter values to compute</p>
+                </div>
+
+                <!-- Detailed Explanation -->
+                <div x-show="result !== null" class="mt-8 p-4 rounded-xl bg-white/5 border border-white/10" x-transition>
+                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Breakdown</div>
+                    <div class="font-mono text-sm text-white" x-html="explanation"></div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div x-show="showToast" x-transition class="toast" style="display: none;">
+        <i class="fas fa-check-circle text-success"></i>
+        <span>Copied to clipboard!</span>
+    </div>
+
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('percentageCalculator', () => ({
+        mode: 'basic',
+        val1: null,
+        val2: null,
+        result: null,
+        resultLabel: 'Result',
+        resultSuffix: '',
+        resultSubtext: '',
+        explanation: '',
+        visualPercentage: 0, // For the progress bar
+        showToast: false,
+
+        calculate() {
+            if (this.val1 === null || this.val2 === null) return;
             
-            fetch(appBase + '/calculator/api/percentage', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: `type=${type}&value1=${value1}&value2=${value2}`
-            })
-            .then(r => r.json())
-            .then(data => {
-                document.getElementById('resultBox').style.display = 'block';
-                document.getElementById('resultValue').textContent = data.result.toFixed(2);
+            this.val1 = parseFloat(this.val1);
+            this.val2 = parseFloat(this.val2);
+
+            switch(this.mode) {
+                case 'basic': // What is X% of Y?
+                    this.result = (this.val1 / 100) * this.val2;
+                    this.resultLabel = `${this.val1}% of ${this.val2}`;
+                    this.resultSuffix = '';
+                    this.resultSubtext = '';
+                    this.explanation = `${this.val1} / 100 × ${this.val2} = ${this.formatNumber(this.result)}`;
+                    this.visualPercentage = this.val1;
+                    break;
                 
-                let formula = '';
-                if (type === 'what_is') {
-                    formula = `${value1}% of ${value2} = ${data.result.toFixed(2)}`;
-                } else if (type === 'is_what_percent') {
-                    formula = `${value1} is ${data.result.toFixed(2)}% of ${value2}`;
-                } else {
-                    formula = `Change from ${value1} to ${value2} = ${data.result.toFixed(2)}%`;
-                }
-                document.getElementById('resultFormula').textContent = formula;
-            });
+                case 'find_percent': // X is what % of Y?
+                    if (this.val2 === 0) { this.result = 0; break; }
+                    this.result = (this.val1 / this.val2) * 100;
+                    this.resultLabel = 'Percentage';
+                    this.resultSuffix = '%';
+                    this.resultSubtext = `${this.val1} out of ${this.val2}`;
+                    this.explanation = `${this.val1} ÷ ${this.val2} × 100 = ${this.formatNumber(this.result)}%`;
+                    this.visualPercentage = this.result;
+                    break;
+
+                case 'increase': // Percentage Change
+                    if (this.val1 === 0) { this.result = 0; break; }
+                    let diff = this.val2 - this.val1;
+                    this.result = (diff / this.val1) * 100;
+                    this.resultLabel = this.result > 0 ? 'Increase' : 'Decrease';
+                    this.resultSuffix = '%';
+                    this.resultSubtext = `Difference: ${this.formatNumber(diff)}`;
+                    this.explanation = `(${this.val2} - ${this.val1}) ÷ ${this.val1} × 100 = ${this.formatNumber(this.result)}%`;
+                    this.visualPercentage = Math.abs(this.result);
+                    break;
+
+                case 'reverse': // Finds original number. X is Y% of what?
+                     // val1 = part, val2 = percent
+                     if (this.val2 === 0) { this.result = 0; break; }
+                     this.result = (this.val1 / this.val2) * 100;
+                     this.resultLabel = 'Original Value';
+                     this.resultSuffix = '';
+                     this.resultSubtext = `100% Value`;
+                     this.explanation = `${this.val1} ÷ ${this.val2}% = ${this.formatNumber(this.result)}`;
+                     this.visualPercentage = 100; // Original is always 100%
+                     break;
+            }
+        },
+
+        resetInputs() {
+            this.val1 = null;
+            this.val2 = null;
+            this.result = null;
+            this.visualPercentage = 0;
+        },
+
+        reset() {
+            this.resetInputs();
+            this.mode = 'basic';
+        },
+
+        formatNumber(num) {
+            return num ? num.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '0';
+        },
+
+        copyResult() {
+            if (this.result !== null) {
+                navigator.clipboard.writeText(this.formatNumber(this.result) + this.resultSuffix);
+                this.showToast = true;
+                setTimeout(() => this.showToast = false, 2000);
+            }
         }
-    </script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>
