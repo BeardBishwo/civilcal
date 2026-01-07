@@ -161,4 +161,30 @@ class CalculatorController extends Controller
             ]
         ]);
     }
+    
+    /**
+     * Catch-all permalink route for calculators
+     */
+    public function permalink($slug)
+    {
+        // 1. Try to find a calculator by slug
+        $calculator = $this->db->findOne('calculators', ['slug' => $slug, 'is_active' => 1]);
+        
+        if ($calculator) {
+            return $this->show($calculator['category'], $calculator['calculator_id']);
+        }
+        
+        // 2. Try to find a calculator by calculator_id as fallback
+        $calculator = $this->db->findOne('calculators', ['calculator_id' => $slug, 'is_active' => 1]);
+        if ($calculator) {
+             return $this->show($calculator['category'], $calculator['calculator_id']);
+        }
+
+        // 3. 404 if not found
+        http_response_code(404);
+        $this->view->render('errors/404', [
+            'title' => 'Page Not Found',
+            'message' => 'The calculator or page you are looking for does not exist.'
+        ]);
+    }
 }

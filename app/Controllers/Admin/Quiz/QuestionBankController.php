@@ -59,6 +59,9 @@ class QuestionBankController extends Controller
             } elseif ($type === 'THEORY_LONG') {
                 // Long answer only
                 $where[] = "q.type = 'THEORY' AND (q.theory_type = 'long' OR q.default_marks > 4)";
+            } elseif ($type === 'SEQUENCE') {
+                // Map frontend SEQUENCE to backend ORDER
+                $where[] = "q.type = 'ORDER'";
             } else {
                 // Other types
                 $where[] = "q.type = :type";
@@ -125,6 +128,7 @@ class QuestionBankController extends Controller
             $type = $row['type'];
             if(in_array($type, ['MCQ', 'TF'])) $stats['mcq'] += $row['count'];
             if($type == 'MULTI') $stats['multi'] += $row['count'];
+            if($type == 'ORDER') $stats['order'] += $row['count'];
             if($type == 'THEORY') $stats['theory'] += $row['count'];
         }
         

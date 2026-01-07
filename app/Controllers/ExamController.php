@@ -34,7 +34,7 @@ class ExamController extends Controller
             AND level.is_active = 1
             AND course.is_active = 1
             GROUP BY s.id
-            ORDER BY s.name
+            ORDER BY s.title
         ")->fetchAll();
 
         $this->view('exams/index', [
@@ -79,7 +79,7 @@ class ExamController extends Controller
         $this->view('exams/category', [
             'category' => $category,
             'stats' => $stats,
-            'page_title' => $category['name'] . ' - Exam Prep'
+            'page_title' => $category['title'] . ' - Exam Prep'
         ]);
     }
 

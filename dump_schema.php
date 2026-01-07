@@ -1,11 +1,16 @@
 <?php
-$c = include 'config/database.php';
-try {
-    $pdo = new PDO('mysql:host='.$c['host'].';dbname='.$c['database'], $c['username'], $c['password']);
-    $stmt = $pdo->query("SHOW CREATE TABLE quiz_questions");
-    $row = $stmt->fetch(PDO::FETCH_NUM);
-    file_put_contents('quiz_questions_schema.txt', $row[1]);
-    echo "Schema written to quiz_questions_schema.txt\n";
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
+require_once __DIR__ . '/app/Core/Database.php';
+use App\Core\Database;
+
+$db = Database::getInstance();
+
+$tables = ['quiz_exams', 'quiz_exam_questions', 'quiz_questions', 'syllabus_nodes'];
+
+foreach ($tables as $table) {
+    echo "--- SCHEMA FOR $table ---\n";
+    $cols = $db->query("SHOW COLUMNS FROM $table")->fetchAll();
+    foreach ($cols as $c) {
+        echo "{$c['Field']} ({$c['Type']})\n";
+    }
+    echo "\n";
 }

@@ -21,7 +21,7 @@ $positionLevels = $positionLevels ?? [];
                     <i class="fas fa-database"></i>
                     <h1>Question Bank</h1>
                 </div>
-                <div class="header-subtitle"><?php echo number_format($stats['total']); ?> Questions • <?php echo number_format($stats['mcq']); ?> MCQ • <?php echo number_format($stats['multi']); ?> Multi</div>
+                <div class="header-subtitle"><?php echo number_format($stats['total']); ?> Questions • <?php echo number_format($stats['mcq']); ?> MCQ • <?php echo number_format($stats['multi']); ?> Multi • <?php echo number_format($stats['order'] ?? 0); ?> Sequence</div>
             </div>
             <div class="header-actions" style="display:flex; gap:10px;">
                 <div class="stat-pill">
@@ -31,6 +31,10 @@ $positionLevels = $positionLevels ?? [];
                 <div class="stat-pill warning">
                     <span class="label">MCQ</span>
                     <span class="value"><?php echo number_format($stats['mcq']); ?></span>
+                </div>
+                <div class="stat-pill success">
+                    <span class="label">SEQUENCE</span>
+                    <span class="value"><?php echo number_format($stats['order'] ?? 0); ?></span>
                 </div>
                 <div style="width:1px; height:40px; background:rgba(255,255,255,0.2);"></div>
                 <a href="<?php echo app_base_url('admin/quiz/questions/create'); ?>" class="btn-create-premium" style="text-decoration:none;">
@@ -188,6 +192,11 @@ $positionLevels = $positionLevels ?? [];
                                             $badgeColor = '#e0e7ff';
                                             $textColor = '#3730a3';
                                             $borderColor = '#a5b4fc';
+                                        } elseif ($q['type'] == 'ORDER') {
+                                            $badgeColor = '#f3e8ff';
+                                            $textColor = '#6b21a8';
+                                            $borderColor = '#d8b4fe';
+                                            $displayType = 'SEQUENCE';
                                         }
                                         ?>
                                         <span class="badge-pill" style="background: <?php echo $badgeColor; ?>; color: <?php echo $textColor; ?>; border-color: <?php echo $borderColor; ?>;">
@@ -447,6 +456,7 @@ function filterQuestions() {
     min-width: 80px;
 }
 .stat-pill.warning { background: rgba(252, 211, 77, 0.15); border-color: rgba(252, 211, 77, 0.3); }
+.stat-pill.success { background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); }
 .stat-pill .label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.9; }
 .stat-pill .value { font-size: 1.1rem; font-weight: 800; line-height: 1.1; }
 

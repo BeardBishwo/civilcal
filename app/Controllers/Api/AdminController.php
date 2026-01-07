@@ -315,11 +315,19 @@ class AdminController extends Controller
         $path = __DIR__ . '/../../../storage';
         
         if (is_dir($path)) {
-            $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
-            foreach ($iterator as $file) {
-                if ($file->isFile()) {
-                    $size += $file->getSize();
+            try {
+                $iterator = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS),
+                    \RecursiveIteratorIterator::SELF_FIRST
+                );
+                foreach ($iterator as $file) {
+                    if ($file->isFile()) {
+                        $size += $file->getSize();
+                    }
                 }
+            } catch (\Throwable $e) {
+                error_log("Storage Usage Error: " . $e->getMessage());
+                return "Calculating...";
             }
         }
         
@@ -356,10 +364,13 @@ class AdminController extends Controller
     
     private function getStorageUsagePercent()
     {
-        $total = disk_total_space('.');
-        $free = disk_free_space('.');
-        
-        return $total > 0 ? round((($total - $free) / $total) * 100, 1) : 0;
+        try {
+            $total = @disk_total_space('.');
+            $free = @disk_free_space('.');
+            return $total > 0 ? round((($total - $free) / $total) * 100, 1) : 0;
+        } catch (\Throwable $e) {
+            return 0;
+        }
     }
     
     private function parseSize($size)
