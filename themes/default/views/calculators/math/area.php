@@ -1,160 +1,288 @@
-<?php $page_title = $title ?? 'Area Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/floating-calculator.css'); ?>">
-    <style>
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 40px 0; }
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 800px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .shape-btn { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 20px; margin: 10px; cursor: pointer; transition: all 0.3s; text-align: center; }
-        .shape-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-color: #667eea; }
-        .shape-btn i { font-size: 2rem; display: block; margin-bottom: 10px; }
-        .calc-input { font-size: 1.3rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px; }
-        .calc-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-radius: 12px; padding: 30px; text-align: center; margin-top: 30px; }
-        .result-value { font-size: 3rem; font-weight: 700; margin: 10px 0; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Back</a>
-        <div class="calc-card">
-            <div class="calc-header">
-                <i class="bi bi-bounding-box" style="font-size: 2.5rem;"></i>
-                <h2>Area Calculator</h2>
-                <p class="mb-0 mt-2">Calculate area of different shapes</p>
+<?php
+// themes/default/views/calculators/math/area.php
+// PREMIUM AREA CALCULATOR
+?>
+
+<!-- Load Calculators CSS -->
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<!-- Load Alpine.js -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="areaCalculator()">
+    
+    <!-- Animated Background -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] animate-float"></div>
+        <div class="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[120px] animate-float" style="animation-delay: 1s;"></div>
+    </div>
+
+    <div class="calc-container">
+        
+        <!-- Breadcrumb -->
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/') ?>" class="hover:text-white transition"><i class="fas fa-home"></i></a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Area Calculator</li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="calc-header animate-slide-down">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
+                <i class="fas fa-square"></i>
+                <span>MATHEMATICS</span>
             </div>
-            <div class="calc-body">
-                <div class="row mb-4">
-                    <div class="col-md-3">
-                        <div class="shape-btn active" onclick="selectShape('square', this)">
-                            <i class="bi bi-square"></i>
-                            <div>Square</div>
-                        </div>
+            
+            <h1 class="calc-title">
+                Area <span class="text-gradient">Calculator</span>
+            </h1>
+            <p class="calc-subtitle max-w-2xl mx-auto">
+                Calculate the area of various geometric shapes with precision. Choose your shape and enter the dimensions.
+            </p>
+        </div>
+
+        <!-- Main Calculator Card -->
+        <div class="calc-grid mb-12">
+            
+            <!-- Input Section -->
+            <div class="calc-card animate-scale-in">
+                <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30 flex items-center justify-center">
+                        <i class="fas fa-edit text-primary"></i>
                     </div>
-                    <div class="col-md-3">
-                        <div class="shape-btn" onclick="selectShape('rectangle', this)">
-                            <i class="bi bi-square"></i>
-                            <div>Rectangle</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="shape-btn" onclick="selectShape('circle', this)">
-                            <i class="bi bi-circle"></i>
-                            <div>Circle</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="shape-btn" onclick="selectShape('triangle', this)">
-                            <i class="bi bi-triangle"></i>
-                            <div>Triangle</div>
-                        </div>
+                    <span>Input</span>
+                </h2>
+
+                <!-- Shape Selector -->
+                <div class="calc-section">
+                    <label class="calc-label">
+                        <i class="fas fa-shapes mr-2"></i> Select Shape
+                    </label>
+                    <select x-model="shape" @change="resetInputs()" class="calc-select">
+                        <option value="square">Square</option>
+                        <option value="rectangle">Rectangle</option>
+                        <option value="circle">Circle</option>
+                        <option value="triangle">Triangle</option>
+                    </select>
+                </div>
+
+                <!-- Dynamic Inputs Based on Shape -->
+                <div x-show="shape === 'square'" class="calc-section animate-slide-up">
+                    <label class="calc-label">
+                        <i class="fas fa-ruler mr-2"></i> Side Length
+                    </label>
+                    <div class="calc-input-group">
+                        <input type="number" x-model.number="side" @input="calculate()" class="calc-input" placeholder="Enter side length" step="0.01">
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">units</div>
                     </div>
                 </div>
-                
-                <!-- Square -->
-                <div id="shape_square" class="shape-inputs">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Side Length</label>
-                        <input type="number" id="square_side" class="form-control calc-input" value="10" step="any">
+
+                <div x-show="shape === 'rectangle'" class="space-y-4 animate-slide-up">
+                    <div class="calc-section">
+                        <label class="calc-label">
+                            <i class="fas fa-arrows-alt-h mr-2"></i> Length
+                        </label>
+                        <input type="number" x-model.number="length" @input="calculate()" class="calc-input" placeholder="Enter length" step="0.01">
+                    </div>
+                    <div class="calc-section">
+                        <label class="calc-label">
+                            <i class="fas fa-arrows-alt-v mr-2"></i> Width
+                        </label>
+                        <input type="number" x-model.number="width" @input="calculate()" class="calc-input" placeholder="Enter width" step="0.01">
                     </div>
                 </div>
-                
-                <!-- Rectangle -->
-                <div id="shape_rectangle" class="shape-inputs" style="display:none;">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Length</label>
-                            <input type="number" id="rect_length" class="form-control calc-input" value="10" step="any">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Width</label>
-                            <input type="number" id="rect_width" class="form-control calc-input" value="5" step="any">
-                        </div>
+
+                <div x-show="shape === 'circle'" class="calc-section animate-slide-up">
+                    <label class="calc-label">
+                        <i class="fas fa-circle mr-2"></i> Radius
+                    </label>
+                    <input type="number" x-model.number="radius" @input="calculate()" class="calc-input" placeholder="Enter radius" step="0.01">
+                </div>
+
+                <div x-show="shape === 'triangle'" class="space-y-4 animate-slide-up">
+                    <div class="calc-section">
+                        <label class="calc-label">
+                            <i class="fas fa-arrows-alt-h mr-2"></i> Base
+                        </label>
+                        <input type="number" x-model.number="base" @input="calculate()" class="calc-input" placeholder="Enter base" step="0.01">
+                    </div>
+                    <div class="calc-section">
+                        <label class="calc-label">
+                            <i class="fas fa-arrows-alt-v mr-2"></i> Height
+                        </label>
+                        <input type="number" x-model.number="height" @input="calculate()" class="calc-input" placeholder="Enter height" step="0.01">
                     </div>
                 </div>
-                
-                <!-- Circle -->
-                <div id="shape_circle" class="shape-inputs" style="display:none;">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Radius</label>
-                        <input type="number" id="circle_radius" class="form-control calc-input" value="5" step="any">
+
+                <!-- Action Buttons -->
+                <div class="flex gap-4 mt-8">
+                    <button @click="calculate()" class="btn-primary flex-1">
+                        <i class="fas fa-calculator mr-2"></i> Calculate
+                    </button>
+                    <button @click="reset()" class="btn-secondary">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div class="calc-card animate-scale-in" style="animation-delay: 0.1s;">
+                <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-500"></i>
+                    </div>
+                    <span>Result</span>
+                </h2>
+
+                <!-- Result Display -->
+                <div x-show="result !== null" class="calc-result" x-transition>
+                    <div class="calc-result-label">Area</div>
+                    <div class="calc-result-value" x-text="formatNumber(result)"></div>
+                    <div class="calc-result-unit">square units</div>
+                    
+                    <!-- Copy Button -->
+                    <button @click="copyResult()" class="mt-6 btn-secondary w-full">
+                        <i class="fas fa-copy mr-2"></i> Copy Result
+                    </button>
+                </div>
+
+                <!-- Empty State -->
+                <div x-show="result === null" class="text-center py-12">
+                    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-white/5 flex items-center justify-center text-3xl text-gray-600 animate-pulse">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <p class="text-gray-400">Enter dimensions to calculate area</p>
+                </div>
+
+                <!-- Formula Display -->
+                <div x-show="result !== null" class="mt-8 p-4 rounded-xl bg-white/5 border border-white/10" x-transition>
+                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Formula Used</div>
+                    <div class="font-mono text-sm text-white" x-html="getFormula()"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Info Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="glass-card stagger-item">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-square text-blue-500 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white mb-1">Square</h3>
+                        <p class="text-sm text-gray-400">Area = side²</p>
                     </div>
                 </div>
-                
-                <!-- Triangle -->
-                <div id="shape_triangle" class="shape-inputs" style="display:none;">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Base</label>
-                            <input type="number" id="tri_base" class="form-control calc-input" value="10" step="any">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Height</label>
-                            <input type="number" id="tri_height" class="form-control calc-input" value="8" step="any">
-                        </div>
+            </div>
+
+            <div class="glass-card stagger-item" style="animation-delay: 0.1s;">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-circle text-purple-500 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white mb-1">Circle</h3>
+                        <p class="text-sm text-gray-400">Area = πr²</p>
                     </div>
                 </div>
-                
-                <button class="calc-btn mt-4 w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Calculate Area</button>
-                <div class="result-box" id="resultBox" style="display:none;">
-                    <div>Area</div>
-                    <div class="result-value" id="areaValue">0</div>
-                    <div id="formula"></div>
+            </div>
+
+            <div class="glass-card stagger-item" style="animation-delay: 0.2s;">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-play text-green-500 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white mb-1">Triangle</h3>
+                        <p class="text-sm text-gray-400">Area = ½ × base × height</p>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
-    <script>
-        let currentShape = 'square';
-        
-        function selectShape(shape, btn) {
-            document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll('.shape-inputs').forEach(s => s.style.display = 'none');
-            document.getElementById('shape_' + shape).style.display = 'block';
-            currentShape = shape;
-        }
-        
-        function calculate() {
-            let area = 0;
-            let formula = '';
-            
-            if (currentShape === 'square') {
-                const side = parseFloat(document.getElementById('square_side').value);
-                area = side * side;
-                formula = `${side} × ${side} = ${area.toFixed(2)}`;
-            } else if (currentShape === 'rectangle') {
-                const length = parseFloat(document.getElementById('rect_length').value);
-                const width = parseFloat(document.getElementById('rect_width').value);
-                area = length * width;
-                formula = `${length} × ${width} = ${area.toFixed(2)}`;
-            } else if (currentShape === 'circle') {
-                const radius = parseFloat(document.getElementById('circle_radius').value);
-                area = Math.PI * radius * radius;
-                formula = `π × ${radius}² = ${area.toFixed(2)}`;
-            } else if (currentShape === 'triangle') {
-                const base = parseFloat(document.getElementById('tri_base').value);
-                const height = parseFloat(document.getElementById('tri_height').value);
-                area = 0.5 * base * height;
-                formula = `½ × ${base} × ${height} = ${area.toFixed(2)}`;
+
+    <!-- Toast Notification -->
+    <div x-show="showToast" x-transition class="toast" style="display: none;">
+        <i class="fas fa-check-circle text-green-500"></i>
+        <span>Result copied to clipboard!</span>
+    </div>
+
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('areaCalculator', () => ({
+        shape: 'square',
+        side: null,
+        length: null,
+        width: null,
+        radius: null,
+        base: null,
+        height: null,
+        result: null,
+        showToast: false,
+
+        calculate() {
+            switch(this.shape) {
+                case 'square':
+                    if (this.side) this.result = this.side * this.side;
+                    break;
+                case 'rectangle':
+                    if (this.length && this.width) this.result = this.length * this.width;
+                    break;
+                case 'circle':
+                    if (this.radius) this.result = Math.PI * this.radius * this.radius;
+                    break;
+                case 'triangle':
+                    if (this.base && this.height) this.result = 0.5 * this.base * this.height;
+                    break;
             }
-            
-            document.getElementById('resultBox').style.display = 'block';
-            document.getElementById('areaValue').textContent = area.toFixed(2);
-            document.getElementById('formula').textContent = formula;
+        },
+
+        resetInputs() {
+            this.side = null;
+            this.length = null;
+            this.width = null;
+            this.radius = null;
+            this.base = null;
+            this.height = null;
+            this.result = null;
+        },
+
+        reset() {
+            this.resetInputs();
+            this.shape = 'square';
+        },
+
+        formatNumber(num) {
+            return num ? num.toFixed(2) : '0.00';
+        },
+
+        getFormula() {
+            const formulas = {
+                'square': 'Area = side² = ' + (this.side || 0) + '² = ' + this.formatNumber(this.result),
+                'rectangle': 'Area = length × width = ' + (this.length || 0) + ' × ' + (this.width || 0) + ' = ' + this.formatNumber(this.result),
+                'circle': 'Area = πr² = π × ' + (this.radius || 0) + '² = ' + this.formatNumber(this.result),
+                'triangle': 'Area = ½ × base × height = ½ × ' + (this.base || 0) + ' × ' + (this.height || 0) + ' = ' + this.formatNumber(this.result)
+            };
+            return formulas[this.shape] || '';
+        },
+
+        copyResult() {
+            if (this.result) {
+                navigator.clipboard.writeText(this.formatNumber(this.result));
+                this.showToast = true;
+                setTimeout(() => this.showToast = false, 2000);
+            }
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

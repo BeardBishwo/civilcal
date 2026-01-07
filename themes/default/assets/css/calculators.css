@@ -1,0 +1,265 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Base Styles */
+body {
+    @apply bg-background text-white;
+}
+
+/* ============================================
+   GLASSMORPHISM COMPONENTS
+   ============================================ */
+
+.glass {
+    @apply bg-surface backdrop-blur-md border border-white/10 shadow-lg;
+}
+
+.glass-card {
+    @apply glass rounded-2xl p-8 transition-all duration-300 hover:bg-surfaceHover hover:scale-[1.01] hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1;
+}
+
+.glass-input {
+    @apply bg-black/30 border border-white/10 rounded-lg px-4 py-3 text-white font-mono text-lg placeholder-gray-400 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/30 transition-all;
+}
+
+/* ============================================
+   CALCULATOR SPECIFIC COMPONENTS
+   ============================================ */
+
+.calc-container {
+    @apply max-w-7xl mx-auto px-4 py-8 relative z-10;
+}
+
+.calc-header {
+    @apply mb-8 text-center;
+}
+
+.calc-title {
+    @apply text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r from-white via-gray-200 to-gray-500 bg-clip-text text-transparent;
+}
+
+.calc-subtitle {
+    @apply text-gray-400 text-lg;
+}
+
+.calc-card {
+    @apply glass-card relative overflow-hidden;
+}
+
+.calc-section {
+    @apply mb-6;
+}
+
+.calc-label {
+    @apply block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2;
+}
+
+.calc-input-group {
+    @apply relative;
+}
+
+.calc-input {
+    @apply glass-input w-full;
+}
+
+.calc-input:focus {
+    @apply border-primary shadow-lg shadow-primary/20;
+}
+
+.calc-select {
+    @apply glass-input w-full cursor-pointer appearance-none pr-10;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23667eea'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2rem;
+}
+
+.calc-result {
+    @apply bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 rounded-2xl p-8 text-center font-mono text-4xl md:text-5xl font-black text-white shadow-lg shadow-primary/10 animate-scale-in;
+}
+
+.calc-result-label {
+    @apply text-sm font-bold text-gray-400 uppercase tracking-widest mb-3;
+}
+
+.calc-result-value {
+    @apply text-5xl md:text-6xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
+}
+
+.calc-result-unit {
+    @apply text-xl text-gray-400 mt-2;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+.btn-primary {
+    @apply bg-gradient-to-r from-primary to-secondary text-white font-bold py-4 px-8 rounded-xl hover:shadow-lg hover:shadow-primary/40 transition-all active:scale-95 relative overflow-hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] transition-transform duration-700;
+}
+
+.btn-primary:hover::before {
+    @apply translate-x-[200%];
+}
+
+.btn-secondary {
+    @apply bg-white/10 border border-white/20 text-white font-bold py-4 px-8 rounded-xl hover:bg-white/20 hover:border-white/30 transition-all active:scale-95;
+}
+
+.btn-icon {
+    @apply w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white/20 hover:border-primary/50 hover:text-primary transition-all active:scale-90;
+}
+
+/* ============================================
+   GRID LAYOUTS
+   ============================================ */
+
+.calc-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.calc-grid-3 {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-6;
+}
+
+.calc-grid-4 {
+    @apply grid grid-cols-2 md:grid-cols-4 gap-4;
+}
+
+/* ============================================
+   ANIMATIONS & EFFECTS
+   ============================================ */
+
+.shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+
+.pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.float {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Stagger Animation for Lists */
+.stagger-item {
+    opacity: 0;
+    animation: slideUp 0.3s ease-out forwards;
+}
+
+.stagger-item:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.stagger-item:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.stagger-item:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.stagger-item:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.stagger-item:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+.stagger-item:nth-child(6) {
+    animation-delay: 0.3s;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+.text-gradient {
+    @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
+}
+
+.border-gradient {
+    border-image: linear-gradient(135deg, rgba(102, 126, 234, 0.5), rgba(240, 147, 251, 0.5)) 1;
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0f0c29;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #764ba2;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #667eea;
+}
+
+/* ============================================
+   TOAST NOTIFICATIONS
+   ============================================ */
+
+.toast {
+    @apply fixed bottom-8 right-8 bg-surface backdrop-blur-md border border-white/10 rounded-xl px-6 py-4 shadow-2xl shadow-primary/20 flex items-center gap-3 transition-all duration-300 z-50;
+}
+
+.toast.show {
+    @apply translate-y-0 opacity-100;
+}
+
+.toast.hide {
+    @apply translate-y-full opacity-0;
+}
+
+/* ============================================
+   SKELETON LOADERS
+   ============================================ */
+
+.skeleton {
+    @apply bg-white/5 rounded animate-pulse;
+}
+
+.skeleton-text {
+    @apply h-4 bg-white/5 rounded animate-pulse;
+}
+
+/* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+
+@media (max-width: 768px) {
+    .calc-title {
+        @apply text-3xl;
+    }
+
+    .calc-result-value {
+        @apply text-4xl;
+    }
+
+    .calc-card {
+        @apply p-6;
+    }
+}
