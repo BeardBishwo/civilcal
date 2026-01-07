@@ -1,465 +1,236 @@
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+<?php
+/**
+ * Gamification: City Builder (Architect's Studio)
+ * Premium Dark Mode UI - Refactored
+ */
+?>
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architect's Studio | Civil City</title>
+    <!-- Load Tailwind & General Quiz CSS -->
+    <link rel="stylesheet" href="<?php echo app_base_url('themes/default/assets/css/quiz.min.css?v=' . time()); ?>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+</head>
+<body class="bg-background text-white font-sans min-h-screen pb-20" x-data="cityBuilder()">
 
-:root {
-    --city-bg: #0f172a;
-    --city-card: rgba(255, 255, 255, 0.03);
-    --city-border: rgba(255, 255, 255, 0.08);
-    --city-primary: #667eea;
-    --city-primary-grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --city-accent: #00d1ff;
-    --city-success: #10b981;
-    --city-danger: #ef4444;
-    --city-text: #ffffff;
-    --city-muted: #94a3b8;
-    --city-glow: 0 8px 32px rgba(102, 126, 234, 0.15);
-}
-
-.city-wrapper {
-    background: var(--city-bg);
-    min-height: 100vh;
-    color: var(--city-text);
-    font-family: 'Inter', system-ui, sans-serif;
-    padding: 0 0 40px;
-    position: relative;
-    overflow-x: hidden;
-}
-
-/* Background Effects */
-.city-bg-glow {
-    position: fixed;
-    top: -10%; right: -10%;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(118, 75, 162, 0.15), transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-}
-
-.city-content { position: relative; z-index: 1; }
-
-.premium-card {
-    background: var(--city-card);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--city-border);
-    border-radius: 20px;
-    padding: 24px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.premium-card:hover {
-    border-color: rgba(102, 126, 234, 0.3);
-    transform: translateY(-4px);
-    box-shadow: var(--city-glow);
-}
-
-.wallet-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.resource-card {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 20px;
-}
-
-.resource-icon-shell {
-    width: 48px;
-    height: 48px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--city-border);
-}
-
-.resource-icon-shell img {
-    width: 28px;
-    height: 28px;
-    object-fit: contain;
-}
-
-.resource-info h4 {
-    margin: 0;
-    font-size: 13px;
-    color: var(--city-muted);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.resource-info .amount {
-    font-size: 24px;
-    font-weight: 700;
-    color: #fff;
-    line-height: 1.2;
-}
-
-/* Header */
-.gamification-header {
-    padding: 20px 0;
-    margin-bottom: 30px;
-    border-bottom: 1px solid var(--city-border);
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(10px);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.header-inner { display: flex; align-items: center; justify-content: space-between; }
-
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--city-muted);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: color 0.2s;
-}
-.back-link:hover { color: white; }
-
-.header-title-group { text-align: right; }
-.city-title {
-    font-size: 1.5rem;
-    font-weight: 800;
-    margin: 0;
-    background: var(--city-primary-grad);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-.city-subtitle { font-size: 0.85rem; color: var(--city-muted); margin: 0; }
-
-.construction-grid {
-    display: grid;
-    grid-template-columns: 350px 1fr;
-    gap: 25px;
-}
-
-@media (max-width: 992px) {
-    .construction-grid { grid-template-columns: 1fr; }
-}
-
-.build-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.build-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 16px;
-    border: 1px solid var(--city-border);
-    transition: background 0.2s;
-}
-.build-item:hover { background: rgba(255, 255, 255, 0.04); }
-
-.build-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-}
-
-.cost-tag {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--city-accent);
-    background: rgba(0, 209, 255, 0.1);
-    padding: 3px 8px;
-    border-radius: 20px;
-    margin-top: 4px;
-    display: inline-block;
-}
-
-.btn-build {
-    background: var(--city-primary-grad);
-    border: none;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-}
-
-.btn-build:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-}
-
-.btn-build:disabled {
-    background: var(--city-card);
-    color: var(--city-muted);
-    cursor: not-allowed;
-    box-shadow: none;
-    border: 1px solid var(--city-border);
-}
-
-.map-container {
-    min-height: 600px;
-    position: relative;
-    background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    border-radius: 20px;
-    overflow: auto;
-    padding: 30px;
-}
-
-.building-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 20px;
-    text-align: center;
-    transition: all 0.3s;
-    animation: fadeIn 0.5s ease-out backwards;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.building-card:hover {
-    background: rgba(102, 126, 234, 0.1);
-    border-color: var(--city-primary);
-    transform: translateY(-5px);
-}
-
-.building-icon {
-    font-size: 32px;
-    margin-bottom: 12px;
-    display: block;
-}
-
-.building-name {
-    display: block;
-    font-weight: 600;
-    font-size: 0.95rem;
-    text-transform: capitalize;
-}
-
-.building-level {
-    font-size: 11px;
-    color: var(--city-muted);
-}
-</style>
-
-<div class="city-wrapper">
-    <div class="city-bg-glow"></div>
-    
     <!-- Header -->
-    <header class="gamification-header">
-        <div class="container header-inner">
-            <a href="<?php echo app_base_url('quiz'); ?>" class="back-link">
-                <i class="fas fa-arrow-left"></i> <span>Back to Portal</span>
-            </a>
-            <div class="header-title-group">
-                <h1 class="city-title">Architect's Studio</h1>
-                <p class="city-subtitle">Design the future of civil engineering</p>
-            </div>
+    <header class="h-16 bg-surface/80 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-6 sticky top-0 z-50">
+        <a href="<?php echo app_base_url('quiz'); ?>" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium">
+            <i class="fas fa-arrow-left"></i> <span>Portal</span>
+        </a>
+        <div class="text-right">
+            <h1 class="text-lg font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent leading-none">Architect's Studio</h1>
+            <p class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Civil City</p>
         </div>
     </header>
 
-    <div class="container city-content">
-
-        <div class="wallet-grid">
-            <div class="premium-card resource-card">
-                <div class="resource-icon-shell">
-                    <img src="<?php echo app_base_url('themes/default/assets/resources/currency/coin.webp'); ?>" alt="Coins">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Resources Wallet -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <!-- Coins -->
+            <div class="glass-card p-4 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center p-2 border border-white/10 shrink-0">
+                    <img src="<?php echo app_base_url('themes/default/assets/resources/currency/coin.webp'); ?>" class="w-full h-full object-contain">
                 </div>
-                <div class="resource-info">
-                    <h4>Gold Coins</h4>
-                    <div class="amount" id="res-coins"><?php echo $wallet['coins'] ?? 0; ?></div>
-                </div>
-            </div>
-            <div class="premium-card resource-card">
-                <div class="resource-icon-shell">
-                    <img src="<?php echo app_base_url('themes/default/assets/resources/materials/brick_single.webp'); ?>" alt="Bricks">
-                </div>
-                <div class="resource-info">
-                    <h4>Bricks</h4>
-                    <div class="amount" id="res-bricks"><?php echo $wallet['bricks'] ?? 0; ?></div>
+                <div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Gold Coins</h4>
+                    <div class="text-2xl font-black text-white leading-none mt-1"><?php echo number_format($wallet['coins'] ?? 0); ?></div>
                 </div>
             </div>
-            <div class="premium-card resource-card">
-                <div class="resource-icon-shell">
-                    <img src="<?php echo app_base_url('themes/default/assets/resources/materials/bbcement.webp'); ?>" alt="Cement">
+            <!-- Bricks -->
+            <div class="glass-card p-4 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center p-2 border border-white/10 shrink-0">
+                    <img src="<?php echo app_base_url('themes/default/assets/resources/materials/brick_single.webp'); ?>" class="w-full h-full object-contain">
                 </div>
-                <div class="resource-info">
-                    <h4>Cement</h4>
-                    <div class="amount" id="res-cement"><?php echo $wallet['cement'] ?? 0; ?></div>
+                <div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Bricks</h4>
+                    <div class="text-2xl font-black text-white leading-none mt-1"><?php echo number_format($wallet['bricks'] ?? 0); ?></div>
                 </div>
             </div>
-            <div class="premium-card resource-card">
-                <div class="resource-icon-shell">
-                    <img src="<?php echo app_base_url('themes/default/assets/resources/materials/steel.webp'); ?>" alt="Steel">
+            <!-- Cement -->
+            <div class="glass-card p-4 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center p-2 border border-white/10 shrink-0">
+                    <img src="<?php echo app_base_url('themes/default/assets/resources/materials/bbcement.webp'); ?>" class="w-full h-full object-contain">
                 </div>
-                <div class="resource-info">
-                    <h4>Steel</h4>
-                    <div class="amount" id="res-steel"><?php echo $wallet['steel'] ?? 0; ?></div>
+                <div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Cement</h4>
+                    <div class="text-2xl font-black text-white leading-none mt-1"><?php echo number_format($wallet['cement'] ?? 0); ?></div>
+                </div>
+            </div>
+            <!-- Steel -->
+            <div class="glass-card p-4 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center p-2 border border-white/10 shrink-0">
+                    <img src="<?php echo app_base_url('themes/default/assets/resources/materials/steel.webp'); ?>" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Steel</h4>
+                    <div class="text-2xl font-black text-white leading-none mt-1"><?php echo number_format($wallet['steel'] ?? 0); ?></div>
                 </div>
             </div>
         </div>
 
-        <div class="construction-grid">
-            <!-- Sidebar: Construction Menu -->
-            <div class="construction-menu">
-                <div class="premium-card">
-                    <h3 class="mb-4" style="font-weight: 800; font-size: 20px;">
-                        <i class="fas fa-hammer me-2 text-primary"></i> BLUEPRINT CATALOG
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+            <!-- Sidebar: Blueprint Catalog -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="glass-card p-6 rounded-3xl sticky top-24">
+                    <h3 class="flex items-center gap-2 text-xl font-black text-white mb-6">
+                        <i class="fas fa-hammer text-primary"></i> Catalog
                     </h3>
-                    <div class="build-list">
+
+                    <div class="space-y-3">
                         <!-- House -->
-                        <div class="build-item">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="build-icon bg-success bg-opacity-10 text-success">
+                        <div class="p-4 rounded-xl bg-surface/50 border border-white/5 hover:border-primary/30 hover:bg-surface/80 transition-all group">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-500 text-lg">
                                     <i class="fas fa-home"></i>
                                 </div>
-                                <div>
-                                    <div style="font-weight: 700;">Residential Unit</div>
-                                    <div class="cost-tag">100 Bricks</div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-white text-sm">Residential Unit</div>
+                                    <div class="text-[10px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full inline-block mt-1">100 Bricks</div>
                                 </div>
                             </div>
-                            <button class="btn-build" data-type="house">BUILD</button>
+                            <button @click="build('house', 100, 'bricks')" :disabled="loading" 
+                                    class="w-full py-2 bg-white/5 hover:bg-primary text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-white/10 hover:border-primary text-gray-400 hover:text-white group-hover:bg-white/10">
+                                Construct
+                            </button>
                         </div>
-                        
+
                         <!-- Road -->
-                        <div class="build-item">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="build-icon bg-secondary bg-opacity-10 text-secondary">
+                        <div class="p-4 rounded-xl bg-surface/50 border border-white/5 hover:border-primary/30 hover:bg-surface/80 transition-all group">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 text-lg">
                                     <i class="fas fa-road"></i>
                                 </div>
-                                <div>
-                                    <div style="font-weight: 700;">Asphalt Road</div>
-                                    <div class="cost-tag">50 Cement</div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-white text-sm">Asphalt Road</div>
+                                    <div class="text-[10px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full inline-block mt-1">50 Cement</div>
                                 </div>
                             </div>
-                            <button class="btn-build" data-type="road">BUILD</button>
+                            <button @click="build('road', 50, 'cement')" :disabled="loading" 
+                                    class="w-full py-2 bg-white/5 hover:bg-primary text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-white/10 hover:border-primary text-gray-400 hover:text-white group-hover:bg-white/10">
+                                Construct
+                            </button>
                         </div>
 
                         <!-- Bridge -->
-                        <div class="build-item">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="build-icon bg-danger bg-opacity-10 text-danger">
+                        <div class="p-4 rounded-xl bg-surface/50 border border-white/5 hover:border-primary/30 hover:bg-surface/80 transition-all group">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 text-lg">
                                     <i class="fas fa-archway"></i>
                                 </div>
-                                <div>
-                                    <div style="font-weight: 700;">Arch Bridge</div>
-                                    <div class="cost-tag">500 Bricks + 200 Steel</div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-white text-sm">Arch Bridge</div>
+                                    <div class="text-[10px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full inline-block mt-1">500 Br + 200 St</div>
                                 </div>
                             </div>
-                            <button class="btn-build" data-type="bridge">BUILD</button>
+                            <button @click="build('bridge', 500, 'bricks')" :disabled="loading" 
+                                    class="w-full py-2 bg-white/5 hover:bg-primary text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-white/10 hover:border-primary text-gray-400 hover:text-white group-hover:bg-white/10">
+                                Construct
+                            </button>
                         </div>
 
-                        <!-- Skyscraper -->
-                        <div class="build-item">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="build-icon bg-info bg-opacity-10 text-info">
+                        <!-- Tower -->
+                        <div class="p-4 rounded-xl bg-surface/50 border border-white/5 hover:border-primary/30 hover:bg-surface/80 transition-all group">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 text-lg">
                                     <i class="fas fa-building"></i>
                                 </div>
-                                <div>
-                                    <div style="font-weight: 700;">Corporate Tower</div>
-                                    <div class="cost-tag">1k Bricks + 500 Steel</div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-white text-sm">Corporate Tower</div>
+                                    <div class="text-[10px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full inline-block mt-1">1k Br + 500 St</div>
                                 </div>
                             </div>
-                            <button class="btn-build" data-type="tower">BUILD</button>
+                            <button @click="build('tower', 1000, 'bricks')" :disabled="loading" 
+                                    class="w-full py-2 bg-white/5 hover:bg-primary text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-white/10 hover:border-primary text-gray-400 hover:text-white group-hover:bg-white/10">
+                                Construct
+                            </button>
                         </div>
+
                     </div>
                 </div>
             </div>
 
-            <!-- Main: Map Overview -->
-            <div class="map-view">
-                <div class="premium-card map-container">
+            <!-- Main: City Map -->
+            <div class="lg:col-span-3">
+                <div class="bg-surface/30 border border-white/5 rounded-3xl p-8 min-h-[600px] relative overflow-hidden backdrop-blur-sm">
+                    <!-- Grid Background -->
+                    <div class="absolute inset-0 z-0 opacity-10" 
+                         style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 40px 40px;">
+                    </div>
+                
                     <?php if (empty($buildings)): ?>
-                        <div class="text-center py-5">
-                            <i class="fas fa-hard-hat fa-4x mb-4 text-muted opacity-20"></i>
-                            <h3>Virgin Terraforming Site</h3>
-                            <p class="text-muted">Solve quiz challenges to earn materials and begin colonization.</p>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-center z-10 p-8">
+                            <div class="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-6">
+                                <i class="fas fa-hard-hat text-4xl text-gray-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-black text-white mb-2">Virgin Terraforming Site</h3>
+                            <p class="text-gray-400 max-w-md">The site is cleared and ready for development. Solve quiz challenges to earn materials and begin colonization.</p>
                         </div>
                     <?php else: ?>
-                        <div class="row g-4">
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 relative z-10">
                             <?php foreach($buildings as $idx => $b): ?>
-                                <div class="col-xl-3 col-lg-4 col-sm-6">
-                                    <div class="building-card" style="animation-delay: <?php echo $idx * 0.1; ?>s">
-                                        <?php 
-                                            $icon = 'home'; $class = 'text-success';
-                                            if($b['building_type'] == 'road') { $icon = 'road'; $class = 'text-secondary'; }
-                                            if($b['building_type'] == 'bridge') { $icon = 'archway'; $class = 'text-danger'; }
-                                            if($b['building_type'] == 'tower') { $icon = 'building'; $class = 'text-info'; }
-                                        ?>
-                                        <i class="fas fa-<?php echo $icon; ?> building-icon <?php echo $class; ?>"></i>
-                                        <span class="building-name"><?php echo $b['building_type']; ?></span>
-                                        <span class="building-level">Iteration 0<?php echo $b['level']; ?></span>
+                                <?php 
+                                    $icon = 'home'; $color = 'text-green-500'; $bg = 'bg-green-500/10';
+                                    if($b['building_type'] == 'road') { $icon = 'road'; $color = 'text-indigo-400'; $bg = 'bg-indigo-500/10'; }
+                                    if($b['building_type'] == 'bridge') { $icon = 'archway'; $color = 'text-red-500'; $bg = 'bg-red-500/10'; }
+                                    if($b['building_type'] == 'tower') { $icon = 'building'; $color = 'text-blue-500'; $bg = 'bg-blue-500/10'; }
+                                ?>
+                                <div class="bg-surface border border-white/10 p-4 rounded-xl flex flex-col items-center text-center hover:-translate-y-1 transition-transform shadow-lg shadow-black/20 animate-fade-in-up" 
+                                     style="animation-delay: <?php echo $idx * 50; ?>ms">
+                                    <div class="w-14 h-14 rounded-xl <?php echo $bg; ?> flex items-center justify-center <?php echo $color; ?> text-2xl mb-3 shadow-inner">
+                                        <i class="fas fa-<?php echo $icon; ?>"></i>
                                     </div>
+                                    <div class="font-bold text-white text-sm capitalize"><?php echo $b['building_type']; ?></div>
+                                    <div class="text-[10px] text-gray-500 font-mono mt-1">Lvl <?php echo $b['level']; ?></div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
                 </div>
             </div>
+
         </div>
     </div>
-</div>
 
-<script>
-document.querySelectorAll('.btn-build').forEach(btn => {
-    btn.addEventListener('click', async function() {
-        const type = this.dataset.type;
-        const originalText = this.innerHTML;
-        
-        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        this.disabled = true;
-        
-        try {
-            const fd = new FormData();
-            fd.append('type', type);
-            fd.append('csrf_token', '<?php echo csrf_token(); ?>');
-            
-            const res = await fetch('<?php echo app_base_url("api/city/build"); ?>', {
-                method: 'POST',
-                body: fd
-            });
-            const data = await res.json();
-            
-            if (res.ok) {
-                this.innerHTML = '<i class="fas fa-check"></i>';
-                this.style.background = 'var(--city-success)';
-                
-                setTimeout(() => {
-                    location.reload(); 
-                }, 800);
-            } else {
-                alert('Structural Failure: ' + data.message);
-                this.innerHTML = originalText;
-                this.disabled = false;
+    <script>
+        function cityBuilder() {
+            return {
+                loading: false,
+                async build(type, cost, resource) {
+                    if(!confirm('Construct ' + type + '?')) return;
+                    
+                    this.loading = true;
+                    const fd = new FormData();
+                    fd.append('type', type);
+                    fd.append('csrf_token', '<?php echo csrf_token(); ?>');
+                    
+                    try {
+                        const res = await fetch('<?php echo app_base_url("api/city/build"); ?>', {
+                            method: 'POST',
+                            body: fd
+                        });
+                        const data = await res.json();
+                        
+                        if (res.ok) {
+                            window.location.reload(); 
+                        } else {
+                            alert(data.message || 'Construction Failed');
+                        }
+                    } catch(e) {
+                        alert('Connection Error');
+                    } finally {
+                        this.loading = false;
+                    }
+                }
             }
-        } catch (e) {
-            alert('Signal Lost: Check connectivity.');
-            this.innerHTML = originalText;
-            this.disabled = false;
         }
-    });
-});
-</script>
+    </script>
+</body>
+</html>

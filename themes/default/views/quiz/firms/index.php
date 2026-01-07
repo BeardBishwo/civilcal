@@ -1,216 +1,236 @@
-<div class="firm-page">
-    <div class="firm-hero container">
-        <div class="row align-items-center">
-            <div class="col-lg-7">
-                <div class="firm-pill">Alliances</div>
-                <h1 class="firm-title">Engineering Firms</h1>
-                <p class="firm-subtitle">Form elite crews, pool resources, and unlock mega projects with premium-grade collaboration.</p>
-                <div class="firm-stats">
-                    <div><span class="firm-stat-label">Security</span><span class="firm-stat-value"><i class="fas fa-lock mr-1"></i>Nonce + Honeypot</span></div>
-                    <div><span class="firm-stat-label">Onboarding</span><span class="firm-stat-value"><i class="fas fa-user-plus mr-1"></i>Request-based</span></div>
-                    <div><span class="firm-stat-label">Economy</span><span class="firm-stat-value"><i class="fas fa-coins mr-1"></i>Server-validated</span></div>
-                </div>
-            </div>
-            <div class="col-lg-5">
-                <div class="firm-card glass">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="firm-icon-circle"><i class="fas fa-plus"></i></div>
-                        <div class="ml-3">
-                            <div class="firm-kicker">Create a Firm</div>
-                            <div class="firm-card-title">Founder's License</div>
+<?php
+/**
+ * Engineering Firms: Index (Alliance Discovery)
+ * Premium Dark Mode UI - Refactored
+ */
+?>
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engineering Firms | Civil City</title>
+    <!-- Load Tailwind & General Quiz CSS -->
+    <link rel="stylesheet" href="<?php echo app_base_url('themes/default/assets/css/quiz.min.css?v=' . time()); ?>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-background text-white font-sans min-h-screen pb-20" x-data="firmsIndex()">
+
+    <!-- Header -->
+    <header class="h-16 bg-surface/80 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-6 sticky top-0 z-50">
+        <a href="<?php echo app_base_url('quiz'); ?>" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium">
+            <i class="fas fa-arrow-left"></i> <span>Portal</span>
+        </a>
+        <div class="text-right">
+            <h1 class="text-lg font-black bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent leading-none">Engineering Firms</h1>
+            <p class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Alliance Network</p>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden py-16 border-b border-white/5">
+        <!-- Background Effects -->
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[100px] animate-blob"></div>
+            <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-bold uppercase tracking-widest border border-cyan-500/20 mb-6">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Collaborative Economy
+                    </div>
+                    <h1 class="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight leading-tight">
+                        Build together.<br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Conquer together.</span>
+                    </h1>
+                    <p class="text-xl text-gray-400 mb-8 max-w-lg leading-relaxed">Form elite crews, pool resources, and unlock mega projects with premium-grade collaboration tools.</p>
+                    
+                    <div class="flex flex-wrap gap-8">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-surface/50 border border-white/10 flex items-center justify-center text-green-400">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-gray-500 uppercase tracking-wider">Security</div>
+                                <div class="font-bold text-white">Nonce + Honeypot</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-surface/50 border border-white/10 flex items-center justify-center text-amber-500">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-gray-500 uppercase tracking-wider">Economy</div>
+                                <div class="font-bold text-white">Server-Validated</div>
+                            </div>
                         </div>
                     </div>
-                    <p class="firm-muted mb-3">Cost: 5,000 Coins · Launch a secure firm and start building together.</p>
-                    <form action="/api/firms/create" method="POST">
-                        <input type="hidden" name="nonce" value="<?php echo htmlspecialchars($createNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                        <input type="text" name="trap_answer" id="firm_create_trap" style="display:none" autocomplete="off">
-                        <div class="form-group mb-3">
-                            <input type="text" name="name" class="form-control firm-input" placeholder="Firm Name" required>
+                </div>
+
+                <!-- Create Firm Card -->
+                <div class="bg-surface/60 backdrop-blur-xl rounded-3xl p-1 border border-white/10 shadow-2xl">
+                    <div class="bg-black/20 rounded-[20px] p-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white text-xl shadow-lg">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Founder's License</h3>
+                                <div class="text-cyan-400 font-bold text-sm">Create New Firm</div>
+                            </div>
                         </div>
-                        <div class="form-group mb-4">
-                            <textarea name="description" class="form-control firm-input" placeholder="Description..." rows="2"></textarea>
-                        </div>
-                        <button type="submit" class="firm-btn gradient w-100">Create Firm</button>
-                    </form>
+
+                        <form action="/api/firms/create" method="POST" @submit.prevent="createFirm">
+                            <input type="hidden" name="nonce" value="<?php echo htmlspecialchars($createNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                            <input type="text" name="trap_answer" id="firm_create_trap" style="display:none" autocomplete="off">
+                            
+                            <div class="space-y-4 mb-6">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Firm Name</label>
+                                    <input type="text" name="name" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/10 transition-all font-bold placeholder-gray-600" placeholder="e.g. Omega Construct" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Description</label>
+                                    <textarea name="description" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/10 transition-all font-medium placeholder-gray-600 h-24 resize-none" placeholder="What is your firm's mission?"></textarea>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-white uppercase tracking-widest shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 hover:-translate-y-1 transition-all">
+                                Establish Firm <span class="opacity-70 text-xs ml-1">(5,000 Coins)</span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="container firm-body">
-        <div class="firm-section-header">
-            <div>
-                <p class="firm-kicker mb-1"><i class="fas fa-shield-alt mr-2"></i>Active Firms</p>
-                <h3 class="firm-heading">Discover alliances to join</h3>
+    <!-- Active Firms List -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="flex items-center justify-between mb-8">
+            <h3 class="text-2xl font-black text-white flex items-center gap-3">
+                <i class="fas fa-globe text-gray-500"></i> Global Directory
+            </h3>
+            <div class="text-sm font-bold text-gray-500 bg-white/5 px-4 py-2 rounded-lg">
+                <?php echo count($firms); ?> Active Alliances
             </div>
-            <div class="firm-legend">Secure join flow with nonce + honeypot checks.</div>
         </div>
 
-        <div class="row">
-            <?php if (empty($firms)): ?>
-                <div class="col-12">
-                    <div class="firm-empty text-center">
-                        <div class="firm-icon-circle"><i class="fas fa-city"></i></div>
-                        <h5 class="mt-3">No firms yet</h5>
-                        <p class="firm-muted mb-0">Be the pioneer—create the first firm and start recruiting.</p>
-                    </div>
+        <?php if (empty($firms)): ?>
+            <div class="text-center py-20 bg-surface/30 rounded-3xl border border-white/5">
+                <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-600 text-4xl">
+                    <i class="fas fa-city"></i>
                 </div>
-            <?php else: ?>
+                <h3 class="text-xl font-bold text-white mb-2">No Firms Established</h3>
+                <p class="text-gray-400">Be the pioneer—create the first firm and start recruiting engineers.</p>
+            </div>
+        <?php else: ?>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <?php foreach ($firms as $f): ?>
-                <div class="col-lg-6 mb-4">
-                    <div class="firm-card h-100">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="firm-logo mr-3">
-                                <img src="<?php echo $f['logo_url'] ?: 'https://cdn-icons-png.flaticon.com/512/1063/1063376.png'; ?>" alt="logo">
-                            </div>
+                <div class="glass-card p-1 rounded-2xl hover:-translate-y-2 transition-transform duration-300">
+                    <div class="bg-surface/80 backdrop-blur-md rounded-[14px] p-6 h-full flex flex-col border border-white/5">
+                        <div class="flex items-center gap-4 mb-4">
+                            <img src="<?php echo $f['logo_url'] ?: app_base_url('themes/default/assets/images/default-firm.png'); ?>" 
+                                 class="w-16 h-16 rounded-xl object-cover border border-white/10 bg-black/20"
+                                 onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($f['name']); ?>&background=0D8ABC&color=fff'">
                             <div>
-                                <div class="d-flex align-items-center">
-                                    <h5 class="mb-0 firm-title-sm"><?php echo htmlspecialchars($f['name']); ?></h5>
-                                    <span class="firm-tag ml-2">Lvl <?php echo $f['level']; ?></span>
+                                <h4 class="font-bold text-white text-lg leading-tight mb-1"><?php echo htmlspecialchars($f['name']); ?></h4>
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-white/10 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Lvl <?php echo $f['level']; ?></span>
+                                    <span class="text-gray-500 text-xs font-medium"><i class="fas fa-users mr-1"></i><?php echo $f['member_count']; ?></span>
                                 </div>
-                                <div class="firm-muted small"><?php echo $f['member_count']; ?> members</div>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div class="firm-badges">
-                                <span class="firm-pill soft"><i class="fas fa-users mr-1"></i>Teamplay</span>
-                                <span class="firm-pill soft"><i class="fas fa-briefcase mr-1"></i>Projects</span>
+
+                        <p class="text-gray-400 text-sm mb-6 line-clamp-2 flex-grow h-10">
+                            <?php echo htmlspecialchars($f['description'] ?: 'No description provided.'); ?>
+                        </p>
+
+                        <div class="flex items-center justify-between mt-auto">
+                            <div class="flex -space-x-2">
+                                <!-- Placeholders for member avatars if available, otherwise generic circles -->
+                                <div class="w-8 h-8 rounded-full bg-white/10 border-2 border-[#0f172a] flex items-center justify-center text-[10px] text-gray-500">
+                                    <i class="fas fa-user"></i>
+                                </div>
                             </div>
-                            <button class="firm-btn ghost" onclick="requestJoin(<?php echo $f['id']; ?>)">Request Join</button>
+                            <button @click="requestJoin(<?php echo $f['id']; ?>)" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-bold text-white transition-colors">
+                                Request Join
+                            </button>
                         </div>
                     </div>
                 </div>
                 <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
+            </div>
+        <?php endif; ?>
     </div>
-</div>
 
-<script>
-    const joinNonce = '<?php echo htmlspecialchars($joinNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>';
-    function getTrap() {
-        return document.getElementById('firm_create_trap') ? document.getElementById('firm_create_trap').value : '';
-    }
+    <script>
+        const joinNonce = '<?php echo htmlspecialchars($joinNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>';
 
-    async function requestJoin(guildId) {
-        const fd = new FormData();
-        fd.append('guild_id', guildId);
-        fd.append('nonce', joinNonce);
-        fd.append('trap_answer', getTrap());
+        function firmsIndex() {
+            return {
+                getTrap() {
+                    return document.getElementById('firm_create_trap') ? document.getElementById('firm_create_trap').value : '';
+                },
 
-        try {
-            const res = await fetch('/api/firms/join', { method: 'POST', body: fd });
-            const data = await res.json();
-            alert(data.message);
-        } catch (e) {
-            alert('Request failed.');
+                async createFirm(e) {
+                    const form = e.target;
+                    const fd = new FormData(form);
+
+                    try {
+                        Swal.showLoading();
+                        const res = await fetch(form.action, { method: 'POST', body: fd });
+                        const data = await res.json();
+
+                        if (data.success) {
+                            await Swal.fire({ icon: 'success', title: 'Established!', text: 'Firm created successfully.', background: '#1e293b', color: '#fff' });
+                            location.href = data.redirect || '/quiz/firms/dashboard';
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Start-up Failed', text: data.message, background: '#1e293b', color: '#fff' });
+                        }
+                    } catch (err) {
+                        Swal.fire({ icon: 'error', title: 'Error', text: 'Connection failed.', background: '#1e293b', color: '#fff' });
+                    }
+                },
+
+                async requestJoin(guildId) {
+                    const fd = new FormData();
+                    fd.append('guild_id', guildId);
+                    fd.append('nonce', joinNonce);
+                    fd.append('trap_answer', this.getTrap());
+
+                    const result = await Swal.fire({
+                        title: 'Join Firm?',
+                        text: "Send a membership request to this firm.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Send Request',
+                        background: '#1e293b',
+                        color: '#fff'
+                    });
+
+                    if (result.isConfirmed) {
+                        try {
+                            const res = await fetch('/api/firms/join', { method: 'POST', body: fd });
+                            const data = await res.json();
+                            
+                            if (data.success) {
+                                Swal.fire({ icon: 'success', title: 'Sent', text: data.message, background: '#1e293b', color: '#fff' });
+                            } else {
+                                Swal.fire({ icon: 'error', title: 'Failed', text: data.message, background: '#1e293b', color: '#fff' });
+                            }
+                        } catch (e) {
+                             Swal.fire({ icon: 'error', title: 'Error', text: 'Connection failed.', background: '#1e293b', color: '#fff' });
+                        }
+                    }
+                }
+            }
         }
-    }
-</script>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
-:root {
-    --firm-bg: #0b0f1a;
-    --firm-card: rgba(255,255,255,0.04);
-    --firm-border: rgba(255,255,255,0.08);
-    --firm-primary: #7c5dff;
-    --firm-accent: #00d1ff;
-    --firm-text: #e8ecf2;
-    --firm-muted: #9aa4b5;
-    --firm-glow: 0 12px 60px rgba(124,93,255,0.25);
-    --firm-radius: 16px;
-}
-.firm-page {
-    background: radial-gradient(circle at 15% 10%, rgba(124,93,255,0.08), transparent 30%),
-                radial-gradient(circle at 85% 5%, rgba(0,209,255,0.08), transparent 25%),
-                linear-gradient(180deg, #0b0f1a 0%, #0a0c14 100%);
-    color: var(--firm-text);
-    font-family: 'Space Grotesk', 'Inter', system-ui, -apple-system, sans-serif;
-    min-height: 100vh;
-    padding: 40px 0 70px;
-}
-.firm-hero { margin-bottom: 30px; }
-.firm-pill {
-    display: inline-flex;
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.08);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    font-size: 12px;
-}
-.firm-title { font-size: 40px; font-weight: 700; margin: 10px 0 6px; letter-spacing: -0.02em; }
-.firm-subtitle { color: var(--firm-muted); max-width: 560px; font-size: 16px; }
-.firm-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; }
-.firm-stat-label { display: block; color: var(--firm-muted); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; }
-.firm-stat-value { color: var(--firm-text); font-weight: 700; }
-
-.firm-card {
-    background: var(--firm-card);
-    border: 1px solid var(--firm-border);
-    border-radius: var(--firm-radius);
-    padding: 18px;
-    box-shadow: var(--firm-glow);
-    color: var(--firm-text);
-}
-.firm-card.glass { backdrop-filter: blur(10px); }
-.firm-kicker { color: var(--firm-muted); text-transform: uppercase; font-size: 12px; letter-spacing: 0.06em; font-weight: 700; }
-.firm-card-title { font-weight: 700; font-size: 22px; }
-.firm-muted { color: var(--firm-muted); }
-.firm-input {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid var(--firm-border);
-    color: var(--firm-text);
-    border-radius: 12px;
-    padding: 12px 14px;
-}
-.firm-input::placeholder { color: rgba(255,255,255,0.5); }
-
-.firm-btn {
-    border: none;
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    transition: transform 0.15s ease, box-shadow 0.2s ease;
-}
-.firm-btn.gradient { background: linear-gradient(90deg, var(--firm-primary), var(--firm-accent)); color: #0b0f1a; box-shadow: var(--firm-glow); }
-.firm-btn.ghost { background: transparent; border: 1px solid var(--firm-border); color: var(--firm-text); }
-.firm-btn:hover { transform: translateY(-1px); }
-.firm-btn:active { transform: translateY(0); }
-
-.firm-icon-circle {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.08);
-    display: grid; place-items: center;
-    color: var(--firm-text);
-    font-size: 18px;
-}
-.firm-logo img { width: 52px; height: 52px; object-fit: cover; border-radius: 12px; border: 1px solid var(--firm-border); }
-.firm-title-sm { font-weight: 700; }
-.firm-tag { background: rgba(255,255,255,0.08); color: var(--firm-text); border-radius: 8px; padding: 4px 8px; font-weight: 700; font-size: 12px; }
-.firm-pill.soft { background: rgba(255,255,255,0.06); color: var(--firm-muted); padding: 6px 10px; border-radius: 999px; margin-right: 6px; font-weight: 600; font-size: 12px; }
-.firm-badges { display: flex; flex-wrap: wrap; gap: 6px; }
-
-.firm-body { margin-top: 10px; }
-.firm-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.firm-heading { margin: 0; font-weight: 700; }
-.firm-legend { color: var(--firm-muted); font-size: 13px; }
-.firm-empty { padding: 40px; border: 1px dashed var(--firm-border); border-radius: var(--firm-radius); }
-
-@media (max-width: 992px) {
-    .firm-title { font-size: 32px; }
-    .firm-subtitle { font-size: 15px; }
-    .firm-page { padding: 30px 0 50px; }
-}
-@media (max-width: 768px) {
-    .firm-section-header { flex-direction: column; align-items: flex-start; gap: 6px; }
-    .firm-stats { flex-direction: column; gap: 10px; }
-    .firm-card { padding: 16px; }
-    .firm-btn { width: 100%; }
-}
-</style>
+    </script>
+</body>
+</html>

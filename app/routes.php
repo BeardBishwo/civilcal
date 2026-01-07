@@ -2164,6 +2164,8 @@ $router->add("GET", "/quiz/shop", "Quiz\\GamificationController@shop", ["auth"])
 $router->add("GET", "/quiz/sawmill", "Quiz\\GamificationController@sawmill", ["auth"]);
 $router->add("GET", "/quiz/battle-pass", "Quiz\\GamificationController@battlePass", ["auth"]);
 
+
+
 // Gamification APIs
 $router->add("POST", "/api/city/build", "Quiz\\GamificationController@build", ["auth"]);
 $router->add("POST", "/api/city/craft", "Quiz\\GamificationController@craft", ["auth"]);

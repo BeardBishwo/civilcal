@@ -1,302 +1,301 @@
-<?php include_once __DIR__ . '/../partials/header.php'; ?>
-
-<!-- Full screen mode logic will be handled by removing standard header/footer if requested, but for now we keep them or simplify -->
 <?php
-// Simple logic to minimize distraction
+/**
+ * Public Exam Interface
+ * Premium SaaS Design (Refactored)
+ * Stack: PHP + Tailwind CSS + Alpine.js
+ */
 $isMock = ($session['mode'] === 'mock');
 ?>
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo htmlspecialchars($category['name']); ?> | Exam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="<?php echo app_base_url('themes/default/assets/css/quiz.min.css?v=' . time()); ?>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="//unpkg.com/alpinejs" defer></script>
+</head>
+<body class="bg-background text-white font-sans h-screen overflow-hidden select-none"
+      x-data="examEngine()">
 
-<div class="bg-gray-50 min-h-screen py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <header class="h-16 bg-surface border-b border-white/10 flex items-center justify-between px-6 fixed top-0 left-0 w-full z-50">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold shadow-lg shadow-primary/25">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight"><?php echo htmlspecialchars($category['name']); ?></h1>
+                <div class="text-xs text-gray-400 font-medium">
+                    <?php echo $isMock ? 'Mock Exam Mode' : 'Practice Mode'; ?>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-6">
+             <!-- Timer -->
+             <?php if($isMock): ?>
+             <div class="flex items-center gap-3 px-4 py-2 bg-background rounded-full border border-white/10" 
+                  :class="{'animate-pulse border-red-500/50': timeLeft < 300}">
+                 <div class="w-2 h-2 rounded-full" :class="timeLeft < 300 ? 'bg-red-500' : 'bg-green-500'"></div>
+                 <span class="font-mono text-xl font-bold tracking-widest" x-text="formatTime(timeLeft)"></span>
+             </div>
+             <?php endif; ?>
+
+             <button @click="submitExam()" class="btn-primary px-6 py-2 rounded-lg text-sm font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+                Submit <span class="hidden md:inline">Exam</span>
+             </button>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="flex h-full pt-16">
         
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Sidebar (Question Palette) -->
+        <aside class="w-80 bg-surface border-r border-white/5 flex flex-col hidden lg:flex">
+            <div class="p-6 border-b border-white/5">
+                <h3 class="font-bold text-gray-400 text-sm uppercase tracking-wider mb-4">Question Palette</h3>
+                <div class="grid grid-cols-5 gap-2">
+                    <template x-for="(q, index) in questions" :key="q.id">
+                        <button @click="jumpTo(index)" 
+                                class="w-10 h-10 rounded-lg text-sm font-bold transition-all relative group"
+                                :class="getPaletteClass(index)">
+                            <span x-text="index + 1"></span>
+                            <!-- Hover tooltip -->
+                            <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 transition-opacity">
+                                Q<span x-text="index + 1"></span>
+                            </span>
+                        </button>
+                    </template>
+                </div>
+            </div>
             
-            <!-- Main Question Area -->
-            <div class="lg:col-span-3">
-                <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+            <div class="p-6 mt-auto border-t border-white/5">
+                <div class="space-y-3 text-xs font-medium text-gray-400">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-primary shadow shadow-primary/50"></div> Current
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500"></div> Answered
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-white/5 border border-white/10"></div> Not Visited
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="flex-1 overflow-y-auto relative bg-background">
+            <div class="max-w-4xl mx-auto px-6 py-10 pb-32">
+                
+                <!-- Question Card -->
+                <div class="glass-card p-0 overflow-hidden min-h-[500px] flex flex-col" x-show="!loading" x-transition.opacity.duration.300ms>
                     
-                    <!-- Header -->
-                    <div class="bg-gray-900 text-white p-4 flex justify-between items-center">
-                        <div>
-                            <span class="text-gray-400 text-sm block">Subject</span>
-                            <span class="font-bold text-lg"><?php echo htmlspecialchars($category['name']); ?></span>
+                    <!-- Question Header & Progress -->
+                    <div class="px-8 py-6 border-b border-white/5 bg-white/5 flex justify-between items-center relative">
+                        <span class="font-bold text-gray-400">Question <span x-text="currentIndex + 1"></span> of <span x-text="questions.length"></span></span>
+                        
+                        <!-- Progress Bar -->
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-white/5">
+                            <div class="h-full bg-primary transition-all duration-300" :style="`width: ${(currentIndex + 1) / questions.length * 100}%`"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question Text -->
+                    <div class="p-8 md:p-10 flex-1">
+                        <div class="text-xl md:text-2xl font-medium leading-relaxed text-white mb-8">
+                             <span class="text-primary font-bold mr-2" x-text="(currentIndex + 1) + '.'"></span>
+                             <span x-html="questions[currentIndex].text"></span>
+                        </div>
+
+                        <!-- Options -->
+                        <div class="grid gap-4">
+                            <template x-for="(opt, idx) in questions[currentIndex].options" :key="idx">
+                                <div @click="selectAnswer(idx)" 
+                                     class="group relative p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 flex items-center gap-4 hover:bg-white/5"
+                                     :class="answers[questions[currentIndex].id] === idx ? 'border-primary bg-primary/10 hover:bg-primary/10' : 'border-white/10 hover:border-white/30 bg-surface'">
+                                    
+                                    <!-- Radio Circle -->
+                                    <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm shrink-0 transition-colors"
+                                         :class="answers[questions[currentIndex].id] === idx ? 'border-primary bg-primary text-white' : 'border-gray-500 text-gray-500 group-hover:border-gray-400'">
+                                        <span x-text="String.fromCharCode(65 + idx)"></span>
+                                    </div>
+                                    
+                                    <div class="text-lg text-gray-200 group-hover:text-white" x-text="opt"></div>
+                                    
+                                    <!-- Checkmark for selected -->
+                                    <div x-show="answers[questions[currentIndex].id] === idx" class="absolute right-5 text-primary text-xl animate-scale-in">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                         
-                        <?php if($isMock): ?>
-                        <div class="bg-gray-800 rounded-lg px-4 py-2 flex items-center gap-2">
-                            <i class="fas fa-clock text-red-400"></i>
-                            <span id="timer" class="font-mono text-xl font-bold">45:00</span>
-                        </div>
-                        <?php else: ?>
-                        <div class="bg-gray-800 rounded-lg px-4 py-2">
-                            <span class="text-green-400 font-bold">Practice Mode</span>
+                        <!-- Practice Mode Feedback -->
+                        <?php if(!$isMock): ?>
+                        <div x-show="showFeedback && answers[questions[currentIndex].id] !== undefined" 
+                             x-transition.opacity
+                             class="mt-8 p-6 rounded-xl border"
+                             :class="isCorrect ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'">
+                            
+                            <div class="flex items-center gap-3 mb-3 font-bold text-lg" :class="isCorrect ? 'text-green-400' : 'text-red-400'">
+                                <i class="fas" :class="isCorrect ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                                <span x-text="isCorrect ? 'Correct!' : 'Incorrect'"></span>
+                            </div>
+                            
+                            <div class="text-gray-300 leading-relaxed">
+                                <strong class="text-xs uppercase tracking-wider text-gray-500 block mb-1">Explanation</strong>
+                                <span x-html="explanation"></span>
+                            </div>
                         </div>
                         <?php endif; ?>
-                    </div>
-                    
-                    <!-- Progress Bar -->
-                    <div class="w-full bg-gray-200 h-1">
-                        <div id="progress-bar" class="bg-indigo-600 h-1 transition-all duration-300" style="width: 0%"></div>
+                        
                     </div>
 
-                    <!-- Question Container -->
-                    <div id="question-container" class="p-8 min-h-[400px]">
-                        <!-- JS Injected Content -->
-                        <div class="flex justify-center items-center h-64">
-                            <i class="fas fa-spinner fa-spin text-4xl text-indigo-600"></i>
-                        </div>
-                    </div>
-
-                    <!-- Footer Controls -->
-                    <div class="bg-gray-50 px-8 py-4 border-t border-gray-200 flex justify-between items-center">
-                        <button onclick="prevQuestion()" id="btn-prev" class="px-6 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 disabled:opacity-50 font-medium">
-                            <i class="fas fa-chevron-left mr-2"></i> Previous
+                    <!-- Footer Nav -->
+                    <div class="px-8 py-6 bg-surface border-t border-white/5 flex justify-between items-center">
+                        <button @click="prev()" :disabled="currentIndex === 0" 
+                                class="px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all"
+                                :class="currentIndex === 0 ? 'opacity-50 cursor-not-allowed text-gray-600' : 'text-gray-400 hover:text-white hover:bg-white/5'">
+                            <i class="fas fa-arrow-left"></i> Previous
                         </button>
                         
-                        <div class="hidden sm:block text-gray-500 font-medium">
-                            Question <span id="current-q-num">1</span> of <?php echo count($questions); ?>
-                        </div>
-
-                        <button onclick="nextQuestion()" id="btn-next" class="px-6 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 font-medium">
-                            Next <i class="fas fa-chevron-right ml-2"></i>
+                        <button @click="next()" x-show="currentIndex < questions.length - 1"
+                                class="px-8 py-3 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-1 transition-all flex items-center gap-2">
+                            Next <i class="fas fa-arrow-right"></i>
                         </button>
                         
-                        <button onclick="submitExam()" id="btn-submit" class="hidden px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 font-bold">
-                            Submit Exam <i class="fas fa-check ml-2"></i>
+                        <button @click="submitExam()" x-show="currentIndex === questions.length - 1"
+                                class="px-8 py-3 rounded-xl bg-green-500 text-white font-bold shadow-lg shadow-green-500/25 hover:shadow-green-500/40 hover:-translate-y-1 transition-all flex items-center gap-2">
+                            Finish Exam <i class="fas fa-check"></i>
                         </button>
                     </div>
-                    
                 </div>
             </div>
-            
-            <!-- Sidebar / Navigator -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-24">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Question Navigator</h3>
-                    
-                    <div class="grid grid-cols-5 gap-2 mb-6">
-                        <?php foreach($questions as $idx => $q): ?>
-                            <button onclick="jumpTo(<?php echo $idx; ?>)" 
-                                    id="nav-btn-<?php echo $idx; ?>"
-                                    class="w-full aspect-square rounded-lg border border-gray-200 text-sm font-medium hover:border-indigo-500 hover:text-indigo-600 transition flex items-center justify-center">
-                                <?php echo $idx + 1; ?>
-                            </button>
-                        <?php endforeach; ?>
-                    </div>
-                    
-                    <div class="space-y-3 text-sm text-gray-500 border-t pt-4">
-                        <div class="flex items-center gap-2">
-                            <div class="w-4 h-4 rounded border border-gray-200"></div> Not Visited
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-4 h-4 rounded bg-indigo-100 border border-indigo-500 text-indigo-700"></div> Current
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-4 h-4 rounded bg-blue-600 border border-blue-600"></div> Answered
-                        </div>
-                    </div>
-
-                    <button onclick="submitExam()" class="mt-6 w-full py-3 bg-gray-900 text-white rounded-lg font-bold hover:bg-gray-800 transition">
-                        Finish Exam
-                    </button>
-                </div>
-            </div>
-            
-        </div>
+        </main>
     </div>
-</div>
-
-<!-- DATA STORE -->
-<script>
-    const SESSION_ID = <?php echo $session['id']; ?>;
-    const QUESTIONS = <?php echo json_encode($questions); ?>;
-    const MODE = '<?php echo $session['mode']; ?>';
-    let currentIndex = 0;
-    let answers = {}; // {question_id: answer_val}
-    let timerInterval;
-    let timeLeft = 45 * 60; // 45 mins in seconds
-</script>
-
-<script>
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
-        renderQuestion(0);
-        updateNavigator();
-        if (MODE === 'mock') startTimer();
-    });
-
-    function startTimer() {
-        const display = document.getElementById('timer');
-        timerInterval = setInterval(() => {
-            timeLeft--;
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                alert("Time's up! Submitting exam automatically.");
-                submitExam(true);
-            }
-            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-            const s = (timeLeft % 60).toString().padStart(2, '0');
-            display.innerText = `${m}:${s}`;
-        }, 1000);
-    }
-
-    function renderQuestion(index) {
-        currentIndex = index;
-        const q = QUESTIONS[index];
-        const container = document.getElementById('question-container');
-        
-        let optionsHtml = '';
-        if (q.options && q.options.length) {
-            optionsHtml = `<div class="grid gap-3 mt-6">`;
-            q.options.forEach((opt, idx) => {
-                const isSelected = answers[q.id] == idx;
-                const activeClass = isSelected ? 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-200' : 'border-gray-200 hover:border-indigo-300 bg-white';
-                
-                optionsHtml += `
-                    <div onclick="selectAnswer(${q.id}, ${idx})" 
-                         class="cursor-pointer p-4 rounded-xl border-2 transition-all ${activeClass} flex items-center group">
-                        <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center mr-4 font-bold ${isSelected ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-300 text-gray-500 group-hover:border-indigo-400'}">
-                            ${String.fromCharCode(65 + idx)}
-                        </div>
-                        <div class="text-gray-800 font-medium">${opt}</div>
-                    </div>
-                `;
-            });
-            optionsHtml += `</div>`;
-        }
-
-        // Explanation container (for Practice Mode)
-        const feedbackHtml = `
-            <div id="feedback-${q.id}" class="mt-6 hidden">
-                <div id="feedback-alert-${q.id}" class="p-4 rounded-lg mb-4"></div>
-                <div class="bg-gray-100 p-4 rounded-lg text-gray-700">
-                    <span class="font-bold block mb-2">Explanation:</span>
-                    <span id="explanation-${q.id}"></span>
-                </div>
-            </div>
-        `;
-
-        container.innerHTML = `
-            <div class="text-xl text-gray-900 font-medium leading-relaxed">
-                <span class="font-bold mr-2">${index + 1}.</span> 
-                ${q.text.replace(/\n/g, '<br>')}
-            </div>
-            ${optionsHtml}
-            ${feedbackHtml}
-        `;
-
-        // Update Nav
-        document.getElementById('current-q-num').innerText = index + 1;
-        document.getElementById('progress-bar').style.width = `${((index + 1) / QUESTIONS.length) * 100}%`;
-        
-        document.getElementById('btn-prev').disabled = (index === 0);
-        
-        if (index === QUESTIONS.length - 1) {
-            document.getElementById('btn-next').classList.add('hidden');
-            document.getElementById('btn-submit').classList.remove('hidden');
-        } else {
-            document.getElementById('btn-next').classList.remove('hidden');
-            document.getElementById('btn-submit').classList.add('hidden');
-        }
-
-        updateNavigator();
-
-        // If Practice Mode and already answered, show feedback
-        if (MODE === 'practice' && answers[q.id] !== undefined) {
-             checkAnswerAPI(q.id, answers[q.id], false); // passive check
-        }
-    }
-
-    function selectAnswer(qId, ansIdx) {
-        if (MODE === 'practice' && answers[qId] !== undefined) return; // Prevent re-answering in practice mode for now
-
-        answers[qId] = ansIdx;
-        renderQuestion(currentIndex); // Re-render to update UI
-        
-        if (MODE === 'practice') {
-            checkAnswerAPI(qId, ansIdx, true);
-        }
-    }
-
-    function checkAnswerAPI(qId, ans, animate) {
-        // Only fetch if not already fetched? Or just fetch.
-        const feedbackAlert = document.getElementById(`feedback-alert-${qId}`);
-        const feedbackDiv = document.getElementById(`feedback-${qId}`);
-        const explanationSpan = document.getElementById(`explanation-${qId}`);
-        
-        fetch('<?php echo app_base_url("exams/check-answer"); ?>', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: `question_id=${qId}&answer=${ans}`
-        })
-        .then(r => r.json())
-        .then(data => {
-            feedbackDiv.classList.remove('hidden');
-            explanationSpan.innerHTML = data.explanation || 'No explanation available.';
-            
-            if (data.correct) {
-                feedbackAlert.className = 'p-4 rounded-lg mb-4 bg-green-100 text-green-800 border border-green-200';
-                feedbackAlert.innerHTML = '<i class="fas fa-check-circle mr-2"></i> <strong>Correct!</strong> Great job.';
-            } else {
-                feedbackAlert.className = 'p-4 rounded-lg mb-4 bg-red-100 text-red-800 border border-red-200';
-                feedbackAlert.innerHTML = `<i class="fas fa-times-circle mr-2"></i> <strong>Incorrect.</strong> The correct answer is ${String.fromCharCode(65 + parseInt(data.correct_answer))}.`;
-            }
-        });
-    }
-
-    function prevQuestion() {
-        if (currentIndex > 0) renderQuestion(currentIndex - 1);
-    }
-
-    function nextQuestion() {
-        if (currentIndex < QUESTIONS.length - 1) renderQuestion(currentIndex + 1);
-    }
     
-    function jumpTo(idx) {
-        renderQuestion(idx);
-    }
+    <!-- Alpine Data -->
+    <script>
+        const QUESTIONS = <?php echo json_encode($questions); ?>;
+        const SESSION_ID = <?php echo $session['id']; ?>;
+        const MODE = '<?php echo $session['mode']; ?>';
+        // Pre-fill answers if any (not implemented in backend yet but good structure)
+        const PREV_ANSWERS = {}; 
 
-    function updateNavigator() {
-        QUESTIONS.forEach((q, idx) => {
-            const btn = document.getElementById(`nav-btn-${idx}`);
-            btn.className = `w-full aspect-square rounded-lg border text-sm font-medium flex items-center justify-center transition `;
-            
-            if (idx === currentIndex) {
-                btn.className += 'bg-indigo-100 border-indigo-500 text-indigo-700 ring-2 ring-indigo-200';
-            } else if (answers[q.id] !== undefined) {
-                btn.className += 'bg-blue-600 border-blue-600 text-white';
-            } else {
-                btn.className += 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50';
+        function examEngine() {
+            return {
+                questions: QUESTIONS,
+                currentIndex: 0,
+                answers: PREV_ANSWERS, // {qId: answerIndex}
+                timeLeft: 45 * 60,
+                loading: false,
+                
+                // Feedback State
+                showFeedback: false,
+                isCorrect: false,
+                explanation: '',
+
+                init() {
+                    if (MODE === 'mock') {
+                        setInterval(() => {
+                            if (this.timeLeft > 0) this.timeLeft--;
+                            else this.submitExam(true);
+                        }, 1000);
+                    }
+                },
+
+                formatTime(seconds) {
+                    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                    const s = (seconds % 60).toString().padStart(2, '0');
+                    return `${m}:${s}`;
+                },
+
+                selectAnswer(idx) {
+                     // Check if already answered in mock mode (allow change) or practice mode (prevent change if logic dictates)
+                     // For now allow always
+                     const qId = this.questions[this.currentIndex].id;
+                     this.answers[qId] = idx;
+                     
+                     if (MODE === 'practice') {
+                         this.checkAnswer(qId, idx);
+                     }
+                },
+
+                getPaletteClass(index) {
+                    const qId = this.questions[index].id;
+                    if (index === this.currentIndex) return 'bg-primary text-white ring-2 ring-primary ring-offset-2 ring-offset-surface';
+                    if (this.answers[qId] !== undefined) return 'bg-green-500/20 text-green-400 border border-green-500/50';
+                    return 'bg-white/5 text-gray-500 hover:bg-white/10 hover:text-gray-300';
+                },
+
+                async checkAnswer(qId, ans) {
+                    this.showFeedback = true; // Show loading or existing
+                    
+                    const fd = new URLSearchParams();
+                    fd.append('question_id', qId);
+                    fd.append('answer', ans);
+
+                    const res = await fetch('<?php echo app_base_url("exams/check-answer"); ?>', {
+                        method: 'POST',
+                        body: fd
+                    });
+                    const data = await res.json();
+                    
+                    this.isCorrect = data.correct;
+                    this.explanation = data.explanation || 'No explanation provided.';
+                },
+
+                next() {
+                    if (this.currentIndex < this.questions.length - 1) {
+                        this.currentIndex++;
+                        this.showFeedback = false; // Reset for next q
+                        // If practice mode and already answered, fetch feedback silently? 
+                        // Simplified: Only fetch on click.
+                    }
+                },
+
+                prev() {
+                    if (this.currentIndex > 0) {
+                        this.currentIndex--;
+                        this.showFeedback = (MODE === 'practice' && this.answers[this.questions[this.currentIndex].id] !== undefined);
+                    }
+                },
+
+                jumpTo(index) {
+                    this.currentIndex = index;
+                    this.showFeedback = (MODE === 'practice' && this.answers[this.questions[this.currentIndex].id] !== undefined);
+                },
+
+                async submitExam(force = false) {
+                    if (!force && !confirm('Are you sure you want to finish the exam?')) return;
+                    
+                    const payload = [];
+                    for (const [qId, ans] of Object.entries(this.answers)) {
+                        payload.push({question_id: qId, answer: ans});
+                    }
+
+                    const fd = new FormData();
+                    fd.append('session_id', SESSION_ID);
+                    fd.append('answers', JSON.stringify(payload));
+
+                    const res = await fetch('<?php echo app_base_url("exams/submit"); ?>', {
+                        method: 'POST',
+                        body: fd
+                    });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        window.location.href = data.redirect;
+                    } else {
+                        alert('Submission failed. Please try again.');
+                    }
+                }
             }
-        });
-    }
-
-    function submitExam(force = false) {
-        if (!force && !confirm('Are you sure you want to submit your exam?')) return;
-        
-        // Prepare payload
-        const payload = [];
-        for (const [qId, ans] of Object.entries(answers)) {
-            payload.push({question_id: qId, answer: ans});
         }
-        
-        const fd = new FormData();
-        fd.append('session_id', SESSION_ID);
-        fd.append('answers', JSON.stringify(payload));
-
-        fetch('<?php echo app_base_url("exams/submit"); ?>', {
-            method: 'POST',
-            body: fd
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = data.redirect;
-            } else {
-                alert("Error submitting exam");
-            }
-        });
-    }
-</script>
-
-<?php include_once __DIR__ . '/../partials/footer.php'; ?>
+    </script>
+</body>
+</html>

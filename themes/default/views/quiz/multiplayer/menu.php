@@ -1,180 +1,158 @@
 
+<?php include_once __DIR__ . '/../../partials/header.php'; ?>
 
-<div class="mp-page">
-    <div class="mp-hero container">
-        <div class="row align-items-center">
-            <div class="col-lg-7">
-                <div class="mp-pill">Realtime Arena</div>
-                <h1 class="mp-title">Engineering Battle Royale</h1>
-                <p class="mp-subtitle">Join friends or create your own lobby. Server-locked scoring, anti-replay wagers, and premium-grade UX.</p>
-                <div class="mp-stats">
-                    <div><span class="mp-stat-label">Latency Guard</span><span class="mp-stat-value"><i class="fas fa-shield-alt mr-1"></i>On</span></div>
-                    <div><span class="mp-stat-label">Security</span><span class="mp-stat-value"><i class="fas fa-lock mr-1"></i>Nonce + Honeypot</span></div>
-                    <div><span class="mp-stat-label">Players</span><span class="mp-stat-value"><i class="fas fa-users mr-1"></i>Live</span></div>
+<!-- Load Tailwind CSS -->
+<link rel="stylesheet" href="<?php echo app_base_url('themes/default/assets/css/quiz.min.css?v=' . time()); ?>">
+
+<div class="bg-background min-h-screen font-sans text-white pb-20 overflow-x-hidden relative">
+    
+    <!-- Background Gradient Orbs -->
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-primary/20 rounded-full blur-[100px] animate-blob"></div>
+        <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 lg:pt-32">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            <!-- Hero Text -->
+            <div class="lg:col-span-7">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold uppercase tracking-wider mb-6 text-accent animate-fade-in-up">
+                    <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+                    Realtime Arena
+                </div>
+                
+                <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 leading-tight animate-fade-in-up animation-delay-100">
+                    Engineering <br>
+                    <span class="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">Battle Royale</span>
+                </h1>
+                
+                <p class="text-xl text-gray-400 mb-10 max-w-2xl leading-relaxed animate-fade-in-up animation-delay-200">
+                    Join friends or create your own lobby. Server-locked scoring, anti-replay wagers, and premium-grade distinction.
+                </p>
+                
+                <div class="flex flex-wrap gap-8 animate-fade-in-up animation-delay-300">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-xs uppercase tracking-wider text-gray-500 font-bold">Latency Guard</span>
+                        <span class="text-white font-bold flex items-center gap-2">
+                            <i class="fas fa-shield-alt text-green-400"></i> Active
+                        </span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-xs uppercase tracking-wider text-gray-500 font-bold">Security</span>
+                        <span class="text-white font-bold flex items-center gap-2">
+                            <i class="fas fa-lock text-primary"></i> Nonce + Honeypot
+                        </span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-xs uppercase tracking-wider text-gray-500 font-bold">Players</span>
+                        <span class="text-white font-bold flex items-center gap-2">
+                            <i class="fas fa-users text-accent"></i> Live
+                        </span>
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-5">
-                <div class="mp-card glass">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="mp-icon-circle"><i class="fas fa-search"></i></div>
-                        <div class="ml-3">
-                            <div class="mp-kicker">Join a battle</div>
-                            <div class="mp-card-title">Enter a code</div>
+
+            <!-- Join Card -->
+            <div class="lg:col-span-5 relative">
+                <!-- Decorative Blur -->
+                <div class="absolute inset-0 bg-primary/20 blur-[60px] rounded-full -z-10 transform translate-y-10"></div>
+                
+                <div class="glass-card p-1 rounded-3xl animate-fade-in-up animation-delay-400">
+                    <div class="bg-surface/80 backdrop-blur-xl rounded-[20px] p-8 border border-white/10 shadow-2xl">
+                        <div class="flex items-center gap-4 mb-8">
+                            <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white text-xl border border-white/10">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white leading-tight">Join a Battle</h3>
+                                <p class="text-sm text-gray-400">Enter a lobby code to enter</p>
+                            </div>
                         </div>
+
+                        <form action="/quiz/lobby/join" method="POST" class="space-y-4">
+                            <input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
+                            
+                            <div class="relative group">
+                                <input type="text" name="code" 
+                                       class="glass-input w-full px-5 py-4 pl-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary focus:bg-white/10 transition-all font-mono text-lg uppercase tracking-widest"
+                                       placeholder="A7X92" required>
+                                <i class="fas fa-hashtag absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-primary transition-colors"></i>
+                            </div>
+
+                            <button type="submit" class="btn-primary w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 text-lg shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all">
+                                Join Room <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </form>
                     </div>
-                    <form action="/quiz/lobby/join" method="POST">
-                        <input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
-                        <div class="form-group mb-3">
-                            <input type="text" name="code" class="form-control mp-input text-uppercase" placeholder="ENTER CODE (e.g. A7X92)" required>
-                        </div>
-                        <button type="submit" class="mp-btn primary w-100">Join Room</button>
-                    </form>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="container mp-grid">
-        <div class="row">
-            <div class="col-lg-6 mb-4">
-                <div class="mp-card h-100">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="mp-icon-circle accent"><i class="fas fa-crown"></i></div>
-                        <div class="ml-3">
-                            <div class="mp-kicker">Host mode</div>
-                            <div class="mp-card-title">Create a lobby</div>
+        <!-- Options Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-20">
+            
+            <!-- Host Card -->
+            <div class="glass-card p-1 rounded-3xl group hover:-translate-y-1 transition-transform duration-300">
+                <div class="bg-surface/50 rounded-[20px] p-8 h-full border border-white/5 group-hover:bg-surface/70 transition-colors">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center text-accent text-xl border border-accent/20">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-accent uppercase tracking-wider block mb-1">Host Mode</span>
+                            <h3 class="text-xl font-bold text-white">Create a Lobby</h3>
                         </div>
                     </div>
-                    <p class="mp-muted">Spin up a secure lobby, invite friends, and let the server handle fairness.</p>
-                    <form action="/quiz/lobby/create" method="POST" class="mt-3">
+                    
+                    <p class="text-gray-400 mb-8 leading-relaxed">
+                        Spin up a secure lobby, invite friends via code, and let the server handle fairness and scoring.
+                    </p>
+
+                    <form action="/quiz/lobby/create" method="POST">
                         <input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
-                        <input type="hidden" name="exam_id" value="1">
-                        <button type="submit" class="mp-btn gradient w-100">Create New Room</button>
+                        <input type="hidden" name="exam_id" value="1"> <!-- Default exam for now -->
+                        <button type="submit" class="w-full py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl font-bold transition-all flex items-center justify-center gap-2 group-hover:border-accent/50 group-hover:text-accent">
+                            Create New Room <i class="fas fa-plus"></i>
+                        </button>
                     </form>
                 </div>
             </div>
-            <div class="col-lg-6 mb-4">
-                <div class="mp-card h-100">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="mp-icon-circle warning"><i class="fas fa-bolt"></i></div>
-                        <div class="ml-3">
-                            <div class="mp-kicker">What you get</div>
-                            <div class="mp-card-title">Competitive stack</div>
+
+            <!-- Features Card -->
+            <div class="glass-card p-1 rounded-3xl group hover:-translate-y-1 transition-transform duration-300">
+                <div class="bg-surface/50 rounded-[20px] p-8 h-full border border-white/5 group-hover:bg-surface/70 transition-colors">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center text-yellow-400 text-xl border border-yellow-500/20">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-yellow-400 uppercase tracking-wider block mb-1">Stack Specs</span>
+                            <h3 class="text-xl font-bold text-white">Competitive Engine</h3>
                         </div>
                     </div>
-                    <ul class="mp-list">
-                        <li><i class="fas fa-check text-success mr-2"></i>Server-authoritative scoring & wagers</li>
-                        <li><i class="fas fa-check text-success mr-2"></i>Nonce + honeypot defenses on wagers</li>
-                        <li><i class="fas fa-check text-success mr-2"></i>Real-time pulse updates for lobby status</li>
-                        <li><i class="fas fa-check text-success mr-2"></i>Premium glass UI aligned with home page</li>
+
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-green-400 mt-1"></i>
+                            <span class="text-gray-400 text-sm">Server-authoritative scoring & wager validation</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-green-400 mt-1"></i>
+                            <span class="text-gray-400 text-sm">Real-time WebSocket-style pulse updates</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-green-400 mt-1"></i>
+                            <span class="text-gray-400 text-sm">Premium glass UI aligned with core design</span>
+                        </li>
                     </ul>
                 </div>
             </div>
+            
         </div>
     </div>
 </div>
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
-:root {
-    --mp-bg: #0b0f1a;
-    --mp-card: rgba(255,255,255,0.04);
-    --mp-border: rgba(255,255,255,0.08);
-    --mp-primary: #7c5dff;
-    --mp-accent: #00d1ff;
-    --mp-warning: #f7c948;
-    --mp-text: #e8ecf2;
-    --mp-muted: #9aa4b5;
-    --mp-glow: 0 12px 60px rgba(124,93,255,0.25);
-    --mp-radius: 16px;
-}
-.mp-page {
-    background: radial-gradient(circle at 20% 20%, rgba(124,93,255,0.08), transparent 35%),
-                radial-gradient(circle at 80% 10%, rgba(0,209,255,0.08), transparent 30%),
-                linear-gradient(180deg, #0b0f1a 0%, #0a0c14 100%);
-    color: var(--mp-text);
-    font-family: 'Space Grotesk', 'Inter', system-ui, -apple-system, sans-serif;
-    min-height: 100vh;
-    padding: 40px 0 70px;
-}
-.mp-hero { position: relative; margin-bottom: 30px; }
-.mp-pill {
-    display: inline-flex;
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.08);
-    color: var(--mp-text);
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    font-size: 12px;
-}
-.mp-title { font-size: 42px; font-weight: 700; letter-spacing: -0.02em; margin: 10px 0 6px; }
-.mp-subtitle { color: var(--mp-muted); font-size: 16px; max-width: 560px; }
-.mp-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
-.mp-stat-label { display: block; color: var(--mp-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
-.mp-stat-value { color: var(--mp-text); font-weight: 700; }
-
-.mp-card {
-    background: var(--mp-card);
-    border: 1px solid var(--mp-border);
-    border-radius: var(--mp-radius);
-    padding: 18px;
-    box-shadow: var(--mp-glow);
-}
-.mp-card.glass {
-    backdrop-filter: blur(10px);
-    background: rgba(255,255,255,0.04);
-}
-.mp-kicker { color: var(--mp-muted); text-transform: uppercase; font-size: 12px; letter-spacing: 0.06em; font-weight: 700; }
-.mp-card-title { font-weight: 700; font-size: 22px; color: var(--mp-text); }
-.mp-muted { color: var(--mp-muted); }
-.mp-input {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid var(--mp-border);
-    color: var(--mp-text);
-    border-radius: 12px;
-    padding: 12px 14px;
-}
-.mp-input::placeholder { color: rgba(255,255,255,0.5); }
-
-.mp-btn {
-    border: none;
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    transition: transform 0.15s ease, box-shadow 0.2s ease;
-}
-.mp-btn.primary { background: rgba(255,255,255,0.12); color: var(--mp-text); border: 1px solid var(--mp-border); }
-.mp-btn.gradient { background: linear-gradient(90deg, var(--mp-primary), var(--mp-accent)); color: #0b0f1a; box-shadow: var(--mp-glow); }
-.mp-btn:hover { transform: translateY(-1px); }
-.mp-btn:active { transform: translateY(0); }
-
-.mp-icon-circle {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.08);
-    display: grid; place-items: center;
-    color: var(--mp-text);
-    font-size: 18px;
-}
-.mp-icon-circle.accent { color: var(--mp-primary); }
-.mp-icon-circle.warning { color: var(--mp-warning); }
-
-.mp-grid { margin-top: 10px; }
-.mp-list { list-style: none; padding-left: 0; margin: 0; }
-.mp-list li { color: var(--mp-text); padding: 6px 0; }
-
-@media (max-width: 992px) {
-    .mp-title { font-size: 34px; }
-    .mp-subtitle { font-size: 15px; }
-    .mp-page { padding: 30px 0 50px; }
-}
-@media (max-width: 768px) {
-    .mp-title { font-size: 28px; }
-    .mp-stats { flex-direction: column; gap: 10px; }
-    .mp-card { padding: 16px; }
-}
-</style>
+<?php include_once __DIR__ . '/../../partials/footer.php'; ?>

@@ -18,7 +18,9 @@
     "test:ci": "TEST_ENV=staging npx playwright test tests/Api/ --reporter=json --reporter=junit",
     "install:browsers": "npx playwright install",
     "clean:results": "rm -rf test-results/*",
-    "validate:config": "node -e \"console.log('Configuration valid:', require('./tests/config.json').baseUrl)\""
+    "validate:config": "node -e \"console.log('Configuration valid:', require('./tests/config.json').baseUrl)\"",
+    "watch:quiz": "tailwindcss -i ./themes/default/assets/css/quiz.css -o ./themes/default/assets/css/quiz.min.css --config tailwind.quiz.config.js --watch",
+    "build:quiz": "tailwindcss -i ./themes/default/assets/css/quiz.css -o ./themes/default/assets/css/quiz.min.css --config tailwind.quiz.config.js --minify"
   },
   "keywords": [
     "api-testing",
@@ -34,7 +36,11 @@
   "license": "UNLICENSED",
   "devDependencies": {
     "@playwright/test": "^1.40.0",
-    "playwright": "^1.40.0"
+    "playwright": "^1.40.0",
+    "tailwindcss": "^3.4.1",
+    "postcss": "^8.4.33",
+    "autoprefixer": "^10.4.16",
+    "alpinejs": "^3.13.3"
   },
   "engines": {
     "node": ">=16.0.0",
