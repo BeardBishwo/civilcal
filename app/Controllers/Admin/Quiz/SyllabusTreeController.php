@@ -176,7 +176,7 @@ class SyllabusTreeController extends Controller
                 throw new Exception("Search query is required");
             }
 
-            $results = $this->syllabusService->searchNodes($query, $level);
+            $results = $this->syllabusService->searchNodes($query, $level, true);
 
             $this->jsonResponse(['success' => true, 'results' => $results]);
 

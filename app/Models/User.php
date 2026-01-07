@@ -388,16 +388,23 @@ class User
         $newsStmt->execute([$userId]);
         $newsResult = $newsStmt->fetch();
 
-        // Get Quizzes Completed
+        // Get Quizzes Completed (Legacy)
         $quizStmt = $this->db->getPdo()->prepare("SELECT COUNT(*) as quiz_count FROM quiz_attempts WHERE user_id = ? AND status = 'completed'");
         $quizStmt->execute([$userId]);
         $quizResult = $quizStmt->fetch();
+
+        // Get Exams Completed (New Phase 17)
+        $examStmt = $this->db->getPdo()->prepare("SELECT COUNT(*) as exam_count FROM exam_sessions WHERE user_id = ? AND status = 'completed'");
+        $examStmt->execute([$userId]);
+        $examResult = $examStmt->fetch();
+
+        $totalExams = ($quizResult['quiz_count'] ?? 0) + ($examResult['exam_count'] ?? 0);
 
         return [
             'calculations_count' => $calcResult['calculation_count'] ?? 0,
             'favorites_count' => $favResult['favorites_count'] ?? 0,
             'news_reads_count' => $newsResult['news_count'] ?? 0,
-            'quizzes_completed_count' => $quizResult['quiz_count'] ?? 0,
+            'quizzes_completed_count' => $totalExams,
             'login_count' => $user['login_count'] ?? 0,
             'last_login' => $user['last_login'],
             'profile_completion' => $this->getProfileCompletion($userId)

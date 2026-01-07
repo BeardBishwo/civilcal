@@ -141,6 +141,7 @@ $stats = [
                             <th class="text-center" style="width: 35%;">Main Category</th>
                             <th class="text-center" style="width: 100px;">Questions</th>
                             <th class="text-center" style="width: 100px;">Premium</th>
+                            <th class="text-center" style="width: 100px;">Status</th>
                             <th class="text-center" style="width: 100px;">Actions</th>
                         </tr>
                     </thead>
@@ -200,6 +201,21 @@ $stats = [
                                             <?php if($sub['is_premium']): ?>
                                                 <span class="price-tag"><i class="fas fa-coins"></i> <?php echo $sub['unlock_price']; ?></span>
                                             <?php endif; ?>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <?php 
+                                        // Freeze if Parent (Cat), Grandparent (Level), or Great-Grandparent (Course) is inactive
+                                        $pActive = $sub['parent_active'] ?? 1;
+                                        $gpActive = $sub['grandparent_active'] ?? 1;
+                                        $ggpActive = $sub['greatgrandparent_active'] ?? 1;
+                                        $isFrozen = ($pActive == 0 || $gpActive == 0 || $ggpActive == 0);
+                                        ?>
+                                        <div class="premium-control" <?php if($isFrozen) echo 'style="opacity: 0.6; pointer-events: none;" title="Disabled by Hierarchy"'; ?>>
+                                            <label class="switch scale-sm">
+                                                <input type="checkbox" class="status-toggle" data-id="<?php echo $sub['id']; ?>" <?php echo ($sub['is_active'] ?? 1) ? 'checked' : ''; ?> <?php if($isFrozen) echo 'disabled'; ?>>
+                                                <span class="slider round" <?php if($isFrozen && ($sub['is_active'] ?? 1)) echo 'style="background-color: #94a3b8;"'; ?>></span>
+                                            </label>
                                         </div>
                                     </td>
                                     <td class="text-center">
@@ -351,6 +367,18 @@ document.querySelectorAll('.premium-toggle').forEach(el => {
            method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:formData
         });
         location.reload();
+    });
+});
+
+document.querySelectorAll('.status-toggle').forEach(el => {
+    el.addEventListener('change', async function() {
+        const formData = new URLSearchParams();
+        formData.append('id', this.dataset.id);
+        formData.append('val', this.checked ? 1 : 0);
+        await fetch('<?php echo app_base_url('admin/quiz/subcategories/toggle-status'); ?>', {
+           method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:formData
+        });
+        // location.reload();
     });
 });
 

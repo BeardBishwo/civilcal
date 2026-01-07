@@ -27,12 +27,20 @@ class CategoryController extends Controller
         $levelId = $_GET['level_id'] ?? null;
 
         // Fetch all Education Levels for dropdown
-        $levels = $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'education_level' ORDER BY order_index ASC")->fetchAll();
+        // Join with Course to show context in dropdown if needed, but simple list is fine.
+        $levels = $this->db->query("
+            SELECT el.id, el.title 
+            FROM syllabus_nodes el
+            ORDER BY el.order_index ASC
+        ")->fetchAll();
 
-        // Base Query
-        $sql = "SELECT c.*, p.title as parent_title 
+        // Base Query (Categories -> Education Level -> Course)
+        $sql = "SELECT c.*, 
+                       p.title as parent_title, p.is_active as parent_active,
+                       course.is_active as grandparent_active 
                 FROM syllabus_nodes c 
                 LEFT JOIN syllabus_nodes p ON c.parent_id = p.id 
+                LEFT JOIN syllabus_nodes course ON p.parent_id = course.id
                 WHERE c.type = 'category'";
 
         $params = [];
@@ -41,7 +49,7 @@ class CategoryController extends Controller
             $params['level_id'] = $levelId;
         }
 
-        $sql .= " ORDER BY c.order_index ASC";
+        $sql .= " ORDER BY (c.is_active = 1 AND IFNULL(p.is_active, 1) = 1 AND IFNULL(course.is_active, 1) = 1) DESC, c.order_index ASC";
 
         $categories = $this->db->query($sql, $params)->fetchAll();
 
@@ -141,6 +149,22 @@ class CategoryController extends Controller
             echo json_encode(['status' => 'success']);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Database error']);
+        }
+    }
+
+    /**
+     * Toggle Status
+     */
+    public function toggleStatus()
+    {
+        $id = $_POST['id'] ?? null;
+        $val = $_POST['val'] ?? 0;
+
+        if ($id) {
+            $this->db->update('syllabus_nodes', ['is_active' => $val], "id = :id", ['id' => $id]);
+            echo json_encode(['status' => 'success']);
+        } else {
+            echo json_encode(['status' => 'error']);
         }
     }
 

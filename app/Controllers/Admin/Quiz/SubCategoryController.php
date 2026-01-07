@@ -28,9 +28,14 @@ class SubCategoryController extends Controller
 
         // 1. Fetch Sub-Categories (Nodes with a Parent)
         $sql = "
-            SELECT child.*, parent.title as parent_title 
+            SELECT child.*, 
+                   parent.title as parent_title, parent.is_active as parent_active,
+                   level.is_active as grandparent_active,
+                   course.is_active as greatgrandparent_active
             FROM syllabus_nodes child
             LEFT JOIN syllabus_nodes parent ON child.parent_id = parent.id
+            LEFT JOIN syllabus_nodes level ON parent.parent_id = level.id
+            LEFT JOIN syllabus_nodes course ON level.parent_id = course.id
             WHERE child.parent_id IS NOT NULL
         ";
         
@@ -41,7 +46,7 @@ class SubCategoryController extends Controller
             $params['pid'] = $parentId;
         }
 
-        $sql .= " ORDER BY child.order_index ASC, child.parent_id ASC";
+        $sql .= " ORDER BY (child.is_active = 1 AND IFNULL(parent.is_active, 1) = 1 AND IFNULL(level.is_active, 1) = 1 AND IFNULL(course.is_active, 1) = 1) DESC, child.order_index ASC, child.parent_id ASC";
 
         $stmt = $this->db->getPdo()->prepare($sql);
         $stmt->execute($params);
@@ -114,6 +119,22 @@ class SubCategoryController extends Controller
             echo json_encode(['status' => 'success']);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Database error']);
+        }
+    }
+
+    /**
+     * Toggle Status
+     */
+    public function toggleStatus()
+    {
+        $id = $_POST['id'] ?? null;
+        $val = $_POST['val'] ?? 0;
+
+        if ($id) {
+            $this->db->update('syllabus_nodes', ['is_active' => $val], "id = :id", ['id' => $id]);
+            echo json_encode(['status' => 'success']);
+        } else {
+            echo json_encode(['status' => 'error']);
         }
     }
 

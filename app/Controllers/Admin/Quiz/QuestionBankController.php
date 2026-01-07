@@ -46,10 +46,24 @@ class QuestionBankController extends Controller
             $params['topic_id'] = $_GET['topic_id'];
         }
         
-        // Filter by Type
+        // Filter by Type (Enhanced for Theory)
         if (!empty($_GET['type'])) {
-            $where[] = "q.type = :type";
-            $params['type'] = $_GET['type'];
+            $type = $_GET['type'];
+            
+            if ($type === 'THEORY') {
+                // All theory questions
+                $where[] = "q.type = 'THEORY'";
+            } elseif ($type === 'THEORY_SHORT') {
+                // Short answer only
+                $where[] = "q.type = 'THEORY' AND (q.theory_type = 'short' OR q.default_marks <= 4)";
+            } elseif ($type === 'THEORY_LONG') {
+                // Long answer only
+                $where[] = "q.type = 'THEORY' AND (q.theory_type = 'long' OR q.default_marks > 4)";
+            } else {
+                // Other types
+                $where[] = "q.type = :type";
+                $params['type'] = $type;
+            }
         }
 
         // Filter by Course/Stream (OPTIMIZED)
@@ -105,13 +119,25 @@ class QuestionBankController extends Controller
         $questions = $stmt->fetchAll();
 
         // Calculate Stats
-        $stats = ['total' => $total, 'mcq' => 0, 'multi' => 0, 'order' => 0];
+        $stats = ['total' => $total, 'mcq' => 0, 'multi' => 0, 'order' => 0, 'theory' => 0, 'theory_short' => 0, 'theory_long' => 0];
         $stmtStats = $this->db->getPdo()->query("SELECT type, COUNT(*) as count FROM quiz_questions GROUP BY type");
         while($row = $stmtStats->fetch()) {
             $type = $row['type'];
             if(in_array($type, ['MCQ', 'TF'])) $stats['mcq'] += $row['count'];
             if($type == 'MULTI') $stats['multi'] += $row['count'];
+            if($type == 'THEORY') $stats['theory'] += $row['count'];
         }
+        
+        // Get theory sub-type counts
+        $theoryStats = $this->db->query("
+            SELECT 
+                SUM(CASE WHEN theory_type = 'short' OR default_marks <= 4 THEN 1 ELSE 0 END) as short_count,
+                SUM(CASE WHEN theory_type = 'long' OR default_marks > 4 THEN 1 ELSE 0 END) as long_count
+            FROM quiz_questions 
+            WHERE type = 'THEORY'
+        ")->fetch();
+        $stats['theory_short'] = $theoryStats['short_count'] ?? 0;
+        $stats['theory_long'] = $theoryStats['long_count'] ?? 0;
 
         // Load roots from syllabus tree
         $mainCategories = $this->db->query("SELECT id, title FROM syllabus_nodes WHERE parent_id IS NULL AND is_active = 1 ORDER BY order_index ASC")->fetchAll();

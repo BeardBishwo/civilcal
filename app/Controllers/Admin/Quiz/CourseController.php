@@ -26,7 +26,7 @@ class CourseController extends Controller
     {
         // Fetch only Courses (type = 'course')
         // Parent ID is typically NULL for root courses
-        $sql = "SELECT * FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC";
+        $sql = "SELECT * FROM syllabus_nodes WHERE type = 'course' ORDER BY is_active DESC, order_index ASC";
         $courses = $this->db->query($sql)->fetchAll();
 
         // Calculate Stats

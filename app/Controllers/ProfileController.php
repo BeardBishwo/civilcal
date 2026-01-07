@@ -61,6 +61,15 @@ class ProfileController extends Controller
         $wallet = $gamification->getWallet($userId);
         $rankData = $rankService->getUserRankData($stats, $wallet);
 
+        // Fetch Recent Exam Sessions (Phase 18)
+        $recentExams = $this->db->query("
+            SELECT es.*, s.name as category_name 
+            FROM exam_sessions es
+            LEFT JOIN syllabus_nodes s ON es.category_id = s.id
+            WHERE es.user_id = :uid AND es.status = 'completed'
+            ORDER BY es.created_at DESC 
+            LIMIT 5
+        ", ['uid' => $userId])->fetchAll();
 
         $data = [
             'user' => $user,
@@ -70,10 +79,50 @@ class ProfileController extends Controller
             'social_links' => $this->userModel->getSocialLinksAttribute($userId),
             'two_factor_status' => $twoFactorStatus,
             'export_requests' => $exportRequests,
-            'rank_data' => $rankData
+            'rank_data' => $rankData,
+            'recent_exams' => $recentExams
         ];
         
         $this->view->render('user/profile', $data);
+    }
+
+    /**
+     * User Exam History Page
+     */
+    public function exams()
+    {
+        $userId = $this->getCurrentUserId();
+        
+        // Pagination logic (Simple for now)
+        $limit = 20;
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $offset = ($page - 1) * $limit;
+
+        $exams = $this->db->query("
+            SELECT es.*, s.name as category_name 
+            FROM exam_sessions es
+            LEFT JOIN syllabus_nodes s ON es.category_id = s.id
+            WHERE es.user_id = :uid 
+            ORDER BY es.created_at DESC 
+            LIMIT $limit OFFSET $offset
+        ", ['uid' => $userId])->fetchAll();
+
+        $this->view('user/exams', [
+            'exams' => $exams,
+            'page_title' => 'My Exam History'
+        ]);
+    }
+
+    /**
+     * User Analytics Page
+     */
+    public function analytics()
+    {
+        $userId = $this->getCurrentUserId();
+        // Placeholder for now
+        $this->view('user/analytics', [
+            'page_title' => 'Performance Analytics'
+        ]);
     }
 
     /**

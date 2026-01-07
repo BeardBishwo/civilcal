@@ -231,17 +231,42 @@ class SyllabusService
     /**
      * Search nodes by title
      */
-    public function searchNodes($query, $level = null)
+    public function searchNodes($query, $level = null, $activeOnly = false)
     {
-        $sql = "SELECT * FROM syllabus_nodes WHERE title LIKE :query";
+        // Search with strict hierarchy check (Active Only mode)
+        $sql = "SELECT DISTINCT t1.* FROM syllabus_nodes t1";
+        
+        if ($activeOnly) {
+            // Join up to 4 levels of ancestors to ensure full chain is active
+            $sql .= "
+                LEFT JOIN syllabus_nodes t2 ON t1.parent_id = t2.id
+                LEFT JOIN syllabus_nodes t3 ON t2.parent_id = t3.id
+                LEFT JOIN syllabus_nodes t4 ON t3.parent_id = t4.id
+                LEFT JOIN syllabus_nodes t5 ON t4.parent_id = t5.id
+            ";
+        }
+
+        $sql .= " WHERE t1.title LIKE :query";
         $params = ['query' => "%$query%"];
 
         if ($level) {
-            $sql .= " AND level = :level";
+            $sql .= " AND t1.level = :level";
             $params['level'] = $level;
         }
 
-        $sql .= " ORDER BY `order` ASC LIMIT 50";
+        if ($activeOnly) {
+             // Ensure all existing ancestors are active
+             // valid = (no parent OR parent is active) AND (no grandparent OR grandparent is active) ...
+             $sql .= " 
+                AND t1.is_active = 1
+                AND (t2.is_active = 1 OR t2.id IS NULL)
+                AND (t3.is_active = 1 OR t3.id IS NULL)
+                AND (t4.is_active = 1 OR t4.id IS NULL)
+                AND (t5.is_active = 1 OR t5.id IS NULL)
+             ";
+        }
+
+        $sql .= " ORDER BY t1.`order` ASC LIMIT 50";
 
         $stmt = $this->db->getPdo()->prepare($sql);
         $stmt->execute($params);

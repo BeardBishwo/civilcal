@@ -74,10 +74,17 @@ $positionLevels = $positionLevels ?? [];
                         <?php endif; ?>
                     </select>
 
-                    <select name="type" class="filter-select" style="width:120px;">
+                    <select name="type" class="filter-select" style="width:180px;">
                         <option value="">All Types</option>
                         <option value="MCQ" <?php echo ($_GET['type'] ?? '') == 'MCQ' ? 'selected' : ''; ?>>MCQ</option>
                         <option value="TF" <?php echo ($_GET['type'] ?? '') == 'TF' ? 'selected' : ''; ?>>True/False</option>
+                        <option value="MULTI" <?php echo ($_GET['type'] ?? '') == 'MULTI' ? 'selected' : ''; ?>>Multi-Select</option>
+                        <option value="SEQUENCE" <?php echo ($_GET['type'] ?? '') == 'SEQUENCE' ? 'selected' : ''; ?>>Sequence</option>
+                        <option value="NUMERICAL" <?php echo ($_GET['type'] ?? '') == 'NUMERICAL' ? 'selected' : ''; ?>>Numerical</option>
+                        <option value="TEXT" <?php echo ($_GET['type'] ?? '') == 'TEXT' ? 'selected' : ''; ?>>Text</option>
+                        <option value="THEORY" <?php echo ($_GET['type'] ?? '') == 'THEORY' ? 'selected' : ''; ?>>Theory (All)</option>
+                        <option value="THEORY_SHORT" <?php echo ($_GET['type'] ?? '') == 'THEORY_SHORT' ? 'selected' : ''; ?>>└─ Short Answer (4 marks)</option>
+                        <option value="THEORY_LONG" <?php echo ($_GET['type'] ?? '') == 'THEORY_LONG' ? 'selected' : ''; ?>>└─ Long Answer (8 marks)</option>
                     </select>
 
                     <button type="submit" class="btn-filter-apply">
@@ -152,8 +159,39 @@ $positionLevels = $positionLevels ?? [];
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <span class="badge-pill" style="background: <?php echo $q['type'] == 'MCQ' ? '#dbeafe' : '#d1fae5'; ?>; color: <?php echo $q['type'] == 'MCQ' ? '#1e40af' : '#065f46'; ?>; border-color: <?php echo $q['type'] == 'MCQ' ? '#93c5fd' : '#6ee7b7'; ?>;">
-                                            <?php echo $q['type']; ?>
+                                        <?php 
+                                        $badgeColor = '#dbeafe';
+                                        $textColor = '#1e40af';
+                                        $borderColor = '#93c5fd';
+                                        $displayType = $q['type'];
+                                        
+                                        if ($q['type'] == 'THEORY') {
+                                            $badgeColor = '#fef3c7';
+                                            $textColor = '#92400e';
+                                            $borderColor = '#fcd34d';
+                                            
+                                            // Determine short or long
+                                            if (!empty($q['theory_type'])) {
+                                                $displayType = $q['theory_type'] == 'short' ? 'THEORY (S)' : 'THEORY (L)';
+                                            } else {
+                                                $displayType = $q['default_marks'] <= 4 ? 'THEORY (S)' : 'THEORY (L)';
+                                            }
+                                        } elseif ($q['type'] == 'MCQ') {
+                                            $badgeColor = '#dbeafe';
+                                            $textColor = '#1e40af';
+                                            $borderColor = '#93c5fd';
+                                        } elseif ($q['type'] == 'MULTI') {
+                                            $badgeColor = '#d1fae5';
+                                            $textColor = '#065f46';
+                                            $borderColor = '#6ee7b7';
+                                        } elseif ($q['type'] == 'TF') {
+                                            $badgeColor = '#e0e7ff';
+                                            $textColor = '#3730a3';
+                                            $borderColor = '#a5b4fc';
+                                        }
+                                        ?>
+                                        <span class="badge-pill" style="background: <?php echo $badgeColor; ?>; color: <?php echo $textColor; ?>; border-color: <?php echo $borderColor; ?>;">
+                                            <?php echo $displayType; ?>
                                         </span>
                                     </td>
                                     <td class="text-center align-middle">

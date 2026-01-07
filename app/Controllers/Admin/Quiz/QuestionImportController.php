@@ -59,7 +59,7 @@ class QuestionImportController extends Controller
             'Option A', 'Option B', 'Option C', 'Option D', 'Option E',
             'Correct Answer(s)', 'Explanation', 'Difficulty',
             'Marks', 'Negative Marks', 'Governance Status',
-            'Active Status', 'Shuffle Options', 'Target Audience', 'Tags', 'Unique Code'
+            'Active Status', 'Shuffle Options', 'Target Audience', 'Tags', 'Unique Code', 'Theory Type'
         ];
         $sheet->fromArray($headers, NULL, 'A1');
         
@@ -69,7 +69,7 @@ class QuestionImportController extends Controller
             'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '667EEA']],
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER]
         ];
-        $sheet->getStyle('A1:W1')->applyFromArray($headerStyle);
+        $sheet->getStyle('A1:X1')->applyFromArray($headerStyle);
         $sheet->getRowDimension(1)->setRowHeight(30);
         
         // Set column widths
@@ -96,6 +96,7 @@ class QuestionImportController extends Controller
         $sheet->getColumnDimension('U')->setWidth(15); // Target Audience
         $sheet->getColumnDimension('V')->setWidth(30); // Tags
         $sheet->getColumnDimension('W')->setWidth(15); // Unique Code
+        $sheet->getColumnDimension('X')->setWidth(15); // Theory Type
         
         // Add dropdowns with database data
         $this->addEnterpriseDropdowns($sheet);
@@ -106,8 +107,17 @@ class QuestionImportController extends Controller
             'MCQ', 'What is the minimum grade of concrete for RCC work?',
             'M10', 'M15', 'M20', 'M25', '',
             'c', 'M20 is the minimum grade as per IS 456', '2',
-            '1', '0.25', 'approved', 'Yes', 'Yes', 'universal', 'concrete,rcc,design', 'Q001'
+            '1', '0.25', 'approved', 'Yes', 'Yes', 'universal', 'concrete,rcc,design', 'Q001', ''
         ], NULL, 'A2');
+        
+        // Add theory question sample
+        $sheet->fromArray([
+            'civil-eng', 'bachelor', 'structural', 'rcc-design', 'engineer',
+            'THEORY', 'Define RCC and explain its advantages over plain concrete.',
+            '', '', '', '', '',
+            '', 'RCC (Reinforced Cement Concrete) is a composite material where steel reinforcement is embedded in concrete to resist tensile stresses. Advantages: 1) High tensile strength due to steel, 2) Better crack resistance, 3) Suitable for long spans, 4) Economical for large structures.', '4',
+            '4', '0', 'approved', 'Yes', 'No', 'universal', 'rcc,theory,definition', 'TH001', 'short'
+        ], NULL, 'A3');
         
         // ========================================
         // SHEET 2: COURSES (Reference Data)
@@ -152,10 +162,10 @@ class QuestionImportController extends Controller
     private function addEnterpriseDropdowns($sheet)
     {
         // Question Type
-        $this->addDropdown($sheet, 'F', ['MCQ', 'TF', 'MULTI', 'SEQUENCE', 'NUMERICAL', 'TEXT']);
+        $this->addDropdown($sheet, 'F', ['MCQ', 'TF', 'MULTI', 'SEQUENCE', 'NUMERICAL', 'TEXT', 'THEORY']);
         
-        // Difficulty
-        $this->addDropdown($sheet, 'O', ['1', '2', '3']);
+        // Difficulty (5 levels)
+        $this->addDropdown($sheet, 'O', ['1', '2', '3', '4', '5']);
         
         // Governance Status
         $this->addDropdown($sheet, 'R', ['draft', 'approved', 'archive']);
@@ -171,6 +181,9 @@ class QuestionImportController extends Controller
         
         // Correct Answer (for MCQ)
         $this->addDropdown($sheet, 'M', ['a', 'b', 'c', 'd', 'e', 'a,b', 'a,c', 'b,c', 'a,b,c']);
+        
+        // Theory Type
+        $this->addDropdown($sheet, 'X', ['short', 'long']);
     }
 
     private function addCourseReferenceSheet($spreadsheet)
@@ -340,12 +353,12 @@ class QuestionImportController extends Controller
             ['Main Category Code: Must match a code from "Main Categories" sheet (e.g., structural)'],
             ['Sub-Category Code: Must match a code from "Sub-Categories" sheet (e.g., rcc-design)'],
             ['Position Level Code: Must match a code from "Position Levels" sheet (e.g., sub-engineer)'],
-            ['Question Type: MCQ, TF, MULTI, SEQUENCE, NUMERICAL, or TEXT'],
+            ['Question Type: MCQ, TF, MULTI, SEQUENCE, NUMERICAL, TEXT, or THEORY'],
             ['Question Text: The actual question (max 5000 characters)'],
-            ['Options A-E: Answer options (A & B required for MCQ/MULTI, only A & B for TF)'],
+            ['Options A-E: Answer options (A & B required for MCQ/MULTI, only A & B for TF, not needed for THEORY)'],
             ['Correct Answer(s): Single letter (a,b,c,d,e) or comma-separated for MULTI (a,b,c)'],
             ['Explanation: Answer explanation (optional)'],
-            ['Difficulty: 1=Easy, 2=Medium, 3=Hard'],
+            ['Difficulty: 1=Easy, 2=Easy-Mid, 3=Medium, 4=Hard, 5=Expert'],
             ['Marks: Default marks for correct answer (e.g., 1)'],
             ['Negative Marks: Penalty for wrong answer (e.g., 0.25)'],
             ['Governance Status: draft, approved, or archive'],
@@ -354,6 +367,7 @@ class QuestionImportController extends Controller
             ['Target Audience: universal, psc_only, or world_only'],
             ['Tags: Comma-separated tags (e.g., concrete,rcc,design)'],
             ['Unique Code: Optional admin reference code (auto-generated if empty)'],
+            ['Theory Type: short or long (only for THEORY questions, leave empty for others)'],
             [''],
             ['VALIDATION RULES'],
             [''],
@@ -361,6 +375,7 @@ class QuestionImportController extends Controller
             ['✓ Hierarchy must be valid (Sub-Category must belong to Category, etc.)'],
             ['✓ For MCQ/MULTI: Options A & B are required'],
             ['✓ For TF: Only 2 options allowed (True/False)'],
+            ['✓ For THEORY: No options needed, answer in explanation field'],
             ['✓ Correct answer must exist in options'],
             ['✓ Marks must be between 0.25 and 10'],
             ['✓ Negative marks must be between 0 and 5'],

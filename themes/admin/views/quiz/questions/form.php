@@ -11,6 +11,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <!-- Animate.css -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<!-- TinyMCE Rich Text Editor -->
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
 <style>
     /* Custom Scrollbar for sleek look */
@@ -80,6 +82,10 @@
 
                             <button type="button" class="tab-btn flex-1 min-w-[120px] py-4 px-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-all" onclick="switchType('ORDER', this)">
                                 <i class="fas fa-sort-amount-down mb-1 block text-lg"></i> Sequence
+                            </button>
+
+                            <button type="button" class="tab-btn flex-1 min-w-[120px] py-4 px-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-all" onclick="switchType('THEORY', this)">
+                                <i class="fas fa-file-alt mb-1 block text-lg"></i> Theory
                             </button>
                         </div>
                         <div class="px-3 border-l border-slate-100">
@@ -308,6 +314,28 @@
                                 <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
                             </div>
                         </label>
+                        
+                        <!-- Publish to Blog Toggle -->
+                        <label class="flex items-center justify-between p-3 border border-amber-100 rounded-xl hover:bg-amber-50 cursor-pointer transition group bg-gradient-to-r from-amber-50/50 to-orange-50/50">
+                            <div>
+                                <span class="text-sm font-semibold text-slate-700 group-hover:text-amber-600 transition flex items-center gap-2">
+                                    <i class="fas fa-blog text-amber-500"></i> Publish as Blog Post
+                                </span>
+                                <div class="text-xs text-slate-500 mt-0.5">Make publicly accessible for SEO</div>
+                            </div>
+                            <div class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="publish_blog_toggle" name="is_published_as_blog" value="1" class="sr-only peer">
+                                <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600"></div>
+                            </div>
+                        </label>
+                        
+                        <!-- URL Preview (shown when toggle is ON) -->
+                        <div id="blog_url_preview_box" class="hidden p-3 bg-blue-50 border border-blue-200 rounded-xl animate__animated animate__fadeIn">
+                            <div class="text-xs font-bold text-blue-800 mb-1 flex items-center gap-2">
+                                <i class="fas fa-link"></i> Blog URL Preview:
+                            </div>
+                            <div id="blog_url_text" class="text-xs text-blue-600 font-mono break-all bg-white p-2 rounded border border-blue-100"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -461,6 +489,83 @@
                 </div>
             `;
             if(optsToolbar) optsToolbar.style.display = 'none'; 
+        } else if (newType === 'THEORY') {
+            // Theory Question Layout
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Theory Type Selector -->
+                    <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-6">
+                        <label class="block text-sm font-bold text-amber-900 mb-4 flex items-center gap-2">
+                            <i class="fas fa-graduation-cap"></i> Theory Question Type
+                        </label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="theory_type" value="short" checked class="peer sr-only" onchange="updateTheoryMarks('short')">
+                                <div class="p-5 rounded-xl border-2 border-amber-200 bg-white peer-checked:bg-amber-100 peer-checked:border-amber-500 transition-all group-hover:shadow-md">
+                                    <div class="text-center">
+                                        <i class="fas fa-file-alt text-3xl text-amber-600 mb-2"></i>
+                                        <div class="font-bold text-slate-800">Short Answer</div>
+                                        <div class="text-xs text-slate-500 mt-1">4 Marks • 100-150 words</div>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="theory_type" value="long" class="peer sr-only" onchange="updateTheoryMarks('long')">
+                                <div class="p-5 rounded-xl border-2 border-amber-200 bg-white peer-checked:bg-amber-100 peer-checked:border-amber-500 transition-all group-hover:shadow-md">
+                                    <div class="text-center">
+                                        <i class="fas fa-file-alt text-3xl text-amber-600 mb-2"></i>
+                                        <div class="font-bold text-slate-800">Long Answer</div>
+                                        <div class="text-xs text-slate-500 mt-1">8 Marks • 300-500 words</div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Model Answer / Marking Scheme -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+                        <label class="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                            <i class="fas fa-book-open text-emerald-600"></i> Model Answer & Marking Scheme
+                        </label>
+                        <textarea id="theory_model_answer" name="model_answer" rows="10" class="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition" placeholder="Provide the complete model answer with point-wise marking scheme..."></textarea>
+                        <div class="mt-2 text-xs text-slate-500 flex items-start gap-2">
+                            <i class="fas fa-info-circle mt-0.5"></i>
+                            <span>Include the complete answer with point-wise marks distribution. This will be used for manual grading.</span>
+                        </div>
+                    </div>
+
+                    <!-- Expected Answer Guidelines -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-lightbulb text-blue-600 text-lg mt-0.5"></i>
+                            <div class="text-xs text-blue-800">
+                                <div class="font-bold mb-1">Tips for Theory Questions:</div>
+                                <ul class="list-disc list-inside space-y-1 ml-2">
+                                    <li>Specify expected answer length in question text</li>
+                                    <li>Break down marking scheme into clear points</li>
+                                    <li>Include all acceptable answer variations</li>
+                                    <li>Mention if diagrams/sketches are required</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            if(optsToolbar) optsToolbar.style.display = 'none';
+            
+            // Initialize TinyMCE for model answer
+            setTimeout(() => {
+                if (typeof tinymce !== 'undefined') {
+                    tinymce.init({
+                        selector: '#theory_model_answer',
+                        height: 400,
+                        menubar: false,
+                        plugins: 'lists link image code',
+                        toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code',
+                        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; }'
+                    });
+                }
+            }, 100);
         } else {
             // Standard Options List
             state.optionCount = 4;
@@ -542,6 +647,19 @@
         const el = document.getElementById('diff_label');
         el.innerText = map[val][0];
         el.className = `text-xs font-bold px-2.5 py-1 rounded-md ${map[val][1]}`;
+    }
+
+    function updateTheoryMarks(type) {
+        const marksInput = document.querySelector('input[name="default_marks"]');
+        const negMarksInput = document.querySelector('input[name="default_negative_marks"]');
+        
+        if (type === 'short') {
+            if (marksInput) marksInput.value = 4;
+            if (negMarksInput) negMarksInput.value = 0;
+        } else if (type === 'long') {
+            if (marksInput) marksInput.value = 8;
+            if (negMarksInput) negMarksInput.value = 0;
+        }
     }
 
 

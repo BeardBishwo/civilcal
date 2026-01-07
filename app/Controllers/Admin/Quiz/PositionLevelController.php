@@ -40,7 +40,9 @@ class PositionLevelController extends Controller
         // Build query with filters
         $sql = "SELECT pl.*, 
                        c.title as course_title,
-                       el.title as education_level_title
+                       c.is_active as course_status,
+                       el.title as education_level_title,
+                       el.is_active as education_level_status
                 FROM position_levels pl
                 LEFT JOIN syllabus_nodes c ON pl.course_id = c.id
                 LEFT JOIN syllabus_nodes el ON pl.education_level_id = el.id
@@ -56,7 +58,7 @@ class PositionLevelController extends Controller
             $params['education_level_id'] = $educationLevelId;
         }
         
-        $sql .= " ORDER BY pl.order_index ASC, pl.level_number ASC";
+        $sql .= " ORDER BY (pl.is_active = 1 AND IFNULL(c.is_active, 1) = 1 AND IFNULL(el.is_active, 1) = 1) DESC, pl.level_number ASC, pl.order_index ASC";
         $levels = $this->db->query($sql, $params)->fetchAll();
 
         $stats = [

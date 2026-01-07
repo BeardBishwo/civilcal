@@ -26,11 +26,13 @@ class EducationLevelController extends Controller
     {
         // Fetch Education Levels with Parent Course Name
         // Assumes Education Levels are children of Courses in syllabus_nodes
-        $sql = "SELECT el.*, c.title as parent_title 
+        // Fetch Education Levels with Parent Course Name
+        // Assumes Education Levels are children of Courses in syllabus_nodes
+        $sql = "SELECT el.*, c.title as parent_title, c.is_active as parent_active 
                 FROM syllabus_nodes el 
                 LEFT JOIN syllabus_nodes c ON el.parent_id = c.id
                 WHERE el.type = 'education_level' 
-                ORDER BY c.order_index ASC, el.order_index ASC";
+                ORDER BY (el.is_active = 1 AND IFNULL(c.is_active, 1) = 1) DESC, c.order_index ASC, el.order_index ASC";
         
         $levels = $this->db->query($sql)->fetchAll();
 

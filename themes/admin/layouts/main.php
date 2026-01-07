@@ -842,10 +842,16 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
 
                     <!-- Blog System -->
                     <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/blog') !== false ? 'active' : ''; ?>">
-                        <a href="<?php echo app_base_url('/admin/blog'); ?>" class="nav-link">
+                        <a href="javascript:void(0)" class="nav-link">
                             <i class="nav-icon fas fa-blog"></i>
-                            <span class="nav-text">Blog Manager</span>
+                            <span class="nav-text">Blog System</span>
+                            <i class="nav-arrow fas fa-chevron-right"></i>
                         </a>
+                        <ul class="nav-submenu">
+                            <li><a href="<?php echo app_base_url('admin/blog/articles'); ?>">Articles</a></li>
+                            <li><a href="<?php echo app_base_url('admin/blog/posts'); ?>">Collections</a></li>
+                            <li><a href="<?php echo app_base_url('admin/blog/categories'); ?>">Categories</a></li>
+                        </ul>
                     </li>
 
                     <!-- Modules -->

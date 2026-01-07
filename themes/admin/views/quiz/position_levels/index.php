@@ -187,10 +187,15 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                                         <i class="fas <?php echo htmlspecialchars($l['icon'] ?? 'fa-user'); ?>" style="font-size: 1.2rem; color: <?php echo htmlspecialchars($l['color'] ?? '#667eea'); ?>;"></i>
                                     </td>
                                     <td class="text-center">
-                                        <div class="premium-control">
+                                        <?php 
+                                        $courseActive = $l['course_status'] ?? 1;
+                                        $eduLevelActive = $l['education_level_status'] ?? 1;
+                                        $isFrozen = ($courseActive == 0 || $eduLevelActive == 0);
+                                        ?>
+                                        <div class="premium-control" <?php if($isFrozen) echo 'style="opacity: 0.6; pointer-events: none;" title="Disabled by Parent Hierarchy"'; ?>>
                                             <label class="switch scale-sm">
-                                                <input type="checkbox" class="status-toggle" data-id="<?php echo $l['id']; ?>" <?php echo $l['is_active'] ? 'checked' : ''; ?>>
-                                                <span class="slider round"></span>
+                                                <input type="checkbox" class="status-toggle" data-id="<?php echo $l['id']; ?>" <?php echo $l['is_active'] ? 'checked' : ''; ?> <?php if($isFrozen) echo 'disabled'; ?>>
+                                                <span class="slider round" <?php if($isFrozen && $l['is_active']) echo 'style="background-color: #94a3b8;"'; ?>></span>
                                             </label>
                                         </div>
                                     </td>

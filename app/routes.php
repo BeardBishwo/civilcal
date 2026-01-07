@@ -286,12 +286,11 @@ $router->add("POST", "/admin/analytics/reports/generate", "Admin\\AnalyticsContr
 $router->add("GET", "/admin/analytics/performance", "Admin\\AnalyticsController@performance", ["auth", "admin"]);
 
 // Blog Management
-$router->add("GET", "/admin/blog", "Admin\BlogController@index", ["auth", "admin"]);
-$router->add("GET", "/admin/blog/create", "Admin\BlogController@create", ["auth", "admin"]);
-$router->add("POST", "/admin/blog/store", "Admin\BlogController@store", ["auth", "admin"]);
-$router->add("GET", "/admin/blog/edit/{id}", "Admin\BlogController@edit", ["auth", "admin"]);
-$router->add("POST", "/admin/blog/update/{id}", "Admin\BlogController@update", ["auth", "admin"]);
-$router->add("POST", "/admin/blog/delete/{id}", "Admin\BlogController@delete", ["auth", "admin"]);
+$router->add("GET", "/admin/blog/posts", "Admin\\Blog\\BlogPostController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/blog/posts/create", "Admin\\Blog\\BlogPostController@create", ["auth", "admin"]);
+$router->add("POST", "/admin/blog/posts/store", "Admin\\Blog\\BlogPostController@store", ["auth", "admin"]);
+$router->add("GET", "/admin/blog/posts/{id}", "Admin\\Blog\\BlogPostController@show", ["auth", "admin"]);
+$router->add("POST", "/admin/blog/posts/delete/{id}", "Admin\\Blog\\BlogPostController@delete", ["auth", "admin"]);
 
 // Logo & Branding Settings
 $router->add("GET", "/admin/logo-settings", "Admin\LogoController@index", [
@@ -1986,6 +1985,7 @@ $router->add("POST", "/admin/quiz/categories/store", "Admin\\Quiz\\CategoryContr
 $router->add("POST", "/admin/quiz/categories/delete/{id}", "Admin\\Quiz\\CategoryController@delete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/categories/reorder", "Admin\\Quiz\\CategoryController@reorder", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/categories/toggle-premium", "Admin\\Quiz\\CategoryController@togglePremium", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/categories/toggle-status", "Admin\\Quiz\\CategoryController@toggleStatus", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/categories/bulk-delete", "Admin\\Quiz\\CategoryController@bulkDelete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/categories/duplicate", "Admin\\Quiz\\CategoryController@duplicate", ["auth", "admin"]);
 
@@ -1995,6 +1995,7 @@ $router->add("POST", "/admin/quiz/subcategories/store", "Admin\\Quiz\\SubCategor
 $router->add("POST", "/admin/quiz/subcategories/delete/{id}", "Admin\\Quiz\\SubCategoryController@delete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/subcategories/reorder", "Admin\\Quiz\\SubCategoryController@reorder", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/subcategories/toggle-premium", "Admin\\Quiz\\SubCategoryController@togglePremium", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/subcategories/toggle-status", "Admin\\Quiz\\SubCategoryController@toggleStatus", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/subcategories/bulk-delete", "Admin\\Quiz\\SubCategoryController@bulkDelete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/subcategories/duplicate", "Admin\\Quiz\\SubCategoryController@duplicate", ["auth", "admin"]);
 
@@ -2071,6 +2072,11 @@ $router->add("GET", "/admin/quiz/staging", "Admin\\Quiz\\StagingQueueController@
 $router->add("GET", "/admin/quiz/staging/batch/{batchId}", "Admin\\Quiz\\StagingQueueController@viewBatch", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/staging/delete", "Admin\\Quiz\\StagingQueueController@deleteBatch", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/staging/clean-old", "Admin\\Quiz\\StagingQueueController@cleanOldBatches", ["auth", "admin"]);
+
+// Marking Scheme (Theory Questions)
+$router->add("GET", "/admin/quiz/marking/{attemptId}", "Admin\\Quiz\\MarkingSchemeController@markExam", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/marking/save", "Admin\\Quiz\\MarkingSchemeController@saveMarks", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/marking/bulk-save", "Admin\\Quiz\\MarkingSchemeController@bulkSaveMarks", ["auth", "admin"]);
 
 
 // Terminology Manager (Word Bank)
@@ -2203,6 +2209,25 @@ $router->add("POST", "/blueprint/submit", "Quiz\\TerminologyController@submit", 
 
 
 // ============================================
+// ============================================
+// PUBLIC EXAM SYSTEM (PHASE 17)
+// ============================================
+$router->add('GET', '/exams', 'ExamController@index');
+$router->add('GET', '/exams/category/{slug}', 'ExamController@category');
+$router->add('POST', '/exams/start', 'ExamController@start');
+$router->add('GET', '/exams/take/{id}', 'ExamController@take');
+$router->add('POST', '/exams/check-answer', 'ExamController@checkAnswer');
+$router->add('POST', '/exams/submit', 'ExamController@submit');
+$router->add('GET', '/exams/result/{id}', 'ExamController@result');
+
+// User Profile & History (Phase 18)
+$router->add('GET', '/profile', 'ProfileController@index', ['auth']);
+$router->add('GET', '/profile/exams', 'ProfileController@exams', ['auth']);
+$router->add('GET', '/profile/analytics', 'ProfileController@analytics', ['auth']);
+
+// Leaderboard (Phase 19)
+$router->add('GET', '/leaderboard', 'LeaderboardController@index', ['auth']);
+
 // CALCULATOR PERMALINK CATCH-ALL ROUTE
 // Must be at the end to not interfere with other routes
 // ============================================
