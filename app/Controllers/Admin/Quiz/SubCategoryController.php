@@ -46,7 +46,7 @@ class SubCategoryController extends Controller
             $params['pid'] = $parentId;
         }
 
-        $sql .= " ORDER BY (child.is_active = 1 AND IFNULL(parent.is_active, 1) = 1 AND IFNULL(level.is_active, 1) = 1 AND IFNULL(course.is_active, 1) = 1) DESC, child.order_index ASC, child.parent_id ASC";
+        $sql .= " ORDER BY (child.is_active = 1 AND IFNULL(parent.is_active, 1) = 1 AND IFNULL(level.is_active, 1) = 1 AND IFNULL(course.is_active, 1) = 1) DESC, parent.title ASC, child.order_index ASC, child.parent_id ASC";
 
         $stmt = $this->db->getPdo()->prepare($sql);
         $stmt->execute($params);

@@ -32,7 +32,7 @@ class EducationLevelController extends Controller
                 FROM syllabus_nodes el 
                 LEFT JOIN syllabus_nodes c ON el.parent_id = c.id
                 WHERE el.type = 'education_level' 
-                ORDER BY (el.is_active = 1 AND IFNULL(c.is_active, 1) = 1) DESC, c.order_index ASC, el.order_index ASC";
+                ORDER BY (el.is_active = 1 AND IFNULL(c.is_active, 1) = 1) DESC, c.title ASC, el.order_index ASC";
         
         $levels = $this->db->query($sql)->fetchAll();
 

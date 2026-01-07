@@ -49,7 +49,7 @@ class CategoryController extends Controller
             $params['level_id'] = $levelId;
         }
 
-        $sql .= " ORDER BY (c.is_active = 1 AND IFNULL(p.is_active, 1) = 1 AND IFNULL(course.is_active, 1) = 1) DESC, c.order_index ASC";
+        $sql .= " ORDER BY (c.is_active = 1 AND IFNULL(p.is_active, 1) = 1 AND IFNULL(course.is_active, 1) = 1) DESC, p.title ASC, c.order_index ASC";
 
         $categories = $this->db->query($sql, $params)->fetchAll();
 

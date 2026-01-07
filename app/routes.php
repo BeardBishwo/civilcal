@@ -2004,6 +2004,7 @@ $router->add("GET", "/admin/quiz/position-levels", "Admin\\Quiz\\PositionLevelCo
 $router->add("POST", "/admin/quiz/position-levels/store", "Admin\\Quiz\\PositionLevelController@store", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/position-levels/delete/{id}", "Admin\\Quiz\\PositionLevelController@delete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/position-levels/reorder", "Admin\\Quiz\\PositionLevelController@reorder", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/position-levels/toggle-premium", "Admin\\Quiz\\PositionLevelController@togglePremium", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/position-levels/toggle-status", "Admin\\Quiz\\PositionLevelController@toggleStatus", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/position-levels/bulk-delete", "Admin\\Quiz\\PositionLevelController@bulkDelete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/position-levels/duplicate", "Admin\\Quiz\\PositionLevelController@duplicate", ["auth", "admin"]);

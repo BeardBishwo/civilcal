@@ -58,7 +58,7 @@ class PositionLevelController extends Controller
             $params['education_level_id'] = $educationLevelId;
         }
         
-        $sql .= " ORDER BY (pl.is_active = 1 AND IFNULL(c.is_active, 1) = 1 AND IFNULL(el.is_active, 1) = 1) DESC, pl.level_number ASC, pl.order_index ASC";
+        $sql .= " ORDER BY (pl.is_active = 1 AND IFNULL(c.is_active, 1) = 1 AND IFNULL(el.is_active, 1) = 1) DESC, c.title ASC, el.title ASC, pl.level_number ASC, pl.order_index ASC";
         $levels = $this->db->query($sql, $params)->fetchAll();
 
         $stats = [
@@ -112,7 +112,9 @@ class PositionLevelController extends Controller
             'course_id' => $courseId,
             'education_level_id' => $educationLevelId,
             'order_index' => $maxOrder + 1,
-            'is_active' => 1
+            'is_active' => 1,
+            'is_premium' => $_POST['is_premium'] ?? 0,
+            'unlock_price' => $_POST['unlock_price'] ?? 0
         ];
 
         $result = $this->db->insert('position_levels', $data);
@@ -121,6 +123,22 @@ class PositionLevelController extends Controller
             echo json_encode(['status' => 'success']);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Database error']);
+        }
+    }
+
+    /**
+     * Toggle Premium Status
+     */
+    public function togglePremium()
+    {
+        $id = $_POST['id'] ?? null;
+        $val = $_POST['val'] ?? 0;
+
+        if ($id) {
+            $this->db->update('position_levels', ['is_premium' => $val], "id = :id", ['id' => $id]);
+            echo json_encode(['status' => 'success']);
+        } else {
+            echo json_encode(['status' => 'error']);
         }
     }
 

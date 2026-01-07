@@ -113,14 +113,27 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                     <input type="text" name="icon" class="form-input-premium" placeholder="fa-user" value="fa-user">
                 </div>
 
+                <div class="premium-toggle-group">
+                    <label class="switch scale-sm">
+                        <input type="checkbox" name="is_premium" value="1">
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="toggle-label">PREMIUM</span>
+                </div>
+
+                <div class="input-group-premium" style="flex: 1; min-width: 100px;">
+                    <i class="fas fa-coins icon"></i>
+                    <input type="number" name="unlock_price" class="form-input-premium" placeholder="Price" min="0" value="0">
+                </div>
+
                 <button type="button" onclick="saveLevel()" class="btn-create-premium">
                     <i class="fas fa-plus"></i> ADD
                 </button>
             </form>
         </div>
 
-        <!-- Table Section -->
-        <div class="table-section">
+        <!-- Content Area -->
+        <div class="table-container">
             <div class="table-wrapper">
                 <table class="table-compact">
                     <thead>
@@ -136,14 +149,49 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                             <th style="width: 80px;">Level #</th>
                             <th style="width: 80px;">Color</th>
                             <th style="width: 80px;">Icon</th>
-                            <th style="width: 80px; text-align: center;">Status</th>
-                            <th style="width: 100px; text-align: center;">Actions</th>
+                             <th style="width: 60px; text-align: center;">Premium</th>
+                             <th style="width: 80px; text-align: center;">Status</th>
+                             <th style="width: 100px; text-align: center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="levelSortable">
-                        <?php if (!empty($levels)): ?>
-                            <?php foreach ($levels as $index => $l): ?>
-                                <tr class="level-item" data-id="<?php echo $l['id']; ?>">
+                        <?php if (empty($levels)): ?>
+                             <tr><td colspan="12" class="empty-state-compact">
+                                <i class="fas fa-layer-group"></i>
+                                <h3>No Position Levels Yet</h3>
+                                <p>Create your first position level above</p>
+                            </td></tr>
+                        <?php else: ?>
+                            <?php 
+                            $lastParent = null; 
+                            foreach ($levels as $index => $l): 
+                                $cActive = $l['course_status'] ?? 1;
+                                $elActive = $l['education_level_status'] ?? 1;
+                                $isFrozen = ($cActive == 0 || $elActive == 0);
+                                $courseName = $l['course_title'] ?? 'Generic';
+                                $eduName = $l['education_level_title'] ?? 'Core';
+                                $parentTitle = htmlspecialchars("$courseName » $eduName");
+                                
+                                if ($lastParent !== $parentTitle): 
+                                    $lastParent = $parentTitle;
+                                    $sectionId = "section-" . md5($parentTitle);
+                            ?>
+                                <tr class="section-header-row" id="<?php echo $sectionId; ?>" data-section-name="<?php echo $parentTitle; ?>">
+                                    <td colspan="12" style="background: #f1f5f9; padding: 10px 20px; border-left: 4px solid #667eea;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleSection('<?php echo $sectionId; ?>')">
+                                            <div style="font-weight: 800; color: #1e293b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">
+                                                <i class="fas fa-id-badge" style="margin-right: 8px; color: #667eea;"></i>
+                                                <?php echo $parentTitle; ?>
+                                                <?php if($isFrozen): ?><span style="margin-left: 10px; font-size: 0.65rem; background: #fee2e2; color: #ef4444; padding: 2px 8px; border-radius: 4px;">FROZEN (HIERARCHY DISABLED)</span><?php endif; ?>
+                                            </div>
+                                            <div style="color: #64748b; font-size: 0.75rem;">
+                                                <i class="fas fa-chevron-down section-icon"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                                <tr class="level-item group <?php echo $sectionId; ?>" data-id="<?php echo $l['id']; ?>">
                                     <td>
                                         <input type="checkbox" class="row-checkbox" value="<?php echo $l['id']; ?>" onchange="updateBulkToolbar()">
                                     </td>
@@ -186,6 +234,17 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                                     <td class="text-center">
                                         <i class="fas <?php echo htmlspecialchars($l['icon'] ?? 'fa-user'); ?>" style="font-size: 1.2rem; color: <?php echo htmlspecialchars($l['color'] ?? '#667eea'); ?>;"></i>
                                     </td>
+                                    <td class="text-center align-middle">
+                                        <div class="premium-control">
+                                            <label class="switch scale-sm">
+                                                <input type="checkbox" class="premium-toggle" data-id="<?php echo $l['id']; ?>" <?php echo $l['is_premium'] ? 'checked' : ''; ?>>
+                                                <span class="slider round"></span>
+                                            </label>
+                                            <?php if($l['is_premium']): ?>
+                                                <span class="price-tag"><i class="fas fa-coins"></i> <?php echo $l['unlock_price']; ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
                                     <td class="text-center">
                                         <?php 
                                         $courseActive = $l['course_status'] ?? 1;
@@ -201,6 +260,9 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                                     </td>
                                     <td class="text-center">
                                         <div class="actions-compact justify-center">
+                                            <button onclick="editLevel(<?php echo $l['id']; ?>)" class="action-btn-icon edit-btn" title="Edit">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </button>
                                             <button onclick="deleteLevel(<?php echo $l['id']; ?>)" class="action-btn-icon delete-btn" title="Delete">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
@@ -208,18 +270,21 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="11" class="empty-state-compact">
-                                    <i class="fas fa-layer-group"></i>
-                                    <h3>No Position Levels Yet</h3>
-                                    <p>Create your first position level above</p>
-                                </td>
-                            </tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Floating Navigation Ball -->
+        <div class="nav-ball-container">
+            <div class="nav-ball-menu">
+                <div class="nav-ball-header">QUICK JUMP</div>
+                <div id="sectionLinks" class="nav-ball-links"></div>
+            </div>
+            <button class="nav-ball-toggle" title="Quick Navigation">
+                <i class="fas fa-compass"></i>
+            </button>
         </div>
 
         <!-- Float Bulk Toolbar -->
@@ -296,7 +361,73 @@ $(document).ready(function() {
             document.querySelector('.select2-search__field').focus();
         }, 100);
     });
+
+    buildSectionSidebar();
 });
+
+// Nav Ball Interaction
+$(document).on('click', '.nav-ball-toggle', function(e) {
+    e.stopPropagation();
+    $('.nav-ball-container').toggleClass('active');
+});
+
+$(document).on('click', function() {
+    $('.nav-ball-container').removeClass('active');
+});
+
+$('.nav-ball-menu').on('click', function(e) {
+    e.stopPropagation();
+});
+
+document.querySelectorAll('.premium-toggle').forEach(el => {
+    el.addEventListener('change', async function() {
+        const formData = new URLSearchParams();
+        formData.append('id', this.dataset.id);
+        formData.append('val', this.checked ? 1 : 0);
+        await fetch('<?php echo app_base_url('admin/quiz/position-levels/toggle-premium'); ?>', {
+           method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:formData
+        });
+        location.reload();
+    });
+});
+
+// Section Management
+function toggleSection(sectionId) {
+    const rows = document.querySelectorAll('.' + sectionId);
+    const header = document.getElementById(sectionId);
+    const icon = header.querySelector('.section-icon');
+    
+    rows.forEach(r => {
+        if (r.style.display === 'none') {
+            r.style.display = '';
+            icon.style.transform = 'rotate(0deg)';
+        } else {
+            r.style.display = 'none';
+            icon.style.transform = 'rotate(-90deg)';
+        }
+    });
+}
+
+function buildSectionSidebar() {
+    const sections = document.querySelectorAll('.section-header-row');
+    const container = document.getElementById('sectionLinks');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    sections.forEach(s => {
+        const name = s.getAttribute('data-section-name');
+        const id = s.id;
+        const link = document.createElement('div');
+        link.className = 'sidebar-link';
+        link.innerText = name;
+        link.onclick = () => {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+        };
+        container.appendChild(link);
+    });
+}
 
 async function saveLevel() {
     const form = document.getElementById('addLevelForm');
@@ -599,6 +730,12 @@ input:checked + .slider:before { transform: translateX(16px); }
 }
 
 .premium-control { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.price-tag { font-size: 0.65rem; font-weight: 700; color: #d97706; display: flex; align-items: center; gap: 2px; }
+.premium-toggle-group {
+    display: flex; align-items: center; gap: 0.5rem; background: white; border: 1px solid #cbd5e1;
+    height: 40px; padding: 0 0.75rem; border-radius: 8px;
+}
+.toggle-label { font-size: 0.7rem; font-weight: 700; color: #64748b; }
 .scale-sm { transform: scale(0.8); }
 
 .handle { cursor: grab; color: #cbd5e1; }
@@ -645,5 +782,57 @@ input:checked + .slider:before { transform: translateX(16px); }
 @media (max-width: 1024px) {
     .creation-form { flex-direction: column; align-items: stretch; }
     .input-group-premium { width: 100% !important; }
+}
+/* Floating Navigation Ball */
+.nav-ball-container {
+    position: fixed; bottom: 30px; right: 30px; z-index: 1000;
+}
+.nav-ball-toggle {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);
+    color: white; border: none; cursor: pointer;
+    box-shadow: 0 10px 25px rgba(255, 8, 68, 0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative; z-index: 1001;
+}
+.nav-ball-container.active .nav-ball-toggle { transform: rotate(45deg) scale(1.1); background: #ff0844; }
+
+.nav-ball-menu {
+    position: absolute; bottom: 80px; right: 0;
+    width: 280px; background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    padding: 20px; opacity: 0; transform: translateY(20px) scale(0.9);
+    pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 500px; display: flex; flex-direction: column;
+}
+.nav-ball-container.active .nav-ball-menu {
+    opacity: 1; transform: translateY(0) scale(1); pointer-events: all;
+}
+.nav-ball-header {
+    font-size: 0.65rem; font-weight: 800; color: #94a3b8; letter-spacing: 1.5px;
+    margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #f1f5f9;
+    text-transform: uppercase;
+}
+.nav-ball-links { overflow-y: auto; flex: 1; padding-right: 5px; }
+.nav-ball-links::-webkit-scrollbar { width: 5px; }
+.nav-ball-links::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+.sidebar-link {
+    font-size: 0.8rem; font-weight: 600; color: #475569; padding: 10px 14px;
+    border-radius: 10px; cursor: pointer; transition: 0.2s;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-bottom: 4px;
+}
+.sidebar-link:hover { background: #f1f5f9; color: #667eea; padding-left: 18px; }
+.sidebar-link.active { background: #eff6ff; color: #2563eb; border-left: 4px solid #3b82f6; }
+
+.section-icon { transition: transform 0.3s; }
+
+@media (max-width: 768px) {
+    .nav-ball-container { bottom: 20px; right: 20px; }
+    .nav-ball-toggle { width: 50px; height: 50px; font-size: 1.25rem; }
+    .nav-ball-menu { width: 240px; bottom: 65px; }
 }
 </style>
