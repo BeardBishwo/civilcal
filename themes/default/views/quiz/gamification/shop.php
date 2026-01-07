@@ -16,7 +16,7 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
     <link rel="stylesheet" href="<?php echo app_base_url('themes/default/assets/css/quiz.min.css?v=' . time()); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-background text-white font-sans min-h-screen pb-20" x-data="shopSystem()">
@@ -36,7 +36,9 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
         
         <!-- Hero -->
         <div class="text-center mb-10 relative">
-            <div class="text-6xl mb-4 animate-bounce-slow">🛕</div>
+            <div class="w-20 h-20 mb-4 flex items-center justify-center">
+                <img src="<?php echo app_base_url('themes/default/assets/resources/buildings/shop.webp'); ?>" class="w-full h-full object-contain drop-shadow-lg">
+            </div>
             <h1 class="text-4xl md:text-5xl font-black text-white mb-2 tracking-tight">Temple Market</h1>
             <p class="text-gray-400 text-lg">Trade artifacts, engineering materials, and precious bundles.</p>
         </div>
@@ -44,7 +46,7 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
         <!-- Wallet Card -->
         <div class="max-w-2xl mx-auto mb-12">
             <div class="glass-card p-1 rounded-3xl bg-gradient-to-br from-amber-500/20 via-transparent to-transparent">
-                <div class="bg-surface/80 backdrop-blur-xl rounded-[20px] p-8 border border-white/10 shadow-2xl relative overflow-hidden">
+                <div class="bg-surface rounded-[20px] p-8 border border-white/10 shadow-2xl relative overflow-hidden">
                     <div class="absolute -right-10 -bottom-10 opacity-5 text-9xl rotate-12 pointer-events-none">
                         <i class="fas fa-coins"></i>
                     </div>
@@ -106,7 +108,7 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
                     $owned = $inventory[$item['id']] ?? 0;
                 ?>
                 <div class="glass-card p-1 rounded-3xl hover:-translate-y-2 transition-transform duration-300 group">
-                    <div class="bg-surface/90 backdrop-blur-xl rounded-[20px] p-6 h-full flex flex-col border border-white/5">
+                    <div class="bg-surface rounded-[20px] p-6 h-full flex flex-col border border-white/10">
                         <div class="w-16 h-16 rounded-2xl bg-gradient-to-br <?php echo $item['color']; ?> flex items-center justify-center text-white text-2xl shadow-lg mb-6">
                             <i class="<?php echo $item['icon']; ?>"></i>
                         </div>
@@ -136,7 +138,7 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
                     $owned = $wallet[$id] ?? 0;
                 ?>
                 <div class="glass-card p-4 rounded-3xl" x-data="{ qty: 1 }">
-                    <div class="flex flex-col h-full bg-surface/50 rounded-2xl p-4 border border-white/5">
+                    <div class="flex flex-col h-full bg-surface rounded-2xl p-4 border border-white/10">
                         <div class="h-40 flex items-center justify-center bg-white/5 rounded-xl mb-4 relative overflow-hidden">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                             <img src="<?php echo app_base_url($res['icon']); ?>" class="h-24 object-contain transition-transform hover:scale-110 duration-300">
@@ -178,7 +180,7 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
                     <div class="absolute -top-3 -right-3 bg-green-500 text-black text-xs font-black uppercase py-1 px-3 rounded-full shadow-lg z-10">
                         Save <?php echo $bundle['savings']; ?>!
                     </div>
-                    <div class="bg-surface/80 rounded-[20px] p-6 h-full flex flex-col border border-white/5">
+                    <div class="bg-surface rounded-[20px] p-6 h-full flex flex-col border border-white/10">
                         <div class="h-32 flex items-center justify-center mb-6">
                              <img src="<?php echo app_base_url($bundle['icon']); ?>" class="h-24 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
                         </div>
@@ -209,7 +211,7 @@ $coinConfig = $economyResources['coins'] ?? ['name' => 'BB Coins', 'icon' => 'th
                         Best Value
                     </div>
                     <?php endif; ?>
-                    <div class="bg-surface/80 rounded-[20px] p-6 h-full flex flex-col items-center text-center">
+                    <div class="bg-surface rounded-[20px] p-6 h-full flex flex-col items-center text-center">
                         <img src="<?php echo app_base_url($pack['icon']); ?>" class="h-28 object-contain mb-6 drop-shadow-xl">
                         <h3 class="text-2xl font-black text-white mb-1"><?php echo number_format($pack['coins']); ?> Coins</h3>
                         <p class="text-gray-400 text-sm mb-6"><?php echo htmlspecialchars($pack['description']); ?></p>

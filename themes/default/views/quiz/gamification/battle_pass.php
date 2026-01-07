@@ -64,7 +64,7 @@
 
                     <!-- Level Progress Card -->
                     <div class="glass-card p-1 rounded-2xl max-w-md">
-                        <div class="bg-surface/60 backdrop-blur-xl rounded-[14px] p-6 border border-white/5">
+                        <div class="bg-surface rounded-[14px] p-6 border border-white/10">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-4">
                                     <div class="text-center">
@@ -145,7 +145,7 @@
                         $isUnlocked = $progress['current_level'] >= $reward['level'];
                         $canClaim = $isUnlocked && !$isClaimed && (!$reward['is_premium'] || $progress['is_premium_unlocked']);
                     ?>
-                    <div class="group relative overflow-hidden rounded-xl border border-white/5 bg-surface/30 hover:bg-surface/50 transition-all 
+                    <div class="group relative overflow-hidden rounded-xl border border-white/10 bg-surface hover:bg-surface/80 transition-all 
                                 <?php echo $reward['is_premium'] ? 'border-l-2 border-l-amber-500' : 'border-l-2 border-l-indigo-500'; ?> 
                                 <?php echo $isClaimed ? 'opacity-50' : ''; ?>
                                 <?php echo $canClaim ? 'ring-1 ring-white/20' : ''; ?>">
