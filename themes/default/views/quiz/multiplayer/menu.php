@@ -7,9 +7,9 @@
 <div class="bg-background min-h-screen font-sans text-white pb-20 overflow-x-hidden relative">
     
     <!-- Background Gradient Orbs -->
+    <!-- Background Gradient Orbs Removed per user request -->
     <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-primary/20 rounded-full blur-[100px] animate-blob"></div>
-        <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
+        <!-- Orbs removed -->
     </div>
 
     <!-- Main Content -->
@@ -57,11 +57,11 @@
 
             <!-- Join Card -->
             <div class="lg:col-span-5 relative">
-                <!-- Decorative Blur -->
-                <div class="absolute inset-0 bg-primary/20 blur-[60px] rounded-full -z-10 transform translate-y-10"></div>
+                <!-- Decorative Blur Removed -->
                 
                 <div class="glass-card p-1 rounded-3xl animate-fade-in-up animation-delay-400">
-                    <div class="bg-surface/80 backdrop-blur-xl rounded-[20px] p-8 border border-white/10 shadow-2xl">
+                    <!-- Darker, higher contrast background -->
+                    <div class="bg-gray-900/60 backdrop-blur-2xl rounded-[20px] p-8 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
                         <div class="flex items-center gap-4 mb-8">
                             <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white text-xl border border-white/10">
                                 <i class="fas fa-search"></i>
@@ -77,7 +77,7 @@
                             
                             <div class="relative group">
                                 <input type="text" name="code" 
-                                       class="glass-input w-full px-5 py-4 pl-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary focus:bg-white/10 transition-all font-mono text-lg uppercase tracking-widest"
+                                       class="glass-input w-full px-5 py-4 pl-12 rounded-xl bg-black/50 border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:border-primary focus:bg-black/70 transition-all font-mono text-lg uppercase tracking-widest shadow-inner"
                                        placeholder="A7X92" required>
                                 <i class="fas fa-hashtag absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-primary transition-colors"></i>
                             </div>
@@ -96,7 +96,8 @@
             
             <!-- Host Card -->
             <div class="glass-card p-1 rounded-3xl group hover:-translate-y-1 transition-transform duration-300">
-                <div class="bg-surface/50 rounded-[20px] p-8 h-full border border-white/5 group-hover:bg-surface/70 transition-colors">
+                <!-- Darker background for better text contrast -->
+                <div class="bg-gray-900/40 hover:bg-gray-900/60 rounded-[20px] p-8 h-full border border-white/10 hover:border-accent/30 transition-all shadow-lg">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center text-accent text-xl border border-accent/20">
                             <i class="fas fa-crown"></i>
@@ -123,7 +124,7 @@
 
             <!-- Features Card -->
             <div class="glass-card p-1 rounded-3xl group hover:-translate-y-1 transition-transform duration-300">
-                <div class="bg-surface/50 rounded-[20px] p-8 h-full border border-white/5 group-hover:bg-surface/70 transition-colors">
+                <div class="bg-gray-900/40 hover:bg-gray-900/60 rounded-[20px] p-8 h-full border border-white/10 hover:border-yellow-500/30 transition-all shadow-lg">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center text-yellow-400 text-xl border border-yellow-500/20">
                             <i class="fas fa-bolt"></i>

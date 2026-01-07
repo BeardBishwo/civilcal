@@ -7,10 +7,9 @@
     
     <!-- Hero Section -->
     <div class="relative pt-24 pb-16 lg:pt-32 lg:pb-24 overflow-hidden">
-        <!-- Background Effects -->
+        <!-- Background Effects Removed -->
         <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-            <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] animate-blob"></div>
-            <div class="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-secondary/20 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
+            <!-- Orbs removed per user request -->
         </div>
 
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
@@ -33,10 +32,9 @@
                    class="group glass-card p-1 rounded-3xl hover:-translate-y-2 transition-all duration-300 block animate-fade-in-up"
                    style="animation-delay: <?php echo ($index * 100) + 200; ?>ms">
                     
-                    <div class="bg-surface/50 rounded-[20px] p-8 h-full border border-white/5 group-hover:bg-surface/80 transition-colors relative overflow-hidden">
+                    <div class="bg-gray-900/60 backdrop-blur-md rounded-[20px] p-8 h-full border border-white/10 group-hover:bg-gray-900/80 transition-colors relative overflow-hidden shadow-lg">
                         
-                        <!-- Hover Glow -->
-                        <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <!-- Hover Glow Removed -->
 
                         <div class="relative z-10">
                             <div class="flex items-center justify-between mb-8">

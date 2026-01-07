@@ -33,9 +33,9 @@
     <!-- Hero Section -->
     <div class="relative overflow-hidden py-16 border-b border-white/5">
         <!-- Background Effects -->
+        <!-- Background Effects Removed -->
         <div class="absolute inset-0 pointer-events-none">
-            <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[100px] animate-blob"></div>
-            <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
+            <!-- Orbs removed per user request -->
         </div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -73,8 +73,9 @@
                 </div>
 
                 <!-- Create Firm Card -->
-                <div class="bg-surface/60 backdrop-blur-xl rounded-3xl p-1 border border-white/10 shadow-2xl">
-                    <div class="bg-black/20 rounded-[20px] p-8">
+                <!-- Create Firm Card (Dark Theme) -->
+                <div class="bg-gray-900/60 backdrop-blur-2xl rounded-3xl p-1 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                    <div class="bg-black/40 rounded-[20px] p-8">
                         <div class="flex items-center gap-4 mb-6">
                             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white text-xl shadow-lg">
                                 <i class="fas fa-building"></i>
@@ -122,8 +123,8 @@
         </div>
 
         <?php if (empty($firms)): ?>
-            <div class="text-center py-20 bg-surface/30 rounded-3xl border border-white/5">
-                <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-600 text-4xl">
+            <div class="text-center py-20 bg-gray-900/40 rounded-3xl border border-white/10 shadow-lg">
+                <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-600 text-4xl border border-white/5">
                     <i class="fas fa-city"></i>
                 </div>
                 <h3 class="text-xl font-bold text-white mb-2">No Firms Established</h3>
@@ -133,7 +134,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <?php foreach ($firms as $f): ?>
                 <div class="glass-card p-1 rounded-2xl hover:-translate-y-2 transition-transform duration-300">
-                    <div class="bg-surface/80 backdrop-blur-md rounded-[14px] p-6 h-full flex flex-col border border-white/5">
+                    <div class="bg-gray-900/60 backdrop-blur-md rounded-[14px] p-6 h-full flex flex-col border border-white/10 hover:border-cyan-500/30 transition-all shadow-lg">
                         <div class="flex items-center gap-4 mb-4">
                             <img src="<?php echo $f['logo_url'] ?: app_base_url('themes/default/assets/images/default-firm.png'); ?>" 
                                  class="w-16 h-16 rounded-xl object-cover border border-white/10 bg-black/20"

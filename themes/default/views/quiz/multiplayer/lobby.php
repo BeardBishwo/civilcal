@@ -172,9 +172,7 @@
     <!-- Event Feed Overlay -->
     <div class="event-feed-container" id="event-feed"></div>
 
-    <!-- Background Elements -->
-    <div class="bg-orb orb-1"></div>
-    <div class="bg-orb orb-2"></div>
+    <!-- Background Elements Removed -->
     <div class="grid-overlay"></div>
 </div>
 
@@ -203,15 +201,7 @@
 }
 
 /* Background Effects */
-.bg-orb {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(100px);
-    z-index: 0;
-    opacity: 0.3;
-}
-.orb-1 { width: 400px; height: 400px; background: #764ba2; top: -100px; left: -100px; animation: float 10s infinite alternate; }
-.orb-2 { width: 300px; height: 300px; background: #4facfe; bottom: -50px; right: -50px; animation: float 8s infinite alternate-reverse; }
+/* Orbs removed */
 .grid-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;

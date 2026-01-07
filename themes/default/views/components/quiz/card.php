@@ -1,7 +1,7 @@
 <?php
 // Props: $title, $description, $icon, $link, $questions_count, $category
 ?>
-<div class="glass-card group relative overflow-hidden">
+<div class="glass-card group relative overflow-hidden bg-gray-900/60 backdrop-blur-xl border border-white/10 shadow-lg rounded-2xl p-6 hover:bg-gray-900/80 transition-all duration-300">
     <div class="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity">
         <i class="<?= $icon ?? 'fas fa-question-circle' ?> text-4xl text-white/10 group-hover:text-white/20 transform group-hover:rotate-12 transition-all"></i>
     </div>
@@ -31,5 +31,5 @@
     </div>
     
     <!-- Hover Glow Effect -->
-    <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl group-hover:bg-primary/30 transition-all duration-500"></div>
+    <!-- Hover Glow Effect Removed -->
 </div>

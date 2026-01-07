@@ -16,8 +16,7 @@
     <!-- Hero Section -->
     <div class="relative overflow-hidden bg-gradient-to-br from-background via-background to-primary/20 pt-20 pb-32">
         <!-- Animated Background Blobs -->
-        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-primary/20 blur-3xl opacity-50 animate-pulse"></div>
-        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-secondary/20 blur-3xl opacity-50 animate-pulse animation-delay-2000"></div>
+        <!-- Animated Background Blobs Removed -->
 
         <div class="container mx-auto px-6 relative z-10 text-center">
             <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-8 animate-fade-in-up">
