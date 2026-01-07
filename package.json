@@ -20,7 +20,9 @@
     "clean:results": "rm -rf test-results/*",
     "validate:config": "node -e \"console.log('Configuration valid:', require('./tests/config.json').baseUrl)\"",
     "watch:quiz": "tailwindcss -i ./themes/default/assets/css/quiz.css -o ./themes/default/assets/css/quiz.min.css --config tailwind.quiz.config.js --watch",
-    "build:quiz": "tailwindcss -i ./themes/default/assets/css/quiz.css -o ./themes/default/assets/css/quiz.min.css --config tailwind.quiz.config.js --minify"
+    "build:quiz": "tailwindcss -i ./themes/default/assets/css/quiz.css -o ./themes/default/assets/css/quiz.min.css --config tailwind.quiz.config.js --minify",
+    "watch:library": "tailwindcss -i ./themes/default/assets/css/library.css -o ./themes/default/assets/css/library.min.css --config tailwind.library.config.js --watch",
+    "build:library": "tailwindcss -i ./themes/default/assets/css/library.css -o ./themes/default/assets/css/library.min.css --config tailwind.library.config.js --minify"
   },
   "keywords": [
     "api-testing",
