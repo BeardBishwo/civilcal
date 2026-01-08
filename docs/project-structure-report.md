@@ -1,35 +1,36 @@
 # Project Structure Report
 
-Generated: 2026-01-03 02:47:13
+Generated: 2026-01-08 04:04:13
 
 ```
 === PROJECT STATISTICS ===
-📁 Directories: 1,534
-📄 Files: 20,481
-💾 Total Size: 1.38 GB
-🐘 PHP Files: 7332 (1,053,536 lines)
-📋 JSON Files: 162
-🎨 CSS Files: 37
-⚡ JS Files: 479
-📝 MD Files: 238
-🗄️ SQL Files: 27
+📁 Directories: 1,862
+📄 Files: 23,563
+💾 Total Size: 1.86 GB
+🐘 PHP Files: 7483 (1,081,645 lines)
+📋 JSON Files: 285
+🎨 CSS Files: 51
+⚡ JS Files: 2196
+📝 MD Files: 350
+🗄️ SQL Files: 28
 
 === STATISTICS (EXCLUDING VENDOR/NODE_MODULES/STORAGE CACHE) ===
-📁 Directories: 1,470
-📄 Files: 15,195
-💾 Total Size: 1.37 GB
-🐘 PHP Files: 7332 (1,053,536 lines)
-📋 JSON Files: 156
-🎨 CSS Files: 30
-⚡ JS Files: 33
-📝 MD Files: 228
-🗄️ SQL Files: 27
+📁 Directories: 1,487
+📄 Files: 12,279
+💾 Total Size: 1.83 GB
+🐘 PHP Files: 7483 (1,081,645 lines)
+📋 JSON Files: 165
+🎨 CSS Files: 36
+⚡ JS Files: 38
+📝 MD Files: 233
+🗄️ SQL Files: 28
 
 --- FILE TREE ---
 Bishwo_Calculator/
 ├── .env
 ├── .env.production
 ├── .htaccess
+├── add_premium_cols.php
 ├── Admin Media Management Workflow - Upload, Storage, and Modal Interface.md
 ├── Admin Panel Content Management System - Pages, Menus & Media.md
 ├── Admin Panel Media Management System.md
@@ -47,7 +48,6 @@ Bishwo_Calculator/
 │   ├── check-username.php
 │   ├── forgot-password.php
 │   ├── health-check.php
-│   ├── library/
 │   ├── login.php
 │   ├── logout.php
 │   ├── profile.php
@@ -93,6 +93,10 @@ Bishwo_Calculator/
 │   │   │   ├── AuditController.php
 │   │   │   ├── AuditLogController.php
 │   │   │   ├── BackupController.php
+│   │   │   ├── Blog/
+│   │   │   │   ├── BlogArticleController.php
+│   │   │   │   ├── BlogCategoryController.php
+│   │   │   │   └── BlogPostController.php
 │   │   │   ├── BlogController.php
 │   │   │   ├── BountyController.php
 │   │   │   ├── CalculationsController.php
@@ -116,13 +120,27 @@ Bishwo_Calculator/
 │   │   │   ├── NotificationManagementController.php
 │   │   │   ├── PluginController.php
 │   │   │   ├── Quiz/
+│   │   │   │   ├── BlueprintController.php
+│   │   │   │   ├── CategoryController.php
+│   │   │   │   ├── ContestController.php
+│   │   │   │   ├── CourseController.php
+│   │   │   │   ├── DailyQuizController.php
+│   │   │   │   ├── EducationLevelController.php
 │   │   │   │   ├── ExamController.php
 │   │   │   │   ├── LeaderboardController.php
+│   │   │   │   ├── MarkingSchemeController.php
+│   │   │   │   ├── PositionLevelController.php
 │   │   │   │   ├── QuestionBankController.php
+│   │   │   │   ├── QuestionExportController.php
 │   │   │   │   ├── QuestionImportController.php
 │   │   │   │   ├── QuizDashboardController.php
+│   │   │   │   ├── ReportController.php
 │   │   │   │   ├── ResultsController.php
-│   │   │   │   └── SyllabusController.php
+│   │   │   │   ├── StagingQueueController.php
+│   │   │   │   ├── SubCategoryController.php
+│   │   │   │   ├── SyllabusController.php
+│   │   │   │   ├── SyllabusTreeController.php
+│   │   │   │   └── WordBankController.php
 │   │   │   ├── SearchController.php
 │   │   │   ├── SecurityAlertsController.php
 │   │   │   ├── SettingsController.php
@@ -166,6 +184,7 @@ Bishwo_Calculator/
 │   │   ├── DateTimeCalculatorController.php
 │   │   ├── DeveloperController.php
 │   │   ├── EstimationController.php
+│   │   ├── ExamController.php
 │   │   ├── ExportController.php
 │   │   ├── FavoritesController.php
 │   │   ├── FinanceCalculatorController.php
@@ -177,6 +196,7 @@ Bishwo_Calculator/
 │   │   ├── HoneypotController.php
 │   │   ├── InterestController.php
 │   │   ├── LandingController.php
+│   │   ├── LeaderboardController.php
 │   │   ├── LegalController.php
 │   │   ├── LibraryController.php
 │   │   ├── MathCalculatorController.php
@@ -198,7 +218,9 @@ Bishwo_Calculator/
 │   │   │   ├── LeaderboardController.php
 │   │   │   ├── LifelineController.php
 │   │   │   ├── MultiplayerController.php
-│   │   │   └── PortalController.php
+│   │   │   ├── PortalController.php
+│   │   │   ├── StudentContestController.php
+│   │   │   └── TerminologyController.php
 │   │   ├── RateAnalysisController.php
 │   │   ├── ReportController.php
 │   │   ├── ShareController.php
@@ -250,6 +272,7 @@ Bishwo_Calculator/
 │   │   └── ValidationEngine.php
 │   ├── Helpers/
 │   │   ├── AdHelper.php
+│   │   ├── BlogUrlHelper.php
 │   │   ├── functions.php
 │   │   ├── ImageHelper.php
 │   │   ├── NepaliCalendar.php
@@ -275,12 +298,15 @@ Bishwo_Calculator/
 │   │   ├── Advertisement.php
 │   │   ├── Analytics.php
 │   │   ├── AuditLog.php
+│   │   ├── BlueprintReveal.php
 │   │   ├── BountyRequest.php
 │   │   ├── BountySubmission.php
 │   │   ├── Calculation.php
 │   │   ├── CalculationHistory.php
 │   │   ├── Campaign.php
 │   │   ├── Comment.php
+│   │   ├── Contest.php
+│   │   ├── ContestParticipant.php
 │   │   ├── EmailResponse.php
 │   │   ├── EmailTemplate.php
 │   │   ├── EmailThread.php
@@ -298,17 +324,21 @@ Bishwo_Calculator/
 │   │   ├── Plugin.php
 │   │   ├── Post.php
 │   │   ├── Project.php
+│   │   ├── Question.php
+│   │   ├── QuestionReport.php
 │   │   ├── Role.php
 │   │   ├── Search.php
 │   │   ├── Settings.php
 │   │   ├── Share.php
 │   │   ├── Sponsor.php
 │   │   ├── Subscription.php
+│   │   ├── SyllabusNode.php
 │   │   ├── Theme.php
 │   │   ├── Transaction.php
 │   │   ├── User.php
 │   │   ├── UserSubscription.php
-│   │   └── Vote.php
+│   │   ├── Vote.php
+│   │   └── WordBank.php
 │   ├── Modules/
 │   │   ├── Admin/
 │   │   │   ├── DashboardModule.php
@@ -341,11 +371,14 @@ Bishwo_Calculator/
 │   │   ├── CalculationService.php
 │   │   ├── CalculatorManagement.php
 │   │   ├── CalculatorService.php
+│   │   ├── ChunkReadFilter.php
 │   │   ├── ContentService.php
 │   │   ├── DataExportService.php
 │   │   ├── EconomicSecurityService.php
 │   │   ├── EmailManager.php
 │   │   ├── EmailService.php
+│   │   ├── ExamBlueprintService.php
+│   │   ├── ExamGeneratorService.php
 │   │   ├── ExportService.php
 │   │   ├── FileService.php
 │   │   ├── FileUploadService.php
@@ -383,7 +416,15 @@ Bishwo_Calculator/
 │   │   ├── PluginManager.php
 │   │   ├── PremiumThemeManager.php
 │   │   ├── QueryOptimizer.php
+│   │   ├── QuestionImportService.php
 │   │   ├── QuestService.php
+│   │   ├── Quiz/
+│   │   │   ├── ContestService.php
+│   │   │   ├── DailyQuizService.php
+│   │   │   ├── ImportProcessor.php
+│   │   │   ├── ScoringService.php
+│   │   │   ├── ShuffleService.php
+│   │   │   └── StreakService.php
 │   │   ├── RankService.php
 │   │   ├── RateLimiter.php
 │   │   ├── RecaptchaService.php
@@ -397,6 +438,7 @@ Bishwo_Calculator/
 │   │   ├── ShortcodeService.php
 │   │   ├── StripeService.php
 │   │   ├── SuspiciousActivityDetector.php
+│   │   ├── SyllabusService.php
 │   │   ├── SystemMonitoringService.php
 │   │   ├── ThemeBuilder.php
 │   │   ├── ThemeImageLoader.php
@@ -420,13 +462,29 @@ Bishwo_Calculator/
 │       ├── layouts/
 │       │   ├── admin.php
 │       │   ├── auth.php
-│       │   └── main.php
-│       └── partials/
-│           └── navigation.php
+│       │   ├── main.php
+│       │   └── quiz_focus.php
+│       ├── partials/
+│       │   └── navigation.php
+│       └── quiz/
+│           ├── arena/
+│           │   └── room.php
+│           └── gamification/
+│               └── city.php
+├── audit_hierarchy.php
 ├── battle-pass-gamification.md
+├── blog_migration.sql
 ├── Blueprint Vault File Management - Dual-File Upload, Watermarking & Preview Generation.md
 ├── Blueprint Vault Viewer Strategy and Final Tables.md
 ├── Bounty System and Library Resource Management - Dual Marketplace Architecture.md
+├── bridge_quiz.php
+├── check_attempts.php
+├── check_categories.php
+├── check_exams.php
+├── check_exams_details.php
+├── check_logs.php
+├── check_schema.php
+├── check_theme_files.php
 ├── Civil City Growth Strategy and Monetization Roadmap.md
 ├── composer.json
 ├── composer.lock
@@ -454,6 +512,7 @@ Bishwo_Calculator/
 │   ├── check_threads.php
 │   ├── check_users.php
 │   ├── enhanced_permalink_system.sql
+│   ├── find_admin.php
 │   ├── fix_sessions_table.php
 │   ├── image_optimization.sql
 │   ├── migrate.php
@@ -488,8 +547,27 @@ Bishwo_Calculator/
 │   │   ├── 030_create_ghost_mode_tables.php
 │   │   ├── 031_create_civil_city_tables.php
 │   │   ├── 032_create_security_tables.php
+│   │   ├── 032_create_syllabus_engine_tables.php
+│   │   ├── 033_add_complex_negative_marking_fields.php
+│   │   ├── 033_seed_level5_civil_syllabus.php
+│   │   ├── 033_upgrade_syllabus_premium.php
+│   │   ├── 034_create_daily_quiz_tables.php
+│   │   ├── 034_seed_sample_blueprint.php
+│   │   ├── 035_add_complex_question_types.php
+│   │   ├── 035_create_import_staging_tables.php
+│   │   ├── 036_add_level_map_to_staging.php
+│   │   ├── 036_update_import_staging.php
+│   │   ├── 037_create_question_reports_table.php
+│   │   ├── 038_create_contest_tables.php
+│   │   ├── 039_add_contest_id_to_staging.php
+│   │   ├── 040_create_word_bank_table.php
+│   │   ├── 041_add_linkage_to_syllabus.php
+│   │   ├── 045_add_theory_question_type.php
+│   │   ├── 046_add_blog_columns.php
+│   │   ├── 047_add_exam_tables.php
 │   │   ├── add_bounty_preview_column.sql
 │   │   ├── add_comprehensive_units.sql
+│   │   ├── add_course_education_to_position_levels.php
 │   │   ├── add_file_hash_columns.sql
 │   │   ├── add_report_fields_to_email_threads.sql
 │   │   ├── add_themes_table.php
@@ -502,11 +580,19 @@ Bishwo_Calculator/
 │   │   ├── create_est_templates.sql
 │   │   ├── create_images_table.php
 │   │   ├── create_notifications_tables.sql
+│   │   ├── create_position_levels_tables.php
 │   │   ├── create_premium_themes_table.php
+│   │   ├── daily_quest_seed.php
+│   │   ├── fix_civil_electrical_position_levels.php
+│   │   ├── fix_syllabus_nodes_enum.php
 │   │   ├── human_elements_setup.sql
 │   │   ├── lifeline_economy_setup.sql
 │   │   ├── optimize_estimation_db.sql
 │   │   ├── seed_all_units.sql
+│   │   ├── seed_complete_quiz_hierarchy.php
+│   │   ├── seed_difficulty_levels.php
+│   │   ├── seed_loksewa_hierarchy.php
+│   │   ├── update_quiz_hierarchy_tables.php
 │   │   └── viewer_setup.sql
 │   ├── OPTIMIZATION_REPORT.md
 │   ├── payment_settings_table.sql
@@ -528,6 +614,9 @@ Bishwo_Calculator/
 │   ├── verify_themes.php
 │   └── verify_urls.php
 ├── Database Migration System.md
+├── debug_exams.php
+├── debug_theme.php
+├── debug_themes_all.php
 ├── docs/
 │   ├── admin-sponsor-management-b2b-campaign.md
 │   ├── admin-sponsor-management-platform.md
@@ -548,16 +637,26 @@ Bishwo_Calculator/
 │   │   ├── README.md
 │   │   ├── Security Services Implementation.md
 │   │   └── Security_Patch_Verification.md
+│   ├── CSV_IMPORT_TEMPLATE.md
+│   ├── enterprise_import_design.md
+│   ├── enterprise_import_report.md
 │   ├── library-file-management-complete-flow.md
 │   └── library-file-management-viewer.md
 ├── dual-track-psc-world-integration-plan.md
 ├── Dual-Track Career System and Rank Ladder.md
 ├── Dual-Track Career System Infrastructure - Current State.md
 ├── Dual File Upload Strategy and Master Prompt.md
+├── dump_schema.php
 ├── favicon.ico
+├── final_check.php
+├── final_status_check.php
+├── fix_status.php
 ├── forgot-password.php
 ├── Gamification Shop & Resource Management System.md
 ├── Gamification System Architecture.md
+├── get_cols_real.php
+├── get_create_table.php
+├── get_schema.php
 ├── includes/
 │   └── config.php
 ├── index.php
@@ -595,11 +694,11 @@ Bishwo_Calculator/
 │   └── sync_modules.php
 ├── Library & Bounty System - Dual Marketplace.md
 ├── library-blueprint-vault-api.md
+├── link_exam_questions.php
 ├── logout.php
 ├── manifest.json
 ├── Media Manager Modal.md
 ├── Media Upload and Storage System.md
-├── migrate_identity.php
 ├── modules/
 │   ├── civil/
 │   │   ├── brickwork/
@@ -817,7 +916,6 @@ Bishwo_Calculator/
 │   │       ├── assign-task.php
 │   │       ├── create-task.php
 │   │       └── task-dependency.php
-│   ├── mathematics/
 │   ├── mep/
 │   │   ├── bootstrap.php
 │   │   ├── collaboration/
@@ -950,7 +1048,6 @@ Bishwo_Calculator/
 │   │   │   ├── pump-sizing.php
 │   │   │   ├── safety-valve.php
 │   │   │   └── storage-tank-sizing.php
-│   │   ├── shared/
 │   │   ├── stormwater/
 │   │   │   ├── downpipe-sizing.php
 │   │   │   ├── gutter-sizing.php
@@ -1179,28 +1276,27 @@ Bishwo_Calculator/
 ├── openspec/
 │   ├── AGENTS.md
 │   ├── changes/
-│   │   ├── add-standalone-calculators-to-engine/
-│   │   │   ├── design.md
-│   │   │   ├── proposal.md
-│   │   │   ├── specs/
-│   │   │   │   ├── admin-calculator-management/
-│   │   │   │   │   └── spec.md
-│   │   │   │   ├── calculators-engine/
-│   │   │   │   │   └── spec.md
-│   │   │   │   └── user-experience/
-│   │   │   │       └── spec.md
-│   │   │   └── tasks.md
-│   │   └── archive/
-│   ├── project.md
-│   └── specs/
+│   │   └── add-standalone-calculators-to-engine/
+│   │       ├── design.md
+│   │       ├── proposal.md
+│   │       ├── specs/
+│   │       │   ├── admin-calculator-management/
+│   │       │   │   └── spec.md
+│   │       │   ├── calculators-engine/
+│   │       │   │   └── spec.md
+│   │       │   └── user-experience/
+│   │       │       └── spec.md
+│   │       └── tasks.md
+│   └── project.md
 ├── package-lock.json
 ├── package.json
+├── project-structure-report.md
 ├── project-structure-report.php
 ├── project-structure-report.txt
+├── PROJECT_SUMMARY_GEMINI_ANTIGRAVITY.md
 ├── public/
 │   ├── .htaccess
 │   ├── assets/
-│   │   ├── badges/
 │   │   ├── css/
 │   │   │   └── global-notifications.css
 │   │   ├── data/
@@ -1212,6 +1308,7 @@ Bishwo_Calculator/
 │   │   │   └── icon-512.png
 │   │   ├── js/
 │   │   │   ├── admin/
+│   │   │   │   ├── import-manager.js
 │   │   │   │   └── settings-manager.js
 │   │   │   ├── admin.js
 │   │   │   ├── app-utils.js
@@ -1219,6 +1316,8 @@ Bishwo_Calculator/
 │   │   │   ├── global-notifications.js
 │   │   │   ├── history.js
 │   │   │   ├── profile.js
+│   │   │   ├── quiz/
+│   │   │   │   └── exam-engine.js
 │   │   │   ├── responsive-nav.js
 │   │   │   ├── search-toggle.js
 │   │   │   └── share.js
@@ -1256,6 +1355,9 @@ Bishwo_Calculator/
 │   │       └── vlucas/phpdotenv (^5.5)
 │   ├── debug_base.php
 │   ├── debug_reset_v2.php
+│   ├── debug_subjects.txt
+│   ├── debug_subjects_2.txt
+│   ├── favicon.ico
 │   ├── index.php
 │   ├── manifest.json
 │   ├── notification-demo.html
@@ -1263,9 +1365,7 @@ Bishwo_Calculator/
 │   ├── service-worker.js
 │   ├── sitemap.xml
 │   ├── storage/
-│   │   ├── .htaccess
-│   │   └── media/
-│   │       └── images/
+│   │   └── .htaccess
 │   ├── sw.js
 │   ├── templates/
 │   │   └── question_import_template.csv
@@ -1284,13 +1384,16 @@ Bishwo_Calculator/
 ├── Quiz System Authentication and Exam Flow.md
 ├── Quiz System Infrastructure - Foundation for Suggestion Engine.md
 ├── Quiz URLs.md
+├── quiz_questions_schema.txt
 ├── Rank Assets Folder and Naming Convention.md
-├── run_b2b_migration.php
-├── run_library_migration.php
+├── schema_dump.txt
 ├── scripts/
 │   ├── add_production_indexes.php
+│   ├── diagnose_db.php
 │   ├── inspect_projects_schema.php
 │   ├── inspect_schema.php
+│   ├── migrate_add_optional_questions.php
+│   ├── migrate_enterprise_exam_system.php
 │   ├── migrate_locations.php
 │   ├── migrate_project_location_column.php
 │   ├── migrate_urls.php
@@ -1306,10 +1409,13 @@ Bishwo_Calculator/
 │   ├── seed_boq_data.php
 │   ├── seed_locations_from_local_json.php
 │   ├── seed_locations_full.php
+│   ├── setup_test_data.php
 │   ├── temp_locations.json
 │   ├── test_location_api.php
 │   └── test_rate_injection.php
+├── search_nodes.php
 ├── Security Services Implementation.md
+├── seed_all_types.php
 ├── service-worker.js
 ├── shop_error_output.html
 ├── sitemap.php
@@ -1320,11 +1426,20 @@ Bishwo_Calculator/
 │   │   ├── bookmarklet.uncompressed.js
 │   │   ├── bookmarklet.uncompressed.min.js
 │   │   ├── calculators_status.json
+│   │   ├── exams/
+│   │   │   ├── 1.json
+│   │   │   ├── 2.json
+│   │   │   ├── 8.json
+│   │   │   ├── 9.json
+│   │   │   ├── 10.json
+│   │   │   ├── 11.json
+│   │   │   ├── 12.json
+│   │   │   ├── 15.json
+│   │   │   └── 19.json
 │   │   ├── GeoLite2-City.mmdb
 │   │   ├── jShortener.js
 │   │   ├── modules_config.json
 │   │   └── wpplugin.php
-│   ├── backups/
 │   ├── cache/
 │   │   └── ratelimit/
 │   ├── exports/
@@ -1334,14 +1449,9 @@ Bishwo_Calculator/
 │   ├── installer.processed
 │   ├── library/
 │   │   ├── approved/
-│   │   │   ├── cad/
-│   │   │   │   ├── lib_6957a12d9d6dd_1767350573.pdf
-│   │   │   │   └── lib_69579d3dc5056_1767349565.dwg
-│   │   │   ├── doc/
-│   │   │   ├── excel/
-│   │   │   ├── image/
-│   │   │   ├── other/
-│   │   │   └── pdf/
+│   │   │   └── cad/
+│   │   │       ├── lib_6957a12d9d6dd_1767350573.pdf
+│   │   │       └── lib_69579d3dc5056_1767349565.dwg
 │   │   ├── previews/
 │   │   │   ├── preview_6957a12d9e695_1767350573.jpg
 │   │   │   ├── preview_6957a31dd4e28_1767351069.png
@@ -1375,17 +1485,28 @@ Bishwo_Calculator/
 │   │   ├── 2026-01-01.log
 │   │   ├── 2026-01-02.log
 │   │   ├── 2026-01-03.log
+│   │   ├── 2026-01-04.log
+│   │   ├── 2026-01-05.log
+│   │   ├── 2026-01-06.log
+│   │   ├── 2026-01-07.log
 │   │   ├── cron_daily.log
 │   │   └── php_error.log
 │   ├── menus.json
-│   ├── public/
-│   │   └── previews/
 │   └── uploads/
 │       ├── .htaccess
 │       └── temp/
 │           └── .htaccess
 ├── Suggestion Engine & Onboarding Flow - Existing vs Planned.md
 ├── Suggestion Engine and Onboarding Controller.md
+├── tailwind.calculators.config.js
+├── tailwind.library.config.js
+├── tailwind.quiz.config.js
+├── tests/
+│   ├── verify_daily_frontend.php
+│   ├── verify_daily_quest.php
+│   ├── verify_enterprise_schema.php
+│   └── verify_exam_engine.php
+├── test_blog_system.php
 ├── themes/
 │   ├── admin/
 │   │   ├── assets/
@@ -1422,10 +1543,19 @@ Bishwo_Calculator/
 │   │       ├── backup/
 │   │       │   └── index.php
 │   │       ├── blog/
+│   │       │   ├── articles/
+│   │       │   │   ├── create.php
+│   │       │   │   └── index.php
+│   │       │   ├── categories/
+│   │       │   │   └── index.php
 │   │       │   ├── create.php
 │   │       │   ├── edit.php
 │   │       │   ├── form.php
-│   │       │   └── index.php
+│   │       │   ├── index.php
+│   │       │   └── posts/
+│   │       │       ├── create.php
+│   │       │       ├── index.php
+│   │       │       └── preview.php
 │   │       ├── bounty/
 │   │       │   └── requests.php
 │   │       ├── calculations/
@@ -1485,21 +1615,49 @@ Bishwo_Calculator/
 │   │       ├── plugins/
 │   │       │   └── index.php
 │   │       ├── quiz/
+│   │       │   ├── blueprints/
+│   │       │   │   ├── editor.php
+│   │       │   │   └── index.php
+│   │       │   ├── categories/
+│   │       │   │   └── index.php
+│   │       │   ├── contests/
+│   │       │   │   └── index.php
+│   │       │   ├── courses/
+│   │       │   │   └── index.php
+│   │       │   ├── daily/
+│   │       │   │   └── index.php
 │   │       │   ├── dashboard.php
+│   │       │   ├── education_levels/
+│   │       │   │   └── index.php
 │   │       │   ├── exams/
 │   │       │   │   ├── builder.php
 │   │       │   │   ├── form.php
 │   │       │   │   └── index.php
+│   │       │   ├── import/
+│   │       │   │   └── index.php
 │   │       │   ├── import.php
 │   │       │   ├── leaderboard/
+│   │       │   │   └── index.php
+│   │       │   ├── marking-scheme.php
+│   │       │   ├── position_levels/
 │   │       │   │   └── index.php
 │   │       │   ├── questions/
 │   │       │   │   ├── form.php
 │   │       │   │   └── index.php
+│   │       │   ├── reports/
+│   │       │   │   └── index.php
 │   │       │   ├── results/
 │   │       │   │   └── index.php
 │   │       │   ├── settings.php
-│   │       │   └── syllabus/
+│   │       │   ├── staging-queue.php
+│   │       │   ├── subcategories/
+│   │       │   │   └── index.php
+│   │       │   ├── syllabus/
+│   │       │   │   ├── index.php
+│   │       │   │   └── manage.php
+│   │       │   ├── syllabus-tree/
+│   │       │   │   └── index.php
+│   │       │   └── word-bank/
 │   │       │       └── index.php
 │   │       ├── security/
 │   │       │   ├── alerts.php
@@ -1557,6 +1715,12 @@ Bishwo_Calculator/
 │   │           │   └── report.php
 │   │           ├── arena/
 │   │           │   └── room.php
+│   │           ├── games/
+│   │           │   ├── blueprint_arena.php
+│   │           │   ├── blueprint_list.php
+│   │           │   ├── contests_list.php
+│   │           │   ├── contest_result.php
+│   │           │   └── contest_room.php
 │   │           └── portal/
 │   │               ├── index.php
 │   │               └── overview.php
@@ -1565,6 +1729,8 @@ Bishwo_Calculator/
 │   │   │   ├── css/
 │   │   │   │   ├── back-to-top.css
 │   │   │   │   ├── calculator-platform.css
+│   │   │   │   ├── calculators.css
+│   │   │   │   ├── calculators.min.css
 │   │   │   │   ├── civil.css
 │   │   │   │   ├── electrical.css
 │   │   │   │   ├── estimation.css
@@ -1574,10 +1740,14 @@ Bishwo_Calculator/
 │   │   │   │   ├── header.css
 │   │   │   │   ├── home.css
 │   │   │   │   ├── hvac.css
+│   │   │   │   ├── library.css
+│   │   │   │   ├── library.min.css
 │   │   │   │   ├── logo-enhanced.css
 │   │   │   │   ├── management.css
 │   │   │   │   ├── mep.css
 │   │   │   │   ├── plumbing.css
+│   │   │   │   ├── quiz.css
+│   │   │   │   ├── quiz.min.css
 │   │   │   │   ├── site.css
 │   │   │   │   ├── structural.css
 │   │   │   │   ├── theme.css
@@ -2071,7 +2241,6 @@ Bishwo_Calculator/
 │   │       │   │   ├── gas_laws.php
 │   │       │   │   ├── molar_mass.php
 │   │       │   │   └── ph.php
-│   │       │   ├── civil/
 │   │       │   ├── datetime/
 │   │       │   │   ├── adder.php
 │   │       │   │   ├── duration.php
@@ -2091,6 +2260,7 @@ Bishwo_Calculator/
 │   │       │   │   ├── bmr.php
 │   │       │   │   ├── body_fat.php
 │   │       │   │   └── calories.php
+│   │       │   ├── index.php
 │   │       │   ├── item_rate_analysis.php
 │   │       │   ├── labor_rate_analysis.php
 │   │       │   ├── math/
@@ -2116,10 +2286,16 @@ Bishwo_Calculator/
 │   │       │   │   ├── force.php
 │   │       │   │   ├── ohms_law.php
 │   │       │   │   └── velocity.php
+│   │       │   ├── scientific.php
 │   │       │   └── statistics/
 │   │       │       ├── basic.php
 │   │       │       ├── dispersion.php
 │   │       │       └── probability.php
+│   │       ├── components/
+│   │       │   └── quiz/
+│   │       │       ├── card-enhanced.php
+│   │       │       ├── card.php
+│   │       │       └── option.php
 │   │       ├── contact.php
 │   │       ├── dashboard.php
 │   │       ├── developer/
@@ -2131,6 +2307,11 @@ Bishwo_Calculator/
 │   │       ├── estimation/
 │   │       │   ├── rates_manager.php
 │   │       │   └── sheet.php
+│   │       ├── exams/
+│   │       │   ├── category.php
+│   │       │   ├── index.php
+│   │       │   ├── result.php
+│   │       │   └── take.php
 │   │       ├── help/
 │   │       │   ├── article.php
 │   │       │   ├── index.php
@@ -2188,6 +2369,10 @@ Bishwo_Calculator/
 │   │       │   ├── index.php
 │   │       │   └── view.php
 │   │       ├── quiz/
+│   │       │   ├── analysis/
+│   │       │   │   └── report.php
+│   │       │   ├── arena/
+│   │       │   │   └── room.php
 │   │       │   ├── firms/
 │   │       │   │   ├── dashboard.php
 │   │       │   │   └── index.php
@@ -2202,8 +2387,10 @@ Bishwo_Calculator/
 │   │       │   │   ├── lobby.php
 │   │       │   │   └── menu.php
 │   │       │   └── portal/
-│   │       │       └── index.php
+│   │       │       ├── index.php
+│   │       │       └── overview.php
 │   │       ├── report.php
+│   │       ├── scientific/
 │   │       ├── share/
 │   │       │   └── public-view.php
 │   │       ├── shared/
@@ -2220,11 +2407,27 @@ Bishwo_Calculator/
 │   │           ├── modals/
 │   │           │   └── profile-modals.php
 │   │           └── profile.php
-│   └── email/
-│       └── notification.php
+│   ├── email/
+│   │   └── notification.php
+│   └── public/
+│       └── views/
+│           ├── blog/
+│           │   ├── article.php
+│           │   ├── collection-post.php
+│           │   ├── index.php
+│           │   └── question-post.php
+│           ├── exams/
+│           │   ├── category.php
+│           │   ├── index.php
+│           │   ├── result.php
+│           │   └── take.php
+│           ├── leaderboard/
+│           │   └── index.php
+│           └── user/
+│               ├── analytics.php
+│               ├── exams.php
+│               └── profile.php
 ├── tools/
-│   ├── migration-wizard/
-│   │   └── views/
 │   ├── optimize_images.php
 │   ├── reindex.php
 │   └── verify_features.php
@@ -2260,6 +2463,8 @@ Bishwo_Calculator/
 │   ├── symfony/validator (^5.4)
 │   ├── tecnickcom/tcpdf (^6.6)
 │   └── vlucas/phpdotenv (^5.5)
-├── verify_footer.php
+├── verification_log.txt
+├── verification_log_2.txt
+├── verify_stats.php
 └── version.json
 ```
