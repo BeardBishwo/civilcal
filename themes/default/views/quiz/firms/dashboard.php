@@ -13,11 +13,12 @@
     <!-- Load Tailwind & General Quiz CSS -->
     <link rel="stylesheet" href="<?php echo app_base_url('themes/default/assets/css/quiz.min.css?v=' . time()); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-background text-white font-sans min-h-screen pb-20" x-data="firmDashboard()">
+<body class="bg-background text-white font-sans min-h-screen pb-20" x-data="firmDashboard()" @donate.window="donateTrigger"></body>
+
 
     <!-- Header -->
     <header class="h-16 bg-surface/80 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-6 sticky top-0 z-50">
@@ -117,8 +118,9 @@
                                     <input type="number" id="res-amt" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500 font-bold text-sm h-full" placeholder="Amount">
                                 </div>
                                 <div class="md:col-span-3">
-                                    <button onclick="donate()" class="w-full h-full bg-amber-500 hover:bg-amber-400 text-black font-black uppercase tracking-wider rounded-xl text-xs shadow-lg shadow-amber-500/20 transition-all hover:-translate-y-1">
-                                        Donate
+                                    <button @click="donate()" class="w-full h-full bg-amber-500 hover:bg-amber-400 text-black font-black uppercase tracking-wider rounded-xl text-xs shadow-lg shadow-amber-500/20 transition-all hover:-translate-y-1 disabled:opacity-50" :disabled="donating">
+                                        <span x-show="!donating">Donate</span>
+                                        <span x-show="donating"><i class="fas fa-spinner fa-spin"></i> Donating...</span>
                                     </button>
                                 </div>
                             </div>
@@ -222,7 +224,41 @@
     <script>
         function firmDashboard() {
             return {
-                // Alpine logic here if needed, currently using global funcs for compatibility with inline PHP vars
+                donating: false,
+                donate() {
+                    const typeSelect = document.getElementById('res-type');
+                    const amtInput = document.getElementById('res-amt');
+                    const resType = typeSelect.value;
+                    const amount = parseInt(amtInput.value);
+
+                    if (!amount || amount <= 0) {
+                        Swal.fire({ icon: 'warning', title: 'Invalid Amount', text: 'Please enter a valid amount.', background: '#1e293b', color: '#fff' });
+                        return;
+                    }
+
+                    const fd = new FormData();
+                    fd.append('resource_type', resType);
+                    fd.append('amount', amount);
+                    fd.append('csrf_token', '<?php echo csrf_token(); ?>');
+
+                    this.donating = true;
+
+                    fetch('/api/firms/donate-resources', { method: 'POST', body: fd })
+                        .then(res => res.json())
+                        .then(data => {
+                            this.donating = false;
+                            if (data.success) {
+                                Swal.fire({ icon: 'success', title: 'Donated!', text: `${amount} ${resType} contributed to vault.`, background: '#1e293b', color: '#fff' });
+                                setTimeout(() => location.reload(), 1500);
+                            } else {
+                                Swal.fire({ icon: 'error', title: 'Donation Failed', text: data.message, background: '#1e293b', color: '#fff' });
+                            }
+                        })
+                        .catch(e => {
+                            this.donating = false;
+                            Swal.fire({ icon: 'error', title: 'Error', text: 'Connection failed.', background: '#1e293b', color: '#fff' });
+                        });
+                }
             }
         }
 
@@ -270,6 +306,42 @@
             } catch (e) {
                 Swal.fire({ icon: 'error', title: 'Error', text: 'Connection failed.', background: '#1e293b', color: '#fff' });
             }
+        }
+
+        // Alpine Donate Function
+        function donateTrigger() {
+            const typeSelect = document.getElementById('res-type');
+            const amtInput = document.getElementById('res-amt');
+            const resType = typeSelect.value;
+            const amount = parseInt(amtInput.value);
+
+            if (!amount || amount <= 0) {
+                Swal.fire({ icon: 'warning', title: 'Invalid Amount', text: 'Please enter a valid amount.', background: '#1e293b', color: '#fff' });
+                return;
+            }
+
+            const fd = new FormData();
+            fd.append('resource_type', resType);
+            fd.append('amount', amount);
+            fd.append('csrf_token', '<?php echo csrf_token(); ?>');
+
+            this.donating = true;
+
+            fetch('/api/firms/donate-resources', { method: 'POST', body: fd })
+                .then(res => res.json())
+                .then(data => {
+                    this.donating = false;
+                    if (data.success) {
+                        Swal.fire({ icon: 'success', title: 'Donated!', text: `${amount} ${resType} contributed to vault.`, background: '#1e293b', color: '#fff' });
+                        location.reload();
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Donation Failed', text: data.message, background: '#1e293b', color: '#fff' });
+                    }
+                })
+                .catch(e => {
+                    this.donating = false;
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Connection failed.', background: '#1e293b', color: '#fff' });
+                });
         }
     </script>
 </body>

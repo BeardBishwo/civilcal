@@ -1,5 +1,11 @@
+<?php include_once __DIR__ . '/../../partials/header.php'; ?>
 
-<div class="lobby-premium">
+<!-- Load Tailwind CSS & Alpine.js -->
+<link rel="stylesheet" href="<?php echo app_base_url('themes/default/assets/css/quiz.min.css?v=' . time()); ?>">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
+
+<div class="lobby-premium" x-data="lobbyManager()">
     <!-- Lobby Header -->
     <header class="lobby-header">
         <div class="container-fluid">
@@ -24,7 +30,7 @@
         <div class="room-info-section text-center mb-5">
             <div class="room-label">ROOM CODE</div>
             <h1 class="room-code-display" id="room-code"><?php echo htmlspecialchars($code); ?></h1>
-            <button class="btn-copy-code" onclick="copyRoomCode()">
+            <button class="btn-copy-code" @click="copyRoomCode()">
                 <i class="fas fa-copy"></i> Copy Code
             </button>
         </div>
@@ -529,6 +535,48 @@
     async function loadInventory() {
         // Mock inventory loading
         // In real impl, fetch from API or use echo'd data
+    }
+    
+    // Alpine Lobby Manager Component
+    function lobbyManager() {
+        return {
+            roomCode: "<?php echo $code; ?>",
+            connectionStatus: 'Connected',
+            currentState: 'waiting',
+            
+            copyRoomCode() {
+                navigator.clipboard.writeText(this.roomCode).then(() => {
+                    Swal.fire({ icon: 'success', title: 'Copied!', text: 'Room code copied to clipboard.', timer: 1500, showConfirmButton: false, background: '#1e293b', color: '#fff' });
+                }).catch(() => {
+                    alert('Failed to copy code');
+                });
+            },
+            
+            async pulse() {
+                try {
+                    const response = await fetch('/api/lobby/' + this.roomCode + '/status');
+                    const data = await response.json();
+                    
+                    if (!data || !data.lobby) return;
+                    
+                    this.connectionStatus = 'Connected';
+                    
+                    if (data.lobby.status !== this.currentState) {
+                        this.currentState = data.lobby.status;
+                        if (this.currentState === 'active') {
+                            document.getElementById('waiting-room').style.display = 'none';
+                            document.getElementById('game-arena').style.display = 'block';
+                        }
+                    }
+                } catch (e) {
+                    this.connectionStatus = 'Reconnecting...';
+                }
+            },
+            
+            init() {
+                setInterval(() => this.pulse(), 1000);
+            }
+        }
     }
     
     // ... Additional game logic can be preserved or enhanced ...

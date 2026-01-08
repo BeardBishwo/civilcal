@@ -21,7 +21,7 @@
     <!-- Top Toolbar -->
     <div class="glass border-b border-white/10 px-4 py-3 flex justify-between items-center z-50 relative">
         <div class="flex items-center gap-4">
-            <button onclick="window.close()" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition">
+            <button @click="windowClose()" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition">
                 <i class="fas fa-arrow-left"></i>
             </button>
             <div>
@@ -163,6 +163,10 @@
                     if (this.scale <= 0.4) return;
                     this.scale -= 0.2;
                     this.renderPage(this.pageNum);
+                },
+
+                windowClose() {
+                    window.close();
                 }
             }));
         });
