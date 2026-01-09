@@ -20,6 +20,7 @@ return array(
     'Symfony\\Component\\Validator\\' => array($vendorDir . '/symfony/validator'),
     'Symfony\\Component\\Translation\\' => array($vendorDir . '/symfony/translation'),
     'Symfony\\Component\\OptionsResolver\\' => array($vendorDir . '/symfony/options-resolver'),
+    'Symfony\\Component\\ExpressionLanguage\\' => array($vendorDir . '/symfony/expression-language'),
     'Symfony\\Component\\Cache\\' => array($vendorDir . '/symfony/cache'),
     'Stripe\\' => array($vendorDir . '/stripe/stripe-php/lib'),
     'Sentry\\' => array($vendorDir . '/sentry/sentry/src'),
