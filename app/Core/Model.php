@@ -10,13 +10,13 @@ abstract class Model {
     }
     
     public function find($id) {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE id = ?");
+        $stmt = $this->db->getReadPdo()->prepare("SELECT * FROM {$this->table} WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
     
     public function findAll() {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table}");
+        $stmt = $this->db->getReadPdo()->prepare("SELECT * FROM {$this->table}");
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -24,7 +24,7 @@ abstract class Model {
     public function where($conditions, $params = []) {
         $whereClause = implode(' AND ', array_map(fn($key) => "$key = ?", array_keys($conditions)));
         $sql = "SELECT * FROM {$this->table} WHERE {$whereClause}";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getReadPdo()->prepare($sql);
         $stmt->execute(array_values($params ?: $conditions));
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }

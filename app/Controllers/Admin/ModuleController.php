@@ -28,28 +28,9 @@ class ModuleController extends Controller
         header('Expires: 0');
         
         $modulesFromDb = $this->moduleService->getAllModules();
-        $modulesFromFile = $this->getAllModulesFromFileSystem();
         
-        // Sync missing modules to DB
-        foreach ($modulesFromFile as $fModule) {
-            $exists = false;
-            foreach ($modulesFromDb as $dbModule) {
-                if ($dbModule['name'] === $fModule['slug']) {
-                    $exists = true;
-                    break;
-                }
-            }
-            
-            if (!$exists) {
-                // Add missing module to DB
-                $this->moduleService->createModule([
-                    'name' => $fModule['slug'],
-                    'description' => $fModule['description'],
-                    'category' => $fModule['category'],
-                    'is_active' => 1
-                ]);
-            }
-        }
+        // Removed automatic file-to-db sync from index to improve performance
+        // This is now handled by the sync() method
         
         // Re-fetch all from DB (now including newly added ones)
         $modules = $this->moduleService->getAllModules();
@@ -97,7 +78,8 @@ class ModuleController extends Controller
             'modules' => $modules,
             'categories' => $categories,
             'stats' => $stats,
-            'title' => 'Modules Management - Admin Panel'
+            'title' => 'Modules Management - Admin Panel',
+            'csrf_token' => $this->generateCsrfToken()
         ];
 
         // Load the view
@@ -106,6 +88,12 @@ class ModuleController extends Controller
 
     public function activate()
     {
+        // Validate CSRF
+        if (empty($_POST['csrf_token']) || !$this->validateCsrfToken($_POST['csrf_token'])) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            return;
+        }
+
         $moduleName = $_POST['module'] ?? '';
 
         if (empty($moduleName)) {
@@ -127,6 +115,12 @@ class ModuleController extends Controller
 
     public function deactivate()
     {
+        // Validate CSRF
+        if (empty($_POST['csrf_token']) || !$this->validateCsrfToken($_POST['csrf_token'])) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            return;
+        }
+
         $moduleName = $_POST['module'] ?? '';
 
         if (empty($moduleName)) {
@@ -211,7 +205,8 @@ class ModuleController extends Controller
         $data = [
             'currentPage' => 'modules',
             'module' => $module,
-            'title' => "Module Settings: {$moduleName}"
+            'title' => "Module Settings: {$moduleName}",
+            'csrf_token' => $this->generateCsrfToken()
         ];
 
         $this->view->render('admin/modules/settings', $data);
@@ -219,6 +214,12 @@ class ModuleController extends Controller
 
     public function updateSettings()
     {
+        // Validate CSRF
+        if (empty($_POST['csrf_token']) || !$this->validateCsrfToken($_POST['csrf_token'])) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            return;
+        }
+
         $moduleName = $_POST['module'] ?? '';
 
         if (empty($moduleName)) {
@@ -237,6 +238,44 @@ class ModuleController extends Controller
         $result = $this->moduleService->updateModuleConfig($module['id'], $settingsData);
 
         echo json_encode($result);
+    }
+
+    /**
+     * Explicitly sync modules from file system to DB
+     */
+    public function sync()
+    {
+        // Validate CSRF
+        if (empty($_POST['csrf_token']) || !$this->validateCsrfToken($_POST['csrf_token'])) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            return;
+        }
+
+        $modulesFromDb = $this->moduleService->getAllModules();
+        $modulesFromFile = $this->getAllModulesFromFileSystem();
+        $newCount = 0;
+
+        foreach ($modulesFromFile as $fModule) {
+            $exists = false;
+            foreach ($modulesFromDb as $dbModule) {
+                if ($dbModule['name'] === $fModule['slug']) {
+                    $exists = true;
+                    break;
+                }
+            }
+            
+            if (!$exists) {
+                $this->moduleService->createModule([
+                    'name' => $fModule['slug'],
+                    'description' => $fModule['description'],
+                    'category' => $fModule['category'],
+                    'is_active' => 1
+                ]);
+                $newCount++;
+            }
+        }
+
+        echo json_encode(['success' => true, 'message' => "Synced successfully. {$newCount} new modules added."]);
     }
 
     /**

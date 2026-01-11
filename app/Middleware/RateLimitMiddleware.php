@@ -45,7 +45,11 @@ class RateLimitMiddleware
             return $next($request);
         }
 
-        $key = "rate_limit:{$identifier}";
+        // Fixed Window Strategy
+        // Key changes every 60 seconds (or whatever window is)
+        // e.g. rate_limit:127.0.0.1:2894500
+        $timestamp = floor(time() / $this->window);
+        $key = "rate_limit:{$identifier}:{$timestamp}";
 
         // Get current count
         $current = (int)$this->cache->get($key);
@@ -56,25 +60,19 @@ class RateLimitMiddleware
         }
 
         // Increment count
-        // If it's the first request, set the TTL
+        // If it's the first request in this window, set the TTL
         if ($current === 0) {
             $this->cache->set($key, 1, $this->window);
         } else {
-            // For Redis, INCR typically preserves TTL, but file cache might reset.
-            // Using a simple get/set pattern with remaining TTL would be robust,
-            // but for now, we just increment. A proper Token Bucket is more complex.
-            // Since our CacheService abstract 'set', we just re-set with same TTL logic if known,
-            // or simply use a counter that expires.
-            
-            // Optimization: Just increment without resetting TTL if driver supports it?
-            // Our CacheService is simple. Let's just set ($current + 1)
-            // preserving original expiration is tricky without 'getTtl' support.
-            // We'll reset TTL to window for simplicity window-sliding or fixed window.
-            // Fixed window:
-            $this->cache->set($key, $current + 1, $this->window); 
-            // Note: This slight logic flaw resets TTL on every hit if we aren't careful.
-            // Better approach for simple cache: 
-            // Store timestamp of window start + count.
+            // Just increment. Since the key is time-based, it technically expires automatically
+            // when the time window passes, but we keep the TTL for cache cleanup.
+            // We do NOT reset the TTL to full window here to avoid "infinite ban"
+            // if the cache driver supports TOUCH on set.
+            // However, since we change the key every minute, simply setting it again with
+            // the *same* window TTL is fine, OR we can calculate remaining time.
+            // But simplifying: with a unique key per minute, we don't need complex TTL logic.
+            // We just need to ensure the key exists for at least the window duration.
+            $this->cache->set($key, $current + 1, $this->window);
         }
 
         return $next($request);

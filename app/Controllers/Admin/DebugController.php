@@ -858,8 +858,8 @@ class DebugController extends \App\Core\Controller
         if (file_exists($cacheFile) && (filemtime($cacheFile) + $ttl) > time()) {
             $content = @file_get_contents($cacheFile);
             if ($content !== false) {
-                $data = @unserialize($content);
-                if ($data !== false) {
+                $data = @json_decode($content, true);
+                if ($data !== null) {
                     return $data;
                 }
             }
@@ -870,7 +870,7 @@ class DebugController extends \App\Core\Controller
 
         // Try to write to cache, but don't crash if it fails
         if (is_writable($cacheDir)) {
-            @file_put_contents($cacheFile, serialize($data));
+            @file_put_contents($cacheFile, json_encode($data));
         }
 
         return $data;

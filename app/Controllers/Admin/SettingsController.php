@@ -431,6 +431,11 @@ class SettingsController extends Controller
             return $this->json(['success' => false, 'message' => 'Invalid request']);
         }
 
+        // CSRF Token validation
+        if (!\App\Services\Security::validateCsrfToken()) {
+            return $this->json(['success' => false, 'message' => 'Invalid CSRF token']);
+        }
+
         try {
             $input = json_decode(file_get_contents('php://input'), true);
             $group = $input['group'] ?? null;
@@ -497,6 +502,11 @@ class SettingsController extends Controller
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return $this->redirect('/admin/settings');
+        }
+
+        // CSRF Token validation
+        if (!\App\Services\Security::validateCsrfToken()) {
+            return $this->json(['success' => false, 'message' => 'Invalid CSRF token']);
         }
 
         try {
@@ -776,6 +786,12 @@ class SettingsController extends Controller
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['success' => false, 'message' => 'Invalid request']);
+            return;
+        }
+
+        // CSRF Token validation
+        if (!\App\Services\Security::validateCsrfToken()) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
             return;
         }
 
@@ -1153,6 +1169,12 @@ class SettingsController extends Controller
             exit;
         }
 
+        // CSRF Token validation
+        if (!\App\Services\Security::validateCsrfToken()) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            exit;
+        }
+
         try {
             $type = $_POST['type'] ?? '';
             
@@ -1195,6 +1217,12 @@ class SettingsController extends Controller
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['success' => false, 'message' => 'Invalid request']);
+            exit;
+        }
+
+        // CSRF Token validation
+        if (!\App\Services\Security::validateCsrfToken()) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
             exit;
         }
 

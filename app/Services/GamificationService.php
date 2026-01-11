@@ -102,9 +102,13 @@ class GamificationService
     {
         if (empty($correctAnswers)) return;
 
-        $this->initWallet($userId);
-        
-        // Calculate Total Loot
+
+        $this->db->getPdo()->beginTransaction();
+
+        try {
+            $this->initWallet($userId);
+            
+            // Calculate Total Loot
         $totalLoot = ['coins' => 0, 'bricks' => 0, 'cement' => 0, 'steel' => 0, 'xp' => 0];
         
         $rewards = [
@@ -174,6 +178,13 @@ class GamificationService
                 }
             }
         }
+        
+        $this->db->getPdo()->commit();
+
+    } catch (\Exception $e) {
+        $this->db->getPdo()->rollBack();
+        error_log("Gamification Transaction Failed: " . $e->getMessage());
+    }
     }
     public function processDailyLoginBonus($userId)
     {

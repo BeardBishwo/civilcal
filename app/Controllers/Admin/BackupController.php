@@ -118,11 +118,20 @@ class BackupController extends Controller
             die('Access denied');
         }
 
+        // Sanitize backupId to prevent path traversal
+        $backupId = basename($backupId); // Strip any path components
+        $backupId = preg_replace('/[^a-zA-Z0-9_-]/', '', $backupId); // Only allow alphanumeric, dash, underscore
+
+        if (empty($backupId)) {
+            http_response_code(400);
+            die("Invalid Backup ID");
+        }
+
         $backupPath = BASE_PATH . '/storage/backups/' . $backupId . '.zip';
 
         if (file_exists($backupPath)) {
             header('Content-Type: application/zip');
-            header('Content-Disposition: attachment; filename="' . basename($backupPath) . '"');
+            header('Content-Disposition: attachment; filename="' . $backupId . '.zip"');
             header('Content-Length: ' . filesize($backupPath));
             
             readfile($backupPath);

@@ -443,18 +443,27 @@ class PayPalService
             $webhookId = PayPalConfig::getWebhookId();
             
             if (empty($webhookId)) {
-                // If no webhook ID configured, skip verification in sandbox
-                if (PayPalConfig::isSandbox()) {
-                    return true;
-                }
-                return false;
+                error_log('PayPal Webhook ID not configured. Verification skipped/failed.');
+                return PayPalConfig::isSandbox(); // Only skip in sandbox if explicitly allowed
             }
-            
-            // PayPal webhook verification would go here
-            // This is a simplified version
-            return true;
+
+            // Prepare verification request
+            $signatureVerification = new \PayPal\Api\VerifyWebhookSignature();
+            $signatureVerification->setAuthAlgo($headers['PAYPAL-AUTH-ALGO'] ?? $headers['Paypal-Auth-Algo'] ?? null);
+            $signatureVerification->setTransmissionId($headers['PAYPAL-TRANSMISSION-ID'] ?? $headers['Paypal-Transmission-Id'] ?? null);
+            $signatureVerification->setCertUrl($headers['PAYPAL-CERT-URL'] ?? $headers['Paypal-Cert-Url'] ?? null);
+            $signatureVerification->setTransmissionSig($headers['PAYPAL-TRANSMISSION-SIG'] ?? $headers['Paypal-Transmission-Sig'] ?? null);
+            $signatureVerification->setTransmissionTime($headers['PAYPAL-TRANSMISSION-TIME'] ?? $headers['Paypal-Transmission-Time'] ?? null);
+            $signatureVerification->setWebhookId($webhookId);
+            $signatureVerification->setRequestBody($body);
+
+            $output = $signatureVerification->post($apiContext);
+            $verificationStatus = json_decode($output, true);
+
+            return isset($verificationStatus['verification_status']) && $verificationStatus['verification_status'] === 'SUCCESS';
             
         } catch (\Exception $e) {
+            error_log('PayPal Webhook Verification Error: ' . $e->getMessage());
             return false;
         }
     }

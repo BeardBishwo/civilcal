@@ -104,8 +104,9 @@ class TranslationService
      */
     public static function addTranslation($key, $value, $locale, $group = 'general')
     {
-        $db = Database::getInstance();
-        
+        // Sanitize value: allow only safe formatting tags
+        $value = strip_tags($value, '<b><i><a><strong><em><br>');
+
         $stmt = $db->prepare("
             INSERT INTO translations (translation_key, locale, translation_value, translation_group)
             VALUES (?, ?, ?, ?)

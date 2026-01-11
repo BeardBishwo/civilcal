@@ -13,6 +13,7 @@ abstract class SafeModel extends Model {
     protected array $fillable = [];
     protected array $hidden = [];
     protected array $timestamps = ['created_at', 'updated_at'];
+    protected bool $softDelete = false;
     
     /**
      * Create a new record with validation and security
@@ -50,7 +51,7 @@ abstract class SafeModel extends Model {
      */
     public function delete($id) {
         // Check if soft delete is enabled
-        if (in_array('deleted_at', $this->fillable)) {
+        if ($this->softDelete) {
             return $this->softDelete($id);
         }
         
@@ -168,7 +169,7 @@ abstract class SafeModel extends Model {
     public function deleteWithResponse(int $id): array {
         try {
             // Check if soft delete is enabled
-            if (in_array('deleted_at', $this->fillable)) {
+            if ($this->softDelete) {
                 $result = $this->softDelete($id);
             } else {
                 // Hard delete

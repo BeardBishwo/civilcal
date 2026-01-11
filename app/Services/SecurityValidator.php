@@ -156,14 +156,13 @@ class SecurityValidator
     /**
      * Get client IP address
      */
+    /**
+     * Get client IP address
+     * NOTE: We rely strictly on REMOTE_ADDR unless we are behind a known trusted proxy.
+     * Spoofing X-Forwarded-For is a common attack vector.
+     */
     public static function getClientIp()
     {
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            return $_SERVER['HTTP_CLIENT_IP'];
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            return $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } else {
-            return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-        }
+        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 }

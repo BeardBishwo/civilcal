@@ -129,6 +129,14 @@ class PayStackService
         $result = json_decode($response, true);
         
         if ($result && isset($result['data']['status']) && $result['data']['status'] === 'success') {
+             // Check for Replay Attack (Idempotency)
+             $db = Database::getInstance();
+             $existingPayment = $db->findOne('payments', ['transaction_id' => $reference]);
+             
+             if ($existingPayment) {
+                 return true; // Already processed
+             }
+
              $userId = $result['data']['metadata']['user_id'] ?? $_GET['user_id'] ?? null;
              
              if ($userId) {
@@ -141,7 +149,6 @@ class PayStackService
                  }
 
                  // Update User
-                 $db = Database::getInstance();
                  $stmt = $db->getPdo()->prepare("
                     UPDATE users 
                     SET subscription_id = ?, subscription_status = 'active', subscription_ends_at = ? 

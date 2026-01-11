@@ -140,9 +140,17 @@ class AuthController extends Controller
                         'samesite' => 'Strict' // CSRF protection
                     ]);
                     
-                    // Store token hash in database (you'd need to add this column)
-                    // For now, just log it for demo purposes
-                    error_log("Remember token set for user {$user['username']}: expires " . date('Y-m-d H:i:s', $expire));
+                    // Store token hash in database
+                    $tokenHash = hash('sha256', $rememberToken);
+                    
+                    try {
+                        $db = Database::getInstance();
+                        $pdo = $db->getPdo();
+                        $stm = $pdo->prepare("UPDATE users SET remember_token = ? WHERE id = ?");
+                        $stm->execute([$tokenHash, $user['id']]);
+                    } catch (Exception $e) {
+                         error_log("Failed to store remember token: " . $e->getMessage());
+                    }
                 }
 
                 // Check for installer auto-deletion on first admin login
@@ -513,25 +521,42 @@ class AuthController extends Controller
             }
             
             $token = $_COOKIE['remember_token'];
+            $tokenHash = hash('sha256', $token);
+
+            $userModel = new User();
+            // We need to find user by remember_token
+            // Since User model doesn't have findByRememberToken, we'll use raw generic query here for speed
+            $db = Database::getInstance();
+            $pdo = $db->getPdo();
             
-            // For production, you'd validate this token against database
-            // For now, we'll just check if it's a valid format and not expired
-            if (strlen($token) === 64) { // 32 bytes = 64 hex chars
-                // In a real app, you'd:
-                // 1. Hash the token and look it up in database
-                // 2. Get associated user_id
-                // 3. Validate token hasn't expired
-                // 4. Auto-login the user
+            $stmt = $pdo->prepare("SELECT * FROM users WHERE remember_token = ?");
+            $stmt->execute([$tokenHash]);
+            $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if ($user) {
+                // Log them in securely
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['user'] = $user;
+                $_SESSION['is_admin'] = in_array(($user['role'] ?? 'user'), ['admin','super_admin']);
+
+                // Rotate token for security (optional but recommended)
+                // For now, just logging success
                 
                 echo json_encode([
                     'success' => true, 
-                    'message' => 'Remember token valid',
-                    'auto_login' => true
+                    'message' => 'Auto-login successful',
+                    'auto_login' => true,
+                    'user' => [
+                        'id' => $user['id'],
+                        'username' => $user['username'],
+                        'role' => $user['role'] ?? 'user'
+                    ]
                 ]);
             } else {
-                // Invalid token format
+                // Invalid token - maybe rotated or forged
                 $this->clearRememberToken();
-                echo json_encode(['success' => false, 'message' => 'Invalid token format']);
+                echo json_encode(['success' => false, 'message' => 'Invalid or expired token']);
             }
             
         } catch (Exception $e) {

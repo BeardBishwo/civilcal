@@ -12,6 +12,16 @@ class AdvancedCache {
     private $logger;
     private bool $enabled = true;
     
+    private static ?self $instance = null;
+
+    public static function getInstance(): self
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+    
     public function __construct(array $config = [], $logger = null) {
         $this->logger = $logger;
         $this->enabled = getenv('ADVANCED_CACHE_ENABLED') !== 'false';

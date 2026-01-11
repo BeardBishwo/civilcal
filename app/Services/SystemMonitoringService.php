@@ -193,21 +193,22 @@ class SystemMonitoringService
      */
     private function getCpuUsage()
     {
-        // For Windows, we might not be able to get detailed CPU usage
+        // For Windows, sys_getloadavg is not available
         if (PHP_OS_FAMILY === 'Windows') {
             return [
                 'usage_percent' => 'N/A (Windows)',
-                'count' => 'N/A',
-                'model' => 'N/A'
+                'count' => $this->getCpuCount(),
+                'model' => $this->getCpuModel()
             ];
         }
         
-        // On Unix-like systems, you can execute system commands to get CPU usage
-        $start = $this->getCpuTime();
-        sleep(1);
-        $end = $this->getCpuTime();
-        
-        $cpuUsage = $start !== false && $end !== false ? round(100 * (1 - ($end - $start) / 1000000), 2) : 'N/A';
+        // On Unix-like systems, use sys_getloadavg for non-blocking load check
+        if (function_exists('sys_getloadavg')) {
+            $load = sys_getloadavg();
+            $cpuUsage = $load[0] ?? 'N/A';
+        } else {
+            $cpuUsage = 'N/A';
+        }
         
         return [
             'usage_percent' => $cpuUsage,

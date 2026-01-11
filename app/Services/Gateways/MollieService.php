@@ -85,11 +85,31 @@ class MollieService
         }
     }
 
+    /**
+     * Verify payment status via API (for callback verification)
+     */
+    public function verifyPayment($paymentId)
+    {
+        $config = $this->getConfig();
+        if (!$config['enabled'] || !$config['api_key']) {
+            return false;
+        }
+
+        try {
+            $mollie = new \Mollie\Api\MollieApiClient();
+            $mollie->setApiKey($config['api_key']);
+            $payment = $mollie->payments->get($paymentId);
+
+            return $payment->isPaid();
+        } catch (\Exception $e) {
+            error_log('Mollie Verify Error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function handleCallback($paymentId, $planId, $type)
     {
-        // specific logic for callback if needed, usually just redirect to dashboard
-        // Verification happens via Webhook for Mollie usually, but we can double check
-        return true;
+        return $this->verifyPayment($paymentId);
     }
 
     public function handleWebhook()
@@ -113,24 +133,64 @@ class MollieService
                 $type = $payment->metadata->type ?? 'monthly';
 
                 if ($userId && $planId) {
-                     // Calculate expiry
-                     $expiry = date('Y-m-d H:i:s', strtotime('+1 month'));
-                     if ($type === 'yearly') {
-                          $expiry = date('Y-m-d H:i:s', strtotime('+1 year'));
-                     } elseif ($type === 'lifetime') {
-                          $expiry = date('Y-m-d H:i:s', strtotime('+100 years'));
+                     $db = Database::getInstance();
+
+                     // 0. Idempotency check: Has this payment already been processed?
+                     $stmtIdem = $db->getPdo()->prepare("SELECT id FROM payments WHERE transaction_id = ? AND status = 'completed'");
+                     $stmtIdem->execute([$id]);
+                     if ($stmtIdem->fetch()) {
+                         http_response_code(200); // Already processed
+                         return;
                      }
 
-                     // Update User
-                     $db = Database::getInstance();
-                     $stmt = $db->getPdo()->prepare("
+                     // 1. Calculate expiry (Handle "Lost Days")
+                     $stmtUser = $db->getPdo()->prepare("SELECT subscription_ends_at FROM users WHERE id = ?");
+                     $stmtUser->execute([$userId]);
+                     $userSub = $stmtUser->fetch();
+                     
+                     $startTime = time();
+                     if ($userSub && !empty($userSub['subscription_ends_at'])) {
+                         $currentExpiry = strtotime($userSub['subscription_ends_at']);
+                         if ($currentExpiry > $startTime) {
+                             $startTime = $currentExpiry;
+                         }
+                     }
+
+                     $duration = '+1 month';
+                     if ($type === 'yearly') {
+                          $duration = '+1 year';
+                     } elseif ($type === 'lifetime') {
+                          $duration = '+100 years';
+                     }
+                     $expiry = date('Y-m-d H:i:s', strtotime($duration, $startTime));
+
+                     // 2. Update Users Table (Fast Access)
+                     $stmtUpdate = $db->getPdo()->prepare("
                         UPDATE users 
                         SET subscription_id = ?, subscription_status = 'active', subscription_ends_at = ? 
                         WHERE id = ?
                      ");
-                     $stmt->execute([$planId, $expiry, $userId]);
+                     $stmtUpdate->execute([$planId, $expiry, $userId]);
 
-                     // Payment Record
+                     // 3. Update User Subscriptions Table (Audit History)
+                     $this->subscriptionModel->create([
+                         'user_id' => $userId,
+                         'plan_id' => $planId,
+                         'paypal_subscription_id' => 'mollie_' . $id,
+                         'paypal_plan_id' => $planId,
+                         'status' => 'active',
+                         'billing_cycle' => $type,
+                         'amount' => $payment->amount->value,
+                         'currency' => $payment->amount->currency,
+                         'current_period_start' => date('Y-m-d H:i:s'),
+                         'current_period_end' => $expiry,
+                         'next_billing_date' => $expiry,
+                         'is_trial' => 0,
+                         'trial_start' => null,
+                         'trial_end' => null
+                     ]);
+
+                     // 4. Create Payment Record (Already exists in user's request as step 4)
                      $this->paymentModel->create([
                          'user_id' => $userId,
                          'subscription_id' => $planId,

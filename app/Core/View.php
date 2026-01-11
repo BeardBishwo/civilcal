@@ -239,7 +239,7 @@ class View
     public function csrfToken()
     {
         if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+            \App\Services\Security::startSession();
         }
         if (empty($_SESSION["csrf_token"])) {
             $_SESSION["csrf_token"] = bin2hex(random_bytes(32));

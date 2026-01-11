@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Exception;
 use App\Services\ThemeImageLoader;
-use App\Services\ImageUploadService;
+use App\Services\FileService;
 use App\Services\ImageRetrievalService;
 
 /**
@@ -55,7 +55,7 @@ class ImageManager
      */
     public static function initializeStorage()
     {
-        return ImageUploadService::initializeDirectories();
+        return FileService::initializeDirectories();
     }
 
     /**
@@ -68,7 +68,7 @@ class ImageManager
      */
     public static function uploadAdminImage($file, $type)
     {
-        return ImageUploadService::uploadAdminImage($file, $type);
+        return FileService::uploadAdminImage($file, $type);
     }
 
     /**
@@ -81,7 +81,7 @@ class ImageManager
      */
     public static function uploadUserImage($file, $userId)
     {
-        return ImageUploadService::uploadUserImage($file, $userId);
+        return FileService::uploadUserImage($file, $userId);
     }
 
     /**
@@ -139,7 +139,7 @@ class ImageManager
     public static function deleteImage($path)
     {
         $fullPath = BASE_PATH . $path;
-        return ImageUploadService::deleteImage($fullPath);
+        return FileService::deleteFile($fullPath);
     }
 
     /**

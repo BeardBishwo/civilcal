@@ -60,8 +60,8 @@ class DashboardController extends Controller
             $result = $stmt->fetch();
             return $result['count'] ?? 1234;
         } catch (\Exception $e) {
-            // Return mock data if database query fails
-            return 1234;
+            error_log('Dashboard usage error: ' . $e->getMessage());
+            return 0;
         }
     }
 
@@ -77,7 +77,8 @@ class DashboardController extends Controller
             $result = $stmt->fetch();
             return $result['count'] ?? 850;
         } catch (\Exception $e) {
-            return 850;
+            error_log('Dashboard active users error: ' . $e->getMessage());
+            return 0;
         }
     }
 
@@ -99,7 +100,7 @@ class DashboardController extends Controller
 
             return $activeModules;
         } catch (\Exception $e) {
-            return 12; // Default value
+            return 0; 
         }
     }
 
@@ -111,7 +112,7 @@ class DashboardController extends Controller
             $result = $stmt->fetch();
             return $result['count'] ?? 56;
         } catch (\Exception $e) {
-            return 56; // Default value
+            return 0;
         }
     }
 
@@ -127,7 +128,7 @@ class DashboardController extends Controller
             $result = $stmt->fetch();
             return $result['count'] ?? 15420;
         } catch (\Exception $e) {
-            return 15420;
+            return 0;
         }
     }
 
@@ -153,7 +154,8 @@ class DashboardController extends Controller
             // Return mock data if log reading fails
         }
 
-        return 789; // Default value
+
+        return 0;
     }
 
     private function getSystemHealth()

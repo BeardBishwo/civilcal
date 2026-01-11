@@ -410,8 +410,8 @@ class UserManagementController extends Controller
         }
 
         try {
-            $stmt = $this->db->prepare("DELETE FROM users WHERE id = ?");
-            $result = $stmt->execute([$id]);
+            $userModel = new User();
+            $result = $userModel->delete($id);
 
             if ($result) {
                 if ($isAjax) {
@@ -520,16 +520,18 @@ class UserManagementController extends Controller
         }
 
         try {
-            // Convert IDs to parameterized placeholder string
-            $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
-            $sql = "DELETE FROM users WHERE id IN ($placeholders)";
-            $stmt = $this->db->prepare($sql);
-            $result = $stmt->execute(array_values($userIds));
+            $userModel = new User();
+            $deletedCount = 0;
+            foreach ($userIds as $id) {
+                if ($userModel->delete($id)) {
+                    $deletedCount++;
+                }
+            }
 
-            if ($result) {
+            if ($deletedCount > 0) {
                 echo json_encode([
                     'success' => true, 
-                    'message' => count($userIds) . ' users deleted successfully'
+                    'message' => $deletedCount . ' users deleted successfully'
                 ]);
             } else {
                 throw new \Exception('Database error');

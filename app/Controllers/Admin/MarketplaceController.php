@@ -56,12 +56,14 @@ class MarketplaceController extends Controller
      */
     public function validateLicense()
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('/admin/marketplace');
-            return;
-        }
-        
         try {
+            // CSRF Protection
+            if (!verify_csrf($_POST['csrf_token'] ?? '')) {
+                $this->addFlashMessage('error', 'CSRF verification failed');
+                $this->redirect('/admin/marketplace');
+                return;
+            }
+            
             $licenseKey = $_POST['license_key'] ?? '';
             $domain = $_SERVER['HTTP_HOST'] ?? '';
             $userId = $_SESSION['user_id'] ?? 'default';
@@ -97,12 +99,14 @@ class MarketplaceController extends Controller
      */
     public function install()
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('/admin/marketplace');
-            return;
-        }
-        
         try {
+            // CSRF Protection
+            if (!verify_csrf($_POST['csrf_token'] ?? '')) {
+                $this->addFlashMessage('error', 'CSRF verification failed');
+                $this->redirect('/admin/marketplace');
+                return;
+            }
+            
             $licenseKey = $_POST['license_key'] ?? '';
             $type = $_POST['type'] ?? 'theme'; // theme, plugin, script
             $userId = $_SESSION['user_id'] ?? 'default';
@@ -132,8 +136,15 @@ class MarketplaceController extends Controller
             
             $zipPath = $upload['file_path'];
             
-            // For now we still use themeManager, but in future this should dispatch to correct manager
-            $result = $this->themeManager->installThemeFromZip($zipPath, $licenseKey, $userId);
+            // Dispatch to correct manager based on type
+            if ($type === 'plugin') {
+                $pluginManager = new \App\Services\PluginManager();
+                // Assuming PluginManager has a similar sync install method
+                $result = $pluginManager->installPlugin($zipPath);
+            } else {
+                // Default to Theme for 'theme' or 'script' (scripts are often bundled as themes or handled by theme manager in this architecture)
+                $result = $this->themeManager->installThemeFromZip($zipPath, $licenseKey, $userId);
+            }
             
             if ($result['success']) {
                 $this->addFlashMessage('success', ucfirst($type) . ' installed successfully');

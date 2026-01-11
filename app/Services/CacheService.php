@@ -5,6 +5,7 @@ namespace App\Services;
 /**
  * Cache Service
  * 
+ * @deprecated Use App\Services\AdvancedCache instead
  * Unified caching interface supporting multiple drivers
  * Currently supports file-based caching, Redis-ready for future
  * 
@@ -13,39 +14,11 @@ namespace App\Services;
 class CacheService
 {
     private static $instance = null;
-    private $driver;
-    private $cacheDir;
-    private $defaultTtl = 3600; // 1 hour
-
-    private $redis = null;
+    private $advancedCache;
 
     private function __construct()
     {
-        // Try to connect to Redis first
-        if (extension_loaded('redis')) {
-            try {
-                $this->redis = new \Redis();
-                $connected = $this->redis->connect('127.0.0.1', 6379, 1); // 1 second timeout
-                
-                if ($connected) {
-                    $this->driver = 'redis';
-                } else {
-                    $this->driver = 'file';
-                }
-            } catch (\Exception $e) {
-                // Redis not available, fall back to file
-                $this->driver = 'file';
-                $this->redis = null;
-            }
-        } else {
-            $this->driver = 'file';
-        }
-        
-        // Set up file cache directory
-        $this->cacheDir = __DIR__ . '/../../storage/cache/';
-        if (!is_dir($this->cacheDir)) {
-            mkdir($this->cacheDir, 0755, true);
-        }
+        $this->advancedCache = AdvancedCache::getInstance();
     }
 
     /**
@@ -68,11 +41,7 @@ class CacheService
      */
     public function get($key, $default = null)
     {
-        if ($this->driver === 'redis' && $this->redis) {
-            return $this->redisGet($key, $default);
-        }
-        
-        return $this->fileGet($key, $default);
+        return $this->advancedCache->get($key, $default);
     }
 
     /**
@@ -85,13 +54,8 @@ class CacheService
      */
     public function set($key, $value, $ttl = null)
     {
-        $ttl = $ttl ?? $this->defaultTtl;
-        
-        if ($this->driver === 'redis' && $this->redis) {
-            return $this->redisSet($key, $value, $ttl);
-        }
-        
-        return $this->fileSet($key, $value, $ttl);
+        // AdvancedCache expects TTL, handle null default there or here
+        return $this->advancedCache->set($key, $value, $ttl);
     }
 
     /**
@@ -102,11 +66,7 @@ class CacheService
      */
     public function delete($key)
     {
-        if ($this->driver === 'redis' && $this->redis) {
-            return $this->redisDelete($key);
-        }
-        
-        return $this->fileDelete($key);
+        return $this->advancedCache->forget($key);
     }
 
     /**
@@ -116,11 +76,7 @@ class CacheService
      */
     public function flush()
     {
-        if ($this->driver === 'redis' && $this->redis) {
-            return $this->redisFlush();
-        }
-        
-        return $this->fileFlush();
+        return $this->advancedCache->flush();
     }
 
     /**
@@ -153,7 +109,7 @@ class CacheService
      */
     public function has($key)
     {
-        return $this->get($key) !== null;
+        return $this->advancedCache->has($key);
     }
 
     // ============ File Driver Methods ============

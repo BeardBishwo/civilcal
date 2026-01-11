@@ -166,22 +166,20 @@ class BackupService
                 $createTable = $this->db->query("SHOW CREATE TABLE `{$table}`")->fetch(PDO::FETCH_ASSOC);
                 fwrite($handle, $createTable['Create Table'] . ";\n\n");
                 
-                // Insert data
-                $rows = $this->db->query("SELECT * FROM `{$table}`")->fetchAll(PDO::FETCH_ASSOC);
+                // Insert data (Streaming approach to prevent memory exhaustion)
+                $stmt = $this->db->query("SELECT * FROM `{$table}`");
                 
-                if (!empty($rows)) {
-                    foreach ($rows as $row) {
-                        $values = array_map(function($value) {
-                            return $value === null ? 'NULL' : $this->db->quote($value);
-                        }, array_values($row));
-                        
-                        $columns = '`' . implode('`, `', array_keys($row)) . '`';
-                        $valuesStr = implode(', ', $values);
-                        
-                        fwrite($handle, "INSERT INTO `{$table}` ({$columns}) VALUES ({$valuesStr});\n");
-                    }
-                    fwrite($handle, "\n");
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $values = array_map(function($value) {
+                        return $value === null ? 'NULL' : $this->db->quote($value);
+                    }, array_values($row));
+                    
+                    $columns = '`' . implode('`, `', array_keys($row)) . '`';
+                    $valuesStr = implode(', ', $values);
+                    
+                    fwrite($handle, "INSERT INTO `{$table}` ({$columns}) VALUES ({$valuesStr});\n");
                 }
+                fwrite($handle, "\n");
             }
             
             fwrite($handle, "SET FOREIGN_KEY_CHECKS=1;\n");

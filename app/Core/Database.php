@@ -175,7 +175,7 @@ class Database {
             $sql .= " LIMIT {$limit}";
         }
         
-        $stmt = $this->prepare($sql);
+        $stmt = $this->pdoRead->prepare($sql);
         $stmt->execute($params);
         
         return $stmt->fetchAll();
@@ -201,7 +201,7 @@ class Database {
         }
         
         $sql = "SELECT COUNT(*) as count FROM {$table} {$where}";
-        $stmt = $this->prepare($sql);
+        $stmt = $this->pdoRead->prepare($sql);
         $stmt->execute($params);
         
         $result = $stmt->fetch();

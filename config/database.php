@@ -23,7 +23,7 @@ if (!function_exists('loadConfigEnv')) {
 // Load environment variables
 loadConfigEnv();
 
-return [
+$config = [
     'driver' => 'mysql',
     'host' => $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?? 'localhost',
     'database' => $_ENV['DB_DATABASE'] ?? getenv('DB_DATABASE') ?? '',

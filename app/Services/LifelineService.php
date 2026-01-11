@@ -33,22 +33,24 @@ class LifelineService
         }
 
         $cost = $prices[$type];
-        $wallet = $this->gamificationService->getWallet($userId);
-
-        if (($wallet['coins'] ?? 0) < $cost) {
-            return ['success' => false, 'message' => "Need $cost coins! Try a daily quest."];
-        }
-
-        // 1. Log the activity (Security & Audit)
-        require_once __DIR__ . '/ActivityLogger.php';
-        $logger = new ActivityLogger();
-        $logger->logAndReward($userId, 'LIFELINE_USE', 0, -$cost, 0, 0);
-
-        // 2. Deduct Coins directly
-        $this->db->query("UPDATE user_resources SET coins = coins - :cost WHERE user_id = :uid", [
+        // 1. Deduct Coins atomically (and check balance in the same query)
+        $stmt = $this->db->query("
+            UPDATE user_resources 
+            SET coins = coins - :cost 
+            WHERE user_id = :uid AND coins >= :cost
+        ", [
             'cost' => $cost,
             'uid' => $userId
         ]);
+
+        if ($stmt->rowCount() === 0) {
+            return ['success' => false, 'message' => "Need $cost coins! Try a daily quest."];
+        }
+
+        // 2. Log the activity (Security & Audit)
+        require_once __DIR__ . '/ActivityLogger.php';
+        $logger = new ActivityLogger();
+        $logger->logAndReward($userId, 'LIFELINE_USE', 0, -$cost, 0, 0);
 
         $responseData = ['success' => true, 'message' => "Activated " . strtoupper($type) . "!"];
 
@@ -139,17 +141,19 @@ class LifelineService
         }
 
         $cost = $prices[$type] * $quantity;
-        $wallet = $this->gamificationService->getWallet($userId);
-
-        if ($wallet['coins'] < $cost) {
-            return ['success' => false, 'message' => "Not enough coins! You need $cost coins."];
-        }
-
-        // Deduct Coins
-        $this->db->query("UPDATE user_resources SET coins = coins - :cost WHERE user_id = :uid", [
+        // Deduct Coins atomically
+        $stmt = $this->db->query("
+            UPDATE user_resources 
+            SET coins = coins - :cost 
+            WHERE user_id = :uid AND coins >= :cost
+        ", [
             'cost' => $cost,
             'uid' => $userId
         ]);
+
+        if ($stmt->rowCount() === 0) {
+            return ['success' => false, 'message' => "Not enough coins! You need $cost coins."];
+        }
 
         // Add to Inventory
         $this->db->query("
@@ -170,17 +174,19 @@ class LifelineService
      */
     public function useLifeline($userId, $type)
     {
-        $inventory = $this->getInventory($userId);
-        
-        if (($inventory[$type] ?? 0) <= 0) {
-            return ['success' => false, 'message' => "You don't have any " . str_replace('_', ' ', $type) . " left!"];
-        }
-
-        // Deduct from Inventory
-        $this->db->query("UPDATE user_lifelines SET quantity = quantity - 1 WHERE user_id = :uid AND lifeline_type = :type", [
+        // Deduct from Inventory atomically
+        $stmt = $this->db->query("
+            UPDATE user_lifelines 
+            SET quantity = quantity - 1 
+            WHERE user_id = :uid AND lifeline_type = :type AND quantity >= 1
+        ", [
             'uid' => $userId,
             'type' => $type
         ]);
+
+        if ($stmt->rowCount() === 0) {
+            return ['success' => false, 'message' => "You don't have any " . str_replace('_', ' ', $type) . " left!"];
+        }
 
         return ['success' => true, 'message' => "Used " . str_replace('_', ' ', $type)];
     }

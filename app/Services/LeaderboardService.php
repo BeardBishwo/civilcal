@@ -36,34 +36,7 @@ class LeaderboardService
     private function upsertAggregate($userId, $type, $value, $score, $accuracy, $categoryId)
     {
         $pdo = $this->db->getPdo();
-        
-        // Check if exists
-        // Note: Managing CategoryID nullability in SQL unique key is tricky. 
-        // For MVP, if categoryId is null, we treat as 'All Categories'.
-        // SQL Unique key ignores NULLs usually, so we might need a dummy ID like 0 for 'Global'.
         $catId = $categoryId ?? 0; 
-        
-        $sql = "
-            INSERT INTO quiz_leaderboard_aggregates 
-            (user_id, period_type, period_value, category_id, total_score, tests_taken, accuracy_avg)
-            VALUES (:uid, :ptype, :pval, :cat, :score, 1, :acc)
-            ON DUPLICATE KEY UPDATE
-                total_score = total_score + :score2,
-                tests_taken = tests_taken + 1,
-                accuracy_avg = ((accuracy_avg * (tests_taken - 1)) + :acc2) / tests_taken
-        ";
-        // Note on AVG calculation: 
-        // (OldAvg * OldCount + NewVal) / NewCount
-        // In update clause: tests_taken is already incremented? No, waiting to be.
-        // Actually MySQL UPDATE order is undefined for single statement dependency? 
-        // Safer to use VALUES(tests_taken) + 1 logic or specific order.
-        // Let's do it carefully:
-        // tests_taken = tests_taken + 1
-        // accuracy = ( (accuracy_avg * tests_taken) + newAgg ) / (tests_taken + 1) -> Wait, tests_taken refers to OLD value in expression?
-        // In MySQL Update: "col = expr". Uses old value unless updated earlier in set clause.
-        
-        // Correct logic for single query update of moving average:
-        // NewAvg = (OldAvg * OldCount + NewVal) / (OldCount + 1)
         
         $sql = "
             INSERT INTO quiz_leaderboard_aggregates 
@@ -100,10 +73,16 @@ class LeaderboardService
             };
         }
         
-        // 1. Try Cache First
+        $limit = (int)$limit;
         $pdo = $this->db->getPdo();
-        $stmtCache = $pdo->prepare("SELECT top_users FROM leaderboard_cache WHERE category = :cat AND period_type = :ptype AND period_value = :pval");
-        $categoryName = ($categoryId == 0) ? 'global' : 'cat_' . $categoryId; // Simple mapping
+        $categoryName = ($categoryId == 0) ? 'global' : 'cat_' . $categoryId;
+
+        // 1. Try Cache First (with 5-minute expiration)
+        $stmtCache = $pdo->prepare("
+            SELECT top_users, updated_at 
+            FROM leaderboard_cache 
+            WHERE category = :cat AND period_type = :ptype AND period_value = :pval
+        ");
         
         $stmtCache->execute([
             'cat' => $categoryName,
@@ -112,22 +91,36 @@ class LeaderboardService
         ]);
         
         $cacheRow = $stmtCache->fetch();
-        if ($cacheRow && !empty($cacheRow['top_users'])) {
+        $cacheTTL = 300; // 5 minutes
+
+        if ($cacheRow && (time() - strtotime($cacheRow['updated_at'])) < $cacheTTL) {
             $results = json_decode($cacheRow['top_users'], true);
-            
-            // Add trends dummy logic
-            $rank = 1;
-            foreach ($results as &$row) {
-                $row['calculated_rank'] = $rank++;
-                // Trend is tricky directly from cache unless stored. MVP: 0
-                $row['trend'] = 0; 
-            }
-            return $results;
+        } else {
+            // 2. Fallback to Real-Time (Recalculate and Cache)
+            $results = $this->refreshCache($periodType, $periodValue, $categoryId, $limit);
+        }
+        
+        // Add rankings and trends
+        $rank = 1;
+        foreach ($results as &$row) {
+            $row['calculated_rank'] = $rank++;
+            $row['trend'] = 0; 
         }
 
-        // 2. Fallback to Real-Time (if cache missing)
+        return $results;
+    }
+
+    /**
+     * Refresh the leaderboard cache
+     */
+    public function refreshCache($periodType, $periodValue, $categoryId, $limit = 100)
+    {
+        $limit = (int)$limit;
+        $pdo = $this->db->getPdo();
+
         $sql = "
-            SELECT l.*, u.username, CONCAT_WS(' ', u.first_name, u.last_name) as full_name, u.avatar 
+            SELECT l.user_id, l.total_score, l.tests_taken, l.accuracy_avg, 
+                   u.username, CONCAT_WS(' ', u.first_name, u.last_name) as full_name, u.avatar 
             FROM quiz_leaderboard_aggregates l
             JOIN users u ON l.user_id = u.id
             WHERE l.period_type = :ptype 
@@ -141,17 +134,28 @@ class LeaderboardService
         $stmt->execute([
             'ptype' => $periodType,
             'pval' => $periodValue,
-            'cat' => $categoryId
+            'cat' => (int)$categoryId
         ]);
         
-        $results = $stmt->fetchAll();
-        
-        $rank = 1;
-        foreach ($results as &$row) {
-            $row['calculated_rank'] = $rank++;
-            $row['trend'] = 0;
-        }
-        
+        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $categoryName = ($categoryId == 0) ? 'global' : 'cat_' . $categoryId;
+
+        // Save to Cache
+        $stmtSave = $pdo->prepare("
+            INSERT INTO leaderboard_cache (category, period_type, period_value, top_users)
+            VALUES (:cat, :ptype, :pval, :data)
+            ON DUPLICATE KEY UPDATE 
+                top_users = VALUES(top_users),
+                updated_at = CURRENT_TIMESTAMP
+        ");
+
+        $stmtSave->execute([
+            'cat' => $categoryName,
+            'ptype' => $periodType,
+            'pval' => $periodValue,
+            'data' => json_encode($results)
+        ]);
+
         return $results;
     }
     

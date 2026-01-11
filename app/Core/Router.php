@@ -172,22 +172,7 @@ class Router
 
         // Execute pipeline middleware
         $next = function ($request) use ($route, $params) {
-            list($controllerClass, $method) = explode('@', $route['controller']);
-
-            if (strpos($controllerClass, '\\') === false) {
-                $controllerClass = "App\\Controllers\\{$controllerClass}";
-            } else {
-                $controllerClass = "App\\Controllers\\{$controllerClass}";
-            }
-
-            if (class_exists($controllerClass)) {
-                $controller = new $controllerClass();
-                return call_user_func_array([$controller, $method], $params);
-            }
-
-            http_response_code(500);
-            echo "Controller not found: {$controllerClass}";
-            return null;
+            return $this->executeController($route['controller'], $params);
         };
 
         // Run through pipeline in reverse order
@@ -202,11 +187,14 @@ class Router
             return $next($request);
         }
 
-        list($controllerClass, $method) = explode('@', $route['controller']);
+        return $this->executeController($route['controller'], $params);
+    }
+
+    private function executeController($controllerStr, $params = [])
+    {
+        list($controllerClass, $method) = explode('@', $controllerStr);
 
         if (strpos($controllerClass, '\\') === false) {
-            $controllerClass = "App\\Controllers\\{$controllerClass}";
-        } else {
             $controllerClass = "App\\Controllers\\{$controllerClass}";
         }
 

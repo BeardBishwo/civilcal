@@ -51,8 +51,8 @@ class ThemeCustomizeController extends Controller
      */
     public function saveColors($id)
     {
-        if (!$this->isAjax()) {
-            $this->error('Invalid request');
+        if (!$this->isAjax() || !verify_csrf($_POST['csrf_token'] ?? '')) {
+            $this->error('Invalid request or CSRF token');
             return;
         }
 
@@ -91,8 +91,8 @@ class ThemeCustomizeController extends Controller
      */
     public function saveTypography($id)
     {
-        if (!$this->isAjax()) {
-            $this->error('Invalid request');
+        if (!$this->isAjax() || !verify_csrf($_POST['csrf_token'] ?? '')) {
+            $this->error('Invalid request or CSRF token');
             return;
         }
 
@@ -129,8 +129,8 @@ class ThemeCustomizeController extends Controller
      */
     public function saveFeatures($id)
     {
-        if (!$this->isAjax()) {
-            $this->error('Invalid request');
+        if (!$this->isAjax() || !verify_csrf($_POST['csrf_token'] ?? '')) {
+            $this->error('Invalid request or CSRF token');
             return;
         }
 
@@ -167,8 +167,8 @@ class ThemeCustomizeController extends Controller
      */
     public function saveLayout($id)
     {
-        if (!$this->isAjax()) {
-            $this->error('Invalid request');
+        if (!$this->isAjax() || !verify_csrf($_POST['csrf_token'] ?? '')) {
+            $this->error('Invalid request or CSRF token');
             return;
         }
 
@@ -204,8 +204,8 @@ class ThemeCustomizeController extends Controller
      */
     public function saveCustomCSS($id)
     {
-        if (!$this->isAjax()) {
-            $this->error('Invalid request');
+        if (!$this->isAjax() || !verify_csrf($_POST['csrf_token'] ?? '')) {
+            $this->error('Invalid request or CSRF token');
             return;
         }
 
@@ -284,8 +284,8 @@ class ThemeCustomizeController extends Controller
      */
     public function reset($id)
     {
-        if (!$this->isAjax()) {
-            $this->error('Invalid request');
+        if (!$this->isAjax() || !verify_csrf($_POST['csrf_token'] ?? '')) {
+            $this->error('Invalid request or CSRF token');
             return;
         }
 

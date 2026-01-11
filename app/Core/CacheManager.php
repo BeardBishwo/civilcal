@@ -2,32 +2,22 @@
 
 namespace App\Core;
 
+use App\Services\AdvancedCache;
+
 /**
  * Simple Cache Manager for Database Query Results
+ * @deprecated Use App\Services\AdvancedCache instead
  */
 class CacheManager
 {
-    private static $cache = [];
-    private static $ttl = 300; // 5 minutes default
+    // Keeping minimal structure for compatibility but proxying logic
 
     /**
      * Get cached value
      */
     public static function get($key)
     {
-        if (!isset(self::$cache[$key])) {
-            return null;
-        }
-
-        $item = self::$cache[$key];
-        
-        // Check if expired
-        if (time() > $item['expires']) {
-            unset(self::$cache[$key]);
-            return null;
-        }
-
-        return $item['value'];
+        return AdvancedCache::getInstance()->get($key);
     }
 
     /**
@@ -35,12 +25,7 @@ class CacheManager
      */
     public static function set($key, $value, $ttl = null)
     {
-        $ttl = $ttl ?? self::$ttl;
-        
-        self::$cache[$key] = [
-            'value' => $value,
-            'expires' => time() + $ttl
-        ];
+        AdvancedCache::getInstance()->set($key, $value, $ttl);
     }
 
     /**
@@ -48,7 +33,7 @@ class CacheManager
      */
     public static function has($key)
     {
-        return self::get($key) !== null;
+        return AdvancedCache::getInstance()->has($key);
     }
 
     /**
@@ -56,7 +41,7 @@ class CacheManager
      */
     public static function delete($key)
     {
-        unset(self::$cache[$key]);
+        AdvancedCache::getInstance()->forget($key);
     }
 
     /**
@@ -64,7 +49,7 @@ class CacheManager
      */
     public static function clear()
     {
-        self::$cache = [];
+        AdvancedCache::getInstance()->flush();
     }
 
     /**

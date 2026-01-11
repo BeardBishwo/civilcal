@@ -39,7 +39,7 @@ class HealthController extends Controller
                     'version' => '1.0.0'
                 ],
                 'env' => [
-                    'php' => PHP_VERSION,
+                    'php' => (defined('APP_DEBUG') && APP_DEBUG) ? PHP_VERSION : 'HIDDEN',
                     'debug' => defined('APP_DEBUG') ? (bool)APP_DEBUG : null
                 ],
                 'metrics' => [

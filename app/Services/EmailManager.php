@@ -269,196 +269,31 @@ class EmailManager
      */
     private function getTemplate($templateName, $variables = [])
     {
-        $templates = [
-            'email_verification' => '
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <style>
-                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                        .header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 30px; text-align: center; }
-                        .content { background: #f9f9f9; padding: 30px; }
-                        .button { display: inline-block; background: #4f46e5; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-                        .footer { background: #f1f1f1; padding: 20px; text-align: center; font-size: 12px; color: #666; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1>🔧 {{site_name}}</h1>
-                            <p>Professional Engineering Calculations</p>
-                        </div>
-                        <div class="content">
-                            <h2>Verify Your Email Address</h2>
-                            <p>Hello {{full_name}},</p>
-                            <p>Thank you for signing up with {{site_name}}! To complete your registration and start using our professional engineering calculation tools, please verify your email address.</p>
-                            <div style="text-align: center;">
-                                <a href="{{verification_link}}" class="button">Verify Email Address</a>
-                            </div>
-                            <p>If the button doesn\'t work, copy and paste this link into your browser:</p>
-                            <p><a href="{{verification_link}}">{{verification_link}}</a></p>
-                            <p>This verification link will expire in 24 hours for security purposes.</p>
-                            <p>If you didn\'t create an account with {{site_name}}, please ignore this email.</p>
-                        </div>
-                        <div class="footer">
-                            <p>&copy; {{current_year}} {{site_name}}. All rights reserved.</p>
-                            <p>Professional Engineering Calculations | Building Excellence Through Technology</p>
-                        </div>
-                    </div>
-                </body>
-                </html>
-            ',
-            'password_reset' => '
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <style>
-                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                        .header { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 30px; text-align: center; }
-                        .content { background: #f9f9f9; padding: 30px; }
-                        .button { display: inline-block; background: #ef4444; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-                        .footer { background: #f1f1f1; padding: 20px; text-align: center; font-size: 12px; color: #666; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1>🔐 Password Reset Request</h1>
-                            <p>EngiCal Pro Security</p>
-                        </div>
-                        <div class="content">
-                            <h2>Reset Your Password</h2>
-                            <p>Hello {{full_name}},</p>
-                            <p>We received a request to reset your password for your EngiCal Pro account. Click the button below to create a new password:</p>
-                            <div style="text-align: center;">
-                                <a href="{{reset_link}}" class="button">Reset Password</a>
-                            </div>
-                            <p>If the button doesn\'t work, copy and paste this link into your browser:</p>
-                            <p><a href="{{reset_link}}">{{reset_link}}</a></p>
-                            <p><strong>This reset link will expire in 1 hour for security purposes.</strong></p>
-                            <p>If you didn\'t request a password reset, please ignore this email. Your password will remain unchanged.</p>
-                        </div>
-                        <div class="footer">
-                            <p>&copy; 2025 EngiCal Pro. All rights reserved.</p>
-                            <p>For security reasons, this email was sent to {{email}}</p>
-                        </div>
-                    </div>
-                </body>
-                </html>
-            ',
-            'welcome' => '
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <style>
-                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                        .header { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 30px; text-align: center; }
-                        .content { background: #f9f9f9; padding: 30px; }
-                        .button { display: inline-block; background: #10b981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-                        .features { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-                        .footer { background: #f1f1f1; padding: 20px; text-align: center; font-size: 12px; color: #666; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1>🎉 Welcome to EngiCal Pro!</h1>
-                            <p>Your Professional Engineering Toolkit</p>
-                        </div>
-                        <div class="content">
-                            <h2>Account Verified Successfully!</h2>
-                            <p>Hello {{full_name}},</p>
-                            <p>Congratulations! Your EngiCal Pro account has been verified and is now fully active. You can now access all our professional engineering calculation tools.</p>
-                            
-                            <div class="features">
-                                <h3>🚀 What\'s Available Now:</h3>
-                                <ul>
-                                    <li><strong>Civil Engineering:</strong> Structural calculations, concrete design, foundation analysis</li>
-                                    <li><strong>Electrical Engineering:</strong> Load calculations, power distribution, circuit design</li>
-                                    <li><strong>Mechanical/HVAC:</strong> Ventilation, heating/cooling load calculations</li>
-                                    <li><strong>Fire Safety:</strong> Fire protection system calculations</li>
-                                    <li><strong>Plumbing:</strong> Water supply and drainage calculations</li>
-                                </ul>
-                            </div>
-                            
-                            <div style="text-align: center;">
-                                <a href="{{login_url}}" class="button">Start Calculating</a>
-                            </div>
-                            
-                            <p><strong>Username:</strong> {{username}}</p>
-                            <p>If you have any questions or need support, don\'t hesitate to contact us.</p>
-                            <p>Welcome aboard!</p>
-                        </div>
-                        <div class="footer">
-                            <p>&copy; 2025 EngiCal Pro. All rights reserved.</p>
-                            <p>Building Excellence Through Professional Engineering Tools</p>
-                        </div>
-                    </div>
-                </body>
-                </html>
-            '
-            ,
-            'new_account' => '
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <style>
-                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                        .header { background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; padding: 30px; text-align: center; }
-                        .content { background: #f9f9f9; padding: 30px; }
-                        .button { display: inline-block; background: #4f46e5; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-                        .credentials-box { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0; }
-                        .footer { background: #f1f1f1; padding: 20px; text-align: center; font-size: 12px; color: #666; }
-                        .warning { color: #b91c1c; background: #fef2f2; padding: 10px; border-radius: 4px; font-size: 14px; margin-top: 15px; border-left: 4px solid #ef4444; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1>Welcome to {{site_name}}</h1>
-                        </div>
-                        <div class="content">
-                            <h2>Your Account Has Been Created</h2>
-                            <p>Hello {{full_name}},</p>
-                            <p>An administrator has created an account for you. Here are your login credentials:</p>
-                            
-                            <div class="credentials-box">
-                                <p><strong>Username:</strong> {{username}}</p>
-                                <p><strong>Temporary Password:</strong> {{password}}</p>
-                            </div>
-
-                            <div class="warning">
-                                <strong>⚠️ Important:</strong> This temporary password will expire in 1 hour. Please log in immediately to change it.
-                            </div>
-                            
-                            <div style="text-align: center;">
-                                <a href="{{login_url}}" class="button">Log In Now</a>
-                            </div>
-                            
-                            <p>If the button doesn\'t work, you can login here:</p>
-                            <p><a href="{{login_url}}">{{login_url}}</a></p>
-                        </div>
-                        <div class="footer">
-                            <p>&copy; 2025 {{site_name}}. All rights reserved.</p>
-                        </div>
-                    </div>
-                </body>
-                </html>
-            '
+        // Map logical template names to file names
+        $templateMap = [
+            'email_verification' => 'verification.php',
+            'password_reset' => 'password_reset.php',
+            'welcome' => 'welcome.php',
+            'new_account' => 'new_account.php'
         ];
 
-        $template = $templates[$templateName] ?? '';
+        $fileName = $templateMap[$templateName] ?? null;
+        if (!$fileName) {
+            return '';
+        }
 
-        // Add current year to variables
+        $templatePath = __DIR__ . '/../../themes/default/emails/' . $fileName;
+        
+        if (!file_exists($templatePath)) {
+            error_log("Email template not found: " . $templatePath);
+            return '';
+        }
+
+        $template = file_get_contents($templatePath);
+
+        // Add default variables
         $variables['current_year'] = date('Y');
+        $variables['site_name'] = \App\Services\SettingsService::get('site_name', 'Bishwo Calculator');
 
         // Replace variables in template
         foreach ($variables as $key => $value) {

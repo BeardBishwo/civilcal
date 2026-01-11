@@ -47,6 +47,8 @@ class BountyApiController extends Controller
                 throw new Exception('Insufficient Coins', 400);
             }
 
+            $this->db->beginTransaction();
+
             // Lock Coins (Deduct immediately)
             if (!$userModel->deductCoins($user->id, $amount, "Created Bounty: $title")) {
                 throw new Exception('Failed to process coin deduction', 500);
@@ -60,9 +62,13 @@ class BountyApiController extends Controller
                 'bounty_amount' => $amount
             ]);
 
+            $this->db->commit();
             $this->json(['success' => true, 'message' => 'Bounty Posted!', 'id' => $id]);
 
         } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
             $this->json(['success' => false, 'message' => $e->getMessage()], $e->getCode() ?: 500);
         }
     }
@@ -191,6 +197,8 @@ class BountyApiController extends Controller
                 // Verify Bounty is still open
                 if ($bounty->status !== 'open') throw new Exception('Bounty already closed/filled');
 
+                $this->db->beginTransaction();
+
                 // 1. Release Coins to Engineer
                 $userModel = new User();
                 $userModel->addCoins($submission->uploader_id, $bounty->bounty_amount, "Bounty Reward: $bounty->title", $bounty->id);
@@ -201,8 +209,7 @@ class BountyApiController extends Controller
                 // 3. Close Bounty
                 $bountyModel->updateStatus($bounty->id, 'filled');
 
-                // 4. Return Download URL (Using existing library download logic or similar secure handler)
-                // We'll create a simple download handler for bounties `api/bounty/download?id=SUBID`
+                $this->db->commit();
                 
                 $this->json(['success' => true, 'message' => 'Accepted! Payment Released.']);
 
@@ -213,6 +220,9 @@ class BountyApiController extends Controller
             }
 
         } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
             $this->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }

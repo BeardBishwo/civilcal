@@ -255,6 +255,8 @@ class ExamEngineController extends Controller
                         unset($opt['is_correct']);
                     }
                 }
+                unset($q['correct_answer']);
+                unset($q['correct_answer_json']);
                 unset($q['explanation']);
             }
         }
@@ -303,7 +305,8 @@ class ExamEngineController extends Controller
         $data['answers'][$questionId] = $selectedOptions;
         
         // Write Back
-        file_put_contents($file, json_encode($data));
+        // Write Back with LOCK_EX to prevent race conditions
+        file_put_contents($file, json_encode($data), LOCK_EX);
 
         echo json_encode(['success' => true]);
     }

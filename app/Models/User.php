@@ -140,7 +140,9 @@ class User
                 'lockout_until' => "ALTER TABLE users ADD COLUMN lockout_until DATETIME NULL AFTER failed_logins",
                 'is_banned' => "ALTER TABLE users ADD COLUMN is_banned TINYINT(1) DEFAULT 0 AFTER lockout_until",
                 'ban_reason' => "ALTER TABLE users ADD COLUMN ban_reason TEXT NULL AFTER is_banned",
-                'banned_at' => "ALTER TABLE users ADD COLUMN banned_at DATETIME NULL AFTER ban_reason"
+                'ban_reason' => "ALTER TABLE users ADD COLUMN ban_reason TEXT NULL AFTER is_banned",
+                'banned_at' => "ALTER TABLE users ADD COLUMN banned_at DATETIME NULL AFTER ban_reason",
+                'remember_token' => "ALTER TABLE users ADD COLUMN remember_token VARCHAR(100) NULL AFTER banned_at"
             ];
 
             foreach ($requiredColumns as $columnName => $alterSql) {

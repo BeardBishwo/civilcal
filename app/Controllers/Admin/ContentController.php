@@ -289,15 +289,22 @@ class ContentController extends Controller
 
     public function deleteMenu($id)
     {
-        $user = Auth::user();
-        if (!$user || !$user->is_admin) {
+        $this->requireAdmin();
+
+        // Security: Ensure it's a POST request for destructive actions
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            die('Method Not Allowed. Use POST for deletion.');
+        }
+
+        // Validate CSRF
+        if (empty($_POST['csrf_token']) || !$this->validateCsrfToken($_POST['csrf_token'])) {
             http_response_code(403);
-            die('Access denied');
+            die('Invalid CSRF token');
         }
 
         // Use the menu model to delete
-        $menuModel = new Menu();
-        $menuModel->delete($id);
+        $this->menuModel->delete($id);
 
         // If AJAX request
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
@@ -360,14 +367,28 @@ class ContentController extends Controller
     public function saveMenus()
     {
         $this->requireAdmin();
+
+        // Validate CSRF
+        if (empty($_POST['csrf_token']) || !$this->validateCsrfToken($_POST['csrf_token'])) {
+            http_response_code(403);
+            die('Invalid CSRF token');
+        }
+
         $id = $_POST['id'] ?? null;
         $data = [
             'name' => $_POST['name'] ?? '',
             'location' => $_POST['location'] ?? '',
             'is_active' => isset($_POST['is_active']) ? 1 : 0,
             'show_name' => isset($_POST['show_name']) ? 1 : 0,
-            'items' => $_POST['items'] ?? '[]'
         ];
+        // Validate JSON structure to prevent site-wide header crashes
+        $itemsJson = $_POST['items'] ?? '[]';
+        $items = json_decode($itemsJson, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $this->logError('Invalid menu JSON attempted', ['error' => json_last_error_msg(), 'data' => $itemsJson]);
+            die('Invalid Menu Structure: The submitted data is not valid JSON. Please go back and try again.');
+        }
+        $data['items'] = $itemsJson;
 
         $menuModel = new Menu();
         if ($id) {
@@ -386,6 +407,11 @@ class ContentController extends Controller
     {
         $this->requireAdmin();
         
+        // Validate CSRF
+        if (empty($_POST['csrf_token']) || !$this->validateCsrfToken($_POST['csrf_token'])) {
+            return $this->json(['success' => false, 'message' => 'Invalid CSRF token']);
+        }
+
         $location = $_POST['location'] ?? null;
         $menuId = $_POST['menu_id'] ?? null;
 
@@ -611,7 +637,8 @@ class ContentController extends Controller
                         'mime_type' => $mimeType,
                         'width' => $width,
                         'height' => $height,
-                        'uploaded_by' => $user->id
+                        'uploaded_by' => $user->id,
+                        'file_hash' => $fileHash // Store the hash
                     ], $optimizedData));
 
                     if ($mediaId) {
@@ -736,6 +763,13 @@ class ContentController extends Controller
         }
 
         $menuId = $_POST['id'] ?? null;
+        
+        // Validate CSRF
+        if (empty($_POST['csrf_token']) || !$this->validateCsrfToken($_POST['csrf_token'])) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            return;
+        }
+
         if (!$menuId) {
             echo json_encode(['success' => false, 'message' => 'Menu ID is required']);
             return;

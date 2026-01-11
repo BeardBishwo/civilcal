@@ -90,18 +90,48 @@ class WidgetManager
     }
     
     /**
-     * Get class name from PHP file
+     * Get class name from PHP file using Tokenizer
      * 
      * @param string $file
      * @return string|null
      */
     private function getClassNameFromFile($file)
     {
-        $content = file_get_contents($file);
-        if (preg_match('/class\s+(\w+)\s+extends\s+BaseWidget/', $content, $matches)) {
-            return $matches[1];
+        $fp = fopen($file, 'r');
+        $class = $namespace = $buffer = '';
+        $i = 0;
+        
+        while (!$class) {
+            if (feof($fp)) break;
+            
+            $buffer .= fread($fp, 512);
+            $tokens = token_get_all($buffer);
+            
+            if (strpos($buffer, '{') === false) continue;
+            
+            for (; $i < count($tokens); $i++) {
+                if ($tokens[$i][0] === T_NAMESPACE) {
+                    for ($j = $i + 1; $j < count($tokens); $j++) {
+                        if ($tokens[$j][0] === T_STRING) {
+                            $namespace .= $tokens[$j][1] . '\\';
+                        } else if ($tokens[$j] === '{' || $tokens[$j] === ';') {
+                            break;
+                        }
+                    }
+                }
+                
+                if ($tokens[$i][0] === T_CLASS) {
+                    for ($j = $i + 1; $j < count($tokens); $j++) {
+                        if ($tokens[$j] === '{') {
+                            $class = $tokens[$i + 2][1];
+                        }
+                    }
+                }
+            }
         }
-        return null;
+        
+        fclose($fp);
+        return $class ? $namespace . $class : null;
     }
     
     /**
@@ -112,7 +142,12 @@ class WidgetManager
      */
     private function isWidgetClass($className)
     {
-        return class_exists($className) && is_subclass_of($className, BaseWidget::class);
+        if (!class_exists($className)) {
+            return false;
+        }
+        
+        $reflection = new \ReflectionClass($className);
+        return $reflection->isSubclassOf(BaseWidget::class) && !$reflection->isAbstract();
     }
     
     /**

@@ -60,7 +60,29 @@ class SearchController extends Controller
      */
     public function reindex()
     {
+        // Validate CSRF
+        if (empty($_POST['csrf_token']) || !$this->validateCsrfToken($_POST['csrf_token'])) {
+            return $this->json(['success' => false, 'message' => 'Invalid CSRF token']);
+        }
+
+        // Increase time limit for heavy indexing
+        set_time_limit(300);
+
+        $limit = isset($_POST['limit']) ? (int)$_POST['limit'] : null;
+        $offset = isset($_POST['offset']) ? (int)$_POST['offset'] : 0;
+
         $indexer = new SearchIndexer();
+        
+        // If batching requested
+        if ($limit !== null) {
+            $count = $indexer->indexBatch($limit, $offset);
+            return $this->json([
+                'success' => true, 
+                'message' => "Batch indexed: {$count} items from offset {$offset}.",
+                'batch_count' => $count
+            ]);
+        }
+
         $count = $indexer->indexAll();
         
         return $this->json([

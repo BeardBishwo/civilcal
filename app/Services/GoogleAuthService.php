@@ -22,7 +22,7 @@ class GoogleAuthService
         $this->client = new Client([
             'base_uri' => 'https://accounts.google.com',
             'timeout'  => 10.0,
-            'verify'   => false // Disable SSL verification for local dev if needed, typically true for prod
+            'verify'   => true // SSL verification enabled for security
         ]);
     }
 

@@ -126,29 +126,93 @@ class PaddleService
              $public_key = $config['public_key'];
              $signature = $input['p_signature'] ?? '';
              
-             // Verification Logic (Simplified)
-             // ksort($input);
-             // unset($input['p_signature']);
-             // ... verify with openssl ...
+             if (!$signature || !$public_key) {
+                 http_response_code(403);
+                 die('Missing signature or public key');
+             }
+
+             // Verification Logic
+             $data = $input;
+             unset($data['p_signature']);
+             foreach ($data as $key => $value) {
+                 if (!is_string($value)) {
+                     $data[$key] = (string)$value;
+                 }
+             }
+             ksort($data);
+             $serialized = serialize($data);
              
-             // Assuming verified for MVP:
+             $verified = openssl_verify($serialized, base64_decode($signature), $public_key, OPENSSL_ALGO_SHA1);
+             
+             if ($verified !== 1) {
+                 http_response_code(403);
+                 die('Invalid signature');
+             }
+
              if (isset($input['alert_name']) && $input['alert_name'] === 'payment_succeeded') {
                  $passthrough = json_decode($input['passthrough'], true);
                  $userId = $passthrough['user_id'] ?? null;
                  $planId = $passthrough['plan_id'] ?? null;
+                 $cycleType = $passthrough['type'] ?? 'monthly';
                  
                   if ($userId && $planId) {
-                      // Update or create subscription
-                      // Calculate expiry...
-                      $expiry = date('Y-m-d H:i:s', strtotime('+1 year')); // usually subscription
-                      
                        $db = Database::getInstance();
+                       
+                       // Fetch current user subscription info to handle "Lost Days"
+                       $stmt = $db->getPdo()->prepare("SELECT subscription_ends_at FROM users WHERE id = ?");
+                       $stmt->execute([$userId]);
+                       $userSub = $stmt->fetch();
+                       
+                       $startTime = time();
+                       if ($userSub && !empty($userSub['subscription_ends_at'])) {
+                           $currentExpiry = strtotime($userSub['subscription_ends_at']);
+                           if ($currentExpiry > $startTime) {
+                               $startTime = $currentExpiry;
+                           }
+                       }
+
+                       // Calculate new expiry
+                       $duration = ($cycleType === 'yearly') ? '+1 year' : '+1 month';
+                       $newExpiry = date('Y-m-d H:i:s', strtotime($duration, $startTime));
+                       
+                       // 1. Update Users Table (Fast Access)
                        $stmt = $db->getPdo()->prepare("
                           UPDATE users 
                           SET subscription_id = ?, subscription_status = 'active', subscription_ends_at = ? 
                           WHERE id = ?
                        ");
-                       $stmt->execute([$planId, $expiry, $userId]);
+                       $stmt->execute([$planId, $newExpiry, $userId]);
+
+                       // 2. Update User Subscriptions Table (Audit History)
+                       $this->subscriptionModel->create([
+                           'user_id' => $userId,
+                           'plan_id' => $planId,
+                           'paypal_subscription_id' => $input['subscription_id'] ?? 'paddle_' . ($input['checkout_id'] ?? uniqid()),
+                           'paypal_plan_id' => $input['subscription_plan_id'] ?? $planId,
+                           'status' => 'active',
+                           'billing_cycle' => $cycleType,
+                           'amount' => $input['sale_gross'] ?? 0,
+                           'currency' => $input['currency'] ?? 'USD',
+                           'current_period_start' => date('Y-m-d H:i:s'),
+                           'current_period_end' => $newExpiry,
+                           'next_billing_date' => $newExpiry,
+                           'is_trial' => 0,
+                           'trial_start' => null,
+                           'trial_end' => null
+                       ]);
+
+                       // 3. Create Payment Record
+                       $this->paymentModel->create([
+                           'user_id' => $userId,
+                           'subscription_id' => $planId,
+                           'amount' => $input['sale_gross'] ?? 0,
+                           'currency' => $input['currency'] ?? 'USD',
+                           'payment_method' => 'paddle',
+                           'status' => 'completed',
+                           'starts_at' => date('Y-m-d H:i:s'),
+                           'ends_at' => $newExpiry,
+                           'transaction_id' => $input['order_id'] ?? $input['checkout_id'] ?? uniqid()
+                       ]);
                   }
              }
         }

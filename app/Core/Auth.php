@@ -58,7 +58,7 @@ class Auth
     public static function logout()
     {
         if (session_status() == PHP_SESSION_NONE) {
-            session_start();
+            \App\Services\Security::startSession();
         }
 
         // Clear all session variables

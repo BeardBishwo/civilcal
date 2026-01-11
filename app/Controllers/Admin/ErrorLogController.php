@@ -91,6 +91,12 @@ class ErrorLogController extends Controller {
         $this->checkAdminAuth();
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // CSRF Protection
+            if (!verify_csrf($_POST['csrf_token'] ?? '')) {
+                $this->session->setFlash('error', 'CSRF verification failed.');
+                $this->redirect('/admin/error-logs');
+            }
+
             // Clear error logs
             $this->clearLogFiles();
             

@@ -72,269 +72,82 @@ class SetupController extends Controller
      */
     private function getChecklistSections()
     {
-        return [
+        $savedStatus = \App\Services\SettingsService::get('admin_setup_checklist', []);
+        
+        $sections = [
             [
                 'id' => 'basic-information',
                 'title' => 'Basic Information',
                 'description' => 'Essential site information and branding',
-                'progress' => 85,
-                'status' => 'good',
                 'items' => [
-                    [
-                        'id' => 'site-url',
-                        'title' => 'Site URL',
-                        'description' => 'Configure your site\'s primary URL',
-                        'completed' => true,
-                        'required' => true,
-                        'action_url' => '/admin/settings/general',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'site-name',
-                        'title' => 'Site Name',
-                        'description' => 'Set your site\'s display name',
-                        'completed' => true,
-                        'required' => true,
-                        'action_url' => '/admin/settings/general',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'site-title',
-                        'title' => 'Site Title',
-                        'description' => 'Configure page titles and SEO',
-                        'completed' => true,
-                        'required' => true,
-                        'action_url' => '/admin/settings/seo',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'site-description',
-                        'title' => 'Site Description',
-                        'description' => 'Add a compelling site description',
-                        'completed' => true,
-                        'required' => true,
-                        'action_url' => '/admin/settings/seo',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'site-logo',
-                        'title' => 'Site Logo',
-                        'description' => 'Upload and configure your brand logo',
-                        'completed' => true,
-                        'required' => false,
-                        'action_url' => '/admin/logo-settings',
-                        'action_text' => 'Upload'
-                    ],
-                    [
-                        'id' => 'favicon',
-                        'title' => 'Favicon',
-                        'description' => 'Set your site\'s favicon icon',
-                        'completed' => false,
-                        'required' => false,
-                        'action_url' => '/admin/logo-settings',
-                        'action_text' => 'Upload'
-                    ]
+                    ['id' => 'site-url', 'title' => 'Site URL', 'description' => 'Configure your site\'s primary URL', 'required' => true, 'action_url' => '/admin/settings/general', 'action_text' => 'Configure'],
+                    ['id' => 'site-name', 'title' => 'Site Name', 'description' => 'Set your site\'s display name', 'required' => true, 'action_url' => '/admin/settings/general', 'action_text' => 'Configure'],
+                    ['id' => 'site-title', 'title' => 'Site Title', 'description' => 'Configure page titles and SEO', 'required' => true, 'action_url' => '/admin/settings/seo', 'action_text' => 'Configure'],
+                    ['id' => 'site-description', 'title' => 'Site Description', 'description' => 'Add a compelling site description', 'required' => true, 'action_url' => '/admin/settings/seo', 'action_text' => 'Configure'],
+                    ['id' => 'site-logo', 'title' => 'Site Logo', 'description' => 'Upload and configure your brand logo', 'required' => false, 'action_url' => '/admin/logo-settings', 'action_text' => 'Upload'],
+                    ['id' => 'favicon', 'title' => 'Favicon', 'description' => 'Set your site\'s favicon icon', 'required' => false, 'action_url' => '/admin/logo-settings', 'action_text' => 'Upload']
                 ]
             ],
             [
                 'id' => 'user-settings',
                 'title' => 'User Settings',
                 'description' => 'User management and authentication configuration',
-                'progress' => 75,
-                'status' => 'warning',
                 'items' => [
-                    [
-                        'id' => 'user-registration',
-                        'title' => 'User Registration',
-                        'description' => 'Configure user registration settings',
-                        'completed' => true,
-                        'required' => true,
-                        'action_url' => '/admin/settings/users',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'email-verification',
-                        'title' => 'Email Verification',
-                        'description' => 'Set up email verification for new users',
-                        'completed' => true,
-                        'required' => true,
-                        'action_url' => '/admin/settings/email',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'password-policy',
-                        'title' => 'Password Policy',
-                        'description' => 'Define password strength requirements',
-                        'completed' => true,
-                        'required' => true,
-                        'action_url' => '/admin/settings/security',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'user-roles',
-                        'title' => 'User Roles',
-                        'description' => 'Set up user roles and permissions',
-                        'completed' => false,
-                        'required' => false,
-                        'action_url' => '/admin/users/roles',
-                        'action_text' => 'Configure'
-                    ]
+                    ['id' => 'user-registration', 'title' => 'User Registration', 'description' => 'Configure user registration settings', 'required' => true, 'action_url' => '/admin/settings/users', 'action_text' => 'Configure'],
+                    ['id' => 'email-verification', 'title' => 'Email Verification', 'description' => 'Set up email verification for new users', 'required' => true, 'action_url' => '/admin/settings/email', 'action_text' => 'Configure'],
+                    ['id' => 'password-policy', 'title' => 'Password Policy', 'description' => 'Define password strength requirements', 'required' => true, 'action_url' => '/admin/settings/security', 'action_text' => 'Configure'],
+                    ['id' => 'user-roles', 'title' => 'User Roles', 'description' => 'Set up user roles and permissions', 'required' => false, 'action_url' => '/admin/users/roles', 'action_text' => 'Configure']
                 ]
             ],
             [
                 'id' => 'security-settings',
                 'title' => 'Security Settings',
                 'description' => 'Essential security configurations',
-                'progress' => 60,
-                'status' => 'warning',
                 'items' => [
-                    [
-                        'id' => 'ssl-certificate',
-                        'title' => 'SSL Certificate',
-                        'description' => 'Ensure HTTPS is properly configured',
-                        'completed' => true,
-                        'required' => true,
-                        'action_url' => '/admin/settings/security',
-                        'action_text' => 'Check SSL'
-                    ],
-                    [
-                        'id' => 'backup-schedule',
-                        'title' => 'Backup Schedule',
-                        'description' => 'Configure automated backups',
-                        'completed' => false,
-                        'required' => true,
-                        'action_url' => '/admin/settings/backup',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'security-headers',
-                        'title' => 'Security Headers',
-                        'description' => 'Configure security headers',
-                        'completed' => true,
-                        'required' => true,
-                        'action_url' => '/admin/settings/security',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'rate-limiting',
-                        'title' => 'Rate Limiting',
-                        'description' => 'Set up API rate limiting',
-                        'completed' => false,
-                        'required' => false,
-                        'action_url' => '/admin/settings/api',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'admin-2fa',
-                        'title' => 'Admin 2FA',
-                        'description' => 'Enable two-factor authentication for admins',
-                        'completed' => false,
-                        'required' => false,
-                        'action_url' => '/admin/profile/security',
-                        'action_text' => 'Enable'
-                    ]
+                    ['id' => 'ssl-certificate', 'title' => 'SSL Certificate', 'description' => 'Ensure HTTPS is properly configured', 'required' => true, 'action_url' => '/admin/settings/security', 'action_text' => 'Check SSL'],
+                    ['id' => 'backup-schedule', 'title' => 'Backup Schedule', 'description' => 'Configure automated backups', 'required' => true, 'action_url' => '/admin/settings/backup', 'action_text' => 'Configure'],
+                    ['id' => 'security-headers', 'title' => 'Security Headers', 'description' => 'Configure security headers', 'required' => true, 'action_url' => '/admin/settings/security', 'action_text' => 'Configure'],
+                    ['id' => 'rate-limiting', 'title' => 'Rate Limiting', 'description' => 'Set up API rate limiting', 'required' => false, 'action_url' => '/admin/settings/api', 'action_text' => 'Configure'],
+                    ['id' => 'admin-2fa', 'title' => 'Admin 2FA', 'description' => 'Enable two-factor authentication for admins', 'required' => false, 'action_url' => '/admin/profile/security', 'action_text' => 'Enable']
                 ]
             ],
             [
                 'id' => 'application-settings',
                 'title' => 'Application Settings',
                 'description' => 'Core application functionality',
-                'progress' => 90,
-                'status' => 'good',
                 'items' => [
-                    [
-                        'id' => 'maintenance-mode',
-                        'title' => 'Maintenance Mode',
-                        'description' => 'Configure maintenance mode settings',
-                        'completed' => true,
-                        'required' => true,
-                        'action_url' => '/admin/settings/maintenance',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'timezone',
-                        'title' => 'Timezone',
-                        'description' => 'Set the default timezone',
-                        'completed' => true,
-                        'required' => true,
-                        'action_url' => '/admin/settings/general',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'default-language',
-                        'title' => 'Default Language',
-                        'description' => 'Set the site\'s default language',
-                        'completed' => true,
-                        'required' => true,
-                        'action_url' => '/admin/settings/localization',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'caching',
-                        'title' => 'Caching',
-                        'description' => 'Configure caching for better performance',
-                        'completed' => true,
-                        'required' => false,
-                        'action_url' => '/admin/settings/performance',
-                        'action_text' => 'Configure'
-                    ]
+                    ['id' => 'maintenance-mode', 'title' => 'Maintenance Mode', 'description' => 'Configure maintenance mode settings', 'required' => true, 'action_url' => '/admin/settings/maintenance', 'action_text' => 'Configure'],
+                    ['id' => 'timezone', 'title' => 'Timezone', 'description' => 'Set the default timezone', 'required' => true, 'action_url' => '/admin/settings/general', 'action_text' => 'Configure'],
+                    ['id' => 'default-language', 'title' => 'Default Language', 'description' => 'Set the site\'s default language', 'required' => true, 'action_url' => '/admin/settings/localization', 'action_text' => 'Configure'],
+                    ['id' => 'caching', 'title' => 'Caching', 'description' => 'Configure caching for better performance', 'required' => false, 'action_url' => '/admin/settings/performance', 'action_text' => 'Configure']
                 ]
             ],
             [
                 'id' => 'integrations',
                 'title' => 'Additional Integrations',
                 'description' => 'Third-party services and integrations',
-                'progress' => 40,
-                'status' => 'needs-attention',
                 'items' => [
-                    [
-                        'id' => 'payment-gateway',
-                        'title' => 'Payment Gateway Setup',
-                        'description' => 'Configure payment processing',
-                        'completed' => false,
-                        'required' => false,
-                        'action_url' => '/admin/settings/payments',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'email-service',
-                        'title' => 'Email Service',
-                        'description' => 'Set up email delivery service',
-                        'completed' => true,
-                        'required' => true,
-                        'action_url' => '/admin/settings/email',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'analytics',
-                        'title' => 'Analytics Tracking',
-                        'description' => 'Set up Google Analytics or similar',
-                        'completed' => false,
-                        'required' => false,
-                        'action_url' => '/admin/settings/analytics',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'cdn',
-                        'title' => 'CDN Configuration',
-                        'description' => 'Configure content delivery network',
-                        'completed' => false,
-                        'required' => false,
-                        'action_url' => '/admin/settings/performance',
-                        'action_text' => 'Configure'
-                    ],
-                    [
-                        'id' => 'api-keys',
-                        'title' => 'API Keys',
-                        'description' => 'Configure external API keys',
-                        'completed' => false,
-                        'required' => false,
-                        'action_url' => '/admin/settings/api',
-                        'action_text' => 'Configure'
-                    ]
+                    ['id' => 'payment-gateway', 'title' => 'Payment Gateway Setup', 'description' => 'Configure payment processing', 'required' => false, 'action_url' => '/admin/settings/payments', 'action_text' => 'Configure'],
+                    ['id' => 'email-service', 'title' => 'Email Service', 'description' => 'Set up email delivery service', 'required' => true, 'action_url' => '/admin/settings/email', 'action_text' => 'Configure'],
+                    ['id' => 'analytics', 'title' => 'Analytics Tracking', 'description' => 'Set up Google Analytics or similar', 'required' => false, 'action_url' => '/admin/settings/analytics', 'action_text' => 'Configure'],
+                    ['id' => 'cdn', 'title' => 'CDN Configuration', 'description' => 'Configure content delivery network', 'required' => false, 'action_url' => '/admin/settings/performance', 'action_text' => 'Configure'],
+                    ['id' => 'api-keys', 'title' => 'API Keys', 'description' => 'Configure external API keys', 'required' => false, 'action_url' => '/admin/settings/api', 'action_text' => 'Configure']
                 ]
             ]
         ];
+
+        // Apply completion status and calculate section progress
+        foreach ($sections as &$section) {
+            $completedCount = 0;
+            foreach ($section['items'] as &$item) {
+                $item['completed'] = $savedStatus[$item['id']] ?? false;
+                if ($item['completed']) $completedCount++;
+            }
+            $section['progress'] = count($section['items']) > 0 ? round(($completedCount / count($section['items'])) * 100) : 0;
+            $section['status'] = $section['progress'] > 80 ? 'good' : ($section['progress'] > 40 ? 'warning' : 'needs-attention');
+        }
+
+        return $sections;
     }
 
     /**
@@ -458,9 +271,10 @@ class SetupController extends Controller
      */
     private function updateChecklistItem($itemId, $completed)
     {
-        // In a real application, this would update the database
-        // For now, we'll just return success
-        return true;
+        $savedStatus = \App\Services\SettingsService::get('admin_setup_checklist', []);
+        $savedStatus[$itemId] = (bool)$completed;
+        
+        return \App\Services\SettingsService::set('admin_setup_checklist', $savedStatus, 'json', 'admin', 'Store admin setup checklist completion states');
     }
 
     /**

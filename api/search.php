@@ -136,7 +136,22 @@ try {
     }
     
     $modules_dir = __DIR__ . '/../modules';
-    $calculators = discover_calculators($modules_dir);
+    $cache_file = __DIR__ . '/../storage/cache/calculators_index.json';
+    $cache_lifetime = 3600; // 1 hour
+
+    $calculators = [];
+    if (file_exists($cache_file) && (time() - filemtime($cache_file) < $cache_lifetime)) {
+        $calculators = json_decode(file_get_contents($cache_file), true);
+    }
+
+    if (empty($calculators)) {
+        $calculators = discover_calculators($modules_dir);
+        // Ensure cache directory exists
+        if (!is_dir(dirname($cache_file))) {
+            @mkdir(dirname($cache_file), 0755, true);
+        }
+        file_put_contents($cache_file, json_encode($calculators));
+    }
     
     $results = [];
     

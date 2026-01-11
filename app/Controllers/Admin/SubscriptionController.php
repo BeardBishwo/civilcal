@@ -35,15 +35,14 @@ class SubscriptionController extends Controller
         if ($_POST) {
             $data = [
                 'name' => $_POST['name'],
-                'description' => $_POST['description'],
-                'price_monthly' => $_POST['price_monthly'],
-                'price_yearly' => $_POST['price_yearly'],
-                'features' => json_encode($_POST['features']),
+                'description' => $_POST['description'] ?? '',
+                'price_monthly' => (float)$_POST['price_monthly'],
+                'price_yearly' => (float)$_POST['price_yearly'],
+                'features' => is_array($_POST['features']) ? json_encode($_POST['features']) : $_POST['features'],
                 'is_active' => isset($_POST['is_active']) ? 1 : 0,
                 'created_at' => date('Y-m-d H:i:s')
             ];
 
-            // Save to database logic would go here
             $result = $this->savePlan($data);
             
             echo json_encode($result);
@@ -55,86 +54,26 @@ class SubscriptionController extends Controller
 
     private function getSubscriptionPlans()
     {
-        // Mock data for subscription plans
-        return [
-            [
-                'id' => 1,
-                'name' => 'Free',
-                'description' => 'Basic calculator access',
-                'price_monthly' => 0,
-                'price_yearly' => 0,
-                'features' => ['5 calculations per day', 'Basic calculators', 'Email support'],
-                'is_active' => true,
-                'subscribers' => 850
-            ],
-            [
-                'id' => 2,
-                'name' => 'Professional',
-                'description' => 'For individual engineers',
-                'price_monthly' => 9.99,
-                'price_yearly' => 99.99,
-                'features' => ['Unlimited calculations', 'All calculators', 'Priority support', 'Export features'],
-                'is_active' => true,
-                'subscribers' => 320
-            ],
-            [
-                'id' => 3,
-                'name' => 'Enterprise',
-                'description' => 'For teams and companies',
-                'price_monthly' => 29.99,
-                'price_yearly' => 299.99,
-                'features' => ['Everything in Professional', 'Team management', 'API access', 'Custom calculators'],
-                'is_active' => true,
-                'subscribers' => 45
-            ]
-        ];
+        return $this->subscriptionModel->getAll();
     }
 
     private function getRecentTransactions()
     {
-        // Mock data for recent transactions
-        return [
-            [
-                'id' => 'TXN_001',
-                'user' => 'John Doe',
-                'plan' => 'Professional',
-                'amount' => 9.99,
-                'status' => 'completed',
-                'date' => '2024-01-15 14:30:00'
-            ],
-            [
-                'id' => 'TXN_002', 
-                'user' => 'Jane Smith',
-                'plan' => 'Enterprise',
-                'amount' => 29.99,
-                'status' => 'completed',
-                'date' => '2024-01-15 12:15:00'
-            ],
-            [
-                'id' => 'TXN_003',
-                'user' => 'Mike Johnson',
-                'plan' => 'Professional',
-                'amount' => 9.99,
-                'status' => 'pending',
-                'date' => '2024-01-15 10:45:00'
-            ]
-        ];
+        return $this->subscriptionModel->getTransactions(10);
     }
 
     private function getBillingStats()
     {
-        return [
-            'total_revenue' => 4850.50,
-            'monthly_recurring' => 1250.75,
-            'active_subscribers' => 1215,
-            'conversion_rate' => 3.2
-        ];
+        return $this->subscriptionModel->getStats();
     }
 
     private function savePlan($data)
     {
-        // Database save logic would go here
-        return ['success' => true, 'message' => 'Plan created successfully'];
+        $success = $this->subscriptionModel->create($data);
+        if ($success) {
+            return ['success' => true, 'message' => 'Plan created successfully'];
+        }
+        return ['success' => false, 'message' => 'Failed to create plan'];
     }
 
     public function edit($id)
@@ -189,8 +128,16 @@ class SubscriptionController extends Controller
 
     private function updatePlan($data)
     {
-        // Database update logic would go here
-        return ['success' => true, 'message' => 'Plan updated successfully'];
+        $id = $data['id'];
+        unset($data['id']);
+        unset($data['updated_at']); // handled by MySQL trigger usually, but we can keep it if needed
+        $data['updated_at'] = date('Y-m-d H:i:s');
+
+        $success = $this->subscriptionModel->update($id, $data);
+        if ($success) {
+            return ['success' => true, 'message' => 'Plan updated successfully'];
+        }
+        return ['success' => false, 'message' => 'Failed to update plan'];
     }
 }
 ?>

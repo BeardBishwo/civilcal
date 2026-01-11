@@ -194,8 +194,7 @@ class DataExportService
         $stmt = $this->db->getPdo()->prepare("
             SELECT * FROM login_sessions 
             WHERE user_id = ? 
-            ORDER BY login_time DESC 
-            LIMIT 100
+            ORDER BY login_time DESC
         ");
         $stmt->execute([$userId]);
         $data['login_sessions'] = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -213,8 +212,7 @@ class DataExportService
         $stmt = $this->db->getPdo()->prepare("
             SELECT * FROM user_activity_logs 
             WHERE user_id = ? 
-            ORDER BY created_at DESC 
-            LIMIT 1000
+            ORDER BY created_at DESC
         ");
         $stmt->execute([$userId]);
         $data['activity_logs'] = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -223,8 +221,7 @@ class DataExportService
         $stmt = $this->db->getPdo()->prepare("
             SELECT * FROM login_attempts 
             WHERE user_id = ? 
-            ORDER BY attempted_at DESC 
-            LIMIT 100
+            ORDER BY attempted_at DESC
         ");
         $stmt->execute([$userId]);
         $data['login_attempts'] = $stmt->fetchAll(\PDO::FETCH_ASSOC);

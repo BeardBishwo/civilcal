@@ -119,12 +119,12 @@ class PaymentController extends Controller
                     break;
 
                 case 'mollie':
+                    $paymentId = $_GET['id'] ?? null;
                     $planId = $_GET['plan_id'] ?? null;
                     $type = $_GET['type'] ?? 'monthly';
-                    // Mollie verification usually via Webhook, assuming success if redirect back successful for UX
-                    // Or implement handleCallback to check status via API
-                    if ($planId) {
-                         $success = true; // Optimistic UX, real verification in webhook
+                    
+                    if ($paymentId && $planId) {
+                        $success = $this->mollieService->verifyPayment($paymentId);
                     }
                     break;
 
@@ -172,7 +172,7 @@ class PaymentController extends Controller
                 $this->paddleService->handleWebhook();
                 break;
             case 'paypal':
-                http_response_code(200);
+                $this->payPalService->handleWebhook($payload);
                 break;
         }
         

@@ -87,8 +87,49 @@ class PluginManager
                 mkdir($extractPath, 0755, true);
             }
 
-            // Extract files
-            $zip->extractTo($extractPath);
+            // Secure Extraction Logic
+            $realExtractPath = realpath($extractPath);
+            if (!$realExtractPath) {
+                // If it doesn't exist yet, we can't realpath it easily
+                // But we just created/checked it above.
+                $realExtractPath = $extractPath;
+            }
+
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $entryName = $zip->getNameIndex($i);
+                if ($entryName === false) continue;
+
+                $targetFile = $extractPath . DIRECTORY_SEPARATOR . $entryName;
+                
+                // Prevent path traversal
+                // Normalize path (handle both / and \)
+                $normalizedTarget = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $targetFile);
+                
+                // If it's a directory
+                if (substr($entryName, -1) === '/' || substr($entryName, -1) === '\\') {
+                    if (!is_dir($normalizedTarget)) {
+                        mkdir($normalizedTarget, 0755, true);
+                    }
+                    continue;
+                }
+
+                // Ensure parent directory exists
+                $parentDir = dirname($normalizedTarget);
+                if (!is_dir($parentDir)) {
+                    mkdir($parentDir, 0755, true);
+                }
+
+                // SECURITY CHECK: Ensure destination is inside $extractPath
+                $realTargetDir = realpath($parentDir);
+                $realBaseDir = realpath($extractPath);
+
+                if ($realTargetDir === false || $realBaseDir === false || strpos($realTargetDir, $realBaseDir) !== 0) {
+                    Logger::warning("plugin_zip_slip_attempt", ["file" => $entryName]);
+                    continue; // Skip malicious file
+                }
+
+                copy("zip://".$zipFile."#".$entryName, $normalizedTarget);
+            }
             $zip->close();
 
             // Validate manifest

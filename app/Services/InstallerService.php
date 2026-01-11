@@ -81,17 +81,9 @@ class InstallerService
      */
     public static function isFirstAdminLogin($userId)
     {
-        // Check if install.lock was created recently (within last hour)
-        $lockFile = __DIR__ . '/../../storage/install.lock';
-        
-        if (!file_exists($lockFile)) {
-            return false;
-        }
-        
-        $lockTime = filemtime($lockFile);
-        $oneHourAgo = time() - 3600;
-        
-        return $lockTime > $oneHourAgo;
+        // Simply check if installer folder exists and hasn't been processed
+        // We delete it when an admin logs in for the first time
+        return file_exists(__DIR__ . '/../../install') && !self::isInstallerProcessed();
     }
     
     /**

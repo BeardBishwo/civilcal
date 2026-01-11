@@ -117,7 +117,7 @@ class TwoFactorAuthService
     public function disable($userId, $password)
     {
         // Verify password before disabling
-        $stmt = $this->db->getPdo()->prepare("SELECT password FROM users WHERE id = ?");
+        $stmt = $this->db->getReadPdo()->prepare("SELECT password FROM users WHERE id = ?");
         $stmt->execute([$userId]);
         $user = $stmt->fetch();
         
@@ -168,7 +168,7 @@ class TwoFactorAuthService
      */
     public function verifyRecoveryCode($userId, $code)
     {
-        $stmt = $this->db->getPdo()->prepare("
+        $stmt = $this->db->getReadPdo()->prepare("
             SELECT two_factor_recovery_codes 
             FROM users 
             WHERE id = ? AND two_factor_enabled = 1
@@ -219,7 +219,7 @@ class TwoFactorAuthService
     public function regenerateRecoveryCodes($userId, $password)
     {
         // Verify password
-        $stmt = $this->db->getPdo()->prepare("SELECT password FROM users WHERE id = ?");
+        $stmt = $this->db->getReadPdo()->prepare("SELECT password FROM users WHERE id = ?");
         $stmt->execute([$userId]);
         $user = $stmt->fetch();
         
@@ -294,7 +294,7 @@ class TwoFactorAuthService
             return false;
         }
         
-        $stmt = $this->db->getPdo()->prepare("
+        $stmt = $this->db->getReadPdo()->prepare("
             SELECT id FROM trusted_devices 
             WHERE user_id = ? 
             AND device_fingerprint = ? 
@@ -326,7 +326,7 @@ class TwoFactorAuthService
      */
     public function getTrustedDevices($userId)
     {
-        $stmt = $this->db->getPdo()->prepare("
+        $stmt = $this->db->getReadPdo()->prepare("
             SELECT id, device_name, ip_address, last_used_at, trusted_at, expires_at, is_active
             FROM trusted_devices 
             WHERE user_id = ? 
@@ -372,8 +372,7 @@ class TwoFactorAuthService
     {
         $components = [
             $_SERVER['HTTP_USER_AGENT'] ?? '',
-            $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '',
-            $_SERVER['REMOTE_ADDR'] ?? ''
+            $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? ''
         ];
         
         return hash('sha256', implode('|', $components) . uniqid('', true));
@@ -409,7 +408,7 @@ class TwoFactorAuthService
      */
     public function getStatus($userId)
     {
-        $stmt = $this->db->getPdo()->prepare("
+        $stmt = $this->db->getReadPdo()->prepare("
             SELECT two_factor_enabled, two_factor_confirmed_at, two_factor_recovery_codes
             FROM users 
             WHERE id = ?

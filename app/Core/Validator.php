@@ -42,7 +42,8 @@ class Validator
                 
             case 'html':
                 // Allow HTML but strip dangerous tags
-                return strip_tags($input, '<p><br><strong><em><ul><ol><li><a><h1><h2><h3><h4><h5><h6>');
+                // Strictly clean HTML to prevent XSS
+                return self::xssClean($input);
                 
             case 'string':
             default:

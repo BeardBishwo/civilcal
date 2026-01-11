@@ -98,7 +98,7 @@ class PayPalService
 
         // Create Redirect URLs
         $redirectUrls = new RedirectUrls();
-        $redirectUrls->setReturnUrl(app_base_url('/payment/callback/paypal?success=true&plan_id=' . $planId . '&type=' . $type))
+        $redirectUrls->setReturnUrl(app_base_url('/payment/callback/paypal?success=true&plan_id=' . $planId . '&type=' . $type . '&user_id=' . $user->id))
             ->setCancelUrl(app_base_url('/payment/failed'));
 
         // Create Payment
@@ -132,7 +132,14 @@ class PayPalService
 
             if ($result->getState() == 'approved') {
                  // Verify user and update subscription
-                 $userId = $_SESSION['user_id'] ?? null; // Ideally passed via session or metadata, but for now session
+                 // Retrieve user_id from GET parameters (passed in Return URL)
+                 $userId = $_GET['user_id'] ?? null; 
+                 
+                 if (!$userId) {
+                     // Fallback to session if mostly reliable, but don't depend on it exclusively
+                     $userId = $_SESSION['user_id'] ?? null;
+                 }
+
                  if (!$userId) return false;
 
                  // Calculate expiry

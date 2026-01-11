@@ -35,6 +35,10 @@ class ImageController extends Controller
             return $this->jsonResponse(['success' => false, 'error' => 'Invalid request method']);
         }
 
+        if (empty($_POST['csrf_token']) || !\App\Services\Security::validateCsrfToken($_POST['csrf_token'])) {
+            return $this->jsonResponse(['success' => false, 'error' => 'Invalid CSRF token']);
+        }
+
         if (!isset($_FILES['logo'])) {
             return $this->jsonResponse(['success' => false, 'error' => 'No file uploaded']);
         }
@@ -64,6 +68,10 @@ class ImageController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return $this->jsonResponse(['success' => false, 'error' => 'Invalid request method']);
+        }
+
+        if (empty($_POST['csrf_token']) || !\App\Services\Security::validateCsrfToken($_POST['csrf_token'])) {
+            return $this->jsonResponse(['success' => false, 'error' => 'Invalid CSRF token']);
         }
 
         if (!isset($_FILES['favicon'])) {
@@ -97,6 +105,10 @@ class ImageController extends Controller
             return $this->jsonResponse(['success' => false, 'error' => 'Invalid request method']);
         }
 
+        if (empty($_POST['csrf_token']) || !\App\Services\Security::validateCsrfToken($_POST['csrf_token'])) {
+            return $this->jsonResponse(['success' => false, 'error' => 'Invalid CSRF token']);
+        }
+
         if (!isset($_FILES['banner'])) {
             return $this->jsonResponse(['success' => false, 'error' => 'No file uploaded']);
         }
@@ -126,6 +138,10 @@ class ImageController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return $this->jsonResponse(['success' => false, 'error' => 'Invalid request method']);
+        }
+
+        if (empty($_POST['csrf_token']) || !\App\Services\Security::validateCsrfToken($_POST['csrf_token'])) {
+            return $this->jsonResponse(['success' => false, 'error' => 'Invalid CSRF token']);
         }
 
         $imageId = $_POST['image_id'] ?? null;

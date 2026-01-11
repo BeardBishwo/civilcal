@@ -10,11 +10,13 @@ class EmailService
 {
     private $emailTemplateModel;
     private $emailThreadModel;
+    private $emailManager;
 
     public function __construct()
     {
         $this->emailTemplateModel = new EmailTemplate();
         $this->emailThreadModel = new EmailThread();
+        $this->emailManager = new \App\Services\EmailManager();
     }
 
     /**
@@ -73,36 +75,16 @@ class EmailService
                 throw new Exception("Invalid recipient email: {$to}");
             }
 
-            // Prepare headers
-            $headers = [];
-            
-            if ($from) {
-                if (filter_var($from, FILTER_VALIDATE_EMAIL)) {
-                    $headers[] = "From: {$from}";
-                } else {
-                    throw new Exception("Invalid sender email: {$from}");
-                }
-            } else {
-                // Use default sender
-                $defaultFrom = $_ENV['MAIL_FROM'] ?? (defined('MAIL_FROM') ? MAIL_FROM : 'noreply@' . $_SERVER['HTTP_HOST']);
-                $headers[] = "From: {$defaultFrom}";
-            }
-
-            $headers[] = "Reply-To: " . ($replyTo ?? $to);
-            $headers[] = "MIME-Version: 1.0";
-            $headers[] = "Content-Type: text/html; charset=UTF-8";
-            $headers[] = "X-Mailer: PHP/" . phpversion();
-
-            // Send the email
-            $mailSent = mail($to, $subject, $body, implode("\r\n", $headers));
+            // Delegate to EmailManager to use SMTP
+            $mailSent = $this->emailManager->sendEmail($to, $subject, $body, $from, $replyTo);
 
             if ($mailSent) {
                 return [
                     'success' => true,
-                    'message' => 'Email sent successfully'
+                    'message' => 'Email sent successfully via SMTP'
                 ];
             } else {
-                throw new Exception("Mail function failed to send email");
+                throw new Exception("EmailManager failed to send email");
             }
         } catch (Exception $e) {
             return [

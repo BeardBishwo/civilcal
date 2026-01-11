@@ -55,27 +55,9 @@ class ProfileController extends Controller
         header('Content-Type: application/json');
         
         try {
-            // Check authentication via session or HTTP Basic Auth
-            $userId = null;
-            
-            // Check session first
+            // Check session
             if (isset($_SESSION['user_id'])) {
                 $userId = $_SESSION['user_id'];
-            }
-            
-            // Check HTTP Basic Auth
-            if (!$userId && isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
-                $username = $_SERVER['PHP_AUTH_USER'];
-                $password = $_SERVER['PHP_AUTH_PW'];
-                
-                $userModel = new User();
-                $user = $userModel->findByUsername($username);
-                if ($user) {
-                    $userArray = is_array($user) ? $user : (array) $user;
-                    if (password_verify($password, $userArray['password'])) {
-                        $userId = $userArray['id'];
-                    }
-                }
             }
             
             if (!$userId) {

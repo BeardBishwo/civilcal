@@ -345,6 +345,11 @@ class CalculatorService {
      * Get validation rules for calculator type
      */
     private function getValidationRules(string $calculatorType): array {
+        // Security: Sanitize calculatorType to prevent LFI/Directory Traversal
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $calculatorType)) {
+            return [];
+        }
+
         // Load validation rules from config
         $rulesFile = BASE_PATH . "/app/Config/calculators/{$calculatorType}.php";
         

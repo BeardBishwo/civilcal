@@ -50,12 +50,12 @@ class WebhookController extends Controller
             return;
         }
         
-        // Verify webhook signature (optional but recommended)
+        // Verify webhook signature (Mandatory for security)
         if (!$this->paypalService->verifyWebhookSignature($headers, $payload)) {
-            // Log verification failure
-            error_log('PayPal webhook signature verification failed');
-            // In production, you might want to reject unverified webhooks
-            // For sandbox testing, we'll continue
+            error_log('PayPal webhook signature verification failed - REJECTED');
+            http_response_code(403);
+            echo json_encode(['error' => 'Unverified webhook signature']);
+            return;
         }
         
         // Process event based on type

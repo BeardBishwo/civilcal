@@ -27,6 +27,36 @@ class SearchIndexer
         return $count;
     }
 
+    /**
+     * Index a specific batch for better performance/stability
+     */
+    public function indexBatch($limit, $offset = 0)
+    {
+        // For simplicity in this audit, we'll implement batching for Pages
+        // Modules and Settings are usually few enough to index normally.
+        $db = \App\Core\Database::getInstance();
+        $stmt = $db->prepare("SELECT id, title, content, slug, status FROM pages LIMIT ? OFFSET ?");
+        $stmt->bindValue(1, (int)$limit, \PDO::PARAM_INT);
+        $stmt->bindValue(2, (int)$offset, \PDO::PARAM_INT);
+        $stmt->execute();
+        $pages = $stmt->fetchAll();
+        
+        $count = 0;
+        foreach ($pages as $page) {
+            if (isset($page['status']) && $page['status'] !== 'published') continue;
+            
+            $this->search->updateIndex(
+                'page',
+                $page['id'],
+                $page['title'],
+                $page['content'] ?? '',
+                '/page/' . $page['slug']
+            );
+            $count++;
+        }
+        return $count;
+    }
+
     private function indexPages()
     {
         $db = \App\Core\Database::getInstance();

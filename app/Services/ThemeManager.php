@@ -598,33 +598,54 @@ class ThemeManager
             for ($i = 0; $i < $zip->numFiles; $i++) {
                 $entry = $zip->getNameIndex($i);
                 if ($entry === false) { continue; }
-                // Normalize entry path and prevent traversal
-                $entry = str_replace('..', '', $entry);
-                $entry = ltrim($entry, '/\\');
-                if ($entry === '' || substr($entry, -1) === '/') {
-                    // Directory entry
-                    $dirPath = $tempExtract . '/' . $entry;
-                    if (!is_dir($dirPath)) { mkdir($dirPath, 0755, true); }
-                    continue;
-                }
-                $dest = $tempExtract . '/' . $entry;
-                $destDir = dirname($dest);
-                if (!is_dir($destDir)) { mkdir($destDir, 0755, true); }
-                $contents = $zip->getFromIndex($i);
-                if ($contents === false) { continue; }
-                file_put_contents($dest, $contents);
-                // Verify path stays within tempExtract
-                $realTemp = realpath($tempExtract);
-                $realDest = realpath($dest);
-                if ($realTemp === false || $realDest === false || strpos($realDest, $realTemp) !== 0) {
-                    @unlink($dest);
+                
+                // Security: Strictly reject any path containing traversal characters
+                if (strpos($entry, '..') !== false || strpos($entry, './') !== false || strpos($entry, '.\\') !== false) {
                     $zip->close();
                     $this->rrmdir($tempBase);
                     return [
                         'success' => false,
-                        'message' => 'Invalid archive path detected'
+                        'message' => 'Malicious archive entry detected: ' . $entry
                     ];
                 }
+
+                $entry = ltrim($entry, '/\\');
+                
+                // Security check for entry name
+                if (strpos($entry, '..') !== false) {
+                    continue;
+                }
+
+                $dest = $tempExtract . DIRECTORY_SEPARATOR . $entry;
+                
+                if (substr($entry, -1) === '/' || substr($entry, -1) === '\\') {
+                    // Directory entry
+                    if (!is_dir($dest)) { mkdir($dest, 0755, true); }
+                    continue;
+                }
+
+                $destDir = dirname($dest);
+                if (!is_dir($destDir)) { mkdir($destDir, 0755, true); }
+
+                // PRE-WRITE Boundary Check
+                $realTemp = realpath($tempExtract);
+                
+                // If directory doesn't exist yet, we can't realpath it, 
+                // but mkdir above should have created it.
+                $realDestDir = realpath($destDir);
+                
+                if ($realTemp === false || $realDestDir === false || strpos($realDestDir, $realTemp) !== 0) {
+                    $zip->close();
+                    $this->rrmdir($tempBase);
+                    return [
+                        'success' => false,
+                        'message' => 'Invalid archive path detected: ' . $entry
+                    ];
+                }
+
+                $contents = $zip->getFromIndex($i);
+                if ($contents === false) { continue; }
+                file_put_contents($dest, $contents);
             }
             $zip->close();
 
@@ -1213,14 +1234,24 @@ class ThemeManager
      */
     public function getThemeAssetUrl($assetPath)
     {
-        $fullPath = $this->themesPath . $this->activeTheme . '/' . ltrim($assetPath, '/');
-        
-        if (file_exists($fullPath)) {
-            $mtime = filemtime($fullPath);
-            return $this->themeUrl($assetPath . '?v=' . $mtime);
+        if (strpos($assetPath, '..') !== false) {
+            return '';
         }
+
+        if (isset($this->assetsCache[$assetPath])) {
+            return $this->assetsCache[$assetPath];
+        }
+
+        $path = $this->themesPath . $this->activeTheme . '/' . $assetPath;
         
-        return $this->themeUrl($assetPath);
+        if (file_exists($path)) {
+            $mtime = filemtime($path);
+            $url = $this->themeUrl($assetPath . '?v=' . $mtime);
+            $this->assetsCache[$assetPath] = $url;
+            return $url;
+        }
+
+        return '';
     }
 
     /**

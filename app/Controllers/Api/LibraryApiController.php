@@ -240,6 +240,12 @@ class LibraryApiController extends Controller
 
     public function approve()
     {
+        $db = \App\Core\Database::getInstance();
+        $pdo = $db->getPdo();
+        $sourcePath = null;
+        $targetPath = null;
+        $fileMoved = false;
+
         try {
             // Admin check middleware handles auth, but verifying admin role:
             $user = Auth::user();
@@ -261,53 +267,55 @@ class LibraryApiController extends Controller
             if ($file->status !== 'pending') throw new Exception('File is not pending approval');
 
             if ($action === 'approve') {
-            $sourcePath = STORAGE_PATH . '/library/' . $file->file_path;
-            $fileType = $file->file_type;
-            $targetDir = STORAGE_PATH . '/library/approved/' . $fileType;
-            
-            if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
-
-            $fileName = basename($file->file_path);
-            $targetPathRelative = 'approved/' . $fileType . '/' . $fileName;
-            $targetPath = $targetDir . '/' . $fileName;
-
-            // Handle reward
-            $customReward = (int)($input['reward_amount'] ?? 100);
-
-            if (file_exists($sourcePath)) {
-                // Ensure target directory exists
-                if (!is_dir(dirname($targetPath))) {
-                    mkdir(dirname($targetPath), 0755, true);
-                }
-
-                if (!rename($sourcePath, $targetPath)) {
-                    // Fallback to copy if rename fails (across partitions)
-                    if (!copy($sourcePath, $targetPath)) {
-                        throw new Exception('Failed to move/copy file to approved directory: ' . $sourcePath, 500);
-                    }
-                    unlink($sourcePath);
-                }
+                $sourcePath = STORAGE_PATH . '/library/' . $file->file_path;
+                $fileType = $file->file_type;
+                $targetDir = STORAGE_PATH . '/library/approved/' . $fileType;
                 
-                // Update Path in DB
-                $db = \App\Core\Database::getInstance();
-                $stmt = $db->getPdo()->prepare("UPDATE library_files SET file_path = ? WHERE id = ?");
-                $stmt->execute([$targetPathRelative, $fileId]);
+                if (!is_dir($targetDir)) @mkdir($targetDir, 0755, true);
 
-            } else {
-                 // If file is missing, we check if it's already in the target (maybe already processed?)
-                 if (!file_exists($targetPath)) {
-                    throw new Exception('Source file missing in quarantine: ' . $sourcePath, 404);
-                 }
-            }
+                $fileName = basename($file->file_path);
+                $targetPathRelative = 'approved/' . $fileType . '/' . $fileName;
+                $targetPath = $targetDir . '/' . $fileName;
 
-            $libraryFileModel->approve($fileId, $customReward);
+                // Handle reward
+                $customReward = (int)($input['reward_amount'] ?? 100);
 
-            // Add coins to uploader
-            $userModel->addCoins($file->uploader_id, $customReward, 'Reward for approved resource: ' . $file->title, $fileId);
-            
-            $this->json(['success' => true, 'message' => 'Approved and ' . $customReward . ' coins awarded.']);
+                if (file_exists($sourcePath)) {
+                    // Start DB Transaction
+                    $pdo->beginTransaction();
 
-        } elseif ($action === 'reject') {
+                    // 1. Physically move file
+                    if (!@rename($sourcePath, $targetPath)) {
+                        // Fallback to copy if rename fails
+                        if (!@copy($sourcePath, $targetPath)) {
+                            throw new Exception('Failed to move/copy file to approved directory.', 500);
+                        }
+                        @unlink($sourcePath);
+                    }
+                    $fileMoved = true;
+
+                    // 2. Update Path in DB
+                    $stmt = $pdo->prepare("UPDATE library_files SET file_path = ? WHERE id = ?");
+                    $stmt->execute([$targetPathRelative, $fileId]);
+
+                    // 3. Update Status and Stats
+                    $libraryFileModel->approve($fileId, $customReward);
+
+                    // 4. Add coins to uploader
+                    $userModel->addCoins($file->uploader_id, $customReward, 'Reward for approved resource: ' . $file->title, $fileId);
+                    
+                    $pdo->commit();
+                    $this->json(['success' => true, 'message' => 'Approved and ' . $customReward . ' coins awarded.']);
+
+                } else {
+                    // If file is missing, we check if it's already in the target (maybe already processed?)
+                    if (!file_exists($targetPath)) {
+                        throw new Exception('Source file missing in quarantine.', 404);
+                    }
+                    throw new Exception('File already exists in target but record is still pending.', 409);
+                }
+
+            } elseif ($action === 'reject') {
                 $reason = $input['reason'] ?? 'Did not meet guidelines';
                 $libraryFileModel->reject($fileId, $reason);
                 $this->json(['success' => true, 'message' => 'Rejected']);
@@ -316,6 +324,15 @@ class LibraryApiController extends Controller
             }
 
         } catch (Exception $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            // FILE ROLLBACK: If file was moved but DB failed, move it back
+            if ($fileMoved && $sourcePath && $targetPath && file_exists($targetPath)) {
+                @rename($targetPath, $sourcePath);
+            }
+
             $this->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }

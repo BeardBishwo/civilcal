@@ -18,7 +18,7 @@ class SystemStatusController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if (!$user || !$user->is_admin) {
+        if (!$user || !(new \App\Models\User())->isAdmin($user->id)) {
             http_response_code(403);
             die('Access denied');
         }
@@ -41,7 +41,7 @@ class SystemStatusController extends Controller
     public function getSystemHealth()
     {
         $user = Auth::user();
-        if (!$user || !$user->is_admin) {
+        if (!$user || !(new \App\Models\User())->isAdmin($user->id)) {
             http_response_code(403);
             echo json_encode(['error' => 'Access denied']);
             return;
@@ -63,7 +63,7 @@ class SystemStatusController extends Controller
     public function getMetrics($type)
     {
         $user = Auth::user();
-        if (!$user || !$user->is_admin) {
+        if (!$user || !(new \App\Models\User())->isAdmin($user->id)) {
             http_response_code(403);
             echo json_encode(['error' => 'Access denied']);
             return;
@@ -108,7 +108,7 @@ class SystemStatusController extends Controller
     public function runHealthCheck()
     {
         $user = Auth::user();
-        if (!$user || !$user->is_admin) {
+        if (!$user || !(new \App\Models\User())->isAdmin($user->id)) {
             http_response_code(403);
             echo json_encode(['error' => 'Access denied']);
             return;

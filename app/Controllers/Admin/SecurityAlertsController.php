@@ -64,6 +64,12 @@ class SecurityAlertsController extends Controller
             echo json_encode(['success' => false, 'message' => 'Invalid request']);
             exit;
         }
+
+        // Validate CSRF
+        if (empty($_POST['csrf_token']) || !$this->validateCsrfToken($_POST['csrf_token'])) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            exit;
+        }
         
         $alertId = $_POST['alert_id'] ?? null;
         $userId = $_SESSION['user_id'] ?? null;

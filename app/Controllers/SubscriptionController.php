@@ -171,9 +171,21 @@ class SubscriptionController extends Controller
             $stmt->execute([$pendingData['plan_id']]);
             $plan = $stmt->fetch(\PDO::FETCH_ASSOC);
             
-            // Calculate period dates
+            // 1. Calculate Period Dates (Handle "Lost Days")
+            $stmtUser = $db->prepare("SELECT subscription_ends_at FROM users WHERE id = ?");
+            $stmtUser->execute([$_SESSION['user_id']]);
+            $userSub = $stmtUser->fetch(\PDO::FETCH_ASSOC);
+            
+            $startTime = time();
+            if ($userSub && !empty($userSub['subscription_ends_at'])) {
+                $currentExpiry = strtotime($userSub['subscription_ends_at']);
+                if ($currentExpiry > $startTime) {
+                    $startTime = $currentExpiry;
+                }
+            }
+
             $now = new \DateTime();
-            $periodEnd = clone $now;
+            $periodEnd = (new \DateTime())->setTimestamp($startTime);
             
             if ($pendingData['billing_cycle'] === 'yearly') {
                 $periodEnd->modify('+1 year');
@@ -181,7 +193,19 @@ class SubscriptionController extends Controller
                 $periodEnd->modify('+1 month');
             }
             
-            // Create subscription record
+            // 2. Update Users Table (Fast Access)
+            $stmtUpd = $db->prepare("
+                UPDATE users 
+                SET subscription_id = ?, subscription_status = 'active', subscription_ends_at = ? 
+                WHERE id = ?
+            ");
+            $stmtUpd->execute([
+                $pendingData['plan_id'],
+                $periodEnd->format('Y-m-d H:i:s'),
+                $_SESSION['user_id']
+            ]);
+
+            // 3. Create Subscription Record (Audit History)
             $subscriptionData = [
                 'user_id' => $_SESSION['user_id'],
                 'plan_id' => $pendingData['plan_id'],

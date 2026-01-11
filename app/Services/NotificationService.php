@@ -23,6 +23,9 @@ class NotificationService
      */
     public function send($userId, $type, $title, $message, $options = [])
     {
+        // Allow pre-fetched email to avoid N+1 queries
+        $userEmail = $options['user_email'] ?? null;
+
         // Create in-app notification
         $created = $this->notificationModel->createNotification(
             $userId,
@@ -38,7 +41,7 @@ class NotificationService
 
         // Check if should send email
         if ($this->preferenceModel->shouldSendEmail($userId, $type)) {
-            $this->sendEmail($userId, $type, $title, $message, $options);
+            $this->sendEmail($userId, $type, $title, $message, array_merge($options, ['user_email' => $userEmail]));
         }
 
         return true;
@@ -49,9 +52,23 @@ class NotificationService
      */
     public function sendBulk($userIds, $type, $title, $message, $options = [])
     {
+        if (empty($userIds)) return [];
+
+        // Pre-fetch all emails to avoid N+1 queries in the loop
+        $db = \App\Core\Database::getInstance();
+        $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+        $stmt = $db->prepare("SELECT id, email, first_name, last_name FROM users WHERE id IN ($placeholders)");
+        $stmt->execute($userIds);
+        $users = $stmt->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
+
         $results = [];
         foreach ($userIds as $userId) {
-            $results[$userId] = $this->send($userId, $type, $title, $message, $options);
+            $userOptions = $options;
+            if (isset($users[$userId])) {
+                $userOptions['user_email'] = $users[$userId]['email'];
+                $userOptions['user_data'] = $users[$userId];
+            }
+            $results[$userId] = $this->send($userId, $type, $title, $message, $userOptions);
         }
         return $results;
     }
@@ -76,13 +93,19 @@ class NotificationService
     private function sendEmail($userId, $type, $title, $message, $options = [])
     {
         try {
-            // Get user email
-            $db = \App\Core\Database::getInstance();
-            $stmt = $db->prepare("SELECT email, first_name, last_name FROM users WHERE id = ?");
-            $stmt->execute([$userId]);
-            $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+            // Get user data (use pre-fetched if available)
+            $user = $options['user_data'] ?? null;
+            $email = $options['user_email'] ?? null;
 
-            if (!$user || !$user['email']) {
+            if (!$user || !$email) {
+                $db = \App\Core\Database::getInstance();
+                $stmt = $db->prepare("SELECT email, first_name, last_name FROM users WHERE id = ?");
+                $stmt->execute([$userId]);
+                $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+                $email = $user['email'] ?? null;
+            }
+
+            if (!$user || !$email) {
                 return false;
             }
 
@@ -96,8 +119,8 @@ class NotificationService
             
             // Prepare email data
             $emailData = [
-                'to' => $user['email'],
-                'to_name' => trim($user['first_name'] . ' ' . $user['last_name']),
+                'to' => $email,
+                'to_name' => trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')),
                 'subject' => $title,
                 'template' => 'notification',
                 'data' => [
@@ -108,7 +131,7 @@ class NotificationService
                     'actionText' => $options['action_text'] ?? null,
                     'metadata' => $options['metadata'] ?? null,
                     'siteName' => \App\Services\SettingsService::get('site_name', 'Bishwo Calculator'),
-                    'baseUrl' => rtrim($_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']), '/')
+                    'baseUrl' => app_base_url()
                 ]
             ];
 
@@ -128,6 +151,8 @@ class NotificationService
         $stmt = $db->prepare("SELECT id FROM users");
         $stmt->execute();
         $userIds = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+
+        if (empty($userIds)) return [];
 
         return $this->sendBulk($userIds, $type, $title, $message, $options);
     }

@@ -94,7 +94,7 @@
 
         // Add data rows
         foreach ($logs as $log) {
-            fputcsv($output, [
+            $row = [
                 $log['id'],
                 $log['username'] ?? 'N/A',
                 $log['email'] ?? 'N/A',
@@ -107,7 +107,19 @@
                 $log['browser'] ?? 'Unknown',
                 $log['os'] ?? 'Unknown',
                 $log['login_time']
-            ]);
+            ];
+
+            // CSV Injection Protection: prepend tab if value starts with trigger characters
+            foreach ($row as &$value) {
+                if ($value !== null && strlen($value) > 0) {
+                    $firstChar = $value[0];
+                    if (in_array($firstChar, ['=', '+', '-', '@'])) {
+                        $value = "\t" . $value;
+                    }
+                }
+            }
+
+            fputcsv($output, $row);
         }
 
         fclose($output);
