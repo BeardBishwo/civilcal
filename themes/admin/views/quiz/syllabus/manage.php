@@ -143,20 +143,20 @@ if (!empty($nodesTree)) {
                 <div class="syllabus-grid-wrapper overflow-x-auto">
                     <div class="syllabus-grid" id="syllabus-container">
                         <!-- Headers -->
-                        <div class="grid-header border-r border-slate-200"><input type="checkbox" id="select-all" class="w-4 h-4 rounded cursor-pointer" onclick="toggleSelectAll()"></div>
-                        <div class="grid-header border-r border-slate-200" title="Drag to Reorder"><i class="fas fa-arrows-alt text-slate-400"></i></div>
-                        <div class="grid-header border-r border-slate-200">Lvl</div>
-                        <div class="grid-header text-left pl-4 border-r border-slate-200">Topic / Title</div>
-                        <div class="grid-header border-r border-slate-200">Time (m)</div>
-                        <div class="grid-header border-r border-slate-200">Node Type</div>
-                        <div class="grid-header border-r border-slate-200">Qty</div>
-                        <div class="grid-header border-r border-slate-200" title="Optional Questions">Opt</div>
-                        <div class="grid-header border-r border-slate-200">Each</div>
-                        <div class="grid-header border-r border-slate-200" title="Question Type Constraint">Q-Type</div>
-                        <div class="grid-header border-r border-slate-200" title="Difficulty Constraint">Diff</div>
-                        <div class="grid-header border-r border-slate-200">Marks</div>
-                        <div class="grid-header border-r border-slate-200 text-center">Hierarchy</div>
-                        <div class="grid-header border-r border-slate-200">Actions</div>
+                        <div class="grid-header"><input type="checkbox" id="select-all" class="w-4 h-4 rounded cursor-pointer" onclick="toggleSelectAll()"></div>
+                        <div class="grid-header" title="Drag to Reorder"><i class="fas fa-arrows-alt text-slate-400"></i></div>
+                        <div class="grid-header">Lvl</div>
+                        <div class="grid-header text-left pl-4">Topic / Title</div>
+                        <div class="grid-header">Time (m)</div>
+                        <div class="grid-header">Node Type</div>
+                        <div class="grid-header">Qty</div>
+                        <div class="grid-header" title="Optional Questions">Opt</div>
+                        <div class="grid-header">Each</div>
+                        <div class="grid-header" title="Question Type Constraint">Q-Type</div>
+                        <div class="grid-header" title="Difficulty Constraint">Diff</div>
+                        <div class="grid-header">Marks</div>
+                        <div class="grid-header text-center">Hierarchy</div>
+                        <div class="grid-header">Actions</div>
                         <div class="grid-header text-center">Linked</div>
                         <!-- Rows via JS -->
                     </div>
@@ -320,55 +320,104 @@ if (!empty($nodesTree)) {
 </div>
 
 <style>
-    /* Premium Grid Styles */
+    /* Premium Grid Styles - Beautiful Grid Transformation */
     .syllabus-grid {
         display: grid;
-        /* Columns: Ck(40), Drag(35), LVL(35), Title(1fr), Time(60), Type(100), Qty(55), Opt(55), Each(55), Q-Type(85), Diff(85), Marks(60), Hier(75), Act(85), Linked(250) */
-        grid-template-columns: 40px 35px 35px 1fr 60px 100px 55px 55px 55px 85px 85px 60px 75px 85px 250px;
-        background-color: #f1f5f9;
-        min-width: 1400px;
+        /* Columns: Ck(40), Drag(35), LVL(35), Title(1fr), Time(65), Type(110), Qty(60), Opt(60), Each(60), Q-Type(90), Diff(90), Marks(65), Hier(80), Act(90), Linked(250) */
+        grid-template-columns: 40px 35px 35px 1fr 65px 110px 60px 60px 60px 90px 90px 65px 80px 90px 250px;
+        background-color: #cbd5e1; /* The color of ALL grid lines */
+        gap: 1.5px; /* Distinct 1.5px grid lines everywhere */
+        min-width: 1450px;
+        border: 2px solid #94a3b8; /* Stronger outer frame */
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        border-radius: 8px 8px 0 0;
+        overflow: hidden;
     }
     .grid-header {
-        background-color: #f8fafc; color: #64748b; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 2px; display: flex; align-items: center; justify-content: center;
+        background-color: #f8fafc; 
+        color: #1e293b; 
+        font-size: 0.65rem; 
+        font-weight: 800; 
+        text-transform: uppercase; 
+        letter-spacing: 0.1em; 
+        padding: 14px 4px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+        position: sticky;
+        top: 0;
+        z-index: 20;
     }
-    .grid-row { background-color: white; border-bottom: 1px solid #f1f5f9; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-    .grid-row:hover { background-color: #f8fafc; }
-    
-    .grid-row[data-type="paper"] { background-color: #f8fafc; }
-    .grid-row[data-type="paper"] .grid-cell { color: #1e293b; font-weight: 800; }
+    .grid-row { display: none; } /* Legacy row container not used in this flat grid model */
     
     /* Clean Title Cells - Matching Sample */
     .cell-title-phase { 
-        background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important; 
-        color: white !important;
-        border-right: 1px solid #111827 !important;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important; 
+        color: #f8fafc !important;
+        position: relative;
     }
     .cell-title-section { 
         background-color: #f1f5f9 !important; 
-        color: #1d4ed8 !important;
+        color: #1e40af !important;
     }
     
     .grid-cell { 
-        padding: 0 12px; 
+        padding: 0 14px; 
         display: flex; 
         align-items: center; 
-        font-size: 0.8rem; 
+        font-size: 0.825rem; 
         color: #334155; 
+        background-color: white; /* Base background for data cells */
         position: relative; 
-        height: 48px; 
-        border-right: 1px solid #f1f5f9;
-        border-bottom: 1px solid #f1f5f9;
+        height: 54px; /* Luxury spacing */
         overflow: hidden; 
     }
+
+    /* Row Background Tints */
+    .row-phase { background-color: #f8fafc !important; color: #0f172a; font-weight: 800; }
+    .row-section { background-color: #f1f5f9 !important; color: #1e40af; font-weight: 700; }
+    .row-unit { background-color: white !important; }
+
+    /* Hierarchy Indicators - Still useful overlay on first cell */
+    .row-phase-indicator { border-left: 5px solid #0f172a !important; }
+    .row-section-indicator { border-left: 5px solid #3b82f6 !important; }
+    .row-unit-indicator { border-left: 5px solid #e2e8f0 !important; }
     
     .input-premium {
-        width: 100%; padding: 0 4px; border: 1px solid #e2e8f0; border-radius: 4px; text-align: center; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.75rem; transition: 0.2s;
-        background-color: white; height: 26px;
+        width: 100%; 
+        padding: 0 6px; 
+        border: 1px solid #e2e8f0; 
+        border-radius: 6px; 
+        text-align: center; 
+        font-family: 'Inter', system-ui, sans-serif; 
+        font-weight: 700; 
+        font-size: 0.75rem; 
+        transition: all 0.2s;
+        background-color: white; 
+        height: 28px;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
     }
-    .input-premium:focus { border-color: #6366f1; ring: 3px rgba(99, 102, 241, 0.1); outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    .input-premium:focus { 
+        border-color: #3b82f6; 
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); 
+        outline: none; 
+    }
     
     .input-readonly { 
-        width: 100%; height: 26px; background-color: #f8fafc; border: 1px solid #f1f5f9; border-radius: 4px; color: #94a3b8; font-size: 0.7rem; text-align: center; display: flex; items-center justify-center; font-weight: 800; cursor: not-allowed;
+        width: 100%; 
+        height: 28px; 
+        background-color: #f8fafc !important; 
+        border: 1px solid #e2e8f0 !important; 
+        border-radius: 6px; 
+        color: #94a3b8 !important; 
+        font-size: 0.725rem; 
+        text-align: center; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-weight: 800; 
+        cursor: not-allowed;
+        opacity: 0.8;
     }
     
     .time-input { color: #b45309; }
@@ -386,17 +435,17 @@ if (!empty($nodesTree)) {
         left: var(--guide-x);
         top: 0;
         bottom: 0;
-        width: 1px;
-        background-color: #e2e8f0;
+        width: 1.5px;
+        background-color: #cbd5e1;
         pointer-events: none;
     }
     .tree-guide-horizontal {
         position: absolute;
         left: var(--guide-x);
         top: 50%;
-        width: 12px;
-        height: 1px;
-        background-color: #e2e8f0;
+        width: 14px;
+        height: 1.5px;
+        background-color: #cbd5e1;
         pointer-events: none;
     }
     
@@ -443,22 +492,29 @@ if (!empty($nodesTree)) {
         appearance: none;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
-        background-position: right 8px center;
+        background-position: right 10px center;
         background-size: 10px;
-        border: 1px solid transparent;
+        border: 1px solid #e2e8f0;
         outline: none;
         cursor: pointer;
         font-size: 10px;
         font-weight: 800;
-        padding: 0 20px 0 10px;
-        border-radius: 9999px;
+        padding: 0 24px 0 12px;
+        border-radius: 8px; /* Slightly more modern than pill */
         text-align: center;
         width: 100% !important;
-        height: 28px;
+        height: 30px;
         transition: all 0.2s;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
     }
-    .type-select-styled:hover { border-color: rgba(99, 102, 241, 0.3); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .type-select-styled:hover { 
+        border-color: #3b82f6; 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+    }
+    .type-select-styled:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
 
     .badge-phase { background: #1e293b; color: white; }
     .badge-section { background: #e0e7ff; color: #4338ca; }
@@ -738,12 +794,14 @@ if (!empty($nodesTree)) {
             if(row.type === 'paper') typeColor = "bg-slate-800 text-white font-bold";
             if(row.type === 'section') typeColor = "bg-slate-200 text-slate-700 font-bold";
             if(row.type === 'unit') typeColor = "bg-slate-50 text-slate-400";
+            if(row.type === 'topic') typeColor = "bg-blue-50 text-blue-600 font-bold";
 
             container.appendChild(createCell(`
                 <select class="type-select-styled ${typeColor}" onchange="updateRow(${index}, 'type', this.value)">
-                    <option value="paper" ${row.type==='paper'?'selected':''}>PHASE</option>
-                    <option value="section" ${row.type==='section'?'selected':''}>SECTION</option>
-                    <option value="unit" ${row.type==='unit'?'selected':''}>UNIT</option>
+                    <option value="paper" ${row.type==='paper'?'selected':''}>Paper</option>
+                    <option value="section" ${row.type==='section'?'selected':''}>Main Category</option>
+                    <option value="unit" ${row.type==='unit'?'selected':''}>Sub Category</option>
+                    <option value="topic" ${row.type==='topic'?'selected':''}>Topic</option>
                 </select>
             `, 'justify-center px-2'));
 

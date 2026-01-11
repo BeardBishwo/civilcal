@@ -2,194 +2,345 @@
 $page_title = 'HVAC Engineering Toolkit';
 $breadcrumb = [
     ['name' => 'Home', 'url' => app_base_url('/')],
-    ['name' => 'HVAC Engineering', 'url' => '#']
+    ['name' => 'HVAC', 'url' => '#']
 ];
 ?>
 
-<?php if (!function_exists('load_theme_css')) { require_once __DIR__ . '/../partials/theme-helpers.php'; } ?>
-<?php load_theme_css('hvac.css'); ?>
+<!-- CDN Utilities -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-<div class="container">
-    <div class="hero">
-        <h1>HVAC Engineering Toolkit</h1>
-        <p>A comprehensive suite of calculators for heating, ventilation, and air conditioning professionals.</p>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    dark: '#050505',
+                    surface: '#0a0a0a',
+                    glass: 'rgba(255, 255, 255, 0.03)',
+                    'glass-border': 'rgba(255, 255, 255, 0.08)',
+                    accent: '#ffffff',
+                    'accent-muted': '#a1a1aa',
+                    'hvac-sky': '#0ea5e9', // Sky-500
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+    [x-cloak] { display: none !important; }
+    
+    .glass-card {
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .glass-card:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.04);
+        transform: translateY(-4px);
+    }
+
+    .glass-card.card-focused {
+        border-color: rgba(14, 165, 233, 0.4);
+        background: rgba(14, 165, 233, 0.04);
+        transform: scale(1.05);
+        box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(14, 165, 233, 0.1);
+        z-index: 20;
+    }
+
+    .glass-card.card-blurred {
+        opacity: 0.2;
+        filter: blur(4px);
+        transform: scale(0.95);
+        pointer-events: none;
+    }
+
+    .hero-glow {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 800px;
+        height: 400px;
+        background: radial-gradient(circle at center, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .premium-btn {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .premium-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .tool-item {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .tool-item:last-child {
+        border-bottom: none;
+    }
+
+    .tool-item:hover {
+        background: rgba(255, 255, 255, 0.03);
+        padding-left: 1.25rem;
+    }
+
+    .sticky-nav {
+        background: rgba(5, 5, 5, 0.8) !important;
+        backdrop-filter: blur(20px) !important;
+        border-bottom: 1px solid rgba(14, 165, 233, 0.2) !important;
+        border-radius: 0 0 1.5rem 1.5rem !important;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+</style>
+
+<div 
+    class="min-h-screen bg-dark text-white selection:bg-hvac-sky/30 selection:text-hvac-sky" 
+    x-data="{ 
+        activeSect: null, 
+        focusSect: null, 
+        isSticky: false, 
+        timer: null,
+        highlight(id) {
+            if (this.timer) clearTimeout(this.timer);
+            this.activeSect = id;
+            this.focusSect = id;
+            this.timer = setTimeout(() => {
+                this.focusSect = null;
+            }, 2000);
+        },
+        init() {
+            // Check for hash on load
+            if (window.location.hash) {
+                this.highlight(window.location.hash.slice(1));
+            }
+        }
+    }" 
+    @scroll.window="isSticky = window.pageYOffset > 250"
+>
+    <div class="hero-glow"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-20 pb-32">
+        <!-- Hero Section -->
+        <div class="text-center mb-20">
+            <div class="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-hvac-sky/10 border border-hvac-sky/20 text-hvac-sky text-xs font-bold tracking-widest uppercase mb-8">
+                <i class="fas fa-fan"></i>
+                <span>Climate Control</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40">
+                HVAC Engineering
+            </h1>
+            <p class="text-accent-muted text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
+                Professional calculators for load calculation, duct sizing, psychrometrics, and equipment selection.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="#loadCalculation" class="premium-btn bg-white text-black px-10 py-4 rounded-2xl font-black text-sm tracking-wide">
+                    EXPLORE TOOLS
+                </a>
+            </div>
+        </div>
+
+        <!-- Sticky Sub Nav -->
+        <div :class="isSticky ? 'h-[74px]' : ''">
+            <div 
+            class="z-[1001] transition-all duration-500"
+            :class="isSticky ? 'fixed top-0 left-0 w-full' : 'relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16'"
+        >
+                <div 
+                    class="glass-card p-2 flex items-center justify-center space-x-1 overflow-x-auto scrollbar-hide no-scrollbar transition-all duration-500"
+                    :class="isSticky ? 'sticky-nav rounded-none border-x-0 border-t-0 shadow-2xl' : 'rounded-2xl'"
+                >
+                <?php 
+                $navItems = [
+                    ['id' => 'loadCalculation', 'label' => 'Load Calc', 'icon' => 'fa-thermometer-half'],
+                    ['id' => 'ductSizing', 'label' => 'Duct Sizing', 'icon' => 'fa-wind'],
+                    ['id' => 'psychrometrics', 'label' => 'Psychrometrics', 'icon' => 'fa-cloud'],
+                    ['id' => 'equipmentSizing', 'label' => 'Equipment', 'icon' => 'fa-cog'],
+                    ['id' => 'energyAnalysis', 'label' => 'Energy', 'icon' => 'fa-bolt'],
+                ];
+                foreach ($navItems as $item): 
+                ?>
+                <a 
+                    href="#<?php echo $item['id']; ?>" 
+                    @click="highlight('<?php echo $item['id']; ?>')"
+                    class="flex items-center space-x-2 px-5 py-2.5 rounded-xl transition-all font-bold text-xs whitespace-nowrap"
+                    :class="activeSect === '<?php echo $item['id']; ?>' ? 'bg-white text-black' : 'text-accent-muted hover:text-white hover:bg-white/5'"
+                >
+                    <i class="fas <?php echo $item['icon']; ?>"></i>
+                    <span><?php echo $item['label']; ?></span>
+                </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
     </div>
 
-    <!-- Sub-navigation for categories -->
-    <div class="sub-nav" id="sub-nav">
-        <a href="#loadcalculation" class="sub-nav-btn">Load Calculation</a>
-        <a href="#ductsizing" class="sub-nav-btn">Duct Sizing</a>
-        <a href="#psychrometrics" class="sub-nav-btn">Psychrometrics</a>
-        <a href="#equipmentsizing" class="sub-nav-btn">Equipment Sizing</a>
-        <a href="#energyanalysis" class="sub-nav-btn">Energy Analysis</a>
-    </div>
-
-    <div class="category-grid">
-        <!-- Load Calculation Section -->
-        <div id="loadcalculation" class="category-card">
-            <div class="category-header">
-                <i class="fas fa-thermometer-half category-icon"></i>
-                <div class="category-title">
-                    <h3>Load Calculation</h3>
-                    <p>Calculate heating and cooling loads for accurate system sizing.</p>
+        <!-- Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <!-- Load Calculation -->
+            <div id="loadCalculation" class="glass-card group rounded-[2.5rem] p-8" :class="focusSect === 'loadCalculation' ? 'card-focused' : (focusSect ? 'card-blurred' : '')">
+                <div class="flex items-center space-x-4 mb-8">
+                    <div class="w-14 h-14 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500">
+                        <i class="fas fa-thermometer-half text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black">Load Calc</h3>
+                        <p class="text-xs font-bold text-accent-muted uppercase tracking-tighter opacity-50">Heating & Cooling</p>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('cooling-load'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Cooling Load</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('heating-load'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Heating Load</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('ventilation'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Ventilation Rate</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
                 </div>
             </div>
-            <ul class="tool-list">
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('cooling-load'); ?>" class="tool-item"><span>Cooling Load Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('heating-load'); ?>" class="tool-item"><span>Heating Load Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('ventilation'); ?>" class="tool-item"><span>Ventilation Rate Calculator</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('infiltration'); ?>" class="tool-item"><span>Infiltration Load</span> <i class="fas fa-arrow-right"></i></a>
-            </ul>
-        </div>
 
-        <!-- Duct Sizing Section -->
-        <div id="ductsizing" class="category-card">
-            <div class="category-header">
-                <i class="fas fa-vent-damper category-icon"></i>
-                <div class="category-title">
-                    <h3>Duct Sizing</h3>
-                    <p>Design and analyze HVAC duct systems for optimal airflow.</p>
+            <!-- Duct Sizing -->
+            <div id="ductSizing" class="glass-card group rounded-[2.5rem] p-8" :class="focusSect === 'ductSizing' ? 'card-focused' : (focusSect ? 'card-blurred' : '')">
+                <div class="flex items-center space-x-4 mb-8">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500">
+                        <i class="fas fa-wind text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black">Duct Sizing</h3>
+                        <p class="text-xs font-bold text-accent-muted uppercase tracking-tighter opacity-50">Air Distribution</p>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('duct-by-velocity'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Duct by Velocity</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('pressure-drop'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Pressure Drop</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('fitting-loss'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Fitting Loss</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
                 </div>
             </div>
-            <ul class="tool-list">
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('duct-by-velocity'); ?>" class="tool-item"><span>Duct Sizing by Velocity</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pressure-drop'); ?>" class="tool-item"><span>Duct Pressure Drop</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('equivalent-round'); ?>" class="tool-item"><span>Equivalent Round Duct</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('fitting-loss'); ?>" class="tool-item"><span>Duct Fitting Loss</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('grille-sizing'); ?>" class="tool-item"><span>Grille & Diffuser Sizing</span> <i class="fas fa-arrow-right"></i></a>
-            </ul>
-        </div>
 
-        <!-- Psychrometrics Section -->
-        <div id="psychrometrics" class="category-card">
-            <div class="category-header">
-                <i class="fas fa-cloud category-icon"></i>
-                <div class="category-title">
-                    <h3>Psychrometrics</h3>
-                    <p>Air properties and moisture calculations for HVAC processes.</p>
+            <!-- Psychrometrics -->
+            <div id="psychrometrics" class="glass-card group rounded-[2.5rem] p-8" :class="focusSect === 'psychrometrics' ? 'card-focused' : (focusSect ? 'card-blurred' : '')">
+                <div class="flex items-center space-x-4 mb-8">
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500">
+                        <i class="fas fa-cloud text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black">Psychrometrics</h3>
+                        <p class="text-xs font-bold text-accent-muted uppercase tracking-tighter opacity-50">Air Properties</p>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('air-properties'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Air Properties</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('enthalpy'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Enthalpy Calc</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
                 </div>
             </div>
-            <ul class="tool-list">
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('air-properties'); ?>" class="tool-item"><span>Air Properties Calculator</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('enthalpy'); ?>" class="tool-item"><span>Enthalpy Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('cooling-load-psych'); ?>" class="tool-item"><span>Cooling Load (Psych)</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('sensible-heat-ratio'); ?>" class="tool-item"><span>Sensible Heat Ratio</span> <i class="fas fa-arrow-right"></i></a>
-            </ul>
-        </div>
 
-        <!-- Equipment Sizing Section -->
-        <div id="equipmentsizing" class="category-card">
-            <div class="category-header">
-                <i class="fas fa-cog category-icon"></i>
-                <div class="category-title">
-                    <h3>Equipment Sizing</h3>
-                    <p>Size HVAC equipment including air conditioners, furnaces, chillers, and pumps.</p>
+            <!-- Equipment Sizing -->
+            <div id="equipmentSizing" class="glass-card group rounded-[2.5rem] p-8" :class="focusSect === 'equipmentSizing' ? 'card-focused' : (focusSect ? 'card-blurred' : '')">
+                <div class="flex items-center space-x-4 mb-8">
+                    <div class="w-14 h-14 rounded-2xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-500">
+                        <i class="fas fa-cog text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black">Equipment</h3>
+                        <p class="text-xs font-bold text-accent-muted uppercase tracking-tighter opacity-50">System Selection</p>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('ac-sizing'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">AC Unit Sizing</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('furnace-sizing'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Furnace Sizing</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
                 </div>
             </div>
-            <ul class="tool-list">
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('ac-sizing'); ?>" class="tool-item"><span>AC Unit Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('furnace-sizing'); ?>" class="tool-item"><span>Furnace Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('chiller-sizing'); ?>" class="tool-item"><span>Chiller Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pump-sizing'); ?>" class="tool-item"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a>
-            </ul>
-        </div>
 
-        <!-- Energy Analysis Section -->
-        <div id="energyanalysis" class="category-card">
-            <div class="category-header">
-                <i class="fas fa-bolt category-icon"></i>
-                <div class="category-title">
-                    <h3>Energy Analysis</h3>
-                    <p>Energy consumption, cost analysis, and efficiency calculations.</p>
+             <!-- Energy Analysis -->
+             <div id="energyAnalysis" class="glass-card group rounded-[2.5rem] p-8" :class="focusSect === 'energyAnalysis' ? 'card-focused' : (focusSect ? 'card-blurred' : '')">
+                <div class="flex items-center space-x-4 mb-8">
+                    <div class="w-14 h-14 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center text-green-500">
+                        <i class="fas fa-bolt text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black">Energy</h3>
+                        <p class="text-xs font-bold text-accent-muted uppercase tracking-tighter opacity-50">Efficiency & Cost</p>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('energy-consumption'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Energy Consumption</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('payback-period'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Payback Period</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
                 </div>
             </div>
-            <ul class="tool-list">
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('energy-consumption'); ?>" class="tool-item"><span>Energy Consumption</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('payback-period'); ?>" class="tool-item"><span>Payback Period</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('co2-emissions'); ?>" class="tool-item"><span>CO₂ Emissions</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('insulation-savings'); ?>" class="tool-item"><span>Insulation Savings</span> <i class="fas fa-arrow-right"></i></a>
-            </ul>
+
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const subNav = document.getElementById("sub-nav");
-    const subNavOffsetTop = subNav.offsetTop;
-    const body = document.body;
-
-    // Smooth scrolling for sub-navigation links
-    document.querySelectorAll('.sub-nav-btn').forEach(anchor => {
+    // Smooth scroll handling for sub-nav
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
-            
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                const headerOffset = 100;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-            if(targetElement) {
+                // Call highlight via Alpine
+                const root = document.querySelector('[x-data]');
+                if (root) {
+                    if (root.__x_data_stack) {
+                       root.__x_data_stack[0].highlight(this.getAttribute('href').slice(1));
+                    } else if (window.Alpine) {
+                       window.Alpine.$data(root).highlight(this.getAttribute('href').slice(1));
+                    }
+                }
+
                 window.scrollTo({
-                    top: targetElement.offsetTop - 150, // Adjust for fixed nav height
-                    behavior: 'smooth'
+                    top: offsetPosition,
+                    behavior: "smooth"
                 });
             }
         });
     });
-
-    // Sticky sub-navigation
-    window.addEventListener("scroll", function() {
-        if (window.pageYOffset >= subNavOffsetTop) {
-            body.classList.add("sticky-nav");
-        } else {
-            body.classList.remove("sticky-nav");
-        }
-    });
-
-    // Toggle tool lists
-    const categoryCards = document.querySelectorAll('.category-card');
-    categoryCards.forEach(card => {
-        // Expand all cards by default
-        card.classList.add('active');
-
-        card.addEventListener('click', (e) => {
-            // Prevent clicks on links from toggling the card
-            if (e.target.closest('a')) return;
-            
-            card.classList.toggle('active');
-        });
-    });
-
-    // Active state for sub-nav buttons with expand and blur effect
-    const subNavButtons = document.querySelectorAll('.sub-nav-btn');
-    subNavButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            subNavButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            
-            // Get target card ID from href
-            const targetId = button.getAttribute('href').slice(1);
-            const targetCard = document.getElementById(targetId);
-            
-            // Apply focused and blur effects
-            categoryCards.forEach(card => {
-                card.classList.remove('focused', 'blurred');
-                if (card.id === targetId) {
-                    card.classList.add('focused');
-                } else {
-                    card.classList.add('blurred');
-                }
-            });
-            
-            // Remove all effects after 1 second
-            setTimeout(() => {
-                categoryCards.forEach(card => {
-                    card.classList.remove('focused', 'blurred');
-                });
-            }, 1000);
-        });
-    });
-});
 </script>
-
-<?php ?>
-

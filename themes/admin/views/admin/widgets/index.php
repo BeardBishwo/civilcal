@@ -105,6 +105,7 @@ $page_title = 'Widget Management - ' . \App\Services\SettingsService::get('site_
                             <div class="card-footer-compact">
                                 <div class="flex-grow-1 flex-align-center gap-2">
                                     <form method="post" action="<?php echo app_base_url('/admin/widgets/toggle/'); ?><?php echo $widget->getId(); ?>" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                                         <button type="submit" class="action-btn-icon" title="<?php echo $widget->isEnabled() ? 'Disable' : 'Enable'; ?>">
                                             <i class="fas <?php echo $widget->isEnabled() ? 'fa-pause text-warning' : 'fa-play text-success'; ?>"></i>
                                         </button>
@@ -117,6 +118,7 @@ $page_title = 'Widget Management - ' . \App\Services\SettingsService::get('site_
                                     </a>
                                 </div>
                                 <form method="post" action="<?php echo app_base_url('/admin/widgets/delete/'); ?><?php echo $widget->getId(); ?>" id="delete-widget-<?php echo $widget->getId(); ?>">
+                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                                     <button type="button" class="action-btn-icon delete-btn" title="Delete" onclick="deleteWidget('<?php echo $widget->getId(); ?>')">
                                         <i class="fas fa-trash"></i>
                                     </button>

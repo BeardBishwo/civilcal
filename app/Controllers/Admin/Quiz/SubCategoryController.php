@@ -24,41 +24,53 @@ class SubCategoryController extends Controller
      */
     public function index()
     {
-        $parentId = $_GET['parent_id'] ?? null;
+        $courseId = $_GET['course_id'] ?? null;
+        $educationLevelId = $_GET['education_level_id'] ?? null;
+        $categoryId = $_GET['parent_id'] ?? null;
 
-        // 1. Fetch Sub-Categories (Nodes with a Parent)
+        // Fetch dropdown options for filters
+        $courses = $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC")->fetchAll();
+        
+        $eduLevelSql = "SELECT id, title FROM syllabus_nodes WHERE type = 'education_level'";
+        $eduLevelParams = [];
+        if ($courseId) { $eduLevelSql .= " AND parent_id = :pid"; $eduLevelParams['pid'] = $courseId; }
+        $educationLevels = $this->db->query($eduLevelSql . " ORDER BY order_index ASC", $eduLevelParams)->fetchAll();
+
+        $categorySql = "SELECT id, title FROM syllabus_nodes WHERE type = 'category'";
+        $categoryParams = [];
+        if ($educationLevelId) { $categorySql .= " AND parent_id = :pid"; $categoryParams['pid'] = $educationLevelId; }
+        $categories = $this->db->query($categorySql . " ORDER BY order_index ASC", $categoryParams)->fetchAll();
+
+        // 1. Fetch Sub-Categories with Parent Info
         $sql = "
-            SELECT child.*, 
-                   parent.title as parent_title, parent.is_active as parent_active,
-                   level.is_active as grandparent_active,
-                   course.is_active as greatgrandparent_active
-            FROM syllabus_nodes child
-            LEFT JOIN syllabus_nodes parent ON child.parent_id = parent.id
-            LEFT JOIN syllabus_nodes level ON parent.parent_id = level.id
-            LEFT JOIN syllabus_nodes course ON level.parent_id = course.id
-            WHERE child.parent_id IS NOT NULL
+            SELECT sc.*, 
+                   c.title as parent_title, c.is_active as parent_active,
+                   el.title as education_level_title, el.is_active as education_level_active,
+                   co.title as course_title, co.is_active as course_active
+            FROM syllabus_nodes sc
+            LEFT JOIN syllabus_nodes c ON sc.parent_id = c.id
+            LEFT JOIN syllabus_nodes el ON c.parent_id = el.id
+            LEFT JOIN syllabus_nodes co ON el.parent_id = co.id
+            WHERE sc.type IN ('unit', 'section', 'part')
         ";
         
         $params = [];
-        
-        if ($parentId) {
-            $sql .= " AND child.parent_id = :pid";
-            $params['pid'] = $parentId;
-        }
+        if ($courseId) { $sql .= " AND co.id = :course_id"; $params['course_id'] = $courseId; }
+        if ($educationLevelId) { $sql .= " AND el.id = :ed_level_id"; $params['ed_level_id'] = $educationLevelId; }
+        if ($categoryId) { $sql .= " AND sc.parent_id = :category_id"; $params['category_id'] = $categoryId; }
 
-        $sql .= " ORDER BY (child.is_active = 1 AND IFNULL(parent.is_active, 1) = 1 AND IFNULL(level.is_active, 1) = 1 AND IFNULL(course.is_active, 1) = 1) DESC, parent.title ASC, child.order_index ASC, child.parent_id ASC";
+        $sql .= " ORDER BY (sc.is_active = 1 AND IFNULL(c.is_active, 1) = 1 AND IFNULL(el.is_active, 1) = 1) DESC, co.title ASC, el.title ASC, c.title ASC, sc.order_index ASC";
 
-        $stmt = $this->db->getPdo()->prepare($sql);
-        $stmt->execute($params);
-        $subCategories = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-        // 2. Fetch Main Categories (For the Dropdown Filter & Modal)
-        $parents = $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'category' ORDER BY title ASC")->fetchAll();
+        $subCategories = $this->db->query($sql, $params)->fetchAll();
 
         return $this->view('admin/quiz/subcategories/index', [
             'subCategories' => $subCategories,
-            'parents' => $parents,
-            'selectedParent' => $parentId
+            'courses' => $courses,
+            'educationLevels' => $educationLevels,
+            'parents' => $categories, // used for dropdown in modal/filter
+            'selectedCourse' => $courseId,
+            'selectedEducationLevel' => $educationLevelId,
+            'selectedParent' => $categoryId
         ]);
     }
 
@@ -106,14 +118,17 @@ class SubCategoryController extends Controller
             'is_active' => 1
         ];
 
+
         // Determine type based on parent
         $parent = $this->db->findOne('syllabus_nodes', ['id' => $parentId]);
         if ($parent) {
             if ($parent['type'] == 'paper') $data['type'] = 'part';
             elseif ($parent['type'] == 'part') $data['type'] = 'section';
             elseif ($parent['type'] == 'section') $data['type'] = 'unit';
+            elseif ($parent['type'] == 'unit') $data['type'] = 'topic';
             else $data['type'] = 'unit';
         }
+
 
         if ($this->syllabusService->createNode($data)) {
             echo json_encode(['status' => 'success']);
@@ -169,8 +184,35 @@ class SubCategoryController extends Controller
         echo json_encode(['status' => 'success']);
     }
 
+    /**
+     * Get Stats for Deletion Modal
+     */
+    public function getDeleteStats($id)
+    {
+        $counts = $this->syllabusService->getChildTypeCounts($id);
+        echo json_encode(['status' => 'success', 'counts' => $counts]);
+    }
+
+    /**
+     * Delete SubCategory with Selective Cascade
+     */
     public function delete($id)
     {
+        // Check for JSON input (flags)
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        // Selective Delete
+        if (isset($input['delete_types']) && is_array($input['delete_types'])) {
+            $deleteTypes = $input['delete_types'];
+            if ($this->syllabusService->deleteWithPreservation($id, $deleteTypes)) {
+                echo json_encode(['status' => 'success']);
+            } else {
+                echo json_encode(['status' => 'error']);
+            }
+            return;
+        }
+
+        // Fallback
         if ($this->syllabusService->deleteNode($id)) {
             echo json_encode(['status' => 'success']);
         } else {

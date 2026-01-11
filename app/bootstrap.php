@@ -72,13 +72,16 @@ if (APP_DEBUG) {
 ini_set("log_errors", "1");
 ini_set("error_log", $__logsDir . "/php_error.log");
 
+// Initialize Monitoring (Sentry)
+\App\Services\MonitoringService::init();
+
 // Global error/exception/shutdown handlers
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {
     if (!(error_reporting() & $errno)) {
         return false;
     }
 
-    \App\Services\Logger::error($errstr, [
+    \App\Core\Logger::error($errstr, [
         "type" => $errno,
         "file" => $errfile,
         "line" => $errline,
@@ -87,22 +90,32 @@ set_error_handler(function ($errno, $errstr, $errfile, $errline) {
 });
 
 set_exception_handler(function ($e) {
-    \App\Services\Logger::exception($e);
+    \App\Services\MonitoringService::captureException($e);
 
-    if (APP_DEBUG) {
+    if (defined('APP_DEBUG') && APP_DEBUG) {
         http_response_code(500);
         echo "Exception: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, "UTF-8");
+    } else {
+        http_response_code(500);
+        // Load clean error page
+        if (file_exists(BASE_PATH . '/themes/admin/views/errors/500.php')) {
+            require BASE_PATH . '/themes/admin/views/errors/500.php';
+        } else {
+            echo "<h1>Server Error</h1><p>Something went wrong. Please try again later.</p>";
+        }
     }
 });
 
 register_shutdown_function(function () {
     $error = error_get_last();
     if ($error && $error["type"] === E_ERROR) {
-        \App\Services\Logger::error($error["message"], [
+        // Fatal error
+        \App\Core\Logger::error($error["message"], [
             "type" => $error["type"],
             "file" => $error["file"],
             "line" => $error["line"],
         ]);
+        // Ideally send to Sentry too if possible
     }
 });
 

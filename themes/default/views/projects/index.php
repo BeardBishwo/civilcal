@@ -1,157 +1,268 @@
 <?php require_once dirname(__DIR__) . '/partials/header.php'; ?>
 
-<div class="container py-5">
-    <div class="row align-items-center mb-5 pb-3 border-bottom border-secondary">
-        <div class="col-md-8">
-            <h1 class="display-5 fw-bold text-light mb-1">My Projects</h1>
-            <p class="text-muted mb-0">Manage and organize your calculation results.</p>
+<!-- CDN Utilities -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    dark: '#000000',
+                    surface: '#0a0a0a',
+                    glass: 'rgba(255, 255, 255, 0.03)',
+                    'glass-border': 'rgba(255, 255, 255, 0.1)',
+                    accent: '#ffffff',
+                    'accent-muted': '#cbd5e1',
+                },
+                backgroundImage: {
+                    'glow-gradient': 'radial-gradient(circle at center, rgba(255,255,255,0.05) 0%, transparent 70%)',
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+    [x-cloak] { display: none !important; }
+    
+    .glass-card {
+        background: var(--glass-bg, rgba(255, 255, 255, 0.02));
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .glass-card:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.04);
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .premium-btn {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .premium-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+    }
+
+    .input-premium {
+        background: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        transition: all 0.3s ease;
+    }
+
+    .input-premium:focus {
+        border-color: rgba(255, 255, 255, 0.4) !important;
+        background: rgba(255, 255, 255, 0.06) !important;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+    }
+</style>
+
+<div class="min-h-screen pt-12 pb-20 px-4 sm:px-6 lg:px-8 bg-dark text-white" x-data="{ openModal: false }">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 space-y-4 md:space-y-0 pb-8 border-b border-white/10">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-white mb-2">My Projects</h1>
+                <p class="text-accent-muted text-lg opacity-80">Organize and manage your professional estimations.</p>
+            </div>
+            <div>
+                <button 
+                    @click="openModal = true"
+                    class="premium-btn bg-white text-black px-8 py-3.5 rounded-2xl font-bold flex items-center space-x-2 group"
+                >
+                    <i class="fas fa-plus transition-transform group-hover:rotate-90"></i>
+                    <span>Start New Project</span>
+                </button>
+            </div>
         </div>
-        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-            <button class="btn btn-primary btn-lg shadow-sm" data-bs-toggle="modal" data-bs-target="#createProjectModal">
-                <i class="fas fa-plus me-2"></i> New Project
-            </button>
+
+        <!-- Success Messages -->
+        <?php if (isset($_GET['success'])): ?>
+            <div 
+                x-data="{ show: true }" 
+                x-show="show" 
+                x-init="setTimeout(() => show = false, 5000)"
+                class="mb-8 p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between text-white backdrop-blur-md"
+            >
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+                        <i class="fas fa-check text-black text-xs"></i>
+                    </div>
+                    <span><?php echo $_GET['success'] == 'deleted' ? 'Project successfully removed.' : 'Project created successfully.'; ?></span>
+                </div>
+                <button @click="show = false" class="text-white/40 hover:text-white transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        <?php endif; ?>
+
+        <!-- Content Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <?php if (empty($projects)): ?>
+                <div class="col-span-full py-32 flex flex-col items-center text-center">
+                    <div class="w-24 h-24 mb-8 bg-white/5 rounded-full flex items-center justify-center border border-white/10 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-glow-gradient"></div>
+                        <i class="fas fa-folder-open text-3xl text-white/20"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">No projects drafted yet</h3>
+                    <p class="text-accent-muted mb-8 max-w-sm mx-auto">Click the button below to initialize your first project workspace.</p>
+                    <button 
+                        @click="openModal = true"
+                        class="text-white border border-white/20 hover:border-white/40 px-6 py-2.5 rounded-xl transition-all"
+                    >
+                        Create Workspace
+                    </button>
+                </div>
+            <?php else: ?>
+                <?php foreach ($projects as $project): ?>
+                    <div 
+                        class="glass-card group relative p-6 rounded-3xl"
+                        x-data="{ dropdownOpen: false }"
+                    >
+                        <div class="flex justify-between items-start mb-6">
+                            <div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-colors">
+                                <i class="fas fa-folder text-xl text-white/60"></i>
+                            </div>
+                            
+                            <!-- Dropdown -->
+                            <div class="relative">
+                                <button 
+                                    @click="dropdownOpen = !dropdownOpen"
+                                    @click.away="dropdownOpen = false"
+                                    class="w-10 h-10 flex items-center justify-center text-white/40 hover:text-white transition-colors"
+                                >
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                
+                                <div 
+                                    x-show="dropdownOpen"
+                                    x-cloak
+                                    x-transition:enter="transition ease-out duration-200"
+                                    x-transition:enter-start="opacity-0 scale-95"
+                                    x-transition:enter-end="opacity-100 scale-100"
+                                    class="absolute right-0 mt-2 w-56 bg-surface border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden backdrop-blur-xl"
+                                >
+                                    <a href="<?php echo app_base_url('/projects/view/' . $project['id']); ?>" class="flex items-center space-x-3 px-4 py-3 text-sm text-accent-muted hover:text-white hover:bg-white/5 transition-colors">
+                                        <i class="fas fa-eye w-5"></i>
+                                        <span>View Details</span>
+                                    </a>
+                                    <div class="h-px bg-white/5 mx-4"></div>
+                                    <form action="<?php echo app_base_url('/projects/delete/' . $project['id']); ?>" method="POST" onsubmit="return confirm('Archive this project? This will not delete internal calculations.');">
+                                        <button type="submit" class="w-full flex items-center space-x-3 px-4 py-3 text-sm text-red-500 hover:text-red-400 hover:bg-white/5 transition-colors text-left">
+                                            <i class="fas fa-trash-alt w-5"></i>
+                                            <span>Archive Project</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="<?php echo app_base_url('/projects/view/' . $project['id']); ?>" class="block">
+                            <h4 class="text-xl font-bold text-white mb-2 group-hover:text-accent transition-colors">
+                                <?php echo htmlspecialchars($project['name']); ?>
+                            </h4>
+                            <p class="text-accent-muted text-sm line-clamp-2 min-h-[2.5rem] opacity-70 mb-6 font-medium">
+                                <?php echo htmlspecialchars($project['description'] ?: 'Organized estimation workspace.'); ?>
+                            </p>
+                            
+                            <div class="flex items-center justify-between pt-5 border-t border-white/5">
+                                <div class="flex items-center text-xs font-bold uppercase tracking-wider text-white/40">
+                                    <i class="fas fa-calculator mr-2 text-[10px]"></i>
+                                    <span><?php echo $project['calculation_count']; ?> Nodes</span>
+                                </div>
+                                <div class="text-xs font-medium text-white/30">
+                                    <?php echo date('M d, Y', strtotime($project['updated_at'])); ?>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 
-    <?php if (isset($_GET['success'])): ?>
-        <div class="alert alert-success alert-dismissible fade show bg-success text-white border-0 shadow-sm" role="alert">
-            <i class="fas fa-check-circle me-2"></i>
-            <?php echo $_GET['success'] == 'deleted' ? 'Project deleted successfully.' : 'Project created successfully.'; ?>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
+    <!-- Modal Backdrop -->
+    <template x-teleport="body">
+        <div 
+            x-show="openModal" 
+            x-cloak
+            class="fixed inset-0 z-[1060] flex items-center justify-center px-4"
+        >
+            <!-- Overlay -->
+            <div 
+                x-show="openModal"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                @click="openModal = false"
+                class="fixed inset-0 bg-black/95 backdrop-blur-sm"
+            ></div>
 
-    <div class="row g-4">
-        <?php if (empty($projects)): ?>
-            <div class="col-12">
-                <div class="empty-state-card text-center py-5 rounded-3">
-                    <div class="mb-4 icon-glow">
-                        <i class="fas fa-folder-open fa-4x text-muted"></i>
-                    </div>
-                    <h3 class="text-light fw-bold">No projects yet</h3>
-                    <p class="text-muted mb-4">Create your first project to start organizing your work.</p>
-                    <button class="btn btn-outline-primary px-4" data-bs-toggle="modal" data-bs-target="#createProjectModal">
-                        Create First Project
-                    </button>
-                </div>
-            </div>
-        <?php else: ?>
-            <?php foreach ($projects as $project): ?>
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 project-card bg-dark border-secondary shadow-sm">
-                        <div class="card-body p-4 d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="icon-wrapper">
-                                    <i class="fas fa-folder fa-lg text-primary"></i>
-                                </div>
-                                <div class="dropdown">
-                                    <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary shadow">
-                                        <li>
-                                            <a class="dropdown-item text-light hover-bg-light" href="<?php echo app_base_url('/projects/view/' . $project['id']); ?>">
-                                                <i class="fas fa-eye me-2 text-primary"></i> View Details
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider bg-secondary"></li>
-                                        <li>
-                                            <form action="<?php echo app_base_url('/projects/delete/' . $project['id']); ?>" method="POST" onsubmit="return confirm('Are you sure? This will not delete the calculations inside, but unlink them.');">
-                                                <button type="submit" class="dropdown-item text-danger hover-bg-light"><i class="fas fa-trash-alt me-2"></i>Delete Project</button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </div>
+            <!-- Modal Content -->
+            <div 
+                x-show="openModal"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95"
+                class="relative bg-surface border border-white/10 w-full max-w-lg rounded-[2.5rem] overflow-hidden shadow-[0_0_100px_rgba(255,255,255,0.05)]"
+            >
+                <form action="<?php echo app_base_url('/projects/store'); ?>" method="POST">
+                    <div class="p-8 sm:p-12">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-3xl font-black">New Workspace</h2>
+                            <button @click.prevent="openModal = false" class="text-white/40 hover:text-white transition-colors">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-3">Workspace Name</label>
+                                <input 
+                                    type="text" 
+                                    name="name" 
+                                    required 
+                                    placeholder="e.g. Modern Villa Estimation"
+                                    class="input-premium w-full px-6 py-4 rounded-2xl text-white placeholder-white/20"
+                                >
                             </div>
-                            
-                            <h4 class="card-title text-light mb-2">
-                                <a href="<?php echo app_base_url('/projects/view/' . $project['id']); ?>" class="text-decoration-none text-reset stretched-link">
-                                    <?php echo htmlspecialchars($project['name']); ?>
-                                </a>
-                            </h4>
-                            <p class="card-text text-muted small mb-4 flex-grow-1">
-                                <?php echo htmlspecialchars($project['description'] ?: 'No description provided.'); ?>
-                            </p>
-                            
-                            <div class="project-meta d-flex justify-content-between align-items-center pt-3 border-top border-secondary">
-                                <small class="text-muted">
-                                    <i class="fas fa-calculator me-1"></i> 
-                                    <span class="fw-bold text-light"><?php echo $project['calculation_count']; ?></span> items
-                                </small>
-                                <small class="text-muted">
-                                    <i class="far fa-clock me-1"></i> <?php echo date('M d, Y', strtotime($project['updated_at'])); ?>
-                                </small>
+
+                            <div>
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-3">Scope Description</label>
+                                <textarea 
+                                    name="description" 
+                                    rows="4" 
+                                    placeholder="Brief outline of project scope..."
+                                    class="input-premium w-full px-6 py-4 rounded-2xl text-white placeholder-white/20 resize-none"
+                                ></textarea>
                             </div>
                         </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </div>
-</div>
 
-<!-- Create Project Modal -->
-<div class="modal fade" id="createProjectModal" tabindex="-1" aria-hidden="true" style="z-index: 1055;">
-    <div class="modal-dialog modal-dialog-centered">
-        <form action="<?php echo app_base_url('/projects/store'); ?>" method="POST" id="create-project-form">
-            <div class="modal-content bg-dark border-secondary text-light">
-                <div class="modal-header border-secondary">
-                    <h5 class="modal-title"><i class="fas fa-folder-plus me-2 text-primary"></i>Create New Project</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label text-muted">Project Name</label>
-                        <input type="text" name="name" class="form-control bg-dark text-light border-secondary" required placeholder="e.g. Smith Residence">
+                    <div class="px-8 pb-12 sm:px-12">
+                        <button type="submit" class="premium-btn w-full bg-white text-black py-5 rounded-3xl font-black tracking-wide">
+                            CREATE WORKSPACE
+                        </button>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label text-muted">Description (Optional)</label>
-                        <textarea name="description" class="form-control bg-dark text-light border-secondary" rows="3" placeholder="Brief details about this project..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer border-secondary">
-                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary px-4">Create Project</button>
-                </div>
+                </form>
             </div>
-        </form>
-    </div>
+        </div>
+    </template>
 </div>
-
-<style>
-.project-card { 
-    transition: all 0.3s ease; 
-    background: #1e1e1e;
-    border-radius: 12px;
-    overflow: hidden;
-}
-.project-card:hover { 
-    transform: translateY(-5px); 
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3) !important;
-    border-color: #4ecdc4 !important;
-}
-.empty-state-card {
-    background: rgba(255,255,255,0.02);
-    border: 1px dashed rgba(255,255,255,0.1);
-}
-.icon-wrapper {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(78, 205, 196, 0.1);
-    border-radius: 50%;
-}
-.hover-bg-light:hover {
-    background-color: rgba(255,255,255,0.1);
-}
-.form-control:focus {
-    background-color: #1a1a1a;
-    color: #fff;
-    border-color: #4ecdc4;
-    box-shadow: 0 0 0 0.25rem rgba(78, 205, 196, 0.25);
-}
-</style>
 
 <?php require_once dirname(__DIR__) . '/partials/footer.php'; ?>

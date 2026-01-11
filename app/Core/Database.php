@@ -7,7 +7,9 @@ use PDOException;
 
 class Database {
     private static $instance = null;
-    private $pdo;
+    private $pdoWrite;
+    private $pdoRead;
+    private $inTransaction = false;
     
     private function __construct() {
         $configFile = __DIR__ . '/../../config/database.php';
@@ -16,30 +18,31 @@ class Database {
             throw new \Exception("Database configuration file not found: $configFile");
         }
         
-        // Include the file to get the config array
         $config = include $configFile;
         
-        if (!is_array($config)) {
-            throw new \Exception("Database configuration is not an array. Got: " . gettype($config));
-        }
+        // Connect to Write (Master)
+        $this->pdoWrite = $this->createConnection($config, 'write');
         
-        // Validate required configuration keys
-        $requiredKeys = ['host', 'database', 'username'];
-        foreach ($requiredKeys as $key) {
-            if (!isset($config[$key])) {
-                throw new \Exception("Missing required database configuration key: $key");
-            }
+        // Connect to Read (Replica) - fallback to write if not configured
+        if (isset($config['read'])) {
+            $this->pdoRead = $this->createConnection(array_merge($config, $config['read']), 'read');
+        } else {
+            $this->pdoRead = $this->pdoWrite;
         }
-        
+    }
+
+    private function createConnection($config, $type) {
         try {
-            $dsn = "mysql:host={$config['host']};dbname={$config['database']}";
+            $host = $config['host'] ?? '127.0.0.1';
+            $dsn = "mysql:host={$host};dbname={$config['database']}";
+            
             if (isset($config['charset'])) {
                 $dsn .= ";charset={$config['charset']}";
             }
             
             $password = $config['password'] ?? '';
             
-            $this->pdo = new PDO(
+            return new PDO(
                 $dsn,
                 $config['username'],
                 $password,
@@ -51,7 +54,7 @@ class Database {
                 ]
             );
         } catch (PDOException $e) {
-            throw new \Exception("Database connection failed: " . $e->getMessage());
+            throw new \Exception("Database ($type) connection failed: " . $e->getMessage());
         }
     }
     
@@ -63,23 +66,40 @@ class Database {
     }
     
     public function getPdo() {
-        return $this->pdo;
+        return $this->pdoWrite; // Default to write connection for backward compatibility
+    }
+    
+    public function getReadPdo() {
+        return $this->pdoRead;
+    }
+
+    public function beginTransaction() {
+        $this->inTransaction = true;
+        return $this->pdoWrite->beginTransaction();
+    }
+
+    public function commit() {
+        $this->inTransaction = false;
+        return $this->pdoWrite->commit();
+    }
+
+    public function rollBack() {
+        $this->inTransaction = false;
+        return $this->pdoWrite->rollBack();
     }
     
     public function query($sql, $params = []) {
-        /**
-         * Execute a prepared statement and return a PDOCompat wrapper around
-         * the PDOStatement so legacy code can use fetch_assoc() while modern
-         * code can still call fetchAll()/fetch() via delegation.
-         *
-         * @param string $sql
-         * @param array $params
-         * @return \App\Core\PDOCompat|\PDOStatement
-         */
-        $stmt = $this->pdo->prepare($sql);
+        // Determine connection
+        // Use Write connection if:
+        // 1. We are in a transaction (crucial for consistency)
+        // 2. It's not a SELECT statement
+        $isSelect = stripos(trim($sql), 'SELECT') === 0;
+        
+        $pdo = ($this->inTransaction || !$isSelect) ? $this->pdoWrite : $this->pdoRead;
+        
+        $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
 
-        // Return a compatibility wrapper that exposes fetch_assoc()
         if (class_exists('\App\Core\PDOCompat')) {
             return new \App\Core\PDOCompat($stmt);
         }
@@ -88,7 +108,9 @@ class Database {
     }
     
     public function prepare($sql) {
-        return $this->pdo->prepare($sql);
+        // For manual prepare, we default to Write to be safe,
+        // or we could analyze the SQL. For now, safety first.
+        return $this->pdoWrite->prepare($sql);
     }
     
     public function insert($table, $data) {
@@ -149,6 +171,7 @@ class Database {
         }
         
         if ($limit) {
+            $limit = (int)$limit; // Sanitize to prevent SQL injection
             $sql .= " LIMIT {$limit}";
         }
         
@@ -190,19 +213,7 @@ class Database {
      * @return string The last inserted ID
      */
     public function lastInsertId() {
-        return $this->pdo->lastInsertId();
-    }
-
-    public function beginTransaction() {
-        return $this->pdo->beginTransaction();
-    }
-
-    public function commit() {
-        return $this->pdo->commit();
-    }
-
-    public function rollBack() {
-        return $this->pdo->rollBack();
+        return $this->pdoWrite->lastInsertId();
     }
 }
 ?>

@@ -70,9 +70,8 @@ class UnitConverter
             $name = $fieldSchema['name'];
             $value = $inputs[$name] ?? null;
             if ($value === null || $value === '') {
-                $type = $fieldSchema['type'] ?? 'string';
-                $default = $fieldSchema['default'] ?? (($type === 'number' || $type === 'integer' || $type === 'float') ? 0 : '');
-                $normalized[$name] = $default;
+                // Return null for missing optional values so formulas can detect them
+                $normalized[$name] = null;
                 continue;
             }
             

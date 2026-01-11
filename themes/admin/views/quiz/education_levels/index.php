@@ -43,10 +43,10 @@ $stats = [
         <!-- Single Row Creation Toolbar -->
         <div class="creation-toolbar">
             <h5 class="toolbar-title">Create New Level</h5>
-            <form id="addLevelForm" class="creation-form">
+            <form id="addLevelForm" class="creation-form" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: nowrap;">
                 
                 <!-- Course Select -->
-                <div class="input-group-premium" style="flex: 2; min-width: 200px;">
+                <div class="input-group-premium" style="flex: 1.5; min-width: 150px; flex-shrink: 1;">
                     <i class="fas fa-university icon"></i>
                     <select name="parent_id" id="parentCourseSelect" class="form-input-premium" required style="padding-left: 2.25rem;">
                         <option value="" disabled <?php echo !$selectedCourse ? 'selected' : ''; ?>>Select Course...</option>
@@ -59,18 +59,18 @@ $stats = [
                 </div>
 
                 <!-- Title Input -->
-                <div class="input-group-premium" style="flex: 3; min-width: 200px;">
+                <div class="input-group-premium" style="flex: 2; min-width: 150px; flex-shrink: 1;">
                     <i class="fas fa-heading icon"></i>
                     <input type="text" name="title" class="form-input-premium" placeholder="Level Name (e.g. Bachelor)" required>
                 </div>
                 
                 <!-- Slug Input -->
-                <div class="input-group-premium" style="flex: 2; min-width: 150px;">
+                <div class="input-group-premium" style="flex: 1; min-width: 120px; flex-shrink: 1;">
                     <i class="fas fa-link icon"></i>
                     <input type="text" name="slug" class="form-input-premium" placeholder="Slug (Optional)">
                 </div>
 
-                <button type="button" onclick="saveLevel()" class="btn-create-premium">
+                <button type="button" onclick="saveLevel()" class="btn-create-premium" style="flex-shrink: 0;">
                     <i class="fas fa-plus"></i> ADD
                 </button>
             </form>
@@ -82,7 +82,7 @@ $stats = [
                 <div class="filter-group">
                     <span class="filter-label">FILTER DATA:</span>
                     <form method="GET" id="filterForm" style="margin:0;">
-                        <select name="course_id" id="courseFilter" class="filter-select" style="width: 250px;">
+                        <select name="course_id" id="courseFilter" class="filter-select-search" style="width: 250px;">
                             <option value="">All Courses</option>
                             <?php foreach ($courses as $c): ?>
                                 <option value="<?php echo $c['id']; ?>" <?php echo $selectedCourse == $c['id'] ? 'selected' : ''; ?>>
@@ -99,7 +99,6 @@ $stats = [
                 </div>
             </div>
             <div class="toolbar-right">
-                <div class="drag-hint"><i class="fas fa-arrows-alt"></i> Drag handle to reorder (Global)</div>
             </div>
         </div>
 
@@ -264,17 +263,108 @@ async function saveLevel() {
     } catch(e) { Swal.fire('Error', 'Server Error', 'error'); }
 }
 
-function deleteLevel(id) {
-    Swal.fire({
-        title: 'Delete Level?', text: "This cannot be undone.", icon: 'warning',
-        showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#cbd5e1', confirmButtonText: 'Delete'
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            const res = await fetch('<?php echo app_base_url('admin/quiz/education-levels/delete/'); ?>' + id, {method:'POST'});
-            const d = await res.json();
-            if(d.status==='success') location.reload();
+// Custom Delete Logic with Selective Cascade (Universal)
+async function deleteLevel(id) {
+    try {
+        // 1. Fetch Stats First
+        const res = await fetch('<?php echo app_base_url('admin/quiz/education-levels/delete-stats/'); ?>' + id);
+        const data = await res.json();
+        
+        if(data.status !== 'success') {
+            Swal.fire('Error', 'Could not fetch level data', 'error');
+            return;
         }
-    });
+
+        const counts = data.counts;
+        const hasChildren = Object.keys(counts).length > 0;
+
+        // 2. Prepare Modal Content
+        let html = `<div class="text-left mb-4 text-sm text-slate-600">
+            This level contains the following items. Uncheck items you want to <b>PRESERVE</b> (keep). 
+            Checked items will be <b>DELETED</b> forever.
+        </div>`;
+        
+        html += `<table style="width: 100%; border-collapse: collapse; border: 2px solid #94a3b8; margin-top: 10px; background: white;">`;
+        
+        // Downward only: Main Category -> Sub Category -> Topic -> Position
+        const typeConfig = [
+            { key: 'category', label: 'Main Categories' },
+            { key: 'sub_category', label: 'Sub Categories', altKeys: ['unit'] }, 
+            { key: 'topic', label: 'Topics' },
+            { key: 'position', label: 'Position Levels' }
+        ];
+
+        typeConfig.forEach(item => {
+            let count = counts[item.key] || 0;
+            
+            // Merge counts from alternative keys
+            if(item.altKeys) {
+                item.altKeys.forEach(k => { count += (counts[k] || 0); });
+            }
+
+            // Always show all types as requested
+            const isZero = count === 0;
+            const opacityClass = isZero ? 'opacity-50 grayscale' : '';
+            const bgClass = isZero ? 'bg-slate-50' : 'bg-white hover:bg-slate-50';
+            
+            html += `
+            <tr style="background: ${isZero ? '#f8fafc' : 'white'}; opacity: ${isZero ? '0.6' : '1'}; transition: background 0.2s;">
+                <td style="padding: 15px 12px; border: 1.5px solid #cbd5e1; width: 50px; text-align: center;">
+                    <input type="checkbox" class="delete-type-check" value="${item.key}" ${isZero ? 'disabled' : 'checked'} style="width: 18px; height: 18px; cursor: pointer;">
+                </td>
+                <td style="padding: 15px 15px; border: 1.5px solid #cbd5e1; font-weight: 700; color: #1e293b; font-size: 0.9rem;">
+                    ${item.label}
+                </td>
+                <td style="padding: 15px 15px; border: 1.5px solid #cbd5e1; text-align: right;">
+                    <span style="background: #f1f5f9; padding: 5px 14px; border-radius: 20px; border: 1px solid #cbd5e1; font-weight: 800; font-size: 0.75rem; color: #64748b; display: inline-block;">
+                        ${count} items
+                    </span>
+                </td>
+            </tr>`;
+        });
+        html += `</table>`;
+
+        // 3. Show Modal
+        Swal.fire({
+            title: 'Delete Level?',
+            html: html,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#cbd5e1',
+            confirmButtonText: 'Delete Selected',
+            didOpen: () => {
+                // Focus styling or logic if needed
+            }
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const deleteTypes = [];
+                document.querySelectorAll('.delete-type-check:checked').forEach(el => deleteTypes.push(el.value));
+                
+                const payload = {
+                    delete_types: deleteTypes
+                };
+
+                const delRes = await fetch('<?php echo app_base_url('admin/quiz/education-levels/delete/'); ?>' + id, {
+                    method:'POST', 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                
+                const d = await delRes.json();
+                if(d.status==='success') {
+                    Swal.fire({icon:'success', title:'Deleted', showConfirmButton:false, timer:1000})
+                    .then(() => location.reload());
+                } else {
+                    Swal.fire('Error', 'Deletion failed', 'error');
+                }
+            }
+        });
+
+    } catch(e) {
+        console.error(e);
+        Swal.fire('Error', 'Network Error', 'error');
+    }
 }
 
 // Bulk Actions
@@ -462,12 +552,12 @@ function editLevel(id) {
 .stat-pill .value { font-size: 1.1rem; font-weight: 800; line-height: 1.1; }
 
 .creation-toolbar {
-    padding: 1rem 2rem;
+    padding: 0.6rem 2rem;
     background: #f8fafc;
     border-bottom: 1px solid var(--admin-gray-200);
 }
 .toolbar-title {
-    font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem;
+    font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;
 }
 .creation-form {
     display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
@@ -476,7 +566,7 @@ function editLevel(id) {
 .input-group-premium { position: relative; }
 .input-group-premium .icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.85rem; pointer-events: none; }
 .form-input-premium {
-    width: 100%; height: 40px; padding: 0 0.75rem 0 2.25rem; font-size: 0.875rem; 
+    width: 100%; height: 34px; padding: 0 0.75rem 0 2.25rem; font-size: 0.875rem; 
     border: 1px solid #cbd5e1; border-radius: 8px; outline: none; transition: all 0.2s;
     background: white; color: #334155;
 }
@@ -489,7 +579,7 @@ function editLevel(id) {
 .btn-icon-inside:hover { background: #e2e8f0; color: #4338ca; }
 
 .btn-create-premium {
-    height: 40px; padding: 0 1.5rem; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    height: 34px; padding: 0 1.25rem; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
     color: white; font-weight: 600; font-size: 0.875rem; border: none; border-radius: 8px; cursor: pointer;
     display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s;
     box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2); white-space: nowrap;
@@ -512,7 +602,7 @@ input:checked + .slider:before { transform: translateX(16px); }
 
 .compact-toolbar {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 0.75rem 2rem; background: #eff6ff; border-bottom: 1px solid #bfdbfe;
+    padding: 0.4rem 2rem; background: #eff6ff; border-bottom: 1px solid #bfdbfe;
 }
 .filter-group { display: flex; align-items: center; gap: 0.75rem; }
 .filter-label { font-size: 0.7rem; font-weight: 700; color: #1e40af; letter-spacing: 0.5px; }
@@ -523,7 +613,7 @@ input:checked + .slider:before { transform: translateX(16px); }
 .search-compact { position: relative; width: 100%; max-width: 300px; }
 .search-compact i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 0.85rem; }
 .search-compact input {
-    width: 100%; height: 36px; padding: 0 0.75rem 0 2.25rem; font-size: 0.85rem;
+    width: 100%; height: 32px; padding: 0 0.75rem 0 2.25rem; font-size: 0.85rem;
     border: 1px solid #bfdbfe; border-radius: 6px; outline: none; background: white; color: #1e40af;
 }
 
@@ -595,8 +685,8 @@ input:checked + .slider:before { transform: translateX(16px); }
 .btn-bulk-delete:hover { background: #dc2626; }
 
 @media (max-width: 1024px) {
-    .creation-form { flex-direction: column; align-items: stretch; }
-    .input-group-premium { width: 100% !important; }
+    .creation-form { flex-direction: row; overflow-x: auto; padding-bottom: 5px; }
+    .input-group-premium { width: auto !important; }
 }
 </style>
 
@@ -607,16 +697,20 @@ input:checked + .slider:before { transform: translateX(16px); }
 <script>
 $(document).ready(function() {
     // Course filter dropdown
-    $('#courseFilter').select2({
-        placeholder: 'All Courses',
-        allowClear: true,
-        width: '250px'
-    }).on('select2:open', function() {
-        setTimeout(() => document.querySelector('.select2-search__field').focus(), 100);
-    }).on('change', function() {
-        document.getElementById('filterForm').submit();
+    // Select2 with Auto-Submit for Filters
+    $('.filter-select-search').each(function() {
+        const placeholder = $(this).find('option:first').text();
+        $(this).select2({
+            placeholder: placeholder,
+            allowClear: true,
+            width: 'resolve'
+        }).on('select2:open', function() {
+            setTimeout(() => document.querySelector('.select2-search__field').focus(), 100);
+        }).on('change', function() {
+            document.getElementById('filterForm').submit();
+        });
     });
-    
+
     // Parent course select in creation form
     $('#parentCourseSelect').select2({
         placeholder: 'Select Course...',
@@ -642,13 +736,13 @@ $(document).ready(function() {
 <style>
 /* Select2 Custom Styling */
 .select2-container--default .select2-selection--single {
-    height: 40px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 0.75rem;
+    height: 34px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 0.75rem;
     display: flex; align-items: center;
 }
 .select2-container--default .select2-selection--single .select2-selection__rendered {
-    line-height: 40px; padding-left: 0; color: #334155; font-size: 0.875rem;
+    line-height: 34px; padding-left: 0; color: #334155; font-size: 0.875rem;
 }
-.select2-container--default .select2-selection--single .select2-selection__arrow { height: 38px; }
+.select2-container--default .select2-selection--single .select2-selection__arrow { height: 32px; }
 .select2-dropdown {
     border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
 }

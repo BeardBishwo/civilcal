@@ -113,8 +113,49 @@ class CourseController extends Controller
     /**
      * Delete Course
      */
+    /**
+     * Get Stats for Deletion Modal
+     */
+    public function getDeleteStats($id)
+    {
+        $counts = $this->syllabusService->getChildTypeCounts($id);
+        echo json_encode(['status' => 'success', 'counts' => $counts]);
+    }
+
+    /**
+     * Delete Course with Selective Cascade
+     */
     public function delete($id)
     {
+        // Check for JSON input (flags)
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        // If DELETE_ALL is requested or legacy simple delete
+        if (isset($input['delete_all']) && $input['delete_all'] === true) {
+             // Standard recursive delete (all children go)
+             // We can simulate this by passing ALL types, or just using simple deleteNode if logic permits.
+             // But deleteNode might rely on DB cascade. Let's use simple deleteNode for "Delete All".
+             if ($this->syllabusService->deleteNode($id)) {
+                 echo json_encode(['status' => 'success']);
+             } else {
+                 echo json_encode(['status' => 'error']);
+             }
+             return;
+        }
+
+        // Selective Delete
+        if (isset($input['delete_types']) && is_array($input['delete_types'])) {
+            $deleteTypes = $input['delete_types'];
+            if ($this->syllabusService->deleteWithPreservation($id, $deleteTypes)) {
+                echo json_encode(['status' => 'success']);
+            } else {
+                echo json_encode(['status' => 'error']);
+            }
+            return;
+        }
+
+        // Fallback for simple GET/POST without flags (Legacy)
+        // Default to "Safe Mode" or "Delete All"? Usually legacy behavior implies "Delete All".
         if ($this->syllabusService->deleteNode($id)) {
             echo json_encode(['status' => 'success']);
         } else {

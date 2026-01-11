@@ -161,7 +161,7 @@ function renderCalculator($calculatorId, $pageTitle = null, $description = null,
                                         </tr>
                                         <tr>
                                             <td class="ps-4">Overhead & Profit</td>
-                                            <td class="text-muted small"><?php echo $_POST['overhead'] ?? 15; ?>% of Direct Cost</td>
+                                            <td class="text-muted small"><?php echo htmlspecialchars($_POST['overhead'] ?? 15); ?>% of Direct Cost</td>
                                             <td class="text-end"><?php echo number_format($analysis['final'] - $analysis['direct'], 2); ?></td>
                                         </tr>
                                         <tr class="h4">
@@ -171,7 +171,7 @@ function renderCalculator($calculatorId, $pageTitle = null, $description = null,
                                         </tr>
                                         <tr class="h5 border-top border-primary">
                                             <td class="text-info">Rate per Unit</td>
-                                            <td class="text-muted small"><?php echo htmlspecialchars($_POST['item_type']); ?></td>
+                                            <td class="text-muted small"><?php echo htmlspecialchars($_POST['item_type'] ?? ''); ?></td>
                                             <td class="text-end text-info fw-bold">NPR <?php echo number_format($analysis['per_unit'], 2); ?></td>
                                         </tr>
                                     </tbody>
@@ -184,24 +184,96 @@ function renderCalculator($calculatorId, $pageTitle = null, $description = null,
                             </div>
                         </div>
                     <?php else: ?>
-                        <div class="results-grid">
-                            <?php foreach ($result['results'] as $key => $data): ?>
-                                <div class="result-item p-3 rounded mb-3 bg-dark border border-secondary">
-                                    <div class="result-label text-muted small text-uppercase"><?php echo htmlspecialchars($data['label']); ?></div>
-                                    <div class="result-value h2 mb-0 text-success"><?php echo htmlspecialchars($data['formatted']); ?></div>
-                                </div>
-                            <?php endforeach; ?>
+                    <div class="results-grid">
+                        <?php foreach ($result['results'] as $key => $data): 
+                            // Skip enterprise keys as they are handled in dedicated sections below
+                            if (in_array($key, ['bill_of_materials', 'related_items', 'cost', 'materials', 'suggestions', 'analysis'])) continue;
+                        ?>
+                            <div class="result-item p-4 rounded mb-3 bg-dark border border-secondary animate__animated animate__zoomIn">
+                                <div class="result-label text-muted small text-uppercase fw-bold"><?php echo htmlspecialchars($data['label']); ?></div>
+                                <div class="result-value h2 mb-0 text-success"><?php echo htmlspecialchars($data['formatted']); ?></div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <!-- ENTERPRISE LEVEL: Bill of Materials & Cost Estimation -->
+                    <?php if (isset($result['results']['bill_of_materials'])): 
+                        $bom = $result['results']['bill_of_materials'];
+                        $items = $bom['line_items'] ?? $bom; // Support both structures
+                    ?>
+                        <div class="enterprise-section mt-5 p-4 rounded bg-dark border border-info animate__animated animate__fadeInUp">
+                            <h3 class="text-info mb-4 d-flex align-items-center">
+                                <i class="fas fa-layer-group me-3"></i> Enterprise: Bill of Materials
+                            </h3>
+                            <div class="table-responsive">
+                                <table class="table table-dark table-hover mb-0">
+                                    <thead class="table-info text-dark">
+                                        <tr>
+                                            <th>Item / Material</th>
+                                            <th class="text-center">Quantity</th>
+                                            <th class="text-center">Unit</th>
+                                            <th class="text-end">Est. Cost (NPR)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($items as $item): ?>
+                                            <tr>
+                                                <td><i class="fas fa-cube me-2 text-secondary"></i><?php echo htmlspecialchars($item['name'] ?? $item['item_id']); ?></td>
+                                                <td class="text-center fw-bold"><?php echo is_numeric($item['quantity']) ? number_format($item['quantity'], 2) : $item['quantity']; ?></td>
+                                                <td class="text-center text-muted"><?php echo htmlspecialchars($item['unit']); ?></td>
+                                                <td class="text-end text-success">
+                                                    <?php echo isset($item['total']) ? number_format($item['total'], 2) : '-'; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                    <?php if (isset($bom['total_amount'])): ?>
+                                        <tfoot>
+                                            <tr class="h5 border-top border-info">
+                                                <td colspan="3" class="text-info fw-bold">Estimated Grand Total</td>
+                                                <td class="text-end text-info fw-bold">NPR <?php echo number_format($bom['total_amount'], 2); ?></td>
+                                            </tr>
+                                        </tfoot>
+                                    <?php endif; ?>
+                                </table>
+                            </div>
                         </div>
                     <?php endif; ?>
-                    <div class="calculation-metadata text-end mt-2">
+
+                    <!-- ENTERPRISE LEVEL: Pro-Active Suggestions -->
+                    <?php if (isset($result['results']['related_items']) && !empty($result['results']['related_items'])): ?>
+                        <div class="suggestions-section mt-5 border-top border-secondary pt-4">
+                            <h4 class="text-muted mb-4 d-flex align-items-center">
+                                <i class="fas fa-lightbulb me-2 text-warning"></i> Enterprise Suggestions
+                            </h4>
+                            <div class="row g-3">
+                                <?php foreach ($result['results']['related_items'] as $suggestion): ?>
+                                    <div class="col-md-6">
+                                        <div class="suggestion-card p-3 rounded bg-dark border border-warning h-100 d-flex flex-column">
+                                            <h5 class="text-warning small text-uppercase mb-2"><?php echo htmlspecialchars($suggestion['heading']); ?></h5>
+                                            <p class="small text-light mb-3 flex-grow-1"><?php echo htmlspecialchars($suggestion['description']); ?></p>
+                                            <a href="<?php echo htmlspecialchars($suggestion['target_url']); ?>" class="btn btn-outline-warning btn-sm mt-auto">
+                                                <i class="fas fa-external-link-alt me-1"></i> Open Tool
+                                            </a>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="calculation-metadata text-end mt-4">
                         <small class="text-muted">
-                            <i class="fas fa-clock me-1"></i> <?php echo $result['metadata']['execution_time']; ?>
+                            <i class="fas fa-microchip me-1"></i> Engine: Enterprise Pipeline v<?php echo $result['metadata']['formula_version'] ?? '1.0'; ?> 
+                            <span class="mx-2">|</span>
+                            <i class="fas fa-clock me-1"></i> Processed in <?php echo $result['metadata']['execution_time']; ?>
                         </small>
                     </div>
 
                     <?php echo \App\Helpers\AdHelper::show('result_bottom', 'mt-5 ad-slot-result'); ?>
+                    <?php endif; // End of analysis-else ?>
                 </div>
-            <?php endif; ?>
+            <?php endif; // End of result-success ?>
         </div>
     </div>
     <style>

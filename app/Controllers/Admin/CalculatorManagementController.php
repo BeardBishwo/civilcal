@@ -300,68 +300,41 @@ class CalculatorManagementController extends Controller
 
     private function scanCalculators()
     {
-        $modulesPath = BASE_PATH . '/modules/';
         $calculators = [];
-
-        if (!is_dir($modulesPath)) {
-            return [];
-        }
-
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($modulesPath, \RecursiveDirectoryIterator::SKIP_DOTS)
-        );
-
-        $realBasePath = realpath(BASE_PATH);
-
-        foreach ($iterator as $file) {
-            if ($file->isFile() && $file->getExtension() === 'php') {
-                $realPath = $file->getRealPath();
-                
-                // Robust path calculation relative to BASE_PATH/modules
-                // c:\...\modules\civil\beam.php -> civil\beam.php
-                $relativePath = str_ireplace($realBasePath . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR, '', $realPath);
-                
-                // Normalize slashes
-                $relativePath = str_replace('\\', '/', $relativePath);
-                
-                $parts = explode('/', $relativePath);
-                
-                if (count($parts) >= 2) {
-                    $moduleSlug = $parts[0];
-                    $calculatorSlug = pathinfo($realPath, PATHINFO_FILENAME);
-                    
-                    // Unique ID for storage (e.g. civil.beam)
-                    $uniqueId = $moduleSlug . '.' . $calculatorSlug;
-                    
-                    $moduleName = ucwords(str_replace(['-', '_'], ' ', $moduleSlug));
-                    
-                    // Special Case for Nepali Land Converter
-                    if ($uniqueId === 'country.nepali-land') {
-                        $calculatorName = 'Nepali Land Converter';
-                        $url = '/nepali';
-                    } else {
-                        $calculatorName = ucwords(str_replace(['-', '_'], ' ', $calculatorSlug));
-                        $url = "/calculator/{$moduleSlug}/{$calculatorSlug}";
-                    }
-
-                    $calculators[] = [
-                        'unique_id' => $uniqueId,
-                        'name' => $calculatorName,
-                        'slug' => $calculatorSlug,
-                        'module_name' => $moduleName,
-                        'module_slug' => $moduleSlug,
-                        'path' => $relativePath,
-                        'url' => $url,
-                    ];
-                }
+        $engine = new \App\Engine\CalculatorEngine();
+        $list = $engine->listCalculators();
+        
+        foreach ($list as $calc) {
+            $category = $calc['category'];
+            $slug = $calc['id'];
+            
+            // Unique ID for storage
+            $uniqueId = $category . '.' . $slug;
+            
+            // Special Case for Nepali Land Converter
+            if ($slug === 'nepali-land') { // Simple heuristics for known outliers
+                $url = '/nepali';
+            } else {
+                $url = "/{$slug}"; // Virtual Route
             }
+
+            $calculators[] = [
+                'unique_id' => $uniqueId,
+                'name' => $calc['name'],
+                'slug' => $slug,
+                'module_name' => ucwords($category), // Using category as module name
+                'module_slug' => $category,
+                'path' => 'virtual',
+                'url' => $url,
+            ];
         }
 
+        // Sort by Category then Name
         usort($calculators, function($a, $b) {
-            if ($a['module_name'] === $b['module_name']) {
+            if ($a['module_slug'] === $b['module_slug']) {
                 return strcmp($a['name'], $b['name']);
             }
-            return strcmp($a['module_name'], $b['module_name']);
+            return strcmp($a['module_slug'], $b['module_slug']);
         });
 
         return $calculators;
@@ -445,6 +418,19 @@ class CalculatorManagementController extends Controller
     
     private function saveConfigFile($file, $config)
     {
+        // SECURITY CHECK: Scan for closures before saving
+        // var_export() exports closures as generic objects or fails, corrupting the file.
+        // We must prevent saving if the config relies on executable logic.
+        array_walk_recursive($config, function($item) {
+            if ($item instanceof \Closure) {
+                // Return internal server error via JSON if possible, but here we throw to be caught
+                // or just let the controller handle the exception formatting?
+                // The controller store/update methods don't have extensive try/catch blocks for this private method.
+                // Let's rely on global exception handler or just return false/throw.
+                throw new \Exception("Cannot save configuration via Admin Panel because it contains complex Formulas (Closures). Please edit the file directly.");
+            }
+        });
+
         $export = var_export($config, true);
         $content = "<?php\n\nreturn {$export};\n";
         file_put_contents($file, $content);
@@ -452,21 +438,9 @@ class CalculatorManagementController extends Controller
     
     private function createFrontendFile($category, $subcategory, $slug)
     {
-        $dir = BASE_PATH . "/modules/{$category}";
-        if ($subcategory) {
-            $dir .= "/{$subcategory}";
-        }
-        
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-        
-        $file = $dir . "/{$slug}.php";
-        
-        if (!file_exists($file)) {
-            $content = "<?php\n/**\n * {$slug} Calculator - Migrated to Calculator Engine\n */\nrequire_once dirname(__DIR__, 3) . '/app/bootstrap.php';\nrequire_once dirname(__DIR__, 3) . '/themes/default/views/shared/calculator-template.php';\nrenderCalculator('{$slug}');\n";
-            file_put_contents($file, $content);
-        }
+        // NO-OP: We use Virtual Routing now. 
+        // No physical file creation needed in modules directory.
+        return true;
     }
     
     private function updateCalculatorUrls($category, $subcategory, $slug)

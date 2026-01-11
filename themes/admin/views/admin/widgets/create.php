@@ -38,6 +38,7 @@ $page_title = 'Create Widget - ' . \App\Services\SettingsService::get('site_name
                     
                     <div class="card-content-compact">
                         <form method="post" action="<?php echo app_base_url('/admin/widgets/create'); ?>">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                             <div class="form-group mb-4">
                                 <label class="form-label">Widget Class <span class="text-danger">*</span></label>
                                 <select name="class_name" class="form-select form-control" required>

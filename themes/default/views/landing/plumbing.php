@@ -2,228 +2,397 @@
 $page_title = 'Plumbing Engineering Toolkit';
 $breadcrumb = [
     ['name' => 'Home', 'url' => app_base_url('/')],
-    ['name' => 'Plumbing Engineering', 'url' => '#']
+    ['name' => 'Plumbing', 'url' => '#']
 ];
 ?>
 
-<?php if (!function_exists('load_theme_css')) { require_once __DIR__ . '/../partials/theme-helpers.php'; } ?>
-<?php load_theme_css('plumbing.css'); ?>
+<!-- CDN Utilities -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-<div class="container">
-    <div class="hero">
-        <h1>Plumbing Engineering Toolkit</h1>
-        <p>Professional calculators and reference tools for plumbing engineers and technicians.</p>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    dark: '#050505',
+                    surface: '#0a0a0a',
+                    glass: 'rgba(255, 255, 255, 0.03)',
+                    'glass-border': 'rgba(255, 255, 255, 0.08)',
+                    accent: '#ffffff',
+                    'accent-muted': '#a1a1aa',
+                    'plumb-cyan': '#06b6d4', // Cyan-500
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+    [x-cloak] { display: none !important; }
+    
+    .glass-card {
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .glass-card:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.04);
+        transform: translateY(-4px);
+    }
+
+    .glass-card.card-focused {
+        border-color: rgba(6, 182, 212, 0.4);
+        background: rgba(6, 182, 212, 0.04);
+        transform: scale(1.05);
+        box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(6, 182, 212, 0.1);
+        z-index: 20;
+    }
+
+    .glass-card.card-blurred {
+        opacity: 0.2;
+        filter: blur(4px);
+        transform: scale(0.95);
+        pointer-events: none;
+    }
+
+    .hero-glow {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 800px;
+        height: 400px;
+        background: radial-gradient(circle at center, rgba(6, 182, 212, 0.1) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .premium-btn {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .premium-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .tool-item {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .tool-item:last-child {
+        border-bottom: none;
+    }
+
+    .tool-item:hover {
+        background: rgba(255, 255, 255, 0.03);
+        padding-left: 1.25rem;
+    }
+
+    .sticky-nav {
+        background: rgba(5, 5, 5, 0.8) !important;
+        backdrop-filter: blur(20px) !important;
+        border-bottom: 1px solid rgba(6, 182, 212, 0.2) !important;
+        border-radius: 0 0 1.5rem 1.5rem !important;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+</style>
+
+<div 
+    class="min-h-screen bg-dark text-white selection:bg-plumb-cyan/30 selection:text-plumb-cyan" 
+    x-data="{ 
+        activeSect: null, 
+        focusSect: null, 
+        isSticky: false, 
+        timer: null,
+        highlight(id) {
+            if (this.timer) clearTimeout(this.timer);
+            this.activeSect = id;
+            this.focusSect = id;
+            this.timer = setTimeout(() => {
+                this.focusSect = null;
+            }, 2000);
+        },
+        init() {
+            // Check for hash on load
+            if (window.location.hash) {
+                this.highlight(window.location.hash.slice(1));
+            }
+        }
+    }" 
+    @scroll.window="isSticky = window.pageYOffset > 250"
+>
+    <div class="hero-glow"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-20 pb-32">
+        <!-- Hero Section -->
+        <div class="text-center mb-20">
+            <div class="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-plumb-cyan/10 border border-plumb-cyan/20 text-plumb-cyan text-xs font-bold tracking-widest uppercase mb-8">
+                <i class="fas fa-tint"></i>
+                <span>Hydraulic Systems</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40">
+                Plumbing Engineering
+            </h1>
+            <p class="text-accent-muted text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
+                Professional calculators for pipe sizing, water supply, drainage, and pressure loss analysis.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="#pipeSizing" class="premium-btn bg-white text-black px-10 py-4 rounded-2xl font-black text-sm tracking-wide">
+                    EXPLORE TOOLS
+                </a>
+            </div>
+        </div>
+
+        <!-- Sticky Sub Nav -->
+        <div :class="isSticky ? 'h-[74px]' : ''">
+            <div 
+            class="z-[1001] transition-all duration-500"
+            :class="isSticky ? 'fixed top-0 left-0 w-full' : 'relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16'"
+        >
+                <div 
+                    class="glass-card p-2 flex items-center justify-center space-x-1 overflow-x-auto scrollbar-hide no-scrollbar transition-all duration-500"
+                    :class="isSticky ? 'sticky-nav rounded-none border-x-0 border-t-0 shadow-2xl' : 'rounded-2xl'"
+                >
+                <?php 
+                $navItems = [
+                    ['id' => 'pipeSizing', 'label' => 'Pipe Sizing', 'icon' => 'fa-pipe'],
+                    ['id' => 'waterSupply', 'label' => 'Water Supply', 'icon' => 'fa-tint'],
+                    ['id' => 'drainage', 'label' => 'Drainage', 'icon' => 'fa-water'],
+                    ['id' => 'pressure', 'label' => 'Pressure', 'icon' => 'fa-gauge-high'],
+                    ['id' => 'hotWater', 'label' => 'Hot Water', 'icon' => 'fa-fire'],
+                    ['id' => 'stormwater', 'label' => 'Stormwater', 'icon' => 'fa-cloud-rain'],
+                    ['id' => 'fixtures', 'label' => 'Fixtures', 'icon' => 'fa-toilet'],
+                ];
+                foreach ($navItems as $item): 
+                ?>
+                <a 
+                    href="#<?php echo $item['id']; ?>" 
+                    @click="highlight('<?php echo $item['id']; ?>')"
+                    class="flex items-center space-x-2 px-5 py-2.5 rounded-xl transition-all font-bold text-xs whitespace-nowrap"
+                    :class="activeSect === '<?php echo $item['id']; ?>' ? 'bg-white text-black' : 'text-accent-muted hover:text-white hover:bg-white/5'"
+                >
+                    <i class="fas <?php echo $item['icon']; ?>"></i>
+                    <span><?php echo $item['label']; ?></span>
+                </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
     </div>
 
-    <!-- Sub-navigation for categories -->
-    <div class="sub-nav" id="sub-nav">
-        <a href="#pipeSizing" class="sub-nav-btn">Pipe Sizing</a>
-        <a href="#waterSupply" class="sub-nav-btn">Water Supply</a>
-        <a href="#drainage" class="sub-nav-btn">Drainage</a>
-        <a href="#pressure" class="sub-nav-btn">Pressure Loss</a>
-        <a href="#hotWater" class="sub-nav-btn">Hot Water</a>
-        <a href="#stormwater" class="sub-nav-btn">Stormwater</a>
-        <a href="#fixtures" class="sub-nav-btn">Fixture Units</a>
-    </div>
-
-    <div class="category-grid">
-        <!-- Pipe Sizing Section -->
-        <div id="pipeSizing" class="category-card">
-            <div class="category-header">
-                <i class="fas fa-pipe category-icon"></i>
-                <div class="category-title">
-                    <h3>Pipe Sizing</h3>
-                    <p>Calculate pipe diameters, flow rates, and expansion.</p>
+        <!-- Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <!-- Pipe Sizing -->
+            <div id="pipeSizing" class="glass-card group rounded-[2.5rem] p-8" :class="focusSect === 'pipeSizing' ? 'card-focused' : (focusSect ? 'card-blurred' : '')">
+                <div class="flex items-center space-x-4 mb-8">
+                    <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-500">
+                        <i class="fas fa-pipe text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black">Pipe Sizing</h3>
+                        <p class="text-xs font-bold text-accent-muted uppercase tracking-tighter opacity-50">Dimensions & Flow</p>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('water-pipe-sizing'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Water Pipe Sizing</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('gas-pipe-sizing'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Gas Pipe Sizing</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                     <a href="<?php echo \App\Helpers\UrlHelper::calculator('pipe-flow-capacity'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Flow Capacity</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
                 </div>
             </div>
-            <ul class="tool-list">
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('water-pipe-sizing'); ?>" class="tool-item"><span>Water Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('gas-pipe-sizing'); ?>" class="tool-item"><span>Gas Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pipe-flow-capacity'); ?>" class="tool-item"><span>Pipe Flow Capacity</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('expansion-loop-sizing'); ?>" class="tool-item"><span>Expansion Loop Sizing</span> <i class="fas fa-arrow-right"></i></a>
-            </ul>
-        </div>
 
-        <!-- Water Supply Section -->
-        <div id="waterSupply" class="category-card">
-            <div class="category-header">
-                <i class="fas fa-tint category-icon"></i>
-                <div class="category-title">
-                    <h3>Water Supply</h3>
-                    <p>Water demand, storage, and pumping calculations.</p>
+            <!-- Water Supply -->
+            <div id="waterSupply" class="glass-card group rounded-[2.5rem] p-8" :class="focusSect === 'waterSupply' ? 'card-focused' : (focusSect ? 'card-blurred' : '')">
+                <div class="flex items-center space-x-4 mb-8">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500">
+                        <i class="fas fa-tint text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black">Water Supply</h3>
+                        <p class="text-xs font-bold text-accent-muted uppercase tracking-tighter opacity-50">Distribution</p>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('water-demand-calculation'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Water Demand</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('storage-tank-sizing'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Tank Sizing</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('pump-sizing'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Pump Sizing</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
                 </div>
             </div>
-            <ul class="tool-list">
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('water-demand-calculation'); ?>" class="tool-item"><span>Water Demand Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('storage-tank-sizing'); ?>" class="tool-item"><span>Storage Tank Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pump-sizing'); ?>" class="tool-item"><span>Pump Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('water-hammer-calculation'); ?>" class="tool-item"><span>Water Hammer Calculation</span> <i class="fas fa-arrow-right"></i></a>
-            </ul>
-        </div>
 
-        <!-- Drainage Section -->
-        <div id="drainage" class="category-card">
-            <div class="category-header">
-                <i class="fas fa-water category-icon"></i>
-                <div class="category-title">
-                    <h3>Drainage</h3>
-                    <p>Sanitary and storm water drainage calculations.</p>
+            <!-- Drainage -->
+            <div id="drainage" class="glass-card group rounded-[2.5rem] p-8" :class="focusSect === 'drainage' ? 'card-focused' : (focusSect ? 'card-blurred' : '')">
+                 <div class="flex items-center space-x-4 mb-8">
+                    <div class="w-14 h-14 rounded-2xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-500">
+                        <i class="fas fa-water text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black">Drainage</h3>
+                        <p class="text-xs font-bold text-accent-muted uppercase tracking-tighter opacity-50">Sanitary & Waste</p>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                     <a href="<?php echo \App\Helpers\UrlHelper::calculator('drainage-pipe-sizing'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Drain Pipe Sizing</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('vent-pipe-sizing'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Vent Pipe Sizing</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('grease-trap-sizing'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Grease Trap</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
                 </div>
             </div>
-            <ul class="tool-list">
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('drainage-pipe-sizing'); ?>" class="tool-item"><span>Drain Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('storm-drainage'); ?>" class="tool-item"><span>Storm Water Drainage</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('vent-pipe-sizing'); ?>" class="tool-item"><span>Vent Pipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('grease-trap-sizing'); ?>" class="tool-item"><span>Grease Trap Sizing</span> <i class="fas fa-arrow-right"></i></a>
-            </ul>
-        </div>
 
-        <!-- Pressure Loss Section -->
-        <div id="pressure" class="category-card">
-            <div class="category-header">
-                <i class="fas fa-gauge-high category-icon"></i>
-                <div class="category-title">
-                    <h3>Pressure Loss</h3>
-                    <p>Friction loss, fitting loss, and system pressure.</p>
+            <!-- Pressure Loss -->
+            <div id="pressure" class="glass-card group rounded-[2.5rem] p-8" :class="focusSect === 'pressure' ? 'card-focused' : (focusSect ? 'card-blurred' : '')">
+                <div class="flex items-center space-x-4 mb-8">
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500">
+                        <i class="fas fa-gauge-high text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black">Pressure Loss</h3>
+                        <p class="text-xs font-bold text-accent-muted uppercase tracking-tighter opacity-50">Hydraulics</p>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('pressure-loss'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Friction Loss</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('heat-loss-calculation'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Heat Loss Calc</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
                 </div>
             </div>
-            <ul class="tool-list">
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pressure-loss'); ?>" class="tool-item"><span>Pipe Friction Loss</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('heat-loss-calculation'); ?>" class="tool-item"><span>Heat Loss Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('main-isolation-valve'); ?>" class="tool-item"><span>Isolation Valve Sizing</span> <i class="fas fa-arrow-right"></i></a>
-            </ul>
-        </div>
 
-        <!-- Hot Water Section -->
-        <div id="hotWater" class="category-card">
-            <div class="category-header">
-                <i class="fas fa-fire category-icon"></i>
-                <div class="category-title">
-                    <h3>Hot Water</h3>
-                    <p>Hot water systems, recirculation, and safety.</p>
+            <!-- Hot Water -->
+            <div id="hotWater" class="glass-card group rounded-[2.5rem] p-8" :class="focusSect === 'hotWater' ? 'card-focused' : (focusSect ? 'card-blurred' : '')">
+                <div class="flex items-center space-x-4 mb-8">
+                    <div class="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500">
+                        <i class="fas fa-fire text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black">Hot Water</h3>
+                        <p class="text-xs font-bold text-accent-muted uppercase tracking-tighter opacity-50">Heating Systems</p>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('water-heater-sizing'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Heater Sizing</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('recirculation-loop'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Recirculation Loop</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
                 </div>
             </div>
-            <ul class="tool-list">
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('water-heater-sizing'); ?>" class="tool-item"><span>Water Heater Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('recirculation-loop'); ?>" class="tool-item"><span>Recirculation Loop</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('safety-valve'); ?>" class="tool-item"><span>Safety Valve Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('storage-tank-sizing'); ?>" class="tool-item"><span>Hot Water Storage</span> <i class="fas fa-arrow-right"></i></a>
-            </ul>
-        </div>
 
-        <!-- Stormwater Section -->
-        <div id="stormwater" class="category-card">
-            <div class="category-header">
-                <i class="fas fa-cloud-rain category-icon"></i>
-                <div class="category-title">
-                    <h3>Stormwater</h3>
-                    <p>Rainwater management and drainage systems.</p>
+             <!-- Stormwater -->
+             <div id="stormwater" class="glass-card group rounded-[2.5rem] p-8" :class="focusSect === 'stormwater' ? 'card-focused' : (focusSect ? 'card-blurred' : '')">
+                <div class="flex items-center space-x-4 mb-8">
+                    <div class="w-14 h-14 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-500">
+                        <i class="fas fa-cloud-rain text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black">Stormwater</h3>
+                        <p class="text-xs font-bold text-accent-muted uppercase tracking-tighter opacity-50">Rainwater</p>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('gutter-sizing'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Gutter Sizing</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('downpipe-sizing'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Downpipe Sizing</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
                 </div>
             </div>
-            <ul class="tool-list">
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('gutter-sizing'); ?>" class="tool-item"><span>Gutter Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('downpipe-sizing'); ?>" class="tool-item"><span>Downpipe Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('stormwater-storage'); ?>" class="tool-item"><span>Stormwater Storage</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('pervious-area'); ?>" class="tool-item"><span>Pervious Area</span> <i class="fas fa-arrow-right"></i></a>
-            </ul>
-        </div>
 
-        <!-- Fixture Units Section -->
-        <div id="fixtures" class="category-card">
-            <div class="category-header">
-                <i class="fas fa-toilet category-icon"></i>
-                <div class="category-title">
-                    <h3>Fixture Units</h3>
-                    <p>Fixture unit calculations and pipe sizing.</p>
+             <!-- Fixtures -->
+             <div id="fixtures" class="glass-card group rounded-[2.5rem] p-8" :class="focusSect === 'fixtures' ? 'card-focused' : (focusSect ? 'card-blurred' : '')">
+                <div class="flex items-center space-x-4 mb-8">
+                    <div class="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500">
+                        <i class="fas fa-toilet text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black">Fixtures</h3>
+                        <p class="text-xs font-bold text-accent-muted uppercase tracking-tighter opacity-50">Units & Flow</p>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('fixture-unit-calculation'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Fixture Units</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
+                    <a href="<?php echo \App\Helpers\UrlHelper::calculator('shower-sizing'); ?>" class="tool-item flex items-center justify-between p-4 rounded-xl group/item">
+                        <span class="font-bold text-sm text-accent-muted group-hover/item:text-white">Shower Sizing</span>
+                        <i class="fas fa-arrow-right text-[10px] text-white/20 group-hover/item:text-white group-hover/item:translate-x-1 transition-all"></i>
+                    </a>
                 </div>
             </div>
-            <ul class="tool-list">
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('fixture-unit-calculation'); ?>" class="tool-item"><span>Fixture Unit Calculation</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('shower-sizing'); ?>" class="tool-item"><span>Shower Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('sink-sizing'); ?>" class="tool-item"><span>Sink Sizing</span> <i class="fas fa-arrow-right"></i></a>
-                <a href="<?php echo \App\Helpers\UrlHelper::calculator('toilet-flow'); ?>" class="tool-item"><span>Toilet Flow</span> <i class="fas fa-arrow-right"></i></a>
-            </ul>
+            
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const subNav = document.getElementById("sub-nav");
-    const subNavOffsetTop = subNav.offsetTop;
-    const body = document.body;
-
-    // Smooth scrolling for sub-navigation links
-    document.querySelectorAll('.sub-nav-btn').forEach(anchor => {
+    // Smooth scroll handling for sub-nav
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
-            
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                const headerOffset = 100;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-            if(targetElement) {
+                // Call highlight via Alpine
+                const root = document.querySelector('[x-data]');
+                if (root) {
+                    if (root.__x_data_stack) {
+                       root.__x_data_stack[0].highlight(this.getAttribute('href').slice(1));
+                    } else if (window.Alpine) {
+                       window.Alpine.$data(root).highlight(this.getAttribute('href').slice(1));
+                    }
+                }
+
                 window.scrollTo({
-                    top: targetElement.offsetTop - 150, // Adjust for fixed nav height
-                    behavior: 'smooth'
+                    top: offsetPosition,
+                    behavior: "smooth"
                 });
             }
         });
     });
-
-    // Sticky sub-navigation
-    window.addEventListener("scroll", function() {
-        if (window.pageYOffset >= subNavOffsetTop) {
-            body.classList.add("sticky-nav");
-        } else {
-            body.classList.remove("sticky-nav");
-        }
-    });
-
-    // Toggle tool lists
-    const categoryCards = document.querySelectorAll('.category-card');
-    categoryCards.forEach(card => {
-        // Expand all cards by default
-        card.classList.add('active');
-
-        card.addEventListener('click', (e) => {
-            // Prevent clicks on links from toggling the card
-            if (e.target.closest('a')) return;
-            
-            card.classList.toggle('active');
-        });
-    });
-
-    // Active state for sub-nav buttons with expand and blur effect
-    const subNavButtons = document.querySelectorAll('.sub-nav-btn');
-    subNavButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            subNavButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            
-            // Get target card ID from href
-            const targetId = button.getAttribute('href').slice(1);
-            const targetCard = document.getElementById(targetId);
-            
-            // Apply focused and blur effects
-            categoryCards.forEach(card => {
-                card.classList.remove('focused', 'blurred');
-                if (card.id === targetId) {
-                    card.classList.add('focused');
-                } else {
-                    card.classList.add('blurred');
-                }
-            });
-            
-            // Remove all effects after 1 second
-            setTimeout(() => {
-                categoryCards.forEach(card => {
-                    card.classList.remove('focused', 'blurred');
-                });
-            }, 1000);
-        });
-    });
-});
 </script>
-
-<?php ?>
-

@@ -252,7 +252,7 @@ return [
         ],
     ],
     
-    'pump-sizing' => [
+    'hvac-pump-sizing' => [
         'name' => 'HVAC Pump Sizing Calculator',
         'description' => 'Calculate pump requirements for HVAC systems',
         'category' => 'hvac',

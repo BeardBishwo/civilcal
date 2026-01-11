@@ -4,7 +4,9 @@
  * Professional, high-density layout with integrated creation form.
  */
 $categories = $categories ?? [];
+$courses = $courses ?? [];
 $levels = $levels ?? [];
+$selectedCourse = $selectedCourse ?? null;
 $selectedLevel = $selectedLevel ?? null;
 $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
 ?>
@@ -37,10 +39,10 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
         <!-- Single Row Creation Toolbar -->
         <div class="creation-toolbar">
             <h5 class="toolbar-title">Create New Category</h5>
-            <form id="addCategoryForm" class="creation-form">
+            <form id="addCategoryForm" class="creation-form" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: nowrap;">
                 
                 <!-- Level Select -->
-                <div class="input-group-premium" style="flex: 2; min-width: 200px;">
+                <div class="input-group-premium" style="flex: 1.5; min-width: 150px; flex-shrink: 1;">
                     <i class="fas fa-graduation-cap icon"></i>
                     <select name="parent_id" id="parentLevelSelect" class="form-input-premium" required style="padding-left: 2.25rem;">
                         <option value="" disabled <?php echo !$selectedLevel ? 'selected' : ''; ?>>Select Education Level...</option>
@@ -53,19 +55,19 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
                 </div>
 
                 <!-- Title Input -->
-                <div class="input-group-premium" style="flex: 3; min-width: 200px;">
+                <div class="input-group-premium" style="flex: 2; min-width: 150px; flex-shrink: 1;">
                     <i class="fas fa-heading icon"></i>
                     <input type="text" name="title" class="form-input-premium" placeholder="Category Name" required>
                 </div>
                 
                 <!-- Slug Input -->
-                <div class="input-group-premium" style="flex: 2; min-width: 150px;">
+                <div class="input-group-premium" style="flex: 1; min-width: 120px; flex-shrink: 1;">
                     <i class="fas fa-link icon"></i>
                     <input type="text" name="slug" class="form-input-premium" placeholder="Slug (Optional)">
                 </div>
 
                 <!-- Image Input -->
-                <div class="input-group-premium" style="flex: 2; min-width: 150px;">
+                <div class="input-group-premium" style="flex: 1; min-width: 120px; flex-shrink: 1;">
                     <input type="text" name="image" id="catImage" class="form-input-premium" placeholder="Image URL" style="padding-left: 10px;">
                     <button type="button" class="btn-icon-inside" onclick="MediaManager.open('catImage')">
                         <i class="fas fa-image"></i>
@@ -73,7 +75,7 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
                 </div>
 
                 <!-- Premium Toggle -->
-                <div class="premium-toggle-group">
+                <div class="premium-toggle-group" style="flex-shrink: 0;">
                     <label class="switch">
                         <input type="checkbox" name="is_premium" id="is_premium" onchange="togglePrice(this)">
                         <span class="slider round"></span>
@@ -86,7 +88,7 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
                     <input type="number" name="unlock_price" class="form-input-premium" placeholder="Coins" min="0">
                 </div>
 
-                <button type="button" onclick="saveCategory()" class="btn-create-premium">
+                <button type="button" onclick="saveCategory()" class="btn-create-premium" style="flex-shrink: 0;">
                     <i class="fas fa-plus"></i> ADD
                 </button>
             </form>
@@ -97,9 +99,17 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
             <div class="toolbar-left">
                 <div class="filter-group">
                     <span class="filter-label">FILTER DATA:</span>
-                    <form method="GET" style="margin:0;">
-                        <select name="level_id" id="levelFilter" class="filter-select" style="width: 300px;">
-                            <option value="">All Levels</option>
+                    <form method="GET" id="filterForm" style="margin:0; display:flex; gap:0.5rem;">
+                        <select name="course_id" id="courseFilter" class="filter-select-search" style="width: 180px;">
+                            <option value="">All Courses</option>
+                            <?php foreach ($courses as $c): ?>
+                                <option value="<?php echo $c['id']; ?>" <?php echo $selectedCourse == $c['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($c['title'] ?? ''); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select name="level_id" id="levelFilter" class="filter-select-search" style="width: 250px;">
+                            <option value="">All Education Levels</option>
                             <?php foreach ($levels as $l): ?>
                                 <option value="<?php echo $l['id']; ?>" <?php echo $selectedLevel == $l['id'] ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($l['title'] ?? ''); ?>
@@ -115,7 +125,6 @@ $stats = $stats ?? ['total' => 0, 'premium' => 0, 'total_questions' => 0];
                 </div>
             </div>
             <div class="toolbar-right">
-                <div class="drag-hint"><i class="fas fa-arrows-alt"></i> Drag handle to reorder (Global)</div>
             </div>
         </div>
 
@@ -305,17 +314,104 @@ async function saveCategory() {
     } catch(e) { Swal.fire('Error', 'Server Error', 'error'); }
 }
 
-function deleteCategory(id) {
-    Swal.fire({
-        title: 'Delete Category?', text: "This will remove all sub-data.", icon: 'warning',
-        showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#cbd5e1', confirmButtonText: 'Delete'
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            const res = await fetch('<?php echo app_base_url('admin/quiz/categories/delete/'); ?>' + id, {method:'POST'});
-            const d = await res.json();
-            if(d.status==='success') location.reload();
+// Custom Delete Logic with Selective Cascade (Universal)
+async function deleteCategory(id) {
+    try {
+        // 1. Fetch Stats First
+        const res = await fetch('<?php echo app_base_url('admin/quiz/categories/delete-stats/'); ?>' + id);
+        const data = await res.json();
+        
+        if(data.status !== 'success') {
+            Swal.fire('Error', 'Could not fetch category data', 'error');
+            return;
         }
-    });
+
+        const counts = data.counts;
+        const hasChildren = Object.keys(counts).length > 0;
+
+        // 2. Prepare Modal Content
+        let html = `<div class="text-left mb-4 text-sm text-slate-600">
+            This category contains the following items. Uncheck items you want to <b>PRESERVE</b> (keep). 
+            Checked items will be <b>DELETED</b> forever.
+        </div>`;
+        
+        html += `<table style="width: 100%; border-collapse: collapse; border: 2px solid #94a3b8; margin-top: 10px; background: white;">`;
+        
+        // Downward only: Sub Category -> Topic -> Position
+        const typeConfig = [
+            { key: 'sub_category', label: 'Sub Categories', altKeys: ['unit'] }, 
+            { key: 'topic', label: 'Topics' },
+            { key: 'position', label: 'Position Levels' }
+        ];
+
+        typeConfig.forEach(item => {
+            let count = counts[item.key] || 0;
+            
+            // Merge counts from alternative keys
+            if(item.altKeys) {
+                item.altKeys.forEach(k => { count += (counts[k] || 0); });
+            }
+
+            // Always show all types as requested
+            const isZero = count === 0;
+            const opacityClass = isZero ? 'opacity-50 grayscale' : '';
+            const bgClass = isZero ? 'bg-slate-50' : 'bg-white hover:bg-slate-50';
+            
+            html += `
+            <tr style="background: ${isZero ? '#f8fafc' : 'white'}; opacity: ${isZero ? '0.6' : '1'}; transition: background 0.2s;">
+                <td style="padding: 15px 12px; border: 1.5px solid #cbd5e1; width: 50px; text-align: center;">
+                    <input type="checkbox" class="delete-type-check" value="${item.key}" ${isZero ? 'disabled' : 'checked'} style="width: 18px; height: 18px; cursor: pointer;">
+                </td>
+                <td style="padding: 15px 15px; border: 1.5px solid #cbd5e1; font-weight: 700; color: #1e293b; font-size: 0.9rem;">
+                    ${item.label}
+                </td>
+                <td style="padding: 15px 15px; border: 1.5px solid #cbd5e1; text-align: right;">
+                    <span style="background: #f1f5f9; padding: 5px 14px; border-radius: 20px; border: 1px solid #cbd5e1; font-weight: 800; font-size: 0.75rem; color: #64748b; display: inline-block;">
+                        ${count} items
+                    </span>
+                </td>
+            </tr>`;
+        });
+        html += `</table>`;
+
+        // 3. Show Modal
+        Swal.fire({
+            title: 'Delete Category?',
+            html: html,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#cbd5e1',
+            confirmButtonText: 'Delete Selected'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const deleteTypes = [];
+                document.querySelectorAll('.delete-type-check:checked').forEach(el => deleteTypes.push(el.value));
+                
+                const payload = {
+                    delete_types: deleteTypes
+                };
+
+                const delRes = await fetch('<?php echo app_base_url('admin/quiz/categories/delete/'); ?>' + id, {
+                    method:'POST', 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                
+                const d = await delRes.json();
+                if(d.status==='success') {
+                    Swal.fire({icon:'success', title:'Deleted', showConfirmButton:false, timer:1000})
+                    .then(() => location.reload());
+                } else {
+                    Swal.fire('Error', 'Deletion failed', 'error');
+                }
+            }
+        });
+
+    } catch(e) {
+        console.error(e);
+        Swal.fire('Error', 'Network Error', 'error');
+    }
 }
 
 // Bulk Actions
@@ -515,12 +611,12 @@ function editCategory(id) {
 
 /* Creation Toolbar (Single Row) */
 .creation-toolbar {
-    padding: 1rem 2rem;
+    padding: 0.6rem 2rem;
     background: #f8fafc;
     border-bottom: 1px solid var(--admin-gray-200);
 }
 .toolbar-title {
-    font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem;
+    font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;
 }
 .creation-form {
     display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
@@ -529,7 +625,7 @@ function editCategory(id) {
 .input-group-premium { position: relative; }
 .input-group-premium .icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.85rem; pointer-events: none; }
 .form-input-premium {
-    width: 100%; height: 40px; padding: 0 0.75rem 0 2.25rem; font-size: 0.875rem; 
+    width: 100%; height: 34px; padding: 0 0.75rem 0 2.25rem; font-size: 0.875rem; 
     border: 1px solid #cbd5e1; border-radius: 8px; outline: none; transition: all 0.2s;
     background: white; color: #334155;
 }
@@ -542,7 +638,7 @@ function editCategory(id) {
 .btn-icon-inside:hover { background: #e2e8f0; color: #4338ca; }
 
 .btn-create-premium {
-    height: 40px; padding: 0 1.5rem; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    height: 34px; padding: 0 1.25rem; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
     color: white; font-weight: 600; font-size: 0.875rem; border: none; border-radius: 8px; cursor: pointer;
     display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s;
     box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2); white-space: nowrap;
@@ -552,7 +648,7 @@ function editCategory(id) {
 /* Switch Toggle */
 .premium-toggle-group {
     display: flex; align-items: center; gap: 0.5rem; background: white; border: 1px solid #cbd5e1;
-    height: 40px; padding: 0 0.75rem; border-radius: 8px;
+    height: 34px; padding: 0 0.75rem; border-radius: 8px;
 }
 .switch { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0; }
 .switch input { opacity: 0; width: 0; height: 0; }
@@ -567,7 +663,7 @@ input:checked + .slider:before { transform: translateX(16px); }
 /* Filter Bar */
 .compact-toolbar {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 0.75rem 2rem; background: #eff6ff; border-bottom: 1px solid #bfdbfe;
+    padding: 0.4rem 2rem; background: #eff6ff; border-bottom: 1px solid #bfdbfe;
 }
 .filter-group { display: flex; align-items: center; gap: 0.75rem; }
 .filter-label { font-size: 0.7rem; font-weight: 700; color: #1e40af; letter-spacing: 0.5px; }
@@ -578,7 +674,7 @@ input:checked + .slider:before { transform: translateX(16px); }
 .search-compact { position: relative; width: 100%; max-width: 300px; }
 .search-compact i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 0.85rem; }
 .search-compact input {
-    width: 100%; height: 36px; padding: 0 0.75rem 0 2.25rem; font-size: 0.85rem;
+    width: 100%; height: 32px; padding: 0 0.75rem 0 2.25rem; font-size: 0.85rem;
     border: 1px solid #bfdbfe; border-radius: 6px; outline: none; background: white; color: #1e40af;
 }
 .drag-hint { font-size: 0.75rem; font-weight: 600; color: #64748b; display: flex; align-items: center; gap: 0.5rem; }
@@ -659,8 +755,8 @@ input:checked + .slider:before { transform: translateX(16px); }
 .btn-bulk-delete:hover { background: #dc2626; }
 
 @media (max-width: 1024px) {
-    .creation-form { flex-direction: column; align-items: stretch; }
-    .input-group-premium { width: 100% !important; }
+    .creation-form { flex-direction: row; overflow-x: auto; padding-bottom: 5px; }
+    .input-group-premium { width: auto !important; }
 }
 </style>
 
@@ -670,14 +766,18 @@ input:checked + .slider:before { transform: translateX(16px); }
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function() {
-    $('#levelFilter').select2({
-        placeholder: 'All Levels',
-        allowClear: true,
-        width: '300px'
-    }).on('select2:open', function() {
-        setTimeout(() => document.querySelector('.select2-search__field').focus(), 100);
-    }).on('change', function() {
-        this.form.submit();
+    // Select2 with Auto-Submit for Filters
+    $('.filter-select-search').each(function() {
+        const placeholder = $(this).find('option:first').text();
+        $(this).select2({
+            placeholder: placeholder,
+            allowClear: true,
+            width: 'resolve'
+        }).on('select2:open', function() {
+            setTimeout(() => document.querySelector('.select2-search__field').focus(), 100);
+        }).on('change', function() {
+            document.getElementById('filterForm').submit();
+        });
     });
     
     $('#parentLevelSelect').select2({
@@ -704,12 +804,12 @@ $('.nav-ball-menu').on('click', function(e) {
 </script>
 <style>
 .select2-container--default .select2-selection--single {
-    height: 40px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 0.75rem; display: flex; align-items: center;
+    height: 34px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 0.75rem; display: flex; align-items: center;
 }
 .select2-container--default .select2-selection--single .select2-selection__rendered {
-    line-height: 40px; padding-left: 0; color: #334155; font-size: 0.875rem;
+    line-height: 34px; padding-left: 0; color: #334155; font-size: 0.875rem;
 }
-.select2-container--default .select2-selection--single .select2-selection__arrow { height: 38px; }
+.select2-container--default .select2-selection--single .select2-selection__arrow { height: 32px; }
 .select2-dropdown { border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
 .select2-container--default .select2-search--dropdown .select2-search__field {
     border: 1px solid #cbd5e1; border-radius: 6px; padding: 0.5rem; font-size: 0.875rem;

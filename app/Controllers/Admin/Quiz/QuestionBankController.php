@@ -303,9 +303,16 @@ class QuestionBankController extends Controller
 
             if (!empty($_POST['mappings']) && is_array($_POST['mappings'])) {
                 foreach ($_POST['mappings'] as $m) {
-                    if (!empty($m['unit_id'])) {
-                        $filterContext = $this->syllabusService->resolveFilterContext($m['unit_id']);
-                        break; // Use the first valid unit for master filtering
+                    // RESOLVE CONTEXT FROM DEEPEST NODE (Topic > Unit > Category > Level > Course)
+                    $deepestNodeId = !empty($m['topic_id']) ? $m['topic_id'] : 
+                                    (!empty($m['unit_id']) ? $m['unit_id'] : 
+                                    (!empty($m['category_id']) ? $m['category_id'] : 
+                                    (!empty($m['level_id']) ? $m['level_id'] : 
+                                    (!empty($m['course_id']) ? $m['course_id'] : null))));
+                    
+                    if ($deepestNodeId) {
+                        $filterContext = $this->syllabusService->resolveFilterContext($deepestNodeId);
+                        break; // Use the first valid unit/topic for master filtering
                     }
                 }
             }
@@ -352,10 +359,17 @@ class QuestionBankController extends Controller
             if (!empty($_POST['mappings']) && is_array($_POST['mappings'])) {
                 $isPrimary = true; // First mapping is primary
                 foreach ($_POST['mappings'] as $mapping) {
-                    if (!empty($mapping['unit_id'])) {
+                    // Determine Syllabus Node ID (Deepest Available Level)
+                    $nodeId = !empty($mapping['topic_id']) ? $mapping['topic_id'] : 
+                             (!empty($mapping['unit_id']) ? $mapping['unit_id'] : 
+                             (!empty($mapping['category_id']) ? $mapping['category_id'] : 
+                             (!empty($mapping['level_id']) ? $mapping['level_id'] : 
+                             (!empty($mapping['course_id']) ? $mapping['course_id'] : null))));
+                    
+                    if ($nodeId) {
                         $this->db->insert('question_stream_map', [
                             'question_id' => $questionId,
-                            'syllabus_node_id' => $mapping['unit_id'],
+                            'syllabus_node_id' => $nodeId,
                             'difficulty_in_stream' => $_POST['difficulty_level'] ?? 3,
                             'priority' => $mapping['priority'] ?? 1,
                             'is_primary' => $isPrimary ? 1 : 0
@@ -414,8 +428,14 @@ class QuestionBankController extends Controller
 
             if (!empty($_POST['mappings']) && is_array($_POST['mappings'])) {
                 foreach ($_POST['mappings'] as $m) {
-                    if (!empty($m['unit_id'])) {
-                        $filterContext = $this->syllabusService->resolveFilterContext($m['unit_id']);
+                    $deepestNodeId = !empty($m['topic_id']) ? $m['topic_id'] : 
+                                    (!empty($m['unit_id']) ? $m['unit_id'] : 
+                                    (!empty($m['category_id']) ? $m['category_id'] : 
+                                    (!empty($m['level_id']) ? $m['level_id'] : 
+                                    (!empty($m['course_id']) ? $m['course_id'] : null))));
+
+                    if ($deepestNodeId) {
+                        $filterContext = $this->syllabusService->resolveFilterContext($deepestNodeId);
                         break; 
                     }
                 }
@@ -458,10 +478,16 @@ class QuestionBankController extends Controller
             if (!empty($_POST['mappings']) && is_array($_POST['mappings'])) {
                 $isPrimary = true;
                 foreach ($_POST['mappings'] as $mapping) {
-                    if (!empty($mapping['unit_id'])) {
+                    $nodeId = !empty($mapping['topic_id']) ? $mapping['topic_id'] : 
+                             (!empty($mapping['unit_id']) ? $mapping['unit_id'] : 
+                             (!empty($mapping['category_id']) ? $mapping['category_id'] : 
+                             (!empty($mapping['level_id']) ? $mapping['level_id'] : 
+                             (!empty($mapping['course_id']) ? $mapping['course_id'] : null))));
+
+                    if ($nodeId) {
                         $this->db->insert('question_stream_map', [
                             'question_id' => $id,
-                            'syllabus_node_id' => $mapping['unit_id'],
+                            'syllabus_node_id' => $nodeId,
                             'difficulty_in_stream' => $_POST['difficulty_level'] ?? 3,
                             'priority' => $mapping['priority'] ?? 1,
                             'is_primary' => $isPrimary ? 1 : 0

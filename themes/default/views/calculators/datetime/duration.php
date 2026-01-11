@@ -21,13 +21,25 @@
             </ol>
         </nav>
 
-        <div class="calc-header animate-slide-down">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6">
-                <i class="fas fa-hourglass-half"></i>
-                <span>TIMELINE</span>
+        <!-- Header -->
+        <div class="flex flex-col items-center text-center animate-slide-down mb-12">
+            <!-- Premium Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-primary text-xs font-bold tracking-widest uppercase mb-6 shadow-lg shadow-primary/5 hover:bg-white/10 transition-colors">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                <span>Timeline</span>
             </div>
-            <h1 class="calc-title">Date <span class="text-gradient">Duration</span></h1>
-            <p class="calc-subtitle">Calculate the duration between two dates in years, months, and days.</p>
+            
+            <!-- Title -->
+            <h1 class="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight drop-shadow-xl">
+                Date <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Duration</span>
+            </h1>
+            
+            <!-- Description -->
+            <p class="text-slate-400 font-medium text-lg max-w-2xl leading-relaxed mx-auto">
+                <span class="bg-gradient-to-r from-white/10 to-transparent h-px w-20 inline-block align-middle mr-2"></span>
+                Calculate the duration between two dates in years, months, and days.
+                <span class="bg-gradient-to-l from-white/10 to-transparent h-px w-20 inline-block align-middle ml-2"></span>
+            </p>
         </div>
 
         <div class="calc-grid max-w-4xl mx-auto">

@@ -24,20 +24,26 @@ class EducationLevelController extends Controller
      */
     public function index()
     {
-        // Fetch Education Levels with Parent Course Name
-        // Assumes Education Levels are children of Courses in syllabus_nodes
-        // Fetch Education Levels with Parent Course Name
-        // Assumes Education Levels are children of Courses in syllabus_nodes
-        $sql = "SELECT el.*, c.title as parent_title, c.is_active as parent_active 
-                FROM syllabus_nodes el 
-                LEFT JOIN syllabus_nodes c ON el.parent_id = c.id
-                WHERE el.type = 'education_level' 
-                ORDER BY (el.is_active = 1 AND IFNULL(c.is_active, 1) = 1) DESC, c.title ASC, el.order_index ASC";
-        
-        $levels = $this->db->query($sql)->fetchAll();
+        $selectedCourse = $_GET['course_id'] ?? null;
 
         // Fetch Courses for Dropdown
         $courses = $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC")->fetchAll();
+
+        // Fetch Education Levels with Parent Course Name
+        $sql = "SELECT el.*, c.title as parent_title, c.is_active as parent_active 
+                FROM syllabus_nodes el 
+                LEFT JOIN syllabus_nodes c ON el.parent_id = c.id
+                WHERE el.type = 'education_level'";
+        
+        $params = [];
+        if ($selectedCourse) {
+            $sql .= " AND el.parent_id = :course_id";
+            $params['course_id'] = $selectedCourse;
+        }
+
+        $sql .= " ORDER BY (el.is_active = 1 AND IFNULL(c.is_active, 1) = 1) DESC, c.title ASC, el.order_index ASC";
+        
+        $levels = $this->db->query($sql, $params)->fetchAll();
 
         $stats = [
             'total' => count($levels),
@@ -47,7 +53,8 @@ class EducationLevelController extends Controller
         return $this->view('admin/quiz/education_levels/index', [
             'levels' => $levels,
             'courses' => $courses,
-            'stats' => $stats
+            'stats' => $stats,
+            'selectedCourse' => $selectedCourse
         ]);
     }
 
@@ -111,8 +118,35 @@ class EducationLevelController extends Controller
         }
     }
 
+    /**
+     * Get Stats for Deletion Modal
+     */
+    public function getDeleteStats($id)
+    {
+        $counts = $this->syllabusService->getChildTypeCounts($id);
+        echo json_encode(['status' => 'success', 'counts' => $counts]);
+    }
+
+    /**
+     * Delete Education Level with Selective Cascade
+     */
     public function delete($id)
     {
+        // Check for JSON input (flags)
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        // Selective Delete
+        if (isset($input['delete_types']) && is_array($input['delete_types'])) {
+            $deleteTypes = $input['delete_types'];
+            if ($this->syllabusService->deleteWithPreservation($id, $deleteTypes)) {
+                echo json_encode(['status' => 'success']);
+            } else {
+                echo json_encode(['status' => 'error']);
+            }
+            return;
+        }
+
+        // Fallback for simple GET/POST
         if ($this->syllabusService->deleteNode($id)) {
             echo json_encode(['status' => 'success']);
         } else {

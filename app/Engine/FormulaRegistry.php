@@ -2,19 +2,25 @@
 
 namespace App\Engine;
 
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+
 /**
  * Formula Registry - Formula execution and management
  * 
- * Executes mathematical formulas safely using:
- * - Expression parsing
- * - Variable substitution
- * - Safe evaluation (no eval())
- * - Support for common math functions
+ * Executes mathematical formulas safely using Symfony ExpressionLanguage
  * 
  * @package App\Engine
  */
 class FormulaRegistry
 {
+    private $language;
+
+    public function __construct()
+    {
+        $this->language = new ExpressionLanguage();
+        $this->registerFunctions();
+    }
+
     /**
      * Execute formulas with given inputs
      * 
@@ -26,6 +32,8 @@ class FormulaRegistry
     {
         $results = [];
         $context = array_merge($inputs, $results); // Allow formulas to reference previous results
+        
+        // echo "REGISTRY_DEBUG: Context Keys: " . implode(', ', array_keys($context)) . "\n";
         
         foreach ($formulas as $resultName => $formula) {
             try {
@@ -42,7 +50,9 @@ class FormulaRegistry
                     $context[$resultName] = $evaluated;
                 }
             } catch (\Exception $e) {
-                throw new \Exception("Error in formula '{$resultName}': " . $e->getMessage());
+                // Log the error but throw a user-friendly message
+                error_log("Formula Execution Error [{$resultName}]: " . $e->getMessage());
+                throw new \Exception("Error calculating '{$resultName}'. Please check your inputs.");
             }
         }
         
@@ -65,7 +75,10 @@ class FormulaRegistry
         
         // If formula is a string, parse and evaluate it
         if (is_string($formula)) {
-            return $this->parseExpression($formula, $context);
+            // Clean context: ExpressionLanguage only allows valid variable names
+            // but we might have keys that are not valid variable names. 
+            // In typical calculator config, keys are 'length', 'width' (valid).
+            return $this->language->evaluate($formula, $context);
         }
         
         // If formula is a numeric value, return it
@@ -75,120 +88,27 @@ class FormulaRegistry
         
         throw new \Exception("Invalid formula type");
     }
-    
+
     /**
-     * Parse and evaluate mathematical expression
-     * 
-     * Supported operations: +, -, *, /, %, ^, ()
-     * Supported functions: sqrt, pow, abs, round, ceil, floor, min, max, sin, cos, tan, log, exp
+     * Register standard math functions
      */
-    private function parseExpression(string $expression, array $context): float
+    private function registerFunctions()
     {
-        // Replace variables with their values
-        $expression = $this->substituteVariables($expression, $context);
-        
-        // Replace math functions
-        $expression = $this->replaceMathFunctions($expression);
-        
-        // Validate expression (security check)
-        if (!$this->isValidExpression($expression)) {
-            throw new \Exception("Invalid or unsafe expression");
-        }
-        
-        // Evaluate using a safe evaluator
-        try {
-            $result = $this->safeEval($expression);
-            return (float) $result;
-        } catch (\Throwable $e) {
-            throw new \Exception("Expression evaluation failed: " . $e->getMessage());
-        }
-    }
-    
-    /**
-     * Substitute variables in expression
-     */
-    private function substituteVariables(string $expression, array $context): string
-    {
-        // Replace each variable with its value
-        foreach ($context as $var => $value) {
-            // Match variable names (alphanumeric + underscore)
-            $pattern = '/\b' . preg_quote($var, '/') . '\b/';
-            $expression = preg_replace($pattern, (string) $value, $expression);
-        }
-        
-        return $expression;
-    }
-    
-    /**
-     * Replace math function names with PHP equivalents
-     */
-    private function replaceMathFunctions(string $expression): string
-    {
+        // Register standard PHP math functions
         $functions = [
-            'sqrt' => 'sqrt',
-            'pow' => 'pow',
-            'abs' => 'abs',
-            'round' => 'round',
-            'ceil' => 'ceil',
-            'floor' => 'floor',
-            'min' => 'min',
-            'max' => 'max',
-            'sin' => 'sin',
-            'cos' => 'cos',
-            'tan' => 'tan',
-            'log' => 'log',
-            'exp' => 'exp',
-            'pi' => 'pi()'
+            'abs', 'ceil', 'floor', 'round', 'max', 'min', 
+            'pow', 'sqrt', 'exp', 'log', 'log10', 
+            'sin', 'cos', 'tan', 'asin', 'acos', 'atan',
+            'deg2rad', 'rad2deg', 'pi'
         ];
-        
-        foreach ($functions as $name => $phpFunc) {
-            $expression = str_replace($name, $phpFunc, $expression);
-        }
-        
-        // Handle power operator (^) -> **
-        $expression = str_replace('^', '**', $expression);
-        
-        return $expression;
-    }
-    
-    /**
-     * Validate expression for safety
-     */
-    private function isValidExpression(string $expression): bool
-    {
-        // Allowed characters: numbers, operators, parentheses, decimal point, math functions
-        $allowedPattern = '/^[0-9+\-*\/().%\s]+$/';
-        
-        // Remove known safe function names
-        $cleaned = preg_replace('/\b(sqrt|pow|abs|round|ceil|floor|min|max|sin|cos|tan|log|exp|pi)\s*\(/i', '', $expression);
-        
-        // Check if remaining characters are safe
-        return preg_match($allowedPattern, $cleaned) === 1;
-    }
-    
-    /**
-     * Safe evaluation of mathematical expression
-     * 
-     * Uses a simple recursive descent parser instead of eval()
-     */
-    private function safeEval(string $expression)
-    {
-        // Remove whitespace
-        $expression = str_replace(' ', '', $expression);
-        
-        // Create a simple evaluator using create_function equivalent (PHP 8+ uses arrow functions)
-        // For production, consider using a proper math expression parser library like mathparser/mathparser
-        
-        // Simple approach: Use eval() with strict validation (already validated above)
-        // Note: In production, replace this with a proper expression parser library
-        try {
-            $result = @eval("return {$expression};");
-            if ($result === false && error_get_last()) {
-                throw new \Exception("Expression evaluation error");
-            }
-            return $result;
-        } catch (\Throwable $e) {
-            throw new \Exception("Failed to evaluate expression: " . $e->getMessage());
+
+        foreach ($functions as $func) {
+            $this->language->register($func, function (...$args) use ($func) {
+                return sprintf('%s(%s)', $func, implode(', ', $args));
+            }, function ($arguments, ...$args) use ($func) {
+                return call_user_func_array($func, $args);
+            });
         }
     }
 }
+

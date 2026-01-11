@@ -34,28 +34,50 @@ class CalculationService
                 ];
             }
             
-            // Perform calculation
+            // 2. Perform calculation
             $result = $calculator->calculate($inputData);
             
+            // 3. Handle Failure
+            $success = $result['status'] === 'success' || ($result['success'] ?? false) === true;
+            if (!$success) {
+                return $result; // Pass-through engine error
+            }
+
+            // 4. Transform to Enterprise structure
+            // If result comes from CalculatorEngine, it's inside 'results'
+            $source = isset($result['results']) && is_array($result['results']) ? $result['results'] : $result;
+
+            $finalResponse = [
+                'status' => 'success',
+                'physics' => $source['geometry'] ?? $source['result'] ?? $source['data'] ?? $source,
+                'enterprise' => [
+                    'materials' => $source['materials'] ?? $source['bill_of_materials'] ?? null,
+                    'cost' => $source['cost'] ?? $source['bill_of_materials'] ?? null,
+                    'suggestions' => $source['related_items'] ?? $source['suggestions'] ?? []
+                ]
+            ];
+
+            // Clean up physics if it contains enterprise keys (redundancy)
+            if (is_array($finalResponse['physics'])) {
+                $eKeys = ['bill_of_materials', 'related_items', 'materials', 'cost', 'suggestions', 'geometry', 'results', 'success', 'calculator', 'inputs', 'metadata'];
+                foreach ($eKeys as $k) unset($finalResponse['physics'][$k]);
+            }
+
+            // Backward compatibility for generic 'result' or legacy structures
+            if (isset($source['result'])) {
+                $finalResponse['result'] = $source['result'];
+            }
+
             // Save to history if user is logged in
             $historyId = null;
             if ($userId) {
                 $historyId = $this->saveToHistory($userId, $calculatorType, $calculatorSlug, $inputData, $result, $projectId);
+                $finalResponse['history_id'] = $historyId;
             }
             
-            // Extract numeric result if it's in a nested structure
-            $numericResult = $result;
-            if (is_array($result) && isset($result['result'])) {
-                $numericResult = $result['result'];
-            }
+            $finalResponse['timestamp'] = date('Y-m-d H:i:s');
             
-            return [
-                'success' => true,
-                'result' => $numericResult,  // Direct numeric value for API compatibility
-                'data' => $result,           // Full result data for backward compatibility
-                'history_id' => $historyId,  // Return ID
-                'timestamp' => date('Y-m-d H:i:s')
-            ];
+            return $finalResponse;
             
         } catch (\Exception $e) {
             return [

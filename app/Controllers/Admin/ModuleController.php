@@ -56,7 +56,7 @@ class ModuleController extends Controller
         $categories = $this->getModuleCategories();
 
         // Enhance DB modules with display categories AND file system stats
-        $modulesPath = dirname(dirname(dirname(__DIR__))) . '/modules/';
+        $modulesPath = dirname(dirname(dirname(__DIR__))) . '/Calculators/';
         
         foreach ($modules as &$module) {
             // The 'name' field in DB now contains the directory slug (e.g., 'civil', 'electrical')
@@ -180,9 +180,23 @@ class ModuleController extends Controller
         $module['display_name'] = ucwords(str_replace(['-', '_'], ' ', $key));
         
         // Get actual file system stats for this module
-        $modulesPath = dirname(dirname(dirname(__DIR__))) . '/modules/';
-        $moduleDir = $modulesPath . $key;
-        if (is_dir($moduleDir)) {
+        $calculatorsPath = dirname(dirname(dirname(__DIR__))) . '/Calculators/';
+        // Mapping: name 'civil' -> folder 'Civil' (First letter cap usually, or exact match if we standardizes)
+        // Let's scan for case-insensitive match
+        $targetDir = '';
+        $scan = @scandir($calculatorsPath);
+        if ($scan) {
+            foreach($scan as $d) {
+                if (strtolower($d) === strtolower($key)) {
+                    $targetDir = $d;
+                    break;
+                }
+            }
+        }
+        
+        $moduleDir = $calculatorsPath . $targetDir;
+        
+        if ($targetDir && is_dir($moduleDir)) {
             $stats = $this->getModuleStats($moduleDir);
             $module['calculators_count'] = $stats['calculators'];
             $module['subcategories_count'] = $stats['subcategories'];
@@ -226,50 +240,44 @@ class ModuleController extends Controller
     }
 
     /**
-     * Get modules from the file system as fallback
+     * Get modules from the App/Calculators namespace
+     * Replaces the legacy file-system check in 'modules/'
      */
     private function getAllModulesFromFileSystem()
     {
-        // Get real modules from modules directory
-        $modulesPath = dirname(dirname(dirname(__DIR__))) . '/modules/';
+        // New Path: app/Calculators
+        $calculatorsPath = dirname(dirname(__DIR__)) . '/Calculators/';
         $modules = [];
 
-        // Add error handling for directory access
-        if (!is_dir($modulesPath)) {
-            error_log("Modules directory not found: {$modulesPath}");
+        if (!is_dir($calculatorsPath)) {
+            error_log("Calculators directory not found: {$calculatorsPath}");
             return $modules;
         }
 
-        if (!is_readable($modulesPath)) {
-            error_log("Modules directory not readable: {$modulesPath}");
-            return $modules;
-        }
+        $items = @scandir($calculatorsPath);
+        if ($items === false) return $modules;
 
-        $dirs = @scandir($modulesPath);
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..' || $item === 'CalculatorFactory.php' || $item === 'EnterprisePipeline.php' || $item === 'EnterpriseCalculator.php') continue;
 
-        if ($dirs === false) {
-            error_log("Failed to scan modules directory: {$modulesPath}");
-            return $modules;
-        }
-
-        foreach ($dirs as $dir) {
-            if ($dir === '.' || $dir === '..') continue;
-
-            $fullPath = $modulesPath . $dir;
+            $fullPath = $calculatorsPath . $item;
+            
+            // In the new architecture, Folders = Modules (e.g., Civil, Electrical)
             if (is_dir($fullPath)) {
-                // Get detailed stats about this module
+                $slug = strtolower($item);
                 $stats = $this->getModuleStats($fullPath);
                 
                 $modules[] = [
                     'id' => count($modules) + 1,
-                    'name' => ucwords(str_replace(['-', '_'], ' ', $dir)),
-                    'slug' => $dir,
-                    'description' => $this->getModuleDescription($dir),
-                    'status' => 'active', // TODO: Get from settings
+                    'name' => $slug, // slug for DB sync
+                    'slug' => $slug,
+                    'display_name' => $item, // Capitalized Folder Name
+                    'description' => $this->getModuleDescription($slug),
+                    'status' => 'active', 
                     'calculators_count' => $stats['calculators'],
-                    'subcategories_count' => $stats['subcategories'],
-                    'version' => '1.0.0',
-                    'category' => $this->getCategoryFromName($dir)
+                    'subcategories_count' => 0, // Flattened architecture
+                    'version' => '2.0.0 (Enterprise)',
+                    'category' => $this->getCategoryFromName($slug)
                 ];
             }
         }
@@ -278,8 +286,7 @@ class ModuleController extends Controller
     }
 
     /**
-     * Count calculators and sub-categories in a module
-     * Returns array with 'calculators' and 'subcategories' counts
+     * Count calculators in the class-based structure
      */
     private function getModuleStats($modulePath)
     {
@@ -288,37 +295,15 @@ class ModuleController extends Controller
             'subcategories' => 0
         ];
 
-        if (!is_dir($modulePath)) {
-            return $stats;
-        }
+        if (!is_dir($modulePath)) return $stats;
 
-        // Scan immediate subdirectories (these are sub-categories)
-        $items = @scandir($modulePath);
-        if ($items === false) {
-            return $stats;
-        }
-
-        foreach ($items as $item) {
-            if ($item === '.' || $item === '..') continue;
-            
-            $itemPath = $modulePath . '/' . $item;
-            
-            if (is_dir($itemPath)) {
-                // This is a sub-category
-                $stats['subcategories']++;
-                
-                // Count PHP files in this sub-category
-                $files = @scandir($itemPath);
-                if ($files !== false) {
-                    foreach ($files as $file) {
-                        if (pathinfo($file, PATHINFO_EXTENSION) === 'php' && $file !== 'index.php') {
-                            $stats['calculators']++;
-                        }
-                    }
+        $files = @scandir($modulePath);
+        if ($files !== false) {
+            foreach ($files as $file) {
+                // Count Classes ending in Calculator.php
+                if (strpos($file, 'Calculator.php') !== false) {
+                    $stats['calculators']++;
                 }
-            } elseif (pathinfo($item, PATHINFO_EXTENSION) === 'php' && $item !== 'index.php') {
-                // Direct PHP file in module root (also a calculator)
-                $stats['calculators']++;
             }
         }
 

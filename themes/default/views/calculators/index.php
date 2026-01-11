@@ -1,209 +1,283 @@
 <?php
 // themes/default/views/calculators/index.php
-// PREMIUM CALCULATOR HUB
+// ULTRA PREMIUM CALCULATOR HUB - Content View
 ?>
 
-<!-- Load Calculators CSS -->
-<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
-<!-- Load Alpine.js -->
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-<!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Tailwind CSS & Config -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                    mono: ['JetBrains Mono', 'monospace'],
+                },
+                colors: {
+                    brand: {
+                        purple: '#8b5cf6',
+                        cyan: '#06b6d4',
+                        pink: '#f472b6',
+                    }
+                },
+                animation: {
+                    'blob': 'blob 10s infinite',
+                    'float': 'float 6s ease-in-out infinite',
+                    'glow': 'glow 2s ease-in-out infinite alternate',
+                },
+                keyframes: {
+                    blob: {
+                        '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                        '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                        '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                        '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                    },
+                    float: {
+                        '0%, 100%': { transform: 'translateY(0)' },
+                        '50%': { transform: 'translateY(-20px)' },
+                    },
+                    glow: {
+                        '0%': { boxShadow: '0 0 20px rgba(6, 182, 212, 0.2)' },
+                        '100%': { boxShadow: '0 0 40px rgba(6, 182, 212, 0.6)' },
+                    }
+                }
+            }
+        }
+    }
+</script>
 
-<div class="bg-background min-h-screen relative overflow-hidden" x-data="calculatorHub()">
+<!-- Fonts & Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<style>
+    [x-cloak] { display: none !important; }
+    /* Custom Scrollbar for this page */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
     
-    <!-- Animated Background Mesh -->
-    <div class="fixed inset-0 pointer-events-none z-0">
-        <div class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] animate-float"></div>
-        <div class="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[120px] animate-float" style="animation-delay: 1s;"></div>
-        <div class="absolute top-[40%] left-[50%] w-[400px] h-[400px] bg-accent/10 rounded-full blur-[100px] animate-float" style="animation-delay: 2s;"></div>
+    .mask-gradient {
+        mask-image: linear-gradient(to right, transparent, black 20px, black 95%, transparent);
+    }
+</style>
+
+<!-- Main Page Wrapper (No Navbar/Footer) -->
+<div class="relative w-full min-h-screen bg-[#0f172a] text-slate-200 font-sans antialiased overflow-hidden" x-data="calculatorHub">
+
+    <!-- Background Ambience -->
+    <div class="absolute inset-0 pointer-events-none z-0">
+        <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-purple-600/20 rounded-full mix-blend-screen filter blur-[120px] animate-blob sticky top-0"></div>
+        <div class="absolute bottom-0 left-0 w-[800px] h-[800px] bg-cyan-600/20 rounded-full mix-blend-screen filter blur-[120px] animate-blob animation-delay-2000 sticky bottom-0"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-pink-600/10 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-4000"></div>
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')] z-[1] opacity-30"></div>
     </div>
 
-    <div class="calc-container">
+    <!-- Content Container -->
+    <div class="relative z-10 max-w-7xl mx-auto px-6 py-12 md:py-20 flex flex-col items-center">
         
-        <!-- Hero Section -->
-        <div class="calc-header animate-slide-down">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-6 animate-pulse-glow">
-                <i class="fas fa-calculator"></i>
-                <span>PRECISION TOOLS</span>
+        <!-- Hero Text -->
+        <div class="text-center max-w-3xl mx-auto mb-16 relative">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-6 animate-pulse">
+                <i class="fas fa-sparkles"></i> <span>Premium Tools Collection</span>
             </div>
             
-            <h1 class="calc-title">
-                Calculator <span class="text-gradient">Universe</span>
+            <h1 class="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-slate-400 mb-6 tracking-tight drop-shadow-2xl">
+                Calculator Universe
             </h1>
-            <p class="calc-subtitle max-w-2xl mx-auto">
-                Lightning-fast calculations with premium UI. Choose from 30+ specialized calculators across 6 categories.
+            
+            <p class="text-lg md:text-xl text-slate-400 font-medium leading-relaxed max-w-2xl mx-auto">
+                A curated suite of <span class="text-cyan-400 font-bold">high-precision</span> engineering and mathematical tools. Designed for speed, accuracy, and elegance.
             </p>
         </div>
 
-        <!-- Search & Filter Bar -->
-        <div class="glass-card mb-12 animate-scale-in">
-            <div class="flex flex-col md:flex-row gap-4">
-                <!-- Search Input -->
-                <div class="relative flex-grow group">
-                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-primary transition-colors"></i>
-                    <input 
-                        type="text" 
-                        x-model="searchQuery" 
-                        @input="filterCalculators()"
-                        class="glass-input w-full pl-12 pr-4"
-                        placeholder="Search calculators (e.g., 'area', 'loan', 'BMI')...">
+        <!-- Spotlight Search & Navigation -->
+        <div class="w-full max-w-4xl relative z-20 mb-12">
+            
+            <!-- Search Box -->
+            <div class="relative group mb-8">
+                <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-2xl opacity-30 group-hover:opacity-60 blur-xl transition-opacity duration-500"></div>
+                <div class="relative bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center p-2 shadow-2xl focus-within:border-cyan-500/50 transition-all duration-300">
+                    <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 group-focus-within:text-cyan-400 transition-colors">
+                        <i class="fas fa-search text-xl"></i>
+                    </div>
+                    <input type="text" x-model="searchQuery" 
+                            class="w-full bg-transparent border-none text-lg text-white placeholder-slate-500 focus:ring-0 px-4 h-12"
+                            placeholder="Search tools (e.g., 'converter', 'loan', 'area')...">
+                    <div class="hidden md:flex items-center gap-2 px-4 text-xs font-mono text-slate-500 border-l border-white/5">
+                        <span class="bg-white/5 px-2 py-1 rounded border border-white/5">CTRL</span>
+                        <span class="bg-white/5 px-2 py-1 rounded border border-white/5">K</span>
+                    </div>
                 </div>
-
-                <!-- Category Filter -->
-                <select x-model="selectedCategory" @change="filterCalculators()" class="calc-select md:w-64">
-                    <option value="">All Categories</option>
-                    <option value="math">Mathematics</option>
-                    <option value="finance">Finance</option>
-                    <option value="health">Health</option>
-                    <option value="physics">Physics</option>
-                    <option value="chemistry">Chemistry</option>
-                    <option value="datetime">Date & Time</option>
-                </select>
             </div>
 
-            <!-- Quick Stats -->
-            <div class="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/10">
-                <div class="text-center">
-                    <div class="text-3xl font-black text-gradient" x-text="filteredCalculators.length"></div>
-                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">Available</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-3xl font-black text-gradient">6</div>
-                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">Categories</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-3xl font-black text-gradient">∞</div>
-                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">Calculations</div>
-                </div>
+            <!-- Category Tabs (Glass) -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-4 custom-scrollbar mask-gradient">
+                <button @click="filter = 'all'" 
+                        class="px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 border"
+                        :class="filter === 'all' ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.3)] scale-105' : 'bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:text-white'">
+                    All Tools
+                </button>
+                
+                <template x-for="cat in categories" :key="cat.id">
+                    <button @click="filter = cat.id" 
+                            class="px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 border flex items-center gap-2"
+                            :class="filter === cat.id ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-transparent shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-105' : 'bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:text-white'">
+                        <i :class="cat.icon" class="text-xs opacity-70"></i>
+                        <span x-text="cat.name"></span>
+                    </button>
+                </template>
             </div>
         </div>
 
-        <!-- Calculators Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Stats -->
+        <div class="w-full max-w-4xl grid grid-cols-3 gap-4 mb-20 border-t border-white/5 pt-8">
+            <div class="text-center">
+                <div class="text-3xl font-black text-white" x-text="activeCalculators.length"></div>
+                <div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">Available Tools</div>
+            </div>
+            <div class="text-center border-l border-white/5">
+                <div class="text-3xl font-black text-white" x-text="categories.length"></div>
+                <div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">Categories</div>
+            </div>
+            <div class="text-center border-l border-white/5">
+                <div class="text-3xl font-black text-cyan-400">∞</div>
+                <div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">Possibilities</div>
+            </div>
+        </div>
+
+        <!-- Calculator Grid -->
+        <div class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10 pb-20">
             
-            <template x-for="(calc, index) in filteredCalculators" :key="calc.id">
-                <a :href="calc.url" class="calc-card group stagger-item block no-underline" :style="'animation-delay: ' + (index * 0.05) + 's'">
-                    <!-- Icon Header -->
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300">
-                            <i :class="calc.icon" class="text-primary"></i>
+            <template x-for="calc in activeCalculators" :key="calc.title">
+                <a :href="calc.url" class="group relative block h-full">
+                    <!-- Glow Effect -->
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-[24px] opacity-0 group-hover:opacity-50 blur transition duration-500 group-hover:duration-200"></div>
+                    
+                    <!-- Card Content -->
+                    <div class="relative h-full bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 rounded-[22px] p-6 flex flex-col transition-transform duration-300 group-hover:-translate-y-1">
+                        
+                        <!-- Card Header -->
+                        <div class="flex items-start justify-between mb-5">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-white/5 to-white/0 border border-white/10 flex items-center justify-center text-2xl text-cyan-400 shadow-inner group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                                <i :class="calc.icon"></i>
+                            </div>
+                            <div class="px-3 py-1 rounded-full bg-white/5 border border-white/5 text-[10px] font-bold text-slate-400 uppercase tracking-wider group-hover:bg-cyan-500/10 group-hover:text-cyan-400 transition-colors" x-text="calc.category_name"></div>
                         </div>
-                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/5 border border-white/10 text-gray-400" x-text="calc.category"></span>
+                        
+                        <!-- Card Body -->
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors" x-text="calc.title"></h3>
+                        <p class="text-sm text-slate-400 font-medium leading-relaxed mb-6 line-clamp-2" x-text="calc.description"></p>
+                        
+                        <!-- Card Footer -->
+                        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-500 group-hover:text-white transition-colors flex items-center gap-1.5">
+                                <i class="fas fa-bolt text-yellow-500"></i> Instant
+                            </span>
+                            <span class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-cyan-500 group-hover:text-black transition-all duration-300 transform group-hover:translate-x-1">
+                                <i class="fas fa-arrow-right text-xs"></i>
+                            </span>
+                        </div>
                     </div>
-
-                    <!-- Title & Description -->
-                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors" x-text="calc.title"></h3>
-                    <p class="text-sm text-gray-400 mb-4 line-clamp-2" x-text="calc.description"></p>
-
-                    <!-- Footer -->
-                    <div class="flex items-center justify-between pt-4 border-t border-white/5">
-                        <div class="flex items-center gap-2 text-xs text-gray-500">
-                            <i class="fas fa-bolt text-yellow-500"></i>
-                            <span>Instant Results</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-primary font-bold text-sm group-hover:gap-3 transition-all">
-                            <span>Calculate</span>
-                            <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                        </div>
-                    </div>
-
-                    <!-- Hover Glow Effect -->
-                    <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                 </a>
             </template>
 
+            <!-- No Results -->
+            <div x-show="activeCalculators.length === 0" class="col-span-1 md:col-span-2 lg:col-span-3 py-20 text-center" x-transition>
+                <div class="w-20 h-20 mx-auto bg-white/5 rounded-full flex items-center justify-center text-slate-600 text-3xl mb-6">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">No tools found</h3>
+                <p class="text-slate-400">We couldn't find any calculators matching "<span x-text="searchQuery" class="text-cyan-400"></span>".</p>
+                <button @click="searchQuery = ''; filter = 'all'" class="mt-6 px-6 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-bold transition-colors">
+                    Clear Filters
+                </button>
+            </div>
+
         </div>
 
-        <!-- Empty State -->
-        <div x-show="filteredCalculators.length === 0" class="text-center py-20 animate-fade-in">
-            <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-white/5 flex items-center justify-center text-4xl text-gray-600">
-                <i class="fas fa-search"></i>
+        <!-- Features Info -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="bg-white/5 rounded-2xl p-6 border border-white/10 text-center">
+                <i class="fas fa-bolt text-3xl text-yellow-400 mb-4"></i>
+                <h3 class="text-white font-bold mb-2">Blazing Fast</h3>
+                <p class="text-sm text-slate-400">Instant client-side updates</p>
             </div>
-            <h3 class="text-2xl font-bold text-white mb-2">No calculators found</h3>
-            <p class="text-gray-400 mb-6">Try adjusting your search or filter</p>
-            <button @click="searchQuery = ''; selectedCategory = ''; filterCalculators()" class="btn-secondary">
-                <i class="fas fa-redo mr-2"></i> Reset Filters
-            </button>
-        </div>
-
-        <!-- Info Section -->
-        <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="glass-card text-center stagger-item" style="animation-delay: 0.4s;">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 flex items-center justify-center text-3xl">
-                    <i class="fas fa-rocket text-green-500"></i>
-                </div>
-                <h3 class="text-lg font-bold text-white mb-2">Blazing Fast</h3>
-                <p class="text-sm text-gray-400">GPU-accelerated animations running at 60fps for instant feedback</p>
+            <div class="bg-white/5 rounded-2xl p-6 border border-white/10 text-center">
+                <i class="fas fa-shield-alt text-3xl text-blue-400 mb-4"></i>
+                <h3 class="text-white font-bold mb-2">Secure & Precise</h3>
+                <p class="text-sm text-slate-400">Verified algorithms</p>
             </div>
-
-            <div class="glass-card text-center stagger-item" style="animation-delay: 0.5s;">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 flex items-center justify-center text-3xl">
-                    <i class="fas fa-shield-alt text-blue-500"></i>
-                </div>
-                <h3 class="text-lg font-bold text-white mb-2">100% Accurate</h3>
-                <p class="text-sm text-gray-400">Precision calculations verified against industry standards</p>
-            </div>
-
-            <div class="glass-card text-center stagger-item" style="animation-delay: 0.6s;">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center text-3xl">
-                    <i class="fas fa-mobile-alt text-purple-500"></i>
-                </div>
-                <h3 class="text-lg font-bold text-white mb-2">Fully Responsive</h3>
-                <p class="text-sm text-gray-400">Perfect experience on desktop, tablet, and mobile devices</p>
+            <div class="bg-white/5 rounded-2xl p-6 border border-white/10 text-center">
+                <i class="fas fa-mobile-alt text-3xl text-purple-400 mb-4"></i>
+                <h3 class="text-white font-bold mb-2">Responsive</h3>
+                <p class="text-sm text-slate-400">Works on any device</p>
             </div>
         </div>
 
     </div>
 </div>
 
+<!-- Alpine.js Logic -->
 <script>
-document.addEventListener('alpine:init', () => {
-    Alpine.data('calculatorHub', () => ({
-        searchQuery: '',
-        selectedCategory: '',
-        calculators: [
-            // Core
-            { id: 0, title: 'Scientific Calculator', description: 'Advanced scientific calculator with trigonometry, logs, and exponential functions', category: 'math', icon: 'fas fa-atom', url: '<?= app_base_url("/calculators/scientific") ?>' },
-            // Mathematics
-            { id: 1, title: 'Area Calculator', description: 'Calculate area of various shapes including circles, rectangles, and triangles', category: 'math', icon: 'fas fa-square', url: '<?= app_base_url("/calculators/math/area") ?>' },
-            { id: 2, title: 'Volume Calculator', description: 'Compute volume of 3D shapes like spheres, cubes, and cylinders', category: 'math', icon: 'fas fa-cube', url: '<?= app_base_url("/calculators/math/volume") ?>' },
-            { id: 3, title: 'Percentage Calculator', description: 'Calculate percentages, percentage increase, and percentage difference', category: 'math', icon: 'fas fa-percent', url: '<?= app_base_url("/calculators/math/percentage") ?>' },
-            { id: 4, title: 'Fraction Calculator', description: 'Add, subtract, multiply, and divide fractions with step-by-step solutions', category: 'math', icon: 'fas fa-divide', url: '<?= app_base_url("/calculators/math/fraction") ?>' },
-            { id: 5, title: 'Quadratic Equation Solver', description: 'Solve quadratic equations and visualize the parabola', category: 'math', icon: 'fas fa-superscript', url: '<?= app_base_url("/calculators/math/quadratic") ?>' },
-            { id: 6, title: 'Trigonometry Calculator', description: 'Calculate sine, cosine, tangent, and other trig functions', category: 'math', icon: 'fas fa-wave-square', url: '<?= app_base_url("/calculators/math/trigonometry") ?>' },
-            { id: 7, title: 'Statistics Calculator', description: 'Compute mean, median, mode, standard deviation, and variance', category: 'math', icon: 'fas fa-chart-bar', url: '<?= app_base_url("/calculators/math/statistics") ?>' },
-            { id: 8, title: 'GCD & LCM Calculator', description: 'Find Greatest Common Divisor and Least Common Multiple', category: 'math', icon: 'fas fa-calculator', url: '<?= app_base_url("/calculators/math/gcd_lcm") ?>' },
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('calculatorHub', () => ({
+            searchQuery: '',
+            filter: 'all',
             
-            // Finance
-            { id: 20, title: 'Compound Interest', description: 'Calculate compound interest with customizable compounding frequency', category: 'finance', icon: 'fas fa-chart-line', url: '<?= app_base_url("/calculators/finance/compound_interest") ?>' },
-            { id: 21, title: 'Loan Calculator', description: 'Calculate monthly payments, total interest, and amortization schedule', category: 'finance', icon: 'fas fa-hand-holding-usd', url: '<?= app_base_url("/calculators/finance/loan") ?>' },
-            { id: 22, title: 'Mortgage Calculator', description: 'Estimate monthly mortgage payments including taxes and insurance', category: 'finance', icon: 'fas fa-home', url: '<?= app_base_url("/calculators/finance/mortgage") ?>' },
-            { id: 23, title: 'Investment Calculator', description: 'Project investment growth with regular contributions', category: 'finance', icon: 'fas fa-piggy-bank', url: '<?= app_base_url("/calculators/finance/investment") ?>' },
-            { id: 24, title: 'ROI Calculator', description: 'Calculate Return on Investment for business decisions', category: 'finance', icon: 'fas fa-percentage', url: '<?= app_base_url("/calculators/finance/roi") ?>' },
-            { id: 25, title: 'Salary Calculator', description: 'Convert between hourly, monthly, and annual salary', category: 'finance', icon: 'fas fa-money-bill-wave', url: '<?= app_base_url("/calculators/finance/salary") ?>' },
-            
-            // Health
-            { id: 30, title: 'BMI Calculator', description: 'Calculate Body Mass Index and get health recommendations', category: 'health', icon: 'fas fa-weight', url: '<?= app_base_url("/calculators/math/bmi") ?>' },
-            { id: 31, title: 'Age Calculator', description: 'Calculate exact age in years, months, and days', category: 'health', icon: 'fas fa-birthday-cake', url: '<?= app_base_url("/calculators/math/age") ?>' },
-            
-            // Special
-            { id: 50, title: 'Nepali Unit Converter', description: 'Convert between Ropani, Aana, Bigha, Kattha and metric units', category: 'math', icon: 'fas fa-mountain', url: '<?= app_base_url("/calculators/nepali") ?>' },
-        ],
-        filteredCalculators: [],
+            // Categories
+            categories: [
+                { id: 'math', name: 'Mathematics', icon: 'fas fa-square-root-alt' },
+                { id: 'finance', name: 'Finance', icon: 'fas fa-coins' },
+                { id: 'health', name: 'Health', icon: 'fas fa-heartbeat' },
+                { id: 'engineering', name: 'Engineering', icon: 'fas fa-drafting-compass' },
+                { id: 'nepali', name: 'Regional', icon: 'fas fa-globe-asia' },
+            ],
 
-        init() {
-            this.filteredCalculators = this.calculators;
-        },
+            // Calculator Data
+            calculators: [
+                // MATH
+                { title: 'Scientific Calculator', description: 'Advanced scientific functions including trig, logs, and exponents.', icon: 'fas fa-atom', category: 'math', category_name: 'Math', url: '<?= app_base_url('/calculators/scientific') ?>' },
+                { title: 'Area Calculator', description: 'Compute area for circles, rectangles, triangles, and polygons.', icon: 'fas fa-vector-square', category: 'math', category_name: 'Math', url: '<?= app_base_url('/calculators/math/area') ?>' },
+                { title: 'Volume Calculator', description: 'Calculate volume for spheres, cubes, cylinders, and more.', icon: 'fas fa-cube', category: 'math', category_name: 'Math', url: '<?= app_base_url('/calculators/math/volume') ?>' },
+                { title: 'Percentage', description: 'Calculate increases, decreases, and percentage differences.', icon: 'fas fa-percent', category: 'math', category_name: 'Math', url: '<?= app_base_url('/calculators/math/percentage') ?>' },
+                { title: 'Fraction Calculator', description: 'Work with fractions easily: add, subtract, multiply, and divide.', icon: 'fas fa-divide', category: 'math', category_name: 'Math', url: '<?= app_base_url('/calculators/math/fraction') ?>' },
+                
+                // FINANCE
+                { title: 'Loan Calculator', description: 'Estimate monthly payments, total interest, and amortization.', icon: 'fas fa-hand-holding-usd', category: 'finance', category_name: 'Finance', url: '<?= app_base_url('/calculators/finance/loan') ?>' },
+                { title: 'Compound Interest', description: 'Visualize how your investments grow over time with compounding.', icon: 'fas fa-chart-line', category: 'finance', category_name: 'Finance', url: '<?= app_base_url('/calculators/finance/compound_interest') ?>' },
+                { title: 'Mortgage Estimator', description: 'Calculate monthly home loan payments including tax and insurance.', icon: 'fas fa-home', category: 'finance', category_name: 'Finance', url: '<?= app_base_url('/calculators/finance/mortgage') ?>' },
+                { title: 'ROI Calculator', description: 'Analyze the return on investment for business decisions.', icon: 'fas fa-chart-pie', category: 'finance', category_name: 'Finance', url: '<?= app_base_url('/calculators/finance/roi') ?>' },
 
-        filterCalculators() {
-            this.filteredCalculators = this.calculators.filter(calc => {
-                const matchesSearch = calc.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                                    calc.description.toLowerCase().includes(this.searchQuery.toLowerCase());
-                const matchesCategory = this.selectedCategory === '' || calc.category === this.selectedCategory;
-                return matchesSearch && matchesCategory;
-            });
-        }
-    }));
-});
+                // HEALTH
+                { title: 'BMI Calculator', description: 'Check your Body Mass Index and get health insights.', icon: 'fas fa-weight', category: 'health', category_name: 'Health', url: '<?= app_base_url('/calculators/math/bmi') ?>' },
+                { title: 'Age Calculator', description: 'Calculate your exact age in years, months, and days.', icon: 'fas fa-birthday-cake', category: 'health', category_name: 'Health', url: '<?= app_base_url('/calculators/math/age') ?>' },
+
+                // SPECIAL / CONVERTERS
+                { title: 'Unit Converter', description: 'Convert between thousands of units across 20+ categories.', icon: 'fas fa-exchange-alt', category: 'engineering', category_name: 'Tool', url: '<?= app_base_url('/convert/length') ?>' },
+                { title: 'Nepali Unit Converter', description: 'Traditional Nepali land area conversions (Ropani, Aana, etc).', icon: 'fas fa-mountain', category: 'nepali', category_name: 'Regional', url: '<?= app_base_url('/nepali') ?>' },
+            ],
+
+            get activeCalculators() {
+                const q = this.searchQuery.toLowerCase();
+                return this.calculators.filter(c => {
+                    const matchesSearch = c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q);
+                    const matchesFilter = this.filter === 'all' || c.category === this.filter;
+                    return matchesSearch && matchesFilter;
+                });
+            },
+
+            init() {
+                // Keyboard shortcut for search
+                window.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                        e.preventDefault();
+                        document.querySelector('input[type="text"]').focus();
+                    }
+                });
+            }
+        }));
+    });
 </script>

@@ -444,6 +444,7 @@ $router->add("GET", "/payment/stripe/cancel", "Payment\StripeController@cancel",
 $router->add("POST", "/webhooks/stripe", "Payment\StripeController@webhook"); // Public webhook
 
 // Project Routes
+$router->add("GET", "/project", "LandingController@management"); 
 $router->add("GET", "/projects", "ProjectController@index", ["auth"] );
 $router->add("POST", "/projects/store", "ProjectController@store", ["auth"]);
 $router->add("GET", "/projects/view/{id}", "ProjectController@show", ["auth"]);
@@ -479,122 +480,105 @@ $router->add("GET", "/rate-analysis/cash-flow", "RateAnalysisController@cash_flo
 $router->add("GET", "/rate-analysis/npv-irr", "RateAnalysisController@npv_irr_analysis");
 
 // Calculator Platform Routes
-$router->add("GET", "/calculator", "CalculatorController@index");
-$router->add("GET", "/calculator/converter/{slug}", "CalculatorController@converter");
+$router->add("GET", "/calculators", "CalculatorController@index");
+$router->add("GET", "/convert", "CalculatorController@converter"); // Catch-all / landing
+$router->add("GET", "/convert/{slug}", "CalculatorController@converter");
 $router->add("POST", "/calculator/api/convert", "CalculatorController@convert");
 $router->add("POST", "/calculator/api/calculate", "CalculatorController@calculate");
 $router->add("GET", "/calculator/api/data/{slug}", "ApiController@converterData");
-$router->add("GET", "/calculator/scientific", "CalculatorController@scientific");
 $router->add("GET", "/calculators/scientific", "CalculatorController@scientific");
-
-// Legacy/Dynamic Tool Routes (Disabled to prevent shadowing specific routes)
-$router->add("GET", "/calculators", "CalculatorController@index");
-// $router->add("GET", "/calculator/{category}", "CalculatorController@category");
-// $router->add("GET", "/calculator/{category}/{tool}", "CalculatorController@tool");
-// $router->add("POST", "/calculator/{category}/{tool}/calculate", "CalculatorController@calculate");
+$router->add("GET", "/nepali-v2", "CalculatorController@traditionalUnitsV2");
 
 // Mathematics Calculators
-$router->add("GET", "/calculator/math/percentage", "MathCalculatorController@percentage");
-$router->add("GET", "/calculator/math/fraction", "MathCalculatorController@fraction");
-$router->add("GET", "/calculator/math/ratio", "MathCalculatorController@ratio");
-$router->add("GET", "/calculator/math/square-root", "MathCalculatorController@square_root");
-$router->add("GET", "/calculator/math/exponent", "MathCalculatorController@exponent");
+$router->add("GET", "/calculators/math/percentage", "MathCalculatorController@percentage");
+$router->add("GET", "/calculators/math/fraction", "MathCalculatorController@fraction");
+$router->add("GET", "/calculators/math/ratio", "MathCalculatorController@ratio");
+$router->add("GET", "/calculators/math/square-root", "MathCalculatorController@square_root");
+$router->add("GET", "/calculators/math/exponent", "MathCalculatorController@exponent");
 $router->add("POST", "/calculator/api/percentage", "MathCalculatorController@api_percentage");
 $router->add("POST", "/calculator/api/fraction", "MathCalculatorController@api_fraction");
-$router->add("GET", "/calculator/math/bmi", "MathCalculatorController@bmi");
-$router->add("GET", "/calculator/math/loan", "MathCalculatorController@loan");
-$router->add("GET", "/calculator/math/age", "MathCalculatorController@age");
-$router->add("GET", "/calculator/math/area", "MathCalculatorController@area");
-$router->add("GET", "/calculator/math/volume", "MathCalculatorController@volume");
-$router->add("GET", "/calculator/math/surface-area", "MathCalculatorController@surface_area");
-$router->add("GET", "/calculator/math/surface-area", "MathCalculatorController@surface_area");
-$router->add("GET", "/calculator/math/statistics", "MathCalculatorController@statistics");
-$router->add("GET", "/calculator/math/age", "MathCalculatorController@age"); // Legacy Age calc kept here
+$router->add("GET", "/calculators/math/bmi", "MathCalculatorController@bmi");
+$router->add("GET", "/calculators/math/loan", "MathCalculatorController@loan");
+$router->add("GET", "/calculators/math/age", "MathCalculatorController@age");
+$router->add("GET", "/calculators/math/area", "MathCalculatorController@area");
+$router->add("GET", "/calculators/math/volume", "MathCalculatorController@volume");
+$router->add("GET", "/calculators/math/surface-area", "MathCalculatorController@surface_area");
+$router->add("GET", "/calculators/math/statistics", "MathCalculatorController@statistics");
 $router->add("POST", "/calculator/api/bmi", "MathCalculatorController@api_bmi");
 $router->add("POST", "/calculator/api/loan", "MathCalculatorController@api_loan");
 $router->add("POST", "/calculator/api/statistics", "MathCalculatorController@api_statistics");
-$router->add("GET", "/calculator/math/gcd-lcm", "MathCalculatorController@gcd_lcm");
-$router->add("GET", "/calculator/math/quadratic", "MathCalculatorController@quadratic");
-$router->add("GET", "/calculator/math/linear-equations", "MathCalculatorController@linear_equations");
-$router->add("GET", "/calculator/math/trigonometry", "MathCalculatorController@trigonometry");
-$router->add("GET", "/calculator/math/right-triangle", "MathCalculatorController@right_triangle");
-$router->add("GET", "/calculator/math/pythagorean", "MathCalculatorController@pythagorean");
-
-// Health Calculators
-$router->add("GET", "/calculator/health/bmi", "HealthCalculatorController@bmi");
-$router->add("GET", "/calculator/health/bmr", "HealthCalculatorController@bmr");
-$router->add("GET", "/calculator/health/body-fat", "HealthCalculatorController@body_fat");
-$router->add("GET", "/calculator/health/calories", "HealthCalculatorController@calories");
-
-// Physics Calculators
-$router->add("GET", "/calculator/physics/velocity", "PhysicsCalculatorController@velocity");
-$router->add("GET", "/calculator/physics/force", "PhysicsCalculatorController@force");
-$router->add("GET", "/calculator/physics/ohms-law", "PhysicsCalculatorController@ohms_law");
-$router->add("GET", "/calculator/physics/energy", "PhysicsCalculatorController@energy");
-
-// Chemistry Calculators
-$router->add("GET", "/calculator/chemistry/molar-mass", "ChemistryCalculatorController@molar_mass");
-$router->add("GET", "/calculator/chemistry/ph", "ChemistryCalculatorController@ph");
-$router->add("GET", "/calculator/chemistry/gas-laws", "ChemistryCalculatorController@gas_laws");
-
-// Statistics Calculators
-$router->add("GET", "/calculator/statistics/basic", "StatisticsCalculatorController@basic");
-$router->add("GET", "/calculator/statistics/dispersion", "StatisticsCalculatorController@dispersion");
-$router->add("GET", "/calculator/statistics/probability", "StatisticsCalculatorController@probability");
-
-// Finance Calculators
-$router->add("GET", "/calculator/finance/loan", "FinanceCalculatorController@loan");
-$router->add("GET", "/calculator/finance/investment", "FinanceCalculatorController@investment");
-$router->add("GET", "/calculator/finance/salary", "FinanceCalculatorController@salary");
-$router->add("GET", "/calculator/math/discount", "MathCalculatorController@discount");
-$router->add("POST", "/calculator/api/gcd-lcm", "MathCalculatorController@api_gcd_lcm");
-$router->add("POST", "/calculator/api/quadratic", "MathCalculatorController@api_quadratic");
-$router->add("POST", "/calculator/api/pythagorean", "MathCalculatorController@api_pythagorean");
-$router->add("POST", "/calculator/api/pythagorean", "MathCalculatorController@api_pythagorean");
-$router->add("POST", "/calculator/api/discount", "MathCalculatorController@api_discount");
+$router->add("GET", "/calculators/math/gcd-lcm", "MathCalculatorController@gcd_lcm");
+$router->add("GET", "/calculators/math/quadratic", "MathCalculatorController@quadratic");
+$router->add("GET", "/calculators/math/linear-equations", "MathCalculatorController@linear_equations");
+$router->add("GET", "/calculators/math/trigonometry", "MathCalculatorController@trigonometry");
+$router->add("GET", "/calculators/math/right-triangle", "MathCalculatorController@right_triangle");
+$router->add("GET", "/calculators/math/pythagorean", "MathCalculatorController@pythagorean");
 
 // Date & Time Calculators
-$router->add("GET", "/calculator/datetime/duration", "DateTimeCalculatorController@duration");
-$router->add("GET", "/calculator/datetime/adder", "DateTimeCalculatorController@adder");
-$router->add("GET", "/calculator/datetime/workdays", "DateTimeCalculatorController@workdays");
-$router->add("GET", "/calculator/datetime/time", "DateTimeCalculatorController@time");
-$router->add("GET", "/calculator/datetime/nepali", "DateTimeCalculatorController@nepali");
+$router->add("GET", "/calculators/datetime/duration", "DateTimeCalculatorController@duration");
+$router->add("GET", "/calculators/datetime/adder", "DateTimeCalculatorController@adder");
+$router->add("GET", "/calculators/datetime/workdays", "DateTimeCalculatorController@workdays");
+$router->add("GET", "/calculators/datetime/time", "DateTimeCalculatorController@time");
+$router->add("GET", "/calculators/datetime/nepali", "DateTimeCalculatorController@nepali");
 
 $router->add("POST", "/calculator/api/datetime/duration", "DateTimeCalculatorController@api_duration");
 $router->add("POST", "/calculator/api/datetime/adder", "DateTimeCalculatorController@api_adder");
 $router->add("POST", "/calculator/api/datetime/nepali", "DateTimeCalculatorController@api_nepali");
 
-
 // Finance Calculators
-$router->add("GET", "/calculator/finance/mortgage", "FinanceCalculatorController@mortgage");
-$router->add("GET", "/calculator/finance/investment", "FinanceCalculatorController@investment");
-$router->add("GET", "/calculator/finance/compound-interest", "FinanceCalculatorController@compound_interest");
-$router->add("GET", "/calculator/finance/savings", "FinanceCalculatorController@savings");
-$router->add("GET", "/calculator/finance/roi", "FinanceCalculatorController@roi");
+$router->add("GET", "/calculators/finance/mortgage", "FinanceCalculatorController@mortgage");
+$router->add("GET", "/calculators/finance/investment", "FinanceCalculatorController@investment");
+$router->add("GET", "/calculators/finance/compound-interest", "FinanceCalculatorController@compound_interest");
+$router->add("GET", "/calculators/finance/savings", "FinanceCalculatorController@savings");
+$router->add("GET", "/calculators/finance/roi", "FinanceCalculatorController@roi");
+$router->add("GET", "/calculators/finance/loan", "FinanceCalculatorController@loan");
+$router->add("GET", "/calculators/finance/salary", "FinanceCalculatorController@salary");
+$router->add("GET", "/calculators/math/discount", "MathCalculatorController@discount");
+
 $router->add("POST", "/calculator/api/mortgage", "FinanceCalculatorController@api_mortgage");
 $router->add("POST", "/calculator/api/compound-interest", "FinanceCalculatorController@api_compound_interest");
 $router->add("POST", "/calculator/api/roi", "FinanceCalculatorController@api_roi");
+$router->add("POST", "/calculator/api/gcd-lcm", "MathCalculatorController@api_gcd_lcm");
+$router->add("POST", "/calculator/api/quadratic", "MathCalculatorController@api_quadratic");
+$router->add("POST", "/calculator/api/pythagorean", "MathCalculatorController@api_pythagorean");
+$router->add("POST", "/calculator/api/discount", "MathCalculatorController@api_discount");
+
 
 // Health Calculators
-$router->add("GET", "/calculator/health/bmr", "HealthCalculatorController@bmr");
-$router->add("GET", "/calculator/health/calorie", "HealthCalculatorController@calorie");
-$router->add("GET", "/calculator/health/body-fat", "HealthCalculatorController@body_fat");
-$router->add("GET", "/calculator/health/water-intake", "HealthCalculatorController@water_intake");
-$router->add("GET", "/calculator/health/pregnancy", "HealthCalculatorController@pregnancy");
+$router->add("GET", "/calculators/health/bmi", "HealthCalculatorController@bmi");
+$router->add("GET", "/calculators/health/bmr", "HealthCalculatorController@bmr");
+$router->add("GET", "/calculators/health/calorie", "HealthCalculatorController@calorie");
+$router->add("GET", "/calculators/health/body-fat", "HealthCalculatorController@body_fat");
+$router->add("GET", "/calculators/health/water-intake", "HealthCalculatorController@water_intake");
+$router->add("GET", "/calculators/health/pregnancy", "HealthCalculatorController@pregnancy");
+$router->add("GET", "/calculators/health/calories", "HealthCalculatorController@calories");
+
 $router->add("POST", "/calculator/api/bmr", "HealthCalculatorController@api_bmr");
 $router->add("POST", "/calculator/api/body-fat", "HealthCalculatorController@api_body_fat");
 
 // Physics Calculators
-$router->add("GET", "/calculator/physics/velocity", "PhysicsCalculatorController@velocity");
-$router->add("GET", "/calculator/physics/force", "PhysicsCalculatorController@force");
-$router->add("GET", "/calculator/physics/kinetic-energy", "PhysicsCalculatorController@kinetic_energy");
-$router->add("GET", "/calculator/physics/power", "PhysicsCalculatorController@power");
-$router->add("GET", "/calculator/physics/ohms-law", "PhysicsCalculatorController@ohms_law");
+$router->add("GET", "/calculators/physics/velocity", "PhysicsCalculatorController@velocity");
+$router->add("GET", "/calculators/physics/force", "PhysicsCalculatorController@force");
+$router->add("GET", "/calculators/physics/kinetic-energy", "PhysicsCalculatorController@kinetic_energy");
+$router->add("GET", "/calculators/physics/power", "PhysicsCalculatorController@power");
+$router->add("GET", "/calculators/physics/ohms-law", "PhysicsCalculatorController@ohms_law");
+$router->add("GET", "/calculators/physics/energy", "PhysicsCalculatorController@energy");
+
 $router->add("POST", "/calculator/api/velocity", "PhysicsCalculatorController@api_velocity");
 $router->add("POST", "/calculator/api/force", "PhysicsCalculatorController@api_force");
 $router->add("POST", "/calculator/api/kinetic-energy", "PhysicsCalculatorController@api_kinetic_energy");
 $router->add("POST", "/calculator/api/power", "PhysicsCalculatorController@api_power");
 $router->add("POST", "/calculator/api/ohms-law", "PhysicsCalculatorController@api_ohms_law");
+
+// Chemistry Calculators
+$router->add("GET", "/calculators/chemistry/molar-mass", "ChemistryCalculatorController@molar_mass");
+$router->add("GET", "/calculators/chemistry/ph", "ChemistryCalculatorController@ph");
+$router->add("GET", "/calculators/chemistry/gas-laws", "ChemistryCalculatorController@gas_laws");
+
+// Statistics Calculators
+$router->add("GET", "/calculators/statistics/basic", "StatisticsCalculatorController@basic");
+$router->add("GET", "/calculators/statistics/dispersion", "StatisticsCalculatorController@dispersion");
+$router->add("GET", "/calculators/statistics/probability", "StatisticsCalculatorController@probability");
 
 $router->add(
     "POST",
@@ -1971,11 +1955,13 @@ $router->add("POST", "/admin/quiz/courses/reorder", "Admin\\Quiz\\CourseControll
 $router->add("POST", "/admin/quiz/courses/toggle-status", "Admin\\Quiz\\CourseController@toggleStatus", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/courses/bulk-delete", "Admin\\Quiz\\CourseController@bulkDelete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/courses/duplicate", "Admin\\Quiz\\CourseController@duplicate", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/courses/delete-stats/{id}", "Admin\\Quiz\\CourseController@getDeleteStats", ["auth", "admin"]);
 
 // Education Levels
 $router->add("GET", "/admin/quiz/education-levels", "Admin\\Quiz\\EducationLevelController@index", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/education-levels/store", "Admin\\Quiz\\EducationLevelController@store", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/education-levels/delete/{id}", "Admin\\Quiz\\EducationLevelController@delete", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/education-levels/delete-stats/{id}", "Admin\\Quiz\\EducationLevelController@getDeleteStats", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/education-levels/reorder", "Admin\\Quiz\\EducationLevelController@reorder", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/education-levels/toggle-status", "Admin\\Quiz\\EducationLevelController@toggleStatus", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/education-levels/bulk-delete", "Admin\\Quiz\\EducationLevelController@bulkDelete", ["auth", "admin"]);
@@ -1985,6 +1971,7 @@ $router->add("POST", "/admin/quiz/education-levels/duplicate", "Admin\\Quiz\\Edu
 $router->add("GET", "/admin/quiz/categories", "Admin\\Quiz\\CategoryController@index", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/categories/store", "Admin\\Quiz\\CategoryController@store", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/categories/delete/{id}", "Admin\\Quiz\\CategoryController@delete", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/categories/delete-stats/{id}", "Admin\\Quiz\\CategoryController@getDeleteStats", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/categories/reorder", "Admin\\Quiz\\CategoryController@reorder", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/categories/toggle-premium", "Admin\\Quiz\\CategoryController@togglePremium", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/categories/toggle-status", "Admin\\Quiz\\CategoryController@toggleStatus", ["auth", "admin"]);
@@ -1995,11 +1982,24 @@ $router->add("POST", "/admin/quiz/categories/duplicate", "Admin\\Quiz\\CategoryC
 $router->add("GET", "/admin/quiz/subcategories", "Admin\\Quiz\\SubCategoryController@index", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/subcategories/store", "Admin\\Quiz\\SubCategoryController@store", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/subcategories/delete/{id}", "Admin\\Quiz\\SubCategoryController@delete", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/subcategories/delete-stats/{id}", "Admin\\Quiz\\SubCategoryController@getDeleteStats", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/subcategories/reorder", "Admin\\Quiz\\SubCategoryController@reorder", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/subcategories/toggle-premium", "Admin\\Quiz\\SubCategoryController@togglePremium", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/subcategories/toggle-status", "Admin\\Quiz\\SubCategoryController@toggleStatus", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/subcategories/bulk-delete", "Admin\\Quiz\\SubCategoryController@bulkDelete", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/subcategories/duplicate", "Admin\\Quiz\\SubCategoryController@duplicate", ["auth", "admin"]);
+
+// Topics
+$router->add("GET", "/admin/quiz/topics", "Admin\\Quiz\\TopicController@index", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/topics/store", "Admin\\Quiz\\TopicController@store", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/topics/delete/{id}", "Admin\\Quiz\\TopicController@delete", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/topics/delete-stats/{id}", "Admin\\Quiz\\TopicController@getDeleteStats", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/topics/reorder", "Admin\\Quiz\\TopicController@reorder", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/topics/toggle-premium", "Admin\\Quiz\\TopicController@togglePremium", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/topics/toggle-status", "Admin\\Quiz\\TopicController@toggleStatus", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/topics/bulk-delete", "Admin\\Quiz\\TopicController@bulkDelete", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/topics/duplicate", "Admin\\Quiz\\TopicController@duplicate", ["auth", "admin"]);
+
 
 // Position Levels
 $router->add("GET", "/admin/quiz/position-levels", "Admin\\Quiz\\PositionLevelController@index", ["auth", "admin"]);

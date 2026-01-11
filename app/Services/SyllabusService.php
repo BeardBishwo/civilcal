@@ -363,6 +363,64 @@ class SyllabusService
     }
 
     /**
+     * Delete node with selective preservation of descendants
+     * 
+     * @param int $nodeId The ID of the node being deleted
+     * @param array $deleteTypes Array of types to delete (e.g. ['education_level', 'category']). 
+     *                           Types NOT in this list will be preserved (unlinked).
+     */
+    public function deleteWithPreservation($nodeId, $deleteTypes = [])
+    {
+        // 1. Fetch Direct Children
+        $sql = "SELECT id, type FROM syllabus_nodes WHERE parent_id = :id";
+        $params = ['id' => $nodeId];
+        $children = $this->db->query($sql, $params)->fetchAll();
+
+        foreach ($children as $child) {
+            // Check if this child type should be deleted
+            if (in_array($child['type'], $deleteTypes)) {
+                // If yes, recurse down (this child is also doomed, but apply same logic to its children)
+                $this->deleteWithPreservation($child['id'], $deleteTypes);
+            } else {
+                // If no, preserve this child (unlink from parent)
+                $this->db->update('syllabus_nodes', ['parent_id' => null], "id = :id", ['id' => $child['id']]);
+            }
+        }
+
+        // 2. Finally, delete the node itself
+        // Note: Children that were selected for deletion will have been recursively processed and deleted by now.
+        // Children preserved were unlinked.
+        // So this delete is safe.
+        return $this->db->delete('syllabus_nodes', "id = :id", ['id' => $nodeId]);
+    }
+
+    /**
+     * Get counts of all descendant types for a node
+     */
+    public function getChildTypeCounts($nodeId)
+    {
+        // Recursive query to get all descendants and their types
+        $sql = "
+            WITH RECURSIVE node_tree AS (
+                SELECT id, parent_id, type
+                FROM syllabus_nodes
+                WHERE parent_id = :node_id
+                
+                UNION ALL
+                
+                SELECT n.id, n.parent_id, n.type
+                FROM syllabus_nodes n
+                INNER JOIN node_tree nt ON n.parent_id = nt.id
+            )
+            SELECT type, COUNT(*) as count FROM node_tree GROUP BY type
+        ";
+
+        $stmt = $this->db->getPdo()->prepare($sql);
+        $stmt->execute(['node_id' => $nodeId]);
+        return $stmt->fetchAll(\PDO::FETCH_KEY_PAIR); // Returns ['type' => count, ...]
+    }
+
+    /**
      * Helper: Slugify text
      */
     public function slugify($text)

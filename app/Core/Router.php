@@ -16,6 +16,7 @@ class Router
         'csrf' => '\App\Middleware\CsrfMiddleware',
         'security' => '\App\Middleware\SecurityMiddleware',
         'ratelimit' => '\App\Middleware\RateLimitMiddleware',
+        'security_headers' => '\App\Middleware\SecurityHeadersMiddleware',
         'maintenance' => '\App\Middleware\MaintenanceMiddleware',
         'analytics' => '\App\Middleware\AnalyticsTracker'
     ];
@@ -25,6 +26,9 @@ class Router
         $mw = $middleware;
         if (!in_array('maintenance', $mw, true)) {
             $mw[] = 'maintenance';
+        }
+        if (!in_array('security_headers', $mw, true)) {
+            $mw[] = 'security_headers';
         }
         if (!in_array('security', $mw, true)) {
             $mw[] = 'security';

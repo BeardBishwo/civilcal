@@ -63,6 +63,7 @@ $page_title = 'Widget Settings - ' . htmlspecialchars($widget->getTitle());
                     
                     <div class="card-content-compact">
                         <form method="post" action="<?php echo app_base_url('/admin/widgets/settings/' . $widget->getId()); ?>">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                             <div class="form-group mb-4">
                                 <label class="form-label">JSON Configuration</label>
                                 <div class="editor-container">

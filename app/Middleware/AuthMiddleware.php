@@ -29,6 +29,7 @@ class AuthMiddleware
                 if (password_verify($password, $userArray['password'])) {
                     // Clear old session and set new session for this request
                     session_unset(); // Clear all session variables
+                    session_regenerate_id(true); // Regenerate session ID to prevent session fixation
                     $_SESSION['user_id'] = $userArray['id'];
                     $_SESSION['user'] = $userArray;
                     $authenticated = true;

@@ -101,7 +101,7 @@ return [
     // FIRE PUMPS (3 calculators)
     // ============================================
     
-    'pump-sizing' => [
+    'fire-pump-sizing' => [
         'name' => 'Fire Pump Sizing',
         'description' => 'Calculate fire pump capacity requirements',
         'category' => 'fire',

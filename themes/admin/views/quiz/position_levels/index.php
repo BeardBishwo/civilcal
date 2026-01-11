@@ -35,7 +35,77 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
             </div>
         </div>
 
-        <!-- Filter Toolbar -->
+        <!-- Single Row Creation Toolbar -->
+        <div class="creation-toolbar">
+            <h5 class="toolbar-title">Create New Position Level</h5>
+            <form id="addLevelForm" class="creation-form" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: nowrap;">
+                
+                <!-- Course Select -->
+                <div class="input-group-premium" style="flex: 1.5; min-width: 120px; flex-shrink: 1;">
+                    <i class="fas fa-university icon"></i>
+                    <select name="course_id" id="courseSelect" class="form-input-premium form-select-search" style="padding-left: 2.25rem;">
+                        <option value="">Select Course...</option>
+                        <?php foreach ($courses as $c): ?>
+                            <option value="<?php echo $c['id']; ?>"><?php echo htmlspecialchars($c['title'] ?? ''); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Education Level Select -->
+                <div class="input-group-premium" style="flex: 1.5; min-width: 120px; flex-shrink: 1;">
+                    <i class="fas fa-graduation-cap icon"></i>
+                    <select name="education_level_id" id="educationLevelSelect" class="form-input-premium form-select-search" style="padding-left: 2.25rem;">
+                        <option value="">Select Education Level...</option>
+                        <?php foreach ($educationLevels as $el): ?>
+                            <option value="<?php echo $el['id']; ?>"><?php echo htmlspecialchars($el['title'] ?? ''); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <!-- Title Input -->
+                <div class="input-group-premium" style="flex: 2; min-width: 150px; flex-shrink: 1;">
+                    <i class="fas fa-heading icon"></i>
+                    <input type="text" name="title" class="form-input-premium" placeholder="Level Title (e.g. Level 5 - Sub-Engineer)" required>
+                </div>
+                
+                <!-- Level Number -->
+                <div class="input-group-premium" style="flex: 0.5; min-width: 60px; flex-shrink: 1;">
+                    <i class="fas fa-sort-numeric-up icon"></i>
+                    <input type="number" name="level_number" class="form-input-premium" placeholder="Level #" min="0" value="0">
+                </div>
+
+                <!-- Color Picker -->
+                <div class="input-group-premium" style="flex: 0.5; min-width: 50px; flex-shrink: 0;">
+                    <i class="fas fa-palette icon"></i>
+                    <input type="color" name="color" class="form-input-premium" value="#667eea" style="padding-left: 0.5rem;">
+                </div>
+
+                <!-- Icon -->
+                <div class="input-group-premium" style="flex: 0.8; min-width: 80px; flex-shrink: 1;">
+                    <i class="fas fa-icons icon"></i>
+                    <input type="text" name="icon" class="form-input-premium" placeholder="fa-user" value="fa-user">
+                </div>
+
+                <div class="premium-toggle-group" style="flex-shrink: 0;">
+                    <label class="switch scale-sm">
+                        <input type="checkbox" name="is_premium" value="1">
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="toggle-label">PREMIUM</span>
+                </div>
+
+                <div class="input-group-premium" style="flex: 0.8; min-width: 80px; flex-shrink: 1;">
+                    <i class="fas fa-coins icon"></i>
+                    <input type="number" name="unlock_price" class="form-input-premium" placeholder="Price" min="0" value="0">
+                </div>
+
+                <button type="button" onclick="saveLevel()" class="btn-create-premium" style="flex-shrink: 0;">
+                    <i class="fas fa-plus"></i> ADD
+                </button>
+            </form>
+        </div>
+
+        <!-- Filter & Toolbar -->
         <div class="compact-toolbar">
             <div class="toolbar-left">
                 <div class="filter-group">
@@ -49,7 +119,7 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <select name="education_level_id" id="educationLevelFilter" class="filter-select-search" style="width: 350px;">
+                        <select name="education_level_id" id="educationLevelFilter" class="filter-select-search" style="width: 250px;">
                             <option value="">All Education Levels</option>
                             <?php foreach ($educationLevels as $el): ?>
                                 <option value="<?php echo $el['id']; ?>" <?php echo $selectedEducationLevel == $el['id'] ? 'selected' : ''; ?>>
@@ -59,77 +129,14 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
                         </select>
                     </form>
                 </div>
+                <!-- Search Input -->
+                <div class="search-compact" style="margin-left: 1rem;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search levels..." id="level-search" onkeyup="filterLevels()">
+                </div>
             </div>
-        </div>
-
-        <!-- Single Row Creation Toolbar -->
-        <div class="creation-toolbar">
-            <h5 class="toolbar-title">Create New Position Level</h5>
-            <form id="addLevelForm" class="creation-form">
-                
-                <!-- Course Select -->
-                <div class="input-group-premium" style="flex: 2; min-width: 150px;">
-                    <i class="fas fa-university icon"></i>
-                    <select name="course_id" id="courseSelect" class="form-input-premium form-select-search" style="padding-left: 2.25rem;">
-                        <option value="">Select Course...</option>
-                        <?php foreach ($courses as $c): ?>
-                            <option value="<?php echo $c['id']; ?>"><?php echo htmlspecialchars($c['title'] ?? ''); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <!-- Education Level Select -->
-                <div class="input-group-premium" style="flex: 2; min-width: 150px;">
-                    <i class="fas fa-graduation-cap icon"></i>
-                    <select name="education_level_id" id="educationLevelSelect" class="form-input-premium form-select-search" style="padding-left: 2.25rem;">
-                        <option value="">Select Education Level...</option>
-                        <?php foreach ($educationLevels as $el): ?>
-                            <option value="<?php echo $el['id']; ?>"><?php echo htmlspecialchars($el['title'] ?? ''); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                
-                <!-- Title Input -->
-                <div class="input-group-premium" style="flex: 3; min-width: 200px;">
-                    <i class="fas fa-heading icon"></i>
-                    <input type="text" name="title" class="form-input-premium" placeholder="Level Title (e.g. Level 5 - Sub-Engineer)" required>
-                </div>
-                
-                <!-- Level Number -->
-                <div class="input-group-premium" style="flex: 1; min-width: 80px;">
-                    <i class="fas fa-sort-numeric-up icon"></i>
-                    <input type="number" name="level_number" class="form-input-premium" placeholder="Level #" min="0" value="0">
-                </div>
-
-                <!-- Color Picker -->
-                <div class="input-group-premium" style="flex: 1; min-width: 80px;">
-                    <i class="fas fa-palette icon"></i>
-                    <input type="color" name="color" class="form-input-premium" value="#667eea" style="padding-left: 0.5rem;">
-                </div>
-
-                <!-- Icon -->
-                <div class="input-group-premium" style="flex: 1; min-width: 100px;">
-                    <i class="fas fa-icons icon"></i>
-                    <input type="text" name="icon" class="form-input-premium" placeholder="fa-user" value="fa-user">
-                </div>
-
-                <div class="premium-toggle-group">
-                    <label class="switch scale-sm">
-                        <input type="checkbox" name="is_premium" value="1">
-                        <span class="slider round"></span>
-                    </label>
-                    <span class="toggle-label">PREMIUM</span>
-                </div>
-
-                <div class="input-group-premium" style="flex: 1; min-width: 100px;">
-                    <i class="fas fa-coins icon"></i>
-                    <input type="number" name="unlock_price" class="form-input-premium" placeholder="Price" min="0" value="0">
-                </div>
-
-                <button type="button" onclick="saveLevel()" class="btn-create-premium">
-                    <i class="fas fa-plus"></i> ADD
-                </button>
-            </form>
+            <div class="toolbar-right">
+            </div>
         </div>
 
         <!-- Content Area -->
@@ -314,41 +321,32 @@ $selectedEducationLevel = $selectedEducationLevel ?? null;
 <script>
 // Initialize Select2 on page load
 $(document).ready(function() {
-    // Filter dropdowns with auto-focus
-    $('#courseFilter').select2({
-        placeholder: 'All Courses',
-        allowClear: true,
-        width: '250px'
-    }).on('select2:open', function() {
-        // Auto-focus search input when dropdown opens
-        setTimeout(() => {
-            document.querySelector('.select2-search__field').focus();
-        }, 100);
-    }).on('change', function() {
-        document.getElementById('filterForm').submit();
-    });
-    
-    $('#educationLevelFilter').select2({
-        placeholder: 'All Education Levels',
-        allowClear: true,
-        width: '350px'
-    }).on('select2:open', function() {
-        // Auto-focus search input when dropdown opens
-        setTimeout(() => {
-            document.querySelector('.select2-search__field').focus();
-        }, 100);
-    }).on('change', function() {
-        document.getElementById('filterForm').submit();
+    // Select2 with Auto-Submit for Filters
+    $('.filter-select-search').each(function() {
+        const placeholder = $(this).find('option:first').text();
+        $(this).select2({
+            placeholder: placeholder,
+            allowClear: true,
+            width: 'resolve'
+        }).on('select2:open', function() {
+            setTimeout(() => {
+                const searchField = document.querySelector('.select2-search__field');
+                if (searchField) searchField.focus();
+            }, 100);
+        }).on('change', function() {
+            document.getElementById('filterForm').submit();
+        });
     });
     
     // Creation form dropdowns with auto-focus
-    $('#courseSelect').select2({
+    $('#courseSelect, #parentCourseSelect').select2({
         placeholder: 'Select Course...',
         allowClear: true,
         dropdownParent: $('.creation-toolbar')
     }).on('select2:open', function() {
         setTimeout(() => {
-            document.querySelector('.select2-search__field').focus();
+            const searchField = document.querySelector('.select2-search__field');
+            if (searchField) searchField.focus();
         }, 100);
     });
     
@@ -358,7 +356,8 @@ $(document).ready(function() {
         dropdownParent: $('.creation-toolbar')
     }).on('select2:open', function() {
         setTimeout(() => {
-            document.querySelector('.select2-search__field').focus();
+            const searchField = document.querySelector('.select2-search__field');
+            if (searchField) searchField.focus();
         }, 100);
     });
 
@@ -563,7 +562,7 @@ document.querySelectorAll('.status-toggle').forEach(el => {
 
 /* Select2 Custom Styling */
 .select2-container--default .select2-selection--single {
-    height: 40px;
+    height: 34px;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
     padding: 0 0.75rem;
@@ -572,14 +571,14 @@ document.querySelectorAll('.status-toggle').forEach(el => {
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
-    line-height: 40px;
+    line-height: 34px;
     padding-left: 0;
     color: #334155;
     font-size: 0.875rem;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 38px;
+    height: 32px;
 }
 
 .select2-dropdown {
@@ -661,7 +660,7 @@ document.querySelectorAll('.status-toggle').forEach(el => {
 
 .compact-toolbar {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 0.75rem 2rem; background: #eff6ff; border-bottom: 1px solid #bfdbfe;
+    padding: 0.4rem 2rem; background: #eff6ff; border-bottom: 1px solid #bfdbfe;
 }
 .filter-group { display: flex; align-items: center; gap: 0.75rem; }
 .filter-label { font-size: 0.7rem; font-weight: 700; color: #1e40af; letter-spacing: 0.5px; }
@@ -671,12 +670,12 @@ document.querySelectorAll('.status-toggle').forEach(el => {
 }
 
 .creation-toolbar {
-    padding: 1rem 2rem;
+    padding: 0.6rem 2rem;
     background: #f8fafc;
     border-bottom: 1px solid var(--admin-gray-200);
 }
 .toolbar-title {
-    font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem;
+    font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;
 }
 .creation-form {
     display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
@@ -685,14 +684,14 @@ document.querySelectorAll('.status-toggle').forEach(el => {
 .input-group-premium { position: relative; }
 .input-group-premium .icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.85rem; pointer-events: none; }
 .form-input-premium {
-    width: 100%; height: 40px; padding: 0 0.75rem 0 2.25rem; font-size: 0.875rem; 
+    width: 100%; height: 34px; padding: 0 0.75rem 0 2.25rem; font-size: 0.875rem; 
     border: 1px solid #cbd5e1; border-radius: 8px; outline: none; transition: all 0.2s;
     background: white; color: #334155;
 }
 .form-input-premium:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
 
 .btn-create-premium {
-    height: 40px; padding: 0 1.5rem; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    height: 34px; padding: 0 1.25rem; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
     color: white; font-weight: 600; font-size: 0.875rem; border: none; border-radius: 8px; cursor: pointer;
     display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s;
     box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2); white-space: nowrap;
@@ -780,8 +779,8 @@ input:checked + .slider:before { transform: translateX(16px); }
 .btn-bulk-delete:hover { background: #dc2626; }
 
 @media (max-width: 1024px) {
-    .creation-form { flex-direction: column; align-items: stretch; }
-    .input-group-premium { width: 100% !important; }
+    .creation-form { flex-direction: row; overflow-x: auto; padding-bottom: 5px; } /* Switched to row + scroll */
+    .input-group-premium { width: auto !important; }
 }
 /* Floating Navigation Ball */
 .nav-ball-container {

@@ -842,12 +842,21 @@
                 
                 <div class="space-y-1">
                     <label class="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-tight ml-1">
-                        <i class="fas fa-book-open text-emerald-400"></i> Topic/Unit
+                        <i class="fas fa-book-open text-emerald-400"></i> Sub Category
                     </label>
-                    <select name="mappings[${idx}][unit_id]" class="mapping-unit w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-lg p-2 focus:ring-4 focus:ring-indigo-500/10 transition" disabled>
-                        <option value="">Select Unit</option>
+                    <select name="mappings[${idx}][unit_id]" class="mapping-unit w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-lg p-2 focus:ring-4 focus:ring-indigo-500/10 transition" onchange="updateMappingCascade(${idx}, 'unit')" disabled>
+                        <option value="">Select Sub Category</option>
                     </select>
                 </div>
+            </div>
+
+            <div class="space-y-1 mb-3">
+                <label class="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-tight ml-1">
+                    <i class="fas fa-file-contract text-blue-400"></i> Topic
+                </label>
+                <select name="mappings[${idx}][topic_id]" class="mapping-topic w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-lg p-2 focus:ring-4 focus:ring-indigo-500/10 transition" disabled>
+                    <option value="">Select Topic (Optional)</option>
+                </select>
             </div>
 
             <div class="flex items-center gap-3 p-2 bg-white border border-slate-100 rounded-lg shadow-sm">
@@ -882,6 +891,7 @@
         const levelSelect = row.querySelector('.mapping-level');
         const categorySelect = row.querySelector('.mapping-category');
         const unitSelect = row.querySelector('.mapping-unit');
+        const topicSelect = row.querySelector('.mapping-topic');
         
         let parentId = null;
         let targetSelect = null;
@@ -891,25 +901,36 @@
             targetSelect = levelSelect;
             
             // Reset children
-            levelSelect.innerHTML = '<option value="">Select Level</option>';
             categorySelect.innerHTML = '<option value="">Select Category</option>';
-            unitSelect.innerHTML = '<option value="">Select Unit</option>';
+            unitSelect.innerHTML = '<option value="">Select Sub Category</option>';
+            topicSelect.innerHTML = '<option value="">Select Topic</option>';
             categorySelect.disabled = true;
             unitSelect.disabled = true;
+            topicSelect.disabled = true;
         } else if (changedLevel === 'level') {
             parentId = levelSelect.value;
             targetSelect = categorySelect;
             
             // Reset children
             categorySelect.innerHTML = '<option value="">Select Category</option>';
-            unitSelect.innerHTML = '<option value="">Select Unit</option>';
+            unitSelect.innerHTML = '<option value="">Select Sub Category</option>';
+            topicSelect.innerHTML = '<option value="">Select Topic</option>';
             unitSelect.disabled = true;
+            topicSelect.disabled = true;
         } else if (changedLevel === 'category') {
             parentId = categorySelect.value;
             targetSelect = unitSelect;
             
             // Reset children
-            unitSelect.innerHTML = '<option value="">Select Unit</option>';
+            unitSelect.innerHTML = '<option value="">Select Sub Category</option>';
+            topicSelect.innerHTML = '<option value="">Select Topic</option>';
+            topicSelect.disabled = true;
+        } else if (changedLevel === 'unit') {
+            parentId = unitSelect.value;
+            targetSelect = topicSelect;
+            
+            // Reset children
+            topicSelect.innerHTML = '<option value="">Select Topic</option>';
         }
         
         if (parentId && targetSelect) {
@@ -919,7 +940,7 @@
             fetch(`<?php echo app_base_url('admin/quiz/syllabus/getChildren'); ?>?parent_id=${parentId}`)
                 .then(res => res.json())
                 .then(data => {
-                    targetSelect.innerHTML = `<option value="">Select ${changedLevel === 'course' ? 'Level' : (changedLevel === 'level' ? 'Category' : 'Unit')}</option>`;
+                    targetSelect.innerHTML = `<option value="">Select ${changedLevel === 'course' ? 'Level' : (changedLevel === 'level' ? 'Category' : (changedLevel === 'category' ? 'Sub Category' : 'Topic'))}</option>`;
                     if (data && data.length > 0) {
                         data.forEach(item => {
                             targetSelect.innerHTML += `<option value="${item.id}">${item.title}</option>`;

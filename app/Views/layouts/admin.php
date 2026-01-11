@@ -178,7 +178,7 @@
     </style>
 </head>
 
-<body class="<?php echo $_COOKIE['sidebar_collapsed'] ?? ''; ?>">
+<body class="<?php echo ($_COOKIE['sidebar_collapsed'] ?? '') === 'collapsed' ? 'collapsed' : ''; ?>">
     <!-- Header -->
     <header class="admin-header">
         <div class="container-fluid h-100">

@@ -16,8 +16,8 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
     <?php endif; ?>
 
     <!-- Admin Styles -->
-    <link rel="stylesheet" href="<?php echo app_base_url('themes/admin/assets/css/admin.css?v=' . time()); ?>">
-    <link rel="stylesheet" href="<?php echo app_base_url('public/assets/css/global-notifications.css'); ?>">
+    <link rel="stylesheet" href="<?php echo \App\Helpers\Asset::url('themes/admin/assets/css/admin.css'); ?>">
+    <link rel="stylesheet" href="<?php echo \App\Helpers\Asset::url('public/assets/css/global-notifications.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -919,6 +919,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                             <li><a href="<?php echo app_base_url('admin/quiz/education-levels'); ?>">Education Levels</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/categories'); ?>">Main Categories</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/subcategories'); ?>">Sub-Categories</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/topics'); ?>">Topics</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/position-levels'); ?>">Position Levels</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/exams'); ?>">Exam Manager</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/daily'); ?>">Daily Quest Scheduler</a></li>
@@ -1018,6 +1019,11 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                     </div>
                 </div>
             </nav>
+            
+            <!-- Bottom Sidebar Toggle -->
+            <button id="sidebar-toggle-bottom" class="sidebar-toggle-bottom" title="Toggle Sidebar">
+                <i class="fas fa-angle-double-left"></i>
+            </button>
         </aside>
 
         <!-- Main Content -->

@@ -40,7 +40,7 @@ class ResultFormatter
             );
 
             // Special handling for structured data like Rate Analysis breakdown
-            if ($outputDef['type'] === 'table' && is_array($value)) {
+            if (($outputDef['type'] ?? '') === 'table' && is_array($value)) {
                 $formatted[$name]['is_table'] = true;
                 $formatted[$name]['rows'] = $value;
             }

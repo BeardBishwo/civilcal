@@ -38,7 +38,6 @@ class AdminModuleManager
     {
         $moduleDirectories = [
             __DIR__ . '/../Modules/Admin/',
-            __DIR__ . '/../Modules/Calculator/',
             __DIR__ . '/../Modules/Analytics/',
             __DIR__ . '/../Modules/Marketing/',
             __DIR__ . '/../Modules/Content/'

@@ -237,17 +237,24 @@ if (
                 "themes/default/assets/css/" . $css . "?v=" . $atime,
             );
         }
-
-        echo '<link rel="stylesheet" href="' .
-            htmlspecialchars($url) .
-            '">' .
-            "\n    ";
+        echo '<link rel="stylesheet" href="' . htmlspecialchars($url) . '">' . "\n";
     }
     ?>
+
+    <!-- Global CSS includes -->
+    <link rel="stylesheet" href="<?php echo \App\Helpers\Asset::url('public/assets/css/bootstrap.min.css'); ?>">
+    <link rel="stylesheet" href="<?php echo \App\Helpers\Asset::url('public/assets/css/styles.css'); ?>">
+    <link rel="stylesheet" href="<?php echo \App\Helpers\Asset::url('public/assets/css/custom.css'); ?>">
+    <link rel="stylesheet" href="<?php echo \App\Helpers\Asset::url('public/assets/css/global-notifications.css'); ?>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Theme CSS -->
+    <?php if (file_exists(BASE_PATH . '/themes/default/assets/css/theme.css')): ?>
+        <link rel="stylesheet" href="<?php echo \App\Helpers\Asset::url('themes/default/assets/css/theme.css'); ?>">
+    <?php endif; ?>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <meta name="theme-color" content="#000000">
     <!-- Inline styles removed to ensure single source of truth in theme.css -->

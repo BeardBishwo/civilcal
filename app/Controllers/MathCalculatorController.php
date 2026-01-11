@@ -3,16 +3,14 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
-use App\Core\MathEngine;
 
 class MathCalculatorController extends Controller
 {
-    private $engine;
+
 
     public function __construct()
     {
         parent::__construct();
-        $this->engine = new MathEngine();
     }
 
     /**

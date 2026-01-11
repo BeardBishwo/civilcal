@@ -13,7 +13,7 @@
  */
 
 return [
-    'concrete-volume' => [
+    'concrete-calculator' => [
         'name' => 'Concrete Volume Calculator',
         'description' => 'Calculate volume of concrete required for slabs, beams, and columns',
         'category' => 'civil',
@@ -50,6 +50,19 @@ return [
                 'label' => 'Depth/Height',
                 'min' => 0.01,
                 'max' => 100
+            ],
+            [
+                'name' => 'mix_ratio',
+                'type' => 'string',
+                'required' => true,
+                'label' => 'Mix Ratio',
+                'default' => 'M15',
+                'options' => [
+                    'M15' => 'M15 (1:2:4)',
+                    'M20' => 'M20 (1:1.5:3)',
+                    'M25' => 'M25 (1:1:2)',
+                    'M10' => 'M10 (1:3:6)'
+                ]
             ]
         ],
         
@@ -296,26 +309,62 @@ return [
     
     // BRICKWORK CALCULATORS
     'brick-quantity' => [
-        'name' => 'Brick Quantity Calculator',
-        'description' => 'Calculate number of bricks required for wall construction',
+        'name' => 'Brick Quantity Calculator (Robust)',
+        'description' => 'Advanced brick quantity, mortar, and material cost estimation',
         'category' => 'civil',
         'subcategory' => 'brickwork',
-        'version' => '1.0',
+        'version' => '2.0',
+        'pipeline' => 'App\\Calculators\\Civil\\BrickQuantityCalculator',
         'inputs' => [
-            ['name' => 'wall_length', 'type' => 'number', 'unit' => 'm', 'required' => true, 'label' => 'Wall Length', 'min' => 0.1],
-            ['name' => 'wall_height', 'type' => 'number', 'unit' => 'm', 'required' => true, 'label' => 'Wall Height', 'min' => 0.1],
-           ['name' => 'brick_length', 'type' => 'number', 'unit' => 'mm', 'required' => true, 'label' => 'Brick Length', 'min' => 1, 'default' => 230],
-            ['name' => 'brick_height', 'type' => 'number', 'unit' => 'mm', 'required' => true, 'label' => 'Brick Height', 'min' => 1, 'default' => 75],
-            ['name' => 'mortar_thickness', 'type' => 'number', 'unit' => 'mm', 'required' => true, 'label' => 'Mortar Thickness', 'min' => 0, 'default' => 10]
+            // Section 1: Wall Detail
+            ['name' => 'wall_group', 'type' => 'header', 'label' => 'Wall Geometry'],
+            ['name' => 'wall_type', 'type' => 'select', 'label' => 'Wall Type', 'options' => ['single' => 'Single Brick Wall (4.5")', 'double' => 'Double Brick Wall (9")'], 'default' => 'single'],
+            ['name' => 'wall_length', 'type' => 'number', 'unit' => 'm', 'required' => true, 'label' => 'Wall Length', 'min' => 0.1, 'default' => 5],
+            ['name' => 'wall_height', 'type' => 'number', 'unit' => 'm', 'required' => true, 'label' => 'Wall Height', 'min' => 0.1, 'default' => 3],
+            
+            // Section 2: Brick Detail
+            ['name' => 'brick_group', 'type' => 'header', 'label' => 'Brick Dimensions'],
+            ['name' => 'brick_length', 'type' => 'number', 'unit' => 'mm', 'required' => true, 'label' => 'Brick Length', 'min' => 1, 'default' => 230],
+            ['name' => 'brick_width', 'type' => 'number', 'unit' => 'mm', 'required' => true, 'label' => 'Brick Width', 'min' => 1, 'default' => 110],
+            ['name' => 'brick_height', 'type' => 'number', 'unit' => 'mm', 'required' => true, 'label' => 'Brick Height', 'min' => 1, 'default' => 70],
+            ['name' => 'mortar_thickness', 'type' => 'number', 'unit' => 'mm', 'required' => true, 'label' => 'Mortar Thickness', 'min' => 0, 'default' => 10],
+
+            // Section 3: Mix & Wastage
+            ['name' => 'mix_group', 'type' => 'header', 'label' => 'Mortar Mix & Wastage'],
+            ['name' => 'mortar_ratio', 'type' => 'select', 'label' => 'Mortar Mix Ratio', 'options' => ['1:3' => '1:3 (Rich)', '1:4' => '1:4 (Standard)', '1:5' => '1:5 (Common)', '1:6' => '1:6 (Lean)'], 'default' => '1:4'],
+            ['name' => 'wastage', 'type' => 'number', 'unit' => '%', 'label' => 'Wastage Percentage', 'default' => 5],
+
+            // Section 4: Cost Details
+            ['name' => 'cost_group', 'type' => 'header', 'label' => 'Material Unit Prices (NPR)'],
+            ['name' => 'brick_price', 'type' => 'number', 'label' => 'Price per Brick', 'default' => 18],
+            ['name' => 'cement_price', 'type' => 'number', 'label' => 'Price per Bag Cement', 'default' => 850],
+            ['name' => 'sand_price', 'type' => 'number', 'label' => 'Price per m³ Sand', 'default' => 3500]
         ],
-        'formulas' => [
-            'wall_area' => 'wall_length * wall_height',
-            'brick_area' => '((brick_length / 1000) + (mortar_thickness / 1000)) * ((brick_height / 1000) + (mortar_thickness / 1000))',
-            'total_bricks' => 'ceil(wall_area / brick_area)'
-        ],
+        'formulas' => [], // Processed by BrickQuantityCalculator class
         'outputs' => [
-            ['name' => 'wall_area', 'unit' => 'm²', 'label' => 'Wall Area', 'precision' => 2],
-            ['name' => 'total_bricks', 'unit' => 'bricks', 'label' => 'Total Bricks', 'precision' => 0, 'type' => 'integer']
+            ['name' => 'wall_area', 'unit' => 'm²', 'label' => 'Wall Surface Area', 'precision' => 2],
+            ['name' => 'total_bricks', 'unit' => 'bricks', 'label' => 'Total Bricks (Incl. Wastage)', 'precision' => 0, 'type' => 'integer'],
+            ['name' => 'cement_bags', 'unit' => 'bags', 'label' => 'Cement Required', 'precision' => 2],
+            ['name' => 'sand_volume', 'unit' => 'm³', 'label' => 'Sand Required', 'precision' => 2],
+            ['name' => 'total_cost', 'unit' => 'NPR', 'label' => 'Estimated Total Cost', 'precision' => 2]
+        ]
+    ],
+
+    'brick-wall-calculator' => [
+        'name' => 'Brick Wall Master Calculator',
+        'description' => 'Enterprise-grade brickwork calculator with material and cost estimation',
+        'category' => 'civil',
+        'subcategory' => 'brickwork',
+        'version' => '1.5-enterprise',
+        'inputs' => [
+            ['name' => 'wall_length', 'type' => 'number', 'unit' => 'm', 'required' => true, 'label' => 'Wall Length'],
+            ['name' => 'wall_height', 'type' => 'number', 'unit' => 'm', 'required' => true, 'label' => 'Wall Height'],
+            ['name' => 'thickness', 'type' => 'number', 'unit' => 'mm', 'required' => true, 'label' => 'Wall Thickness', 'default' => 230]
+        ],
+        'formulas' => [], // Processed by BrickWallCalculator class
+        'outputs' => [
+            ['name' => 'volume', 'unit' => 'm³', 'label' => 'Wall Volume', 'precision' => 3],
+            ['name' => 'surface_area', 'unit' => 'm²', 'label' => 'Surface Area (One Side)', 'precision' => 2]
         ]
     ],
     
@@ -349,7 +398,7 @@ return [
         ]
     ],
     
-    'plastering-estimator' => [
+    'plaster-calculator' => [
         'name' => 'Plastering Estimator',
         'description' => 'Calculate materials required for wall plastering',
         'category' => 'civil',
@@ -357,18 +406,29 @@ return [
         'version' => '1.0',
         'inputs' => [
             ['name' => 'area', 'type' => 'number', 'unit' => 'm²', 'required' => true, 'label' => 'Plaster Area', 'min' => 0.1],
-            ['name' => 'thickness', 'type' => 'number', 'unit' => 'mm', 'required' => true, 'label' => 'Plaster Thickness', 'min' => 1, 'default' => 12]
+            ['name' => 'thickness', 'type' => 'number', 'unit' => 'mm', 'required' => true, 'label' => 'Plaster Thickness', 'min' => 1, 'default' => 12],
+            ['name' => 'mix_ratio', 'type' => 'string', 'required' => true, 'label' => 'Mix Ratio', 'default' => '1:4', 'options' => ['1:3', '1:4', '1:5', '1:6']]
         ],
-        'formulas' => [
-            'volume' => 'area * (thickness / 1000)',
-            'dry_volume' => 'volume * 1.33',
-            'cement' => 'dry_volume * (1/6) * 1440',
-            'sand' => 'dry_volume * (5/6) * 1600'
-        ],
+        'formulas' => [], // Handled by Class
         'outputs' => [
-            ['name' => 'volume', 'unit' => 'm³', 'label' => 'Mortar Volume', 'precision' => 3],
-            ['name' => 'cement', 'unit' => 'kg', 'label' => 'Cement Required', 'precision' => 2],
-            ['name' => 'sand', 'unit' => 'kg', 'label' => 'Sand Required', 'precision' => 2]
+            ['name' => 'area', 'unit' => 'm²', 'label' => 'Plaster Area', 'precision' => 2],
+            ['name' => 'volume', 'unit' => 'm³', 'label' => 'Mortar Volume', 'precision' => 3]
+        ]
+    ],
+    
+    'paint-calculator' => [
+        'name' => 'Painting Estimator',
+        'description' => 'Calculate paint, primer, and putty quantities',
+        'category' => 'civil',
+        'subcategory' => 'finishing',
+        'version' => '1.0',
+        'inputs' => [
+            ['name' => 'area', 'type' => 'number', 'unit' => 'm²', 'required' => true, 'label' => 'Net Area', 'min' => 0.1],
+            ['name' => 'coats', 'type' => 'number', 'required' => true, 'label' => 'Number of Coats', 'default' => 2, 'min' => 1]
+        ],
+        'formulas' => [], // Handled by Class
+        'outputs' => [
+            ['name' => 'net_area', 'unit' => 'm²', 'label' => 'Net Painting Area', 'precision' => 2]
         ]
     ],
     

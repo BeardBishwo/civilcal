@@ -58,16 +58,7 @@ return [
         'formulas' => ['total' => function($inputs) { return $inputs['demand']; }],
         'outputs' => [['name' => 'total', 'label' => 'Total', 'unit' => 'kW']]
     ],
-    'panel-schedule' => [
-        'name' => 'Panel Schedule Generator',
-        'description' => 'Generate electrical panel distributions',
-        'category' => 'mep',
-        'subcategory' => 'electrical',
-        'version' => '1.0',
-        'inputs' => [['name' => 'circuits', 'type' => 'number', 'label' => 'Circuits', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['circuits']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Slots', 'unit' => 'nos']]
-    ],
+
     'transformer-sizing' => [
         'name' => 'Transformer Sizing',
         'description' => 'Calculate required transformer capacity',
@@ -190,16 +181,7 @@ return [
         'formulas' => ['total' => function($inputs) { return $inputs['hydrants']; }],
         'outputs' => [['name' => 'total', 'label' => 'Flow', 'unit' => 'GPM']]
     ],
-    'fire-pump-sizing' => [
-        'name' => 'MEP Fire Pump Sizing',
-        'description' => 'Coordinated fire pump requirements',
-        'category' => 'mep',
-        'subcategory' => 'fire',
-        'version' => '1.0',
-        'inputs' => [['name' => 'flow', 'type' => 'number', 'label' => 'Required Flow', 'unit' => 'GPM', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['flow']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Power', 'unit' => 'HP']]
-    ],
+
     'fire-safety-zoning' => [
         'name' => 'Fire Safety Zoning',
         'description' => 'Define fire zones and compartmentation',
@@ -224,16 +206,7 @@ return [
     // ============================================
     // SUSTAINABILITY (5 calculators)
     // ============================================
-    'energy-consumption' => [
-        'name' => 'Total MEP Energy',
-        'description' => 'Aggregate energy consumption for all MEP systems',
-        'category' => 'mep',
-        'subcategory' => 'sustainability',
-        'version' => '1.0',
-        'inputs' => [['name' => 'kwh', 'type' => 'number', 'label' => 'Annual Use', 'unit' => 'kWh', 'required' => true]],
-        'formulas' => ['total' => function($inputs) { return $inputs['kwh']; }],
-        'outputs' => [['name' => 'total', 'label' => 'Total', 'unit' => 'kWh']]
-    ],
+
     'green-rating' => [
         'name' => 'Green Building Rating',
         'description' => 'Estimate LEED/IGBC points for MEP',

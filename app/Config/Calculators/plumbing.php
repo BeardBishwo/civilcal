@@ -103,10 +103,24 @@ return [
                 return [
                     'theoretical_diameter' => round($diameterMm, 2),
                     'recommended_size' => $recommended,
-                    'actual_velocity' => round($actualVel, 2),
+                    'actual_velocity' => $actualVel,
                     'velocity_check' => $check
                 ];
             }
+        ],
+        'components' => [
+            [
+                'item_id' => '{pipeMaterial}_pipe_{recommended_size}mm',
+                'quantity_formula' => '1', // Placeholder for length if added, otherwise 1 unit
+                'unit' => 'm',
+                'type' => 'material'
+            ],
+            [
+                'item_id' => 'plumber_labor',
+                'quantity_formula' => '2', // 2 hours base
+                'unit' => 'hours',
+                'type' => 'labor'
+            ]
         ]
     ],
     'expansion-loop-sizing' => [
@@ -250,7 +264,7 @@ return [
     'pressure-loss' => ['name' => 'Pressure Loss Calculator', 'description' => 'Calculate pressure drop in pipes', 'category' => 'plumbing', 'subcategory' => 'pipe_sizing', 'version' => '1.0', 'inputs' => [['name' => 'len', 'type' => 'number', 'label' => 'Length', 'unit' => 'm']], 'formulas' => ['loss' => function($i) { return $i['len'] * 0.1; }], 'outputs' => [['name' => 'loss', 'label' => 'Loss', 'unit' => 'bar']]],
     'water-demand-calculation' => ['name' => 'Water Demand Calculation', 'description' => 'Calculate total water demand', 'category' => 'plumbing', 'subcategory' => 'potable_water', 'version' => '1.0', 'inputs' => [['name' => 'ppl', 'type' => 'number', 'label' => 'People']], 'formulas' => ['demand' => function($i) { return $i['ppl'] * 150; }], 'outputs' => [['name' => 'demand', 'label' => 'Demand', 'unit' => 'L/day']]],
     'storage-tank-sizing' => ['name' => 'Storage Tank Sizing', 'description' => 'Calculate tank capacity', 'category' => 'plumbing', 'subcategory' => 'potable_water', 'version' => '1.0', 'inputs' => [['name' => 'demand', 'type' => 'number', 'label' => 'Daily Demand', 'unit' => 'L']], 'formulas' => ['cap' => function($i) { return $i['demand'] * 1.5; }], 'outputs' => [['name' => 'cap', 'label' => 'Tank Capacity', 'unit' => 'L']]],
-    'pump-sizing' => ['name' => 'Pump Sizing Calculator', 'description' => 'Calculate pump head and flow', 'category' => 'plumbing', 'subcategory' => 'potable_water', 'version' => '1.0', 'inputs' => [['name' => 'flow', 'type' => 'number', 'label' => 'Flow', 'unit' => 'L/s']], 'formulas' => ['head' => function($i) { return 10; }], 'outputs' => [['name' => 'head', 'label' => 'Required Head', 'unit' => 'm']]],
+    'plumbing-pump-sizing' => ['name' => 'Pump Sizing Calculator', 'description' => 'Calculate pump head and flow', 'category' => 'plumbing', 'subcategory' => 'potable_water', 'version' => '1.0', 'inputs' => [['name' => 'flow', 'type' => 'number', 'label' => 'Flow', 'unit' => 'L/s']], 'formulas' => ['head' => function($i) { return 10; }], 'outputs' => [['name' => 'head', 'label' => 'Required Head', 'unit' => 'm']]],
     'water-hammer-calculation' => ['name' => 'Water Hammer Calculation', 'description' => 'Analyze surge pressure', 'category' => 'plumbing', 'subcategory' => 'potable_water', 'version' => '1.0', 'inputs' => [['name' => 'vel', 'type' => 'number', 'label' => 'Velocity', 'unit' => 'm/s']], 'formulas' => ['surge' => function($i) { return $i['vel'] * 10; }], 'outputs' => [['name' => 'surge', 'label' => 'Surge Pressure', 'unit' => 'bar']]],
     'heat-loss-calculation' => ['name' => 'Heat Loss Calculation', 'description' => 'Calculate pipe insulation loss', 'category' => 'plumbing', 'subcategory' => 'potable_water', 'version' => '1.0', 'inputs' => [['name' => 'temp', 'type' => 'number', 'label' => 'Temp Diff', 'unit' => '°C']], 'formulas' => ['loss' => function($i) { return $i['temp'] * 2; }], 'outputs' => [['name' => 'loss', 'label' => 'Loss', 'unit' => 'W/m']]],
     'main-isolation-valve' => ['name' => 'Main Isolation Valve Sizing', 'description' => 'Determine valve size', 'category' => 'plumbing', 'subcategory' => 'potable_water', 'version' => '1.0', 'inputs' => [['name' => 'pipe', 'type' => 'number', 'label' => 'Pipe Size', 'unit' => 'mm']], 'formulas' => ['valve' => function($i) { return $i['pipe']; }], 'outputs' => [['name' => 'valve', 'label' => 'Valve Size', 'unit' => 'mm']]],

@@ -24,32 +24,31 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        $courseId = $_GET['course_id'] ?? null;
         $levelId = $_GET['level_id'] ?? null;
 
-        // Fetch all Education Levels for dropdown
-        // Join with Course to show context in dropdown if needed, but simple list is fine.
-        $levels = $this->db->query("
-            SELECT el.id, el.title 
-            FROM syllabus_nodes el
-            ORDER BY el.order_index ASC
-        ")->fetchAll();
+        // Fetch dropdown options for filters
+        $courses = $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC")->fetchAll();
+        
+        $eduLevelSql = "SELECT id, title FROM syllabus_nodes WHERE type = 'education_level'";
+        $eduLevelParams = [];
+        if ($courseId) { $eduLevelSql .= " AND parent_id = :pid"; $eduLevelParams['pid'] = $courseId; }
+        $levels = $this->db->query($eduLevelSql . " ORDER BY order_index ASC", $eduLevelParams)->fetchAll();
 
         // Base Query (Categories -> Education Level -> Course)
         $sql = "SELECT c.*, 
                        p.title as parent_title, p.is_active as parent_active,
-                       course.is_active as grandparent_active 
+                       course.title as course_title, course.is_active as course_active 
                 FROM syllabus_nodes c 
                 LEFT JOIN syllabus_nodes p ON c.parent_id = p.id 
                 LEFT JOIN syllabus_nodes course ON p.parent_id = course.id
                 WHERE c.type = 'category'";
 
         $params = [];
-        if ($levelId) {
-            $sql .= " AND c.parent_id = :level_id";
-            $params['level_id'] = $levelId;
-        }
+        if ($courseId) { $sql .= " AND course.id = :course_id"; $params['course_id'] = $courseId; }
+        if ($levelId) { $sql .= " AND c.parent_id = :level_id"; $params['level_id'] = $levelId; }
 
-        $sql .= " ORDER BY (c.is_active = 1 AND IFNULL(p.is_active, 1) = 1 AND IFNULL(course.is_active, 1) = 1) DESC, p.title ASC, c.order_index ASC";
+        $sql .= " ORDER BY (c.is_active = 1 AND IFNULL(p.is_active, 1) = 1 AND IFNULL(course.is_active, 1) = 1) DESC, course.title ASC, p.title ASC, c.order_index ASC";
 
         $categories = $this->db->query($sql, $params)->fetchAll();
 
@@ -63,7 +62,9 @@ class CategoryController extends Controller
         return $this->view('admin/quiz/categories/index', [
             'categories' => $categories,
             'stats' => $stats,
+            'courses' => $courses,
             'levels' => $levels,
+            'selectedCourse' => $courseId,
             'selectedLevel' => $levelId
         ]);
     }
@@ -171,8 +172,35 @@ class CategoryController extends Controller
     /**
      * Delete Category
      */
+    /**
+     * Get Stats for Deletion Modal
+     */
+    public function getDeleteStats($id)
+    {
+        $counts = $this->syllabusService->getChildTypeCounts($id);
+        echo json_encode(['status' => 'success', 'counts' => $counts]);
+    }
+
+    /**
+     * Delete Category with Selective Cascade
+     */
     public function delete($id)
     {
+        // Check for JSON input (flags)
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        // Selective Delete
+        if (isset($input['delete_types']) && is_array($input['delete_types'])) {
+            $deleteTypes = $input['delete_types'];
+            if ($this->syllabusService->deleteWithPreservation($id, $deleteTypes)) {
+                echo json_encode(['status' => 'success']);
+            } else {
+                echo json_encode(['status' => 'error']);
+            }
+            return;
+        }
+
+        // Fallback
         if ($this->syllabusService->deleteNode($id)) {
             echo json_encode(['status' => 'success']);
         } else {

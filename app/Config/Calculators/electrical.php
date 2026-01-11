@@ -260,6 +260,39 @@ return [
             ['name' => 'voltage_at_load', 'unit' => 'V', 'label' => 'Voltage at Load', 'precision' => 1],
             ['name' => 'resistance', 'unit' => 'Ω/1000ft', 'label' => 'Wire Resistance', 'precision' => 4],
             ['name' => 'assessment', 'unit' => '', 'label' => 'NEC Assessment', 'precision' => 0, 'type' => 'string']
+        ],
+        
+        'components' => [
+            [
+                'item_id' => 'copper_wire_{wire_size}_awg',
+                'quantity_formula' => 'distance * 2', // Round trip
+                'unit' => 'ft',
+                'type' => 'wire'
+            ],
+            [
+                'item_id' => 'conduit_pvc_std',
+                'quantity_formula' => 'distance',
+                'unit' => 'ft',
+                'type' => 'conduit'
+            ]
+        ],
+        
+        // NEW: Virtual Bill of Materials
+        'components' => [
+            [
+                'type' => 'material',
+                'item_id' => 'wire_{material}_{wire_size}', // e.g. wire_copper_12
+                'quantity_formula' => 'distance * 2 * 1.05', // 2 conductors (Hot+Neutral) + 5% Wastage
+                'unit' => 'ft',
+                'label' => 'Total Wire Length'
+            ],
+            [
+                'type' => 'labor',
+                'item_id' => 'labor_electrician',
+                'quantity_formula' => 'distance * 0.1', // 0.1 hours per foot separate conduit run? Rough estimate.
+                'unit' => 'hours',
+                'label' => 'Installation Labor'
+            ]
         ]
     ],
     

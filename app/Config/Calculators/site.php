@@ -446,45 +446,7 @@ return [
         ],
     ],
 
-    'concrete-mix' => [
-        'name' => 'Concrete Mix Design',
-        'description' => 'Calculate concrete ingredients (Nominal)',
-        'category' => 'site',
-        'subcategory' => 'materials',
-        'version' => '1.0',
-        'inputs' => [
-            ['name' => 'volume', 'type' => 'number', 'label' => 'Wet Volume', 'unit' => 'm³', 'required' => true, 'min' => 0],
-            ['name' => 'grade', 'type' => 'select', 'label' => 'Grade', 'required' => true, 'options' => ['M15' => 'M15 (1:2:4)', 'M20' => 'M20 (1:1.5:3)', 'M25' => 'M25 (1:1:2)']],
-        ],
-        'formulas' => [
-            'dry_vol' => function($i) { return $i['volume'] * 1.54; },
-            'ratios' => function($i) {
-                switch ($i['grade']) {
-                    case 'M15': return [1, 2, 4];
-                    case 'M20': return [1, 1.5, 3];
-                    case 'M25': return [1, 1, 2];
-                    default: return [1, 2, 4];
-                }
-            },
-            'cement' => function($i, $r) {
-                $sum = array_sum($r['ratios']);
-                return ($r['dry_vol'] / $sum) * 1440;
-            },
-            'sand' => function($i, $r) {
-                $sum = array_sum($r['ratios']);
-                return ($r['dry_vol'] / $sum) * $r['ratios'][1];
-            },
-            'aggregate' => function($i, $r) {
-                $sum = array_sum($r['ratios']);
-                return ($r['dry_vol'] / $sum) * $r['ratios'][2];
-            },
-        ],
-        'outputs' => [
-            ['name' => 'cement', 'label' => 'Cement', 'unit' => 'kg', 'precision' => 0],
-            ['name' => 'sand', 'label' => 'Sand', 'unit' => 'm³', 'precision' => 2],
-            ['name' => 'aggregate', 'label' => 'Aggregate', 'unit' => 'm³', 'precision' => 2],
-        ],
-    ],
+
 
     'asphalt-calculator' => [
         'name' => 'Asphalt Calculator',

@@ -697,7 +697,7 @@ ob_start();
         
         switch(currentStructure) {
             case 'full-path':
-                url = `${baseUrl}/modules/${category}/${subcategory}/${sampleId}${phpExtension}`;
+                url = `${baseUrl}/${sampleId}`; // Virtual Route
                 break;
             case 'category-calculator':
                 url = `${baseUrl}/${category}/${sampleId}${phpExtension}`;

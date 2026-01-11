@@ -1,110 +1,170 @@
-<?php $page_title = $title ?? 'Standard Deviation Calculator'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/theme.css'); ?>?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/calculator-platform.css'); ?>?v=<?php echo time(); ?>">
-    <style>
-        .calc-card { background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 800px; margin: 0 auto; }
-        .calc-header { background: linear-gradient(135deg, #FF6B6B 0%, #556270 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; text-align: center; }
-        .calc-header h2 { margin: 0; font-size: 2rem; font-weight: 700; }
-        .calc-body { padding: 40px; }
-        .calc-input { font-size: 1.1rem; font-weight: 600; border: 2px solid #e9ecef; border-radius: 8px; padding: 12px; }
-        .calc-btn { background: linear-gradient(135deg, #FF6B6B 0%, #556270 100%); color: white; border: none; border-radius: 8px; padding: 15px 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .result-box { background: #fbecec; border-radius: 12px; padding: 25px; margin-top: 30px; border: 1px solid #e6b0aa; }
-        .stat-item { padding: 10px; border-bottom: 1px dashed #e6b0aa; display: flex; justify-content: space-between; }
-        .stat-item:last-child { border: none; }
-        .stat-label { font-weight: 600; color: #555; }
-        .stat-val { font-weight: 700; color: #c0392b; font-size: 1.2rem; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: var(--text-primary); text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="layout-wrapper">
-        <?php include __DIR__ . '/../../partials/calculator_sidebar.php'; ?>
-        
-        <main class="main-content">
-            <div class="container-fluid">
-                <a href="<?php echo app_base_url('/calculator'); ?>" class="back-btn"><i class="bi bi-arrow-left me-2"></i>Dashboard</a>
-                <div class="calc-card">
-                    <div class="calc-header">
-                        <i class="bi bi-graph-up" style="font-size: 2.5rem;"></i>
-                        <h2>Dispersion Calculator</h2>
-                        <p class="mb-0 mt-2">Standard Deviation & Variance</p>
-                    </div>
-                    <div class="calc-body">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Enter Data Set</label>
-                            <textarea id="dataset" class="form-control calc-input" rows="3" placeholder="e.g. 10, 12, 23, 23, 16, 23, 21, 16"></textarea>
-                            <div class="form-text">Split numbers by comma, space, or new line.</div>
-                        </div>
+<?php
+// themes/default/views/calculators/statistics/dispersion.php
+// PREMIUM DISPERSION CALCULATOR
+?>
 
-                        <div class="form-check mb-4 text-center">
-                            <input class="form-check-input float-none me-2" type="checkbox" id="isSample" checked>
-                            <label class="form-check-label fw-bold" for="isSample">
-                                Calculate as Sample (divide by N-1)
-                            </label>
-                        </div>
+<link rel="stylesheet" href="<?= app_base_url('themes/default/assets/css/calculators.min.css?v=' . time()) ?>">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-                        <button class="calc-btn w-100" onclick="calculate()"><i class="bi bi-calculator me-2"></i>Calculate Dispersion</button>
-
-                        <div class="result-box" id="resultBox" style="display:none;">
-                            <h5 class="text-center mb-3 fw-bold text-muted">Results</h5>
-                             <div class="stat-item"><span class="stat-label">Count (N)</span><span class="stat-val" id="res_n">0</span></div>
-                             <div class="stat-item"><span class="stat-label">Mean</span><span class="stat-val" id="res_mean">0</span></div>
-                             <div class="stat-item"><span class="stat-label">Standard Deviation (σ/s)</span><span class="stat-val" id="res_sd">0</span></div>
-                             <div class="stat-item"><span class="stat-label">Variance (σ²/s²)</span><span class="stat-val" id="res_var">0</span></div>
-                             <div class="stat-item"><span class="stat-label">Coef. of Variation (CV)</span><span class="stat-val" id="res_cv">0%</span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+<div class="bg-background min-h-screen relative overflow-hidden" x-data="dispersionCalculator()">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[30%] left-[20%] w-[500px] h-[500px] bg-red-500/10 rounded-full blur-[120px] animate-pulse-glow"></div>
     </div>
-    <script>
-        function calculate() {
-            const raw = document.getElementById('dataset').value;
-             const isSample = document.getElementById('isSample').checked;
-             
-            const nums = raw.split(/[\s,]+/)
+
+    <div class="calc-container">
+        <nav class="mb-6 animate-slide-down">
+            <ol class="flex items-center gap-2 text-sm text-gray-400">
+                <li><a href="<?= app_base_url('/calculators') ?>" class="hover:text-white transition">Calculators</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-primary font-bold">Statistics</li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="flex flex-col items-center text-center animate-slide-down mb-12">
+            <!-- Premium Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-primary text-xs font-bold tracking-widest uppercase mb-6 shadow-lg shadow-primary/5 hover:bg-white/10 transition-colors">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                <span>Variability</span>
+            </div>
+            
+            <!-- Title -->
+            <h1 class="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight drop-shadow-xl">
+                Dispersion <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Calculator</span>
+            </h1>
+            
+            <!-- Description -->
+            <p class="text-slate-400 font-medium text-lg max-w-2xl leading-relaxed mx-auto">
+                <span class="bg-gradient-to-r from-white/10 to-transparent h-px w-20 inline-block align-middle mr-2"></span>
+                Calculate Standard Deviation and Variance for Sample or Population.
+                <span class="bg-gradient-to-l from-white/10 to-transparent h-px w-20 inline-block align-middle ml-2"></span>
+            </p>
+        </div>
+
+        <div class="calc-grid max-w-4xl mx-auto">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Input -->
+                <div class="calc-card animate-scale-in">
+                    
+                    <div class="mb-6">
+                        <label class="calc-label text-center mb-4">Enter Data Set</label>
+                        <textarea x-model="dataset" @input="calculate()" class="calc-input h-32 font-mono text-sm" placeholder="10, 12, 23, 23, 16, 23, 21, 16"></textarea>
+                         <div class="text-xs text-gray-400 mt-2 text-center">
+                             Split numbers by comma, space, or new line.
+                         </div>
+                    </div>
+
+                    <div class="mb-6 bg-white/5 p-3 rounded-lg border border-white/5">
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-bold text-gray-300">Calculate as Sample</label>
+                            <button 
+                                @click="isSample = !isSample; calculate()" 
+                                class="w-12 h-6 rounded-full p-1 transition-colors duration-300 focus:outline-none" 
+                                :class="isSample ? 'bg-primary' : 'bg-gray-700'"
+                            >
+                                <div 
+                                    class="w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300"
+                                    :class="isSample ? 'translate-x-6' : 'translate-x-0'"
+                                ></div>
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-2" x-text="isSample ? 'Divides by N-1 (Bessel\'s correction)' : 'Divides by N (Population)'"></p>
+                    </div>
+
+                    <div class="flex justify-center gap-2">
+                         <button @click="dataset = ''; calculate()" class="px-3 py-1 bg-white/5 rounded-full hover:bg-white/10 transition text-xs font-mono text-gray-400">Clear</button>
+                    </div>
+
+                </div>
+
+                <!-- Result -->
+                <div class="calc-card animate-slide-up bg-gradient-to-br from-red-900/20 to-black border border-red-500/20">
+                    
+                    <div class="text-center mb-6">
+                        <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Standard Deviation (σ)</div>
+                        <div class="text-4xl font-black text-white" x-text="sd"></div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5">
+                            <span class="text-gray-400 text-sm">Variance (σ²)</span>
+                            <span class="text-red-400 font-bold font-mono text-xl" x-text="variance"></span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5">
+                            <span class="text-gray-400 text-sm">Mean (Average)</span>
+                            <span class="text-red-400 font-bold font-mono text-xl" x-text="mean"></span>
+                        </div>
+                         <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5">
+                            <span class="text-gray-400 text-sm">Count (N)</span>
+                            <span class="text-white font-bold font-mono text-xl" x-text="n"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-center">
+                        <div class="text-[10px] text-red-200/60 uppercase">Coef. of Variation (CV)</div>
+                        <div class="text-2xl font-bold text-red-300" x-text="cv"></div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('dispersionCalculator', () => ({
+        dataset: '10, 12, 23, 23, 16, 23, 21, 16',
+        isSample: true,
+        n: 0,
+        mean: 0,
+        sd: 0,
+        variance: 0,
+        cv: '0%',
+
+        init() {
+            this.calculate();
+        },
+
+        calculate() {
+             const raw = this.dataset;
+             const nums = raw.split(/[\s,]+/)
                             .map(n => parseFloat(n))
                             .filter(n => !isNaN(n));
             
-            if (nums.length < 2) {
-                alert("Please enter at least 2 valid numbers.");
-                return;
-            }
+             if (nums.length < 2) {
+                 this.reset();
+                 return;
+             }
 
-            const n = nums.length;
-            const sum = nums.reduce((a,b) => a + b, 0);
-            const mean = sum / n;
-            
-            // Variance
-            let sumSqDiff = 0;
-            nums.forEach(num => {
-                sumSqDiff += Math.pow(num - mean, 2);
-            });
-            
-            const divisor = isSample ? (n - 1) : n;
-            const variance = sumSqDiff / divisor;
-            const sd = Math.sqrt(variance);
-            const cv = (sd / mean) * 100;
+             this.n = nums.length;
+             const sum = nums.reduce((a,b) => a + b, 0);
+             this.mean = sum / this.n;
 
-            document.getElementById('res_n').textContent = n;
-            document.getElementById('res_mean').textContent = mean.toFixed(4).replace(/\.?0+$/, "");
-            document.getElementById('res_sd').textContent = sd.toFixed(4).replace(/\.?0+$/, "");
-            document.getElementById('res_var').textContent = variance.toFixed(4).replace(/\.?0+$/, "");
-            document.getElementById('res_cv').textContent = cv.toFixed(2).replace(/\.?0+$/, "") + '%';
-            
-            document.getElementById('resultBox').style.display = 'block';
+             // Variance
+             let sumSqDiff = 0;
+             nums.forEach(num => {
+                 sumSqDiff += Math.pow(num - this.mean, 2);
+             });
+             
+             const divisor = this.isSample ? (this.n - 1) : this.n;
+             const v = sumSqDiff / divisor;
+             const s = Math.sqrt(v);
+             const c = (s / this.mean) * 100;
+
+             this.variance = v.toFixed(4).replace(/\.?0+$/, "");
+             this.sd = s.toFixed(4).replace(/\.?0+$/, "");
+             this.mean = this.mean.toFixed(4).replace(/\.?0+$/, "");
+             this.cv = c.toFixed(2).replace(/\.?0+$/, "") + '%';
+        },
+
+        reset() {
+            this.n = 0; this.mean = 0; this.sd = 0; this.variance = 0; this.cv = '0%';
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo app_base_url('/themes/default/assets/js/floating-calculator.js'); ?>"></script>
-</body>
-</html>
+    }));
+});
+</script>

@@ -53,6 +53,12 @@ class CalculatorRouter
         // Clean the route
         $route = trim($route, '/');
         
+        try {
+            $this->db->query("SELECT slug FROM calculator_urls LIMIT 1");
+        } catch (\Exception $e) {
+             throw new \Exception("DB Error in Router: " . $e->getMessage() . " - DB: " . $this->db->query('SELECT DATABASE()')->fetchColumn());
+        }
+        
         // Check for 301 redirects first
         $redirectUrl = $this->checkRedirects($route);
         if ($redirectUrl) {
@@ -176,7 +182,9 @@ class CalculatorRouter
         $route = rtrim($route, '.php');
         
         // Extract calculator ID from full path (with or without .php)
-        if (preg_match('/^modules\/([^\/]+)\/([^\/]+)\/([^\/]+)$/', $route, $matches)) {
+        // Modern: /category/subcategory/calculator-id
+        // Legacy Support: /modules/category/subcategory/calculator-id
+        if (preg_match('/^(?:modules\/)?([^\/]+)\/([^\/]+)\/([^\/]+)$/', $route, $matches)) {
             $category = $matches[1];
             $subcategory = $matches[2];
             $calculatorId = $matches[3];
@@ -248,7 +256,7 @@ class CalculatorRouter
     {
         $stmt = $this->db->prepare("
             SELECT * FROM calculator_urls
-            WHERE category = ? AND slug = ?
+            WHERE category = ? AND `slug` = ?
             LIMIT 1
         ");
         $stmt->execute([$category, $slug]);
@@ -262,7 +270,7 @@ class CalculatorRouter
     {
         $stmt = $this->db->prepare("
             SELECT * FROM calculator_urls
-            WHERE subcategory = ? AND slug = ?
+            WHERE subcategory = ? AND `slug` = ?
             LIMIT 1
         ");
         $stmt->execute([$subcategory, $slug]);
@@ -296,11 +304,43 @@ class CalculatorRouter
     /**
      * Find calculator by slug
      */
+    /**
+     * Find calculator by slug
+     * Now includes fallback to CalculatorEngine for config-only tools
+     */
     private function findCalculatorBySlug($slug)
     {
-        $stmt = $this->db->prepare("SELECT * FROM calculator_urls WHERE slug = ?");
+        // 1. Check Database
+        $stmt = $this->db->prepare("SELECT * FROM calculator_urls WHERE `slug` = ?");
         $stmt->execute([$slug]);
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        $calculator = $stmt->fetch(\PDO::FETCH_ASSOC);
+        
+        if ($calculator) {
+            return $calculator;
+        }
+
+        // 2. Check Engine (Virtual Discovery)
+        try {
+            $engine = new \App\Engine\CalculatorEngine();
+            $metadata = $engine->getMetadata($slug);
+            
+            if ($metadata && ($metadata['success'] ?? false)) {
+                // Construct virtual calculator object
+                return [
+                    'calculator_id' => $slug,
+                    'slug' => $slug, // Assume slug matches ID for virtual tools
+                    'name' => $metadata['name'],
+                    'category' => $metadata['category'],
+                    'subcategory' => $metadata['subcategory'] ?? 'general',
+                    'full_path' => 'virtual', // Marker for virtual tools
+                    'is_active' => 1
+                ];
+            }
+        } catch (\Exception $e) {
+            // Ignore engine errors during discovery
+        }
+        
+        return null; // Not found
     }
     
     /**
@@ -363,23 +403,53 @@ class CalculatorRouter
     /**
      * Execute calculator
      */
+    /**
+     * Execute calculator
+     */
     private function executeCalculator($calculator)
     {
-        $filePath = dirname(__DIR__, 2) . '/' . $calculator['full_path'];
+        // 1. Enterprise Engine / Virtual Execution
+        // We no longer rely on physical files in modules/ directory as they are deprecated/deleted.
         
-        if (file_exists($filePath)) {
-            // Set calculator context for the template
+        try {
+            $engine = new \App\Engine\CalculatorEngine();
+            // Try to load metadata (Inputs/Formulas) from DB or Config
+            $metadata = $engine->getMetadata($calculator['calculator_id']);
+             
+            // Set calculator context globals for the template
             $_SERVER['CALCULATOR_ID'] = $calculator['calculator_id'];
             $_SERVER['CALCULATOR_CATEGORY'] = $calculator['category'];
-            $_SERVER['CALCULATOR_SUBCATEGORY'] = $calculator['subcategory'];
+            $_SERVER['CALCULATOR_SUBCATEGORY'] = $calculator['subcategory'] ?? 'general';
+
+            // If metadata exists, we can render the Generic Template
+            if ($metadata && ($metadata['success'] ?? false)) {
+                $templatePath = dirname(__DIR__, 2) . '/themes/default/views/shared/calculator-template.php';
+                
+                if (file_exists($templatePath)) {
+                    require_once $templatePath;
+                    if (function_exists('renderCalculator')) {
+                        renderCalculator($calculator['calculator_id']);
+                        exit;
+                    }
+                } else {
+                     throw new \Exception("Generic Calculator Template not found.");
+                }
+            }
             
-            require $filePath;
-            exit;
-        } else {
-            http_response_code(404);
-            echo "Calculator not found: " . htmlspecialchars($calculator['calculator_id']);
-            exit;
+            // 2. Fallback: Check if it's a new Class-Based Calculator (EnterprisePipeline)
+            // If DB metadata is missing, maybe we can generate UI from the Class? (Future Feature)
+            // For now, if no metadata, we can't show a form.
+
+        } catch (\Exception $e) {
+            error_log("Router Error: " . $e->getMessage());
         }
+
+        // 3. Not Found / Error
+        http_response_code(404);
+        echo "<h1>Calculator Not Found</h1>";
+        echo "<p>The calculator '{$calculator['calculator_id']}' is currently unavailable or being migrated.</p>";
+        if (isset($e)) echo "<p>Error: " . $e->getMessage() . "</p>";
+        exit;
     }
     
     /**
@@ -389,7 +459,8 @@ class CalculatorRouter
     {
         switch ($this->permalinkStructure) {
             case 'full-path':
-                return "/modules/{$category}/{$subcategory}/{$calculatorId}.php";
+                // Modern structure: /category/subcategory/calculator-id
+                return "/{$category}/{$subcategory}/{$calculatorId}";
                 
             case 'category-calculator':
                 return "/{$category}/{$calculatorId}";

@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
-use App\Core\MathEngine;
 
 use App\Services\GamificationService;
 use App\Services\RankService;
@@ -13,7 +12,6 @@ use App\Services\Quiz\StreakService;
 
 class CalculatorController extends Controller
 {
-    private $engine;
     private $campaignModel;
     private $rankService;
     private $questService;
@@ -23,7 +21,6 @@ class CalculatorController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->engine = new MathEngine();
         $this->campaignModel = new \App\Models\Campaign();
         $this->rankService = new RankService();
         $this->questService = new QuestService();
@@ -41,7 +38,7 @@ class CalculatorController extends Controller
      */
     public function index()
     {
-        $this->view->render('calculator/index', [
+        $this->view->render('calculators/index', [
             'title' => 'Universal Calculator Platform',
             'categories' => $this->getCategories()
         ]);
@@ -49,16 +46,16 @@ class CalculatorController extends Controller
 
     public function converter($categorySlug = null)
     {
+        // Default to 'length' if accessed via /convert
         if (!$categorySlug) {
-            header('Location: ' . app_base_url('/calculator'));
-            exit;
+            $categorySlug = 'length';
         }
 
         $allCategories = $this->getCategories();
         $category = $this->db->findOne('calc_unit_categories', ['slug' => $categorySlug]);
         
         if (!$category) {
-            header('Location: ' . app_base_url('/calculator'));
+            header('Location: ' . app_base_url('/calculators'));
             exit;
         }
 
@@ -75,7 +72,7 @@ class CalculatorController extends Controller
             );
         }
 
-        $this->view->render('calculator/converter', [
+        $this->view->render('calculators/converter', [
             'title' => $category['name'] . ' Converter',
             'category' => $category,
             'units' => $units,
@@ -195,6 +192,26 @@ class CalculatorController extends Controller
     {
         $this->view->render('calculators/scientific', [
             'title' => 'Scientific Calculator'
+        ]);
+    }
+
+    /**
+     * Traditional Nepali Unit Converter
+     */
+    public function traditionalUnits()
+    {
+        $this->view->render('calculators/nepali', [
+            'title' => 'Nepali Unit Converter',
+            'appName' => 'Bishwo Calculator'
+        ]);
+    }
+
+    public function traditionalUnitsV2()
+    {
+        $this->view->render('calculators/nepaliv2', [
+            'title' => 'Nepali Unit Converter V2',
+            'appName' => 'Bishwo Calculator',
+            'layout' => false // Tailwind layout handles itself
         ]);
     }
 }

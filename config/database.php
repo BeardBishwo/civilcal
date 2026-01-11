@@ -33,4 +33,16 @@ return [
     'collation' => 'utf8mb4_unicode_ci',
     'prefix' => '',
 ];
+
+// Read Replica Configuration (Optional)
+$readHost = $_ENV['DB_READ_HOST'] ?? getenv('DB_READ_HOST');
+if ($readHost) {
+    $config['read'] = [
+        'host' => $readHost,
+        'username' => $_ENV['DB_READ_USERNAME'] ?? getenv('DB_READ_USERNAME') ?? null,
+        'password' => $_ENV['DB_READ_PASSWORD'] ?? getenv('DB_READ_PASSWORD') ?? null,
+    ];
+}
+
+return $config;
 ?>

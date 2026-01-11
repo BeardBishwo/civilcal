@@ -241,30 +241,41 @@ class CalculatorService {
     /**
      * Get calculator instance
      */
+    /**
+     * Get calculator instance
+     */
     private function getCalculator(string $calculatorType) {
+        // 1. Try Legacy Class (e.g. App\Calculators\CivilCalculator)
+        // Kept for backward compatibility if any classes remain
         $calculatorClass = "App\\Calculators\\" . ucfirst($calculatorType) . "Calculator";
         
         if (class_exists($calculatorClass)) {
             return new $calculatorClass();
         }
         
-        // Try to find calculator in modules
-        $modulePaths = [
-            BASE_PATH . "/modules/civil/{$calculatorType}.php",
-            BASE_PATH . "/modules/electrical/{$calculatorType}.php",
-            BASE_PATH . "/modules/mechanical/{$calculatorType}.php",
-            BASE_PATH . "/modules/general/{$calculatorType}.php"
-        ];
-        
-        foreach ($modulePaths as $path) {
-            if (file_exists($path)) {
-                require_once $path;
-                
-                $className = ucfirst($calculatorType) . "Calculator";
-                if (class_exists($className)) {
-                    return new $className();
-                }
+        // 2. Try CalculatorEngine (Modern Config-Driven)
+        // If config exists, return a Virtual Calculator Adapter
+        try {
+            $engine = new \App\Engine\CalculatorEngine();
+            $metadata = $engine->getMetadata($calculatorType);
+            
+            if ($metadata && ($metadata['success'] ?? false)) {
+                return new class($engine, $calculatorType) {
+                    private $engine;
+                    private $type;
+                    
+                    public function __construct($engine, $type) {
+                        $this->engine = $engine;
+                        $this->type = $type;
+                    }
+                    
+                    public function calculate($inputs) {
+                        return $this->engine->execute($this->type, $inputs);
+                    }
+                };
             }
+        } catch (\Exception $e) {
+            // Ignore engine errors
         }
         
         return null;

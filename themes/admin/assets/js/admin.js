@@ -91,6 +91,16 @@ const AdminApp = {
       });
     }
 
+    // Bottom Sidebar Toggle
+    const sidebarToggleBottom = document.getElementById("sidebar-toggle-bottom");
+    if (sidebarToggleBottom) {
+      sidebarToggleBottom.addEventListener("click", (e) => {
+        e.preventDefault();
+        const shouldCollapse = !sidebar.classList.contains("collapsed");
+        syncSidebarState(shouldCollapse);
+      });
+    }
+
     this.setupSubmenus(sidebar);
   },
 

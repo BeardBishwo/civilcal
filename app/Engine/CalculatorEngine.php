@@ -25,6 +25,7 @@ class CalculatorEngine
     private UnitConverter $unitConverter;
     private FormulaRegistry $formulaRegistry;
     private ResultFormatter $formatter;
+    private \App\Services\Calculator\CostService $costService;
     private array $config = [];
     
     public function __construct()
@@ -33,6 +34,7 @@ class CalculatorEngine
         $this->unitConverter = new UnitConverter();
         $this->formulaRegistry = new FormulaRegistry();
         $this->formatter = new ResultFormatter();
+        $this->costService = new \App\Services\Calculator\CostService();
     }
     
     /**
@@ -60,11 +62,54 @@ class CalculatorEngine
             // Convert units if needed
             $normalizedInputs = $this->unitConverter->normalize($inputs, $config['inputs']);
             
-            // Execute formulas
-            $results = $this->formulaRegistry->execute($config['formulas'], $normalizedInputs);
+            // PRIORITY: Check if a specific PIPELINE CLASS exists for this ID
+            // e.g. 'brick-wall' -> App\Calculators\Civil\BrickWallCalculator
+            $category = $config['category'] ?? 'Civil';
+            $lookupId = str_replace('-calculator', '', $calculatorId);
+            $classSlug = str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $lookupId)));
+            $pipelineClass = "App\\Calculators\\" . ucfirst($category) . "\\" . $classSlug . "Calculator";
+
+            if (class_exists($pipelineClass)) {
+                $instance = new $pipelineClass();
+                if (method_exists($instance, 'calculate')) {
+                    $classResult = $instance->calculate($inputs);
+                    
+                    // Unified Mapping: Class Results -> Engine Results
+                    $results = $classResult['geometry'] ?? [];
+                    if (isset($classResult['materials'])) {
+                         // Enrich materials with costs via CostService
+                         $results['bill_of_materials'] = $this->costService->calculateCost($classResult['materials']);
+                    }
+                    if (isset($classResult['related_items'])) {
+                        $results['related_items'] = $classResult['related_items'];
+                    }
+                }
+            } else {
+                // FALLBACK: Execute virtual formulas
+                $results = $this->formulaRegistry->execute($config['formulas'], $normalizedInputs);
+
+                // PROCESS VIRTUAL COMPONENTS (BOM Generation)
+                $context = array_merge($normalizedInputs, $results);
+                $components = $this->processComponents($config, $context);
+                if (!empty($components)) {
+                    // Enrich BOM with Costs
+                    $enrichedBOM = $this->costService->calculateCost($components);
+                    $results['bill_of_materials'] = $enrichedBOM;
+                }
+            }
             
             // Format results
             $formattedResults = $this->formatter->format($results, $config['outputs']);
+
+            // Re-attach BOM if it exists (ResultFormatter strips unknown keys)
+            if (isset($results['bill_of_materials'])) {
+                $formattedResults['bill_of_materials'] = $results['bill_of_materials'];
+            }
+
+            // Re-attach Related Items (Suggestions)
+            if (isset($results['related_items'])) {
+                $formattedResults['related_items'] = $results['related_items'];
+            }
             
             $executionTime = round((microtime(true) - $startTime) * 1000, 2);
             
@@ -125,16 +170,20 @@ class CalculatorEngine
     {
         $configDir = __DIR__ . '/../Config/Calculators/';
         
-        // Try common categories first
-        $categories = ['civil', 'electrical', 'plumbing', 'hvac', 'fire', 'site', 'structural', 'estimation', 'mep', 'project-management', 'management', 'country'];
+        // Dynamic scan of all calculator config files
+        // This avoids hardcoding categories and missing new ones
+        $files = glob($configDir . '*.php');
         
-        foreach ($categories as $category) {
-            $file = $configDir . $category . '.php';
-            if (file_exists($file)) {
-                $config = require $file;
-                if (isset($config[$calculatorId])) {
-                    return $file;
-                }
+        foreach ($files as $file) {
+            // We use standard PHP require to inspect the array keys without loading everything into memory permanently?
+            // require will load it. But it's cached by OPCode usually.
+            // This is acceptable for the scale.
+            
+            // Optimization: Maybe check filename? No, calculatorId doesn't always match category.
+            
+            $config = require $file;
+            if (isset($config[$calculatorId])) {
+                return $file;
             }
         }
         
@@ -193,6 +242,63 @@ class CalculatorEngine
         return $calculators;
     }
     
+    /**
+     * Process Virtual Components (BOM)
+     * 
+     * @param array $config Calculator Configuration
+     * @param array $results Calculation Results (for variable resolution)
+     * @return array Bill of Materials
+     */
+    private function processComponents(array $config, array $results): array
+    {
+        if (!isset($config['components']) || !is_array($config['components'])) {
+            return [];
+        }
+
+        $bom = [];
+
+        foreach ($config['components'] as $component) {
+            try {
+                // 1. Resolve Item ID (e.g., "wire_copper_{wire_size}")
+                $itemId = $component['item_id'];
+                foreach ($results as $key => $value) {
+                    if (is_scalar($value)) {
+                         $itemId = str_replace("{{$key}}", $value, $itemId);
+                    }
+                }
+
+                // 2. Calculate Quantity
+                // We use the FormulaRegistry for safety and consistency
+                // The formula might be "length * 1.05"
+                $quantity = 0;
+                if (isset($component['quantity_formula'])) {
+                    // We treat the quantity formula as a mini-calculation
+                    // Input: The results of the main calculation
+                    $qtyResults = $this->formulaRegistry->execute(
+                        ['qty' => $component['quantity_formula']], 
+                        $results
+                    );
+                    $quantity = $qtyResults['qty'] ?? 0;
+                }
+
+                $bom[] = [
+                    'type' => $component['type'] ?? 'material',
+                    'item_id' => $itemId,
+                    'quantity' => $quantity,
+                    'unit' => $component['unit'] ?? 'pcs'
+                ];
+
+            } catch (\Exception $e) {
+                // Ignore component errors to prevent crashing the main calculator
+                // Log it? 
+                error_log("BOM Logic Error: " . $e->getMessage());
+                continue;
+            }
+        }
+
+        return $bom;
+    }
+
     /**
      * Format error response
      */

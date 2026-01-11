@@ -92,7 +92,6 @@ class GamificationService
         }
 
         return $payout;
-        return $payout;
     }
 
     /**
@@ -232,34 +231,57 @@ class GamificationService
     public function craftPlanks($userId, $quantity = 1)
     {
         $this->initWallet($userId);
-        $wallet = $this->getWallet($userId);
         
-        $logCost = $quantity;
-        $coinCost = $quantity * 10; // 10 Coins labor fee (Official Handbook)
-        $plankGain = $quantity * 4;
+        $pdo = $this->db->getPdo();
+        $pdo->beginTransaction();
         
-        if ($wallet['wood_logs'] < $logCost || $wallet['coins'] < $coinCost) {
-            return ['success' => false, 'message' => 'Insufficient Logs or Coins (Fee: 10 Coins/Log)'];
+        try {
+            // Lock wallet row
+            $stmt = $pdo->prepare("
+                SELECT wood_logs, coins FROM user_resources 
+                WHERE user_id = :uid 
+                FOR UPDATE
+            ");
+            $stmt->execute(['uid' => $userId]);
+            $wallet = $stmt->fetch();
+            
+            if (!$wallet) {
+                throw new \Exception('Wallet not found');
+            }
+            
+            $logCost = $quantity;
+            $coinCost = $quantity * 10; // 10 Coins labor fee (Official Handbook)
+            $plankGain = $quantity * 4;
+            
+            if ($wallet['wood_logs'] < $logCost || $wallet['coins'] < $coinCost) {
+                throw new \Exception('Insufficient Logs or Coins (Fee: 10 Coins/Log)');
+            }
+            
+            $sql = "UPDATE user_resources 
+                    SET wood_logs = wood_logs - :logs, 
+                        coins = coins - :coins, 
+                        wood_planks = wood_planks + :planks 
+                    WHERE user_id = :uid";
+            
+            $this->db->query($sql, [
+                'logs' => $logCost,
+                'coins' => $coinCost,
+                'planks' => $plankGain,
+                'uid' => $userId
+            ]);
+            
+            $this->logTransaction($userId, 'wood_logs', -$logCost, 'crafting');
+            $this->logTransaction($userId, 'coins', -$coinCost, 'crafting');
+            $this->logTransaction($userId, 'wood_planks', $plankGain, 'crafting');
+            
+            $pdo->commit();
+            
+            return ['success' => true, 'message' => "Crafted $plankGain Planks!"];
+            
+        } catch (\Exception $e) {
+            $pdo->rollBack();
+            return ['success' => false, 'message' => $e->getMessage()];
         }
-        
-        $sql = "UPDATE user_resources 
-                SET wood_logs = wood_logs - :logs, 
-                    coins = coins - :coins, 
-                    wood_planks = wood_planks + :planks 
-                WHERE user_id = :uid";
-        
-        $this->db->query($sql, [
-            'logs' => $logCost,
-            'coins' => $coinCost,
-            'planks' => $plankGain,
-            'uid' => $userId
-        ]);
-        
-        $this->logTransaction($userId, 'wood_logs', -$logCost, 'crafting');
-        $this->logTransaction($userId, 'coins', -$coinCost, 'crafting');
-        $this->logTransaction($userId, 'wood_planks', $plankGain, 'crafting');
-        
-        return ['success' => true, 'message' => "Crafted $plankGain Planks!"];
     }
 
     /**
@@ -267,39 +289,72 @@ class GamificationService
      */
     public function purchaseResource($userId, $resource, $amount = 1)
     {
-        $validation = $this->economicSecurity->validatePurchase($userId, $resource, $amount);
+        $pdo = $this->db->getPdo();
+        $pdo->beginTransaction();
+        
+        try {
+            // Lock the user's wallet row to prevent race conditions
+            $stmt = $pdo->prepare("
+                SELECT coins FROM user_resources 
+                WHERE user_id = :uid 
+                FOR UPDATE
+            ");
+            $stmt->execute(['uid' => $userId]);
+            $wallet = $stmt->fetch();
+            
+            if (!$wallet) {
+                throw new \Exception('Wallet not found');
+            }
+            
+            // Validate purchase AFTER locking
+            $validation = $this->economicSecurity->validatePurchase($userId, $resource, $amount);
 
-        if (!$validation['success']) {
-            return $validation;
+            if (!$validation['success']) {
+                throw new \Exception($validation['message'] ?? 'Validation failed');
+            }
+
+            $resource = $validation['resource'];
+            $amount = $validation['amount'];
+            $totalCost = $validation['total_cost'];
+            
+            // Double-check balance after lock (redundant but safe)
+            if ($wallet['coins'] < $totalCost) {
+                throw new \Exception('Insufficient funds');
+            }
+            
+            $sql = "UPDATE user_resources 
+                    SET coins = coins - :cost, 
+                        $resource = $resource + :amt 
+                    WHERE user_id = :uid";
+            
+            $this->db->query($sql, [
+                'cost' => $totalCost,
+                'amt' => $amount,
+                'uid' => $userId
+            ]);
+
+            $this->logTransaction($userId, 'coins', -$totalCost, 'shop_purchase');
+            $this->logTransaction($userId, $resource, $amount, 'shop_purchase');
+
+            $label = $validation['resource_label'] ?? $resource;
+            
+            $pdo->commit();
+
+            return [
+                'success' => true,
+                'message' => "Purchased $amount " . $label,
+                'resource' => $resource,
+                'resource_label' => $label,
+                'total_cost' => $totalCost
+            ];
+            
+        } catch (\Exception $e) {
+            $pdo->rollBack();
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
         }
-
-        $resource = $validation['resource'];
-        $amount = $validation['amount'];
-        $totalCost = $validation['total_cost'];
-        
-        $sql = "UPDATE user_resources 
-                SET coins = coins - :cost, 
-                    $resource = $resource + :amt 
-                WHERE user_id = :uid";
-        
-        $this->db->query($sql, [
-            'cost' => $totalCost,
-            'amt' => $amount,
-            'uid' => $userId
-        ]);
-
-        $this->logTransaction($userId, 'coins', -$totalCost, 'shop_purchase');
-        $this->logTransaction($userId, $resource, $amount, 'shop_purchase');
-
-        $label = $validation['resource_label'] ?? $resource;
-
-        return [
-            'success' => true,
-            'message' => "Purchased $amount " . $label,
-            'resource' => $resource,
-            'resource_label' => $label,
-            'total_cost' => $totalCost
-        ];
     }
 
     /**
@@ -307,39 +362,72 @@ class GamificationService
      */
     public function sellResource($userId, $resource, $amount = 1)
     {
-        $validation = $this->economicSecurity->validateSell($userId, $resource, $amount);
+        $pdo = $this->db->getPdo();
+        $pdo->beginTransaction();
+        
+        try {
+            // Lock the user's wallet row
+            $stmt = $pdo->prepare("
+                SELECT * FROM user_resources 
+                WHERE user_id = :uid 
+                FOR UPDATE
+            ");
+            $stmt->execute(['uid' => $userId]);
+            $wallet = $stmt->fetch();
+            
+            if (!$wallet) {
+                throw new \Exception('Wallet not found');
+            }
+            
+            // Validate sell AFTER locking
+            $validation = $this->economicSecurity->validateSell($userId, $resource, $amount);
 
-        if (!$validation['success']) {
-            return $validation;
+            if (!$validation['success']) {
+                throw new \Exception($validation['message'] ?? 'Validation failed');
+            }
+
+            $resource = $validation['resource'];
+            $amount = $validation['amount'];
+            $gain = $validation['total_gain'];
+            
+            // Check if user has enough resources
+            if (!isset($wallet[$resource]) || $wallet[$resource] < $amount) {
+                throw new \Exception('Insufficient resources to sell');
+            }
+            
+            $sql = "UPDATE user_resources 
+                    SET coins = coins + :gain, 
+                        $resource = $resource - :amt 
+                    WHERE user_id = :uid";
+            
+            $this->db->query($sql, [
+                'gain' => $gain,
+                'amt' => $amount,
+                'uid' => $userId
+            ]);
+            
+            $this->logTransaction($userId, $resource, -$amount, 'shop_sell');
+            $this->logTransaction($userId, 'coins', $gain, 'shop_sell');
+
+            $label = $validation['resource_label'] ?? $resource;
+            
+            $pdo->commit();
+
+            return [
+                'success' => true,
+                'message' => "Sold $amount $label for $gain Coins",
+                'resource' => $resource,
+                'resource_label' => $label,
+                'total_gain' => $gain
+            ];
+            
+        } catch (\Exception $e) {
+            $pdo->rollBack();
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
         }
-
-        $resource = $validation['resource'];
-        $amount = $validation['amount'];
-        $gain = $validation['total_gain'];
-        
-        $sql = "UPDATE user_resources 
-                SET coins = coins + :gain, 
-                    $resource = $resource - :amt 
-                WHERE user_id = :uid";
-        
-        $this->db->query($sql, [
-            'gain' => $gain,
-            'amt' => $amount,
-            'uid' => $userId
-        ]);
-        
-        $this->logTransaction($userId, $resource, -$amount, 'shop_sell');
-        $this->logTransaction($userId, 'coins', $gain, 'shop_sell');
-
-        $label = $validation['resource_label'] ?? $resource;
-
-        return [
-            'success' => true,
-            'message' => "Sold $amount $label for $gain Coins",
-            'resource' => $resource,
-            'resource_label' => $label,
-            'total_gain' => $gain
-        ];
     }
 
     /**
@@ -397,38 +485,60 @@ class GamificationService
         ];
 
         if (!isset($costs[$buildingType])) {
-            throw new Exception("Invalid building type");
+            return ['success' => false, 'message' => 'Invalid building type'];
         }
 
         $cost = $costs[$buildingType];
         
-        // Check Balance
-        $wallet = $this->getWallet($userId);
+        $pdo = $this->db->getPdo();
+        $pdo->beginTransaction();
         
-        foreach ($cost as $res => $amount) {
-            if ($wallet[$res] < $amount) {
-                return ['success' => false, 'message' => "Not enough " . str_replace('_', ' ', ucfirst($res))];
+        try {
+            // Lock wallet row
+            $stmt = $pdo->prepare("
+                SELECT * FROM user_resources 
+                WHERE user_id = :uid 
+                FOR UPDATE
+            ");
+            $stmt->execute(['uid' => $userId]);
+            $wallet = $stmt->fetch();
+            
+            if (!$wallet) {
+                throw new \Exception('Wallet not found');
             }
+            
+            // Check Balance
+            foreach ($cost as $res => $amount) {
+                if (!isset($wallet[$res]) || $wallet[$res] < $amount) {
+                    throw new \Exception("Not enough " . str_replace('_', ' ', ucfirst($res)));
+                }
+            }
+
+            // Deduct Resources
+            $setParts = [];
+            $params = ['uid' => $userId];
+            
+            foreach ($cost as $res => $amount) {
+                $setParts[] = "$res = $res - :$res";
+                $params[$res] = $amount;
+                $this->logTransaction($userId, $res, -$amount, 'building_cost');
+            }
+
+            $sql = "UPDATE user_resources SET " . implode(', ', $setParts) . " WHERE user_id = :uid";
+            $this->db->query($sql, $params);
+
+            // Add Building
+            $sqlBuild = "INSERT INTO user_city_buildings (user_id, building_type, level) VALUES (:uid, :type, 1)";
+            $this->db->query($sqlBuild, ['uid' => $userId, 'type' => $buildingType]);
+
+            $pdo->commit();
+            
+            return ['success' => true, 'message' => "Built $buildingType successfully!"];
+            
+        } catch (\Exception $e) {
+            $pdo->rollBack();
+            return ['success' => false, 'message' => $e->getMessage()];
         }
-
-        // Deduct Resources
-        $setParts = [];
-        $params = ['uid' => $userId];
-        
-        foreach ($cost as $res => $amount) {
-            $setParts[] = "$res = $res - :$res";
-            $params[$res] = $amount;
-            $this->logTransaction($userId, $res, -$amount, 'building_cost');
-        }
-
-        $sql = "UPDATE user_resources SET " . implode(', ', $setParts) . " WHERE user_id = :uid";
-        $this->db->query($sql, $params);
-
-        // Add Building
-        $sqlBuild = "INSERT INTO user_city_buildings (user_id, building_type, level) VALUES (:uid, :type, 1)";
-        $this->db->query($sqlBuild, ['uid' => $userId, 'type' => $buildingType]);
-
-        return ['success' => true, 'message' => "Built $buildingType successfully!"];
     }
     
     /**

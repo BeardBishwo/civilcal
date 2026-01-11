@@ -428,7 +428,11 @@ class SystemMonitoringService
     {
         $partitions = [];
         if (PHP_OS_FAMILY !== 'Windows') {
-            $df = shell_exec('df -h');
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                $df = ''; // Not supported on Windows
+            } else {
+                $df = shell_exec('df -h');
+            }
             $lines = explode("\n", $df);
             foreach ($lines as $line) {
                 if (preg_match('/^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.+)$/', $line, $matches)) {
