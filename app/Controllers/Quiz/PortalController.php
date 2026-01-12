@@ -25,6 +25,7 @@ class PortalController extends Controller
             LEFT JOIN quiz_exams e ON e.course_id = c.id AND e.status = 'published'
             WHERE c.status = 1
             GROUP BY c.id
+            HAVING exam_count > 0
             ORDER BY c.`order` ASC
         ";
         $categories = $this->db->query($sqlCats)->fetchAll();
@@ -42,6 +43,7 @@ class PortalController extends Controller
             LEFT JOIN quiz_categories c ON e.course_id = c.id
             WHERE e.status = 'published' 
             GROUP BY e.id
+            HAVING question_count > 0
             ORDER BY e.created_at DESC
         ";
         $allExams = $this->db->query($sqlExams)->fetchAll();
@@ -50,23 +52,23 @@ class PortalController extends Controller
         $now = time();
         foreach ($allExams as &$exam) {
             $exam['badges'] = [];
-            
+
             // NEW badge (created in last 7 days)
             $createdTime = strtotime($exam['created_at']);
             if (($now - $createdTime) < (7 * 86400)) {
                 $exam['badges'][] = ['label' => 'NEW', 'color' => 'blue'];
             }
-            
+
             // POPULAR badge (more than 10 attempts)
             if ($exam['attempt_count'] > 10) {
                 $exam['badges'][] = ['label' => 'POPULAR', 'color' => 'red'];
             }
-            
+
             // PREMIUM badge
             if ($exam['is_premium']) {
                 $exam['badges'][] = ['label' => 'PREMIUM', 'color' => 'yellow'];
             }
-            
+
             // EASY/HARD badge based on avg score
             if ($exam['avg_score'] !== null) {
                 if ($exam['avg_score'] >= 75) {
@@ -128,7 +130,6 @@ class PortalController extends Controller
             'dailyBonus' => $dailyBonus,
             'title' => 'Quiz Portal | Bishwo Calculator'
         ]);
-
     }
 
     /**

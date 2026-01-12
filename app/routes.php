@@ -114,53 +114,24 @@ $router->add(
 );
 
 // User Routes
+// User Routes (Consolidated)
 $router->add("GET", "/profile", "ProfileController@index", ["auth"]);
-$router->add("POST", "/profile/update", "ProfileController@update", ["auth"]);
-$router->add(
-    "POST",
-    "/profile/change-password",
-    "ProfileController@changePassword",
-    ["auth"],
-);
+$router->add("POST", "/profile/update", "ProfileController@updateProfile", ["auth"]);
+$router->add("POST", "/profile/password", "ProfileController@changePassword", ["auth"]);
+$router->add("POST", "/profile/avatar", "ProfileController@uploadAvatar", ["auth"]);
 $router->add("GET", "/history", "ProfileController@history", ["auth"]);
-$router->add(
-    "POST",
-    "/history/delete/{id}",
-    "ProfileController@deleteCalculation",
-    ["auth"],
-);
-
-// Extended Profile Management Routes (from original routes.php)
-$router->add("GET", "/user/profile", "ProfileController@index", ["auth"]);
-$router->add("POST", "/profile/update", "ProfileController@updateProfile", [
-    "auth",
-]);
-$router->add(
-    "POST",
-    "/profile/notifications",
-    "ProfileController@updateNotifications",
-    ["auth"],
-);
-$router->add("POST", "/profile/privacy", "ProfileController@updatePrivacy", [
-    "auth",
-]);
-$router->add("POST", "/profile/password", "ProfileController@changePassword", [
-    "auth",
-]);
-$router->add("POST", "/profile/delete", "ProfileController@deleteAccount", [
-    "auth",
-]);
-// 2FA Routes
+$router->add("POST", "/history/delete/{id}", "ProfileController@deleteCalculation", ["auth"]);
 $router->add("POST", "/profile/2fa/enable", "ProfileController@enableTwoFactor", ["auth"]);
 $router->add("POST", "/profile/2fa/confirm", "ProfileController@confirmTwoFactor", ["auth"]);
 $router->add("POST", "/profile/2fa/disable", "ProfileController@disableTwoFactor", ["auth"]);
+$router->add("POST", "/profile/notifications", "ProfileController@updateNotifications", ["auth"]);
+$router->add("POST", "/profile/delete", "ProfileController@deleteAccount", ["auth"]);
 
-$router->add(
-    "GET",
-    "/profile/avatar/{filename}",
-    "ProfileController@serveAvatar",
-    ["auth"],
-);
+// Extended Profile Management (Aliases & Supporting Routes)
+$router->add("GET", "/user/profile", "ProfileController@index", ["auth"]);
+$router->add("GET", "/profile/exams", "ProfileController@exams", ["auth"]);
+$router->add("GET", "/profile/analytics", "ProfileController@analytics", ["auth"]);
+$router->add("GET", "/profile/avatar/{filename}", "ProfileController@serveAvatar", ["auth"]);
 
 // Authentication API Routes (for frontend AJAX)
 $router->add("POST", "/api/login", "Api\AuthController@login");
@@ -2144,6 +2115,7 @@ $router->add("POST", "/admin/analytics/reports/generate", "Admin\\AnalyticsContr
 // FRONTEND QUIZ PORTAL ROUTES
 // ============================================
 $router->add("GET", "/quiz", "Quiz\\PortalController@index");
+$router->add("GET", "/quiz/dashboard", "Quiz\\PortalController@index", ["auth"]);
 $router->add("GET", "/quiz/overview/{slug}", "Quiz\\PortalController@overview");
 
 // Quiz Exam Engine
@@ -2229,13 +2201,8 @@ $router->add('POST', '/exams/check-answer', 'ExamController@checkAnswer');
 $router->add('POST', '/exams/submit', 'ExamController@submit');
 $router->add('GET', '/exams/result/{id}', 'ExamController@result');
 
-// User Profile & History (Phase 18)
-$router->add('GET', '/profile', 'ProfileController@index', ['auth']);
-$router->add('GET', '/profile/exams', 'ProfileController@exams', ['auth']);
-$router->add('GET', '/profile/analytics', 'ProfileController@analytics', ['auth']);
-
 // Leaderboard (Phase 19)
-$router->add('GET', '/leaderboard', 'LeaderboardController@index', ['auth']);
+$router->add('GET', '/leaderboard', 'Quiz\\LeaderboardController@index', ['auth']);
 
 // CALCULATOR PERMALINK CATCH-ALL ROUTE
 // Must be at the end to not interfere with other routes

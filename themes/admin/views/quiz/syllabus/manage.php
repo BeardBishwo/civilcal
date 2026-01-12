@@ -1,11 +1,13 @@
 <?php
+
 /**
  * PREMIUM SYLLABUS EDITOR - PRO GRID UI
  * Replaces the old tree table with the interactive Grid System
  */
 
 // Helper to flatten the recursive tree for the JS Grid
-function flattenTreeForGrid($tree, $depth = 0, &$result = []) {
+function flattenTreeForGrid($tree, $depth = 0, &$result = [])
+{
     foreach ($tree as $node) {
         $flatNode = [
             'id' => $node['id'],
@@ -15,8 +17,8 @@ function flattenTreeForGrid($tree, $depth = 0, &$result = []) {
             // Map DB 'questions_weight' to grid 'weight' (Marks)
             'weight' => (float)($node['questions_weight'] ?? 0),
             // Default missing fields since DB might not have them yet
-            'time' => (int)($node['time_minutes'] ?? 0), 
-            'qCount' => (int)($node['question_count'] ?? 0), 
+            'time' => (int)($node['time_minutes'] ?? 0),
+            'qCount' => (int)($node['question_count'] ?? 0),
             'qOptional' => (int)($node['question_optional'] ?? 0),
             'qType' => $node['question_type'] ?? 'any',
             'difficulty' => $node['difficulty_constraint'] ?? 'any',
@@ -30,11 +32,11 @@ function flattenTreeForGrid($tree, $depth = 0, &$result = []) {
             'linked_topic_id' => $node['linked_topic_id'] ?? null,
             'topic_name' => $node['topic_name'] ?? null,
             'linked_subject_id' => $node['linked_subject_id'] ?? null,
-            'subject_name' => $node['subject_name'] ?? null 
+            'subject_name' => $node['subject_name'] ?? null
         ];
-        
+
         $result[] = $flatNode;
-        
+
         if (!empty($node['children'])) {
             flattenTreeForGrid($node['children'], $depth + 1, $result);
         }
@@ -62,7 +64,7 @@ if (!empty($nodesTree)) {
         <!-- === HEADER: METRICS & ACTIONS === -->
         <div class="bg-white border-b border-slate-200 px-6 py-3 sticky top-0 z-50 print:relative print:border-none print:px-0">
             <div class="max-w-full mx-auto flex flex-col gap-3">
-                
+
                 <!-- TOP LINE: Back, Title | Description -->
                 <div class="flex items-center gap-3">
                     <a href="<?php echo app_base_url('admin/quiz/syllabus'); ?>" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition shrink-0 print:hidden">
@@ -116,16 +118,16 @@ if (!empty($nodesTree)) {
                     </div>
 
                     <!-- Right Actions -->
-                <div class="flex items-center gap-2 print:hidden ml-auto">
-                    <button onclick="loadSubEngineerTemplate()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold transition-all border border-slate-200">
-                        <i class="fas fa-magic text-blue-500"></i> Sub-Engineer
-                    </button>
-                    <button onclick="addTopic()" class="flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold transition-all border border-slate-200 shadow-sm">
-                        <i class="fas fa-plus text-blue-500"></i> Row
-                    </button>
-                    <button onclick="openCloneModal()" class="flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold transition-all border border-slate-200 shadow-sm">
-                        <i class="fas fa-copy text-indigo-500"></i> Clone
-                    </button>
+                    <div class="flex items-center gap-2 print:hidden ml-auto">
+                        <button onclick="loadSubEngineerTemplate()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold transition-all border border-slate-200">
+                            <i class="fas fa-magic text-blue-500"></i> Sub-Engineer
+                        </button>
+                        <button onclick="addTopic()" class="flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold transition-all border border-slate-200 shadow-sm">
+                            <i class="fas fa-plus text-blue-500"></i> Row
+                        </button>
+                        <button onclick="openCloneModal()" class="flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold transition-all border border-slate-200 shadow-sm">
+                            <i class="fas fa-copy text-indigo-500"></i> Clone
+                        </button>
                         <button onclick="saveSyllabus()" class="h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition shadow-md flex items-center">
                             <i class="fas fa-save mr-2"></i> Save Changes
                         </button>
@@ -179,13 +181,24 @@ if (!empty($nodesTree)) {
 
     </div>
 
-<style>
-    /* Link Hierarchy Modal Responsive Positioning */
-    .hierarchy-modal-position { left: 280px; transition: left 0.3s ease; }
-    .sidebar-collapsed .hierarchy-modal-position,
-    .admin-main.sidebar-collapsed .hierarchy-modal-position { left: 70px !important; }
-    @media (max-width: 991px) { .hierarchy-modal-position { left: 0 !important; } }
-</style>
+    <style>
+        /* Link Hierarchy Modal Responsive Positioning */
+        .hierarchy-modal-position {
+            left: 280px;
+            transition: left 0.3s ease;
+        }
+
+        .sidebar-collapsed .hierarchy-modal-position,
+        .admin-main.sidebar-collapsed .hierarchy-modal-position {
+            left: 70px !important;
+        }
+
+        @media (max-width: 991px) {
+            .hierarchy-modal-position {
+                left: 0 !important;
+            }
+        }
+    </style>
 
     <!-- === HIERARCHY SELECTION MODAL === -->
     <div id="hierarchy-modal" class="fixed inset-0 z-[100] hidden" aria-hidden="true">
@@ -211,20 +224,20 @@ if (!empty($nodesTree)) {
                 </div>
                 <!-- Filters Row (Searchable Selects) -->
                 <div class="link-filter-row flex items-center justify-between gap-3 mb-4 sticky top-0 z-30">
-                    
+
                     <!-- Course Filter -->
                     <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-course">
                         <button type="button" class="w-full flex items-center justify-between px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('course')">
                             <span class="truncate dropdown-label">Course</span>
-                             <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
+                            <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
                         <div class="absolute top-full left-0 min-w-full w-auto mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
-                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
+                            <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('course', this.value)">
-                             </div>
-                             <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-course">
+                            </div>
+                            <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-course">
                                 <!-- JS Populated -->
-                             </ul>
+                            </ul>
                         </div>
                         <input type="hidden" id="modal-filter-course" value="">
                     </div>
@@ -233,70 +246,70 @@ if (!empty($nodesTree)) {
                     <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-edu">
                         <button type="button" class="w-full flex items-center justify-between px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('edu')">
                             <span class="truncate dropdown-label">Edu. Level</span>
-                             <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
+                            <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
                         <div class="absolute top-full left-0 min-w-full w-auto mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
-                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
+                            <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('edu', this.value)">
-                             </div>
-                             <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-edu">
+                            </div>
+                            <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-edu">
                                 <!-- JS Populated -->
-                             </ul>
+                            </ul>
                         </div>
-                         <input type="hidden" id="modal-filter-edu" value="">
+                        <input type="hidden" id="modal-filter-edu" value="">
                     </div>
 
                     <!-- Category Filter -->
                     <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-cat">
-                         <button type="button" class="w-full flex items-center justify-between px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('cat')">
+                        <button type="button" class="w-full flex items-center justify-between px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('cat')">
                             <span class="truncate dropdown-label">Category</span>
-                             <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
+                            <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
                         <div class="absolute top-full left-0 min-w-full w-auto mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
-                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
+                            <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('cat', this.value)">
-                             </div>
-                             <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-cat">
+                            </div>
+                            <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-cat">
                                 <!-- JS Populated -->
-                             </ul>
+                            </ul>
                         </div>
                         <input type="hidden" id="modal-filter-cat" value="">
                     </div>
 
-                     <!-- Sub-Category Filter -->
+                    <!-- Sub-Category Filter -->
                     <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-topic">
                         <button type="button" class="w-full flex items-center justify-between px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('topic')">
                             <span class="truncate dropdown-label">Sub-Cat</span>
-                             <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
+                            <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
                         <div class="absolute top-full left-0 min-w-full w-auto mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
-                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
+                            <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('topic', this.value)">
-                             </div>
-                             <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-topic">
+                            </div>
+                            <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-topic">
                                 <!-- JS Populated -->
-                             </ul>
+                            </ul>
                         </div>
                         <input type="hidden" id="modal-filter-topic" value="">
-                     </div>
+                    </div>
 
                     <!-- Position Level Filter (Moved to End) -->
                     <div class="relative flex-1 min-w-[100px] custom-dropdown" id="dropdown-pos">
                         <button type="button" class="w-full flex items-center justify-between px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all dropdown-trigger" onclick="toggleCustomDropdown('pos')">
                             <span class="truncate dropdown-label">Pos. Level</span>
-                             <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
+                            <i class="fas fa-chevron-down text-[10px] opacity-50 ml-1"></i>
                         </button>
                         <div class="absolute top-full right-0 min-w-full w-auto mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 hidden dropdown-menu origin-top transform transition-all duration-200 max-h-96">
-                             <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
+                            <div class="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-xl z-10 w-full min-w-[200px]">
                                 <input type="text" class="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 dropdown-search" placeholder="Search..." onkeyup="filterCustomDropdown('pos', this.value)">
-                                 </div>
+                            </div>
 
-                        <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-pos">
-                            <!-- JS Populated -->
-                        </ul>
+                            <ul class="max-h-80 overflow-y-auto py-1 custom-scrollbar dropdown-list" id="list-pos">
+                                <!-- JS Populated -->
+                            </ul>
+                        </div>
+                        <input type="hidden" id="modal-filter-pos" value="">
                     </div>
-                    <input type="hidden" id="modal-filter-pos" value="">
-                </div>
 
                     <!-- Filter Actions -->
                     <div class="flex items-center gap-1 ml-2">
@@ -325,109 +338,165 @@ if (!empty($nodesTree)) {
         display: grid;
         /* Columns: Ck(40), Drag(35), LVL(35), Title(1fr), Time(65), Type(110), Qty(60), Opt(60), Each(60), Q-Type(90), Diff(90), Marks(65), Hier(80), Act(90), Linked(250) */
         grid-template-columns: 40px 35px 35px 1fr 65px 110px 60px 60px 60px 90px 90px 65px 80px 90px 250px;
-        background-color: #cbd5e1; /* The color of ALL grid lines */
-        gap: 1.5px; /* Distinct 1.5px grid lines everywhere */
+        background-color: #cbd5e1;
+        /* The color of ALL grid lines */
+        gap: 1.5px;
+        /* Distinct 1.5px grid lines everywhere */
         min-width: 1450px;
-        border: 2px solid #94a3b8; /* Stronger outer frame */
+        border: 2px solid #94a3b8;
+        /* Stronger outer frame */
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         border-radius: 8px 8px 0 0;
         overflow: hidden;
     }
+
     .grid-header {
-        background-color: #f8fafc; 
-        color: #1e293b; 
-        font-size: 0.65rem; 
-        font-weight: 800; 
-        text-transform: uppercase; 
-        letter-spacing: 0.1em; 
-        padding: 14px 4px; 
-        display: flex; 
-        align-items: center; 
+        background-color: #f8fafc;
+        color: #1e293b;
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 14px 4px;
+        display: flex;
+        align-items: center;
         justify-content: center;
         position: sticky;
         top: 0;
         z-index: 20;
     }
-    .grid-row { display: none; } /* Legacy row container not used in this flat grid model */
-    
+
+    .grid-row {
+        display: none;
+    }
+
+    /* Legacy row container not used in this flat grid model */
+
     /* Clean Title Cells - Matching Sample */
-    .cell-title-phase { 
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important; 
+    .cell-title-phase {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
         color: #f8fafc !important;
         position: relative;
     }
-    .cell-title-section { 
-        background-color: #f1f5f9 !important; 
+
+    .cell-title-section {
+        background-color: #f1f5f9 !important;
         color: #1e40af !important;
     }
-    
-    .grid-cell { 
-        padding: 0 14px; 
-        display: flex; 
-        align-items: center; 
-        font-size: 0.825rem; 
-        color: #334155; 
-        background-color: white; /* Base background for data cells */
-        position: relative; 
-        height: 54px; /* Luxury spacing */
-        overflow: hidden; 
+
+    .grid-cell {
+        padding: 0 14px;
+        display: flex;
+        align-items: center;
+        font-size: 0.825rem;
+        color: #334155;
+        background-color: white;
+        /* Base background for data cells */
+        position: relative;
+        height: 54px;
+        /* Luxury spacing */
+        overflow: hidden;
     }
 
     /* Row Background Tints */
-    .row-phase { background-color: #f8fafc !important; color: #0f172a; font-weight: 800; }
-    .row-section { background-color: #f1f5f9 !important; color: #1e40af; font-weight: 700; }
-    .row-unit { background-color: white !important; }
+    .row-phase {
+        background-color: #f8fafc !important;
+        color: #0f172a;
+        font-weight: 800;
+    }
+
+    .row-section {
+        background-color: #f1f5f9 !important;
+        color: #1e40af;
+        font-weight: 700;
+    }
+
+    .row-unit {
+        background-color: white !important;
+    }
 
     /* Hierarchy Indicators - Still useful overlay on first cell */
-    .row-phase-indicator { border-left: 5px solid #0f172a !important; }
-    .row-section-indicator { border-left: 5px solid #3b82f6 !important; }
-    .row-unit-indicator { border-left: 5px solid #e2e8f0 !important; }
-    
+    .row-phase-indicator {
+        border-left: 5px solid #0f172a !important;
+    }
+
+    .row-section-indicator {
+        border-left: 5px solid #3b82f6 !important;
+    }
+
+    .row-unit-indicator {
+        border-left: 5px solid #e2e8f0 !important;
+    }
+
     .input-premium {
-        width: 100%; 
-        padding: 0 6px; 
-        border: 1px solid #e2e8f0; 
-        border-radius: 6px; 
-        text-align: center; 
-        font-family: 'Inter', system-ui, sans-serif; 
-        font-weight: 700; 
-        font-size: 0.75rem; 
+        width: 100%;
+        padding: 0 6px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        text-align: center;
+        font-family: 'Inter', system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 0.75rem;
         transition: all 0.2s;
-        background-color: white; 
+        background-color: white;
         height: 28px;
-        box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
     }
-    .input-premium:focus { 
-        border-color: #3b82f6; 
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); 
-        outline: none; 
+
+    .input-premium:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        outline: none;
     }
-    
-    .input-readonly { 
-        width: 100%; 
-        height: 28px; 
-        background-color: #f8fafc !important; 
-        border: 1px solid #e2e8f0 !important; 
-        border-radius: 6px; 
-        color: #94a3b8 !important; 
-        font-size: 0.725rem; 
-        text-align: center; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        font-weight: 800; 
+
+    .input-readonly {
+        width: 100%;
+        height: 28px;
+        background-color: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 6px;
+        color: #94a3b8 !important;
+        font-size: 0.725rem;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
         cursor: not-allowed;
         opacity: 0.8;
     }
-    
-    .time-input { color: #b45309; }
-    .qty-input { color: #059669; }
-    .each-input { color: #2563eb; }
-    
-    .depth-0 { color: #0f172a; font-weight: 800; }
-    .depth-1 { color: #1e293b; font-weight: 700; }
-    .depth-2 { color: #334155; font-weight: 600; }
-    .depth-3 { color: #64748b; font-weight: 500; }
+
+    .time-input {
+        color: #b45309;
+    }
+
+    .qty-input {
+        color: #059669;
+    }
+
+    .each-input {
+        color: #2563eb;
+    }
+
+    .depth-0 {
+        color: #0f172a;
+        font-weight: 800;
+    }
+
+    .depth-1 {
+        color: #1e293b;
+        font-weight: 700;
+    }
+
+    .depth-2 {
+        color: #334155;
+        font-weight: 600;
+    }
+
+    .depth-3 {
+        color: #64748b;
+        font-weight: 500;
+    }
 
     /* Tree Guide Lines */
     .tree-guide {
@@ -439,6 +508,7 @@ if (!empty($nodesTree)) {
         background-color: #cbd5e1;
         pointer-events: none;
     }
+
     .tree-guide-horizontal {
         position: absolute;
         left: var(--guide-x);
@@ -448,14 +518,32 @@ if (!empty($nodesTree)) {
         background-color: #cbd5e1;
         pointer-events: none;
     }
-    
-    .row-checkbox { cursor: pointer; accent-color: #6366f1; }
-    .drag-handle { cursor: grab; color: #cbd5e1; padding: 6px; transition: 0.2s; }
-    .drag-handle:hover { color: #94a3b8; }
-    .drag-handle:active { cursor: grabbing; scale: 0.9; }
 
-    #bulk-action-bar.visible { transform: translate(-50%, 0); }
-    
+    .row-checkbox {
+        cursor: pointer;
+        accent-color: #6366f1;
+    }
+
+    .drag-handle {
+        cursor: grab;
+        color: #cbd5e1;
+        padding: 6px;
+        transition: 0.2s;
+    }
+
+    .drag-handle:hover {
+        color: #94a3b8;
+    }
+
+    .drag-handle:active {
+        cursor: grabbing;
+        scale: 0.9;
+    }
+
+    #bulk-action-bar.visible {
+        transform: translate(-50%, 0);
+    }
+
     /* Node Types & Breadcrumbs */
     .node-badge {
         padding: 4px 10px;
@@ -468,17 +556,20 @@ if (!empty($nodesTree)) {
         transition: all 0.2s;
         justify-content: center;
     }
+
     .badge-breadcrumb {
         background-color: #eff6ff;
         color: #2563eb;
         border: 1px solid #dbeafe;
         margin: 2px;
     }
+
     .breadcrumb-separator {
         color: #94a3b8;
         font-size: 8px;
         margin: 0 2px;
     }
+
     .linked-container {
         display: flex;
         flex-wrap: wrap;
@@ -488,6 +579,7 @@ if (!empty($nodesTree)) {
         width: 100%;
         padding: 4px;
     }
+
     .type-select-styled {
         appearance: none;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
@@ -500,34 +592,56 @@ if (!empty($nodesTree)) {
         font-size: 10px;
         font-weight: 800;
         padding: 0 24px 0 12px;
-        border-radius: 8px; /* Slightly more modern than pill */
+        border-radius: 8px;
+        /* Slightly more modern than pill */
         text-align: center;
         width: 100% !important;
         height: 30px;
         transition: all 0.2s;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
     }
-    .type-select-styled:hover { 
-        border-color: #3b82f6; 
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+
+    .type-select-styled:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
+
     .type-select-styled:focus {
         border-color: #3b82f6;
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
     }
 
-    .badge-phase { background: #1e293b; color: white; }
-    .badge-section { background: #e0e7ff; color: #4338ca; }
-    .badge-unit { background: #f1f5f9; color: #64748b; }
+    .badge-phase {
+        background: #1e293b;
+        color: white;
+    }
+
+    .badge-section {
+        background: #e0e7ff;
+        color: #4338ca;
+    }
+
+    .badge-unit {
+        background: #f1f5f9;
+        color: #64748b;
+    }
 
     /* Hierarchy Indicators - Subtle Bar on first cell only */
-    .row-phase-indicator { border-left: 4px solid #1e293b !important; }
-    .row-section-indicator { border-left: 4px solid #6366f1 !important; }
-    .row-unit-indicator { border-left: 4px solid #e2e8f0 !important; }
-    
-    .input-readonly { 
-        background-color: #f8fafc !important; 
-        color: #94a3b8 !important; 
+    .row-phase-indicator {
+        border-left: 4px solid #1e293b !important;
+    }
+
+    .row-section-indicator {
+        border-left: 4px solid #6366f1 !important;
+    }
+
+    .row-unit-indicator {
+        border-left: 4px solid #e2e8f0 !important;
+    }
+
+    .input-readonly {
+        background-color: #f8fafc !important;
+        color: #94a3b8 !important;
         font-weight: 800 !important;
         border: 1px solid #f1f5f9 !important;
         pointer-events: none;
@@ -543,6 +657,7 @@ if (!empty($nodesTree)) {
         padding: 10px 14px;
         border-bottom: 1px solid #e2e8f0;
     }
+
     .filter-group {
         display: flex;
         align-items: center;
@@ -550,6 +665,7 @@ if (!empty($nodesTree)) {
         flex: 1;
         min-width: 0;
     }
+
     .filter-label {
         font-size: 9px;
         font-weight: 800;
@@ -559,6 +675,7 @@ if (!empty($nodesTree)) {
         white-space: nowrap;
         opacity: 0.8;
     }
+
     .filter-select {
         flex: 1;
         min-width: 110px;
@@ -580,32 +697,67 @@ if (!empty($nodesTree)) {
         white-space: nowrap;
         overflow: hidden;
     }
+
     .filter-select:focus {
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
+
     .filter-select::placeholder {
         color: #94a3b8;
     }
 
     .hierarchy-btn {
-        width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #f8fafc; color: #64748b; transition: 0.2s; border: 1px solid #e2e8f0;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        background: #f8fafc;
+        color: #64748b;
+        transition: 0.2s;
+        border: 1px solid #e2e8f0;
     }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
 
     @media print {
+
         /* Hide Global Infrastructure */
-        #admin-sidebar, .admin-sidebar, header.admin-header, .admin-header, 
-        .loading-overlay, .notification-toast, .search-overlay,
-        .print:hidden, #bulk-action-bar, .actions-cell, .drag-handle, 
-        .row-checkbox, .hierarchy-btn, .sidebar-spacer, header, nav, 
-        .admin-footer, footer {
+        #admin-sidebar,
+        .admin-sidebar,
+        header.admin-header,
+        .admin-header,
+        .loading-overlay,
+        .notification-toast,
+        .search-overlay,
+        .print:hidden,
+        #bulk-action-bar,
+        .actions-cell,
+        .drag-handle,
+        .row-checkbox,
+        .hierarchy-btn,
+        .sidebar-spacer,
+        header,
+        nav,
+        .admin-footer,
+        footer {
             display: none !important;
         }
-        
+
         /* Reset Main Containers */
-        #admin-wrapper, .admin-wrapper, #admin-main, .admin-main {
+        #admin-wrapper,
+        .admin-wrapper,
+        #admin-main,
+        .admin-main {
             margin: 0 !important;
             padding: 0 !important;
             width: 100% !important;
@@ -613,90 +765,167 @@ if (!empty($nodesTree)) {
             position: static !important;
             background: white !important;
         }
-        
-        .admin-wrapper-container, .admin-content-wrapper { 
-            background: white !important; 
-            padding: 0 !important; 
-            margin: 0 !important; 
-            box-shadow: none !important; 
+
+        .admin-wrapper-container,
+        .admin-content-wrapper {
+            background: white !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
             width: 100% !important;
         }
-        
+
         /* Syllabus Header Branding */
-        .sticky { 
-            position: static !important; 
-            display: block !important; 
-            border: none !important; 
-            padding: 2.5cm 0 1cm 0 !important; /* Some breathing room at top */
+        .sticky {
+            position: static !important;
+            display: block !important;
+            border: none !important;
+            padding: 2.5cm 0 1cm 0 !important;
+            /* Some breathing room at top */
         }
-        .header-metrics-row { display: none !important; }
-        
+
+        .header-metrics-row {
+            display: none !important;
+        }
+
         /* Force Grid to Professional Table */
-        .syllabus-grid { 
+        .syllabus-grid {
             display: table !important;
             width: 100% !important;
             border-collapse: collapse !important;
             table-layout: fixed !important;
             margin-top: 10px !important;
         }
-        .grid-header { 
-            display: table-cell !important; 
-            padding: 10px 8px !important; 
-            border: 1px solid #333 !important; 
-            font-size: 11px !important; 
+
+        .grid-header {
+            display: table-cell !important;
+            padding: 10px 8px !important;
+            border: 1px solid #333 !important;
+            font-size: 11px !important;
             font-weight: bold !important;
             background: #eee !important;
             text-transform: uppercase !important;
         }
-        .grid-row { display: table-row !important; page-break-inside: avoid !important; }
-        .grid-cell { 
-            display: table-cell !important; 
-            border: 1px solid #333 !important; 
-            padding: 10px 8px !important; 
-            font-size: 11px !important; 
+
+        .grid-row {
+            display: table-row !important;
+            page-break-inside: avoid !important;
+        }
+
+        .grid-cell {
+            display: table-cell !important;
+            border: 1px solid #333 !important;
+            padding: 10px 8px !important;
+            font-size: 11px !important;
             vertical-align: middle !important;
             word-wrap: break-word !important;
         }
-        
+
         /* Precise Column Widths */
-        .grid-header:nth-child(3), .grid-cell:nth-child(3) { width: 35px !important; text-align: center; }
-        .grid-header:nth-child(4), .grid-cell:nth-child(4) { width: auto !important; }
-        .grid-header:nth-child(5) { width: 60px !important; text-align: center; } 
-        .grid-cell:nth-child(5) { width: 60px !important; text-align: center; font-weight: bold; }
-        .grid-header:nth-child(6), .grid-cell:nth-child(6) { width: 85px !important; text-align: center; }
-        .grid-header:nth-child(7), .grid-cell:nth-child(7) { width: 45px !important; text-align: center; }
-        .grid-header:nth-child(8), .grid-cell:nth-child(8) { width: 45px !important; text-align: center; }
-        .grid-header:nth-child(9) { width: 55px !important; text-align: center; }
-        .grid-cell:nth-child(9) { width: 55px !important; text-align: center; font-weight: bold; }
-        
+        .grid-header:nth-child(3),
+        .grid-cell:nth-child(3) {
+            width: 35px !important;
+            text-align: center;
+        }
+
+        .grid-header:nth-child(4),
+        .grid-cell:nth-child(4) {
+            width: auto !important;
+        }
+
+        .grid-header:nth-child(5) {
+            width: 60px !important;
+            text-align: center;
+        }
+
+        .grid-cell:nth-child(5) {
+            width: 60px !important;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .grid-header:nth-child(6),
+        .grid-cell:nth-child(6) {
+            width: 85px !important;
+            text-align: center;
+        }
+
+        .grid-header:nth-child(7),
+        .grid-cell:nth-child(7) {
+            width: 45px !important;
+            text-align: center;
+        }
+
+        .grid-header:nth-child(8),
+        .grid-cell:nth-child(8) {
+            width: 45px !important;
+            text-align: center;
+        }
+
+        .grid-header:nth-child(9) {
+            width: 55px !important;
+            text-align: center;
+        }
+
+        .grid-cell:nth-child(9) {
+            width: 55px !important;
+            text-align: center;
+            font-weight: bold;
+        }
+
         /* Hide Interaction Columns */
-        .grid-header:nth-child(1), .grid-cell:nth-child(1),
-        .grid-header:nth-child(2), .grid-cell:nth-child(2),
-        .grid-header:nth-child(10), .grid-cell:nth-child(10),
-        .grid-header:nth-child(11), .grid-cell:nth-child(11) {
+        .grid-header:nth-child(1),
+        .grid-cell:nth-child(1),
+        .grid-header:nth-child(2),
+        .grid-cell:nth-child(2),
+        .grid-header:nth-child(10),
+        .grid-cell:nth-child(10),
+        .grid-header:nth-child(11),
+        .grid-cell:nth-child(11) {
             display: none !important;
         }
 
         /* Prevent Text Truncation */
-        .line-clamp-1 { -webkit-line-clamp: unset !important; display: block !important; }
-        .whitespace-nowrap { white-space: normal !important; }
+        .line-clamp-1 {
+            -webkit-line-clamp: unset !important;
+            display: block !important;
+        }
+
+        .whitespace-nowrap {
+            white-space: normal !important;
+        }
     }
 </style>
 
 <script>
     // 1. DATA INITIALIZATION
     let syllabusData = <?php echo !empty($initialData) ? json_encode($initialData) : '[]'; ?>;
-    
-    if(syllabusData.length === 0) {
-        syllabusData = [
-            { id: Date.now(), title: "Paper I: General", type: "paper", depth: 0, weight: 100, time: 0, qCount: 0, qOptional: 0, qEach: 0, selected: false }
-        ];
+
+    if (syllabusData.length === 0) {
+        syllabusData = [{
+            id: Date.now(),
+            title: "Paper I: General",
+            type: "paper",
+            depth: 0,
+            weight: 100,
+            time: 0,
+            qCount: 0,
+            qOptional: 0,
+            qEach: 0,
+            selected: false
+        }];
     }
 
     let currentLevel = '<?php echo addslashes($level); ?>';
     const coursesData = <?php echo json_encode($allCourses); ?>;
     const eduData = <?php echo json_encode($allEduLevels); ?>;
     const posData = <?php echo json_encode($allPosLevels); ?>;
+
+    // Data sources for dropdowns (from quiz tables)
+    const subjectsDB = <?php echo !empty($quizSubjects) ? json_encode($quizSubjects) : '[]'; ?>;
+    const subcategoriesDB = <?php echo !empty($subcategories) ? json_encode($subcategories) : '[]'; ?>;
+    const topicsDB = <?php echo !empty($topics) ? json_encode($topics) : '[]'; ?>;
+
     let manualSettings = <?php echo !empty($settings) ? json_encode($settings) : "{ 
         marks: null, 
         time: null, 
@@ -709,13 +938,13 @@ if (!empty($nodesTree)) {
 
     // --- INITIALIZATION ---
     function initSettings() {
-        if(manualSettings.marks) document.getElementById('global-marks-input').value = manualSettings.marks;
-        if(manualSettings.time) document.getElementById('global-time-input').value = manualSettings.time;
-        if(manualSettings.pass) document.getElementById('global-pass-input').value = manualSettings.pass;
-        if(manualSettings.negValue) document.getElementById('global-neg-input').value = manualSettings.negValue;
-        if(manualSettings.negUnit) document.getElementById('neg-unit-select').value = manualSettings.negUnit;
-        if(manualSettings.negScope) document.getElementById('neg-scope-select').value = manualSettings.negScope;
-        if(manualSettings.description) document.getElementById('syllabus-description-el').innerText = manualSettings.description;
+        if (manualSettings.marks) document.getElementById('global-marks-input').value = manualSettings.marks;
+        if (manualSettings.time) document.getElementById('global-time-input').value = manualSettings.time;
+        if (manualSettings.pass) document.getElementById('global-pass-input').value = manualSettings.pass;
+        if (manualSettings.negValue) document.getElementById('global-neg-input').value = manualSettings.negValue;
+        if (manualSettings.negUnit) document.getElementById('neg-unit-select').value = manualSettings.negUnit;
+        if (manualSettings.negScope) document.getElementById('neg-scope-select').value = manualSettings.negScope;
+        if (manualSettings.description) document.getElementById('syllabus-description-el').innerText = manualSettings.description;
     }
     let draggedItemIndex = null;
 
@@ -728,14 +957,14 @@ if (!empty($nodesTree)) {
     // --- GRID RENDERING ---
     function renderGrid() {
         const container = document.getElementById('syllabus-container');
-        while(container.children.length > 15) container.removeChild(container.lastChild);
+        while (container.children.length > 15) container.removeChild(container.lastChild);
 
         syllabusData.forEach((row, index) => {
             const rowIndicatorClass = row.type === 'paper' ? 'row-phase-indicator' : (row.type === 'section' ? 'row-section-indicator' : 'row-unit-indicator');
-            
+
             // Checkbox (The first cell gets the indicator bar)
             container.appendChild(createCell(`<input type="checkbox" class="row-checkbox w-4 h-4 rounded" ${row.selected ? 'checked' : ''} onchange="toggleRowSelection(${index}, this.checked)">`, `justify-center ${rowIndicatorClass}`));
-            
+
             // Drag Handle
             const dragCell = createCell(`<i class="fas fa-grip-vertical drag-handle"></i>`, 'justify-center');
             dragCell.draggable = true;
@@ -751,12 +980,12 @@ if (!empty($nodesTree)) {
             let icon = 'fa-folder';
             let titleClass = '';
             let extraCellClass = '';
-            
-            if(row.depth === 0 || row.type === 'paper') {
+
+            if (row.depth === 0 || row.type === 'paper') {
                 icon = 'fa-layer-group';
                 titleClass = 'font-bold text-white';
                 extraCellClass = 'cell-title-phase';
-            } else if(row.type === 'section' || row.depth === 1) {
+            } else if (row.type === 'section' || row.depth === 1) {
                 icon = 'fa-folder-open text-blue-500';
                 titleClass = 'font-bold text-blue-700';
                 extraCellClass = 'cell-title-section';
@@ -764,22 +993,54 @@ if (!empty($nodesTree)) {
                 icon = 'fa-folder text-slate-400';
                 titleClass = 'text-slate-600';
             }
-            
+
             // Generate Tree Lines
             let treeLinesHtml = '';
-            for(let i = 0; i < row.depth; i++) {
+            for (let i = 0; i < row.depth; i++) {
                 const xPos = 16 + (i * indentSize) + 6; // Center of icon position for that level
                 treeLinesHtml += `<div class="tree-guide" style="--guide-x: ${xPos}px;"></div>`;
-                if(i === row.depth - 1) {
+                if (i === row.depth - 1) {
                     treeLinesHtml += `<div class="tree-guide-horizontal" style="--guide-x: ${xPos}px;"></div>`;
                 }
+            }
+
+            // Title cell - editable for Paper, dropdown for Main Category/Sub Category/Topic if not linked
+            const isLinked = row.linked_subject_id || row.linked_subcategory_id || row.linked_topic_id;
+            const isEditable = row.type === 'paper' && !isLinked;
+            const needsDropdown = !isLinked && (row.type === 'section' || row.type === 'unit' || row.type === 'topic');
+
+            let titleHtml;
+            if (isEditable) {
+                // Paper: Editable text
+                titleHtml = `<span contenteditable="true" class="w-full outline-none focus:bg-white rounded px-1 transition duration-200 ${titleClass}" onblur="updateRow(${index}, 'title', this.innerText)">${row.title}</span>`;
+            } else if (needsDropdown) {
+                // Main Category, Sub Category, or Topic: Show dropdown to select from database
+                let dataSource, placeholder, options;
+                if (row.type === 'section') {
+                    placeholder = 'Select Subject';
+                    options = typeof subjectsDB !== 'undefined' ? subjectsDB.map(s => `<option value="${s.id}">${s.name || s.title}</option>`).join('') : '';
+                } else if (row.type === 'unit') {
+                    placeholder = 'Select Sub Category';
+                    options = typeof subcategoriesDB !== 'undefined' ? subcategoriesDB.map(sc => `<option value="${sc.id}">${sc.name || sc.title}</option>`).join('') : '';
+                } else { // row.type === 'topic'
+                    placeholder = 'Select Topic';
+                    options = typeof topicsDB !== 'undefined' ? topicsDB.map(t => `<option value="${t.id}">${t.name || t.title}</option>`).join('') : '';
+                }
+
+                titleHtml = `<select class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-sm ${titleClass}" onchange="linkNodeFromDropdown(${index}, this.value, '${row.type}')">
+                    <option value="">${placeholder}</option>
+                    ${options}
+                </select>`;
+            } else {
+                // Linked: Read-only
+                titleHtml = `<span class="w-full ${titleClass} ${isLinked ? 'cursor-not-allowed opacity-80' : ''}" title="${isLinked ? 'Linked from database - cannot edit' : 'Select type to edit'}">${row.title}</span>`;
             }
 
             container.appendChild(createCell(
                 `${treeLinesHtml}
                  <div class="flex items-center w-full relative z-10">
                     <i class="fas ${icon} mr-3 opacity-90 text-sm ${row.type === 'paper' ? 'text-white/60' : ''}"></i> 
-                    <span contenteditable="true" class="w-full outline-none focus:bg-white rounded px-1 transition duration-200 ${titleClass}" onblur="updateRow(${index}, 'title', this.innerText)">${row.title}</span>
+                    ${titleHtml}
                  </div>`,
                 `depth-${row.depth} ${extraCellClass}`, `padding-left: ${padding}px;`
             ));
@@ -791,10 +1052,10 @@ if (!empty($nodesTree)) {
 
             // Node Type (Styled visible select)
             let typeColor = "bg-slate-100/50 text-slate-500";
-            if(row.type === 'paper') typeColor = "bg-slate-800 text-white font-bold";
-            if(row.type === 'section') typeColor = "bg-slate-200 text-slate-700 font-bold";
-            if(row.type === 'unit') typeColor = "bg-slate-50 text-slate-400";
-            if(row.type === 'topic') typeColor = "bg-blue-50 text-blue-600 font-bold";
+            if (row.type === 'paper') typeColor = "bg-slate-800 text-white font-bold";
+            if (row.type === 'section') typeColor = "bg-slate-200 text-slate-700 font-bold";
+            if (row.type === 'unit') typeColor = "bg-slate-50 text-slate-400";
+            if (row.type === 'topic') typeColor = "bg-blue-50 text-blue-600 font-bold";
 
             container.appendChild(createCell(`
                 <select class="type-select-styled ${typeColor}" onchange="updateRow(${index}, 'type', this.value)">
@@ -818,18 +1079,37 @@ if (!empty($nodesTree)) {
 
             // Each (with formatted display)
             const eachClass = isTopic ? 'input-premium' : 'input-readonly';
-            const eachDisplay = isTopic 
-                ? `<input type="number" class="${eachClass} each-input" value="${row.qEach || 0}" onchange="updateRow(${index}, 'qEach', this.value)">`
-                : `<div class="text-slate-400 font-bold text-[10px]">-</div>`;
+            const eachDisplay = isTopic ?
+                `<input type="number" class="${eachClass} each-input" value="${row.qEach || 0}" onchange="updateRow(${index}, 'qEach', this.value)">` :
+                `<div class="text-slate-400 font-bold text-[10px]">-</div>`;
             container.appendChild(createCell(eachDisplay, 'justify-center'));
 
             // Q-Type (Question Type dropdown)
-            const qTypeOptions = [
-                {value: 'any', label: 'Any', color: 'bg-slate-50 text-slate-600'},
-                {value: 'mcq_single', label: 'MCQ', color: 'bg-blue-50 text-blue-700'},
-                {value: 'true_false', label: 'T/F', color: 'bg-green-50 text-green-700'},
-                {value: 'multi_select', label: 'Multi', color: 'bg-purple-50 text-purple-700'},
-                {value: 'subjective', label: 'Theory', color: 'bg-amber-50 text-amber-700'}
+            const qTypeOptions = [{
+                    value: 'any',
+                    label: 'Any',
+                    color: 'bg-slate-50 text-slate-600'
+                },
+                {
+                    value: 'mcq_single',
+                    label: 'MCQ',
+                    color: 'bg-blue-50 text-blue-700'
+                },
+                {
+                    value: 'true_false',
+                    label: 'T/F',
+                    color: 'bg-green-50 text-green-700'
+                },
+                {
+                    value: 'multi_select',
+                    label: 'Multi',
+                    color: 'bg-purple-50 text-purple-700'
+                },
+                {
+                    value: 'subjective',
+                    label: 'Theory',
+                    color: 'bg-amber-50 text-amber-700'
+                }
             ];
             const selectedQType = row.qType || 'any';
             const qTypeColor = qTypeOptions.find(opt => opt.value === selectedQType)?.color || 'bg-slate-50 text-slate-600';
@@ -841,13 +1121,36 @@ if (!empty($nodesTree)) {
             container.appendChild(createCell(qTypeDisplay, 'justify-center px-2'));
 
             // Difficulty dropdown
-            const diffOptions = [
-                {value: 'any', label: 'Any', color: 'bg-slate-50 text-slate-600'},
-                {value: 'easy', label: 'Easy', color: 'bg-green-50 text-green-600 border-green-100'},
-                {value: 'easy_mid', label: 'Easy-Mid', color: 'bg-lime-50 text-lime-600 border-lime-100'},
-                {value: 'medium', label: 'Medium', color: 'bg-yellow-50 text-yellow-600 border-yellow-100'},
-                {value: 'hard', label: 'Hard', color: 'bg-orange-50 text-orange-600 border-orange-100'},
-                {value: 'expert', label: 'Expert', color: 'bg-red-50 text-red-600 border-red-100'}
+            const diffOptions = [{
+                    value: 'any',
+                    label: 'Any',
+                    color: 'bg-slate-50 text-slate-600'
+                },
+                {
+                    value: 'easy',
+                    label: 'Easy',
+                    color: 'bg-green-50 text-green-600 border-green-100'
+                },
+                {
+                    value: 'easy_mid',
+                    label: 'Easy-Mid',
+                    color: 'bg-lime-50 text-lime-600 border-lime-100'
+                },
+                {
+                    value: 'medium',
+                    label: 'Medium',
+                    color: 'bg-yellow-50 text-yellow-600 border-yellow-100'
+                },
+                {
+                    value: 'hard',
+                    label: 'Hard',
+                    color: 'bg-orange-50 text-orange-600 border-orange-100'
+                },
+                {
+                    value: 'expert',
+                    label: 'Expert',
+                    color: 'bg-red-50 text-red-600 border-red-100'
+                }
             ];
             const selectedDiff = row.difficulty || 'any';
             const diffColor = diffOptions.find(opt => opt.value === selectedDiff)?.color || 'bg-slate-50 text-slate-600';
@@ -889,17 +1192,23 @@ if (!empty($nodesTree)) {
             // Linked (Breadcrumbs)
             let linkedHtml = '';
             const breadcrumbBase = <?php echo json_encode($breadcrumbBase ?? []); ?>;
-            
+
             if (row.linked_category_id || row.linked_topic_id) {
                 let crumbs = [...breadcrumbBase];
-                if (row.category_name) crumbs.push({name: row.category_name, type: 'category'});
-                if (row.topic_name) crumbs.push({name: row.topic_name, type: 'topic'});
-                
+                if (row.category_name) crumbs.push({
+                    name: row.category_name,
+                    type: 'category'
+                });
+                if (row.topic_name) crumbs.push({
+                    name: row.topic_name,
+                    type: 'topic'
+                });
+
                 let crumbsHtml = crumbs.map((c, i) => `
                     <div class="node-badge badge-breadcrumb" title="${c.type.toUpperCase()}">${c.name}</div>
                     ${i < crumbs.length - 1 ? '<i class="fas fa-chevron-right breadcrumb-separator"></i>' : ''}
                 `).join('');
-                
+
                 linkedHtml = `<div class="linked-container cursor-pointer hover:opacity-80" onclick="openHierarchyModal(${index})">${crumbsHtml}</div>`;
             } else {
                 linkedHtml = `<button onclick="openHierarchyModal(${index})" class="hierarchy-btn text-blue-500 hover:bg-blue-50 hover:border-blue-200" title="Link Category/Topic"><i class="fas fa-plus text-xs"></i></button>`;
@@ -915,36 +1224,40 @@ if (!empty($nodesTree)) {
         const div = document.createElement('div');
         div.className = `grid-cell ${classes}`;
         div.innerHTML = html;
-        if(style) div.style = style;
+        if (style) div.style = style;
         return div;
     }
 
     // --- LOGIC FUNCTIONS ---
     function updateRow(index, field, value) {
         const stringFields = ['title', 'type', 'difficulty', 'qType'];
-        if(!stringFields.includes(field)) value = parseFloat(value) || 0;
+        if (!stringFields.includes(field)) value = parseFloat(value) || 0;
         syllabusData[index][field] = value;
-        
+
         // Auto-adjust depth based on node type (Enterprise Rule)
-        if(field === 'type') {
-            const typeDepthMap = { 'paper': 0, 'section': 1, 'unit': 2 };
-            if(typeDepthMap[value] !== undefined) {
+        if (field === 'type') {
+            const typeDepthMap = {
+                'paper': 0,
+                'section': 1,
+                'unit': 2
+            };
+            if (typeDepthMap[value] !== undefined) {
                 // If changing to 'unit', and current depth is < 2, force level 2
                 // If changing to 'section', force level 1
                 // If changing to 'paper', force level 0
                 syllabusData[index].depth = typeDepthMap[value];
             }
         }
-        
+
         // Auto-calculation for Unit types: QTY * EACH = MARKS
-        if(syllabusData[index].type === 'unit') {
-            if(field === 'qCount' || field === 'qEach') {
+        if (syllabusData[index].type === 'unit') {
+            if (field === 'qCount' || field === 'qEach') {
                 const count = parseFloat(syllabusData[index].qCount) || 0;
                 const each = parseFloat(syllabusData[index].qEach) || 0;
                 syllabusData[index].weight = count * each;
             }
         }
-        
+
         recalculateTotals();
         renderGrid();
     }
@@ -956,25 +1269,25 @@ if (!empty($nodesTree)) {
     function recalculateTotals() {
         for (let i = syllabusData.length - 1; i >= 0; i--) {
             const row = syllabusData[i];
-            
+
             // Phases and Sections are read-only containers for metrics
             if (row.type !== 'unit') {
                 let totalQty = 0;
                 let totalMarks = 0;
                 let totalTime = 0;
                 let totalOptional = 0;
-                
+
                 // Scan descendants
                 for (let j = i + 1; j < syllabusData.length; j++) {
                     // Stop if we hit a row at the same or higher (parent) level
                     if (syllabusData[j].depth <= row.depth) break;
-                    
+
                     // Only sum up Topic (unit) values to avoid double counting nested groups
                     // (Phase sums its Topics, Section sums its Topics)
                     // Actually, if we want Section to show sum of its Topics, 
                     // and Phase to show sum of its Sections (which already have Topic sums),
                     // we should sum DIRECT children.
-                    
+
                     // But wait, the flat array might have nesting like: Section -> Unit, Unit.
                     // Summing direct descendants that are units works.
                     if (syllabusData[j].type === 'unit') {
@@ -987,7 +1300,7 @@ if (!empty($nodesTree)) {
                                 break;
                             }
                         }
-                        
+
                         if (isDirectDescendant) {
                             totalQty += parseFloat(syllabusData[j].qCount) || 0;
                             totalMarks += parseFloat(syllabusData[j].weight) || 0;
@@ -996,7 +1309,7 @@ if (!empty($nodesTree)) {
                         }
                     }
                 }
-                
+
                 row.qCount = totalQty;
                 row.weight = totalMarks;
                 row.time = totalTime;
@@ -1007,9 +1320,9 @@ if (!empty($nodesTree)) {
 
     function changeDepth(index, change) {
         let newDepth = syllabusData[index].depth + change;
-        if(newDepth >= 0 && newDepth <= 5) { // Support deeper nesting
+        if (newDepth >= 0 && newDepth <= 5) { // Support deeper nesting
             syllabusData[index].depth = newDepth;
-            
+
             // Auto-adjust node type based on indentation (Auto-Hierarchy Rule)
             // Phase is strictly Level 0
             if (newDepth === 0) syllabusData[index].type = 'paper';
@@ -1017,7 +1330,7 @@ if (!empty($nodesTree)) {
             else if (newDepth === 1) syllabusData[index].type = 'section';
             // Valid units can be Level 2 or deeper
             else syllabusData[index].type = 'unit';
-            
+
             recalculateTotals();
             renderGrid();
         }
@@ -1032,49 +1345,376 @@ if (!empty($nodesTree)) {
             confirmButtonColor: '#1e293b',
             cancelButtonColor: '#f1f5f9',
             confirmButtonText: 'Yes, Load Template',
-            customClass: { confirmButton: 'text-white', cancelButton: 'text-slate-600' }
+            customClass: {
+                confirmButton: 'text-white',
+                cancelButton: 'text-slate-600'
+            }
         }).then((result) => {
             if (result.isConfirmed) {
                 syllabusData = [
                     // PAPER I
-                    { id: 'p1', title: "Paper I: General Subject (MCQ)", type: "paper", depth: 0, weight: 100, time: 45, qCount: 100, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "any", selected: false },
-                    { id: 's1', title: "Part I: Gen. Awareness & Reasoning", type: "section", depth: 1, weight: 20, time: 0, qCount: 20, qOptional: 0, qEach: 1, selected: false },
-                    { id: 'u1', title: "General Awareness", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
-                    { id: 'u2', title: "Public Management & Reasoning", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
-                    { id: 's2', title: "Part II: General Technical Subject", type: "section", depth: 1, weight: 80, time: 0, qCount: 80, qOptional: 0, qEach: 1, selected: false },
-                    { id: 'u3', title: "Surveying", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
-                    { id: 'u4', title: "Construction Materials", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
-                    { id: 'u5', title: "Soil Mechanics", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
-                    { id: 'u6', title: "Hydraulics", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
-                    { id: 'u7', title: "Structural Engineering", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
-                    { id: 'u8', title: "Water Supply & Sanitary", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
-                    { id: 'u9', title: "Highway Engineering", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
-                    { id: 'u10', title: "Estimating & Costing", type: "unit", depth: 2, weight: 10, time: 0, qCount: 10, qOptional: 0, qEach: 1, qType: "mcq", difficulty: "medium", selected: false },
-                    
+                    {
+                        id: 'p1',
+                        title: "Paper I: General Subject (MCQ)",
+                        type: "paper",
+                        depth: 0,
+                        weight: 100,
+                        time: 45,
+                        qCount: 100,
+                        qOptional: 0,
+                        qEach: 1,
+                        qType: "mcq",
+                        difficulty: "any",
+                        selected: false
+                    },
+                    {
+                        id: 's1',
+                        title: "Part I: Gen. Awareness & Reasoning",
+                        type: "section",
+                        depth: 1,
+                        weight: 20,
+                        time: 0,
+                        qCount: 20,
+                        qOptional: 0,
+                        qEach: 1,
+                        selected: false
+                    },
+                    {
+                        id: 'u1',
+                        title: "General Awareness",
+                        type: "unit",
+                        depth: 2,
+                        weight: 10,
+                        time: 0,
+                        qCount: 10,
+                        qOptional: 0,
+                        qEach: 1,
+                        qType: "mcq",
+                        difficulty: "medium",
+                        selected: false
+                    },
+                    {
+                        id: 'u2',
+                        title: "Public Management & Reasoning",
+                        type: "unit",
+                        depth: 2,
+                        weight: 10,
+                        time: 0,
+                        qCount: 10,
+                        qOptional: 0,
+                        qEach: 1,
+                        qType: "mcq",
+                        difficulty: "medium",
+                        selected: false
+                    },
+                    {
+                        id: 's2',
+                        title: "Part II: General Technical Subject",
+                        type: "section",
+                        depth: 1,
+                        weight: 80,
+                        time: 0,
+                        qCount: 80,
+                        qOptional: 0,
+                        qEach: 1,
+                        selected: false
+                    },
+                    {
+                        id: 'u3',
+                        title: "Surveying",
+                        type: "unit",
+                        depth: 2,
+                        weight: 10,
+                        time: 0,
+                        qCount: 10,
+                        qOptional: 0,
+                        qEach: 1,
+                        qType: "mcq",
+                        difficulty: "medium",
+                        selected: false
+                    },
+                    {
+                        id: 'u4',
+                        title: "Construction Materials",
+                        type: "unit",
+                        depth: 2,
+                        weight: 10,
+                        time: 0,
+                        qCount: 10,
+                        qOptional: 0,
+                        qEach: 1,
+                        qType: "mcq",
+                        difficulty: "medium",
+                        selected: false
+                    },
+                    {
+                        id: 'u5',
+                        title: "Soil Mechanics",
+                        type: "unit",
+                        depth: 2,
+                        weight: 10,
+                        time: 0,
+                        qCount: 10,
+                        qOptional: 0,
+                        qEach: 1,
+                        qType: "mcq",
+                        difficulty: "medium",
+                        selected: false
+                    },
+                    {
+                        id: 'u6',
+                        title: "Hydraulics",
+                        type: "unit",
+                        depth: 2,
+                        weight: 10,
+                        time: 0,
+                        qCount: 10,
+                        qOptional: 0,
+                        qEach: 1,
+                        qType: "mcq",
+                        difficulty: "medium",
+                        selected: false
+                    },
+                    {
+                        id: 'u7',
+                        title: "Structural Engineering",
+                        type: "unit",
+                        depth: 2,
+                        weight: 10,
+                        time: 0,
+                        qCount: 10,
+                        qOptional: 0,
+                        qEach: 1,
+                        qType: "mcq",
+                        difficulty: "medium",
+                        selected: false
+                    },
+                    {
+                        id: 'u8',
+                        title: "Water Supply & Sanitary",
+                        type: "unit",
+                        depth: 2,
+                        weight: 10,
+                        time: 0,
+                        qCount: 10,
+                        qOptional: 0,
+                        qEach: 1,
+                        qType: "mcq",
+                        difficulty: "medium",
+                        selected: false
+                    },
+                    {
+                        id: 'u9',
+                        title: "Highway Engineering",
+                        type: "unit",
+                        depth: 2,
+                        weight: 10,
+                        time: 0,
+                        qCount: 10,
+                        qOptional: 0,
+                        qEach: 1,
+                        qType: "mcq",
+                        difficulty: "medium",
+                        selected: false
+                    },
+                    {
+                        id: 'u10',
+                        title: "Estimating & Costing",
+                        type: "unit",
+                        depth: 2,
+                        weight: 10,
+                        time: 0,
+                        qCount: 10,
+                        qOptional: 0,
+                        qEach: 1,
+                        qType: "mcq",
+                        difficulty: "medium",
+                        selected: false
+                    },
+
                     // PAPER II
-                    { id: 'p2', title: "Paper II: Technical Subjective (Theoretical)", type: "paper", depth: 0, weight: 100, time: 135, qCount: 14, qOptional: 0, qEach: 0, qType: "subjective", difficulty: "any", selected: false },
-                    { id: 's3', title: "Section A: Structures", type: "section", depth: 1, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, selected: false },
-                    { id: 'u11', title: "Structural Analysis (Subjective)", type: "unit", depth: 2, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, qType: "subjective", difficulty: "hard", selected: false },
-                    { id: 's4', title: "Section B: Water Resources", type: "section", depth: 1, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, selected: false },
-                    { id: 'u12', title: "Irrigation Engineering", type: "unit", depth: 2, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, qType: "subjective", difficulty: "hard", selected: false },
-                    { id: 's5', title: "Section C: Transportation", type: "section", depth: 1, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, selected: false },
-                    { id: 'u13', title: "Highway Design", type: "unit", depth: 2, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, qType: "subjective", difficulty: "hard", selected: false },
-                    { id: 's6', title: "Section D: Public Health", type: "section", depth: 1, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, selected: false },
-                    { id: 'u14', title: "Sanitary Engineering", type: "unit", depth: 2, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, qType: "subjective", difficulty: "hard", selected: false },
-                    { id: 's7', title: "Section E: Management", type: "section", depth: 1, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, selected: false },
-                    { id: 'u15', title: "Project Planning", type: "unit", depth: 2, weight: 20, time: 0, qCount: 2, qOptional: 0, qEach: 10, qType: "subjective", difficulty: "hard", selected: false },
-                    
+                    {
+                        id: 'p2',
+                        title: "Paper II: Technical Subjective (Theoretical)",
+                        type: "paper",
+                        depth: 0,
+                        weight: 100,
+                        time: 135,
+                        qCount: 14,
+                        qOptional: 0,
+                        qEach: 0,
+                        qType: "subjective",
+                        difficulty: "any",
+                        selected: false
+                    },
+                    {
+                        id: 's3',
+                        title: "Section A: Structures",
+                        type: "section",
+                        depth: 1,
+                        weight: 20,
+                        time: 0,
+                        qCount: 2,
+                        qOptional: 0,
+                        qEach: 10,
+                        selected: false
+                    },
+                    {
+                        id: 'u11',
+                        title: "Structural Analysis (Subjective)",
+                        type: "unit",
+                        depth: 2,
+                        weight: 20,
+                        time: 0,
+                        qCount: 2,
+                        qOptional: 0,
+                        qEach: 10,
+                        qType: "subjective",
+                        difficulty: "hard",
+                        selected: false
+                    },
+                    {
+                        id: 's4',
+                        title: "Section B: Water Resources",
+                        type: "section",
+                        depth: 1,
+                        weight: 20,
+                        time: 0,
+                        qCount: 2,
+                        qOptional: 0,
+                        qEach: 10,
+                        selected: false
+                    },
+                    {
+                        id: 'u12',
+                        title: "Irrigation Engineering",
+                        type: "unit",
+                        depth: 2,
+                        weight: 20,
+                        time: 0,
+                        qCount: 2,
+                        qOptional: 0,
+                        qEach: 10,
+                        qType: "subjective",
+                        difficulty: "hard",
+                        selected: false
+                    },
+                    {
+                        id: 's5',
+                        title: "Section C: Transportation",
+                        type: "section",
+                        depth: 1,
+                        weight: 20,
+                        time: 0,
+                        qCount: 2,
+                        qOptional: 0,
+                        qEach: 10,
+                        selected: false
+                    },
+                    {
+                        id: 'u13',
+                        title: "Highway Design",
+                        type: "unit",
+                        depth: 2,
+                        weight: 20,
+                        time: 0,
+                        qCount: 2,
+                        qOptional: 0,
+                        qEach: 10,
+                        qType: "subjective",
+                        difficulty: "hard",
+                        selected: false
+                    },
+                    {
+                        id: 's6',
+                        title: "Section D: Public Health",
+                        type: "section",
+                        depth: 1,
+                        weight: 20,
+                        time: 0,
+                        qCount: 2,
+                        qOptional: 0,
+                        qEach: 10,
+                        selected: false
+                    },
+                    {
+                        id: 'u14',
+                        title: "Sanitary Engineering",
+                        type: "unit",
+                        depth: 2,
+                        weight: 20,
+                        time: 0,
+                        qCount: 2,
+                        qOptional: 0,
+                        qEach: 10,
+                        qType: "subjective",
+                        difficulty: "hard",
+                        selected: false
+                    },
+                    {
+                        id: 's7',
+                        title: "Section E: Management",
+                        type: "section",
+                        depth: 1,
+                        weight: 20,
+                        time: 0,
+                        qCount: 2,
+                        qOptional: 0,
+                        qEach: 10,
+                        selected: false
+                    },
+                    {
+                        id: 'u15',
+                        title: "Project Planning",
+                        type: "unit",
+                        depth: 2,
+                        weight: 20,
+                        time: 0,
+                        qCount: 2,
+                        qOptional: 0,
+                        qEach: 10,
+                        qType: "subjective",
+                        difficulty: "hard",
+                        selected: false
+                    },
+
                     // PHASE III
-                    { id: 'p3', title: "Phase III: Interview", type: "paper", depth: 0, weight: 30, time: 30, qCount: 1, qOptional: 0, qEach: 30, qType: "oral", difficulty: "medium", selected: false },
-                    { id: 'u16', title: "Personal Interview", type: "unit", depth: 1, weight: 30, time: 30, qCount: 1, qOptional: 0, qEach: 30, qType: "oral", difficulty: "medium", selected: false }
+                    {
+                        id: 'p3',
+                        title: "Phase III: Interview",
+                        type: "paper",
+                        depth: 0,
+                        weight: 30,
+                        time: 30,
+                        qCount: 1,
+                        qOptional: 0,
+                        qEach: 30,
+                        qType: "oral",
+                        difficulty: "medium",
+                        selected: false
+                    },
+                    {
+                        id: 'u16',
+                        title: "Personal Interview",
+                        type: "unit",
+                        depth: 1,
+                        weight: 30,
+                        time: 30,
+                        qCount: 1,
+                        qOptional: 0,
+                        qEach: 30,
+                        qType: "oral",
+                        difficulty: "medium",
+                        selected: false
+                    }
                 ];
-                
+
                 // Update global metrics from images
                 document.getElementById('global-marks-input').value = 230;
                 document.getElementById('global-time-input').value = "3h 30m";
                 document.getElementById('global-pass-display').innerText = 40;
                 document.getElementById('global-pass-input').value = 40;
-                
+
                 recalculateTotals();
                 renderGrid();
                 Swal.fire('Loaded!', 'Standard Sub-Engineer curriculum has been generated.', 'success');
@@ -1083,7 +1723,18 @@ if (!empty($nodesTree)) {
     }
 
     function addTopic() {
-        syllabusData.push({ id: Date.now(), title: "New Syllabus Item", type: "unit", depth: 2, weight: 0, time: 0, qCount: 0, qOptional: 0, qEach: 0, selected: false });
+        syllabusData.push({
+            id: Date.now(),
+            title: "New Syllabus Item",
+            type: "unit",
+            depth: 2,
+            weight: 0,
+            time: 0,
+            qCount: 0,
+            qOptional: 0,
+            qEach: 0,
+            selected: false
+        });
         renderGrid();
     }
 
@@ -1093,18 +1744,25 @@ if (!empty($nodesTree)) {
     }
 
     function handleRowDuplicate(index) {
-        const clone = {...syllabusData[index], id: Date.now(), title: syllabusData[index].title + ' (Copy)'};
+        const clone = {
+            ...syllabusData[index],
+            id: Date.now(),
+            title: syllabusData[index].title + ' (Copy)'
+        };
         syllabusData.splice(index + 1, 0, clone);
         renderGrid();
     }
 
     // --- BULK & DRAG ---
     function setupDragEvents(el, index) {
-        el.addEventListener('dragstart', (e) => { draggedItemIndex = index; e.dataTransfer.effectAllowed = 'move'; });
+        el.addEventListener('dragstart', (e) => {
+            draggedItemIndex = index;
+            e.dataTransfer.effectAllowed = 'move';
+        });
         el.addEventListener('dragover', (e) => e.preventDefault());
         el.addEventListener('drop', (e) => {
             e.preventDefault();
-            if(draggedItemIndex !== null && draggedItemIndex !== index) {
+            if (draggedItemIndex !== null && draggedItemIndex !== index) {
                 const item = syllabusData.splice(draggedItemIndex, 1)[0];
                 syllabusData.splice(index, 0, item);
                 draggedItemIndex = null;
@@ -1118,7 +1776,7 @@ if (!empty($nodesTree)) {
         syllabusData.forEach(r => r.selected = checked);
         renderGrid();
     }
-    
+
     function toggleRowSelection(index, checked) {
         syllabusData[index].selected = checked;
         updateBulkBar();
@@ -1128,7 +1786,7 @@ if (!empty($nodesTree)) {
         const count = syllabusData.filter(r => r.selected).length;
         const bar = document.getElementById('bulk-action-bar');
         document.getElementById('selected-count').innerText = count;
-        if(count > 0) {
+        if (count > 0) {
             bar.classList.remove('opacity-0', 'invisible', 'translate-y-[200%]');
             bar.classList.add('translate-y-0');
         } else {
@@ -1138,16 +1796,21 @@ if (!empty($nodesTree)) {
     }
 
     function bulkDuplicate() {
-        const selected = syllabusData.filter(r => r.selected).map(r => ({...r, id: Date.now() + Math.random(), selected: false, title: r.title + ' (Copy)'}));
+        const selected = syllabusData.filter(r => r.selected).map(r => ({
+            ...r,
+            id: Date.now() + Math.random(),
+            selected: false,
+            title: r.title + ' (Copy)'
+        }));
         syllabusData.push(...selected);
         clearSelection();
     }
 
     function bulkIndent(dir) {
         syllabusData.forEach(r => {
-            if(r.selected) {
+            if (r.selected) {
                 let d = r.depth + dir;
-                if(d >= 0 && d <= 3) r.depth = d;
+                if (d >= 0 && d <= 3) r.depth = d;
             }
         });
         renderGrid();
@@ -1161,7 +1824,7 @@ if (!empty($nodesTree)) {
     function clearSelection() {
         syllabusData.forEach(r => r.selected = false);
         const selectAll = document.getElementById('select-all');
-        if(selectAll) selectAll.checked = false;
+        if (selectAll) selectAll.checked = false;
         renderGrid();
     }
 
@@ -1171,7 +1834,7 @@ if (!empty($nodesTree)) {
     }
 
     function updateGlobalSetting(type, value) {
-        if(value.trim() === '') value = null;
+        if (value.trim() === '') value = null;
         manualSettings[type] = value;
         validateSyllabus();
     }
@@ -1180,14 +1843,14 @@ if (!empty($nodesTree)) {
         const roots = syllabusData.filter(r => r.depth === 0);
         const autoTotal = roots.reduce((s, r) => s + r.weight, 0);
         const unitSum = syllabusData.filter(r => r.type === 'unit').reduce((s, r) => s + r.weight, 0);
-        
+
         const target = manualSettings.marks ? parseFloat(manualSettings.marks) : autoTotal;
         const badge = document.getElementById('validator-msg');
         const tallyDisplay = document.getElementById('tally-display');
-        
+
         tallyDisplay.innerText = `${Math.round(unitSum)}/${Math.round(target)}`;
-        
-        if(Math.abs(unitSum - target) < 0.01) {
+
+        if (Math.abs(unitSum - target) < 0.01) {
             badge.className = 'flex-shrink-0 bg-emerald-50 text-emerald-900 border border-emerald-200 px-3 py-1.5 rounded-lg text-[11px] font-bold shadow-sm flex items-center';
         } else {
             badge.className = 'flex-shrink-0 bg-rose-50 text-rose-900 border border-rose-200 px-3 py-1.5 rounded-lg text-[11px] font-bold shadow-sm flex items-center';
@@ -1196,14 +1859,16 @@ if (!empty($nodesTree)) {
 
     function saveSyllabus() {
         // Validation: Must have at least one node
-        if(syllabusData.length === 0) {
+        if (syllabusData.length === 0) {
             Swal.fire('Error', 'Syllabus cannot be empty.', 'error');
             return;
         }
 
         Swal.fire({
             title: 'Saving...',
-            didOpen: () => { Swal.showLoading(); }
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
 
         const payload = {
@@ -1218,27 +1883,31 @@ if (!empty($nodesTree)) {
         };
 
         fetch('<?php echo get_app_url(); ?>/admin/quiz/syllabus/bulk-save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.status === 'success') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Saved!',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-            } else {
-                Swal.fire('Error', data.message || 'Failed to save', 'error');
-            }
-        });
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Saved!',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire('Error', data.message || 'Failed to save', 'error');
+                }
+            });
     }
 
     async function openCloneModal() {
-        const { value: newLabel } = await Swal.fire({
+        const {
+            value: newLabel
+        } = await Swal.fire({
             title: 'Clone Syllabus',
             text: 'Enter a version label to identify this new clone (e.g., "Revision 2025")',
             input: 'text',
@@ -1254,38 +1923,42 @@ if (!empty($nodesTree)) {
         if (!newLabel) return;
 
         const currentLevel = "<?php echo $level; ?>";
-        
+
         Swal.fire({
             title: 'Creating Clone...',
             text: 'Please wait while we duplicate the structure and settings.',
             allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
 
         fetch('<?php echo get_app_url(); ?>/admin/quiz/syllabus/clone', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                level: currentLevel,
-                version_label: newLabel
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    level: currentLevel,
+                    version_label: newLabel
+                })
             })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Syllabus Cloned!',
-                    text: 'Redirecting to the new version...',
-                    timer: 2000,
-                    showConfirmButton: false
-                }).then(() => {
-                    window.location.href = '<?php echo get_app_url(); ?>/admin/quiz/syllabus/manage/' + data.new_level;
-                });
-            } else {
-                Swal.fire('Error', data.message || 'Clone failed', 'error');
-            }
-        });
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Syllabus Cloned!',
+                        text: 'Redirecting to the new version...',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = '<?php echo get_app_url(); ?>/admin/quiz/syllabus/manage/' + data.new_level;
+                    });
+                } else {
+                    Swal.fire('Error', data.message || 'Clone failed', 'error');
+                }
+            });
     }
 
     // --- HIERARCHY MODAL LOGIC ---
@@ -1298,7 +1971,7 @@ if (!empty($nodesTree)) {
     function openHierarchyModal(index) {
         activeRowIndex = index;
         const row = syllabusData[index];
-        
+
         // Reset 5 Filters
         document.getElementById('modal-filter-course').value = '';
         document.getElementById('modal-filter-edu').value = '';
@@ -1306,7 +1979,7 @@ if (!empty($nodesTree)) {
         document.getElementById('modal-filter-cat').value = '';
         document.getElementById('modal-filter-topic').value = '';
         document.getElementById('hierarchy-search').value = '';
-        
+
         // Reset Dropdown UI Text
         resetDropdownUI('dropdown-course', 'Course');
         resetDropdownUI('dropdown-edu', 'Edu. Level');
@@ -1319,7 +1992,7 @@ if (!empty($nodesTree)) {
 
         if (row.linked_topic_id) switchHierarchyTab('topic');
         else switchHierarchyTab('category');
-        
+
         document.getElementById('hierarchy-modal').classList.remove('hidden');
         filterHierarchyList();
         setTimeout(() => document.getElementById('hierarchy-search').focus(), 50);
@@ -1364,16 +2037,16 @@ if (!empty($nodesTree)) {
         // Filters not applied to list items directly due to data simplification, but we keep Search and Linked logic.
         const catId = document.getElementById('modal-filter-cat').value;
         const topicId = document.getElementById('modal-filter-topic').value;
-        
+
         const container = document.getElementById('hierarchy-list-container');
         if (!container) return;
         container.innerHTML = '';
-        
+
         const curTab = typeof currentHierarchyTab !== 'undefined' ? currentHierarchyTab : 'category';
         const sourceData = curTab === 'category' ? categoriesDB : subjectsDB;
         const typeLabel = curTab === 'category' ? 'Category' : 'Sub-Category';
         const linkKey = curTab === 'category' ? 'linked_category_id' : 'linked_topic_id';
-        
+
         // Active Row for Linking Check
         const row = syllabusData[activeRowIndex];
 
@@ -1385,10 +2058,10 @@ if (!empty($nodesTree)) {
             }
 
             if (query && !item.name.toLowerCase().includes(query)) return false;
-            
+
             // For topics, filter by category if catId is set.
             if (curTab === 'topic' && catId && item.category_id != catId && item.category_id !== null) return false;
-            
+
             return true;
         });
 
@@ -1401,7 +2074,7 @@ if (!empty($nodesTree)) {
             const isSelected = row && row[linkKey] == item.id;
             const el = document.createElement('div');
             el.className = `flex items-center justify-between p-4 mb-2 rounded-xl cursor-pointer transition-all duration-200 group ${isSelected ? 'bg-blue-600 shadow-lg shadow-blue-100' : 'bg-white border border-slate-100 hover:border-blue-300 hover:shadow-md'}`;
-            
+
             const textClass = isSelected ? 'text-white' : 'text-slate-700';
             const labelClass = isSelected ? 'bg-blue-500/50 text-blue-100' : 'bg-slate-100 text-slate-500';
             const parentName = curTab === 'topic' ? item.category_name : item.parent_name;
@@ -1457,7 +2130,7 @@ if (!empty($nodesTree)) {
         updateLinkedBtnState();
         filterHierarchyList();
     }
-    
+
     function updateLinkedBtnState() {
         const btn = document.getElementById('btn-show-linked');
         if (!btn) return;
@@ -1469,33 +2142,33 @@ if (!empty($nodesTree)) {
             btn.classList.add('text-slate-400', 'border-transparent');
         }
     }
-    
+
     function resetHierarchyFilters() {
         document.getElementById('modal-filter-course').value = '';
         document.getElementById('modal-filter-edu').value = '';
         document.getElementById('modal-filter-pos').value = '';
         document.getElementById('modal-filter-cat').value = '';
         document.getElementById('modal-filter-topic').value = '';
-        
+
         resetDropdownUI('dropdown-course', 'Course');
         resetDropdownUI('dropdown-edu', 'Edu. Level');
         resetDropdownUI('dropdown-cat', 'Category');
         resetDropdownUI('dropdown-topic', 'Sub-Cat');
         resetDropdownUI('dropdown-pos', 'Pos. Level');
-        
+
         filterHierarchyList();
     }
-    
+
     function resetDropdownUI(id, label) {
         const el = document.getElementById(id);
-        if(el) {
+        if (el) {
             const labelEl = el.querySelector('.dropdown-label');
-            if(labelEl) labelEl.innerText = label;
+            if (labelEl) labelEl.innerText = label;
         }
     }
-    
-    function applyFilters() { 
-        filterHierarchyList(); 
+
+    function applyFilters() {
+        filterHierarchyList();
     }
 
     // --- SEARCHABLE DROPDOWNS LOGIC ---
@@ -1503,40 +2176,40 @@ if (!empty($nodesTree)) {
         populateDropdown('course', coursesData, 'id', 'title');
         populateDropdown('edu', eduData, 'id', 'title');
         populateDropdown('pos', posData, 'id', 'title');
-        
+
         // Categories & Topics might be large, limit initial render or render all?
         // Rendering all for now as browser handles 1-2k nodes okay usually.
         populateDropdown('cat', categoriesDB, 'id', 'name');
         populateDropdown('topic', subjectsDB, 'id', 'name');
-        
+
         initBodyClick();
     }
 
     function populateDropdown_OLD(type, data, idKey, titleKey) {
         const list = document.getElementById(`list-${type}`);
         if (!list) return;
-        
+
         let html = `<li class="px-3 py-2 text-xs text-slate-500 hover:bg-slate-50 cursor-pointer" onclick="selectCustomOption('${type}', '', 'Filter ${type.charAt(0).toUpperCase() + type.slice(1)}')">All ${type.charAt(0).toUpperCase() + type.slice(1)}s</li>`;
-        
+
         if (data.length === 0) {
             html += `<li class="px-3 py-2 text-xs text-slate-400 italic cursor-default">No items found</li>`;
         }
 
         list.innerHTML = html;
-        
+
         data.forEach(item => {
             const li = document.createElement('li');
             li.className = 'px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 whitespace-nowrap transition-colors';
             li.innerText = item[titleKey];
             li.dataset.val = item[idKey];
-            
+
             // Store hierarchy data for cascading (optional visual dimming)
-            if(type === 'pos') {
+            if (type === 'pos') {
                 li.dataset.course = item.course_id;
                 li.dataset.edu = item.education_level_id;
             }
-            if(type === 'cat') li.dataset.pos = item.position_level_id;
-            if(type === 'topic') li.dataset.cat = item.category_id;
+            if (type === 'cat') li.dataset.pos = item.position_level_id;
+            if (type === 'topic') li.dataset.cat = item.category_id;
 
             li.onclick = () => selectCustomOption(type, item[idKey], item[titleKey]);
             list.appendChild(li);
@@ -1546,16 +2219,16 @@ if (!empty($nodesTree)) {
     function toggleCustomDropdown(type) {
         const dd = document.querySelector(`#dropdown-${type} .dropdown-menu`);
         const isOpen = !dd.classList.contains('hidden');
-        
+
         // Close all others
         document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.add('hidden'));
-        
+
         if (!isOpen) {
             dd.classList.remove('hidden');
             // Auto focus search
             setTimeout(() => {
                 const input = dd.querySelector('.dropdown-search');
-                if(input) input.focus();
+                if (input) input.focus();
             }, 50);
         }
     }
@@ -1564,7 +2237,7 @@ if (!empty($nodesTree)) {
         const filter = query.toLowerCase();
         const list = document.getElementById(`list-${type}`);
         const items = list.getElementsByTagName('li');
-        
+
         for (let i = 1; i < items.length; i++) { // Skip first "All" option
             const txt = items[i].textContent || items[i].innerText;
             if (txt.toLowerCase().indexOf(filter) > -1) {
@@ -1578,14 +2251,14 @@ if (!empty($nodesTree)) {
     function selectCustomOption_OLD(type, value, name) {
         // Update Hidden Input
         document.getElementById(`modal-filter-${type}`).value = value;
-        
+
         // Update Trigger Label
         const trigger = document.querySelector(`#dropdown-${type} .dropdown-trigger span`);
-        if(trigger) trigger.innerText = name;
-        
+        if (trigger) trigger.innerText = name;
+
         // Close Dropdown
         document.querySelector(`#dropdown-${type} .dropdown-menu`).classList.add('hidden');
-        
+
         // Trigger Main Filter
         filterHierarchyList();
     }
@@ -1595,37 +2268,37 @@ if (!empty($nodesTree)) {
     function populateDropdown(type, data, idKey, titleKey) {
         const list = document.getElementById(`list-${type}`);
         if (!list) return;
-        
+
         let html = `<li class="px-3 py-2 text-xs text-slate-500 hover:bg-slate-50 cursor-pointer" 
                     onclick="selectCustomOption('${type}', '', 'Filter ${type.charAt(0).toUpperCase() + type.slice(1)}')"
                     data-val="">All ${type.charAt(0).toUpperCase() + type.slice(1)}s</li>`;
-        
+
         if (data.length === 0) {
             html += `<li class="px-3 py-2 text-xs text-slate-400 italic cursor-default">No items found</li>`;
         }
 
         list.innerHTML = html;
-        
+
         data.forEach(item => {
             const li = document.createElement('li');
             li.className = 'px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 whitespace-nowrap transition-colors';
             li.innerText = item[titleKey];
             li.dataset.val = item[idKey];
-            
+
             // Store Hierarchy IDs for Cascading Logic
-            if(type === 'edu') {
+            if (type === 'edu') {
                 li.dataset.course = item.parent_id;
             }
-            if(type === 'cat') {
+            if (type === 'cat') {
                 li.dataset.edu = item.edu_level_id;
                 li.dataset.course = item.course_id;
             }
-            if(type === 'topic') {
+            if (type === 'topic') {
                 li.dataset.cat = item.category_id;
                 li.dataset.edu = item.edu_level_id;
                 li.dataset.course = item.course_id;
             }
-            if(type === 'pos') {
+            if (type === 'pos') {
                 li.dataset.course = item.course_id;
                 li.dataset.edu = item.education_level_id;
             }
@@ -1638,19 +2311,19 @@ if (!empty($nodesTree)) {
     function selectCustomOption(type, value, name) {
         // Update Hidden Input
         document.getElementById(`modal-filter-${type}`).value = value;
-        
+
         // Update Trigger Label
         const trigger = document.querySelector(`#dropdown-${type} .dropdown-trigger span`);
-        if(trigger) trigger.innerText = name;
-        
+        if (trigger) trigger.innerText = name;
+
         // CASCADING RESET LOGIC
         const resetChild = (childType, defaultLabel) => {
-             const input = document.getElementById(`modal-filter-${childType}`);
-             if(input) input.value = '';
-             resetDropdownUI(`dropdown-${childType}`, defaultLabel);
+            const input = document.getElementById(`modal-filter-${childType}`);
+            if (input) input.value = '';
+            resetDropdownUI(`dropdown-${childType}`, defaultLabel);
         };
 
-        if(type === 'course') {
+        if (type === 'course') {
             resetChild('edu', 'Edu. Level');
             resetChild('cat', 'Category');
             resetChild('topic', 'Sub-Cat');
@@ -1665,14 +2338,14 @@ if (!empty($nodesTree)) {
 
         // Apply Cascading Visibility
         updateCascadingFilters();
-        
+
         // Close Dropdown
         document.querySelector(`#dropdown-${type} .dropdown-menu`).classList.add('hidden');
-        
+
         // Trigger Main Filter List
         filterHierarchyList();
     }
-    
+
     function updateCascadingFilters() {
         const courseId = document.getElementById('modal-filter-course').value;
         const eduId = document.getElementById('modal-filter-edu').value;
@@ -1680,10 +2353,10 @@ if (!empty($nodesTree)) {
 
         const applyVisibility = (listId, predicate) => {
             const list = document.getElementById(listId);
-            if(!list) return;
+            if (!list) return;
             const items = list.querySelectorAll('li');
             items.forEach(li => {
-                if(li.dataset.val === '') return; 
+                if (li.dataset.val === '') return;
                 li.style.display = predicate(li) ? '' : 'none';
             });
         };
@@ -1714,12 +2387,12 @@ if (!empty($nodesTree)) {
     }
 
     function saveLinkFromFilter() {
-        if(activeRowIndex === null || !syllabusData[activeRowIndex]) return;
+        if (activeRowIndex === null || !syllabusData[activeRowIndex]) return;
         const curTab = currentHierarchyTab;
-        
+
         if (curTab === 'category') {
             const catId = document.getElementById('modal-filter-cat').value;
-            if(catId) {
+            if (catId) {
                 const li = document.querySelector(`#list-cat li[data-val="${catId}"]`);
                 const name = li ? li.innerText : 'Unknown';
                 selectHierarchyItem('category', catId, name);
@@ -1728,12 +2401,12 @@ if (!empty($nodesTree)) {
             }
         } else {
             const topicId = document.getElementById('modal-filter-topic').value;
-            if(topicId) {
-                 const li = document.querySelector(`#list-topic li[data-val="${topicId}"]`);
-                 const name = li ? li.innerText : 'Unknown';
-                 selectHierarchyItem('topic', topicId, name);
+            if (topicId) {
+                const li = document.querySelector(`#list-topic li[data-val="${topicId}"]`);
+                const name = li ? li.innerText : 'Unknown';
+                selectHierarchyItem('topic', topicId, name);
             } else {
-                 alert("Please select a Sub-Category from the dropdown first.");
+                alert("Please select a Sub-Category from the dropdown first.");
             }
         }
     }
@@ -1745,14 +2418,14 @@ if (!empty($nodesTree)) {
         const linkKey = curTab === 'category' ? 'linked_category_id' : 'linked_topic_id';
         const typeLabel = curTab === 'category' ? 'Category' : 'Sub-Category';
         const row = syllabusData[activeRowIndex];
-        
+
         // Filter Values
         const courseId = document.getElementById('modal-filter-course').value;
         const eduId = document.getElementById('modal-filter-edu').value;
         const posId = document.getElementById('modal-filter-pos').value;
         const catId = document.getElementById('modal-filter-cat').value;
         const topicId = document.getElementById('modal-filter-topic').value;
-        
+
         const container = document.getElementById('hierarchy-list-container');
         if (!container) return;
         container.innerHTML = '';
@@ -1766,34 +2439,34 @@ if (!empty($nodesTree)) {
 
             // Search Text
             if (query && !item.name.toLowerCase().includes(query)) return false;
-            
+
             // Course Filter
             if (courseId && item.course_id && item.course_id != courseId) return false;
-            
+
             // Edu Filter
             if (eduId && item.edu_level_id && item.edu_level_id != eduId) return false;
-            
+
             // Category Filter
             if (catId) {
                 if (curTab === 'category') {
-                     if (item.id != catId) return false;
+                    if (item.id != catId) return false;
                 } else {
-                     if (item.category_id && item.category_id != catId) return false;
+                    if (item.category_id && item.category_id != catId) return false;
                 }
             }
-            
+
             // Topic Filter (Only relevant for Topic Tab really, or specific item match)
             if (topicId && curTab === 'topic') {
                 if (item.id != topicId) return false;
             }
-            
+
             // Pos Level Filter (Optional, checking if Item belongs to pos level? Usually Position is Child of Sub-Cat, or orthogonal?)
             // Controller for Subjects didn't join Position.
             // But Categories check `position_level_id`?
             // Existing `manage.php` previously had no Pos logic, except disabled code.
             // I'll skip Pos logic for List Filtering unless data supports it.
             // (Controller does NOT return position_level_id for categories/subjects).
-            
+
             return true;
         });
 
@@ -1806,10 +2479,10 @@ if (!empty($nodesTree)) {
             const isSelected = row && row[linkKey] == item.id;
             const el = document.createElement('div');
             el.className = `flex items-center justify-between p-4 mb-2 rounded-xl cursor-pointer transition-all duration-200 group ${isSelected ? 'bg-blue-600 shadow-lg shadow-blue-100' : 'bg-white border border-slate-100 hover:border-blue-300 hover:shadow-md'}`;
-            
+
             const textClass = isSelected ? 'text-white' : 'text-slate-700';
             const labelClass = isSelected ? 'bg-blue-500/50 text-blue-100' : 'bg-slate-100 text-slate-500';
-            const parentName = curTab === 'topic' ? item.category_name : (item.edu_level_id ? 'Edu Level ' + item.edu_level_id : ''); 
+            const parentName = curTab === 'topic' ? item.category_name : (item.edu_level_id ? 'Edu Level ' + item.edu_level_id : '');
             // Better parent name? Categories have edu_level_id. Subjects have category_name.
             // For Categories, we don't have edu level NAME, just ID.
             // We can leave parent name empty for Categories or show ID. User didn't ask.
@@ -1831,5 +2504,175 @@ if (!empty($nodesTree)) {
         });
     }
 
-    document.addEventListener('DOMContentLoaded', () => { initSettings(); renderGrid(); initCustomDropdowns(); });
+    // === LINK NODE FROM DROPDOWN ===
+    function linkNodeFromDropdown(index, selectedId, nodeType) {
+        if (!selectedId) return;
+
+        let dataSource, linkField;
+        if (nodeType === 'section') {
+            dataSource = subjectsDB;
+            linkField = 'linked_subject_id';
+        } else if (nodeType === 'unit') {
+            dataSource = typeof subcategoriesDB !== 'undefined' ? subcategoriesDB : [];
+            linkField = 'linked_subcategory_id';
+        } else { // nodeType === 'topic'
+            dataSource = typeof topicsDB !== 'undefined' ? topicsDB : [];
+            linkField = 'linked_topic_id';
+        }
+
+        const selectedItem = dataSource.find(item => item.id == selectedId);
+        if (!selectedItem) return;
+
+        // Update the row with linked data
+        syllabusData[index].title = selectedItem.name || selectedItem.title;
+        syllabusData[index][linkField] = selectedId;
+
+        renderGrid();
+    }
+
+    // === ADD NODE FUNCTIONALITY ===
+    function addTopic() {
+        // Simple: Just add empty row, user can edit/link later
+        syllabusData.push({
+            id: Date.now(),
+            title: "New Item",
+            type: "unit",
+            depth: 2,
+            weight: 0,
+            time: 0,
+            qCount: 0,
+            qOptional: 0,
+            qEach: 0,
+            selected: false
+        });
+        renderGrid();
+    }
+
+    function showAddNodeModal() {
+        Swal.fire({
+            title: 'Add New Node',
+            html: `
+                <div class="text-left space-y-3">
+                    <p class="text-sm text-slate-600 mb-4">What type of node would you like to add?</p>
+                    <button onclick="addNewPaper()" class="w-full p-3 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition text-left">
+                        <i class="fas fa-layer-group mr-2"></i> <strong>Paper</strong> - Create new exam paper
+                    </button>
+                    <button onclick="selectExistingSubject()" class="w-full p-3 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-100 transition text-left">
+                        <i class="fas fa-folder-open mr-2"></i> <strong>Main Category</strong> - Link existing subject
+                    </button>
+                    <button onclick="selectExistingTopic()" class="w-full p-3 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition text-left">
+                        <i class="fas fa-tag mr-2"></i> <strong>Topic</strong> - Link existing topic
+                    </button>
+                </div>
+            `,
+            showConfirmButton: false,
+            showCloseButton: true,
+            width: '500px'
+        });
+    }
+
+    function addNewPaper() {
+        Swal.close();
+        syllabusData.push({
+            id: Date.now(),
+            title: "New Paper",
+            type: "paper",
+            depth: 0,
+            weight: 0,
+            time: 0,
+            qCount: 0,
+            qOptional: 0,
+            qEach: 0,
+            selected: false
+        });
+        renderGrid();
+    }
+
+    function selectExistingSubject() {
+        Swal.close();
+        showSelectionModal('subject', subjectsDB, 'Main Category');
+    }
+
+    function selectExistingTopic() {
+        Swal.close();
+        const topicsDB = <?php echo !empty($topics) ? json_encode($topics) : '[]'; ?>;
+        showSelectionModal('topic', topicsDB, 'Topic');
+    }
+
+    function showSelectionModal(type, data, label) {
+        if (!data || data.length === 0) {
+            Swal.fire('No Data', `No ${label.toLowerCase()}s found in the database. Please create some first.`, 'info');
+            return;
+        }
+
+        const itemsHtml = data.map(item => `
+            <div class="p-3 mb-2 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition" onclick="linkNode('${type}', ${item.id}, '${(item.name || item.title || '').replace(/'/g, "\\'")}')">
+                <div class="font-bold text-sm">${item.name || item.title}</div>
+                ${item.subject_name ? `<div class="text-xs text-slate-500">${item.subject_name}</div>` : ''}
+            </div>
+        `).join('');
+
+        Swal.fire({
+            title: `Select ${label}`,
+            html: `
+                <div class="max-h-96 overflow-y-auto text-left">
+                    ${itemsHtml}
+                </div>
+            `,
+            showConfirmButton: false,
+            showCloseButton: true,
+            width: '500px'
+        });
+    }
+
+    function linkNode(type, id, name) {
+        Swal.close();
+
+        const typeMap = {
+            'subject': {
+                nodeType: 'section',
+                depth: 1,
+                linkField: 'linked_subject_id'
+            },
+            'topic': {
+                nodeType: 'unit',
+                depth: 2,
+                linkField: 'linked_topic_id'
+            }
+        };
+
+        const config = typeMap[type];
+        if (!config) return;
+
+        const newNode = {
+            id: Date.now(),
+            title: name,
+            type: config.nodeType,
+            depth: config.depth,
+            weight: 0,
+            time: 0,
+            qCount: 0,
+            qOptional: 0,
+            qEach: 0,
+            selected: false,
+            [config.linkField]: id
+        };
+
+        syllabusData.push(newNode);
+        renderGrid();
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Linked!',
+            text: `${name} has been added to the syllabus.`,
+            timer: 1500,
+            showConfirmButton: false
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initSettings();
+        renderGrid();
+        initCustomDropdowns();
+    });
 </script>

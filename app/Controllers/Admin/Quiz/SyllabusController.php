@@ -33,7 +33,7 @@ class SyllabusController extends Controller
                 GROUP BY level 
                 ORDER BY level ASC";
         $positions = $this->db->query($sql)->fetchAll();
-        
+
         $stats = [
             'total_positions' => count($positions),
             'active_syllabuses' => $this->db->query("SELECT COUNT(DISTINCT level) as c FROM syllabus_nodes WHERE is_active = 1")->fetch()['c'] ?? 0,
@@ -60,7 +60,7 @@ class SyllabusController extends Controller
         }
 
         $isUnassigned = ($level === 'Unassigned / Draft');
-        
+
         // Fetch nodes with joined names for display
         $sql = "
             SELECT sn.*, 
@@ -72,7 +72,7 @@ class SyllabusController extends Controller
             WHERE " . ($isUnassigned ? "(sn.level IS NULL OR sn.level = '' OR sn.level = 'Unassigned / Draft')" : "sn.level = :level") . "
             ORDER BY sn.order ASC, sn.id ASC
         ";
-        
+
         $params = $isUnassigned ? [] : ['level' => $level];
         $nodes = $this->db->query($sql, $params)->fetchAll();
 
@@ -112,6 +112,11 @@ class SyllabusController extends Controller
         $allCourses = $this->db->find('syllabus_nodes', ['type' => 'course', 'is_active' => 1], 'title ASC');
         $allEduLevels = $this->db->find('syllabus_nodes', ['type' => 'education_level', 'is_active' => 1], 'title ASC');
 
+        // Fetch quiz subjects, subcategories, and topics for dropdowns
+        $quizSubjects = $this->db->query("SELECT id, name, category_id FROM quiz_subjects WHERE is_active = 1 ORDER BY name ASC")->fetchAll();
+        $quizSubcategories = $this->db->query("SELECT id, name, subject_id FROM quiz_subcategories WHERE is_active = 1 ORDER BY name ASC")->fetchAll();
+        $quizTopics = $this->db->query("SELECT id, name, subject_id FROM quiz_topics WHERE is_active = 1 ORDER BY name ASC")->fetchAll();
+
         // Fetch level-wide settings
         $settingsRow = $this->db->findOne('syllabus_settings', ['level' => $level]);
         $settings = [];
@@ -127,7 +132,7 @@ class SyllabusController extends Controller
         // Fetch position level metadata for breadcrumbs
         $posLevel = $this->db->findOne('position_levels', ['slug' => $level]);
         if (!$posLevel) $posLevel = $this->db->findOne('position_levels', ['title' => $level]);
-        
+
         $breadcrumbBase = [];
         if ($posLevel) {
             $course = $this->db->findOne('syllabus_nodes', ['id' => $posLevel['course_id']]);
@@ -144,6 +149,9 @@ class SyllabusController extends Controller
             'level' => $level,
             'categories' => $categories,
             'subjects' => $subjects,
+            'quizSubjects' => $quizSubjects,
+            'subcategories' => $quizSubcategories,
+            'topics' => $quizTopics,
             'settings' => $settings,
             'breadcrumbBase' => $breadcrumbBase,
             'allCourses' => $allCourses,
@@ -192,22 +200,22 @@ class SyllabusController extends Controller
             // 2. Reconstruct Hierarchy & Save Nodes
             // The Grid provides a flat list with 'depth' (0,1,2,3).
             // We use a stack references to reconstruct parent_id relationships.
-            
+
             $parentStack = [null]; // Stack: depth => parent_node_id
-            
+
             foreach ($nodes as $index => $node) {
                 $currentDepth = (int)$node['depth'];
-                
+
                 // Determine Parent ID
                 // If depth is 0, parent is null (Stack[0-1] is undefined/null logic)
                 // If depth is 2, parent is at Stack[1]
-                $parentId = ($currentDepth > 0 && isset($parentStack[$currentDepth - 1])) 
-                            ? $parentStack[$currentDepth - 1] 
-                            : null;
+                $parentId = ($currentDepth > 0 && isset($parentStack[$currentDepth - 1]))
+                    ? $parentStack[$currentDepth - 1]
+                    : null;
 
                 // Create Slug
                 $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $node['title']), '-'));
-                
+
                 // Prepare Data
                 $data = [
                     'level' => $level,
@@ -228,16 +236,16 @@ class SyllabusController extends Controller
                     'linked_category_id' => !empty($node['linked_category_id']) ? $node['linked_category_id'] : null,
                     'linked_topic_id' => !empty($node['linked_topic_id']) ? $node['linked_topic_id'] : null
                 ];
-                
+
                 // Insert
                 $this->db->insert('syllabus_nodes', $data);
                 $newId = $this->db->lastInsertId();
-                
+
                 // Update Stack: This node becomes the potential parent for the next depth (currentDepth + 1)
                 $parentStack[$currentDepth] = $newId;
-                
+
                 // Clean stack for deeper levels to avoid stale references if we jump back up
-                for($i = $currentDepth + 1; $i < 10; $i++) unset($parentStack[$i]);
+                for ($i = $currentDepth + 1; $i < 10; $i++) unset($parentStack[$i]);
             }
 
             // 3. Save Level Meta-Settings
@@ -257,7 +265,7 @@ class SyllabusController extends Controller
                     // Remove 'level' from data for update (it's in WHERE clause)
                     $updateData = $settingsData;
                     unset($updateData['level']);
-                    
+
                     $this->db->update('syllabus_settings', $updateData, "level = :level", ['level' => $level]);
                 } else {
                     // Insert new settings
@@ -267,7 +275,6 @@ class SyllabusController extends Controller
 
             $this->db->commit();
             echo json_encode(['status' => 'success']);
-
         } catch (\Exception $e) {
             $this->db->rollBack();
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
@@ -278,7 +285,7 @@ class SyllabusController extends Controller
     {
         // Sanitize Input
         $parentId = !empty($_POST['parent_id']) ? $_POST['parent_id'] : null;
-        
+
         $data = [
             'parent_id' => $parentId,
             'level' => $_POST['level'] ?? 'Unassigned',
@@ -329,8 +336,8 @@ class SyllabusController extends Controller
         // Safety Check: Prevent deletion of Hierarchy Nodes via Syllabus Controller
         $node = $this->db->findOne('syllabus_nodes', ['id' => $id]);
         if ($node && in_array($node['type'], ['course', 'education_level', 'category', 'sub_category'])) {
-             echo json_encode(['status' => 'error', 'message' => 'Protected Item: Cannot delete hierarchy nodes from Syllabus Manager.']);
-             return;
+            echo json_encode(['status' => 'error', 'message' => 'Protected Item: Cannot delete hierarchy nodes from Syllabus Manager.']);
+            return;
         }
 
         // Basic delete (in production, you might want to check for children first)
@@ -384,10 +391,10 @@ class SyllabusController extends Controller
 
         try {
             $this->db->beginTransaction();
-            
+
             // Fetch all nodes for the old level
             $nodes = $this->db->find('syllabus_nodes', ['level' => $oldLevel], '`order` ASC');
-            
+
             $idMapping = []; // old_id => new_id
 
             // First pass: Insert all nodes without parent_id to get new IDs
@@ -397,7 +404,7 @@ class SyllabusController extends Controller
                 unset($data['id']);
                 $data['level'] = $newLevel;
                 $data['parent_id'] = null; // Temporary
-                
+
                 $this->db->insert('syllabus_nodes', $data);
                 $idMapping[$oldId] = $this->db->lastInsertId();
             }
@@ -418,7 +425,7 @@ class SyllabusController extends Controller
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
-    
+
     public function toggleStatus($id)
     {
         $node = $this->db->findOne('syllabus_nodes', ['id' => $id]);
@@ -432,7 +439,7 @@ class SyllabusController extends Controller
         try {
             $level = $_POST['level'] ?? 'Level 5'; // Fallback or dynamic
             $generator = new \App\Services\ExamGeneratorService();
-            
+
             $options = [
                 'shuffle' => true,
                 'duration' => (int)($_POST['duration'] ?? 45),
@@ -440,7 +447,7 @@ class SyllabusController extends Controller
             ];
 
             $generatedExam = $generator->generateFromSyllabus($level, $options);
-            
+
             // Save it automatically
             $examId = $generator->saveGeneratedExam($generatedExam, [
                 'title' => "Mock Exam: $level (" . date('M d, Y') . ")",
@@ -453,7 +460,6 @@ class SyllabusController extends Controller
                 'exam_id' => $examId,
                 'redirect' => app_base_url('admin/quiz/exams/edit/' . $examId)
             ]);
-
         } catch (\Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
@@ -535,7 +541,7 @@ class SyllabusController extends Controller
                 unset($data['id']);
                 $data['level'] = $newLevel;
                 $data['parent_id'] = null; // Map correctly in Pass 2
-                
+
                 $this->db->insert('syllabus_nodes', $data);
                 $idMapping[$oldId] = $this->db->lastInsertId();
             }
@@ -551,7 +557,6 @@ class SyllabusController extends Controller
 
             $this->db->commit();
             echo json_encode(['status' => 'success', 'new_level' => $newLevel]);
-
         } catch (\Exception $e) {
             $this->db->rollBack();
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
