@@ -18,20 +18,20 @@ class LeaderboardController extends Controller
     public function index()
     {
         $period = $_GET['period'] ?? 'weekly';
-        
+
         // Simple security/validation on period
         if (!in_array($period, ['weekly', 'monthly', 'yearly'])) {
             $period = 'weekly';
         }
-        
-        $value = $_GET['value'] ?? match($period) {
+
+        $value = $_GET['value'] ?? match ($period) {
             'weekly' => date('Y-W'),
             'monthly' => date('Y-m'),
-            'yearly' => date('Y') // Fixed syntax
+            'yearly' => date('Y')
         };
-        
+
         $rankings = $this->service->getLeaderboard($period, $value, 0, 50); // Top 50 public
-        
+
         $this->view('quiz/leaderboard/index', [
             'title' => 'Public Leaderboard',
             'rankings' => $rankings,

@@ -35,7 +35,7 @@ class ProfileService
     public function getUserProfile($userId)
     {
         $user = $this->db->findOne('users', ['id' => $userId]);
-        
+
         if (!$user) {
             return null;
         }
@@ -43,7 +43,7 @@ class ProfileService
         // Get additional profile data
         $stats = $this->db->findOne('user_stats', ['user_id' => $userId]);
         $wallet = $this->db->findOne('user_resources', ['user_id' => $userId]);
-        
+
         return [
             'user' => $user,
             'stats' => $stats ?? [],
@@ -61,12 +61,30 @@ class ProfileService
     public function updateProfile($userId, array $data)
     {
         // Validate and sanitize data
-        $allowedFields = ['first_name', 'last_name', 'bio', 'phone', 'location', 'website'];
+        $allowedFields = [
+            'first_name',
+            'last_name',
+            'bio',
+            'phone',
+            'location',
+            'website',
+            'professional_title',
+            'company',
+            'timezone',
+            'measurement_system',
+            'study_mode',
+            'social_links'
+        ];
         $updateData = [];
-        
+
         foreach ($allowedFields as $field) {
             if (isset($data[$field])) {
-                $updateData[$field] = \App\Core\Validator::sanitize($data[$field]);
+                // Special handling for social_links if it comes as an array
+                if ($field === 'social_links' && is_array($data[$field])) {
+                    $updateData[$field] = json_encode($data[$field]);
+                } else {
+                    $updateData[$field] = \App\Core\Validator::sanitize($data[$field]);
+                }
             }
         }
 
@@ -78,7 +96,7 @@ class ProfileService
 
         try {
             $result = $this->db->update('users', $updateData, 'id = :id', ['id' => $userId]);
-            
+
             return [
                 'success' => true,
                 'message' => 'Profile updated successfully'
@@ -107,7 +125,7 @@ class ProfileService
                 'id = :id',
                 ['id' => $userId]
             );
-            
+
             return [
                 'success' => true,
                 'message' => 'Avatar updated successfully',
@@ -132,7 +150,7 @@ class ProfileService
     public function updatePassword($userId, $oldPassword, $newPassword)
     {
         $user = $this->db->findOne('users', ['id' => $userId]);
-        
+
         if (!$user) {
             return ['success' => false, 'message' => 'User not found'];
         }
@@ -149,14 +167,14 @@ class ProfileService
 
         try {
             $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-            
+
             $result = $this->db->update(
                 'users',
                 ['password' => $hashedPassword, 'updated_at' => date('Y-m-d H:i:s')],
                 'id = :id',
                 ['id' => $userId]
             );
-            
+
             return [
                 'success' => true,
                 'message' => 'Password changed successfully'
@@ -181,18 +199,18 @@ class ProfileService
     {
         $limit = (int)$limit;
         $offset = (int)$offset;
-        
+
         $sql = "SELECT * FROM activity_logs 
                 WHERE user_id = :userId 
                 ORDER BY created_at DESC 
                 LIMIT :limit OFFSET :offset";
-        
+
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':userId', $userId, \PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
         $stmt->execute();
-        
+
         return $stmt->fetchAll();
     }
 
@@ -205,7 +223,7 @@ class ProfileService
     public function getStatistics($userId)
     {
         $stats = $this->db->findOne('user_stats', ['user_id' => $userId]);
-        
+
         if (!$stats) {
             return [
                 'calculations_count' => 0,
@@ -221,7 +239,7 @@ class ProfileService
                     SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) as week_calculations
                 FROM calculation_history 
                 WHERE user_id = :userId";
-        
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['userId' => $userId]);
         $calcStats = $stmt->fetch();
@@ -239,7 +257,7 @@ class ProfileService
     public function deleteAccount($userId, $password)
     {
         $user = $this->db->findOne('users', ['id' => $userId]);
-        
+
         if (!$user) {
             return ['success' => false, 'message' => 'User not found'];
         }
@@ -258,12 +276,12 @@ class ProfileService
             $this->db->delete('user_resources', 'user_id = :uid', ['uid' => $userId]);
             $this->db->delete('calculation_history', 'user_id = :uid', ['uid' => $userId]);
             $this->db->delete('activity_logs', 'user_id = :uid', ['uid' => $userId]);
-            
+
             // Finally delete user
             $this->db->delete('users', 'id = :id', ['id' => $userId]);
-            
+
             $pdo->commit();
-            
+
             return [
                 'success' => true,
                 'message' => 'Account deleted successfully'
@@ -288,7 +306,7 @@ class ProfileService
         $sql = "SELECT * FROM user_preferences WHERE user_id = :userId";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['userId' => $userId]);
-        
+
         return $stmt->fetch() ?: [];
     }
 
@@ -302,20 +320,20 @@ class ProfileService
     {
         $google2fa = new \PragmaRX\Google2FA\Google2FA();
         $secret = $google2fa->generateSecretKey();
-        
+
         // Store secret temporarily or permanently marked as 'pending'
         // For simplicity, we assume we update the user record but look for an 'is_2fa_enabled' flag
         // or just return it for the frontend to verify first.
-        
+
         $user = $this->db->findOne('users', ['id' => $userId]);
         $email = $user['email'];
-        
+
         $qrCodeUrl = $google2fa->getQRCodeUrl(
             'Bishwo Calculator',
             $email,
             $secret
         );
-        
+
         return [
             'success' => true,
             'secret' => $secret,
@@ -333,9 +351,9 @@ class ProfileService
     public function verifyTwoFactor($userId, $secret, $code)
     {
         $google2fa = new \PragmaRX\Google2FA\Google2FA();
-        
+
         $valid = $google2fa->verifyKey($secret, $code);
-        
+
         if ($valid) {
             // Persist the secret and enable 2FA
             $this->db->update('users', [
@@ -343,10 +361,10 @@ class ProfileService
                 'two_factor_enabled' => 1,
                 'two_factor_confirmed_at' => date('Y-m-d H:i:s')
             ], 'id = :id', ['id' => $userId]);
-            
+
             return ['success' => true, 'message' => '2FA enabled successfully'];
         }
-        
+
         return ['success' => false, 'message' => 'Invalid verification code'];
     }
 
@@ -382,7 +400,7 @@ class ProfileService
         try {
             // Check if preferences exist
             $existing = $this->getPreferences($userId);
-            
+
             if ($existing) {
                 $result = $this->db->update(
                     'user_preferences',
@@ -394,7 +412,7 @@ class ProfileService
                 $preferences['user_id'] = $userId;
                 $result = $this->db->insert('user_preferences', $preferences);
             }
-            
+
             return [
                 'success' => true,
                 'message' => 'Preferences updated successfully'

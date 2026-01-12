@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Gamification: City Builder (Architect's Studio)
  * Premium Dark Mode UI - Refactored
@@ -6,6 +7,7 @@
 ?>
 <!DOCTYPE html>
 <html lang="en" class="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,8 +16,10 @@
     <link rel="stylesheet" href="<?php echo app_base_url('themes/default/assets/css/quiz.min.css?v=' . time()); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body class="bg-background text-white font-sans min-h-screen pb-20" x-data="cityBuilder()">
 
     <!-- Header -->
@@ -30,7 +34,7 @@
     </header>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
         <!-- Resources Wallet -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <!-- Coins -->
@@ -76,7 +80,7 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            
+
             <!-- Sidebar: Blueprint Catalog -->
             <div class="lg:col-span-1 space-y-6">
                 <div class="glass-card p-6 rounded-3xl sticky top-24">
@@ -96,8 +100,8 @@
                                     <div class="text-[10px] font-bold text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full inline-block mt-1 border border-green-500/20">100 Bricks</div>
                                 </div>
                             </div>
-                            <button @click="build('house', 100, 'bricks')" :disabled="loading" 
-                                    class="w-full py-2 bg-green-500/10 hover:bg-green-500 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-green-500/30 hover:border-green-500 text-green-400 hover:text-white">
+                            <button @click="build('house', 100, 'bricks')" :disabled="loading"
+                                class="w-full py-2 bg-green-500/10 hover:bg-green-500 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-green-500/30 hover:border-green-500 text-green-400 hover:text-white">
                                 Construct
                             </button>
                         </div>
@@ -113,8 +117,8 @@
                                     <div class="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full inline-block mt-1 border border-indigo-500/20">50 Cement</div>
                                 </div>
                             </div>
-                            <button @click="build('road', 50, 'cement')" :disabled="loading" 
-                                    class="w-full py-2 bg-indigo-500/10 hover:bg-indigo-500 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-indigo-500/30 hover:border-indigo-500 text-indigo-400 hover:text-white">
+                            <button @click="build('road', 50, 'cement')" :disabled="loading"
+                                class="w-full py-2 bg-indigo-500/10 hover:bg-indigo-500 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-indigo-500/30 hover:border-indigo-500 text-indigo-400 hover:text-white">
                                 Construct
                             </button>
                         </div>
@@ -130,8 +134,8 @@
                                     <div class="text-[10px] font-bold text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full inline-block mt-1 border border-red-500/20">500 Br + 200 St</div>
                                 </div>
                             </div>
-                            <button @click="build('bridge', 500, 'bricks')" :disabled="loading" 
-                                    class="w-full py-2 bg-red-500/10 hover:bg-red-500 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-red-500/30 hover:border-red-500 text-red-400 hover:text-white">
+                            <button @click="build('bridge', 500, 'bricks')" :disabled="loading"
+                                class="w-full py-2 bg-red-500/10 hover:bg-red-500 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-red-500/30 hover:border-red-500 text-red-400 hover:text-white">
                                 Construct
                             </button>
                         </div>
@@ -147,8 +151,8 @@
                                     <div class="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full inline-block mt-1 border border-blue-500/20">1k Br + 500 St</div>
                                 </div>
                             </div>
-                            <button @click="build('tower', 1000, 'bricks')" :disabled="loading" 
-                                    class="w-full py-2 bg-blue-500/10 hover:bg-blue-500 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-blue-500/30 hover:border-blue-500 text-blue-400 hover:text-white">
+                            <button @click="build('tower', 1000, 'bricks')" :disabled="loading"
+                                class="w-full py-2 bg-blue-500/10 hover:bg-blue-500 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border border-blue-500/30 hover:border-blue-500 text-blue-400 hover:text-white">
                                 Construct
                             </button>
                         </div>
@@ -161,10 +165,10 @@
             <div class="lg:col-span-3">
                 <div class="bg-surface border border-white/10 rounded-3xl p-8 min-h-[600px] relative overflow-hidden">
                     <!-- Grid Background -->
-                    <div class="absolute inset-0 z-0 opacity-20" 
-                         style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 40px 40px;">
+                    <div class="absolute inset-0 z-0 opacity-20"
+                        style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 40px 40px;">
                     </div>
-                
+
                     <?php if (empty($buildings)): ?>
                         <div class="absolute inset-0 flex flex-col items-center justify-center text-center z-10 p-8">
                             <div class="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-6">
@@ -175,15 +179,39 @@
                         </div>
                     <?php else: ?>
                         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 relative z-10">
-                            <?php foreach($buildings as $idx => $b): ?>
-                                <?php 
-                                    $icon = 'home'; $color = 'text-green-500'; $bg = 'bg-green-500/10';
-                                    if($b['building_type'] == 'road') { $icon = 'road'; $color = 'text-indigo-400'; $bg = 'bg-indigo-500/10'; }
-                                    if($b['building_type'] == 'bridge') { $icon = 'archway'; $color = 'text-red-500'; $bg = 'bg-red-500/10'; }
-                                    if($b['building_type'] == 'tower') { $icon = 'building'; $color = 'text-blue-500'; $bg = 'bg-blue-500/10'; }
+                            <?php foreach ($buildings as $idx => $b): ?>
+                                <?php
+                                $icon = 'home';
+                                $color = 'text-green-500';
+                                $bg = 'bg-green-500/10';
+                                if ($b['building_type'] == 'road') {
+                                    $icon = 'road';
+                                    $color = 'text-indigo-400';
+                                    $bg = 'bg-indigo-500/10';
+                                }
+                                if ($b['building_type'] == 'bridge') {
+                                    $icon = 'archway';
+                                    $color = 'text-red-500';
+                                    $bg = 'bg-red-500/10';
+                                }
+                                if ($b['building_type'] == 'tower') {
+                                    $icon = 'building';
+                                    $color = 'text-blue-500';
+                                    $bg = 'bg-blue-500/10';
+                                }
                                 ?>
-                                <div class="bg-surface border border-white/10 p-4 rounded-xl flex flex-col items-center text-center hover:-translate-y-1 transition-transform shadow-lg shadow-black/20 animate-fade-in-up" 
-                                     style="animation-delay: <?php echo $idx * 50; ?>ms">
+                                <div class="bg-surface border border-white/10 p-4 rounded-xl flex flex-col items-center text-center hover:-translate-y-1 transition-transform shadow-lg shadow-black/20 animate-fade-in-up group relative cursor-help"
+                                    style="animation-delay: <?php echo $idx * 50; ?>ms"
+                                    @mouseenter="showTooltip($event, '<?php echo $b['building_type']; ?>', <?php echo $b['level']; ?>, <?php echo $b['id']; ?>)"
+                                    @mouseleave="hideTooltip()">
+
+                                    <!-- Building Tooltip (Alpine controlled) -->
+                                    <div x-show="tooltip.visible && tooltip.id === <?php echo $b['id']; ?>"
+                                        class="absolute -top-12 left-1/2 -translate-x-1/2 bg-black/90 text-white text-xs p-2 rounded-lg whitespace-nowrap z-50 pointer-events-none border border-white/20 shadow-xl"
+                                        x-transition.opacity>
+                                        <div class="font-bold capitalize"><?php echo $b['building_type']; ?> (Lvl <?php echo $b['level']; ?>)</div>
+                                        <div class="text-green-400">Generates <?php echo $b['level'] * 10; ?> Coins/hr</div>
+                                    </div>
                                     <div class="w-14 h-14 rounded-xl <?php echo $bg; ?> flex items-center justify-center <?php echo $color; ?> text-2xl mb-3 shadow-inner">
                                         <i class="fas fa-<?php echo $icon; ?>"></i>
                                     </div>
@@ -203,27 +231,58 @@
         function cityBuilder() {
             return {
                 loading: false,
+                tooltip: {
+                    visible: false,
+                    id: null
+                },
+
+                showTooltip(e, type, level, id) {
+                    this.tooltip.id = id;
+                    this.tooltip.visible = true;
+                },
+
+                hideTooltip() {
+                    this.tooltip.visible = false;
+                    this.tooltip.id = null;
+                },
+
                 async build(type, cost, resource) {
-                    if(!confirm('Construct ' + type + '?')) return;
-                    
+                    // Sound Effect
+                    const audio = new Audio('/themes/default/assets/audio/construction.mp3');
+                    audio.volume = 0.5;
+                    audio.play().catch(e => console.log('Audio error:', e));
+
+                    // Confetti
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: {
+                            y: 0.6
+                        },
+                        colors: ['#10b981', '#fbbf24']
+                    });
+
+                    if (!confirm('Construct ' + type + '?')) return;
+
                     this.loading = true;
+
                     const fd = new FormData();
                     fd.append('type', type);
                     fd.append('csrf_token', '<?php echo csrf_token(); ?>');
-                    
+
                     try {
                         const res = await fetch('<?php echo app_base_url("api/city/build"); ?>', {
                             method: 'POST',
                             body: fd
                         });
                         const data = await res.json();
-                        
+
                         if (res.ok) {
-                            window.location.reload(); 
+                            setTimeout(() => window.location.reload(), 1000);
                         } else {
                             alert(data.message || 'Construction Failed');
                         }
-                    } catch(e) {
+                    } catch (e) {
                         alert('Connection Error');
                     } finally {
                         this.loading = false;
@@ -233,4 +292,5 @@
         }
     </script>
 </body>
+
 </html>

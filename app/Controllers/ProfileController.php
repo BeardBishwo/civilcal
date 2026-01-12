@@ -6,6 +6,7 @@ use App\Core\Controller;
 use App\Core\Validator;
 use App\Services\ProfileService;
 use App\Services\CacheService;
+use App\Services\RankService;
 
 /**
  * Profile Controller (Refactored)
@@ -17,12 +18,14 @@ class ProfileController extends Controller
 {
     private $profileService;
     private $cache;
+    private $rankService;
 
     public function __construct()
     {
         parent::__construct();
         $this->profileService = new ProfileService();
         $this->cache = CacheService::getInstance();
+        $this->rankService = new RankService();
     }
 
     /**
@@ -31,18 +34,37 @@ class ProfileController extends Controller
     public function index()
     {
         $userId = $this->auth->id();
-        
+
         // Try cache first
         $cacheKey = "user_profile_{$userId}";
         $profile = $this->cache->get($cacheKey);
-        
+
         if (!$profile) {
             $profile = $this->profileService->getUserProfile($userId);
             $this->cache->set($cacheKey, $profile, 300); // 5 min cache
         }
-        
-        $this->view('profile/index', [
-            'profile' => $profile,
+
+        // Get rank data
+        $rankData = $this->rankService->getUserRankData($profile['stats'] ?? [], $profile['wallet'] ?? []);
+
+        // Get social links (stored as JSON in users table or managed by model-like logic)
+        $userModel = new \App\Models\User();
+        $socialLinks = $userModel->getSocialLinksAttribute($userId);
+
+        // Get 2FA status
+        $twoFactorData = $userModel->getTwoFactorData($userId);
+        $twoFactorStatus = [
+            'enabled' => !empty($twoFactorData['two_factor_enabled']),
+            'secret' => $twoFactorData['two_factor_secret'] ?? null
+        ];
+
+        $this->view('user/profile', [
+            'user' => $profile['user'] ?? [],
+            'stats' => $profile['stats'] ?? [],
+            'wallet' => $profile['wallet'] ?? [],
+            'rank_data' => $rankData,
+            'social_links' => $socialLinks,
+            'two_factor_status' => $twoFactorStatus,
             'title' => 'My Profile'
         ]);
     }
@@ -56,9 +78,9 @@ class ProfileController extends Controller
         $page = (int)($_GET['page'] ?? 1);
         $limit = 20;
         $offset = ($page - 1) * $limit;
-        
+
         $history = $this->profileService->getActivityHistory($userId, $limit, $offset);
-        
+
         $this->view('profile/exams', [
             'history' => $history,
             'page' => $page,
@@ -72,13 +94,13 @@ class ProfileController extends Controller
     public function analytics()
     {
         $userId = $this->auth->id();
-        
+
         // Cache statistics for 10 minutes
         $cacheKey = "user_stats_{$userId}";
-        $stats = $this->cache->remember($cacheKey, 600, function() use ($userId) {
+        $stats = $this->cache->remember($cacheKey, 600, function () use ($userId) {
             return $this->profileService->getStatistics($userId);
         });
-        
+
         $this->view('profile/analytics', [
             'stats' => $stats,
             'title' => 'My Analytics'
@@ -103,24 +125,43 @@ class ProfileController extends Controller
         $validation = Validator::validate($_POST, [
             'first_name' => 'required|min:2|max:100',
             'last_name' => 'required|min:2|max:100',
-            'phone' => 'alphanumeric|min:10|max:20',
-            'bio' => 'max:500',
-            'website' => 'url'
+            'phone' => 'min:10|max:20',
+            'bio' => 'max:1000',
+            'website' => 'max:255',
+            'location' => 'max:255',
+            'professional_title' => 'max:255',
+            'company' => 'max:255',
+            'timezone' => 'max:100',
+            'measurement_system' => 'max:20',
+            'study_mode' => 'max:20'
         ]);
 
         if (!$validation['valid']) {
             return $this->json(['errors' => $validation['errors']], 400);
         }
 
-        // Sanitize data
+        // Prepare data for service
         $data = Validator::sanitizeArray($_POST, [
             'first_name' => 'string',
             'last_name' => 'string',
             'phone' => 'string',
             'bio' => 'html',
             'location' => 'string',
-            'website' => 'url'
+            'website' => 'string',
+            'professional_title' => 'string',
+            'company' => 'string',
+            'timezone' => 'string',
+            'measurement_system' => 'string',
+            'study_mode' => 'string'
         ]);
+
+        // Social Links handling
+        if (isset($_POST['social']) && is_array($_POST['social'])) {
+            $data['social_links'] = [];
+            foreach ($_POST['social'] as $key => $val) {
+                $data['social_links'][$key] = Validator::sanitize($val, 'string');
+            }
+        }
 
         $userId = $this->auth->id();
         $result = $this->profileService->updateProfile($userId, $data);
@@ -242,10 +283,10 @@ class ProfileController extends Controller
     public function getProfile()
     {
         $userId = $this->auth->id();
-        
+
         // Use cache
         $cacheKey = "user_profile_{$userId}";
-        $profile = $this->cache->remember($cacheKey, 300, function() use ($userId) {
+        $profile = $this->cache->remember($cacheKey, 300, function () use ($userId) {
             return $this->profileService->getUserProfile($userId);
         });
 
@@ -261,7 +302,7 @@ class ProfileController extends Controller
     public function updateProfileApi()
     {
         $method = $_SERVER['REQUEST_METHOD'];
-        
+
         if (!in_array($method, ['POST', 'PUT', 'PATCH'])) {
             return $this->json(['error' => 'Method not allowed'], 405);
         }
