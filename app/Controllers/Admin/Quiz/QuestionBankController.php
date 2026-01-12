@@ -126,11 +126,12 @@ class QuestionBankController extends Controller
         $questions = $stmt->fetchAll();
 
         // Calculate Stats
-        $stats = ['total' => $total, 'mcq' => 0, 'multi' => 0, 'order' => 0, 'theory' => 0, 'theory_short' => 0, 'theory_long' => 0];
+        $stats = ['total' => $total, 'mcq' => 0, 'tf' => 0, 'multi' => 0, 'order' => 0, 'theory' => 0, 'theory_short' => 0, 'theory_long' => 0];
         $stmtStats = $this->db->getPdo()->query("SELECT type, COUNT(*) as count FROM quiz_questions GROUP BY type");
         while ($row = $stmtStats->fetch()) {
             $type = $row['type'];
-            if (in_array($type, ['MCQ', 'TF'])) $stats['mcq'] += $row['count'];
+            if ($type == 'MCQ') $stats['mcq'] += $row['count'];
+            if ($type == 'TF') $stats['tf'] += $row['count'];
             if ($type == 'MULTI') $stats['multi'] += $row['count'];
             if ($type == 'ORDER') $stats['order'] += $row['count'];
             if ($type == 'THEORY') $stats['theory'] += $row['count'];
