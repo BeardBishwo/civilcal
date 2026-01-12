@@ -639,7 +639,7 @@
 
 /* ===== CONTENT AREA ===== */
 .admin-content {
-  padding: 32px;
+  padding: 0;
   max-width: 100%;
   overflow-x: auto;
   width: 100%;
