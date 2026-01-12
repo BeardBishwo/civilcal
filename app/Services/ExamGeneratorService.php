@@ -38,7 +38,7 @@ class ExamGeneratorService
     public function generateFromBlueprint($blueprintId, $options = [])
     {
         $blueprint = $this->blueprintService->getBlueprintWithRules($blueprintId);
-        
+
         // Validate blueprint first
         $validation = $this->blueprintService->validateBlueprint($blueprintId);
         if (!$validation['valid']) {
@@ -124,9 +124,9 @@ class ExamGeneratorService
             // Get questions using our refined query (handles linked_cat/sub/top)
             // Pass node constraints for type and difficulty filtering
             $qs = $this->queryQuestions(
-                [$nodeId], 
-                $level, 
-                $node['difficulty_constraint'] ?? null, 
+                [$nodeId],
+                $level,
+                $node['difficulty_constraint'] ?? null,
                 $targetCount,
                 $node['question_type'] ?? null
             );
@@ -136,13 +136,13 @@ class ExamGeneratorService
                 $found = count($qs);
                 $needed = $targetCount - $found;
                 $generationLogs[] = "Node [$nodeTitle]: Found $found/$targetCount with strict constraints. Relaxing filters.";
-                
+
                 // Fallback 1: Relax Difficulty
                 $qs2 = $this->queryQuestions([$nodeId], $level, 'any', $needed, $node['question_type'] ?? null);
                 // Ensure no duplicates
                 $ids = array_column($qs, 'id');
-                foreach($qs2 as $q) {
-                    if(!in_array($q['id'], $ids)) {
+                foreach ($qs2 as $q) {
+                    if (!in_array($q['id'], $ids)) {
                         $qs[] = $q;
                         $ids[] = $q['id'];
                     }
@@ -152,8 +152,8 @@ class ExamGeneratorService
                 if (count($qs) < $targetCount) {
                     $needed = $targetCount - count($qs);
                     $qs3 = $this->queryQuestions([$nodeId], $level, 'any', $needed, 'any');
-                    foreach($qs3 as $q) {
-                        if(!in_array($q['id'], $ids)) {
+                    foreach ($qs3 as $q) {
+                        if (!in_array($q['id'], $ids)) {
                             $qs[] = $q;
                             $ids[] = $q['id'];
                         }
@@ -176,7 +176,7 @@ class ExamGeneratorService
 
         // 3. Fetch Level-Wide Settings for Negative Marking and Exam Constraints
         $settings = $this->db->findOne('syllabus_settings', ['level' => $level]);
-        
+
         return [
             'blueprint_id' => null,
             'blueprint_title' => "Auto-Syllabus Exam ($level)",
@@ -186,7 +186,7 @@ class ExamGeneratorService
             'questions' => $selectedQuestions,
             'metadata' => [
                 'duration_minutes' => $settings['total_time'] ?? ($options['duration'] ?? 45),
-                'total_marks' => $settings['full_marks'] ?? (count($selectedQuestions) * 2), 
+                'total_marks' => $settings['full_marks'] ?? (count($selectedQuestions) * 2),
                 'negative_marking_rate' => $settings['negative_rate'] ?? ($options['negative_rate'] ?? 20.00),
                 'negative_marking_unit' => 'percent',
                 'negative_marking_basis' => 'per-q',
@@ -284,7 +284,7 @@ class ExamGeneratorService
             $sql .= " AND (q.difficulty_level = :difficulty OR qsm.difficulty_in_stream = :difficulty)";
             $params['difficulty'] = $difficultyNumeric;
         }
-        
+
         // Question Type filtering
         if ($questionType && $questionType !== 'any') {
             $sql .= " AND q.type = :question_type";
@@ -294,12 +294,12 @@ class ExamGeneratorService
         $sql .= " ORDER BY RAND() LIMIT :limit";
 
         $stmt = $this->db->getPdo()->prepare($sql);
-        
+
         foreach ($params as $key => $value) {
             $stmt->bindValue(":$key", $value);
         }
         $stmt->bindValue(':limit', (int)$limit, \PDO::PARAM_INT);
-        
+
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -331,12 +331,12 @@ class ExamGeneratorService
         $sql .= " ORDER BY RAND() LIMIT :limit";
 
         $stmt = $this->db->getPdo()->prepare($sql);
-        
+
         foreach ($params as $key => $value) {
             $stmt->bindValue(":$key", $value);
         }
         $stmt->bindValue(':limit', (int)$count, \PDO::PARAM_INT);
-        
+
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -379,7 +379,6 @@ class ExamGeneratorService
 
             $pdo->commit();
             return $examId;
-
         } catch (Exception $e) {
             $pdo->rollBack();
             throw $e;
@@ -393,6 +392,7 @@ class ExamGeneratorService
     {
         $map = [
             'easy' => 1,
+            'easy-mid' => 2,
             'easy_mid' => 2,
             'medium' => 3,
             'hard' => 4,

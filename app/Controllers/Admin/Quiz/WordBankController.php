@@ -35,7 +35,7 @@ class WordBankController extends Controller
             $data = [
                 'term' => $_POST['term'],
                 'definition' => $_POST['definition'],
-                'difficulty_level' => (int)($_POST['difficulty_level'] ?? 1),
+                'difficulty_level' => (int)($_POST['difficulty_level'] ?? 3),
                 'language' => $_POST['language'] ?? 'en',
                 'synonyms' => $_POST['synonyms'] ?? '',
                 'usage_example' => $_POST['usage_example'] ?? ''

@@ -1,0 +1,100 @@
+Starting Split Import (Debug Mode - V5 - Ultra Verbose)...
+Clearing existing syllabus nodes...
+Table truncated.
+Created Civil Branch: 1 -> 2 -> 3
+  [MATCH CAT] 'General Awareness' -> ID: 4 (ROOT)
+  [MATCH CAT] 'Public Management' -> ID: 15 (ROOT)
+  [MATCH CAT] 'General Aptitude Test' -> ID: 27 (ROOT)
+  [MATCH CAT] 'Surveying' -> ID: 31 (CIVIL (ID:3))
+  [MATCH CAT] 'Construction Materials' -> ID: 62 (CIVIL (ID:3))
+  [MATCH CAT] 'Mechanics of Materials and Structures' -> ID: 82 (CIVIL (ID:3))
+  [MATCH CAT] 'Hydraulics' -> ID: 90 (CIVIL (ID:3))
+  [MATCH CAT] 'Soil Mechanics' -> ID: 101 (CIVIL (ID:3))
+  [MATCH CAT] 'Structural Design' -> ID: 124 (CIVIL (ID:3))
+  [MATCH CAT] 'Building Construction Technology' -> ID: 139 (CIVIL (ID:3))
+  [MATCH CAT] 'Water Supply and Sanitation Engineering' -> ID: 167 (CIVIL (ID:3))
+  [MATCH CAT] 'Irrigation Engineering' -> ID: 183 (CIVIL (ID:3))
+  [MATCH CAT] 'Highway Engineering' -> ID: 195 (CIVIL (ID:3))
+  [MATCH CAT] 'Estimating and Costing' -> ID: 222 (CIVIL (ID:3))
+  [MATCH CAT] 'Construction Management' -> ID: 234 (CIVIL (ID:3))
+  [MATCH CAT] 'Airport Engineering' -> ID: 264 (CIVIL (ID:3))
+  [CRITICAL] Failed to get ID for Category 'Surveying'. setting categoryId=NULL.
+    [SKIP-ORPHAN] Sub-Category 'General' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Levelling' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Chain surveying' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Compass surveying' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Plane Tabling' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Theodolite and Traverse Surveying' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Contouring' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Setting out' skipped because Category Parent is missing.
+  [CRITICAL] Failed to get ID for Category 'Construction Materials'. setting categoryId=NULL.
+    [SKIP-ORPHAN] Sub-Category 'Stone' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Cement' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Clay and clay products' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Paints and Varnishes' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Timber' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Lime' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Bitumen' skipped because Category Parent is missing.
+  [CRITICAL] Failed to get ID for Category 'Mechanics of Materials and Structures'. setting categoryId=NULL.
+    [SKIP-ORPHAN] Sub-Category 'Mechanics of materials' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Mechanics of beams' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Simple strut theory' skipped because Category Parent is missing.
+  [CRITICAL] Failed to get ID for Category 'Hydraulics'. setting categoryId=NULL.
+    [SKIP-ORPHAN] Sub-Category 'General' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Hydro-kinematics and Hydro-dynamics' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Measurement of discharge' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Flows' skipped because Category Parent is missing.
+  [CRITICAL] Failed to get ID for Category 'Soil Mechanics'. setting categoryId=NULL.
+    [SKIP-ORPHAN] Sub-Category 'General' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Soil water relation' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Compaction of soil' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Shear strength of soil' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Earth Pressures' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Foundation engineering' skipped because Category Parent is missing.
+  [CRITICAL] Failed to get ID for Category 'Structural Design'. setting categoryId=NULL.
+    [SKIP-ORPHAN] Sub-Category 'R.C. Section in bending' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Shear and Bond for R.C. Sections' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Axially Loaded R.C. Columns' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Design and Drafting of R.C. structures' skipped because Category Parent is missing.
+  [CRITICAL] Failed to get ID for Category 'Building Construction Technology'. setting categoryId=NULL.
+    [SKIP-ORPHAN] Sub-Category 'Foundation' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Walls' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Damp Proofing' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Concrete Technology' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Wood Work' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Flooring and Finishing' skipped because Category Parent is missing.
+  [CRITICAL] Failed to get ID for Category 'Water Supply and Sanitation Engineering'. setting categoryId=NULL.
+    [SKIP-ORPHAN] Sub-Category 'General' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Gravity water supply system' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Design of sewer' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Excreta disposal in unsewered area' skipped because Category Parent is missing.
+  [CRITICAL] Failed to get ID for Category 'Irrigation Engineering'. setting categoryId=NULL.
+    [SKIP-ORPHAN] Sub-Category 'General' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Water requirement' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Flow irrigation canals' skipped because Category Parent is missing.
+  [CRITICAL] Failed to get ID for Category 'Highway Engineering'. setting categoryId=NULL.
+    [SKIP-ORPHAN] Sub-Category 'General' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Geometric design' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Drainage System' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Road Pavement' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Road Machineries' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Road Construction Technology' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Bridge' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Road Maintenance and Repair' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Tracks and Trails' skipped because Category Parent is missing.
+  [CRITICAL] Failed to get ID for Category 'Estimating and Costing'. setting categoryId=NULL.
+    [SKIP-ORPHAN] Sub-Category 'General' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Rate analysis' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Specifications' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Valuation' skipped because Category Parent is missing.
+  [CRITICAL] Failed to get ID for Category 'Construction Management'. setting categoryId=NULL.
+    [SKIP-ORPHAN] Sub-Category 'Organization' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Site Management' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Contract Procedure' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Accounts' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Planning and Control' skipped because Category Parent is missing.
+  [CRITICAL] Failed to get ID for Category 'Airport Engineering'. setting categoryId=NULL.
+    [SKIP-ORPHAN] Sub-Category 'General' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Design' skipped because Category Parent is missing.
+    [SKIP-ORPHAN] Sub-Category 'Airport maintenance' skipped because Category Parent is missing.
+Split Import Completed.

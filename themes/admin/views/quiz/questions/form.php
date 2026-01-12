@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PREMIUM CREATE QUESTION UI - GAMENTA STYLE
  * Compact, Tabbed, and Modern
@@ -10,26 +11,43 @@
 <!-- FontAwesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <!-- Animate.css -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 <!-- TinyMCE Rich Text Editor -->
 <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
 <style>
     /* Custom Scrollbar for sleek look */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
     /* Tab Active State */
     .tab-btn.active {
-        color: #4F46E5; /* Indigo-600 */
-        background-color: #EEF2FF; /* Indigo-50 */
+        color: #4F46E5;
+        /* Indigo-600 */
+        background-color: #EEF2FF;
+        /* Indigo-50 */
         border-bottom-color: #4F46E5;
     }
-    
+
     /* Smooth Transitions */
-    .transition-all-300 { transition: all 0.3s ease; }
+    .transition-all-300 {
+        transition: all 0.3s ease;
+    }
 </style>
 
 <div class="admin-wrapper-container bg-slate-50 min-h-screen font-sans">
@@ -57,10 +75,11 @@
         </div>
 
         <form id="createQuestionForm" action="<?php echo app_base_url('admin/quiz/questions/store'); ?>" method="POST" class="flex flex-col lg:flex-row gap-8">
-            
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+
             <!-- LEFT COLUMN: Main Editor (65%) -->
             <div class="w-full lg:w-[65%] space-y-6">
-                
+
                 <!-- 1. Question Type Tabs & Content -->
                 <div id="card_main" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all duration-300">
                     <!-- Tabs Header with Pin -->
@@ -108,10 +127,10 @@
                                 </button>
                             </div>
                         </div>
-                        
+
                         <div class="relative group">
                             <textarea name="question_text" id="q_editor" class="w-full min-h-[140px] p-5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition resize-y text-slate-700 text-base leading-relaxed placeholder:text-slate-400" placeholder="Type your question here..." required><?php echo $question ? htmlspecialchars($question['content']['text']) : ''; ?></textarea>
-                            
+
                             <!-- Simple Toolbar -->
                             <div class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-slate-200 rounded-lg shadow-sm flex overflow-hidden">
                                 <button type="button" class="p-1.5 hover:bg-slate-50 text-slate-500 text-xs w-8" title="Bold"><i class="fas fa-bold"></i></button>
@@ -144,19 +163,19 @@
                             <h3 class="text-lg font-bold text-slate-800">Answer Options</h3>
                         </div>
                         <div class="flex items-center gap-2">
-                             <div id="pin_wrapper_card_opts">
+                            <div id="pin_wrapper_card_opts">
                                 <button type="button" id="pin_btn_card_opts" onclick="togglePin('card_opts')" class="text-slate-300 hover:text-slate-500 transition p-2 mr-2" title="Pin Section">
                                     <i class="fas fa-thumbtack"></i>
                                 </button>
-                             </div>
-                             <div id="options_toolbar" class="flex items-center gap-2">
+                            </div>
+                            <div id="options_toolbar" class="flex items-center gap-2">
                                 <button type="button" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg transition" onclick="addOption()">
                                     <i class="fas fa-plus-circle mr-2"></i> Add Option
                                 </button>
-                             </div>
+                            </div>
                         </div>
                     </div>
-                    
+
                     <div id="options_container" class="space-y-4">
                         <!-- Options injected via JS -->
                     </div>
@@ -166,7 +185,7 @@
 
             <!-- RIGHT COLUMN: Settings Sidebar (35%) -->
             <div class="w-full lg:w-[35%] space-y-6">
-                
+
                 <!-- Org Card -->
                 <div id="card_org" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden transition-all duration-300">
                     <div class="absolute top-0 right-0 p-3 z-10">
@@ -176,15 +195,15 @@
                     </div>
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Syllabus Associations</h4>
-                    
+
                     <div id="syllabus-associations-container" class="space-y-4">
                         <!-- Repeater rows will be added here -->
                     </div>
-                    
+
                     <button type="button" onclick="addSyllabusMapping()" class="w-full mt-4 px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-dashed border-indigo-200 text-indigo-600 rounded-xl text-sm font-bold hover:from-indigo-100 hover:to-purple-100 hover:border-indigo-300 transition flex items-center justify-center gap-2">
                         <i class="fas fa-plus-circle"></i> Add Syllabus Mapping
                     </button>
-                    
+
                     <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                         <p class="text-xs text-blue-700 flex items-start gap-2">
                             <i class="fas fa-info-circle mt-0.5"></i>
@@ -192,7 +211,7 @@
                         </p>
                     </div>
                 </div>
-            
+
                 <!-- Target Position Level Card -->
                 <div id="card_target" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden transition-all duration-300">
                     <div class="absolute top-0 right-0 p-3 z-10">
@@ -208,7 +227,7 @@
                     <!-- Search Input -->
                     <div class="relative mb-4">
                         <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
-                        <input type="text" id="target_pos_search" placeholder="Search position levels..." 
+                        <input type="text" id="target_pos_search" placeholder="Search position levels..."
                             class="w-full pl-9 pr-3 py-2 text-[11px] bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all duration-200">
                     </div>
 
@@ -240,7 +259,7 @@
                         </button>
                     </div>
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Settings</h4>
-                    
+
                     <!-- Question Status -->
                     <div class="mb-6">
                         <label class="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
@@ -267,7 +286,7 @@
                             </label>
                         </div>
                     </div>
-                    
+
                     <!-- Difficulty Slider -->
                     <div class="mb-6">
                         <div class="flex justify-between mb-3">
@@ -306,7 +325,7 @@
                                 <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
                             </div>
                         </label>
-                        
+
                         <label class="flex items-center justify-between p-3 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer transition group">
                             <span class="text-sm font-semibold text-slate-700 group-hover:text-indigo-600 transition">Shuffle Options</span>
                             <div class="relative inline-flex items-center cursor-pointer">
@@ -314,7 +333,7 @@
                                 <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
                             </div>
                         </label>
-                        
+
                         <!-- Publish to Blog Toggle -->
                         <label class="flex items-center justify-between p-3 border border-amber-100 rounded-xl hover:bg-amber-50 cursor-pointer transition group bg-gradient-to-r from-amber-50/50 to-orange-50/50">
                             <div>
@@ -328,7 +347,7 @@
                                 <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600"></div>
                             </div>
                         </label>
-                        
+
                         <!-- URL Preview (shown when toggle is ON) -->
                         <div id="blog_url_preview_box" class="hidden p-3 bg-blue-50 border border-blue-200 rounded-xl animate__animated animate__fadeIn">
                             <div class="text-xs font-bold text-blue-800 mb-1 flex items-center gap-2">
@@ -354,27 +373,46 @@
     /* Select2 Customization to match Tailwind */
     .select2-container .select2-selection--single {
         height: 42px !important;
-        background-color: #f8fafc !important; /* bg-slate-50 */
-        border-color: #e2e8f0 !important; /* border-slate-200 */
-        border-radius: 0.5rem !important; /* rounded-lg */
+        background-color: #f8fafc !important;
+        /* bg-slate-50 */
+        border-color: #e2e8f0 !important;
+        /* border-slate-200 */
+        border-radius: 0.5rem !important;
+        /* rounded-lg */
         padding-top: 6px;
     }
+
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 40px !important;
     }
+
     .select2-dropdown {
         border-color: #e2e8f0 !important;
         border-radius: 0.5rem !important;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
     }
+
     .select2-search__field {
-        border-radius: 0.375rem !important; /* rounded-md */
+        border-radius: 0.375rem !important;
+        /* rounded-md */
     }
-    
-    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
 </style>
 
 <script>
@@ -391,14 +429,14 @@
         renderOptionRow: (idx, type) => {
             const letter = String.fromCharCode(65 + idx); // A, B, C...
             let inputControl = '';
-            
+
             // Logic for Correct Answer Selection
             if (type === 'MCQ') {
                 inputControl = `<input type="radio" name="correct_answer_dummy" class="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer" 
                                 onclick="setSingleCorrect(${idx})" required>`;
                 inputControl += `<input type="hidden" name="options[${idx}][is_correct]" class="is_correct_val" value="0">`;
             } else if (type === 'TF') {
-               // Handled separately
+                // Handled separately
             } else if (type === 'MULTI') {
                 inputControl = `<input type="checkbox" name="options[${idx}][is_correct]" value="1" class="w-5 h-5 text-amber-600 rounded border-gray-300 focus:ring-amber-500 cursor-pointer">`;
             } else if (type === 'ORDER') {
@@ -446,19 +484,19 @@
 
         // Tab Styling
         document.querySelectorAll('.tab-btn').forEach(b => {
-             b.classList.remove('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-600');
-             b.classList.add('text-slate-500', 'border-transparent');
-             
-             // If manual button passed
-             if(btn && b === btn) {
-                 b.classList.remove('text-slate-500', 'border-transparent');
-                 b.classList.add('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-600');
-             } 
-             // If restored from storage (no btn passed), match loosely
-             else if(!btn && b.getAttribute('onclick').includes(`'${newType}'`)) {
-                 b.classList.remove('text-slate-500', 'border-transparent');
-                 b.classList.add('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-600');
-             }
+            b.classList.remove('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-600');
+            b.classList.add('text-slate-500', 'border-transparent');
+
+            // If manual button passed
+            if (btn && b === btn) {
+                b.classList.remove('text-slate-500', 'border-transparent');
+                b.classList.add('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-600');
+            }
+            // If restored from storage (no btn passed), match loosely
+            else if (!btn && b.getAttribute('onclick').includes(`'${newType}'`)) {
+                b.classList.remove('text-slate-500', 'border-transparent');
+                b.classList.add('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-600');
+            }
         });
 
         const container = document.getElementById('options_container');
@@ -488,7 +526,7 @@
                     </label>
                 </div>
             `;
-            if(optsToolbar) optsToolbar.style.display = 'none'; 
+            if (optsToolbar) optsToolbar.style.display = 'none';
         } else if (newType === 'THEORY') {
             // Theory Question Layout
             container.innerHTML = `
@@ -551,8 +589,8 @@
                     </div>
                 </div>
             `;
-            if(optsToolbar) optsToolbar.style.display = 'none';
-            
+            if (optsToolbar) optsToolbar.style.display = 'none';
+
             // Initialize TinyMCE for model answer
             setTimeout(() => {
                 if (typeof tinymce !== 'undefined') {
@@ -570,23 +608,26 @@
             // Standard Options List
             state.optionCount = 4;
             renderOptionsList();
-            if(optsToolbar) optsToolbar.style.display = 'flex';
+            if (optsToolbar) optsToolbar.style.display = 'flex';
         }
 
         // Ensure Pin Button remains visible
         const pinWrapper = document.getElementById('pin_wrapper_card_opts');
-        if(pinWrapper) pinWrapper.style.display = 'block';
+        if (pinWrapper) pinWrapper.style.display = 'block';
 
         // Setup Drag for Order
         if (newType === 'ORDER') {
-            new Sortable(container, { handle: '.handle', animation: 150 });
+            new Sortable(container, {
+                handle: '.handle',
+                animation: 150
+            });
         }
     }
 
     function togglePin(id) {
         const el = document.getElementById(id);
         const btn = document.getElementById('pin_btn_' + id);
-        if(!el || !btn) return;
+        if (!el || !btn) return;
 
         let pins = JSON.parse(localStorage.getItem('q_form_pinned_ids') || '[]');
         const isPinned = pins.includes(id);
@@ -602,7 +643,7 @@
             el.classList.add('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20', 'w-full');
             btn.classList.add('text-indigo-600', '-rotate-45');
             btn.classList.remove('text-slate-300');
-            if(!pins.includes(id)) pins.push(id);
+            if (!pins.includes(id)) pins.push(id);
         }
         localStorage.setItem('q_form_pinned_ids', JSON.stringify(pins));
     }
@@ -639,11 +680,48 @@
         if (state.optionCount <= 2) return;
         btn.closest('.option-row').remove();
         state.optionCount--;
-        renderOptionsList(); 
+        reindexOptions();
+    }
+
+    function reindexOptions() {
+        const rows = document.querySelectorAll('.option-row');
+        rows.forEach((row, index) => {
+            // Update Label (A, B, C...)
+            const letter = String.fromCharCode(65 + index);
+            const label = row.querySelector('.text-slate-400.font-bold.text-sm');
+            if (label) label.innerText = letter + '.';
+
+            // Update Text Input Name
+            const textInput = row.querySelector('input[type="text"]');
+            if (textInput) textInput.name = `options[${index}][text]`;
+
+            // Update Hidden Correct Value
+            const hiddenCorrect = row.querySelector('input[type="hidden"].is_correct_val');
+            if (hiddenCorrect) hiddenCorrect.name = `options[${index}][is_correct]`;
+
+            // Update Radio Button (MCQ) - Reset onclick index
+            const radio = row.querySelector('input[type="radio"][onclick^="setSingleCorrect"]');
+            if (radio) {
+                radio.setAttribute('onclick', `setSingleCorrect(${index})`);
+            }
+
+            // Update Checkbox (Multi)
+            const checkbox = row.querySelector('input[type="checkbox"][name^="options"]');
+            if (checkbox && checkbox.name.includes('[is_correct]')) {
+                checkbox.name = `options[${index}][is_correct]`;
+            }
+        });
+        state.optionCount = rows.length;
     }
 
     function updateDiffLabel(val) {
-        const map = {1: ['Easy', 'bg-green-100 text-green-700'], 2: ['Easy-Med', 'bg-lime-100 text-lime-700'], 3: ['Medium', 'bg-yellow-100 text-yellow-700'], 4: ['Hard', 'bg-orange-100 text-orange-700'], 5: ['Expert', 'bg-red-100 text-red-700']};
+        const map = {
+            1: ['Easy', 'bg-green-100 text-green-700'],
+            2: ['Easy-Med', 'bg-lime-100 text-lime-700'],
+            3: ['Medium', 'bg-yellow-100 text-yellow-700'],
+            4: ['Hard', 'bg-orange-100 text-orange-700'],
+            5: ['Expert', 'bg-red-100 text-red-700']
+        };
         const el = document.getElementById('diff_label');
         el.innerText = map[val][0];
         el.className = `text-xs font-bold px-2.5 py-1 rounded-md ${map[val][1]}`;
@@ -652,7 +730,7 @@
     function updateTheoryMarks(type) {
         const marksInput = document.querySelector('input[name="default_marks"]');
         const negMarksInput = document.querySelector('input[name="default_negative_marks"]');
-        
+
         if (type === 'short') {
             if (marksInput) marksInput.value = 4;
             if (negMarksInput) negMarksInput.value = 0;
@@ -679,7 +757,7 @@
     function toggleHintPin() {
         const btn = document.getElementById('pin_btn_hint');
         const hintEl = document.getElementById('hint_field');
-        
+
         if (state.hintPinned) {
             // Unpin
             state.hintPinned = false;
@@ -712,7 +790,10 @@
             neg: document.querySelector('input[name="default_negative_marks"]')?.value,
             active: document.getElementById('active_status_toggle')?.checked,
             shuffle: document.getElementById('shuffle_options_toggle')?.checked,
-            targets: Array.from(document.querySelectorAll('.target-level-checkbox')).map(cb => ({ id: cb.value, checked: cb.checked }))
+            targets: Array.from(document.querySelectorAll('.target-level-checkbox')).map(cb => ({
+                id: cb.value,
+                checked: cb.checked
+            }))
         };
         localStorage.setItem('q_form_data_v3', JSON.stringify(data));
     }
@@ -725,38 +806,43 @@
             if (data.stream) document.getElementById('stream_select').value = data.stream;
             if (data.level) document.getElementById('level_select').value = data.level;
             if (data.main_cat) {
-                 document.getElementById('main_cat').value = data.main_cat;
-                 if(typeof filterSubTopics === 'function') filterSubTopics();
-                 if (data.sub_cat) {
-                    setTimeout(() => { 
-                         const sc = document.getElementById('sub_cat');
-                         if(sc) sc.value = data.sub_cat; 
+                document.getElementById('main_cat').value = data.main_cat;
+                if (typeof filterSubTopics === 'function') filterSubTopics();
+                if (data.sub_cat) {
+                    setTimeout(() => {
+                        const sc = document.getElementById('sub_cat');
+                        if (sc) sc.value = data.sub_cat;
                     }, 200);
-                 }
+                }
             }
             if (data.diff) {
                 const el = document.querySelector('input[name="difficulty_level"]');
-                if (el) { el.value = data.diff; if(typeof updateDiffLabel === 'function') updateDiffLabel(data.diff); }
+                if (el) {
+                    el.value = data.diff;
+                    if (typeof updateDiffLabel === 'function') updateDiffLabel(data.diff);
+                }
             }
             const marksEl = document.querySelector('input[name="default_marks"]');
             if (data.marks && marksEl) marksEl.value = data.marks;
-            
+
             const negEl = document.querySelector('input[name="default_negative_marks"]');
             if (data.neg && negEl) negEl.value = data.neg;
-            
+
             const activeEl = document.getElementById('active_status_toggle');
             if (data.active !== undefined && activeEl) activeEl.checked = data.active;
-            
+
             const shuffleEl = document.getElementById('shuffle_options_toggle');
             if (data.shuffle !== undefined && shuffleEl) shuffleEl.checked = data.shuffle;
-            
+
             if (data.targets) {
                 data.targets.forEach(t => {
                     const cb = document.querySelector('.target-level-checkbox[value="' + t.id + '"]');
                     if (cb) cb.checked = t.checked;
                 });
             }
-        } catch (e) { console.error("Restore failed", e); }
+        } catch (e) {
+            console.error("Restore failed", e);
+        }
     }
 
     function togglePin(id) {
@@ -778,7 +864,7 @@
             el.classList.add('sticky', 'top-4', 'z-40', 'ring-2', 'ring-indigo-500/20', 'w-full');
             btn.classList.add('text-indigo-600', '-rotate-45');
             btn.classList.remove('text-slate-300');
-            if(!pins.includes(id)) pins.push(id);
+            if (!pins.includes(id)) pins.push(id);
         }
         localStorage.setItem('q_form_pinned_ids', JSON.stringify(pins));
     }
@@ -790,11 +876,11 @@
         const container = document.getElementById('syllabus-associations-container');
         if (!container) return;
         const idx = mappingIndex++;
-        
+
         const row = document.createElement('div');
         row.className = 'mapping-row p-4 bg-slate-50 border border-slate-200 rounded-xl animate__animated animate__fadeIn mb-4';
         row.dataset.index = idx;
-        
+
         row.innerHTML = `
             <div class="flex justify-between items-center mb-3">
                 <div class="flex items-center gap-2">
@@ -871,7 +957,7 @@
                 </div>
             </div>
         `;
-        
+
         container.appendChild(row);
     }
 
@@ -886,20 +972,20 @@
     function updateMappingCascade(idx, changedLevel) {
         const row = document.querySelector(`.mapping-row[data-index="${idx}"]`);
         if (!row) return;
-        
+
         const courseSelect = row.querySelector('.mapping-course');
         const levelSelect = row.querySelector('.mapping-level');
         const categorySelect = row.querySelector('.mapping-category');
         const unitSelect = row.querySelector('.mapping-unit');
         const topicSelect = row.querySelector('.mapping-topic');
-        
+
         let parentId = null;
         let targetSelect = null;
-        
+
         if (changedLevel === 'course') {
             parentId = courseSelect.value;
             targetSelect = levelSelect;
-            
+
             // Reset children
             categorySelect.innerHTML = '<option value="">Select Category</option>';
             unitSelect.innerHTML = '<option value="">Select Sub Category</option>';
@@ -910,7 +996,7 @@
         } else if (changedLevel === 'level') {
             parentId = levelSelect.value;
             targetSelect = categorySelect;
-            
+
             // Reset children
             categorySelect.innerHTML = '<option value="">Select Category</option>';
             unitSelect.innerHTML = '<option value="">Select Sub Category</option>';
@@ -920,7 +1006,7 @@
         } else if (changedLevel === 'category') {
             parentId = categorySelect.value;
             targetSelect = unitSelect;
-            
+
             // Reset children
             unitSelect.innerHTML = '<option value="">Select Sub Category</option>';
             topicSelect.innerHTML = '<option value="">Select Topic</option>';
@@ -928,15 +1014,15 @@
         } else if (changedLevel === 'unit') {
             parentId = unitSelect.value;
             targetSelect = topicSelect;
-            
+
             // Reset children
             topicSelect.innerHTML = '<option value="">Select Topic</option>';
         }
-        
+
         if (parentId && targetSelect) {
             targetSelect.disabled = true;
             targetSelect.innerHTML = '<option value="">Loading...</option>';
-            
+
             fetch(`<?php echo app_base_url('admin/quiz/syllabus/getChildren'); ?>?parent_id=${parentId}`)
                 .then(res => res.json())
                 .then(data => {
@@ -962,15 +1048,15 @@
     document.addEventListener('DOMContentLoaded', () => {
         const questionData = <?php echo json_encode($question); ?>;
         const savedType = questionData ? questionData.type : (localStorage.getItem('q_form_type') || 'MCQ');
-        
-        if (typeof switchType === 'function') switchType(savedType, null); 
-        
+
+        if (typeof switchType === 'function') switchType(savedType, null);
+
         // Populate options if editing
         if (questionData && questionData.options) {
             if (savedType !== 'TF') {
                 state.optionCount = questionData.options.length;
                 renderOptionsList();
-                
+
                 // Set values
                 const container = document.getElementById('options_container');
                 const optRows = container.querySelectorAll('.option-row');
@@ -978,7 +1064,7 @@
                     if (optRows[idx]) {
                         const input = optRows[idx].querySelector('input[type=\"text\"]');
                         input.value = opt.text;
-                        
+
                         // Set correct answer
                         if (savedType === 'MCQ') {
                             const radio = optRows[idx].querySelector('input[type=\"radio\"]');
@@ -1032,11 +1118,11 @@
 
         const savedHintPin = localStorage.getItem('q_hint_pinned');
         if (savedHintPin === '1' && typeof toggleHintPin === 'function') toggleHintPin();
-        
+
         // Target Position Visibility & Search Logic
         const targetSearch = document.getElementById('target_pos_search');
         const posList = document.getElementById('pos_level_list');
-        
+
         function filterTargetPositions() {
             const query = targetSearch.value.toLowerCase();
             const items = posList.querySelectorAll('.pos-level-label');

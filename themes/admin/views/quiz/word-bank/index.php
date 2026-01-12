@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PREMIUM TERMINOLOGY MANAGER (WORD BANK)
  * Professional, high-density layout with integrated terminology entry.
@@ -19,7 +20,7 @@ $uniqueLangs = array_unique(array_column($words, 'language'));
                 </div>
                 <div class="header-subtitle"><?php echo count($words); ?> Terms • <?php echo count($uniqueLangs); ?> Languages • Technical Concept Repository</div>
             </div>
-            
+
             <div class="header-actions" style="display:flex; gap:10px;">
                 <div class="stat-pill">
                     <span class="label">TERMS</span>
@@ -36,13 +37,13 @@ $uniqueLangs = array_unique(array_column($words, 'language'));
         <div class="creation-toolbar">
             <h5 class="toolbar-title">Add Engineering Term</h5>
             <form id="wordForm" class="creation-form">
-                
+
                 <!-- Term Input -->
                 <div class="input-group-premium" style="flex: 2; min-width: 150px;">
                     <i class="fas fa-terminal icon"></i>
                     <input type="text" name="term" class="form-input-premium" placeholder="Technical Term" required>
                 </div>
-                
+
                 <!-- Definition Input -->
                 <div class="input-group-premium" style="flex: 4; min-width: 250px;">
                     <i class="fas fa-align-left icon"></i>
@@ -50,11 +51,13 @@ $uniqueLangs = array_unique(array_column($words, 'language'));
                 </div>
 
                 <!-- Difficulty Select -->
-                <div class="input-group-premium" style="flex: 1; min-width: 100px;">
+                <div class="input-group-premium" style="flex: 1.5; min-width: 130px;">
                     <select name="difficulty_level" class="form-input-premium px-3" style="padding-left: 10px;">
-                        <option value="1">Easy</option>
-                        <option value="2">Medium</option>
-                        <option value="3">Hard</option>
+                        <option value="1">🟢 Easy</option>
+                        <option value="2">🟢 Easy-Mid</option>
+                        <option value="3" selected>🟡 Medium</option>
+                        <option value="4">🟠 Hard</option>
+                        <option value="5">🔴 Expert</option>
                     </select>
                 </div>
 
@@ -101,15 +104,18 @@ $uniqueLangs = array_unique(array_column($words, 'language'));
                     </thead>
                     <tbody id="wordBankBody">
                         <?php if (empty($words)): ?>
-                            <tr><td colspan="6" class="empty-cell">
-                                <div class="empty-state-compact">
-                                    <i class="fas fa-ghost"></i>
-                                    <h3>Empty Vault</h3>
-                                    <p>No technical terms recorded yet. Start building your bank above.</p>
-                                </div>
-                            </td></tr>
+                            <tr>
+                                <td colspan="6" class="empty-cell">
+                                    <div class="empty-state-compact">
+                                        <i class="fas fa-ghost"></i>
+                                        <h3>Empty Vault</h3>
+                                        <p>No technical terms recorded yet. Start building your bank above.</p>
+                                    </div>
+                                </td>
+                            </tr>
                         <?php else: ?>
-                            <?php $i = 1; foreach ($words as $word): ?>
+                            <?php $i = 1;
+                            foreach ($words as $word): ?>
                                 <tr class="word-item group">
                                     <td class="text-center align-middle">
                                         <span class="text-xs font-bold text-slate-400"><?php echo $i++; ?></span>
@@ -131,12 +137,16 @@ $uniqueLangs = array_unique(array_column($words, 'language'));
                                         </div>
                                     </td>
                                     <td class="text-center align-middle">
-                                        <?php if($word['difficulty_level'] == 1): ?>
+                                        <?php if ($word['difficulty_level'] == 1): ?>
                                             <span class="diff-badge diff-easy">EASY</span>
-                                        <?php elseif($word['difficulty_level'] == 2): ?>
+                                        <?php elseif ($word['difficulty_level'] == 2): ?>
+                                            <span class="diff-badge diff-easy-mid">EASY-MID</span>
+                                        <?php elseif ($word['difficulty_level'] == 3): ?>
                                             <span class="diff-badge diff-medium">MEDIUM</span>
-                                        <?php else: ?>
+                                        <?php elseif ($word['difficulty_level'] == 4): ?>
                                             <span class="diff-badge diff-hard">HARD</span>
+                                        <?php else: ?>
+                                            <span class="diff-badge diff-expert">EXPERT</span>
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-center align-middle">
@@ -160,186 +170,432 @@ $uniqueLangs = array_unique(array_column($words, 'language'));
 </div>
 
 <script>
-const baseUrl = '<?php echo app_base_url(); ?>';
+    const baseUrl = '<?php echo app_base_url(); ?>';
 
-document.getElementById('wordForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    
-    Swal.fire({
-        title: 'Saving Term...',
-        didOpen: () => Swal.showLoading(),
-        allowOutsideClick: false
+    document.getElementById('wordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+
+        Swal.fire({
+            title: 'Saving Term...',
+            didOpen: () => Swal.showLoading(),
+            allowOutsideClick: false
+        });
+
+        try {
+            const resp = await fetch(`${baseUrl}/admin/quiz/word-bank/store`, {
+                method: 'POST',
+                body: fd
+            });
+            const data = await resp.json();
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Vault Updated',
+                    timer: 1000,
+                    showConfirmButton: false
+                }).then(() => location.reload());
+            } else {
+                Swal.fire('Error', data.error, 'error');
+            }
+        } catch (e) {
+            Swal.fire('Error', 'Server Communication Failure', 'error');
+        }
     });
 
-    try {
-        const resp = await fetch(`${baseUrl}/admin/quiz/word-bank/store`, { method: 'POST', body: fd });
-        const data = await resp.json();
-        if(data.success) {
-            Swal.fire({ icon: 'success', title: 'Vault Updated', timer: 1000, showConfirmButton: false }).then(() => location.reload());
-        } else {
-            Swal.fire('Error', data.error, 'error');
-        }
-    } catch(e) { Swal.fire('Error', 'Server Communication Failure', 'error'); }
-});
-
-function deleteWord(id) {
-    Swal.fire({
-        title: 'Purge Term?',
-        text: "This mapping will be permanently removed from the builder.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#cbd5e1',
-        confirmButtonText: 'Purge'
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            try {
-                const res = await fetch(`${baseUrl}/admin/quiz/word-bank/delete/${id}`, {method:'POST'});
-                const d = await res.json();
-                if(d.success) {
-                    Swal.fire({ icon: 'success', title: 'Purged', timer: 1000, showConfirmButton: false }).then(() => location.reload());
-                } else {
-                    Swal.fire('Error', d.error, 'error');
+    function deleteWord(id) {
+        Swal.fire({
+            title: 'Purge Term?',
+            text: "This mapping will be permanently removed from the builder.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#cbd5e1',
+            confirmButtonText: 'Purge'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch(`${baseUrl}/admin/quiz/word-bank/delete/${id}`, {
+                        method: 'POST'
+                    });
+                    const d = await res.json();
+                    if (d.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Purged',
+                            timer: 1000,
+                            showConfirmButton: false
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire('Error', d.error, 'error');
+                    }
+                } catch (e) {
+                    Swal.fire('Error', 'Network Failure', 'error');
                 }
-            } catch(e) { Swal.fire('Error', 'Network Failure', 'error'); }
-        }
-    });
-}
+            }
+        });
+    }
 
-function filterWords() {
-    const query = document.getElementById('word-search').value.toLowerCase();
-    document.querySelectorAll('.word-item').forEach(el => {
-        const text = el.innerText.toLowerCase();
-        el.style.display = text.indexOf(query) > -1 ? '' : 'none';
-    });
-}
+    function filterWords() {
+        const query = document.getElementById('word-search').value.toLowerCase();
+        document.querySelectorAll('.word-item').forEach(el => {
+            const text = el.innerText.toLowerCase();
+            el.style.display = text.indexOf(query) > -1 ? '' : 'none';
+        });
+    }
 </script>
 
 <style>
-/* ========================================
+    /* ========================================
    PREMIUM CORE STYLES (Synchronized)
    ======================================== */
-:root {
-    --admin-primary: #667eea;
-    --admin-secondary: #764ba2;
-    --admin-gray-50: #f8f9fa;
-    --admin-gray-200: #e5e7eb;
-    --admin-gray-300: #d1d5db;
-    --admin-gray-400: #9ca3af;
-    --admin-gray-600: #4b5563;
-    --admin-gray-800: #1f2937;
-    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-}
+    :root {
+        --admin-primary: #667eea;
+        --admin-secondary: #764ba2;
+        --admin-gray-50: #f8f9fa;
+        --admin-gray-200: #e5e7eb;
+        --admin-gray-300: #d1d5db;
+        --admin-gray-400: #9ca3af;
+        --admin-gray-600: #4b5563;
+        --admin-gray-800: #1f2937;
+        --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
 
-.admin-wrapper-container {
-    padding: 1rem;
-    background: var(--admin-gray-50);
-    min-height: calc(100vh - 70px);
-}
+    .admin-wrapper-container {
+        padding: 1rem;
+        background: var(--admin-gray-50);
+        min-height: calc(100vh - 70px);
+    }
 
-.admin-content-wrapper {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    overflow: hidden;
-    /* padding-bottom: 2rem; REMOVED FOR CLEANER UI */
-}
+    .admin-content-wrapper {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        /* padding-bottom: 2rem; REMOVED FOR CLEANER UI */
+    }
 
-/* Header */
-.compact-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem;
-    background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-secondary) 100%);
-    color: white;
-}
-.header-left { display: flex; flex-direction: column; }
-.header-title { display: flex; align-items: center; gap: 0.75rem; }
-.header-title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; color: white; }
-.header-title i { font-size: 1.25rem; opacity: 0.9; }
-.header-subtitle { font-size: 0.85rem; opacity: 0.8; margin-top: 4px; font-weight: 500; }
+    /* Header */
+    .compact-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-secondary) 100%);
+        color: white;
+    }
 
-.stat-pill {
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    display: flex; flex-direction: column; align-items: center;
-    min-width: 80px;
-}
-.stat-pill.success { background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); }
-.stat-pill .label { font-size: 0.65rem; font-weight: 700; opacity: 0.9; text-transform: uppercase; }
-.stat-pill .value { font-size: 1.1rem; font-weight: 800; line-height: 1.1; }
+    .header-left {
+        display: flex;
+        flex-direction: column;
+    }
 
-/* Creation Toolbar */
-.creation-toolbar {
-    padding: 1rem 2rem;
-    background: #f8fafc;
-    border-bottom: 1px solid var(--admin-gray-200);
-}
-.toolbar-title { font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 0.75rem; }
-.creation-form { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .header-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
 
-.input-group-premium { position: relative; }
-.input-group-premium .icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.85rem; pointer-events: none; }
-.form-input-premium {
-    width: 100%; height: 40px; padding: 0 0.75rem 0 2.25rem; font-size: 0.875rem; 
-    border: 1px solid #cbd5e1; border-radius: 8px; outline: none; transition: 0.2s;
-    background: white; color: #334155;
-}
-.form-input-premium:focus { border-color: var(--admin-primary); box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+    .header-title h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
+    }
 
-.btn-create-premium {
-    height: 40px; padding: 0 1.5rem; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
-    color: white; font-weight: 600; border: none; border-radius: 8px; cursor: pointer;
-    display: flex; align-items: center; gap: 0.5rem; transition: 0.2s; white-space: nowrap;
-}
-.btn-create-premium:hover { transform: translateY(-1px); box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3); }
+    .header-title i {
+        font-size: 1.25rem;
+        opacity: 0.9;
+    }
 
-/* Table Compact */
-.compact-toolbar {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0.75rem 2rem; background: #eff6ff; border-bottom: 1px solid #bfdbfe;
-}
-.search-compact { position: relative; width: 300px; }
-.search-compact i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 0.85rem; }
-.search-compact input {
-    width: 100%; height: 36px; padding: 0 0.75rem 0 2.25rem; font-size: 0.85rem;
-    border: 1px solid #bfdbfe; border-radius: 6px; outline: none;
-}
-.drag-hint { font-size: 0.75rem; color: #64748b; font-weight: 600; }
+    .header-subtitle {
+        font-size: 0.85rem;
+        opacity: 0.8;
+        margin-top: 4px;
+        font-weight: 500;
+    }
 
-.table-compact { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-.table-compact th {
-    padding: 0.75rem 1.5rem; text-align: left; font-weight: 600; color: #94a3b8; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0;
-}
-.table-compact td { padding: 0.8rem 1.5rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .stat-pill {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 80px;
+    }
 
-.item-info { display: flex; align-items: center; gap: 0.75rem; }
-.item-icon {
-    width: 32px; height: 32px; border-radius: 6px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: var(--admin-primary);
-}
-.item-title { font-weight: 700; color: #1e293b; line-height: 1.2; }
-.item-slug { font-size: 0.7rem; color: #94a3b8; font-family: monospace; }
+    .stat-pill.success {
+        background: rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
 
-.diff-badge { font-size: 0.6rem; font-weight: 800; padding: 2px 8px; border-radius: 10px; }
-.diff-easy { background: #d1fae5; color: #065f46; }
-.diff-medium { background: #fef3c7; color: #92400e; }
-.diff-hard { background: #fee2e2; color: #991b1b; }
+    .stat-pill .label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        opacity: 0.9;
+        text-transform: uppercase;
+    }
 
-.lang-tag { font-size: 0.65rem; font-weight: 800; color: #334155; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; }
+    .stat-pill .value {
+        font-size: 1.1rem;
+        font-weight: 800;
+        line-height: 1.1;
+    }
 
-.action-btn-icon {
-    width: 32px; height: 32px; border: 1px solid #e2e8f0; border-radius: 6px; background: white; color: #94a3b8; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
-}
-.delete-btn:hover { background: #fee2e2; color: #ef4444; border-color: #fecaca; transform: translateY(-1px); }
+    /* Creation Toolbar */
+    .creation-toolbar {
+        padding: 1rem 2rem;
+        background: #f8fafc;
+        border-bottom: 1px solid var(--admin-gray-200);
+    }
 
-.empty-state-compact { padding: 3rem; text-align: center; color: #94a3b8; }
-.empty-state-compact i { font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.5; }
+    .toolbar-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+    }
 
-@media (max-width: 1024px) {
-    .creation-form { flex-direction: column; align-items: stretch; }
-}
+    .creation-form {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .input-group-premium {
+        position: relative;
+    }
+
+    .input-group-premium .icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.85rem;
+        pointer-events: none;
+    }
+
+    .form-input-premium {
+        width: 100%;
+        height: 40px;
+        padding: 0 0.75rem 0 2.25rem;
+        font-size: 0.875rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        outline: none;
+        transition: 0.2s;
+        background: white;
+        color: #334155;
+    }
+
+    .form-input-premium:focus {
+        border-color: var(--admin-primary);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-create-premium {
+        height: 40px;
+        padding: 0 1.5rem;
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        color: white;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-create-premium:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3);
+    }
+
+    /* Table Compact */
+    .compact-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 2rem;
+        background: #eff6ff;
+        border-bottom: 1px solid #bfdbfe;
+    }
+
+    .search-compact {
+        position: relative;
+        width: 300px;
+    }
+
+    .search-compact i {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #64748b;
+        font-size: 0.85rem;
+    }
+
+    .search-compact input {
+        width: 100%;
+        height: 36px;
+        padding: 0 0.75rem 0 2.25rem;
+        font-size: 0.85rem;
+        border: 1px solid #bfdbfe;
+        border-radius: 6px;
+        outline: none;
+    }
+
+    .drag-hint {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .table-compact {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
+
+    .table-compact th {
+        padding: 0.75rem 1.5rem;
+        text-align: left;
+        font-weight: 600;
+        color: #94a3b8;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .table-compact td {
+        padding: 0.8rem 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+
+    .item-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .item-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--admin-primary);
+    }
+
+    .item-title {
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.2;
+    }
+
+    .item-slug {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        font-family: monospace;
+    }
+
+    .diff-badge {
+        font-size: 0.6rem;
+        font-weight: 800;
+        padding: 2px 8px;
+        border-radius: 10px;
+        text-transform: uppercase;
+    }
+
+    .diff-easy {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #10b981;
+    }
+
+    .diff-easy-mid {
+        background: #ecfccb;
+        color: #3f6212;
+        border: 1px solid #84cc16;
+    }
+
+    .diff-medium {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #f59e0b;
+    }
+
+    .diff-hard {
+        background: #ffedd5;
+        color: #9a3412;
+        border: 1px solid #f97316;
+    }
+
+    .diff-expert {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #ef4444;
+    }
+
+    .lang-tag {
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: #334155;
+        background: #f1f5f9;
+        padding: 2px 6px;
+        border-radius: 4px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .action-btn-icon {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        background: white;
+        color: #94a3b8;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+    }
+
+    .delete-btn:hover {
+        background: #fee2e2;
+        color: #ef4444;
+        border-color: #fecaca;
+        transform: translateY(-1px);
+    }
+
+    .empty-state-compact {
+        padding: 3rem;
+        text-align: center;
+        color: #94a3b8;
+    }
+
+    .empty-state-compact i {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.5;
+    }
+
+    @media (max-width: 1024px) {
+        .creation-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
 </style>

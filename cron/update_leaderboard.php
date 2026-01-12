@@ -8,6 +8,7 @@ ini_set('memory_limit', '64M');
 set_time_limit(30);
 
 require_once __DIR__ . '/../app/bootstrap.php';
+
 use App\Core\Database;
 
 $db = Database::getInstance();
@@ -31,7 +32,7 @@ $periods = [
 foreach ($periods as $pType => $pVal) {
     foreach ($categories as $catName => $catId) {
         echo "Processing $catName ($pType - $pVal)... ";
-        
+
         // Fetch Top 100
         $sql = "
             SELECT l.user_id, l.total_score, l.tests_taken, l.accuracy_avg, u.username, u.avatar
@@ -43,25 +44,25 @@ foreach ($periods as $pType => $pVal) {
             ORDER BY l.total_score DESC
             LIMIT 100
         ";
-        
+
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'ptype' => $pType,
             'pval' => $pVal,
             'cat' => $catId
         ]);
-        
+
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         // Upsert Cache
         $json = json_encode($results);
-        
+
         $upsert = "
             INSERT INTO leaderboard_cache (category, period_type, period_value, top_users)
             VALUES (:cat, :ptype, :pval, :json)
             ON DUPLICATE KEY UPDATE top_users = :json2, last_updated = NOW()
         ";
-        
+
         $stmtUpsert = $pdo->prepare($upsert);
         $stmtUpsert->execute([
             'cat' => $catName,
@@ -70,7 +71,7 @@ foreach ($periods as $pType => $pVal) {
             'json' => $json,
             'json2' => $json
         ]);
-        
+
         echo "Cached " . count($results) . " users.\n";
     }
 }
@@ -134,7 +135,7 @@ $sqlGenius = "
     JOIN quiz_attempts qa ON a.attempt_id = qa.id
     JOIN users u ON qa.user_id = u.id
     WHERE a.is_correct = 1 
-    AND (q.difficulty_level = 'hard' OR q.difficulty_level >= 3)
+    AND q.difficulty_level >= 4
     GROUP BY u.id
     ORDER BY total_score DESC
     LIMIT 100

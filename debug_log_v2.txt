@@ -1,0 +1,645 @@
+Starting Split Import (Debug Mode - Fix 2)...
+Clearing existing syllabus nodes...
+Table truncated.
+Created Civil Branch: 1 -> 2 -> 3
+  [SKIP] Unmatched line: **(General, Highway, Sanitary, Irrigation, Hydropower, Hydrology, and Airport Sub-groups)**
+  [SKIP] Unmatched line: **Public Service Commission (Lok Sewa Aayog)**
+  [SKIP] Unmatched line: * * *
+  [SKIP] Unmatched line: **First Paper (Paper I): General Knowledge, General Aptitude Test, and Service-Related Job Knowledge**
+SWITCHING TO UNIVERSAL CONTEXT
+  [IGNORE] **Section - A (15 Questions x 2 Marks = 30 Marks)**
+  [MATCH CAT] '1\. General Awareness (16 Marks)' -> Created 'General Awareness' (ROOT) [ID: 4]
+    [MATCH SUB] '*   1.1. Geographical condition of Nepal, natural resources, and means.' -> Created 'Geographical condition of Nepal, natural resources, and means.' [ID: 5]
+    [MATCH SUB] '*   1.2. Information regarding the historical, cultural, and social condition of Nepal.' -> Created 'Information regarding the historical, cultural, and social condition of Nepal.' [ID: 6]
+    [MATCH SUB] '*   1.3. Information regarding the economic condition of Nepal and current periodic plans.' -> Created 'Information regarding the economic condition of Nepal and current periodic plans.' [ID: 7]
+    [MATCH SUB] '*   1.4. Constitution of Nepal (Parts 1 to 5 and Schedules).' -> Created 'Constitution of Nepal (Parts 1 to 5 and Schedules).' [ID: 8]
+    [MATCH SUB] '*   1.5. General information regarding public health, diseases, food, and nutrition.' -> Created 'General information regarding public health, diseases, food, and nutrition.' [ID: 9]
+    [MATCH SUB] '*   1.6. Biodiversity, sustainable development, environment, pollution, climate change, and population management.' -> Created 'Biodiversity, sustainable development, environment, pollution, climate change, and population management.' [ID: 10]
+    [MATCH SUB] '*   1.7. Important achievements in science and technology affecting human life.' -> Created 'Important achievements in science and technology affecting human life.' [ID: 11]
+    [MATCH SUB] '*   1.8. Information regarding the United Nations and its specialized agencies.' -> Created 'Information regarding the United Nations and its specialized agencies.' [ID: 12]
+    [MATCH SUB] '*   1.9. Information regarding regional organizations (SAARC, BIMSTEC, ASEAN, and European Union).' -> Created 'Information regarding regional organizations (SAARC, BIMSTEC, ASEAN, and European Union).' [ID: 13]
+    [MATCH SUB] '*   1.10. Contemporary activities of national and international importance.' -> Created 'Contemporary activities of national and international importance.' [ID: 14]
+  [MATCH CAT] '2\. Public Management (14 Marks)' -> Created 'Public Management' (ROOT) [ID: 15]
+    [MATCH SUB] '*   2.1. Office Management' -> Created 'Office Management' [ID: 16]
+      [MATCH TOPIC] '*   2.1.1. Office: Introduction, importance, functions, and types.' -> Created 'Office: Introduction, importance, functions, and types.'
+      [MATCH TOPIC] '*   2.1.2. Functions and qualities of assistant staff.' -> Created 'Functions and qualities of assistant staff.'
+      [MATCH TOPIC] '*   2.1.3. Office Resources: Introduction and types.' -> Created 'Office Resources: Introduction and types.'
+      [MATCH TOPIC] '*   2.1.4. Importance, types, and means of communication in an office.' -> Created 'Importance, types, and means of communication in an office.'
+      [MATCH TOPIC] '*   2.1.5. Office Procedure: Correspondence, Registration & Dispatch, Circular, Order (Tok Aadesh), Note writing (Tippani), and points to consider while preparing notes.' -> Created 'Office Procedure: Correspondence, Registration & Dispatch, Circular, Order (Tok Aadesh), Note writing (Tippani), and points to consider while preparing notes.'
+      [MATCH TOPIC] '*   2.1.6. Record Management.' -> Created 'Record Management.'
+    [MATCH SUB] '*   2.2. Provisions in Civil Service Act and Regulations:' -> Created 'Provisions in Civil Service Act and Regulations:' [ID: 23]
+      [MATCH TOPIC] '*   2.2.1. Formation of Civil Service, organizational structure, methods, and processes of filling vacancies.' -> Created 'Formation of Civil Service, organizational structure, methods, and processes of filling vacancies.'
+      [MATCH TOPIC] '*   2.2.2. Appointment, transfer, promotion, leave, departmental punishment, and retirement of employees.' -> Created 'Appointment, transfer, promotion, leave, departmental punishment, and retirement of employees.'
+      [MATCH TOPIC] '*   2.2.3. Conduct and duties to be followed by employees.' -> Created 'Conduct and duties to be followed by employees.'
+  [SKIP] Unmatched line: *   **2.3.** General information regarding the government budget, accounting, and auditing system.
+  [SKIP] Unmatched line: *   **2.4.** Meaning of public service delivery, bodies delivering service, methods, and mediums.
+  [SKIP] Unmatched line: *   **2.5.** Public Charter: Importance and necessity.
+  [SKIP] Unmatched line: *   **2.6.** Concept of management and information regarding direction, control, coordination, decision-making process, motivation, and leadership in public management.
+  [SKIP] Unmatched line: *   **2.7.** Human Values, civic duties and responsibilities, and discipline.
+  [IGNORE] **Section - B (10 Questions x 2 Marks = 20 Marks)**
+  [MATCH CAT] '3\. General Aptitude Test' -> Created 'General Aptitude Test' (ROOT) [ID: 27]
+    [MATCH SUB] '*   3.1. Verbal Aptitude Test: Vocabulary, series, analogy, classification, coding-decoding, direction and distance sense test, logical reasoning, ranking order, etc.' -> Created 'Verbal Aptitude Test: Vocabulary, series, analogy, classification, coding-decoding, direction and distance sense test, logical reasoning, ranking order, etc.' [ID: 28]
+    [MATCH SUB] '*   3.2. Numerical Aptitude Test: Series, analogy, classification, coding, matrix, arithmetical reasoning/operations, percentage, fraction, ratio, average, time and work, etc.' -> Created 'Numerical Aptitude Test: Series, analogy, classification, coding, matrix, arithmetical reasoning/operations, percentage, fraction, ratio, average, time and work, etc.' [ID: 29]
+    [MATCH SUB] '*   3.3. Non-Verbal/Abstract Aptitude Test: Series, analogy, classification, Venn diagram, matrix, construction of triangles and squares, figure construction and analysis, etc.' -> Created 'Non-Verbal/Abstract Aptitude Test: Series, analogy, classification, Venn diagram, matrix, construction of triangles and squares, figure construction and analysis, etc.' [ID: 30]
+  [SKIP] Unmatched line: *   **3.4. Verification Test and Filing Aptitude Test:**
+  [SKIP] Unmatched line: *   Verification Test: Questions regarding checking data, numbers, or verbal information to find errors or detect similarities/differences.
+  [SKIP] Unmatched line: *   Filing Aptitude Test: Questions regarding solving verbal and numerical filing items or processes according to alphabetical, numerical, or chronological order.
+  [SKIP] Unmatched line: *   **3.5. Follows the Instructions and Analytical Reasoning Test:**
+  [SKIP] Unmatched line: *   Follows the Instructions: Questions regarding solving by following written instructions exactly.
+  [SKIP] Unmatched line: *   Analytical Reasoning Test: Questions regarding verbal, numerical, or non-verbal (figural) analytical reasoning.
+  [SKIP] Unmatched line: * * *
+SWITCHING TO CIVIL CONTEXT
+  [MATCH CAT] '1\. Surveying' -> Created 'Surveying' (CIVIL) [ID: 31]
+    [MATCH SUB] '*   1.1. General' -> Created 'General' [ID: 32]
+      [MATCH TOPIC] '*   1.1.1. Classification' -> Created 'Classification'
+      [MATCH TOPIC] '*   1.1.2. Principle of surveying' -> Created 'Principle of surveying'
+      [MATCH TOPIC] '*   1.1.3. Selection of suitable method' -> Created 'Selection of suitable method'
+      [MATCH TOPIC] '*   1.1.4. Scales, plans and maps' -> Created 'Scales, plans and maps'
+      [MATCH TOPIC] '*   1.1.5. Entry into survey field books and level books' -> Created 'Entry into survey field books and level books'
+    [MATCH SUB] '*   1.2. Levelling' -> Created 'Levelling' [ID: 38]
+      [MATCH TOPIC] '*   1.2.1. Methods of levelling' -> Created 'Methods of levelling'
+      [MATCH TOPIC] '*   1.2.2. Levelling instruments and accessories' -> Created 'Levelling instruments and accessories'
+      [MATCH TOPIC] '*   1.2.3. Principles of levelling' -> Created 'Principles of levelling'
+    [MATCH SUB] '*   1.3. Chain surveying' -> Created 'Chain surveying' [ID: 42]
+    [MATCH SUB] '*   1.4. Compass surveying' -> Created 'Compass surveying' [ID: 43]
+    [MATCH SUB] '*   1.5. Plane Tabling' -> Created 'Plane Tabling' [ID: 44]
+      [MATCH TOPIC] '*   1.5.1. Equipments required' -> Created 'Equipments required'
+      [MATCH TOPIC] '*   1.5.2. Methods of plane tabling' -> Created 'Methods of plane tabling'
+      [MATCH TOPIC] '*   1.5.3. Two and three point problems' -> Created 'Two and three point problems'
+    [MATCH SUB] '*   1.6. Theodolite and Traverse Surveying' -> Created 'Theodolite and Traverse Surveying' [ID: 48]
+      [MATCH TOPIC] '*   1.6.1. Basic difference between different theodolites' -> Created 'Basic difference between different theodolites'
+      [MATCH TOPIC] '*   1.6.2. Temporary adjustments of theodolites' -> Created 'Temporary adjustments of theodolites'
+      [MATCH TOPIC] '*   1.6.3. Fundamental lines and desired relations' -> Created 'Fundamental lines and desired relations'
+      [MATCH TOPIC] '*   1.6.4. Tacheometry: stadia method' -> Created 'Tacheometry: stadia method'
+      [MATCH TOPIC] '*   1.6.5. Trigonometrical levelling' -> Created 'Trigonometrical levelling'
+      [MATCH TOPIC] '*   1.6.6. Checks in closed traverse' -> Created 'Checks in closed traverse'
+    [MATCH SUB] '*   1.7. Contouring' -> Created 'Contouring' [ID: 55]
+      [MATCH TOPIC] '*   1.7.1. Characteristics of contour lines' -> Created 'Characteristics of contour lines'
+      [MATCH TOPIC] '*   1.7.2. Methods of locating contours' -> Created 'Methods of locating contours'
+      [MATCH TOPIC] '*   1.7.3. Contour plotting' -> Created 'Contour plotting'
+    [MATCH SUB] '*   1.8. Setting out' -> Created 'Setting out' [ID: 59]
+      [MATCH TOPIC] '*   1.8.1. Small buildings' -> Created 'Small buildings'
+      [MATCH TOPIC] '*   1.8.2. Simple curves' -> Created 'Simple curves'
+  [MATCH CAT] '2\. Construction Materials' -> Created 'Construction Materials' (CIVIL) [ID: 62]
+    [MATCH SUB] '*   2.1. Stone' -> Created 'Stone' [ID: 63]
+      [MATCH TOPIC] '*   2.1.1. Formation and availability of stones in Nepal' -> Created 'Formation and availability of stones in Nepal'
+      [MATCH TOPIC] '*   2.1.2. Methods of laying and construction with various stones' -> Created 'Methods of laying and construction with various stones'
+    [MATCH SUB] '*   2.2. Cement' -> Created 'Cement' [ID: 66]
+      [MATCH TOPIC] '*   2.2.1. Different cements: ingredients, properties and manufacture' -> Created 'Different cements: ingredients, properties and manufacture'
+      [MATCH TOPIC] '*   2.2.2. Storage and transport' -> Created 'Storage and transport'
+      [MATCH TOPIC] '*   2.2.3. Admixtures' -> Created 'Admixtures'
+    [MATCH SUB] '*   2.3. Clay and clay products' -> Created 'Clay and clay products' [ID: 70]
+      [MATCH TOPIC] '*   2.3.1. Brick: type, manufacture, laying, bonds' -> Created 'Brick: type, manufacture, laying, bonds'
+    [MATCH SUB] '*   2.4. Paints and Varnishes' -> Created 'Paints and Varnishes' [ID: 72]
+      [MATCH TOPIC] '*   2.4.1. Types and selection' -> Created 'Types and selection'
+      [MATCH TOPIC] '*   2.4.2. Preparation techniques' -> Created 'Preparation techniques'
+      [MATCH TOPIC] '*   2.4.3. Use' -> Created 'Use'
+    [MATCH SUB] '*   2.5. Timber' -> Created 'Timber' [ID: 76]
+    [MATCH SUB] '*   2.6. Lime' -> Created 'Lime' [ID: 77]
+    [MATCH SUB] '*   2.7. Bitumen' -> Created 'Bitumen' [ID: 78]
+      [MATCH TOPIC] '*   2.7.1. Type' -> Created 'Type'
+      [MATCH TOPIC] '*   2.7.2. Selection' -> Created 'Selection'
+      [MATCH TOPIC] '*   2.7.3. Use' -> Created 'Use'
+  [MATCH CAT] '3\. Mechanics of Materials and Structures' -> Created 'Mechanics of Materials and Structures' (CIVIL) [ID: 82]
+    [MATCH SUB] '*   3.1. Mechanics of materials' -> Created 'Mechanics of materials' [ID: 83]
+      [MATCH TOPIC] '*   3.1.1. Internal effects of loading' -> Created 'Internal effects of loading'
+      [MATCH TOPIC] '*   3.1.2. Ultimate strength and working stress of materials' -> Created 'Ultimate strength and working stress of materials'
+    [MATCH SUB] '*   3.2. Mechanics of beams' -> Created 'Mechanics of beams' [ID: 86]
+      [MATCH TOPIC] '*   3.2.1. Relation between shear force and bending moment under various types of loading' -> Created 'Relation between shear force and bending moment under various types of loading'
+      [MATCH TOPIC] '*   3.2.2. Thrust, shear and bending moment diagrams for statically determinate beams' -> Created 'Thrust, shear and bending moment diagrams for statically determinate beams'
+    [MATCH SUB] '*   3.3. Simple strut theory' -> Created 'Simple strut theory' [ID: 89]
+  [MATCH CAT] '4\. Hydraulics' -> Created 'Hydraulics' (CIVIL) [ID: 90]
+    [MATCH SUB] '*   4.1. General' -> Created 'General' [ID: 91]
+      [MATCH TOPIC] '*   4.1.1. Properties of fluid: mass, weight, specific weight, density, specific volume, specific gravity, viscosity.' -> Created 'Properties of fluid: mass, weight, specific weight, density, specific volume, specific gravity, viscosity.'
+      [MATCH TOPIC] '*   4.1.2. Pressure and Pascal's law.' -> Created 'Pressure and Pascal's law.'
+    [MATCH SUB] '*   4.2. Hydro-kinematics and Hydro-dynamics' -> Created 'Hydro-kinematics and Hydro-dynamics' [ID: 94]
+      [MATCH TOPIC] '*   4.2.1. Energy of flowing liquid: Elevation energy, kinetic energy, potential energy, internal energy.' -> Created 'Energy of flowing liquid: Elevation energy, kinetic energy, potential energy, internal energy.'
+    [MATCH SUB] '*   4.3. Measurement of discharge' -> Created 'Measurement of discharge' [ID: 96]
+      [MATCH TOPIC] '*   4.3.1. Weirs and notches' -> Created 'Weirs and notches'
+      [MATCH TOPIC] '*   4.3.2. Discharge formulas' -> Created 'Discharge formulas'
+    [MATCH SUB] '*   4.4. Flows' -> Created 'Flows' [ID: 99]
+      [MATCH TOPIC] '*   4.4.1. Characteristics of pipe flow and open channel flow' -> Created 'Characteristics of pipe flow and open channel flow'
+  [MATCH CAT] '5\. Soil Mechanics' -> Created 'Soil Mechanics' (CIVIL) [ID: 101]
+    [MATCH SUB] '*   5.1. General' -> Created 'General' [ID: 102]
+      [MATCH TOPIC] '*   5.1.1. Soil types and classification' -> Created 'Soil types and classification'
+      [MATCH TOPIC] '*   5.1.2. Three phases of system of soils' -> Created 'Three phases of system of soils'
+      [MATCH TOPIC] '*   5.1.3. Unit weight of soil mass: bulk density, saturated density, submerged density and dry density' -> Created 'Unit weight of soil mass: bulk density, saturated density, submerged density and dry density'
+      [MATCH TOPIC] '*   5.1.4. Interrelationship between specific gravity, void ratio, porosity, degree of saturation, percentage of air voids, air content and density index.' -> Created 'Interrelationship between specific gravity, void ratio, porosity, degree of saturation, percentage of air voids, air content and density index.'
+    [MATCH SUB] '*   5.2. Soil water relation' -> Created 'Soil water relation' [ID: 107]
+      [MATCH TOPIC] '*   5.2.1. Terzaghi's principle of effective stress' -> Created 'Terzaghi's principle of effective stress'
+      [MATCH TOPIC] '*   5.2.2. Darcy's law' -> Created 'Darcy's law'
+      [MATCH TOPIC] '*   5.2.3. Factors affecting permeability' -> Created 'Factors affecting permeability'
+    [MATCH SUB] '*   5.3. Compaction of soil' -> Created 'Compaction of soil' [ID: 111]
+      [MATCH TOPIC] '*   5.3.1. Factors affecting soil compaction' -> Created 'Factors affecting soil compaction'
+      [MATCH TOPIC] '*   5.3.2. Optimum moisture content' -> Created 'Optimum moisture content'
+      [MATCH TOPIC] '*   5.3.3. Relation between dry density and moisture content' -> Created 'Relation between dry density and moisture content'
+    [MATCH SUB] '*   5.4. Shear strength of soil' -> Created 'Shear strength of soil' [ID: 115]
+      [MATCH TOPIC] '*   5.4.1. Mohr-Coulomb failure theory' -> Created 'Mohr-Coulomb failure theory'
+      [MATCH TOPIC] '*   5.4.2. Cohesion and angle of internal friction' -> Created 'Cohesion and angle of internal friction'
+    [MATCH SUB] '*   5.5. Earth Pressures' -> Created 'Earth Pressures' [ID: 118]
+      [MATCH TOPIC] '*   5.5.1. Active and passive earth pressure' -> Created 'Active and passive earth pressure'
+      [MATCH TOPIC] '*   5.5.2. Lateral earth pressure theory' -> Created 'Lateral earth pressure theory'
+      [MATCH TOPIC] '*   5.5.3. Rankine's earth pressure' -> Created 'Rankine's earth pressure'
+    [MATCH SUB] '*   5.6. Foundation engineering' -> Created 'Foundation engineering' [ID: 122]
+      [MATCH TOPIC] '*   5.6.1. Terzaghi's general bearing capacity formulas and their application' -> Created 'Terzaghi's general bearing capacity formulas and their application'
+  [MATCH CAT] '6\. Structural Design' -> Created 'Structural Design' (CIVIL) [ID: 124]
+    [MATCH SUB] '*   6.1. R.C. Section in bending' -> Created 'R.C. Section in bending' [ID: 125]
+      [MATCH TOPIC] '*   6.1.1. Under reinforced, over reinforced and balanced section' -> Created 'Under reinforced, over reinforced and balanced section'
+      [MATCH TOPIC] '*   6.1.2. Analysis of single and double reinforced rectangular sections' -> Created 'Analysis of single and double reinforced rectangular sections'
+    [MATCH SUB] '*   6.2. Shear and Bond for R.C. Sections' -> Created 'Shear and Bond for R.C. Sections' [ID: 128]
+      [MATCH TOPIC] '*   6.2.1. Shear resistance of a R.C. section' -> Created 'Shear resistance of a R.C. section'
+      [MATCH TOPIC] '*   6.2.2. Types of shear reinforcement and their design' -> Created 'Types of shear reinforcement and their design'
+      [MATCH TOPIC] '*   6.2.3. Determination of anchorage length' -> Created 'Determination of anchorage length'
+    [MATCH SUB] '*   6.3. Axially Loaded R.C. Columns' -> Created 'Axially Loaded R.C. Columns' [ID: 132]
+      [MATCH TOPIC] '*   6.3.1. Short and long columns' -> Created 'Short and long columns'
+      [MATCH TOPIC] '*   6.3.2. Design of rectangular column section' -> Created 'Design of rectangular column section'
+    [MATCH SUB] '*   6.4. Design and Drafting of R.C. structures' -> Created 'Design and Drafting of R.C. structures' [ID: 135]
+      [MATCH TOPIC] '*   6.4.1. Singly and doubly reinforced rectangular beams' -> Created 'Singly and doubly reinforced rectangular beams'
+      [MATCH TOPIC] '*   6.4.2. Simple one way and two way slabs' -> Created 'Simple one way and two way slabs'
+      [MATCH TOPIC] '*   6.4.3. Axially loaded short and long columns' -> Created 'Axially loaded short and long columns'
+  [MATCH CAT] '7\. Building Construction Technology' -> Created 'Building Construction Technology' (CIVIL) [ID: 139]
+    [MATCH SUB] '*   7.1. Foundation' -> Created 'Foundation' [ID: 140]
+      [MATCH TOPIC] '*   7.1.1. Subsoil exploration' -> Created 'Subsoil exploration'
+      [MATCH TOPIC] '*   7.1.2. Types and suitability of different foundations; Shallow, deep' -> Created 'Types and suitability of different foundations; Shallow, deep'
+      [MATCH TOPIC] '*   7.1.3. Shoring and dewatering' -> Created 'Shoring and dewatering'
+      [MATCH TOPIC] '*   7.1.4. Design of simple brick or stone masonry foundations' -> Created 'Design of simple brick or stone masonry foundations'
+    [MATCH SUB] '*   7.2. Walls' -> Created 'Walls' [ID: 145]
+      [MATCH TOPIC] '*   7.2.1. Types of walls' -> Created 'Types of walls'
+      [MATCH TOPIC] '*   7.2.2. Choosing wall thickness, height to length relation' -> Created 'Choosing wall thickness, height to length relation'
+      [MATCH TOPIC] '*   7.2.3. Use of scaffolding' -> Created 'Use of scaffolding'
+    [MATCH SUB] '*   7.3. Damp proofing' -> Created 'Damp proofing' [ID: 149]
+      [MATCH TOPIC] '*   7.3.1. Source of dampness' -> Created 'Source of dampness'
+      [MATCH TOPIC] '*   7.3.2. Remedial measures to prevent dampness' -> Created 'Remedial measures to prevent dampness'
+    [MATCH SUB] '*   7.4. Concrete technology' -> Created 'Concrete technology' [ID: 152]
+      [MATCH TOPIC] '*   7.4.1. Constituents of cement concrete' -> Created 'Constituents of cement concrete'
+      [MATCH TOPIC] '*   7.4.2. Grading of aggregates' -> Created 'Grading of aggregates'
+      [MATCH TOPIC] '*   7.4.3. Concrete mixes' -> Created 'Concrete mixes'
+      [MATCH TOPIC] '*   7.4.4. Water cement ratio' -> Created 'Water cement ratio'
+      [MATCH TOPIC] '*   7.4.5. Factors affecting strength of concrete' -> Created 'Factors affecting strength of concrete'
+      [MATCH TOPIC] '*   7.4.6. Form work' -> Created 'Form work'
+      [MATCH TOPIC] '*   7.4.7. Curing' -> Created 'Curing'
+    [MATCH SUB] '*   7.5. Wood work' -> Created 'Wood work' [ID: 160]
+      [MATCH TOPIC] '*   7.5.1. Frame and shutters of door and window' -> Created 'Frame and shutters of door and window'
+      [MATCH TOPIC] '*   7.5.2. Timber construction of upper floors' -> Created 'Timber construction of upper floors'
+      [MATCH TOPIC] '*   7.5.3. Design and construction of stairs' -> Created 'Design and construction of stairs'
+    [MATCH SUB] '*   7.6. Flooring and finishing' -> Created 'Flooring and finishing' [ID: 164]
+      [MATCH TOPIC] '*   7.6.1. Floor finishes: brick, concrete, flag stone' -> Created 'Floor finishes: brick, concrete, flag stone'
+      [MATCH TOPIC] '*   7.6.2. Plastering' -> Created 'Plastering'
+  [MATCH CAT] '8\. Water Supply and Sanitation Engineering' -> Created 'Water Supply and Sanitation Engineering' (CIVIL) [ID: 167]
+    [MATCH SUB] '*   8.1. General' -> Created 'General' [ID: 168]
+      [MATCH TOPIC] '*   8.1.1. Objectives of water supply system' -> Created 'Objectives of water supply system'
+      [MATCH TOPIC] '*   8.1.2. Source of water and its selection: gravity and artisan springs, shallow and deep wells, infiltration galleries' -> Created 'Source of water and its selection: gravity and artisan springs, shallow and deep wells, infiltration galleries'
+    [MATCH SUB] '*   8.2. Gravity water supply system' -> Created 'Gravity water supply system' [ID: 171]
+      [MATCH TOPIC] '*   8.2.1. Design period' -> Created 'Design period'
+      [MATCH TOPIC] '*   8.2.2. Determination of daily water demand' -> Created 'Determination of daily water demand'
+      [MATCH TOPIC] '*   8.2.3. Determination of storage tank capacity' -> Created 'Determination of storage tank capacity'
+      [MATCH TOPIC] '*   8.2.4. Selection of pipe' -> Created 'Selection of pipe'
+      [MATCH TOPIC] '*   8.2.5. Pipe line design and hydraulic grade line' -> Created 'Pipe line design and hydraulic grade line'
+    [MATCH SUB] '*   8.3. Design of sewer' -> Created 'Design of sewer' [ID: 177]
+      [MATCH TOPIC] '*   8.3.1. Quantity of sanitary sewage' -> Created 'Quantity of sanitary sewage'
+      [MATCH TOPIC] '*   8.3.2. Maximum, minimum and self cleaning velocity' -> Created 'Maximum, minimum and self cleaning velocity'
+    [MATCH SUB] '*   8.4. Excreta disposal in unsewered area' -> Created 'Excreta disposal in unsewered area' [ID: 180]
+      [MATCH TOPIC] '*   8.4.1. Pit latrine' -> Created 'Pit latrine'
+      [MATCH TOPIC] '*   8.4.2. Design of septic tank' -> Created 'Design of septic tank'
+  [MATCH CAT] '9\. Irrigation Engineering' -> Created 'Irrigation Engineering' (CIVIL) [ID: 183]
+    [MATCH SUB] '*   9.1. General' -> Created 'General' [ID: 184]
+      [MATCH TOPIC] '*   9.1.1. Advantages and disadvantages of irrigation' -> Created 'Advantages and disadvantages of irrigation'
+    [MATCH SUB] '*   9.2. Water requirement' -> Created 'Water requirement' [ID: 186]
+      [MATCH TOPIC] '*   9.2.1. Crop season and principal crops' -> Created 'Crop season and principal crops'
+      [MATCH TOPIC] '*   9.2.2. Base period' -> Created 'Base period'
+    [MATCH SUB] '*   9.3. Flow irrigation canals' -> Created 'Flow irrigation canals' [ID: 189]
+      [MATCH TOPIC] '*   9.3.1. Canal losses and their minimization' -> Created 'Canal losses and their minimization'
+      [MATCH TOPIC] '*   9.3.2. Maximum and minimum velocities' -> Created 'Maximum and minimum velocities'
+      [MATCH TOPIC] '*   9.3.3. Design of irrigation canal section based on Manning's formula' -> Created 'Design of irrigation canal section based on Manning's formula'
+      [MATCH TOPIC] '*   9.3.4. Need and location of spillways' -> Created 'Need and location of spillways'
+      [MATCH TOPIC] '*   9.3.5. Head works for small canals' -> Created 'Head works for small canals'
+  [MATCH CAT] '10\. Highway Engineering' -> Created 'Highway Engineering' (CIVIL) [ID: 195]
+    [MATCH SUB] '*   10.1. General' -> Created 'General' [ID: 196]
+      [MATCH TOPIC] '*   10.1.1. Introduction to transportation system' -> Created 'Introduction to transportation system'
+      [MATCH TOPIC] '*   10.1.2. Historic development of roads' -> Created 'Historic development of roads'
+      [MATCH TOPIC] '*   10.1.3. Classification of road in Nepal' -> Created 'Classification of road in Nepal'
+      [MATCH TOPIC] '*   10.1.4. Basic requirements of road alignment' -> Created 'Basic requirements of road alignment'
+    [MATCH SUB] '*   10.2. Geometric design' -> Created 'Geometric design' [ID: 201]
+      [MATCH TOPIC] '*   10.2.1. Basic design control and criteria for design' -> Created 'Basic design control and criteria for design'
+      [MATCH TOPIC] '*   10.2.2. Elements of cross section, typical cross section for all roads in filling and cutting' -> Created 'Elements of cross section, typical cross section for all roads in filling and cutting'
+      [MATCH TOPIC] '*   10.2.3. Camber' -> Created 'Camber'
+      [MATCH TOPIC] '*   10.2.4. Determination of radius of horizontal curves' -> Created 'Determination of radius of horizontal curves'
+      [MATCH TOPIC] '*   10.2.5. Super elevation' -> Created 'Super elevation'
+      [MATCH TOPIC] '*   10.2.6. Sight distances' -> Created 'Sight distances'
+      [MATCH TOPIC] '*   10.2.7. Gradient' -> Created 'Gradient'
+      [MATCH TOPIC] '*   10.2.8. Use of Nepal Road standard 2027 (First revision 2045) and subsequent revision in road design.' -> Created 'Use of Nepal Road standard 2027 (First revision 2045) and subsequent revision in road design.'
+    [MATCH SUB] '*   10.3. Drainage System' -> Created 'Drainage System' [ID: 210]
+      [MATCH TOPIC] '*   10.3.1. Importance of drainage system and requirements of a good drainage system' -> Created 'Importance of drainage system and requirements of a good drainage system'
+    [MATCH SUB] '*   10.4. Road Pavement' -> Created 'Road Pavement' [ID: 212]
+      [MATCH TOPIC] '*   10.4.1. Pavement Structure and its components: Sub grade, sub-base, base and surface courses' -> Created 'Pavement Structure and its components: Sub grade, sub-base, base and surface courses'
+    [MATCH SUB] '*   10.5. Road Machineries' -> Created 'Road Machineries' [ID: 214]
+      [MATCH TOPIC] '*   10.5.1. Earth moving and compaction machines' -> Created 'Earth moving and compaction machines'
+    [MATCH SUB] '*   10.6. Road Construction Technology' -> Created 'Road Construction Technology' [ID: 216]
+    [MATCH SUB] '*   10.7. Bridge' -> Created 'Bridge' [ID: 217]
+      [MATCH TOPIC] '*   10.7.1. T-beam bridge' -> Created 'T-beam bridge'
+      [MATCH TOPIC] '*   10.7.2. Timber bridges' -> Created 'Timber bridges'
+    [MATCH SUB] '*   10.8. Road Maintenance and Repair' -> Created 'Road Maintenance and Repair' [ID: 220]
+    [MATCH SUB] '*   10.9. Tracks and Trails' -> Created 'Tracks and Trails' [ID: 221]
+  [MATCH CAT] '11\. Estimating and Costing' -> Created 'Estimating and Costing' (CIVIL) [ID: 222]
+    [MATCH SUB] '*   11.1. General' -> Created 'General' [ID: 223]
+      [MATCH TOPIC] '*   11.1.1. Main items of work' -> Created 'Main items of work'
+      [MATCH TOPIC] '*   11.1.2. Units of measurement and payments of various items of work and material' -> Created 'Units of measurement and payments of various items of work and material'
+      [MATCH TOPIC] '*   11.1.3. Standard estimate formats of government offices' -> Created 'Standard estimate formats of government offices'
+    [MATCH SUB] '*   11.2. Rate analysis' -> Created 'Rate analysis' [ID: 227]
+      [MATCH TOPIC] '*   11.2.1. Basic general knowledge on the use of rate analysis norms Government of Nepal and approved district rates' -> Created 'Basic general knowledge on the use of rate analysis norms Government of Nepal and approved district rates'
+    [MATCH SUB] '*   11.3. Specifications' -> Created 'Specifications' [ID: 229]
+      [MATCH TOPIC] '*   11.3.1. Interpretation of specification' -> Created 'Interpretation of specification'
+    [MATCH SUB] '*   11.4. Valuation' -> Created 'Valuation' [ID: 231]
+      [MATCH TOPIC] '*   11.4.1. Methods of valuation' -> Created 'Methods of valuation'
+      [MATCH TOPIC] '*   11.4.2. Basic general knowledge of standard formats used by commercial banks and NIDC for valuation' -> Created 'Basic general knowledge of standard formats used by commercial banks and NIDC for valuation'
+  [MATCH CAT] '12\. Construction Management' -> Created 'Construction Management' (CIVIL) [ID: 234]
+    [MATCH SUB] '*   12.1. Organization' -> Created 'Organization' [ID: 235]
+      [MATCH TOPIC] '*   12.1.1. Need for organization' -> Created 'Need for organization'
+      [MATCH TOPIC] '*   12.1.2. Responsibilities of a civil overseer' -> Created 'Responsibilities of a civil overseer'
+      [MATCH TOPIC] '*   12.1.3. Relation between Owner, Contractor and Engineer' -> Created 'Relation between Owner, Contractor and Engineer'
+    [MATCH SUB] '*   12.2. Site Management' -> Created 'Site Management' [ID: 239]
+      [MATCH TOPIC] '*   12.2.1. Preparation of site plan' -> Created 'Preparation of site plan'
+      [MATCH TOPIC] '*   12.2.2. Organizing labor' -> Created 'Organizing labor'
+      [MATCH TOPIC] '*   12.2.3. Organizing labor efficiency' -> Created 'Organizing labor efficiency'
+      [MATCH TOPIC] '*   12.2.4. Accident prevention' -> Created 'Accident prevention'
+    [MATCH SUB] '*   12.3. Contract Procedure' -> Created 'Contract Procedure' [ID: 244]
+      [MATCH TOPIC] '*   12.3.1. Contracts' -> Created 'Contracts'
+      [MATCH TOPIC] '*   12.3.2. Force account and day-works' -> Created 'Force account and day-works'
+      [MATCH TOPIC] '*   12.3.3. Types of contracts' -> Created 'Types of contracts'
+      [MATCH TOPIC] '*   12.3.4. Tender and tender notice' -> Created 'Tender and tender notice'
+      [MATCH TOPIC] '*   12.3.5. Bid security' -> Created 'Bid security'
+      [MATCH TOPIC] '*   12.3.6. Preparation before inviting tender' -> Created 'Preparation before inviting tender'
+      [MATCH TOPIC] '*   12.3.7. Agreement' -> Created 'Agreement'
+      [MATCH TOPIC] '*   12.3.8. Conditions of contract' -> Created 'Conditions of contract'
+      [MATCH TOPIC] '*   12.3.9. Construction supervision' -> Created 'Construction supervision'
+    [MATCH SUB] '*   12.4. Accounts' -> Created 'Accounts' [ID: 254]
+      [MATCH TOPIC] '*   12.4.1. Administrative approval and technical sanction' -> Created 'Administrative approval and technical sanction'
+      [MATCH TOPIC] '*   12.4.2. Familiarity with standard account keeping formats used in governmental organizations' -> Created 'Familiarity with standard account keeping formats used in governmental organizations'
+      [MATCH TOPIC] '*   12.4.3. Muster roll' -> Created 'Muster roll'
+      [MATCH TOPIC] '*   12.4.4. Completion report' -> Created 'Completion report'
+    [MATCH SUB] '*   12.5. Planning and Control' -> Created 'Planning and Control' [ID: 259]
+      [MATCH TOPIC] '*   12.5.1. Construction schedule' -> Created 'Construction schedule'
+      [MATCH TOPIC] '*   12.5.2. Equipment and materials schedule' -> Created 'Equipment and materials schedule'
+      [MATCH TOPIC] '*   12.5.3. Construction stages and operations' -> Created 'Construction stages and operations'
+      [MATCH TOPIC] '*   12.5.4. Bar Chart' -> Created 'Bar Chart'
+  [MATCH CAT] '13\. Airport Engineering' -> Created 'Airport Engineering' (CIVIL) [ID: 264]
+    [MATCH SUB] '*   13.1. General' -> Created 'General' [ID: 265]
+      [MATCH TOPIC] '*   13.1.1. Introduction to air transport system' -> Created 'Introduction to air transport system'
+      [MATCH TOPIC] '*   13.1.2. Historic development of Airports in Nepal' -> Created 'Historic development of Airports in Nepal'
+      [MATCH TOPIC] '*   13.1.3. Classification of Airports' -> Created 'Classification of Airports'
+      [MATCH TOPIC] '*   13.1.4. Airport terminologies' -> Created 'Airport terminologies'
+    [MATCH SUB] '*   13.2. Design' -> Created 'Design' [ID: 270]
+      [MATCH TOPIC] '*   13.2.1. Basic design control and criteria for design' -> Created 'Basic design control and criteria for design'
+      [MATCH TOPIC] '*   13.2.2. General items contained in ANNEX 14 (ICAO publication)' -> Created 'General items contained in ANNEX 14 (ICAO publication)'
+      [MATCH TOPIC] '*   13.2.3. Planning of Airport and its elements' -> Created 'Planning of Airport and its elements'
+      [MATCH TOPIC] '*   13.2.4. Terminal Building and Control Tower' -> Created 'Terminal Building and Control Tower'
+      [MATCH TOPIC] '*   13.2.5. Drainage System' -> Created 'Drainage System'
+      [MATCH TOPIC] '*   13.2.6. Geometric design, pavement structure and its component' -> Created 'Geometric design, pavement structure and its component'
+      [MATCH TOPIC] '*   13.2.7. Basic knowledge on Heliport and Hangars' -> Created 'Basic knowledge on Heliport and Hangars'
+    [MATCH SUB] '*   13.3. Airport maintenance' -> Created 'Airport maintenance' [ID: 278]
+      [MATCH TOPIC] '*   13.3.1. Types of maintenance' -> Created 'Types of maintenance'
+      [MATCH TOPIC] '*   13.3.2. Methods of maintenance' -> Created 'Methods of maintenance'
+  [SKIP] Unmatched line: * * *
+  [SKIP] Unmatched line: **Examination Scheme for First Paper**
+  [SKIP] Unmatched line: **Question Distribution for First Paper (Part II)** _Questions will be asked from the syllabus units as follows:_
+  [SKIP] Unmatched line: * * *
+  [SKIP] Unmatched line: **Second Paper (Paper II): Service Related Job Knowledge**
+  [IGNORE] **Section - A (30 Marks)**
+Error creating 'Surveying' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-surveying' for key 'syllabus_nodes.unique_node'
+  [MATCH CAT] '1\. Surveying' -> Created 'Surveying' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+    [MATCH SUB] '*   1.1. General' -> Created 'General' [ID: 282]
+      [MATCH TOPIC] '*   1.1.1. Classification' -> Created 'Classification'
+      [MATCH TOPIC] '*   1.1.2. Principle of surveying' -> Created 'Principle of surveying'
+      [MATCH TOPIC] '*   1.1.3. Selection of suitable method' -> Created 'Selection of suitable method'
+      [MATCH TOPIC] '*   1.1.4. Scales, plans and maps' -> Created 'Scales, plans and maps'
+      [MATCH TOPIC] '*   1.1.5. Entry into survey field books and level books' -> Created 'Entry into survey field books and level books'
+    [WARN] Orphan Sub-Category 'Levelling', attaching to context root.
+    [MATCH SUB] '*   1.2. Levelling' -> Created 'Levelling' [ID: 288]
+      [MATCH TOPIC] '*   1.2.1. Methods of levelling' -> Created 'Methods of levelling'
+      [MATCH TOPIC] '*   1.2.2. Levelling instruments and accessories' -> Created 'Levelling instruments and accessories'
+      [MATCH TOPIC] '*   1.2.3. Principles of levelling' -> Created 'Principles of levelling'
+    [WARN] Orphan Sub-Category 'Chain surveying', attaching to context root.
+    [MATCH SUB] '*   1.3. Chain surveying' -> Created 'Chain surveying' [ID: 292]
+    [WARN] Orphan Sub-Category 'Compass surveying', attaching to context root.
+    [MATCH SUB] '*   1.4. Compass surveying' -> Created 'Compass surveying' [ID: 293]
+    [WARN] Orphan Sub-Category 'Plane Tabling', attaching to context root.
+    [MATCH SUB] '*   1.5. Plane Tabling' -> Created 'Plane Tabling' [ID: 294]
+      [MATCH TOPIC] '*   1.5.1. Equipments required' -> Created 'Equipments required'
+      [MATCH TOPIC] '*   1.5.2. Methods of plane tabling' -> Created 'Methods of plane tabling'
+      [MATCH TOPIC] '*   1.5.3. Two and three point problems' -> Created 'Two and three point problems'
+    [WARN] Orphan Sub-Category 'Theodolite and Traverse Surveying', attaching to context root.
+    [MATCH SUB] '*   1.6. Theodolite and Traverse Surveying' -> Created 'Theodolite and Traverse Surveying' [ID: 298]
+      [MATCH TOPIC] '*   1.6.1. Basic difference between different theodolites' -> Created 'Basic difference between different theodolites'
+      [MATCH TOPIC] '*   1.6.2. Temporary adjustments of theodolites' -> Created 'Temporary adjustments of theodolites'
+      [MATCH TOPIC] '*   1.6.3. Fundamental lines and desired relations' -> Created 'Fundamental lines and desired relations'
+      [MATCH TOPIC] '*   1.6.4. Tacheometry: stadia method' -> Created 'Tacheometry: stadia method'
+      [MATCH TOPIC] '*   1.6.5. Trigonometrical levelling' -> Created 'Trigonometrical levelling'
+      [MATCH TOPIC] '*   1.6.6. Checks in closed traverse' -> Created 'Checks in closed traverse'
+    [WARN] Orphan Sub-Category 'Contouring', attaching to context root.
+    [MATCH SUB] '*   1.7. Contouring' -> Created 'Contouring' [ID: 305]
+      [MATCH TOPIC] '*   1.7.1. Characteristics of contour lines' -> Created 'Characteristics of contour lines'
+      [MATCH TOPIC] '*   1.7.2. Methods of locating contours' -> Created 'Methods of locating contours'
+      [MATCH TOPIC] '*   1.7.3. Contour plotting' -> Created 'Contour plotting'
+    [WARN] Orphan Sub-Category 'Setting out', attaching to context root.
+    [MATCH SUB] '*   1.8. Setting out' -> Created 'Setting out' [ID: 309]
+      [MATCH TOPIC] '*   1.8.1. Small buildings' -> Created 'Small buildings'
+      [MATCH TOPIC] '*   1.8.2. Simple curves' -> Created 'Simple curves'
+Error creating 'Construction Materials' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-construction-materials' for key 'syllabus_nodes.unique_node'
+  [MATCH CAT] '2\. Construction Materials' -> Created 'Construction Materials' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'Stone', attaching to context root.
+    [MATCH SUB] '*   2.1. Stone' -> Created 'Stone' [ID: 313]
+      [MATCH TOPIC] '*   2.1.1. Formation and availability of stones in Nepal' -> Created 'Formation and availability of stones in Nepal'
+      [MATCH TOPIC] '*   2.1.2. Methods of laying and construction with various stones' -> Created 'Methods of laying and construction with various stones'
+    [WARN] Orphan Sub-Category 'Cement', attaching to context root.
+    [MATCH SUB] '*   2.2. Cement' -> Created 'Cement' [ID: 316]
+      [MATCH TOPIC] '*   2.2.1. Different cements: ingredients, properties and manufacture' -> Created 'Different cements: ingredients, properties and manufacture'
+      [MATCH TOPIC] '*   2.2.2. Storage and transport' -> Created 'Storage and transport'
+      [MATCH TOPIC] '*   2.2.3. Admixtures' -> Created 'Admixtures'
+    [WARN] Orphan Sub-Category 'Clay and clay products', attaching to context root.
+    [MATCH SUB] '*   2.3. Clay and clay products' -> Created 'Clay and clay products' [ID: 320]
+      [MATCH TOPIC] '*   2.3.1. Brick: type, manufacture, laying, bonds' -> Created 'Brick: type, manufacture, laying, bonds'
+    [WARN] Orphan Sub-Category 'Paints and Varnishes', attaching to context root.
+    [MATCH SUB] '*   2.4. Paints and Varnishes' -> Created 'Paints and Varnishes' [ID: 322]
+      [MATCH TOPIC] '*   2.4.1. Types and selection' -> Created 'Types and selection'
+      [MATCH TOPIC] '*   2.4.2. Preparation techniques' -> Created 'Preparation techniques'
+      [MATCH TOPIC] '*   2.4.3. Use' -> Created 'Use'
+    [WARN] Orphan Sub-Category 'Timber', attaching to context root.
+    [MATCH SUB] '*   2.5. Timber' -> Created 'Timber' [ID: 326]
+    [WARN] Orphan Sub-Category 'Lime', attaching to context root.
+    [MATCH SUB] '*   2.6. Lime' -> Created 'Lime' [ID: 327]
+    [WARN] Orphan Sub-Category 'Bitumen', attaching to context root.
+    [MATCH SUB] '*   2.7. Bitumen' -> Created 'Bitumen' [ID: 328]
+      [MATCH TOPIC] '*   2.7.1. Type' -> Created 'Type'
+      [MATCH TOPIC] '*   2.7.2. Selection' -> Created 'Selection'
+      [MATCH TOPIC] '*   2.7.3. Use' -> Created 'Use'
+Error creating 'Mechanics of Materials and Structures' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-mechanics-of-materials-and-structures' for key 'syllabus_nodes.unique_node'
+  [MATCH CAT] '3\. Mechanics of Materials and Structures' -> Created 'Mechanics of Materials and Structures' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'Mechanics of materials', attaching to context root.
+    [MATCH SUB] '*   3.1. Mechanics of materials' -> Created 'Mechanics of materials' [ID: 333]
+      [MATCH TOPIC] '*   3.1.1. Internal effects of loading' -> Created 'Internal effects of loading'
+      [MATCH TOPIC] '*   3.1.2. Ultimate strength and working stress of materials' -> Created 'Ultimate strength and working stress of materials'
+    [WARN] Orphan Sub-Category 'Mechanics of beams', attaching to context root.
+    [MATCH SUB] '*   3.2. Mechanics of beams' -> Created 'Mechanics of beams' [ID: 336]
+      [MATCH TOPIC] '*   3.2.1. Relation between shear force and bending moment' -> Created 'Relation between shear force and bending moment'
+      [MATCH TOPIC] '*   3.2.2. Thrust, shear and bending moment diagrams for statically determinate beams under various types of loading' -> Created 'Thrust, shear and bending moment diagrams for statically determinate beams under various types of loading'
+    [WARN] Orphan Sub-Category 'Simple strut theory', attaching to context root.
+    [MATCH SUB] '*   3.3. Simple strut theory' -> Created 'Simple strut theory' [ID: 339]
+Error creating 'Hydraulics' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-hydraulics' for key 'syllabus_nodes.unique_node'
+  [MATCH CAT] '4\. Hydraulics' -> Created 'Hydraulics' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+Error creating 'General' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-general' for key 'syllabus_nodes.unique_node'
+    [MATCH SUB] '*   4.1. General' -> Created 'General' [ID: ]
+      [MATCH TOPIC] '*   4.1.1. Properties of fluid: mass, weight, specific weight, density, specific volume, specific gravity, viscosity.' -> Created 'Properties of fluid: mass, weight, specific weight, density, specific volume, specific gravity, viscosity.'
+      [MATCH TOPIC] '*   4.1.2. Pressure and Pascal's law.' -> Created 'Pressure and Pascal's law.'
+    [WARN] Orphan Sub-Category 'Hydro-kinematics and Hydro-dynamics', attaching to context root.
+    [MATCH SUB] '*   4.2. Hydro-kinematics and Hydro-dynamics' -> Created 'Hydro-kinematics and Hydro-dynamics' [ID: 344]
+      [MATCH TOPIC] '*   4.2.1. Energy of flowing liquid: Elevation energy, kinetic energy, potential energy, internal energy.' -> Created 'Energy of flowing liquid: Elevation energy, kinetic energy, potential energy, internal energy.'
+    [WARN] Orphan Sub-Category 'Measurement of discharge', attaching to context root.
+    [MATCH SUB] '*   4.3. Measurement of discharge' -> Created 'Measurement of discharge' [ID: 346]
+      [MATCH TOPIC] '*   4.3.1. Weirs and notches' -> Created 'Weirs and notches'
+      [MATCH TOPIC] '*   4.3.2. Discharge formulas' -> Created 'Discharge formulas'
+    [WARN] Orphan Sub-Category 'Flows', attaching to context root.
+    [MATCH SUB] '*   4.4. Flows' -> Created 'Flows' [ID: 349]
+      [MATCH TOPIC] '*   4.4.1. Characteristics of pipe flow and open channel flow' -> Created 'Characteristics of pipe flow and open channel flow'
+Error creating 'Soil Mechanics' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-soil-mechanics' for key 'syllabus_nodes.unique_node'
+  [MATCH CAT] '5\. Soil Mechanics' -> Created 'Soil Mechanics' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+Error creating 'General' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-general' for key 'syllabus_nodes.unique_node'
+    [MATCH SUB] '*   5.1. General' -> Created 'General' [ID: ]
+      [MATCH TOPIC] '*   5.1.1. Soil types and classification' -> Created 'Soil types and classification'
+      [MATCH TOPIC] '*   5.1.2. Three phases of system of soils' -> Created 'Three phases of system of soils'
+      [MATCH TOPIC] '*   5.1.3. Unit weight of soil mass: bulk density, saturated density, submerged density and dry density' -> Created 'Unit weight of soil mass: bulk density, saturated density, submerged density and dry density'
+      [MATCH TOPIC] '*   5.1.4. Interrelationship between specific gravity, void ratio, porosity, degree of saturation, percentage of air voids, air content and density index.' -> Created 'Interrelationship between specific gravity, void ratio, porosity, degree of saturation, percentage of air voids, air content and density index.'
+    [WARN] Orphan Sub-Category 'Soil water relation', attaching to context root.
+    [MATCH SUB] '*   5.2. Soil water relation' -> Created 'Soil water relation' [ID: 357]
+      [MATCH TOPIC] '*   5.2.1. Terzaghi's principle of effective stress' -> Created 'Terzaghi's principle of effective stress'
+      [MATCH TOPIC] '*   5.2.2. Darcy's law' -> Created 'Darcy's law'
+      [MATCH TOPIC] '*   5.2.3. Factors affecting permeability' -> Created 'Factors affecting permeability'
+    [WARN] Orphan Sub-Category 'Compaction of soil', attaching to context root.
+    [MATCH SUB] '*   5.3. Compaction of soil' -> Created 'Compaction of soil' [ID: 361]
+      [MATCH TOPIC] '*   5.3.1. Factors affecting soil compaction' -> Created 'Factors affecting soil compaction'
+      [MATCH TOPIC] '*   5.3.2. Optimum moisture content' -> Created 'Optimum moisture content'
+      [MATCH TOPIC] '*   5.3.3. Relation between dry density and moisture content' -> Created 'Relation between dry density and moisture content'
+    [WARN] Orphan Sub-Category 'Shear strength of soil', attaching to context root.
+    [MATCH SUB] '*   5.4. Shear strength of soil' -> Created 'Shear strength of soil' [ID: 365]
+      [MATCH TOPIC] '*   5.4.1. Mohr-Coulomb failure theory' -> Created 'Mohr-Coulomb failure theory'
+      [MATCH TOPIC] '*   5.4.2. Cohesion and angle of internal friction' -> Created 'Cohesion and angle of internal friction'
+    [WARN] Orphan Sub-Category 'Earth Pressures', attaching to context root.
+    [MATCH SUB] '*   5.5. Earth Pressures' -> Created 'Earth Pressures' [ID: 368]
+      [MATCH TOPIC] '*   5.5.1. Active and passive earth pressure' -> Created 'Active and passive earth pressure'
+      [MATCH TOPIC] '*   5.5.2. Lateral earth pressure theory' -> Created 'Lateral earth pressure theory'
+      [MATCH TOPIC] '*   5.5.3. Rankine's earth pressure' -> Created 'Rankine's earth pressure'
+    [WARN] Orphan Sub-Category 'Foundation engineering', attaching to context root.
+    [MATCH SUB] '*   5.6. Foundation engineering' -> Created 'Foundation engineering' [ID: 372]
+      [MATCH TOPIC] '*   5.6.1. Terzaghi's general bearing capacity formulas and their application' -> Created 'Terzaghi's general bearing capacity formulas and their application'
+Error creating 'Structural Design' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-structural-design' for key 'syllabus_nodes.unique_node'
+  [MATCH CAT] '6\. Structural Design' -> Created 'Structural Design' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'R.C. Section in bending', attaching to context root.
+    [MATCH SUB] '*   6.1. R.C. Section in bending' -> Created 'R.C. Section in bending' [ID: 375]
+      [MATCH TOPIC] '*   6.1.1. Under reinforced, over reinforced and balanced section' -> Created 'Under reinforced, over reinforced and balanced section'
+      [MATCH TOPIC] '*   6.1.2. Analysis of single and double reinforced rectangular sections' -> Created 'Analysis of single and double reinforced rectangular sections'
+    [WARN] Orphan Sub-Category 'Shear and Bond for R.C. Sections', attaching to context root.
+    [MATCH SUB] '*   6.2. Shear and Bond for R.C. Sections' -> Created 'Shear and Bond for R.C. Sections' [ID: 378]
+      [MATCH TOPIC] '*   6.2.1. Shear resistance of a R.C. section' -> Created 'Shear resistance of a R.C. section'
+      [MATCH TOPIC] '*   6.2.2. Types of shear reinforcement and their design' -> Created 'Types of shear reinforcement and their design'
+      [MATCH TOPIC] '*   6.2.3. Determination of anchorage length' -> Created 'Determination of anchorage length'
+    [WARN] Orphan Sub-Category 'Axially Loaded R.C. Columns', attaching to context root.
+    [MATCH SUB] '*   6.3. Axially Loaded R.C. Columns' -> Created 'Axially Loaded R.C. Columns' [ID: 382]
+      [MATCH TOPIC] '*   6.3.1. Short and long columns' -> Created 'Short and long columns'
+      [MATCH TOPIC] '*   6.3.2. Design of rectangular column section' -> Created 'Design of rectangular column section'
+    [WARN] Orphan Sub-Category 'Design and Drafting of R.C. structures', attaching to context root.
+    [MATCH SUB] '*   6.4. Design and Drafting of R.C. structures' -> Created 'Design and Drafting of R.C. structures' [ID: 385]
+      [MATCH TOPIC] '*   6.4.1. Singly and doubly reinforced rectangular beams' -> Created 'Singly and doubly reinforced rectangular beams'
+      [MATCH TOPIC] '*   6.4.2. Simple one way and two way slabs' -> Created 'Simple one way and two way slabs'
+      [MATCH TOPIC] '*   6.4.3. Axially loaded short and long columns' -> Created 'Axially loaded short and long columns'
+Error creating 'Building Construction Technology' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-building-construction-technology' for key 'syllabus_nodes.unique_node'
+  [MATCH CAT] '7\. Building Construction Technology' -> Created 'Building Construction Technology' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'Foundation', attaching to context root.
+    [MATCH SUB] '*   7.1. Foundation' -> Created 'Foundation' [ID: 390]
+      [MATCH TOPIC] '*   7.1.1. Soil Exploration' -> Created 'Soil Exploration'
+      [MATCH TOPIC] '*   7.1.2. Type and suitability of different foundations: Shallow, Deep etc.' -> Created 'Type and suitability of different foundations: Shallow, Deep etc.'
+      [MATCH TOPIC] '*   7.1.3. Shoring and dewatering' -> Created 'Shoring and dewatering'
+      [MATCH TOPIC] '*   7.1.4. Design of simple brick or stone masonry foundations' -> Created 'Design of simple brick or stone masonry foundations'
+    [WARN] Orphan Sub-Category 'Walls', attaching to context root.
+    [MATCH SUB] '*   7.2. Walls' -> Created 'Walls' [ID: 395]
+      [MATCH TOPIC] '*   7.2.1. Types of walls and their functions' -> Created 'Types of walls and their functions'
+      [MATCH TOPIC] '*   7.2.2. Choosing wall thickness and height to length relation' -> Created 'Choosing wall thickness and height to length relation'
+      [MATCH TOPIC] '*   7.2.3. Use of scaffolding' -> Created 'Use of scaffolding'
+    [WARN] Orphan Sub-Category 'Damp Proofing', attaching to context root.
+    [MATCH SUB] '*   7.3. Damp Proofing' -> Created 'Damp Proofing' [ID: 399]
+      [MATCH TOPIC] '*   7.3.1. Source of Dampness' -> Created 'Source of Dampness'
+      [MATCH TOPIC] '*   7.3.2. Remedial measures to prevent dampness' -> Created 'Remedial measures to prevent dampness'
+    [WARN] Orphan Sub-Category 'Concrete Technology', attaching to context root.
+    [MATCH SUB] '*   7.4. Concrete Technology' -> Created 'Concrete Technology' [ID: 402]
+      [MATCH TOPIC] '*   7.4.1. Constituents of cement concrete' -> Created 'Constituents of cement concrete'
+      [MATCH TOPIC] '*   7.4.2. Grading of aggregates' -> Created 'Grading of aggregates'
+      [MATCH TOPIC] '*   7.4.3. Concrete mixes' -> Created 'Concrete mixes'
+      [MATCH TOPIC] '*   7.4.4. Water cement ratio' -> Created 'Water cement ratio'
+      [MATCH TOPIC] '*   7.4.5. Factor affecting strength of concrete' -> Created 'Factor affecting strength of concrete'
+      [MATCH TOPIC] '*   7.4.6. Form work' -> Created 'Form work'
+      [MATCH TOPIC] '*   7.4.7. Curing' -> Created 'Curing'
+    [WARN] Orphan Sub-Category 'Wood Work', attaching to context root.
+    [MATCH SUB] '*   7.5. Wood Work' -> Created 'Wood Work' [ID: 410]
+      [MATCH TOPIC] '*   7.5.1. Frame and shutters of door and window' -> Created 'Frame and shutters of door and window'
+      [MATCH TOPIC] '*   7.5.2. Timber construction of upper floors' -> Created 'Timber construction of upper floors'
+      [MATCH TOPIC] '*   7.5.3. Design and construction of stairs' -> Created 'Design and construction of stairs'
+    [WARN] Orphan Sub-Category 'Flooring and Finishing', attaching to context root.
+    [MATCH SUB] '*   7.6. Flooring and Finishing' -> Created 'Flooring and Finishing' [ID: 414]
+      [MATCH TOPIC] '*   7.6.1. Floor finishes: brick, concrete, flagstone' -> Created 'Floor finishes: brick, concrete, flagstone'
+      [MATCH TOPIC] '*   7.6.2. Plastering' -> Created 'Plastering'
+Error creating 'Water Supply and Sanitation Engineering' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-water-supply-and-sanitation-engineering' for key 'syllabus_nodes.unique_node'
+  [MATCH CAT] '8\. Water Supply and Sanitation Engineering' -> Created 'Water Supply and Sanitation Engineering' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+Error creating 'General' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-general' for key 'syllabus_nodes.unique_node'
+    [MATCH SUB] '*   8.1. General' -> Created 'General' [ID: ]
+      [MATCH TOPIC] '*   8.1.1. Objectives of water supply system' -> Created 'Objectives of water supply system'
+      [MATCH TOPIC] '*   8.1.2. Source of water and its selection: gravity and artisan springs, shallow and deep wells, infiltration galleries' -> Created 'Source of water and its selection: gravity and artisan springs, shallow and deep wells, infiltration galleries'
+    [WARN] Orphan Sub-Category 'Gravity water supply system', attaching to context root.
+    [MATCH SUB] '*   8.2. Gravity water supply system' -> Created 'Gravity water supply system' [ID: 421]
+      [MATCH TOPIC] '*   8.2.1. Design period' -> Created 'Design period'
+      [MATCH TOPIC] '*   8.2.2. Determination of daily water demand' -> Created 'Determination of daily water demand'
+      [MATCH TOPIC] '*   8.2.3. Determination of storage tank capacity' -> Created 'Determination of storage tank capacity'
+      [MATCH TOPIC] '*   8.2.4. Selection of pipe' -> Created 'Selection of pipe'
+      [MATCH TOPIC] '*   8.2.5. Pipe line design and hydraulic grade line' -> Created 'Pipe line design and hydraulic grade line'
+    [WARN] Orphan Sub-Category 'Design of sewer', attaching to context root.
+    [MATCH SUB] '*   8.3. Design of sewer' -> Created 'Design of sewer' [ID: 427]
+      [MATCH TOPIC] '*   8.3.1. Quantity of sanitary sewage' -> Created 'Quantity of sanitary sewage'
+      [MATCH TOPIC] '*   8.3.2. Maximum, minimum and self-cleansing velocity' -> Created 'Maximum, minimum and self-cleansing velocity'
+    [WARN] Orphan Sub-Category 'Excreta disposal in unsewered area', attaching to context root.
+    [MATCH SUB] '*   8.4. Excreta disposal in unsewered area' -> Created 'Excreta disposal in unsewered area' [ID: 430]
+      [MATCH TOPIC] '*   8.4.1. Pit latrine' -> Created 'Pit latrine'
+      [MATCH TOPIC] '*   8.4.2. Design of septic tank' -> Created 'Design of septic tank'
+Error creating 'Irrigation Engineering' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-irrigation-engineering' for key 'syllabus_nodes.unique_node'
+  [MATCH CAT] '9\. Irrigation Engineering' -> Created 'Irrigation Engineering' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+Error creating 'General' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-general' for key 'syllabus_nodes.unique_node'
+    [MATCH SUB] '*   9.1. General' -> Created 'General' [ID: ]
+      [MATCH TOPIC] '*   9.1.1. Advantages and disadvantages of irrigation' -> Created 'Advantages and disadvantages of irrigation'
+    [WARN] Orphan Sub-Category 'Water requirement', attaching to context root.
+    [MATCH SUB] '*   9.2. Water requirement' -> Created 'Water requirement' [ID: 436]
+      [MATCH TOPIC] '*   9.2.1. Crop season and principal crops' -> Created 'Crop season and principal crops'
+      [MATCH TOPIC] '*   9.2.2. Base period' -> Created 'Base period'
+    [WARN] Orphan Sub-Category 'Flow irrigation canals', attaching to context root.
+    [MATCH SUB] '*   9.3. Flow irrigation canals' -> Created 'Flow irrigation canals' [ID: 439]
+      [MATCH TOPIC] '*   9.3.1. Canal losses and their minimization' -> Created 'Canal losses and their minimization'
+      [MATCH TOPIC] '*   9.3.2. Maximum and minimum velocities' -> Created 'Maximum and minimum velocities'
+      [MATCH TOPIC] '*   9.3.3. Design of irrigation canal section based on Manning's formula' -> Created 'Design of irrigation canal section based on Manning's formula'
+      [MATCH TOPIC] '*   9.3.4. Need and location of spillways' -> Created 'Need and location of spillways'
+      [MATCH TOPIC] '*   9.3.5. Head works for small canals' -> Created 'Head works for small canals'
+Error creating 'Highway Engineering' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-highway-engineering' for key 'syllabus_nodes.unique_node'
+  [MATCH CAT] '10\. Highway Engineering' -> Created 'Highway Engineering' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+Error creating 'General' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-general' for key 'syllabus_nodes.unique_node'
+    [MATCH SUB] '*   10.1. General' -> Created 'General' [ID: ]
+      [MATCH TOPIC] '*   10.1.1. Introduction to transportation system' -> Created 'Introduction to transportation system'
+      [MATCH TOPIC] '*   10.1.2. Historic development of roads' -> Created 'Historic development of roads'
+      [MATCH TOPIC] '*   10.1.3. Classification of road in Nepal' -> Created 'Classification of road in Nepal'
+      [MATCH TOPIC] '*   10.1.4. Basic requirements of road alignment' -> Created 'Basic requirements of road alignment'
+    [WARN] Orphan Sub-Category 'Geometric design', attaching to context root.
+    [MATCH SUB] '*   10.2. Geometric design' -> Created 'Geometric design' [ID: 451]
+      [MATCH TOPIC] '*   10.2.1. Basic design control and criteria for design' -> Created 'Basic design control and criteria for design'
+      [MATCH TOPIC] '*   10.2.2. Elements of cross section, typical cross section for all roads in filling and cutting' -> Created 'Elements of cross section, typical cross section for all roads in filling and cutting'
+      [MATCH TOPIC] '*   10.2.3. Camber' -> Created 'Camber'
+      [MATCH TOPIC] '*   10.2.4. Determination of radius of horizontal curves' -> Created 'Determination of radius of horizontal curves'
+      [MATCH TOPIC] '*   10.2.5. Super elevation' -> Created 'Super elevation'
+      [MATCH TOPIC] '*   10.2.6. Sight distances' -> Created 'Sight distances'
+      [MATCH TOPIC] '*   10.2.7. Gradient' -> Created 'Gradient'
+      [MATCH TOPIC] '*   10.2.8. Use of Nepal Road standard 2027 (First revision 2045) and subsequent revision in road design.' -> Created 'Use of Nepal Road standard 2027 (First revision 2045) and subsequent revision in road design.'
+    [WARN] Orphan Sub-Category 'Drainage System', attaching to context root.
+    [MATCH SUB] '*   10.3. Drainage System' -> Created 'Drainage System' [ID: 460]
+      [MATCH TOPIC] '*   10.3.1. Importance of drainage system and requirements of a good drainage system' -> Created 'Importance of drainage system and requirements of a good drainage system'
+    [WARN] Orphan Sub-Category 'Road Pavement', attaching to context root.
+    [MATCH SUB] '*   10.4. Road Pavement' -> Created 'Road Pavement' [ID: 462]
+      [MATCH TOPIC] '*   10.4.1. Pavement Structure and its components: Sub grade, sub-base, base and surface courses' -> Created 'Pavement Structure and its components: Sub grade, sub-base, base and surface courses'
+    [WARN] Orphan Sub-Category 'Road Machineries', attaching to context root.
+    [MATCH SUB] '*   10.5. Road Machineries' -> Created 'Road Machineries' [ID: 464]
+      [MATCH TOPIC] '*   10.5.1. Earth moving and compaction machines' -> Created 'Earth moving and compaction machines'
+    [WARN] Orphan Sub-Category 'Road Construction Technology', attaching to context root.
+    [MATCH SUB] '*   10.6. Road Construction Technology' -> Created 'Road Construction Technology' [ID: 466]
+    [WARN] Orphan Sub-Category 'Bridge', attaching to context root.
+    [MATCH SUB] '*   10.7. Bridge' -> Created 'Bridge' [ID: 467]
+      [MATCH TOPIC] '*   10.7.1. T-beam bridge' -> Created 'T-beam bridge'
+      [MATCH TOPIC] '*   10.7.2. Timber bridges' -> Created 'Timber bridges'
+    [WARN] Orphan Sub-Category 'Road Maintenance and Repair', attaching to context root.
+    [MATCH SUB] '*   10.8. Road Maintenance and Repair' -> Created 'Road Maintenance and Repair' [ID: 470]
+      [MATCH TOPIC] '*   10.8.1. Timber bridges' -> Created 'Timber bridges'
+    [WARN] Orphan Sub-Category 'Tracks and Trails', attaching to context root.
+    [MATCH SUB] '*   10.9. Tracks and Trails' -> Created 'Tracks and Trails' [ID: 472]
+Error creating 'Estimating and Costing' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-estimating-and-costing' for key 'syllabus_nodes.unique_node'
+  [MATCH CAT] '11\. Estimating and Costing' -> Created 'Estimating and Costing' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+Error creating 'General' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-general' for key 'syllabus_nodes.unique_node'
+    [MATCH SUB] '*   11.1. General' -> Created 'General' [ID: ]
+      [MATCH TOPIC] '*   11.1.1. Main items of work' -> Created 'Main items of work'
+      [MATCH TOPIC] '*   11.1.2. Units of measurement and payments of various items of work and material' -> Created 'Units of measurement and payments of various items of work and material'
+      [MATCH TOPIC] '*   11.1.3. Standard estimate formats of government offices' -> Created 'Standard estimate formats of government offices'
+    [WARN] Orphan Sub-Category 'Rate analysis', attaching to context root.
+    [MATCH SUB] '*   11.2. Rate analysis' -> Created 'Rate analysis' [ID: 478]
+      [MATCH TOPIC] '*   11.2.1. Basic general knowledge on the use of rate analysis norms Government of Nepal and approved district rates' -> Created 'Basic general knowledge on the use of rate analysis norms Government of Nepal and approved district rates'
+    [WARN] Orphan Sub-Category 'Specifications', attaching to context root.
+    [MATCH SUB] '*   11.3. Specifications' -> Created 'Specifications' [ID: 480]
+      [MATCH TOPIC] '*   11.3.1. Interpretation of specification' -> Created 'Interpretation of specification'
+    [WARN] Orphan Sub-Category 'Valuation', attaching to context root.
+    [MATCH SUB] '*   11.4. Valuation' -> Created 'Valuation' [ID: 482]
+      [MATCH TOPIC] '*   11.4.1. Methods of valuation' -> Created 'Methods of valuation'
+      [MATCH TOPIC] '*   11.4.2. Basic general knowledge of standard formats used by commercial banks and NIDC for valuation' -> Created 'Basic general knowledge of standard formats used by commercial banks and NIDC for valuation'
+Error creating 'Construction Management' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-construction-management' for key 'syllabus_nodes.unique_node'
+  [MATCH CAT] '12\. Construction Management' -> Created 'Construction Management' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'Organization', attaching to context root.
+    [MATCH SUB] '*   12.1. Organization' -> Created 'Organization' [ID: 486]
+      [MATCH TOPIC] '*   12.1.1. Need for organization' -> Created 'Need for organization'
+      [MATCH TOPIC] '*   12.1.2. Responsibilities of a civil overseer' -> Created 'Responsibilities of a civil overseer'
+      [MATCH TOPIC] '*   12.1.3. Relation between Owner, Contractor and Engineer' -> Created 'Relation between Owner, Contractor and Engineer'
+    [WARN] Orphan Sub-Category 'Site Management', attaching to context root.
+    [MATCH SUB] '*   12.2. Site Management' -> Created 'Site Management' [ID: 490]
+      [MATCH TOPIC] '*   12.2.1. Preparation of site plan' -> Created 'Preparation of site plan'
+      [MATCH TOPIC] '*   12.2.2. Organizing labor' -> Created 'Organizing labor'
+      [MATCH TOPIC] '*   12.2.3. Organizing labor efficiency' -> Created 'Organizing labor efficiency'
+      [MATCH TOPIC] '*   12.2.4. Accident prevention' -> Created 'Accident prevention'
+    [WARN] Orphan Sub-Category 'Contract Procedure', attaching to context root.
+    [MATCH SUB] '*   12.3. Contract Procedure' -> Created 'Contract Procedure' [ID: 495]
+      [MATCH TOPIC] '*   12.3.1. Contracts' -> Created 'Contracts'
+      [MATCH TOPIC] '*   12.3.2. Force account and day-works' -> Created 'Force account and day-works'
+      [MATCH TOPIC] '*   12.3.3. Types of contracts' -> Created 'Types of contracts'
+      [MATCH TOPIC] '*   12.3.4. Tender and tender notice' -> Created 'Tender and tender notice'
+      [MATCH TOPIC] '*   12.3.5. Bid security' -> Created 'Bid security'
+      [MATCH TOPIC] '*   12.3.6. Preparation before inviting tender' -> Created 'Preparation before inviting tender'
+      [MATCH TOPIC] '*   12.3.7. Agreement' -> Created 'Agreement'
+      [MATCH TOPIC] '*   12.3.8. Conditions of contract' -> Created 'Conditions of contract'
+      [MATCH TOPIC] '*   12.3.9. Construction supervision' -> Created 'Construction supervision'
+    [WARN] Orphan Sub-Category 'Accounts', attaching to context root.
+    [MATCH SUB] '*   12.4. Accounts' -> Created 'Accounts' [ID: 505]
+      [MATCH TOPIC] '*   12.4.1. Administrative approval and technical sanction' -> Created 'Administrative approval and technical sanction'
+      [MATCH TOPIC] '*   12.4.2. Familiarity with standard account keeping formats used in governmental organizations' -> Created 'Familiarity with standard account keeping formats used in governmental organizations'
+      [MATCH TOPIC] '*   12.4.3. Muster roll' -> Created 'Muster roll'
+      [MATCH TOPIC] '*   12.4.4. Completion report' -> Created 'Completion report'
+    [WARN] Orphan Sub-Category 'Planning and Control', attaching to context root.
+    [MATCH SUB] '*   12.5. Planning and Control' -> Created 'Planning and Control' [ID: 510]
+      [MATCH TOPIC] '*   12.5.1. Construction schedule' -> Created 'Construction schedule'
+      [MATCH TOPIC] '*   12.5.2. Equipment and materials schedule' -> Created 'Equipment and materials schedule'
+      [MATCH TOPIC] '*   12.5.3. Construction stages and operations' -> Created 'Construction stages and operations'
+      [MATCH TOPIC] '*   12.5.4. Bar Chart' -> Created 'Bar Chart'
+Error creating 'Airport Engineering' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-airport-engineering' for key 'syllabus_nodes.unique_node'
+  [MATCH CAT] '13\. Airport Engineering' -> Created 'Airport Engineering' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+Error creating 'General' (Parent: 3): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-general' for key 'syllabus_nodes.unique_node'
+    [MATCH SUB] '*   13.1. General' -> Created 'General' [ID: ]
+      [MATCH TOPIC] '*   13.1.1. Introduction to air transport system' -> Created 'Introduction to air transport system'
+      [MATCH TOPIC] '*   13.1.2. Historic development of Airports in Nepal' -> Created 'Historic development of Airports in Nepal'
+      [MATCH TOPIC] '*   13.1.3. Classification of Airports' -> Created 'Classification of Airports'
+      [MATCH TOPIC] '*   13.1.4. Airport terminologies' -> Created 'Airport terminologies'
+    [WARN] Orphan Sub-Category 'Design', attaching to context root.
+    [MATCH SUB] '*   13.2. Design' -> Created 'Design' [ID: 521]
+      [MATCH TOPIC] '*   13.2.1. Basic design control and criteria for design' -> Created 'Basic design control and criteria for design'
+      [MATCH TOPIC] '*   13.2.2. General items contained in ANNEX 14 (ICAO publication)' -> Created 'General items contained in ANNEX 14 (ICAO publication)'
+      [MATCH TOPIC] '*   13.2.3. Planning of Airport and its elements' -> Created 'Planning of Airport and its elements'
+      [MATCH TOPIC] '*   13.2.4. Terminal Building and Control Tower' -> Created 'Terminal Building and Control Tower'
+      [MATCH TOPIC] '*   13.2.5. Drainage System' -> Created 'Drainage System'
+      [MATCH TOPIC] '*   13.2.6. Geometric design, pavement structure and its component' -> Created 'Geometric design, pavement structure and its component'
+      [MATCH TOPIC] '*   13.2.7. Basic knowledge on Heliport and Hangars' -> Created 'Basic knowledge on Heliport and Hangars'
+    [WARN] Orphan Sub-Category 'Airport maintenance', attaching to context root.
+    [MATCH SUB] '*   13.3. Airport maintenance' -> Created 'Airport maintenance' [ID: 529]
+      [MATCH TOPIC] '*   13.3.1. Types of maintenance' -> Created 'Types of maintenance'
+      [MATCH TOPIC] '*   13.3.2. Methods of maintenance' -> Created 'Methods of maintenance'
+Split Import Completed.

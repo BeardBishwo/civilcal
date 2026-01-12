@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Migration: Create Word Bank Table
  * 
@@ -27,7 +28,7 @@ try {
         `term` VARCHAR(255) NOT NULL,
         `definition` TEXT NOT NULL,
         `category_id` INT UNSIGNED NULL,
-        `difficulty_level` TINYINT UNSIGNED DEFAULT 1, -- 1: Easy, 2: Medium, 3: Hard
+        `difficulty_level` TINYINT UNSIGNED DEFAULT 1, -- 1: Easy, 2: Easy-Mid, 3: Medium, 4: Hard, 5: Expert
         `language` ENUM('en', 'np') DEFAULT 'en',
         `synonyms` TEXT NULL, -- Comma separated
         `usage_example` TEXT NULL,
@@ -55,7 +56,6 @@ try {
 
     $conn->exec($sql2);
     echo "✅ Table `blueprint_reveals` created successfully.\n";
-
 } catch (Exception $e) {
     echo "❌ Migration Error: " . $e->getMessage() . "\n";
     exit(1);

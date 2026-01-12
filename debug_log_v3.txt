@@ -1,0 +1,625 @@
+Starting Split Import (Debug Mode - Fix 3 - FindOrCreate)...
+Clearing existing syllabus nodes...
+Table truncated.
+Created Civil Branch: 1 -> 2 -> 3
+  [SKIP] Unmatched line: **(General, Highway, Sanitary, Irrigation, Hydropower, Hydrology, and Airport Sub-groups)**
+  [SKIP] Unmatched line: **Public Service Commission (Lok Sewa Aayog)**
+  [SKIP] Unmatched line: * * *
+  [SKIP] Unmatched line: **First Paper (Paper I): General Knowledge, General Aptitude Test, and Service-Related Job Knowledge**
+SWITCHING TO UNIVERSAL CONTEXT
+  [IGNORE] **Section - A (15 Questions x 2 Marks = 30 Marks)**
+  [MATCH CAT] '1\. General Awareness (16 Marks)' -> Created/Found 'General Awareness' (ROOT) [ID: 4]
+    [MATCH SUB] '*   1.1. Geographical condition of Nepal, natural resources, and means.' -> Created/Found 'Geographical condition of Nepal, natural resources, and means.' [ID: 5]
+    [MATCH SUB] '*   1.2. Information regarding the historical, cultural, and social condition of Nepal.' -> Created/Found 'Information regarding the historical, cultural, and social condition of Nepal.' [ID: 6]
+    [MATCH SUB] '*   1.3. Information regarding the economic condition of Nepal and current periodic plans.' -> Created/Found 'Information regarding the economic condition of Nepal and current periodic plans.' [ID: 7]
+    [MATCH SUB] '*   1.4. Constitution of Nepal (Parts 1 to 5 and Schedules).' -> Created/Found 'Constitution of Nepal (Parts 1 to 5 and Schedules).' [ID: 8]
+    [MATCH SUB] '*   1.5. General information regarding public health, diseases, food, and nutrition.' -> Created/Found 'General information regarding public health, diseases, food, and nutrition.' [ID: 9]
+    [MATCH SUB] '*   1.6. Biodiversity, sustainable development, environment, pollution, climate change, and population management.' -> Created/Found 'Biodiversity, sustainable development, environment, pollution, climate change, and population management.' [ID: 10]
+    [MATCH SUB] '*   1.7. Important achievements in science and technology affecting human life.' -> Created/Found 'Important achievements in science and technology affecting human life.' [ID: 11]
+    [MATCH SUB] '*   1.8. Information regarding the United Nations and its specialized agencies.' -> Created/Found 'Information regarding the United Nations and its specialized agencies.' [ID: 12]
+    [MATCH SUB] '*   1.9. Information regarding regional organizations (SAARC, BIMSTEC, ASEAN, and European Union).' -> Created/Found 'Information regarding regional organizations (SAARC, BIMSTEC, ASEAN, and European Union).' [ID: 13]
+    [MATCH SUB] '*   1.10. Contemporary activities of national and international importance.' -> Created/Found 'Contemporary activities of national and international importance.' [ID: 14]
+  [MATCH CAT] '2\. Public Management (14 Marks)' -> Created/Found 'Public Management' (ROOT) [ID: 15]
+    [MATCH SUB] '*   2.1. Office Management' -> Created/Found 'Office Management' [ID: 16]
+      [MATCH TOPIC] '*   2.1.1. Office: Introduction, importance, functions, and types.' -> Created/Found topic starting with '2.1.1'
+      [MATCH TOPIC] '*   2.1.2. Functions and qualities of assistant staff.' -> Created/Found topic starting with '2.1.2'
+      [MATCH TOPIC] '*   2.1.3. Office Resources: Introduction and types.' -> Created/Found topic starting with '2.1.3'
+      [MATCH TOPIC] '*   2.1.4. Importance, types, and means of communication in an office.' -> Created/Found topic starting with '2.1.4'
+      [MATCH TOPIC] '*   2.1.5. Office Procedure: Correspondence, Registration & Dispatch, Circular, Order (Tok Aadesh), Note writing (Tippani), and points to consider while preparing notes.' -> Created/Found topic starting with '2.1.5'
+      [MATCH TOPIC] '*   2.1.6. Record Management.' -> Created/Found topic starting with '2.1.6'
+    [MATCH SUB] '*   2.2. Provisions in Civil Service Act and Regulations:' -> Created/Found 'Provisions in Civil Service Act and Regulations:' [ID: 23]
+      [MATCH TOPIC] '*   2.2.1. Formation of Civil Service, organizational structure, methods, and processes of filling vacancies.' -> Created/Found topic starting with '2.2.1'
+      [MATCH TOPIC] '*   2.2.2. Appointment, transfer, promotion, leave, departmental punishment, and retirement of employees.' -> Created/Found topic starting with '2.2.2'
+      [MATCH TOPIC] '*   2.2.3. Conduct and duties to be followed by employees.' -> Created/Found topic starting with '2.2.3'
+  [SKIP] Unmatched line: *   **2.3.** General information regarding the government budget, accounting, and auditing system.
+  [SKIP] Unmatched line: *   **2.4.** Meaning of public service delivery, bodies delivering service, methods, and mediums.
+  [SKIP] Unmatched line: *   **2.5.** Public Charter: Importance and necessity.
+  [SKIP] Unmatched line: *   **2.6.** Concept of management and information regarding direction, control, coordination, decision-making process, motivation, and leadership in public management.
+  [SKIP] Unmatched line: *   **2.7.** Human Values, civic duties and responsibilities, and discipline.
+  [IGNORE] **Section - B (10 Questions x 2 Marks = 20 Marks)**
+  [MATCH CAT] '3\. General Aptitude Test' -> Created/Found 'General Aptitude Test' (ROOT) [ID: 27]
+    [MATCH SUB] '*   3.1. Verbal Aptitude Test: Vocabulary, series, analogy, classification, coding-decoding, direction and distance sense test, logical reasoning, ranking order, etc.' -> Created/Found 'Verbal Aptitude Test: Vocabulary, series, analogy, classification, coding-decoding, direction and distance sense test, logical reasoning, ranking order, etc.' [ID: 28]
+    [MATCH SUB] '*   3.2. Numerical Aptitude Test: Series, analogy, classification, coding, matrix, arithmetical reasoning/operations, percentage, fraction, ratio, average, time and work, etc.' -> Created/Found 'Numerical Aptitude Test: Series, analogy, classification, coding, matrix, arithmetical reasoning/operations, percentage, fraction, ratio, average, time and work, etc.' [ID: 29]
+    [MATCH SUB] '*   3.3. Non-Verbal/Abstract Aptitude Test: Series, analogy, classification, Venn diagram, matrix, construction of triangles and squares, figure construction and analysis, etc.' -> Created/Found 'Non-Verbal/Abstract Aptitude Test: Series, analogy, classification, Venn diagram, matrix, construction of triangles and squares, figure construction and analysis, etc.' [ID: 30]
+  [SKIP] Unmatched line: *   **3.4. Verification Test and Filing Aptitude Test:**
+  [SKIP] Unmatched line: *   Verification Test: Questions regarding checking data, numbers, or verbal information to find errors or detect similarities/differences.
+  [SKIP] Unmatched line: *   Filing Aptitude Test: Questions regarding solving verbal and numerical filing items or processes according to alphabetical, numerical, or chronological order.
+  [SKIP] Unmatched line: *   **3.5. Follows the Instructions and Analytical Reasoning Test:**
+  [SKIP] Unmatched line: *   Follows the Instructions: Questions regarding solving by following written instructions exactly.
+  [SKIP] Unmatched line: *   Analytical Reasoning Test: Questions regarding verbal, numerical, or non-verbal (figural) analytical reasoning.
+  [SKIP] Unmatched line: * * *
+SWITCHING TO CIVIL CONTEXT
+  [MATCH CAT] '1\. Surveying' -> Created/Found 'Surveying' (CIVIL) [ID: 31]
+    [MATCH SUB] '*   1.1. General' -> Created/Found 'General' [ID: 32]
+      [MATCH TOPIC] '*   1.1.1. Classification' -> Created/Found topic starting with '1.1.1'
+      [MATCH TOPIC] '*   1.1.2. Principle of surveying' -> Created/Found topic starting with '1.1.2'
+      [MATCH TOPIC] '*   1.1.3. Selection of suitable method' -> Created/Found topic starting with '1.1.3'
+      [MATCH TOPIC] '*   1.1.4. Scales, plans and maps' -> Created/Found topic starting with '1.1.4'
+      [MATCH TOPIC] '*   1.1.5. Entry into survey field books and level books' -> Created/Found topic starting with '1.1.5'
+    [MATCH SUB] '*   1.2. Levelling' -> Created/Found 'Levelling' [ID: 38]
+      [MATCH TOPIC] '*   1.2.1. Methods of levelling' -> Created/Found topic starting with '1.2.1'
+      [MATCH TOPIC] '*   1.2.2. Levelling instruments and accessories' -> Created/Found topic starting with '1.2.2'
+      [MATCH TOPIC] '*   1.2.3. Principles of levelling' -> Created/Found topic starting with '1.2.3'
+    [MATCH SUB] '*   1.3. Chain surveying' -> Created/Found 'Chain surveying' [ID: 42]
+    [MATCH SUB] '*   1.4. Compass surveying' -> Created/Found 'Compass surveying' [ID: 43]
+    [MATCH SUB] '*   1.5. Plane Tabling' -> Created/Found 'Plane Tabling' [ID: 44]
+      [MATCH TOPIC] '*   1.5.1. Equipments required' -> Created/Found topic starting with '1.5.1'
+      [MATCH TOPIC] '*   1.5.2. Methods of plane tabling' -> Created/Found topic starting with '1.5.2'
+      [MATCH TOPIC] '*   1.5.3. Two and three point problems' -> Created/Found topic starting with '1.5.3'
+    [MATCH SUB] '*   1.6. Theodolite and Traverse Surveying' -> Created/Found 'Theodolite and Traverse Surveying' [ID: 48]
+      [MATCH TOPIC] '*   1.6.1. Basic difference between different theodolites' -> Created/Found topic starting with '1.6.1'
+      [MATCH TOPIC] '*   1.6.2. Temporary adjustments of theodolites' -> Created/Found topic starting with '1.6.2'
+      [MATCH TOPIC] '*   1.6.3. Fundamental lines and desired relations' -> Created/Found topic starting with '1.6.3'
+      [MATCH TOPIC] '*   1.6.4. Tacheometry: stadia method' -> Created/Found topic starting with '1.6.4'
+      [MATCH TOPIC] '*   1.6.5. Trigonometrical levelling' -> Created/Found topic starting with '1.6.5'
+      [MATCH TOPIC] '*   1.6.6. Checks in closed traverse' -> Created/Found topic starting with '1.6.6'
+    [MATCH SUB] '*   1.7. Contouring' -> Created/Found 'Contouring' [ID: 55]
+      [MATCH TOPIC] '*   1.7.1. Characteristics of contour lines' -> Created/Found topic starting with '1.7.1'
+      [MATCH TOPIC] '*   1.7.2. Methods of locating contours' -> Created/Found topic starting with '1.7.2'
+      [MATCH TOPIC] '*   1.7.3. Contour plotting' -> Created/Found topic starting with '1.7.3'
+    [MATCH SUB] '*   1.8. Setting out' -> Created/Found 'Setting out' [ID: 59]
+      [MATCH TOPIC] '*   1.8.1. Small buildings' -> Created/Found topic starting with '1.8.1'
+      [MATCH TOPIC] '*   1.8.2. Simple curves' -> Created/Found topic starting with '1.8.2'
+  [MATCH CAT] '2\. Construction Materials' -> Created/Found 'Construction Materials' (CIVIL) [ID: 62]
+    [MATCH SUB] '*   2.1. Stone' -> Created/Found 'Stone' [ID: 63]
+      [MATCH TOPIC] '*   2.1.1. Formation and availability of stones in Nepal' -> Created/Found topic starting with '2.1.1'
+      [MATCH TOPIC] '*   2.1.2. Methods of laying and construction with various stones' -> Created/Found topic starting with '2.1.2'
+    [MATCH SUB] '*   2.2. Cement' -> Created/Found 'Cement' [ID: 66]
+      [MATCH TOPIC] '*   2.2.1. Different cements: ingredients, properties and manufacture' -> Created/Found topic starting with '2.2.1'
+      [MATCH TOPIC] '*   2.2.2. Storage and transport' -> Created/Found topic starting with '2.2.2'
+      [MATCH TOPIC] '*   2.2.3. Admixtures' -> Created/Found topic starting with '2.2.3'
+    [MATCH SUB] '*   2.3. Clay and clay products' -> Created/Found 'Clay and clay products' [ID: 70]
+      [MATCH TOPIC] '*   2.3.1. Brick: type, manufacture, laying, bonds' -> Created/Found topic starting with '2.3.1'
+    [MATCH SUB] '*   2.4. Paints and Varnishes' -> Created/Found 'Paints and Varnishes' [ID: 72]
+      [MATCH TOPIC] '*   2.4.1. Types and selection' -> Created/Found topic starting with '2.4.1'
+      [MATCH TOPIC] '*   2.4.2. Preparation techniques' -> Created/Found topic starting with '2.4.2'
+      [MATCH TOPIC] '*   2.4.3. Use' -> Created/Found topic starting with '2.4.3'
+    [MATCH SUB] '*   2.5. Timber' -> Created/Found 'Timber' [ID: 76]
+    [MATCH SUB] '*   2.6. Lime' -> Created/Found 'Lime' [ID: 77]
+    [MATCH SUB] '*   2.7. Bitumen' -> Created/Found 'Bitumen' [ID: 78]
+      [MATCH TOPIC] '*   2.7.1. Type' -> Created/Found topic starting with '2.7.1'
+      [MATCH TOPIC] '*   2.7.2. Selection' -> Created/Found topic starting with '2.7.2'
+      [MATCH TOPIC] '*   2.7.3. Use' -> Created/Found topic starting with '2.7.3'
+  [MATCH CAT] '3\. Mechanics of Materials and Structures' -> Created/Found 'Mechanics of Materials and Structures' (CIVIL) [ID: 82]
+    [MATCH SUB] '*   3.1. Mechanics of materials' -> Created/Found 'Mechanics of materials' [ID: 83]
+      [MATCH TOPIC] '*   3.1.1. Internal effects of loading' -> Created/Found topic starting with '3.1.1'
+      [MATCH TOPIC] '*   3.1.2. Ultimate strength and working stress of materials' -> Created/Found topic starting with '3.1.2'
+    [MATCH SUB] '*   3.2. Mechanics of beams' -> Created/Found 'Mechanics of beams' [ID: 86]
+      [MATCH TOPIC] '*   3.2.1. Relation between shear force and bending moment under various types of loading' -> Created/Found topic starting with '3.2.1'
+      [MATCH TOPIC] '*   3.2.2. Thrust, shear and bending moment diagrams for statically determinate beams' -> Created/Found topic starting with '3.2.2'
+    [MATCH SUB] '*   3.3. Simple strut theory' -> Created/Found 'Simple strut theory' [ID: 89]
+  [MATCH CAT] '4\. Hydraulics' -> Created/Found 'Hydraulics' (CIVIL) [ID: 90]
+    [MATCH SUB] '*   4.1. General' -> Created/Found 'General' [ID: 91]
+      [MATCH TOPIC] '*   4.1.1. Properties of fluid: mass, weight, specific weight, density, specific volume, specific gravity, viscosity.' -> Created/Found topic starting with '4.1.1'
+      [MATCH TOPIC] '*   4.1.2. Pressure and Pascal's law.' -> Created/Found topic starting with '4.1.2'
+    [MATCH SUB] '*   4.2. Hydro-kinematics and Hydro-dynamics' -> Created/Found 'Hydro-kinematics and Hydro-dynamics' [ID: 94]
+      [MATCH TOPIC] '*   4.2.1. Energy of flowing liquid: Elevation energy, kinetic energy, potential energy, internal energy.' -> Created/Found topic starting with '4.2.1'
+    [MATCH SUB] '*   4.3. Measurement of discharge' -> Created/Found 'Measurement of discharge' [ID: 96]
+      [MATCH TOPIC] '*   4.3.1. Weirs and notches' -> Created/Found topic starting with '4.3.1'
+      [MATCH TOPIC] '*   4.3.2. Discharge formulas' -> Created/Found topic starting with '4.3.2'
+    [MATCH SUB] '*   4.4. Flows' -> Created/Found 'Flows' [ID: 99]
+      [MATCH TOPIC] '*   4.4.1. Characteristics of pipe flow and open channel flow' -> Created/Found topic starting with '4.4.1'
+  [MATCH CAT] '5\. Soil Mechanics' -> Created/Found 'Soil Mechanics' (CIVIL) [ID: 101]
+    [MATCH SUB] '*   5.1. General' -> Created/Found 'General' [ID: 102]
+      [MATCH TOPIC] '*   5.1.1. Soil types and classification' -> Created/Found topic starting with '5.1.1'
+      [MATCH TOPIC] '*   5.1.2. Three phases of system of soils' -> Created/Found topic starting with '5.1.2'
+      [MATCH TOPIC] '*   5.1.3. Unit weight of soil mass: bulk density, saturated density, submerged density and dry density' -> Created/Found topic starting with '5.1.3'
+      [MATCH TOPIC] '*   5.1.4. Interrelationship between specific gravity, void ratio, porosity, degree of saturation, percentage of air voids, air content and density index.' -> Created/Found topic starting with '5.1.4'
+    [MATCH SUB] '*   5.2. Soil water relation' -> Created/Found 'Soil water relation' [ID: 107]
+      [MATCH TOPIC] '*   5.2.1. Terzaghi's principle of effective stress' -> Created/Found topic starting with '5.2.1'
+      [MATCH TOPIC] '*   5.2.2. Darcy's law' -> Created/Found topic starting with '5.2.2'
+      [MATCH TOPIC] '*   5.2.3. Factors affecting permeability' -> Created/Found topic starting with '5.2.3'
+    [MATCH SUB] '*   5.3. Compaction of soil' -> Created/Found 'Compaction of soil' [ID: 111]
+      [MATCH TOPIC] '*   5.3.1. Factors affecting soil compaction' -> Created/Found topic starting with '5.3.1'
+      [MATCH TOPIC] '*   5.3.2. Optimum moisture content' -> Created/Found topic starting with '5.3.2'
+      [MATCH TOPIC] '*   5.3.3. Relation between dry density and moisture content' -> Created/Found topic starting with '5.3.3'
+    [MATCH SUB] '*   5.4. Shear strength of soil' -> Created/Found 'Shear strength of soil' [ID: 115]
+      [MATCH TOPIC] '*   5.4.1. Mohr-Coulomb failure theory' -> Created/Found topic starting with '5.4.1'
+      [MATCH TOPIC] '*   5.4.2. Cohesion and angle of internal friction' -> Created/Found topic starting with '5.4.2'
+    [MATCH SUB] '*   5.5. Earth Pressures' -> Created/Found 'Earth Pressures' [ID: 118]
+      [MATCH TOPIC] '*   5.5.1. Active and passive earth pressure' -> Created/Found topic starting with '5.5.1'
+      [MATCH TOPIC] '*   5.5.2. Lateral earth pressure theory' -> Created/Found topic starting with '5.5.2'
+      [MATCH TOPIC] '*   5.5.3. Rankine's earth pressure' -> Created/Found topic starting with '5.5.3'
+    [MATCH SUB] '*   5.6. Foundation engineering' -> Created/Found 'Foundation engineering' [ID: 122]
+      [MATCH TOPIC] '*   5.6.1. Terzaghi's general bearing capacity formulas and their application' -> Created/Found topic starting with '5.6.1'
+  [MATCH CAT] '6\. Structural Design' -> Created/Found 'Structural Design' (CIVIL) [ID: 124]
+    [MATCH SUB] '*   6.1. R.C. Section in bending' -> Created/Found 'R.C. Section in bending' [ID: 125]
+      [MATCH TOPIC] '*   6.1.1. Under reinforced, over reinforced and balanced section' -> Created/Found topic starting with '6.1.1'
+      [MATCH TOPIC] '*   6.1.2. Analysis of single and double reinforced rectangular sections' -> Created/Found topic starting with '6.1.2'
+    [MATCH SUB] '*   6.2. Shear and Bond for R.C. Sections' -> Created/Found 'Shear and Bond for R.C. Sections' [ID: 128]
+      [MATCH TOPIC] '*   6.2.1. Shear resistance of a R.C. section' -> Created/Found topic starting with '6.2.1'
+      [MATCH TOPIC] '*   6.2.2. Types of shear reinforcement and their design' -> Created/Found topic starting with '6.2.2'
+      [MATCH TOPIC] '*   6.2.3. Determination of anchorage length' -> Created/Found topic starting with '6.2.3'
+    [MATCH SUB] '*   6.3. Axially Loaded R.C. Columns' -> Created/Found 'Axially Loaded R.C. Columns' [ID: 132]
+      [MATCH TOPIC] '*   6.3.1. Short and long columns' -> Created/Found topic starting with '6.3.1'
+      [MATCH TOPIC] '*   6.3.2. Design of rectangular column section' -> Created/Found topic starting with '6.3.2'
+    [MATCH SUB] '*   6.4. Design and Drafting of R.C. structures' -> Created/Found 'Design and Drafting of R.C. structures' [ID: 135]
+      [MATCH TOPIC] '*   6.4.1. Singly and doubly reinforced rectangular beams' -> Created/Found topic starting with '6.4.1'
+      [MATCH TOPIC] '*   6.4.2. Simple one way and two way slabs' -> Created/Found topic starting with '6.4.2'
+      [MATCH TOPIC] '*   6.4.3. Axially loaded short and long columns' -> Created/Found topic starting with '6.4.3'
+  [MATCH CAT] '7\. Building Construction Technology' -> Created/Found 'Building Construction Technology' (CIVIL) [ID: 139]
+    [MATCH SUB] '*   7.1. Foundation' -> Created/Found 'Foundation' [ID: 140]
+      [MATCH TOPIC] '*   7.1.1. Subsoil exploration' -> Created/Found topic starting with '7.1.1'
+      [MATCH TOPIC] '*   7.1.2. Types and suitability of different foundations; Shallow, deep' -> Created/Found topic starting with '7.1.2'
+      [MATCH TOPIC] '*   7.1.3. Shoring and dewatering' -> Created/Found topic starting with '7.1.3'
+      [MATCH TOPIC] '*   7.1.4. Design of simple brick or stone masonry foundations' -> Created/Found topic starting with '7.1.4'
+    [MATCH SUB] '*   7.2. Walls' -> Created/Found 'Walls' [ID: 145]
+      [MATCH TOPIC] '*   7.2.1. Types of walls' -> Created/Found topic starting with '7.2.1'
+      [MATCH TOPIC] '*   7.2.2. Choosing wall thickness, height to length relation' -> Created/Found topic starting with '7.2.2'
+      [MATCH TOPIC] '*   7.2.3. Use of scaffolding' -> Created/Found topic starting with '7.2.3'
+    [MATCH SUB] '*   7.3. Damp proofing' -> Created/Found 'Damp proofing' [ID: 149]
+      [MATCH TOPIC] '*   7.3.1. Source of dampness' -> Created/Found topic starting with '7.3.1'
+      [MATCH TOPIC] '*   7.3.2. Remedial measures to prevent dampness' -> Created/Found topic starting with '7.3.2'
+    [MATCH SUB] '*   7.4. Concrete technology' -> Created/Found 'Concrete technology' [ID: 152]
+      [MATCH TOPIC] '*   7.4.1. Constituents of cement concrete' -> Created/Found topic starting with '7.4.1'
+      [MATCH TOPIC] '*   7.4.2. Grading of aggregates' -> Created/Found topic starting with '7.4.2'
+      [MATCH TOPIC] '*   7.4.3. Concrete mixes' -> Created/Found topic starting with '7.4.3'
+      [MATCH TOPIC] '*   7.4.4. Water cement ratio' -> Created/Found topic starting with '7.4.4'
+      [MATCH TOPIC] '*   7.4.5. Factors affecting strength of concrete' -> Created/Found topic starting with '7.4.5'
+      [MATCH TOPIC] '*   7.4.6. Form work' -> Created/Found topic starting with '7.4.6'
+      [MATCH TOPIC] '*   7.4.7. Curing' -> Created/Found topic starting with '7.4.7'
+    [MATCH SUB] '*   7.5. Wood work' -> Created/Found 'Wood work' [ID: 160]
+      [MATCH TOPIC] '*   7.5.1. Frame and shutters of door and window' -> Created/Found topic starting with '7.5.1'
+      [MATCH TOPIC] '*   7.5.2. Timber construction of upper floors' -> Created/Found topic starting with '7.5.2'
+      [MATCH TOPIC] '*   7.5.3. Design and construction of stairs' -> Created/Found topic starting with '7.5.3'
+    [MATCH SUB] '*   7.6. Flooring and finishing' -> Created/Found 'Flooring and finishing' [ID: 164]
+      [MATCH TOPIC] '*   7.6.1. Floor finishes: brick, concrete, flag stone' -> Created/Found topic starting with '7.6.1'
+      [MATCH TOPIC] '*   7.6.2. Plastering' -> Created/Found topic starting with '7.6.2'
+  [MATCH CAT] '8\. Water Supply and Sanitation Engineering' -> Created/Found 'Water Supply and Sanitation Engineering' (CIVIL) [ID: 167]
+    [MATCH SUB] '*   8.1. General' -> Created/Found 'General' [ID: 168]
+      [MATCH TOPIC] '*   8.1.1. Objectives of water supply system' -> Created/Found topic starting with '8.1.1'
+      [MATCH TOPIC] '*   8.1.2. Source of water and its selection: gravity and artisan springs, shallow and deep wells, infiltration galleries' -> Created/Found topic starting with '8.1.2'
+    [MATCH SUB] '*   8.2. Gravity water supply system' -> Created/Found 'Gravity water supply system' [ID: 171]
+      [MATCH TOPIC] '*   8.2.1. Design period' -> Created/Found topic starting with '8.2.1'
+      [MATCH TOPIC] '*   8.2.2. Determination of daily water demand' -> Created/Found topic starting with '8.2.2'
+      [MATCH TOPIC] '*   8.2.3. Determination of storage tank capacity' -> Created/Found topic starting with '8.2.3'
+      [MATCH TOPIC] '*   8.2.4. Selection of pipe' -> Created/Found topic starting with '8.2.4'
+      [MATCH TOPIC] '*   8.2.5. Pipe line design and hydraulic grade line' -> Created/Found topic starting with '8.2.5'
+    [MATCH SUB] '*   8.3. Design of sewer' -> Created/Found 'Design of sewer' [ID: 177]
+      [MATCH TOPIC] '*   8.3.1. Quantity of sanitary sewage' -> Created/Found topic starting with '8.3.1'
+      [MATCH TOPIC] '*   8.3.2. Maximum, minimum and self cleaning velocity' -> Created/Found topic starting with '8.3.2'
+    [MATCH SUB] '*   8.4. Excreta disposal in unsewered area' -> Created/Found 'Excreta disposal in unsewered area' [ID: 180]
+      [MATCH TOPIC] '*   8.4.1. Pit latrine' -> Created/Found topic starting with '8.4.1'
+      [MATCH TOPIC] '*   8.4.2. Design of septic tank' -> Created/Found topic starting with '8.4.2'
+  [MATCH CAT] '9\. Irrigation Engineering' -> Created/Found 'Irrigation Engineering' (CIVIL) [ID: 183]
+    [MATCH SUB] '*   9.1. General' -> Created/Found 'General' [ID: 184]
+      [MATCH TOPIC] '*   9.1.1. Advantages and disadvantages of irrigation' -> Created/Found topic starting with '9.1.1'
+    [MATCH SUB] '*   9.2. Water requirement' -> Created/Found 'Water requirement' [ID: 186]
+      [MATCH TOPIC] '*   9.2.1. Crop season and principal crops' -> Created/Found topic starting with '9.2.1'
+      [MATCH TOPIC] '*   9.2.2. Base period' -> Created/Found topic starting with '9.2.2'
+    [MATCH SUB] '*   9.3. Flow irrigation canals' -> Created/Found 'Flow irrigation canals' [ID: 189]
+      [MATCH TOPIC] '*   9.3.1. Canal losses and their minimization' -> Created/Found topic starting with '9.3.1'
+      [MATCH TOPIC] '*   9.3.2. Maximum and minimum velocities' -> Created/Found topic starting with '9.3.2'
+      [MATCH TOPIC] '*   9.3.3. Design of irrigation canal section based on Manning's formula' -> Created/Found topic starting with '9.3.3'
+      [MATCH TOPIC] '*   9.3.4. Need and location of spillways' -> Created/Found topic starting with '9.3.4'
+      [MATCH TOPIC] '*   9.3.5. Head works for small canals' -> Created/Found topic starting with '9.3.5'
+  [MATCH CAT] '10\. Highway Engineering' -> Created/Found 'Highway Engineering' (CIVIL) [ID: 195]
+    [MATCH SUB] '*   10.1. General' -> Created/Found 'General' [ID: 196]
+      [MATCH TOPIC] '*   10.1.1. Introduction to transportation system' -> Created/Found topic starting with '10.1.1'
+      [MATCH TOPIC] '*   10.1.2. Historic development of roads' -> Created/Found topic starting with '10.1.2'
+      [MATCH TOPIC] '*   10.1.3. Classification of road in Nepal' -> Created/Found topic starting with '10.1.3'
+      [MATCH TOPIC] '*   10.1.4. Basic requirements of road alignment' -> Created/Found topic starting with '10.1.4'
+    [MATCH SUB] '*   10.2. Geometric design' -> Created/Found 'Geometric design' [ID: 201]
+      [MATCH TOPIC] '*   10.2.1. Basic design control and criteria for design' -> Created/Found topic starting with '10.2.1'
+      [MATCH TOPIC] '*   10.2.2. Elements of cross section, typical cross section for all roads in filling and cutting' -> Created/Found topic starting with '10.2.2'
+      [MATCH TOPIC] '*   10.2.3. Camber' -> Created/Found topic starting with '10.2.3'
+      [MATCH TOPIC] '*   10.2.4. Determination of radius of horizontal curves' -> Created/Found topic starting with '10.2.4'
+      [MATCH TOPIC] '*   10.2.5. Super elevation' -> Created/Found topic starting with '10.2.5'
+      [MATCH TOPIC] '*   10.2.6. Sight distances' -> Created/Found topic starting with '10.2.6'
+      [MATCH TOPIC] '*   10.2.7. Gradient' -> Created/Found topic starting with '10.2.7'
+      [MATCH TOPIC] '*   10.2.8. Use of Nepal Road standard 2027 (First revision 2045) and subsequent revision in road design.' -> Created/Found topic starting with '10.2.8'
+    [MATCH SUB] '*   10.3. Drainage System' -> Created/Found 'Drainage System' [ID: 210]
+      [MATCH TOPIC] '*   10.3.1. Importance of drainage system and requirements of a good drainage system' -> Created/Found topic starting with '10.3.1'
+    [MATCH SUB] '*   10.4. Road Pavement' -> Created/Found 'Road Pavement' [ID: 212]
+      [MATCH TOPIC] '*   10.4.1. Pavement Structure and its components: Sub grade, sub-base, base and surface courses' -> Created/Found topic starting with '10.4.1'
+    [MATCH SUB] '*   10.5. Road Machineries' -> Created/Found 'Road Machineries' [ID: 214]
+      [MATCH TOPIC] '*   10.5.1. Earth moving and compaction machines' -> Created/Found topic starting with '10.5.1'
+    [MATCH SUB] '*   10.6. Road Construction Technology' -> Created/Found 'Road Construction Technology' [ID: 216]
+    [MATCH SUB] '*   10.7. Bridge' -> Created/Found 'Bridge' [ID: 217]
+      [MATCH TOPIC] '*   10.7.1. T-beam bridge' -> Created/Found topic starting with '10.7.1'
+      [MATCH TOPIC] '*   10.7.2. Timber bridges' -> Created/Found topic starting with '10.7.2'
+    [MATCH SUB] '*   10.8. Road Maintenance and Repair' -> Created/Found 'Road Maintenance and Repair' [ID: 220]
+    [MATCH SUB] '*   10.9. Tracks and Trails' -> Created/Found 'Tracks and Trails' [ID: 221]
+  [MATCH CAT] '11\. Estimating and Costing' -> Created/Found 'Estimating and Costing' (CIVIL) [ID: 222]
+    [MATCH SUB] '*   11.1. General' -> Created/Found 'General' [ID: 223]
+      [MATCH TOPIC] '*   11.1.1. Main items of work' -> Created/Found topic starting with '11.1.1'
+      [MATCH TOPIC] '*   11.1.2. Units of measurement and payments of various items of work and material' -> Created/Found topic starting with '11.1.2'
+      [MATCH TOPIC] '*   11.1.3. Standard estimate formats of government offices' -> Created/Found topic starting with '11.1.3'
+    [MATCH SUB] '*   11.2. Rate analysis' -> Created/Found 'Rate analysis' [ID: 227]
+      [MATCH TOPIC] '*   11.2.1. Basic general knowledge on the use of rate analysis norms Government of Nepal and approved district rates' -> Created/Found topic starting with '11.2.1'
+    [MATCH SUB] '*   11.3. Specifications' -> Created/Found 'Specifications' [ID: 229]
+      [MATCH TOPIC] '*   11.3.1. Interpretation of specification' -> Created/Found topic starting with '11.3.1'
+    [MATCH SUB] '*   11.4. Valuation' -> Created/Found 'Valuation' [ID: 231]
+      [MATCH TOPIC] '*   11.4.1. Methods of valuation' -> Created/Found topic starting with '11.4.1'
+      [MATCH TOPIC] '*   11.4.2. Basic general knowledge of standard formats used by commercial banks and NIDC for valuation' -> Created/Found topic starting with '11.4.2'
+  [MATCH CAT] '12\. Construction Management' -> Created/Found 'Construction Management' (CIVIL) [ID: 234]
+    [MATCH SUB] '*   12.1. Organization' -> Created/Found 'Organization' [ID: 235]
+      [MATCH TOPIC] '*   12.1.1. Need for organization' -> Created/Found topic starting with '12.1.1'
+      [MATCH TOPIC] '*   12.1.2. Responsibilities of a civil overseer' -> Created/Found topic starting with '12.1.2'
+      [MATCH TOPIC] '*   12.1.3. Relation between Owner, Contractor and Engineer' -> Created/Found topic starting with '12.1.3'
+    [MATCH SUB] '*   12.2. Site Management' -> Created/Found 'Site Management' [ID: 239]
+      [MATCH TOPIC] '*   12.2.1. Preparation of site plan' -> Created/Found topic starting with '12.2.1'
+      [MATCH TOPIC] '*   12.2.2. Organizing labor' -> Created/Found topic starting with '12.2.2'
+      [MATCH TOPIC] '*   12.2.3. Organizing labor efficiency' -> Created/Found topic starting with '12.2.3'
+      [MATCH TOPIC] '*   12.2.4. Accident prevention' -> Created/Found topic starting with '12.2.4'
+    [MATCH SUB] '*   12.3. Contract Procedure' -> Created/Found 'Contract Procedure' [ID: 244]
+      [MATCH TOPIC] '*   12.3.1. Contracts' -> Created/Found topic starting with '12.3.1'
+      [MATCH TOPIC] '*   12.3.2. Force account and day-works' -> Created/Found topic starting with '12.3.2'
+      [MATCH TOPIC] '*   12.3.3. Types of contracts' -> Created/Found topic starting with '12.3.3'
+      [MATCH TOPIC] '*   12.3.4. Tender and tender notice' -> Created/Found topic starting with '12.3.4'
+      [MATCH TOPIC] '*   12.3.5. Bid security' -> Created/Found topic starting with '12.3.5'
+      [MATCH TOPIC] '*   12.3.6. Preparation before inviting tender' -> Created/Found topic starting with '12.3.6'
+      [MATCH TOPIC] '*   12.3.7. Agreement' -> Created/Found topic starting with '12.3.7'
+      [MATCH TOPIC] '*   12.3.8. Conditions of contract' -> Created/Found topic starting with '12.3.8'
+      [MATCH TOPIC] '*   12.3.9. Construction supervision' -> Created/Found topic starting with '12.3.9'
+    [MATCH SUB] '*   12.4. Accounts' -> Created/Found 'Accounts' [ID: 254]
+      [MATCH TOPIC] '*   12.4.1. Administrative approval and technical sanction' -> Created/Found topic starting with '12.4.1'
+      [MATCH TOPIC] '*   12.4.2. Familiarity with standard account keeping formats used in governmental organizations' -> Created/Found topic starting with '12.4.2'
+      [MATCH TOPIC] '*   12.4.3. Muster roll' -> Created/Found topic starting with '12.4.3'
+      [MATCH TOPIC] '*   12.4.4. Completion report' -> Created/Found topic starting with '12.4.4'
+    [MATCH SUB] '*   12.5. Planning and Control' -> Created/Found 'Planning and Control' [ID: 259]
+      [MATCH TOPIC] '*   12.5.1. Construction schedule' -> Created/Found topic starting with '12.5.1'
+      [MATCH TOPIC] '*   12.5.2. Equipment and materials schedule' -> Created/Found topic starting with '12.5.2'
+      [MATCH TOPIC] '*   12.5.3. Construction stages and operations' -> Created/Found topic starting with '12.5.3'
+      [MATCH TOPIC] '*   12.5.4. Bar Chart' -> Created/Found topic starting with '12.5.4'
+  [MATCH CAT] '13\. Airport Engineering' -> Created/Found 'Airport Engineering' (CIVIL) [ID: 264]
+    [MATCH SUB] '*   13.1. General' -> Created/Found 'General' [ID: 265]
+      [MATCH TOPIC] '*   13.1.1. Introduction to air transport system' -> Created/Found topic starting with '13.1.1'
+      [MATCH TOPIC] '*   13.1.2. Historic development of Airports in Nepal' -> Created/Found topic starting with '13.1.2'
+      [MATCH TOPIC] '*   13.1.3. Classification of Airports' -> Created/Found topic starting with '13.1.3'
+      [MATCH TOPIC] '*   13.1.4. Airport terminologies' -> Created/Found topic starting with '13.1.4'
+    [MATCH SUB] '*   13.2. Design' -> Created/Found 'Design' [ID: 270]
+      [MATCH TOPIC] '*   13.2.1. Basic design control and criteria for design' -> Created/Found topic starting with '13.2.1'
+      [MATCH TOPIC] '*   13.2.2. General items contained in ANNEX 14 (ICAO publication)' -> Created/Found topic starting with '13.2.2'
+      [MATCH TOPIC] '*   13.2.3. Planning of Airport and its elements' -> Created/Found topic starting with '13.2.3'
+      [MATCH TOPIC] '*   13.2.4. Terminal Building and Control Tower' -> Created/Found topic starting with '13.2.4'
+      [MATCH TOPIC] '*   13.2.5. Drainage System' -> Created/Found topic starting with '13.2.5'
+      [MATCH TOPIC] '*   13.2.6. Geometric design, pavement structure and its component' -> Created/Found topic starting with '13.2.6'
+      [MATCH TOPIC] '*   13.2.7. Basic knowledge on Heliport and Hangars' -> Created/Found topic starting with '13.2.7'
+    [MATCH SUB] '*   13.3. Airport maintenance' -> Created/Found 'Airport maintenance' [ID: 278]
+      [MATCH TOPIC] '*   13.3.1. Types of maintenance' -> Created/Found topic starting with '13.3.1'
+      [MATCH TOPIC] '*   13.3.2. Methods of maintenance' -> Created/Found topic starting with '13.3.2'
+  [SKIP] Unmatched line: * * *
+  [SKIP] Unmatched line: **Examination Scheme for First Paper**
+  [SKIP] Unmatched line: **Question Distribution for First Paper (Part II)** _Questions will be asked from the syllabus units as follows:_
+  [SKIP] Unmatched line: * * *
+  [SKIP] Unmatched line: **Second Paper (Paper II): Service Related Job Knowledge**
+  [IGNORE] **Section - A (30 Marks)**
+  [MATCH CAT] '1\. Surveying' -> Created/Found 'Surveying' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+    [MATCH SUB] '*   1.1. General' -> Created/Found 'General' [ID: 281]
+      [MATCH TOPIC] '*   1.1.1. Classification' -> Created/Found topic starting with '1.1.1'
+      [MATCH TOPIC] '*   1.1.2. Principle of surveying' -> Created/Found topic starting with '1.1.2'
+      [MATCH TOPIC] '*   1.1.3. Selection of suitable method' -> Created/Found topic starting with '1.1.3'
+      [MATCH TOPIC] '*   1.1.4. Scales, plans and maps' -> Created/Found topic starting with '1.1.4'
+      [MATCH TOPIC] '*   1.1.5. Entry into survey field books and level books' -> Created/Found topic starting with '1.1.5'
+    [WARN] Orphan Sub-Category 'Levelling', attaching to context root.
+    [MATCH SUB] '*   1.2. Levelling' -> Created/Found 'Levelling' [ID: 287]
+      [MATCH TOPIC] '*   1.2.1. Methods of levelling' -> Created/Found topic starting with '1.2.1'
+      [MATCH TOPIC] '*   1.2.2. Levelling instruments and accessories' -> Created/Found topic starting with '1.2.2'
+      [MATCH TOPIC] '*   1.2.3. Principles of levelling' -> Created/Found topic starting with '1.2.3'
+    [WARN] Orphan Sub-Category 'Chain surveying', attaching to context root.
+    [MATCH SUB] '*   1.3. Chain surveying' -> Created/Found 'Chain surveying' [ID: 291]
+    [WARN] Orphan Sub-Category 'Compass surveying', attaching to context root.
+    [MATCH SUB] '*   1.4. Compass surveying' -> Created/Found 'Compass surveying' [ID: 292]
+    [WARN] Orphan Sub-Category 'Plane Tabling', attaching to context root.
+    [MATCH SUB] '*   1.5. Plane Tabling' -> Created/Found 'Plane Tabling' [ID: 293]
+      [MATCH TOPIC] '*   1.5.1. Equipments required' -> Created/Found topic starting with '1.5.1'
+      [MATCH TOPIC] '*   1.5.2. Methods of plane tabling' -> Created/Found topic starting with '1.5.2'
+      [MATCH TOPIC] '*   1.5.3. Two and three point problems' -> Created/Found topic starting with '1.5.3'
+    [WARN] Orphan Sub-Category 'Theodolite and Traverse Surveying', attaching to context root.
+    [MATCH SUB] '*   1.6. Theodolite and Traverse Surveying' -> Created/Found 'Theodolite and Traverse Surveying' [ID: 297]
+      [MATCH TOPIC] '*   1.6.1. Basic difference between different theodolites' -> Created/Found topic starting with '1.6.1'
+      [MATCH TOPIC] '*   1.6.2. Temporary adjustments of theodolites' -> Created/Found topic starting with '1.6.2'
+      [MATCH TOPIC] '*   1.6.3. Fundamental lines and desired relations' -> Created/Found topic starting with '1.6.3'
+      [MATCH TOPIC] '*   1.6.4. Tacheometry: stadia method' -> Created/Found topic starting with '1.6.4'
+      [MATCH TOPIC] '*   1.6.5. Trigonometrical levelling' -> Created/Found topic starting with '1.6.5'
+      [MATCH TOPIC] '*   1.6.6. Checks in closed traverse' -> Created/Found topic starting with '1.6.6'
+    [WARN] Orphan Sub-Category 'Contouring', attaching to context root.
+    [MATCH SUB] '*   1.7. Contouring' -> Created/Found 'Contouring' [ID: 304]
+      [MATCH TOPIC] '*   1.7.1. Characteristics of contour lines' -> Created/Found topic starting with '1.7.1'
+      [MATCH TOPIC] '*   1.7.2. Methods of locating contours' -> Created/Found topic starting with '1.7.2'
+      [MATCH TOPIC] '*   1.7.3. Contour plotting' -> Created/Found topic starting with '1.7.3'
+    [WARN] Orphan Sub-Category 'Setting out', attaching to context root.
+    [MATCH SUB] '*   1.8. Setting out' -> Created/Found 'Setting out' [ID: 308]
+      [MATCH TOPIC] '*   1.8.1. Small buildings' -> Created/Found topic starting with '1.8.1'
+      [MATCH TOPIC] '*   1.8.2. Simple curves' -> Created/Found topic starting with '1.8.2'
+  [MATCH CAT] '2\. Construction Materials' -> Created/Found 'Construction Materials' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'Stone', attaching to context root.
+    [MATCH SUB] '*   2.1. Stone' -> Created/Found 'Stone' [ID: 311]
+      [MATCH TOPIC] '*   2.1.1. Formation and availability of stones in Nepal' -> Created/Found topic starting with '2.1.1'
+      [MATCH TOPIC] '*   2.1.2. Methods of laying and construction with various stones' -> Created/Found topic starting with '2.1.2'
+    [WARN] Orphan Sub-Category 'Cement', attaching to context root.
+    [MATCH SUB] '*   2.2. Cement' -> Created/Found 'Cement' [ID: 314]
+      [MATCH TOPIC] '*   2.2.1. Different cements: ingredients, properties and manufacture' -> Created/Found topic starting with '2.2.1'
+      [MATCH TOPIC] '*   2.2.2. Storage and transport' -> Created/Found topic starting with '2.2.2'
+      [MATCH TOPIC] '*   2.2.3. Admixtures' -> Created/Found topic starting with '2.2.3'
+    [WARN] Orphan Sub-Category 'Clay and clay products', attaching to context root.
+    [MATCH SUB] '*   2.3. Clay and clay products' -> Created/Found 'Clay and clay products' [ID: 318]
+      [MATCH TOPIC] '*   2.3.1. Brick: type, manufacture, laying, bonds' -> Created/Found topic starting with '2.3.1'
+    [WARN] Orphan Sub-Category 'Paints and Varnishes', attaching to context root.
+    [MATCH SUB] '*   2.4. Paints and Varnishes' -> Created/Found 'Paints and Varnishes' [ID: 320]
+      [MATCH TOPIC] '*   2.4.1. Types and selection' -> Created/Found topic starting with '2.4.1'
+      [MATCH TOPIC] '*   2.4.2. Preparation techniques' -> Created/Found topic starting with '2.4.2'
+      [MATCH TOPIC] '*   2.4.3. Use' -> Created/Found topic starting with '2.4.3'
+    [WARN] Orphan Sub-Category 'Timber', attaching to context root.
+    [MATCH SUB] '*   2.5. Timber' -> Created/Found 'Timber' [ID: 324]
+    [WARN] Orphan Sub-Category 'Lime', attaching to context root.
+    [MATCH SUB] '*   2.6. Lime' -> Created/Found 'Lime' [ID: 325]
+    [WARN] Orphan Sub-Category 'Bitumen', attaching to context root.
+    [MATCH SUB] '*   2.7. Bitumen' -> Created/Found 'Bitumen' [ID: 326]
+      [MATCH TOPIC] '*   2.7.1. Type' -> Created/Found topic starting with '2.7.1'
+      [MATCH TOPIC] '*   2.7.2. Selection' -> Created/Found topic starting with '2.7.2'
+      [MATCH TOPIC] '*   2.7.3. Use' -> Created/Found topic starting with '2.7.3'
+  [MATCH CAT] '3\. Mechanics of Materials and Structures' -> Created/Found 'Mechanics of Materials and Structures' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'Mechanics of materials', attaching to context root.
+    [MATCH SUB] '*   3.1. Mechanics of materials' -> Created/Found 'Mechanics of materials' [ID: 330]
+      [MATCH TOPIC] '*   3.1.1. Internal effects of loading' -> Created/Found topic starting with '3.1.1'
+      [MATCH TOPIC] '*   3.1.2. Ultimate strength and working stress of materials' -> Created/Found topic starting with '3.1.2'
+    [WARN] Orphan Sub-Category 'Mechanics of beams', attaching to context root.
+    [MATCH SUB] '*   3.2. Mechanics of beams' -> Created/Found 'Mechanics of beams' [ID: 333]
+      [MATCH TOPIC] '*   3.2.1. Relation between shear force and bending moment' -> Created/Found topic starting with '3.2.1'
+      [MATCH TOPIC] '*   3.2.2. Thrust, shear and bending moment diagrams for statically determinate beams under various types of loading' -> Created/Found topic starting with '3.2.2'
+    [WARN] Orphan Sub-Category 'Simple strut theory', attaching to context root.
+    [MATCH SUB] '*   3.3. Simple strut theory' -> Created/Found 'Simple strut theory' [ID: 336]
+  [MATCH CAT] '4\. Hydraulics' -> Created/Found 'Hydraulics' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+    [MATCH SUB] '*   4.1. General' -> Created/Found 'General' [ID: ]
+      [MATCH TOPIC] '*   4.1.1. Properties of fluid: mass, weight, specific weight, density, specific volume, specific gravity, viscosity.' -> Created/Found topic starting with '4.1.1'
+      [MATCH TOPIC] '*   4.1.2. Pressure and Pascal's law.' -> Created/Found topic starting with '4.1.2'
+    [WARN] Orphan Sub-Category 'Hydro-kinematics and Hydro-dynamics', attaching to context root.
+    [MATCH SUB] '*   4.2. Hydro-kinematics and Hydro-dynamics' -> Created/Found 'Hydro-kinematics and Hydro-dynamics' [ID: 339]
+      [MATCH TOPIC] '*   4.2.1. Energy of flowing liquid: Elevation energy, kinetic energy, potential energy, internal energy.' -> Created/Found topic starting with '4.2.1'
+    [WARN] Orphan Sub-Category 'Measurement of discharge', attaching to context root.
+    [MATCH SUB] '*   4.3. Measurement of discharge' -> Created/Found 'Measurement of discharge' [ID: 341]
+      [MATCH TOPIC] '*   4.3.1. Weirs and notches' -> Created/Found topic starting with '4.3.1'
+      [MATCH TOPIC] '*   4.3.2. Discharge formulas' -> Created/Found topic starting with '4.3.2'
+    [WARN] Orphan Sub-Category 'Flows', attaching to context root.
+    [MATCH SUB] '*   4.4. Flows' -> Created/Found 'Flows' [ID: 344]
+      [MATCH TOPIC] '*   4.4.1. Characteristics of pipe flow and open channel flow' -> Created/Found topic starting with '4.4.1'
+  [MATCH CAT] '5\. Soil Mechanics' -> Created/Found 'Soil Mechanics' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+    [MATCH SUB] '*   5.1. General' -> Created/Found 'General' [ID: ]
+      [MATCH TOPIC] '*   5.1.1. Soil types and classification' -> Created/Found topic starting with '5.1.1'
+      [MATCH TOPIC] '*   5.1.2. Three phases of system of soils' -> Created/Found topic starting with '5.1.2'
+      [MATCH TOPIC] '*   5.1.3. Unit weight of soil mass: bulk density, saturated density, submerged density and dry density' -> Created/Found topic starting with '5.1.3'
+      [MATCH TOPIC] '*   5.1.4. Interrelationship between specific gravity, void ratio, porosity, degree of saturation, percentage of air voids, air content and density index.' -> Created/Found topic starting with '5.1.4'
+    [WARN] Orphan Sub-Category 'Soil water relation', attaching to context root.
+    [MATCH SUB] '*   5.2. Soil water relation' -> Created/Found 'Soil water relation' [ID: 350]
+      [MATCH TOPIC] '*   5.2.1. Terzaghi's principle of effective stress' -> Created/Found topic starting with '5.2.1'
+      [MATCH TOPIC] '*   5.2.2. Darcy's law' -> Created/Found topic starting with '5.2.2'
+      [MATCH TOPIC] '*   5.2.3. Factors affecting permeability' -> Created/Found topic starting with '5.2.3'
+    [WARN] Orphan Sub-Category 'Compaction of soil', attaching to context root.
+    [MATCH SUB] '*   5.3. Compaction of soil' -> Created/Found 'Compaction of soil' [ID: 354]
+      [MATCH TOPIC] '*   5.3.1. Factors affecting soil compaction' -> Created/Found topic starting with '5.3.1'
+      [MATCH TOPIC] '*   5.3.2. Optimum moisture content' -> Created/Found topic starting with '5.3.2'
+      [MATCH TOPIC] '*   5.3.3. Relation between dry density and moisture content' -> Created/Found topic starting with '5.3.3'
+    [WARN] Orphan Sub-Category 'Shear strength of soil', attaching to context root.
+    [MATCH SUB] '*   5.4. Shear strength of soil' -> Created/Found 'Shear strength of soil' [ID: 358]
+      [MATCH TOPIC] '*   5.4.1. Mohr-Coulomb failure theory' -> Created/Found topic starting with '5.4.1'
+      [MATCH TOPIC] '*   5.4.2. Cohesion and angle of internal friction' -> Created/Found topic starting with '5.4.2'
+    [WARN] Orphan Sub-Category 'Earth Pressures', attaching to context root.
+    [MATCH SUB] '*   5.5. Earth Pressures' -> Created/Found 'Earth Pressures' [ID: 361]
+      [MATCH TOPIC] '*   5.5.1. Active and passive earth pressure' -> Created/Found topic starting with '5.5.1'
+      [MATCH TOPIC] '*   5.5.2. Lateral earth pressure theory' -> Created/Found topic starting with '5.5.2'
+      [MATCH TOPIC] '*   5.5.3. Rankine's earth pressure' -> Created/Found topic starting with '5.5.3'
+    [WARN] Orphan Sub-Category 'Foundation engineering', attaching to context root.
+    [MATCH SUB] '*   5.6. Foundation engineering' -> Created/Found 'Foundation engineering' [ID: 365]
+      [MATCH TOPIC] '*   5.6.1. Terzaghi's general bearing capacity formulas and their application' -> Created/Found topic starting with '5.6.1'
+  [MATCH CAT] '6\. Structural Design' -> Created/Found 'Structural Design' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'R.C. Section in bending', attaching to context root.
+    [MATCH SUB] '*   6.1. R.C. Section in bending' -> Created/Found 'R.C. Section in bending' [ID: 367]
+      [MATCH TOPIC] '*   6.1.1. Under reinforced, over reinforced and balanced section' -> Created/Found topic starting with '6.1.1'
+      [MATCH TOPIC] '*   6.1.2. Analysis of single and double reinforced rectangular sections' -> Created/Found topic starting with '6.1.2'
+    [WARN] Orphan Sub-Category 'Shear and Bond for R.C. Sections', attaching to context root.
+    [MATCH SUB] '*   6.2. Shear and Bond for R.C. Sections' -> Created/Found 'Shear and Bond for R.C. Sections' [ID: 370]
+      [MATCH TOPIC] '*   6.2.1. Shear resistance of a R.C. section' -> Created/Found topic starting with '6.2.1'
+      [MATCH TOPIC] '*   6.2.2. Types of shear reinforcement and their design' -> Created/Found topic starting with '6.2.2'
+      [MATCH TOPIC] '*   6.2.3. Determination of anchorage length' -> Created/Found topic starting with '6.2.3'
+    [WARN] Orphan Sub-Category 'Axially Loaded R.C. Columns', attaching to context root.
+    [MATCH SUB] '*   6.3. Axially Loaded R.C. Columns' -> Created/Found 'Axially Loaded R.C. Columns' [ID: 374]
+      [MATCH TOPIC] '*   6.3.1. Short and long columns' -> Created/Found topic starting with '6.3.1'
+      [MATCH TOPIC] '*   6.3.2. Design of rectangular column section' -> Created/Found topic starting with '6.3.2'
+    [WARN] Orphan Sub-Category 'Design and Drafting of R.C. structures', attaching to context root.
+    [MATCH SUB] '*   6.4. Design and Drafting of R.C. structures' -> Created/Found 'Design and Drafting of R.C. structures' [ID: 377]
+      [MATCH TOPIC] '*   6.4.1. Singly and doubly reinforced rectangular beams' -> Created/Found topic starting with '6.4.1'
+      [MATCH TOPIC] '*   6.4.2. Simple one way and two way slabs' -> Created/Found topic starting with '6.4.2'
+      [MATCH TOPIC] '*   6.4.3. Axially loaded short and long columns' -> Created/Found topic starting with '6.4.3'
+  [MATCH CAT] '7\. Building Construction Technology' -> Created/Found 'Building Construction Technology' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'Foundation', attaching to context root.
+    [MATCH SUB] '*   7.1. Foundation' -> Created/Found 'Foundation' [ID: 381]
+      [MATCH TOPIC] '*   7.1.1. Soil Exploration' -> Created/Found topic starting with '7.1.1'
+      [MATCH TOPIC] '*   7.1.2. Type and suitability of different foundations: Shallow, Deep etc.' -> Created/Found topic starting with '7.1.2'
+      [MATCH TOPIC] '*   7.1.3. Shoring and dewatering' -> Created/Found topic starting with '7.1.3'
+      [MATCH TOPIC] '*   7.1.4. Design of simple brick or stone masonry foundations' -> Created/Found topic starting with '7.1.4'
+    [WARN] Orphan Sub-Category 'Walls', attaching to context root.
+    [MATCH SUB] '*   7.2. Walls' -> Created/Found 'Walls' [ID: 386]
+      [MATCH TOPIC] '*   7.2.1. Types of walls and their functions' -> Created/Found topic starting with '7.2.1'
+      [MATCH TOPIC] '*   7.2.2. Choosing wall thickness and height to length relation' -> Created/Found topic starting with '7.2.2'
+      [MATCH TOPIC] '*   7.2.3. Use of scaffolding' -> Created/Found topic starting with '7.2.3'
+    [WARN] Orphan Sub-Category 'Damp Proofing', attaching to context root.
+    [MATCH SUB] '*   7.3. Damp Proofing' -> Created/Found 'Damp Proofing' [ID: 390]
+      [MATCH TOPIC] '*   7.3.1. Source of Dampness' -> Created/Found topic starting with '7.3.1'
+      [MATCH TOPIC] '*   7.3.2. Remedial measures to prevent dampness' -> Created/Found topic starting with '7.3.2'
+    [WARN] Orphan Sub-Category 'Concrete Technology', attaching to context root.
+    [MATCH SUB] '*   7.4. Concrete Technology' -> Created/Found 'Concrete Technology' [ID: 393]
+      [MATCH TOPIC] '*   7.4.1. Constituents of cement concrete' -> Created/Found topic starting with '7.4.1'
+      [MATCH TOPIC] '*   7.4.2. Grading of aggregates' -> Created/Found topic starting with '7.4.2'
+      [MATCH TOPIC] '*   7.4.3. Concrete mixes' -> Created/Found topic starting with '7.4.3'
+      [MATCH TOPIC] '*   7.4.4. Water cement ratio' -> Created/Found topic starting with '7.4.4'
+      [MATCH TOPIC] '*   7.4.5. Factor affecting strength of concrete' -> Created/Found topic starting with '7.4.5'
+      [MATCH TOPIC] '*   7.4.6. Form work' -> Created/Found topic starting with '7.4.6'
+      [MATCH TOPIC] '*   7.4.7. Curing' -> Created/Found topic starting with '7.4.7'
+    [WARN] Orphan Sub-Category 'Wood Work', attaching to context root.
+    [MATCH SUB] '*   7.5. Wood Work' -> Created/Found 'Wood Work' [ID: 401]
+      [MATCH TOPIC] '*   7.5.1. Frame and shutters of door and window' -> Created/Found topic starting with '7.5.1'
+      [MATCH TOPIC] '*   7.5.2. Timber construction of upper floors' -> Created/Found topic starting with '7.5.2'
+      [MATCH TOPIC] '*   7.5.3. Design and construction of stairs' -> Created/Found topic starting with '7.5.3'
+    [WARN] Orphan Sub-Category 'Flooring and Finishing', attaching to context root.
+    [MATCH SUB] '*   7.6. Flooring and Finishing' -> Created/Found 'Flooring and Finishing' [ID: 405]
+      [MATCH TOPIC] '*   7.6.1. Floor finishes: brick, concrete, flagstone' -> Created/Found topic starting with '7.6.1'
+      [MATCH TOPIC] '*   7.6.2. Plastering' -> Created/Found topic starting with '7.6.2'
+  [MATCH CAT] '8\. Water Supply and Sanitation Engineering' -> Created/Found 'Water Supply and Sanitation Engineering' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+    [MATCH SUB] '*   8.1. General' -> Created/Found 'General' [ID: ]
+      [MATCH TOPIC] '*   8.1.1. Objectives of water supply system' -> Created/Found topic starting with '8.1.1'
+      [MATCH TOPIC] '*   8.1.2. Source of water and its selection: gravity and artisan springs, shallow and deep wells, infiltration galleries' -> Created/Found topic starting with '8.1.2'
+    [WARN] Orphan Sub-Category 'Gravity water supply system', attaching to context root.
+    [MATCH SUB] '*   8.2. Gravity water supply system' -> Created/Found 'Gravity water supply system' [ID: 410]
+      [MATCH TOPIC] '*   8.2.1. Design period' -> Created/Found topic starting with '8.2.1'
+      [MATCH TOPIC] '*   8.2.2. Determination of daily water demand' -> Created/Found topic starting with '8.2.2'
+      [MATCH TOPIC] '*   8.2.3. Determination of storage tank capacity' -> Created/Found topic starting with '8.2.3'
+      [MATCH TOPIC] '*   8.2.4. Selection of pipe' -> Created/Found topic starting with '8.2.4'
+      [MATCH TOPIC] '*   8.2.5. Pipe line design and hydraulic grade line' -> Created/Found topic starting with '8.2.5'
+    [WARN] Orphan Sub-Category 'Design of sewer', attaching to context root.
+    [MATCH SUB] '*   8.3. Design of sewer' -> Created/Found 'Design of sewer' [ID: 416]
+      [MATCH TOPIC] '*   8.3.1. Quantity of sanitary sewage' -> Created/Found topic starting with '8.3.1'
+      [MATCH TOPIC] '*   8.3.2. Maximum, minimum and self-cleansing velocity' -> Created/Found topic starting with '8.3.2'
+    [WARN] Orphan Sub-Category 'Excreta disposal in unsewered area', attaching to context root.
+    [MATCH SUB] '*   8.4. Excreta disposal in unsewered area' -> Created/Found 'Excreta disposal in unsewered area' [ID: 419]
+      [MATCH TOPIC] '*   8.4.1. Pit latrine' -> Created/Found topic starting with '8.4.1'
+      [MATCH TOPIC] '*   8.4.2. Design of septic tank' -> Created/Found topic starting with '8.4.2'
+  [MATCH CAT] '9\. Irrigation Engineering' -> Created/Found 'Irrigation Engineering' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+    [MATCH SUB] '*   9.1. General' -> Created/Found 'General' [ID: ]
+      [MATCH TOPIC] '*   9.1.1. Advantages and disadvantages of irrigation' -> Created/Found topic starting with '9.1.1'
+    [WARN] Orphan Sub-Category 'Water requirement', attaching to context root.
+    [MATCH SUB] '*   9.2. Water requirement' -> Created/Found 'Water requirement' [ID: 423]
+      [MATCH TOPIC] '*   9.2.1. Crop season and principal crops' -> Created/Found topic starting with '9.2.1'
+      [MATCH TOPIC] '*   9.2.2. Base period' -> Created/Found topic starting with '9.2.2'
+    [WARN] Orphan Sub-Category 'Flow irrigation canals', attaching to context root.
+    [MATCH SUB] '*   9.3. Flow irrigation canals' -> Created/Found 'Flow irrigation canals' [ID: 426]
+      [MATCH TOPIC] '*   9.3.1. Canal losses and their minimization' -> Created/Found topic starting with '9.3.1'
+      [MATCH TOPIC] '*   9.3.2. Maximum and minimum velocities' -> Created/Found topic starting with '9.3.2'
+      [MATCH TOPIC] '*   9.3.3. Design of irrigation canal section based on Manning's formula' -> Created/Found topic starting with '9.3.3'
+      [MATCH TOPIC] '*   9.3.4. Need and location of spillways' -> Created/Found topic starting with '9.3.4'
+      [MATCH TOPIC] '*   9.3.5. Head works for small canals' -> Created/Found topic starting with '9.3.5'
+  [MATCH CAT] '10\. Highway Engineering' -> Created/Found 'Highway Engineering' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+    [MATCH SUB] '*   10.1. General' -> Created/Found 'General' [ID: ]
+      [MATCH TOPIC] '*   10.1.1. Introduction to transportation system' -> Created/Found topic starting with '10.1.1'
+      [MATCH TOPIC] '*   10.1.2. Historic development of roads' -> Created/Found topic starting with '10.1.2'
+      [MATCH TOPIC] '*   10.1.3. Classification of road in Nepal' -> Created/Found topic starting with '10.1.3'
+      [MATCH TOPIC] '*   10.1.4. Basic requirements of road alignment' -> Created/Found topic starting with '10.1.4'
+    [WARN] Orphan Sub-Category 'Geometric design', attaching to context root.
+    [MATCH SUB] '*   10.2. Geometric design' -> Created/Found 'Geometric design' [ID: 436]
+      [MATCH TOPIC] '*   10.2.1. Basic design control and criteria for design' -> Created/Found topic starting with '10.2.1'
+      [MATCH TOPIC] '*   10.2.2. Elements of cross section, typical cross section for all roads in filling and cutting' -> Created/Found topic starting with '10.2.2'
+      [MATCH TOPIC] '*   10.2.3. Camber' -> Created/Found topic starting with '10.2.3'
+      [MATCH TOPIC] '*   10.2.4. Determination of radius of horizontal curves' -> Created/Found topic starting with '10.2.4'
+      [MATCH TOPIC] '*   10.2.5. Super elevation' -> Created/Found topic starting with '10.2.5'
+      [MATCH TOPIC] '*   10.2.6. Sight distances' -> Created/Found topic starting with '10.2.6'
+      [MATCH TOPIC] '*   10.2.7. Gradient' -> Created/Found topic starting with '10.2.7'
+      [MATCH TOPIC] '*   10.2.8. Use of Nepal Road standard 2027 (First revision 2045) and subsequent revision in road design.' -> Created/Found topic starting with '10.2.8'
+    [WARN] Orphan Sub-Category 'Drainage System', attaching to context root.
+    [MATCH SUB] '*   10.3. Drainage System' -> Created/Found 'Drainage System' [ID: 445]
+      [MATCH TOPIC] '*   10.3.1. Importance of drainage system and requirements of a good drainage system' -> Created/Found topic starting with '10.3.1'
+    [WARN] Orphan Sub-Category 'Road Pavement', attaching to context root.
+    [MATCH SUB] '*   10.4. Road Pavement' -> Created/Found 'Road Pavement' [ID: 447]
+      [MATCH TOPIC] '*   10.4.1. Pavement Structure and its components: Sub grade, sub-base, base and surface courses' -> Created/Found topic starting with '10.4.1'
+    [WARN] Orphan Sub-Category 'Road Machineries', attaching to context root.
+    [MATCH SUB] '*   10.5. Road Machineries' -> Created/Found 'Road Machineries' [ID: 449]
+      [MATCH TOPIC] '*   10.5.1. Earth moving and compaction machines' -> Created/Found topic starting with '10.5.1'
+    [WARN] Orphan Sub-Category 'Road Construction Technology', attaching to context root.
+    [MATCH SUB] '*   10.6. Road Construction Technology' -> Created/Found 'Road Construction Technology' [ID: 451]
+    [WARN] Orphan Sub-Category 'Bridge', attaching to context root.
+    [MATCH SUB] '*   10.7. Bridge' -> Created/Found 'Bridge' [ID: 452]
+      [MATCH TOPIC] '*   10.7.1. T-beam bridge' -> Created/Found topic starting with '10.7.1'
+      [MATCH TOPIC] '*   10.7.2. Timber bridges' -> Created/Found topic starting with '10.7.2'
+    [WARN] Orphan Sub-Category 'Road Maintenance and Repair', attaching to context root.
+    [MATCH SUB] '*   10.8. Road Maintenance and Repair' -> Created/Found 'Road Maintenance and Repair' [ID: 455]
+      [MATCH TOPIC] '*   10.8.1. Timber bridges' -> Created/Found topic starting with '10.8.1'
+    [WARN] Orphan Sub-Category 'Tracks and Trails', attaching to context root.
+    [MATCH SUB] '*   10.9. Tracks and Trails' -> Created/Found 'Tracks and Trails' [ID: 457]
+  [MATCH CAT] '11\. Estimating and Costing' -> Created/Found 'Estimating and Costing' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+    [MATCH SUB] '*   11.1. General' -> Created/Found 'General' [ID: ]
+      [MATCH TOPIC] '*   11.1.1. Main items of work' -> Created/Found topic starting with '11.1.1'
+      [MATCH TOPIC] '*   11.1.2. Units of measurement and payments of various items of work and material' -> Created/Found topic starting with '11.1.2'
+      [MATCH TOPIC] '*   11.1.3. Standard estimate formats of government offices' -> Created/Found topic starting with '11.1.3'
+    [WARN] Orphan Sub-Category 'Rate analysis', attaching to context root.
+    [MATCH SUB] '*   11.2. Rate analysis' -> Created/Found 'Rate analysis' [ID: 461]
+      [MATCH TOPIC] '*   11.2.1. Basic general knowledge on the use of rate analysis norms Government of Nepal and approved district rates' -> Created/Found topic starting with '11.2.1'
+    [WARN] Orphan Sub-Category 'Specifications', attaching to context root.
+    [MATCH SUB] '*   11.3. Specifications' -> Created/Found 'Specifications' [ID: 463]
+      [MATCH TOPIC] '*   11.3.1. Interpretation of specification' -> Created/Found topic starting with '11.3.1'
+    [WARN] Orphan Sub-Category 'Valuation', attaching to context root.
+    [MATCH SUB] '*   11.4. Valuation' -> Created/Found 'Valuation' [ID: 465]
+      [MATCH TOPIC] '*   11.4.1. Methods of valuation' -> Created/Found topic starting with '11.4.1'
+      [MATCH TOPIC] '*   11.4.2. Basic general knowledge of standard formats used by commercial banks and NIDC for valuation' -> Created/Found topic starting with '11.4.2'
+  [MATCH CAT] '12\. Construction Management' -> Created/Found 'Construction Management' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'Organization', attaching to context root.
+    [MATCH SUB] '*   12.1. Organization' -> Created/Found 'Organization' [ID: 468]
+      [MATCH TOPIC] '*   12.1.1. Need for organization' -> Created/Found topic starting with '12.1.1'
+      [MATCH TOPIC] '*   12.1.2. Responsibilities of a civil overseer' -> Created/Found topic starting with '12.1.2'
+      [MATCH TOPIC] '*   12.1.3. Relation between Owner, Contractor and Engineer' -> Created/Found topic starting with '12.1.3'
+    [WARN] Orphan Sub-Category 'Site Management', attaching to context root.
+    [MATCH SUB] '*   12.2. Site Management' -> Created/Found 'Site Management' [ID: 472]
+      [MATCH TOPIC] '*   12.2.1. Preparation of site plan' -> Created/Found topic starting with '12.2.1'
+      [MATCH TOPIC] '*   12.2.2. Organizing labor' -> Created/Found topic starting with '12.2.2'
+      [MATCH TOPIC] '*   12.2.3. Organizing labor efficiency' -> Created/Found topic starting with '12.2.3'
+      [MATCH TOPIC] '*   12.2.4. Accident prevention' -> Created/Found topic starting with '12.2.4'
+    [WARN] Orphan Sub-Category 'Contract Procedure', attaching to context root.
+    [MATCH SUB] '*   12.3. Contract Procedure' -> Created/Found 'Contract Procedure' [ID: 477]
+      [MATCH TOPIC] '*   12.3.1. Contracts' -> Created/Found topic starting with '12.3.1'
+      [MATCH TOPIC] '*   12.3.2. Force account and day-works' -> Created/Found topic starting with '12.3.2'
+      [MATCH TOPIC] '*   12.3.3. Types of contracts' -> Created/Found topic starting with '12.3.3'
+      [MATCH TOPIC] '*   12.3.4. Tender and tender notice' -> Created/Found topic starting with '12.3.4'
+      [MATCH TOPIC] '*   12.3.5. Bid security' -> Created/Found topic starting with '12.3.5'
+      [MATCH TOPIC] '*   12.3.6. Preparation before inviting tender' -> Created/Found topic starting with '12.3.6'
+      [MATCH TOPIC] '*   12.3.7. Agreement' -> Created/Found topic starting with '12.3.7'
+      [MATCH TOPIC] '*   12.3.8. Conditions of contract' -> Created/Found topic starting with '12.3.8'
+      [MATCH TOPIC] '*   12.3.9. Construction supervision' -> Created/Found topic starting with '12.3.9'
+    [WARN] Orphan Sub-Category 'Accounts', attaching to context root.
+    [MATCH SUB] '*   12.4. Accounts' -> Created/Found 'Accounts' [ID: 487]
+      [MATCH TOPIC] '*   12.4.1. Administrative approval and technical sanction' -> Created/Found topic starting with '12.4.1'
+      [MATCH TOPIC] '*   12.4.2. Familiarity with standard account keeping formats used in governmental organizations' -> Created/Found topic starting with '12.4.2'
+      [MATCH TOPIC] '*   12.4.3. Muster roll' -> Created/Found topic starting with '12.4.3'
+      [MATCH TOPIC] '*   12.4.4. Completion report' -> Created/Found topic starting with '12.4.4'
+    [WARN] Orphan Sub-Category 'Planning and Control', attaching to context root.
+    [MATCH SUB] '*   12.5. Planning and Control' -> Created/Found 'Planning and Control' [ID: 492]
+      [MATCH TOPIC] '*   12.5.1. Construction schedule' -> Created/Found topic starting with '12.5.1'
+      [MATCH TOPIC] '*   12.5.2. Equipment and materials schedule' -> Created/Found topic starting with '12.5.2'
+      [MATCH TOPIC] '*   12.5.3. Construction stages and operations' -> Created/Found topic starting with '12.5.3'
+      [MATCH TOPIC] '*   12.5.4. Bar Chart' -> Created/Found topic starting with '12.5.4'
+  [MATCH CAT] '13\. Airport Engineering' -> Created/Found 'Airport Engineering' (CIVIL) [ID: ]
+    [WARN] Orphan Sub-Category 'General', attaching to context root.
+    [MATCH SUB] '*   13.1. General' -> Created/Found 'General' [ID: ]
+      [MATCH TOPIC] '*   13.1.1. Introduction to air transport system' -> Created/Found topic starting with '13.1.1'
+      [MATCH TOPIC] '*   13.1.2. Historic development of Airports in Nepal' -> Created/Found topic starting with '13.1.2'
+      [MATCH TOPIC] '*   13.1.3. Classification of Airports' -> Created/Found topic starting with '13.1.3'
+      [MATCH TOPIC] '*   13.1.4. Airport terminologies' -> Created/Found topic starting with '13.1.4'
+    [WARN] Orphan Sub-Category 'Design', attaching to context root.
+    [MATCH SUB] '*   13.2. Design' -> Created/Found 'Design' [ID: 501]
+      [MATCH TOPIC] '*   13.2.1. Basic design control and criteria for design' -> Created/Found topic starting with '13.2.1'
+      [MATCH TOPIC] '*   13.2.2. General items contained in ANNEX 14 (ICAO publication)' -> Created/Found topic starting with '13.2.2'
+      [MATCH TOPIC] '*   13.2.3. Planning of Airport and its elements' -> Created/Found topic starting with '13.2.3'
+      [MATCH TOPIC] '*   13.2.4. Terminal Building and Control Tower' -> Created/Found topic starting with '13.2.4'
+      [MATCH TOPIC] '*   13.2.5. Drainage System' -> Created/Found topic starting with '13.2.5'
+      [MATCH TOPIC] '*   13.2.6. Geometric design, pavement structure and its component' -> Created/Found topic starting with '13.2.6'
+      [MATCH TOPIC] '*   13.2.7. Basic knowledge on Heliport and Hangars' -> Created/Found topic starting with '13.2.7'
+    [WARN] Orphan Sub-Category 'Airport maintenance', attaching to context root.
+    [MATCH SUB] '*   13.3. Airport maintenance' -> Created/Found 'Airport maintenance' [ID: 509]
+      [MATCH TOPIC] '*   13.3.1. Types of maintenance' -> Created/Found topic starting with '13.3.1'
+      [MATCH TOPIC] '*   13.3.2. Methods of maintenance' -> Created/Found topic starting with '13.3.2'
+Split Import Completed.

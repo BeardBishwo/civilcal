@@ -6,12 +6,14 @@ use App\Models\Contest;
 use App\Models\ContestParticipant;
 use App\Core\Database;
 
-class ContestService {
+class ContestService
+{
     protected $db;
     protected $contestModel;
     protected $participantModel;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->db = Database::getInstance();
         $this->contestModel = new Contest();
         $this->participantModel = new ContestParticipant();
@@ -20,16 +22,17 @@ class ContestService {
     /**
      * Creates a Daily Contest automatically
      */
-    public function autoCreateContest() {
+    public function autoCreateContest()
+    {
         // 1. Config: Tomorrow 6 PM to 7 PM
         $tomorrow = date('Y-m-d', strtotime('+1 day'));
         $startTime = $tomorrow . ' 18:00:00';
         $endTime   = $tomorrow . ' 19:00:00';
-        
+
         // 2. Content Strategy
-        // Pick 20 Random "Hard" questions (Level 5)
+        // Pick 20 Random "Hard/Expert" questions (Level 4+)
         $pdo = $this->db->getPdo();
-        $stmt = $pdo->prepare("SELECT id FROM quiz_questions WHERE difficulty_level = 5 AND is_active = 1 ORDER BY RAND() LIMIT 20");
+        $stmt = $pdo->prepare("SELECT id FROM quiz_questions WHERE difficulty_level >= 4 AND is_active = 1 ORDER BY RAND() LIMIT 20");
         $stmt->execute();
         $questions = $stmt->fetchAll(\PDO::FETCH_COLUMN);
 
@@ -57,7 +60,8 @@ class ContestService {
      * JUDGE: The "Lucky Draw" Engine
      * Picks winner from the pool of top scorers
      */
-    public function processResults($contestId) {
+    public function processResults($contestId)
+    {
         $contest = $this->contestModel->find($contestId);
         if (!$contest || $contest['status'] === 'ended') return false;
 
@@ -83,7 +87,7 @@ class ContestService {
         shuffle($topScorers);
         $winnerCount = (int)$contest['winner_count'];
         $winners = array_slice($topScorers, 0, min($winnerCount, count($topScorers)));
-        
+
         $prizePerWinner = floor($contest['prize_pool'] / max(1, count($winners)));
 
         // 4. Distribute Prizes
@@ -91,11 +95,11 @@ class ContestService {
         foreach ($winners as $winner) {
             try {
                 $pdo->beginTransaction();
-                
+
                 // Give User Coins
                 $stmt = $pdo->prepare("UPDATE users SET coins = coins + ? WHERE id = ?");
                 $stmt->execute([$prizePerWinner, $winner['user_id']]);
-                
+
                 // Mark as Winner
                 $this->participantModel->update($winner['id'], [
                     'is_winner' => 1,
@@ -105,8 +109,8 @@ class ContestService {
                 // Record Transaction
                 $stmt = $pdo->prepare("INSERT INTO transactions (user_id, amount, type, description, status, created_at) VALUES (?, ?, 'credit', ?, 'completed', NOW())");
                 $stmt->execute([
-                    $winner['user_id'], 
-                    $prizePerWinner, 
+                    $winner['user_id'],
+                    $prizePerWinner,
                     "Won Contest: " . $contest['title']
                 ]);
 
@@ -117,7 +121,7 @@ class ContestService {
                     "CONGRATULATIONS!",
                     "You won the Lucky Draw for " . $contest['title'] . "! " . $prizePerWinner . " coins added to your account."
                 ]);
-                
+
                 $pdo->commit();
             } catch (\Exception $e) {
                 $pdo->rollBack();

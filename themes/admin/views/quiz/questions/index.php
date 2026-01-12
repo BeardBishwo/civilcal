@@ -10,6 +10,22 @@ $courses = $courses ?? [];
 $educationLevels = $educationLevels ?? [];
 $mainCategories = $mainCategories ?? [];
 $positionLevels = $positionLevels ?? [];
+
+// Create Category Map for Lookup
+$catMap = [];
+if (!empty($mainCategories)) {
+    foreach ($mainCategories as $cat) {
+        $catMap[$cat['id']] = $cat['title'];
+    }
+}
+
+// Subcategory Map (if available, otherwise fallback)
+$subCatMap = [];
+if (!empty($subCategories)) {
+    foreach ($subCategories as $sub) {
+        $subCatMap[$sub['id']] = $sub['title'];
+    }
+}
 ?>
 
 <div class="admin-wrapper-container">
@@ -102,10 +118,122 @@ $positionLevels = $positionLevels ?? [];
                     <?php endif; ?>
                 </form>
             </div>
-            <div class="toolbar-right">
+            <div class="toolbar-right" style="display: flex; align-items: center; gap: 0.75rem;">
                 <div class="search-compact">
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Search questions..." id="question-search" onkeyup="filterQuestions()">
+                </div>
+
+                <!-- Action Buttons Integrated -->
+                <div class="action-buttons-compact">
+                    <!-- Refresh Button -->
+                    <button class="action-btn-premium" onclick="location.reload()" title="Refresh">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+
+                    <!-- Column Visibility Toggle -->
+                    <div class="dropdown-wrapper">
+                        <button class="action-btn-premium" id="columnToggle" title="Column Visibility">
+                            <i class="fas fa-columns"></i>
+                            <i class="fas fa-caret-down" style="font-size: 0.7rem; margin-left: 4px; opacity: 0.8;"></i>
+                        </button>
+                        <div class="dropdown-menu" id="columnDropdown" style="max-height: 400px; overflow-y: auto;">
+                            <!-- 0. ID -->
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="0" checked>
+                                <span>ID</span>
+                            </label>
+
+                            <!-- 1. Main Category -->
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="1" checked>
+                                <span>Main Category</span>
+                            </label>
+
+                            <!-- 2. Sub Category -->
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="2" checked>
+                                <span>Sub Category</span>
+                            </label>
+
+                            <!-- 3. Image -->
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="3" checked>
+                                <span>Image</span>
+                            </label>
+
+                            <!-- 4. Question -->
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="4" checked>
+                                <span>Question</span>
+                            </label>
+
+                            <!-- 5. Question Type -->
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="5" checked>
+                                <span>Question Type</span>
+                            </label>
+
+                            <!-- 6. Options A -->
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="6">
+                                <span>Option A</span>
+                            </label>
+
+                            <!-- 7. Options B -->
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="7">
+                                <span>Option B</span>
+                            </label>
+
+                            <!-- 8. Options C -->
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="8">
+                                <span>Option C</span>
+                            </label>
+
+                            <!-- 9. Options D -->
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="9">
+                                <span>Option D</span>
+                            </label>
+
+                            <!-- 10. Options E -->
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="10">
+                                <span>Option E</span>
+                            </label>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="11">
+                                <span>Answer</span>
+                            </label>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="12" checked>
+                                <span>Level</span>
+                            </label>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="13">
+                                <span>Note</span>
+                            </label>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="column-toggle" data-column="14" checked>
+                                <span>Action</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Export Button -->
+                    <div class="dropdown-wrapper">
+                        <button class="action-btn-premium" id="exportToggle" title="Export">
+                            <i class="fas fa-download"></i>
+                            <i class="fas fa-caret-down" style="font-size: 0.7rem; margin-left: 4px; opacity: 0.8;"></i>
+                        </button>
+                        <div class="dropdown-menu" id="exportDropdown">
+                            <a href="#" class="dropdown-item" onclick="exportTable('csv'); return false;">CSV</a>
+                            <a href="#" class="dropdown-item" onclick="exportTable('excel'); return false;">MS-Excel</a>
+                            <a href="#" class="dropdown-item" onclick="exportTable('pdf'); return false;">PDF</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -116,21 +244,53 @@ $positionLevels = $positionLevels ?? [];
                 <table class="table-compact">
                     <thead>
                         <tr>
-                            <th style="width: 40px;" class="text-center">
-                                <input type="checkbox" id="selectAll" onclick="toggleSelectAll()">
+                            <!-- Checkbox -->
+                            <th class="text-center" style="width: 40px;">
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
                             </th>
+
+                            <!-- 0. ID -->
                             <th style="width: 60px;" class="text-center">ID</th>
-                            <th style="width: 45%;">Question Content</th>
-                            <th class="text-center" style="width: 15%;">Type</th>
-                            <th class="text-center" style="width: 12%;">Difficulty</th>
-                            <th class="text-center" style="width: 10%;">Status</th>
-                            <th class="text-center" style="width: 100px;">Actions</th>
+
+                            <!-- 1. Main Category -->
+                            <th style="width: 150px;">Main Category</th>
+
+                            <!-- 2. Sub Category -->
+                            <th style="width: 150px;">Sub Category</th>
+
+                            <!-- 3. Image -->
+                            <th style="width: 60px;" class="text-center">Image</th>
+
+                            <!-- 4. Question -->
+                            <th style="min-width: 300px;">Question</th>
+
+                            <!-- 5. Question Type -->
+                            <th class="text-center" style="width: 120px;">Type</th>
+
+                            <!-- 6-10. Options A-E -->
+                            <th class="col-hidden" style="min-width: 150px;">Option A</th>
+                            <th class="col-hidden" style="min-width: 150px;">Option B</th>
+                            <th class="col-hidden" style="min-width: 150px;">Option C</th>
+                            <th class="col-hidden" style="min-width: 150px;">Option D</th>
+                            <th class="col-hidden" style="min-width: 150px;">Option E</th>
+
+                            <!-- 11. Answer -->
+                            <th class="col-hidden" style="min-width: 100px;">Answer</th>
+
+                            <!-- 12. Level -->
+                            <th class="text-center" style="width: 100px;">Level</th>
+
+                            <!-- 13. Note -->
+                            <th class="col-hidden" style="min-width: 200px;">Note</th>
+
+                            <!-- 14. Action -->
+                            <th class="text-center" style="width: 100px;">Action</th>
                         </tr>
                     </thead>
                     <tbody id="questionList">
                         <?php if (empty($questions)): ?>
                             <tr>
-                                <td colspan="7" class="empty-cell">
+                                <td colspan="15" class="empty-cell">
                                     <div class="empty-state-compact">
                                         <i class="fas fa-search"></i>
                                         <h3>No questions found</h3>
@@ -142,15 +302,63 @@ $positionLevels = $positionLevels ?? [];
                             <?php foreach ($questions as $q):
                                 $content = json_decode($q['content'], true);
                                 $text = strip_tags($content['text'] ?? '');
+
+                                // Extract Data
+                                $opts = $content['options'] ?? [];
+                                $explanation = nl2br(htmlspecialchars($content['explanation'] ?? ''));
+                                $mainCatID = $q['topic_id'] ?? null;
+                                $subCatID = $q['sub_topic_id'] ?? null;
+
+                                $mainCatParams = $catMap[$mainCatID] ?? '-';
+                                $subCatParams = $subCatMap[$subCatID] ?? '-';
+
+                                // Truncate text
                                 if (strlen($text) > 100) $text = substr($text, 0, 100) . '...';
+
+                                // Determine Answer Text
+                                $answerText = '-';
+                                if ($q['type'] == 'MCQ' || $q['type'] == 'TF') {
+                                    foreach ($opts as $idx => $opt) {
+                                        if (!empty($opt['is_correct'])) {
+                                            $answerText = ($q['type'] == 'MCQ') ? "Option " . chr(65 + $idx) : ($opt['text'] ?? '-');
+                                        }
+                                    }
+                                } elseif ($q['type'] == 'MULTI') {
+                                    $answers = [];
+                                    foreach ($opts as $idx => $opt) {
+                                        if (!empty($opt['is_correct'])) $answers[] = chr(65 + $idx);
+                                    }
+                                    $answerText = implode(', ', $answers);
+                                }
                             ?>
                                 <tr class="question-item group" data-id="<?php echo $q['id']; ?>">
-                                    <td class="text-center align-middle">
-                                        <input type="checkbox" class="row-checkbox" value="<?php echo $q['id']; ?>" onchange="updateBulkToolbar()">
-                                    </td>
+                                    <!-- 0. ID -->
                                     <td class="text-center align-middle">
                                         <span class="text-xs font-bold text-slate-400"><?php echo $q['id']; ?></span>
                                     </td>
+
+                                    <!-- 1. Main Category -->
+                                    <td class="align-middle">
+                                        <div class="text-sm font-medium text-slate-700"><?php echo htmlspecialchars($mainCatParams); ?></div>
+                                    </td>
+
+                                    <!-- 2. Sub Category -->
+                                    <td class="align-middle">
+                                        <div class="text-sm text-slate-600"><?php echo htmlspecialchars($subCatParams); ?></div>
+                                    </td>
+
+                                    <!-- 3. Image -->
+                                    <td class="text-center align-middle">
+                                        <?php if (!empty($content['image'])): ?>
+                                            <div class="flex justify-center">
+                                                <img src="<?php echo htmlspecialchars($content['image']); ?>" class="w-8 h-8 rounded object-cover border border-slate-200" alt="Q">
+                                            </div>
+                                        <?php else: ?>
+                                            <span class="text-slate-300">-</span>
+                                        <?php endif; ?>
+                                    </td>
+
+                                    <!-- 4. Question -->
                                     <td>
                                         <div class="item-info">
                                             <div class="item-icon" style="background: <?php echo $q['type'] == 'MCQ' ? '#dbeafe' : '#d1fae5'; ?>; color: <?php echo $q['type'] == 'MCQ' ? '#1e40af' : '#065f46'; ?>;">
@@ -164,6 +372,8 @@ $positionLevels = $positionLevels ?? [];
                                             </div>
                                         </div>
                                     </td>
+
+                                    <!-- 5. Question Type -->
                                     <td class="text-center">
                                         <?php
                                         $badgeColor = '#dbeafe';
@@ -175,7 +385,6 @@ $positionLevels = $positionLevels ?? [];
                                             $badgeColor = '#fef3c7';
                                             $textColor = '#92400e';
                                             $borderColor = '#fcd34d';
-
                                             // Determine short or long
                                             if (!empty($q['theory_type'])) {
                                                 $displayType = $q['theory_type'] == 'short' ? 'THEORY (S)' : 'THEORY (L)';
@@ -205,6 +414,26 @@ $positionLevels = $positionLevels ?? [];
                                             <?php echo $displayType; ?>
                                         </span>
                                     </td>
+
+                                    <!-- 6-10 Options A-E -->
+                                    <?php for ($i = 0; $i < 5; $i++):
+                                        $optText = $opts[$i]['text'] ?? '-';
+                                        $isCorrect = !empty($opts[$i]['is_correct']);
+                                        $optClass = $isCorrect ? 'text-emerald-600 font-bold bg-emerald-50 border-emerald-200' : 'text-slate-600';
+                                    ?>
+                                        <td class="col-hidden align-middle">
+                                            <div class="text-xs p-1.5 rounded border border-transparent <?php echo $optClass; ?>">
+                                                <?php echo htmlspecialchars(mb_strimwidth(strip_tags($optText), 0, 40, "...")); ?>
+                                            </div>
+                                        </td>
+                                    <?php endfor; ?>
+
+                                    <!-- 11. Answer -->
+                                    <td class="col-hidden text-center align-middle">
+                                        <span class="font-bold text-emerald-600"><?php echo $answerText; ?></span>
+                                    </td>
+
+                                    <!-- 12. Level -->
                                     <td class="text-center align-middle">
                                         <div class="difficulty-stars">
                                             <?php for ($i = 1; $i <= 5; $i++): ?>
@@ -212,11 +441,15 @@ $positionLevels = $positionLevels ?? [];
                                             <?php endfor; ?>
                                         </div>
                                     </td>
-                                    <td class="text-center align-middle">
-                                        <span class="status-badge <?php echo $q['is_active'] ? 'status-active' : 'status-inactive'; ?>">
-                                            <?php echo $q['is_active'] ? 'Active' : 'Inactive'; ?>
-                                        </span>
+
+                                    <!-- 13. Note -->
+                                    <td class="col-hidden align-middle">
+                                        <div class="text-xs text-slate-500 max-w-[200px] truncate" title="<?php echo strip_tags($explanation); ?>">
+                                            <?php echo !empty($explanation) ? strip_tags($explanation) : '-'; ?>
+                                        </div>
                                     </td>
+
+                                    <!-- 14. Action -->
                                     <td class="text-center align-middle">
                                         <div class="actions-compact justify-center">
                                             <a href="<?php echo app_base_url('admin/quiz/questions/edit/' . $q['id']); ?>" class="action-btn-icon edit-btn" title="Edit">
@@ -876,4 +1109,240 @@ $positionLevels = $positionLevels ?? [];
     .btn-bulk-delete:hover {
         background: #dc2626;
     }
+
+    /* Premium Integrated Action Buttons */
+    .action-buttons-compact {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #fff;
+        padding: 4px;
+        border-radius: 8px;
+    }
+
+    .action-btn-premium {
+        height: 32px;
+        min-width: 32px;
+        padding: 0 0.6rem;
+        border: none;
+        border-radius: 6px;
+        background: #e83e8c;
+        /* Magenta theme */
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.85rem;
+        font-weight: 600;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .action-btn-premium:hover {
+        background: #d63384;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(232, 62, 140, 0.3);
+    }
+
+    .action-btn-premium:active {
+        transform: translateY(0);
+    }
+
+    /* Action Toolbar Styles */
+    .action-toolbar {
+        padding: 0.5rem 2rem;
+        background: #fff;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 6px;
+        background: #e83e8c;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 1rem;
+    }
+
+    .action-btn:hover {
+        background: #d63384;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(232, 62, 140, 0.2);
+    }
+
+    .dropdown-wrapper {
+        position: relative;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 0.75rem;
+        background: #1f2937;
+        /* Dark premium theme */
+        border-radius: 12px;
+        padding: 0.5rem;
+        min-width: 220px;
+        display: none;
+        flex-direction: column;
+        gap: 2px;
+        z-index: 1000;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        border: 1px solid #374151;
+        overflow: hidden;
+    }
+
+    .dropdown-menu.show {
+        display: flex;
+        animation: dropdownFadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes dropdownFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        padding: 0.6rem 0.85rem;
+        color: #e5e7eb;
+        text-decoration: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+        gap: 0.75rem;
+        border: none;
+        background: transparent;
+        width: 100%;
+        text-align: left;
+    }
+
+    .dropdown-item:hover {
+        background: #374151;
+        color: white;
+    }
+
+    /* Highlighted item style matching screenshot */
+    .dropdown-item.active {
+        background: #e83e8c;
+        color: white;
+    }
+
+    .dropdown-item input[type="checkbox"] {
+        accent-color: #e83e8c;
+        width: 15px;
+        height: 15px;
+        cursor: pointer;
+    }
+
+    /* Column visibility utility */
+    .col-hidden {
+        display: none !important;
+    }
 </style>
+
+<script>
+    // Action Toolbar Logic
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle Dropdowns
+        const toggles = ['columnToggle', 'exportToggle'];
+
+        toggles.forEach(id => {
+            const btn = document.getElementById(id);
+            const menu = btn.nextElementSibling;
+
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Close other dropdowns
+                document.querySelectorAll('.dropdown-menu').forEach(el => {
+                    if (el !== menu) el.classList.remove('show');
+                });
+                menu.classList.toggle('show');
+            });
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('show'));
+        });
+
+        // Prevent closing when clicking inside menu
+        document.querySelectorAll('.dropdown-menu').forEach(el => {
+            el.addEventListener('click', (e) => e.stopPropagation());
+        });
+
+        // Column Visibility Logic
+        const table = document.querySelector('.table-compact');
+        const checkboxes = document.querySelectorAll('.column-toggle');
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const colIndex = parseInt(this.dataset.column);
+                const isVisible = this.checked;
+
+                // Toggle header
+                // Note: +2 accounts for:
+                // 1. Checkbox column (always first)
+                // 2. 1-based index of nth-child vs 0-based data-column
+                const th = table.querySelector(`thead tr th:nth-child(${colIndex + 2})`);
+                if (th) th.classList.toggle('col-hidden', !isVisible);
+
+                // Toggle cells
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    if (row.classList.contains('empty-row')) return;
+
+                    // Same index logic for cells
+                    const td = row.querySelector(`td:nth-child(${colIndex + 2})`);
+                    if (td) td.classList.toggle('col-hidden', !isVisible);
+                });
+            });
+        });
+    });
+
+    // Simple Export Function (Placeholder implementation)
+    function exportTable(format) {
+        const table = document.querySelector('.table-compact');
+        // Implement actual export logic here or redirect to export endpoint
+        // For now, we'll just show a toast
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+
+        Toast.fire({
+            icon: 'info',
+            title: `Exporting as ${format.toUpperCase()}...`
+        });
+
+        // Close dropdown
+        document.getElementById('exportDropdown').classList.remove('show');
+    }
+</script>

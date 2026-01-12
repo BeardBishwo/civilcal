@@ -333,7 +333,7 @@ class QuestionBankController extends Controller
                 'content' => json_encode($content),
                 'options' => json_encode($options),
                 'answer_explanation' => $_POST['answer_explanation'] ?? '',
-                'difficulty_level' => $_POST['difficulty_level'] ?? 1,
+                'difficulty_level' => $_POST['difficulty_level'] ?? 3,
                 'level_tags' => $levelTags, // Position Levels (4,5,6)
                 'tags' => json_encode($tags), // Stream/Education context
                 'default_marks' => $_POST['default_marks'] ?? 1.0,
@@ -457,7 +457,7 @@ class QuestionBankController extends Controller
                 'content' => json_encode($content),
                 'options' => json_encode($options),
                 'answer_explanation' => $_POST['answer_explanation'] ?? '',
-                'difficulty_level' => $_POST['difficulty_level'] ?? 1,
+                'difficulty_level' => $_POST['difficulty_level'] ?? 3,
                 'level_tags' => $levelTags,
                 'tags' => json_encode($tags),
                 'status' => $_POST['status'] ?? 'approved',

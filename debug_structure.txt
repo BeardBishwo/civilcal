@@ -1,0 +1,512 @@
+Node Dump:
+[1] Civil Engineering (Type: course) -> Parent: NULL
+[2] Diploma in Civil Engineering (Type: education_level) -> Parent: 1
+[3] Sub Engineer (Type: position) -> Parent: 2
+[4] General Awareness (Type: category) -> Parent: NULL
+[5] Geographical condition of Nepal, natural resources, and means. (Type: sub_category) -> Parent: 4
+[6] Information regarding the historical, cultural, and social condition of Nepal. (Type: sub_category) -> Parent: 4
+[7] Information regarding the economic condition of Nepal and current periodic plans. (Type: sub_category) -> Parent: 4
+[8] Constitution of Nepal (Parts 1 to 5 and Schedules). (Type: sub_category) -> Parent: 4
+[9] General information regarding public health, diseases, food, and nutrition. (Type: sub_category) -> Parent: 4
+[10] Biodiversity, sustainable development, environment, pollution, climate change, and population management. (Type: sub_category) -> Parent: 4
+[11] Important achievements in science and technology affecting human life. (Type: sub_category) -> Parent: 4
+[12] Information regarding the United Nations and its specialized agencies. (Type: sub_category) -> Parent: 4
+[13] Information regarding regional organizations (SAARC, BIMSTEC, ASEAN, and European Union). (Type: sub_category) -> Parent: 4
+[14] Contemporary activities of national and international importance. (Type: sub_category) -> Parent: 4
+[15] Public Management (Type: category) -> Parent: NULL
+[16] Office Management (Type: sub_category) -> Parent: 15
+[17] Office: Introduction, importance, functions, and types. (Type: topic) -> Parent: 16
+[18] Functions and qualities of assistant staff. (Type: topic) -> Parent: 16
+[19] Office Resources: Introduction and types. (Type: topic) -> Parent: 16
+[20] Importance, types, and means of communication in an office. (Type: topic) -> Parent: 16
+[21] Office Procedure: Correspondence, Registration & Dispatch, Circular, Order (Tok Aadesh), Note writing (Tippani), and points to consider while preparing notes. (Type: topic) -> Parent: 16
+[22] Record Management. (Type: topic) -> Parent: 16
+[23] Provisions in Civil Service Act and Regulations: (Type: sub_category) -> Parent: 15
+[24] Formation of Civil Service, organizational structure, methods, and processes of filling vacancies. (Type: topic) -> Parent: 23
+[25] Appointment, transfer, promotion, leave, departmental punishment, and retirement of employees. (Type: topic) -> Parent: 23
+[26] Conduct and duties to be followed by employees. (Type: topic) -> Parent: 23
+[27] General Aptitude Test (Type: category) -> Parent: NULL
+[28] Verbal Aptitude Test: Vocabulary, series, analogy, classification, coding-decoding, direction and distance sense test, logical reasoning, ranking order, etc. (Type: sub_category) -> Parent: 27
+[29] Numerical Aptitude Test: Series, analogy, classification, coding, matrix, arithmetical reasoning/operations, percentage, fraction, ratio, average, time and work, etc. (Type: sub_category) -> Parent: 27
+[30] Non-Verbal/Abstract Aptitude Test: Series, analogy, classification, Venn diagram, matrix, construction of triangles and squares, figure construction and analysis, etc. (Type: sub_category) -> Parent: 27
+[31] Surveying (Type: category) -> Parent: 3
+[32] General (Type: sub_category) -> Parent: 31
+[33] Classification (Type: topic) -> Parent: 32
+[34] Principle of surveying (Type: topic) -> Parent: 32
+[35] Selection of suitable method (Type: topic) -> Parent: 32
+[36] Scales, plans and maps (Type: topic) -> Parent: 32
+[37] Entry into survey field books and level books (Type: topic) -> Parent: 32
+[38] Levelling (Type: sub_category) -> Parent: 31
+[39] Methods of levelling (Type: topic) -> Parent: 38
+[40] Levelling instruments and accessories (Type: topic) -> Parent: 38
+[41] Principles of levelling (Type: topic) -> Parent: 38
+[42] Chain surveying (Type: sub_category) -> Parent: 31
+[43] Compass surveying (Type: sub_category) -> Parent: 31
+[44] Plane Tabling (Type: sub_category) -> Parent: 31
+[45] Equipments required (Type: topic) -> Parent: 44
+[46] Methods of plane tabling (Type: topic) -> Parent: 44
+[47] Two and three point problems (Type: topic) -> Parent: 44
+[48] Theodolite and Traverse Surveying (Type: sub_category) -> Parent: 31
+[49] Basic difference between different theodolites (Type: topic) -> Parent: 48
+[50] Temporary adjustments of theodolites (Type: topic) -> Parent: 48
+[51] Fundamental lines and desired relations (Type: topic) -> Parent: 48
+[52] Tacheometry: stadia method (Type: topic) -> Parent: 48
+[53] Trigonometrical levelling (Type: topic) -> Parent: 48
+[54] Checks in closed traverse (Type: topic) -> Parent: 48
+[55] Contouring (Type: sub_category) -> Parent: 31
+[56] Characteristics of contour lines (Type: topic) -> Parent: 55
+[57] Methods of locating contours (Type: topic) -> Parent: 55
+[58] Contour plotting (Type: topic) -> Parent: 55
+[59] Setting out (Type: sub_category) -> Parent: 31
+[60] Small buildings (Type: topic) -> Parent: 59
+[61] Simple curves (Type: topic) -> Parent: 59
+[62] Construction Materials (Type: category) -> Parent: 3
+[63] Stone (Type: sub_category) -> Parent: 62
+[64] Formation and availability of stones in Nepal (Type: topic) -> Parent: 63
+[65] Methods of laying and construction with various stones (Type: topic) -> Parent: 63
+[66] Cement (Type: sub_category) -> Parent: 62
+[67] Different cements: ingredients, properties and manufacture (Type: topic) -> Parent: 66
+[68] Storage and transport (Type: topic) -> Parent: 66
+[69] Admixtures (Type: topic) -> Parent: 66
+[70] Clay and clay products (Type: sub_category) -> Parent: 62
+[71] Brick: type, manufacture, laying, bonds (Type: topic) -> Parent: 70
+[72] Paints and Varnishes (Type: sub_category) -> Parent: 62
+[73] Types and selection (Type: topic) -> Parent: 72
+[74] Preparation techniques (Type: topic) -> Parent: 72
+[75] Use (Type: topic) -> Parent: 72
+[76] Timber (Type: sub_category) -> Parent: 62
+[77] Lime (Type: sub_category) -> Parent: 62
+[78] Bitumen (Type: sub_category) -> Parent: 62
+[79] Type (Type: topic) -> Parent: 78
+[80] Selection (Type: topic) -> Parent: 78
+[81] Use (Type: topic) -> Parent: 78
+[82] Mechanics of Materials and Structures (Type: category) -> Parent: 3
+[83] Mechanics of materials (Type: sub_category) -> Parent: 82
+[84] Internal effects of loading (Type: topic) -> Parent: 83
+[85] Ultimate strength and working stress of materials (Type: topic) -> Parent: 83
+[86] Mechanics of beams (Type: sub_category) -> Parent: 82
+[87] Relation between shear force and bending moment under various types of loading (Type: topic) -> Parent: 86
+[88] Thrust, shear and bending moment diagrams for statically determinate beams (Type: topic) -> Parent: 86
+[89] Simple strut theory (Type: sub_category) -> Parent: 82
+[90] Hydraulics (Type: category) -> Parent: 3
+[91] General (Type: sub_category) -> Parent: 90
+[92] Properties of fluid: mass, weight, specific weight, density, specific volume, specific gravity, viscosity. (Type: topic) -> Parent: 91
+[93] Pressure and Pascal's law. (Type: topic) -> Parent: 91
+[94] Hydro-kinematics and Hydro-dynamics (Type: sub_category) -> Parent: 90
+[95] Energy of flowing liquid: Elevation energy, kinetic energy, potential energy, internal energy. (Type: topic) -> Parent: 94
+[96] Measurement of discharge (Type: sub_category) -> Parent: 90
+[97] Weirs and notches (Type: topic) -> Parent: 96
+[98] Discharge formulas (Type: topic) -> Parent: 96
+[99] Flows (Type: sub_category) -> Parent: 90
+[100] Characteristics of pipe flow and open channel flow (Type: topic) -> Parent: 99
+[101] Soil Mechanics (Type: category) -> Parent: 3
+[102] General (Type: sub_category) -> Parent: 101
+[103] Soil types and classification (Type: topic) -> Parent: 102
+[104] Three phases of system of soils (Type: topic) -> Parent: 102
+[105] Unit weight of soil mass: bulk density, saturated density, submerged density and dry density (Type: topic) -> Parent: 102
+[106] Interrelationship between specific gravity, void ratio, porosity, degree of saturation, percentage of air voids, air content and density index. (Type: topic) -> Parent: 102
+[107] Soil water relation (Type: sub_category) -> Parent: 101
+[108] Terzaghi's principle of effective stress (Type: topic) -> Parent: 107
+[109] Darcy's law (Type: topic) -> Parent: 107
+[110] Factors affecting permeability (Type: topic) -> Parent: 107
+[111] Compaction of soil (Type: sub_category) -> Parent: 101
+[112] Factors affecting soil compaction (Type: topic) -> Parent: 111
+[113] Optimum moisture content (Type: topic) -> Parent: 111
+[114] Relation between dry density and moisture content (Type: topic) -> Parent: 111
+[115] Shear strength of soil (Type: sub_category) -> Parent: 101
+[116] Mohr-Coulomb failure theory (Type: topic) -> Parent: 115
+[117] Cohesion and angle of internal friction (Type: topic) -> Parent: 115
+[118] Earth Pressures (Type: sub_category) -> Parent: 101
+[119] Active and passive earth pressure (Type: topic) -> Parent: 118
+[120] Lateral earth pressure theory (Type: topic) -> Parent: 118
+[121] Rankine's earth pressure (Type: topic) -> Parent: 118
+[122] Foundation engineering (Type: sub_category) -> Parent: 101
+[123] Terzaghi's general bearing capacity formulas and their application (Type: topic) -> Parent: 122
+[124] Structural Design (Type: category) -> Parent: 3
+[125] R.C. Section in bending (Type: sub_category) -> Parent: 124
+[126] Under reinforced, over reinforced and balanced section (Type: topic) -> Parent: 125
+[127] Analysis of single and double reinforced rectangular sections (Type: topic) -> Parent: 125
+[128] Shear and Bond for R.C. Sections (Type: sub_category) -> Parent: 124
+[129] Shear resistance of a R.C. section (Type: topic) -> Parent: 128
+[130] Types of shear reinforcement and their design (Type: topic) -> Parent: 128
+[131] Determination of anchorage length (Type: topic) -> Parent: 128
+[132] Axially Loaded R.C. Columns (Type: sub_category) -> Parent: 124
+[133] Short and long columns (Type: topic) -> Parent: 132
+[134] Design of rectangular column section (Type: topic) -> Parent: 132
+[135] Design and Drafting of R.C. structures (Type: sub_category) -> Parent: 124
+[136] Singly and doubly reinforced rectangular beams (Type: topic) -> Parent: 135
+[137] Simple one way and two way slabs (Type: topic) -> Parent: 135
+[138] Axially loaded short and long columns (Type: topic) -> Parent: 135
+[139] Building Construction Technology (Type: category) -> Parent: 3
+[140] Foundation (Type: sub_category) -> Parent: 139
+[141] Subsoil exploration (Type: topic) -> Parent: 140
+[142] Types and suitability of different foundations; Shallow, deep (Type: topic) -> Parent: 140
+[143] Shoring and dewatering (Type: topic) -> Parent: 140
+[144] Design of simple brick or stone masonry foundations (Type: topic) -> Parent: 140
+[145] Walls (Type: sub_category) -> Parent: 139
+[146] Types of walls (Type: topic) -> Parent: 145
+[147] Choosing wall thickness, height to length relation (Type: topic) -> Parent: 145
+[148] Use of scaffolding (Type: topic) -> Parent: 145
+[149] Damp proofing (Type: sub_category) -> Parent: 139
+[150] Source of dampness (Type: topic) -> Parent: 149
+[151] Remedial measures to prevent dampness (Type: topic) -> Parent: 149
+[152] Concrete technology (Type: sub_category) -> Parent: 139
+[153] Constituents of cement concrete (Type: topic) -> Parent: 152
+[154] Grading of aggregates (Type: topic) -> Parent: 152
+[155] Concrete mixes (Type: topic) -> Parent: 152
+[156] Water cement ratio (Type: topic) -> Parent: 152
+[157] Factors affecting strength of concrete (Type: topic) -> Parent: 152
+[158] Form work (Type: topic) -> Parent: 152
+[159] Curing (Type: topic) -> Parent: 152
+[160] Wood work (Type: sub_category) -> Parent: 139
+[161] Frame and shutters of door and window (Type: topic) -> Parent: 160
+[162] Timber construction of upper floors (Type: topic) -> Parent: 160
+[163] Design and construction of stairs (Type: topic) -> Parent: 160
+[164] Flooring and finishing (Type: sub_category) -> Parent: 139
+[165] Floor finishes: brick, concrete, flag stone (Type: topic) -> Parent: 164
+[166] Plastering (Type: topic) -> Parent: 164
+[167] Water Supply and Sanitation Engineering (Type: category) -> Parent: 3
+[168] General (Type: sub_category) -> Parent: 167
+[169] Objectives of water supply system (Type: topic) -> Parent: 168
+[170] Source of water and its selection: gravity and artisan springs, shallow and deep wells, infiltration galleries (Type: topic) -> Parent: 168
+[171] Gravity water supply system (Type: sub_category) -> Parent: 167
+[172] Design period (Type: topic) -> Parent: 171
+[173] Determination of daily water demand (Type: topic) -> Parent: 171
+[174] Determination of storage tank capacity (Type: topic) -> Parent: 171
+[175] Selection of pipe (Type: topic) -> Parent: 171
+[176] Pipe line design and hydraulic grade line (Type: topic) -> Parent: 171
+[177] Design of sewer (Type: sub_category) -> Parent: 167
+[178] Quantity of sanitary sewage (Type: topic) -> Parent: 177
+[179] Maximum, minimum and self cleaning velocity (Type: topic) -> Parent: 177
+[180] Excreta disposal in unsewered area (Type: sub_category) -> Parent: 167
+[181] Pit latrine (Type: topic) -> Parent: 180
+[182] Design of septic tank (Type: topic) -> Parent: 180
+[183] Irrigation Engineering (Type: category) -> Parent: 3
+[184] General (Type: sub_category) -> Parent: 183
+[185] Advantages and disadvantages of irrigation (Type: topic) -> Parent: 184
+[186] Water requirement (Type: sub_category) -> Parent: 183
+[187] Crop season and principal crops (Type: topic) -> Parent: 186
+[188] Base period (Type: topic) -> Parent: 186
+[189] Flow irrigation canals (Type: sub_category) -> Parent: 183
+[190] Canal losses and their minimization (Type: topic) -> Parent: 189
+[191] Maximum and minimum velocities (Type: topic) -> Parent: 189
+[192] Design of irrigation canal section based on Manning's formula (Type: topic) -> Parent: 189
+[193] Need and location of spillways (Type: topic) -> Parent: 189
+[194] Head works for small canals (Type: topic) -> Parent: 189
+[195] Highway Engineering (Type: category) -> Parent: 3
+[196] General (Type: sub_category) -> Parent: 195
+[197] Introduction to transportation system (Type: topic) -> Parent: 196
+[198] Historic development of roads (Type: topic) -> Parent: 196
+[199] Classification of road in Nepal (Type: topic) -> Parent: 196
+[200] Basic requirements of road alignment (Type: topic) -> Parent: 196
+[201] Geometric design (Type: sub_category) -> Parent: 195
+[202] Basic design control and criteria for design (Type: topic) -> Parent: 201
+[203] Elements of cross section, typical cross section for all roads in filling and cutting (Type: topic) -> Parent: 201
+[204] Camber (Type: topic) -> Parent: 201
+[205] Determination of radius of horizontal curves (Type: topic) -> Parent: 201
+[206] Super elevation (Type: topic) -> Parent: 201
+[207] Sight distances (Type: topic) -> Parent: 201
+[208] Gradient (Type: topic) -> Parent: 201
+[209] Use of Nepal Road standard 2027 (First revision 2045) and subsequent revision in road design. (Type: topic) -> Parent: 201
+[210] Drainage System (Type: sub_category) -> Parent: 195
+[211] Importance of drainage system and requirements of a good drainage system (Type: topic) -> Parent: 210
+[212] Road Pavement (Type: sub_category) -> Parent: 195
+[213] Pavement Structure and its components: Sub grade, sub-base, base and surface courses (Type: topic) -> Parent: 212
+[214] Road Machineries (Type: sub_category) -> Parent: 195
+[215] Earth moving and compaction machines (Type: topic) -> Parent: 214
+[216] Road Construction Technology (Type: sub_category) -> Parent: 195
+[217] Bridge (Type: sub_category) -> Parent: 195
+[218] T-beam bridge (Type: topic) -> Parent: 217
+[219] Timber bridges (Type: topic) -> Parent: 217
+[220] Road Maintenance and Repair (Type: sub_category) -> Parent: 195
+[221] Tracks and Trails (Type: sub_category) -> Parent: 195
+[222] Estimating and Costing (Type: category) -> Parent: 3
+[223] General (Type: sub_category) -> Parent: 222
+[224] Main items of work (Type: topic) -> Parent: 223
+[225] Units of measurement and payments of various items of work and material (Type: topic) -> Parent: 223
+[226] Standard estimate formats of government offices (Type: topic) -> Parent: 223
+[227] Rate analysis (Type: sub_category) -> Parent: 222
+[228] Basic general knowledge on the use of rate analysis norms Government of Nepal and approved district rates (Type: topic) -> Parent: 227
+[229] Specifications (Type: sub_category) -> Parent: 222
+[230] Interpretation of specification (Type: topic) -> Parent: 229
+[231] Valuation (Type: sub_category) -> Parent: 222
+[232] Methods of valuation (Type: topic) -> Parent: 231
+[233] Basic general knowledge of standard formats used by commercial banks and NIDC for valuation (Type: topic) -> Parent: 231
+[234] Construction Management (Type: category) -> Parent: 3
+[235] Organization (Type: sub_category) -> Parent: 234
+[236] Need for organization (Type: topic) -> Parent: 235
+[237] Responsibilities of a civil overseer (Type: topic) -> Parent: 235
+[238] Relation between Owner, Contractor and Engineer (Type: topic) -> Parent: 235
+[239] Site Management (Type: sub_category) -> Parent: 234
+[240] Preparation of site plan (Type: topic) -> Parent: 239
+[241] Organizing labor (Type: topic) -> Parent: 239
+[242] Organizing labor efficiency (Type: topic) -> Parent: 239
+[243] Accident prevention (Type: topic) -> Parent: 239
+[244] Contract Procedure (Type: sub_category) -> Parent: 234
+[245] Contracts (Type: topic) -> Parent: 244
+[246] Force account and day-works (Type: topic) -> Parent: 244
+[247] Types of contracts (Type: topic) -> Parent: 244
+[248] Tender and tender notice (Type: topic) -> Parent: 244
+[249] Bid security (Type: topic) -> Parent: 244
+[250] Preparation before inviting tender (Type: topic) -> Parent: 244
+[251] Agreement (Type: topic) -> Parent: 244
+[252] Conditions of contract (Type: topic) -> Parent: 244
+[253] Construction supervision (Type: topic) -> Parent: 244
+[254] Accounts (Type: sub_category) -> Parent: 234
+[255] Administrative approval and technical sanction (Type: topic) -> Parent: 254
+[256] Familiarity with standard account keeping formats used in governmental organizations (Type: topic) -> Parent: 254
+[257] Muster roll (Type: topic) -> Parent: 254
+[258] Completion report (Type: topic) -> Parent: 254
+[259] Planning and Control (Type: sub_category) -> Parent: 234
+[260] Construction schedule (Type: topic) -> Parent: 259
+[261] Equipment and materials schedule (Type: topic) -> Parent: 259
+[262] Construction stages and operations (Type: topic) -> Parent: 259
+[263] Bar Chart (Type: topic) -> Parent: 259
+[264] Airport Engineering (Type: category) -> Parent: 3
+[265] General (Type: sub_category) -> Parent: 264
+[266] Introduction to air transport system (Type: topic) -> Parent: 265
+[267] Historic development of Airports in Nepal (Type: topic) -> Parent: 265
+[268] Classification of Airports (Type: topic) -> Parent: 265
+[269] Airport terminologies (Type: topic) -> Parent: 265
+[270] Design (Type: sub_category) -> Parent: 264
+[271] Basic design control and criteria for design (Type: topic) -> Parent: 270
+[272] General items contained in ANNEX 14 (ICAO publication) (Type: topic) -> Parent: 270
+[273] Planning of Airport and its elements (Type: topic) -> Parent: 270
+[274] Terminal Building and Control Tower (Type: topic) -> Parent: 270
+[275] Drainage System (Type: topic) -> Parent: 270
+[276] Geometric design, pavement structure and its component (Type: topic) -> Parent: 270
+[277] Basic knowledge on Heliport and Hangars (Type: topic) -> Parent: 270
+[278] Airport maintenance (Type: sub_category) -> Parent: 264
+[279] Types of maintenance (Type: topic) -> Parent: 278
+[280] Methods of maintenance (Type: topic) -> Parent: 278
+[281] General (Type: sub_category) -> Parent: 3
+[282] Classification (Type: topic) -> Parent: 281
+[283] Principle of surveying (Type: topic) -> Parent: 281
+[284] Selection of suitable method (Type: topic) -> Parent: 281
+[285] Scales, plans and maps (Type: topic) -> Parent: 281
+[286] Entry into survey field books and level books (Type: topic) -> Parent: 281
+[287] Levelling (Type: sub_category) -> Parent: 3
+[288] Methods of levelling (Type: topic) -> Parent: 287
+[289] Levelling instruments and accessories (Type: topic) -> Parent: 287
+[290] Principles of levelling (Type: topic) -> Parent: 287
+[291] Chain surveying (Type: sub_category) -> Parent: 3
+[292] Compass surveying (Type: sub_category) -> Parent: 3
+[293] Plane Tabling (Type: sub_category) -> Parent: 3
+[294] Equipments required (Type: topic) -> Parent: 293
+[295] Methods of plane tabling (Type: topic) -> Parent: 293
+[296] Two and three point problems (Type: topic) -> Parent: 293
+[297] Theodolite and Traverse Surveying (Type: sub_category) -> Parent: 3
+[298] Basic difference between different theodolites (Type: topic) -> Parent: 297
+[299] Temporary adjustments of theodolites (Type: topic) -> Parent: 297
+[300] Fundamental lines and desired relations (Type: topic) -> Parent: 297
+[301] Tacheometry: stadia method (Type: topic) -> Parent: 297
+[302] Trigonometrical levelling (Type: topic) -> Parent: 297
+[303] Checks in closed traverse (Type: topic) -> Parent: 297
+[304] Contouring (Type: sub_category) -> Parent: 3
+[305] Characteristics of contour lines (Type: topic) -> Parent: 304
+[306] Methods of locating contours (Type: topic) -> Parent: 304
+[307] Contour plotting (Type: topic) -> Parent: 304
+[308] Setting out (Type: sub_category) -> Parent: 3
+[309] Small buildings (Type: topic) -> Parent: 308
+[310] Simple curves (Type: topic) -> Parent: 308
+[311] Stone (Type: sub_category) -> Parent: 3
+[312] Formation and availability of stones in Nepal (Type: topic) -> Parent: 311
+[313] Methods of laying and construction with various stones (Type: topic) -> Parent: 311
+[314] Cement (Type: sub_category) -> Parent: 3
+[315] Different cements: ingredients, properties and manufacture (Type: topic) -> Parent: 314
+[316] Storage and transport (Type: topic) -> Parent: 314
+[317] Admixtures (Type: topic) -> Parent: 314
+[318] Clay and clay products (Type: sub_category) -> Parent: 3
+[319] Brick: type, manufacture, laying, bonds (Type: topic) -> Parent: 318
+[320] Paints and Varnishes (Type: sub_category) -> Parent: 3
+[321] Types and selection (Type: topic) -> Parent: 320
+[322] Preparation techniques (Type: topic) -> Parent: 320
+[323] Use (Type: topic) -> Parent: 320
+[324] Timber (Type: sub_category) -> Parent: 3
+[325] Lime (Type: sub_category) -> Parent: 3
+[326] Bitumen (Type: sub_category) -> Parent: 3
+[327] Type (Type: topic) -> Parent: 326
+[328] Selection (Type: topic) -> Parent: 326
+[329] Use (Type: topic) -> Parent: 326
+[330] Mechanics of materials (Type: sub_category) -> Parent: 3
+[331] Internal effects of loading (Type: topic) -> Parent: 330
+[332] Ultimate strength and working stress of materials (Type: topic) -> Parent: 330
+[333] Mechanics of beams (Type: sub_category) -> Parent: 3
+[334] Relation between shear force and bending moment (Type: topic) -> Parent: 333
+[335] Thrust, shear and bending moment diagrams for statically determinate beams under various types of loading (Type: topic) -> Parent: 333
+[336] Simple strut theory (Type: sub_category) -> Parent: 3
+[337] Properties of fluid: mass, weight, specific weight, density, specific volume, specific gravity, viscosity. (Type: topic) -> Parent: NULL
+[338] Pressure and Pascal's law. (Type: topic) -> Parent: NULL
+[339] Hydro-kinematics and Hydro-dynamics (Type: sub_category) -> Parent: 3
+[340] Energy of flowing liquid: Elevation energy, kinetic energy, potential energy, internal energy. (Type: topic) -> Parent: 339
+[341] Measurement of discharge (Type: sub_category) -> Parent: 3
+[342] Weirs and notches (Type: topic) -> Parent: 341
+[343] Discharge formulas (Type: topic) -> Parent: 341
+[344] Flows (Type: sub_category) -> Parent: 3
+[345] Characteristics of pipe flow and open channel flow (Type: topic) -> Parent: 344
+[346] Soil types and classification (Type: topic) -> Parent: NULL
+[347] Three phases of system of soils (Type: topic) -> Parent: NULL
+[348] Unit weight of soil mass: bulk density, saturated density, submerged density and dry density (Type: topic) -> Parent: NULL
+[349] Interrelationship between specific gravity, void ratio, porosity, degree of saturation, percentage of air voids, air content and density index. (Type: topic) -> Parent: NULL
+[350] Soil water relation (Type: sub_category) -> Parent: 3
+[351] Terzaghi's principle of effective stress (Type: topic) -> Parent: 350
+[352] Darcy's law (Type: topic) -> Parent: 350
+[353] Factors affecting permeability (Type: topic) -> Parent: 350
+[354] Compaction of soil (Type: sub_category) -> Parent: 3
+[355] Factors affecting soil compaction (Type: topic) -> Parent: 354
+[356] Optimum moisture content (Type: topic) -> Parent: 354
+[357] Relation between dry density and moisture content (Type: topic) -> Parent: 354
+[358] Shear strength of soil (Type: sub_category) -> Parent: 3
+[359] Mohr-Coulomb failure theory (Type: topic) -> Parent: 358
+[360] Cohesion and angle of internal friction (Type: topic) -> Parent: 358
+[361] Earth Pressures (Type: sub_category) -> Parent: 3
+[362] Active and passive earth pressure (Type: topic) -> Parent: 361
+[363] Lateral earth pressure theory (Type: topic) -> Parent: 361
+[364] Rankine's earth pressure (Type: topic) -> Parent: 361
+[365] Foundation engineering (Type: sub_category) -> Parent: 3
+[366] Terzaghi's general bearing capacity formulas and their application (Type: topic) -> Parent: 365
+[367] R.C. Section in bending (Type: sub_category) -> Parent: 3
+[368] Under reinforced, over reinforced and balanced section (Type: topic) -> Parent: 367
+[369] Analysis of single and double reinforced rectangular sections (Type: topic) -> Parent: 367
+[370] Shear and Bond for R.C. Sections (Type: sub_category) -> Parent: 3
+[371] Shear resistance of a R.C. section (Type: topic) -> Parent: 370
+[372] Types of shear reinforcement and their design (Type: topic) -> Parent: 370
+[373] Determination of anchorage length (Type: topic) -> Parent: 370
+[374] Axially Loaded R.C. Columns (Type: sub_category) -> Parent: 3
+[375] Short and long columns (Type: topic) -> Parent: 374
+[376] Design of rectangular column section (Type: topic) -> Parent: 374
+[377] Design and Drafting of R.C. structures (Type: sub_category) -> Parent: 3
+[378] Singly and doubly reinforced rectangular beams (Type: topic) -> Parent: 377
+[379] Simple one way and two way slabs (Type: topic) -> Parent: 377
+[380] Axially loaded short and long columns (Type: topic) -> Parent: 377
+[381] Foundation (Type: sub_category) -> Parent: 3
+[382] Soil Exploration (Type: topic) -> Parent: 381
+[383] Type and suitability of different foundations: Shallow, Deep etc. (Type: topic) -> Parent: 381
+[384] Shoring and dewatering (Type: topic) -> Parent: 381
+[385] Design of simple brick or stone masonry foundations (Type: topic) -> Parent: 381
+[386] Walls (Type: sub_category) -> Parent: 3
+[387] Types of walls and their functions (Type: topic) -> Parent: 386
+[388] Choosing wall thickness and height to length relation (Type: topic) -> Parent: 386
+[389] Use of scaffolding (Type: topic) -> Parent: 386
+[390] Damp Proofing (Type: sub_category) -> Parent: 3
+[391] Source of Dampness (Type: topic) -> Parent: 390
+[392] Remedial measures to prevent dampness (Type: topic) -> Parent: 390
+[393] Concrete Technology (Type: sub_category) -> Parent: 3
+[394] Constituents of cement concrete (Type: topic) -> Parent: 393
+[395] Grading of aggregates (Type: topic) -> Parent: 393
+[396] Concrete mixes (Type: topic) -> Parent: 393
+[397] Water cement ratio (Type: topic) -> Parent: 393
+[398] Factor affecting strength of concrete (Type: topic) -> Parent: 393
+[399] Form work (Type: topic) -> Parent: 393
+[400] Curing (Type: topic) -> Parent: 393
+[401] Wood Work (Type: sub_category) -> Parent: 3
+[402] Frame and shutters of door and window (Type: topic) -> Parent: 401
+[403] Timber construction of upper floors (Type: topic) -> Parent: 401
+[404] Design and construction of stairs (Type: topic) -> Parent: 401
+[405] Flooring and Finishing (Type: sub_category) -> Parent: 3
+[406] Floor finishes: brick, concrete, flagstone (Type: topic) -> Parent: 405
+[407] Plastering (Type: topic) -> Parent: 405
+[408] Objectives of water supply system (Type: topic) -> Parent: NULL
+[409] Source of water and its selection: gravity and artisan springs, shallow and deep wells, infiltration galleries (Type: topic) -> Parent: NULL
+[410] Gravity water supply system (Type: sub_category) -> Parent: 3
+[411] Design period (Type: topic) -> Parent: 410
+[412] Determination of daily water demand (Type: topic) -> Parent: 410
+[413] Determination of storage tank capacity (Type: topic) -> Parent: 410
+[414] Selection of pipe (Type: topic) -> Parent: 410
+[415] Pipe line design and hydraulic grade line (Type: topic) -> Parent: 410
+[416] Design of sewer (Type: sub_category) -> Parent: 3
+[417] Quantity of sanitary sewage (Type: topic) -> Parent: 416
+[418] Maximum, minimum and self-cleansing velocity (Type: topic) -> Parent: 416
+[419] Excreta disposal in unsewered area (Type: sub_category) -> Parent: 3
+[420] Pit latrine (Type: topic) -> Parent: 419
+[421] Design of septic tank (Type: topic) -> Parent: 419
+[422] Advantages and disadvantages of irrigation (Type: topic) -> Parent: NULL
+[423] Water requirement (Type: sub_category) -> Parent: 3
+[424] Crop season and principal crops (Type: topic) -> Parent: 423
+[425] Base period (Type: topic) -> Parent: 423
+[426] Flow irrigation canals (Type: sub_category) -> Parent: 3
+[427] Canal losses and their minimization (Type: topic) -> Parent: 426
+[428] Maximum and minimum velocities (Type: topic) -> Parent: 426
+[429] Design of irrigation canal section based on Manning's formula (Type: topic) -> Parent: 426
+[430] Need and location of spillways (Type: topic) -> Parent: 426
+[431] Head works for small canals (Type: topic) -> Parent: 426
+[432] Introduction to transportation system (Type: topic) -> Parent: NULL
+[433] Historic development of roads (Type: topic) -> Parent: NULL
+[434] Classification of road in Nepal (Type: topic) -> Parent: NULL
+[435] Basic requirements of road alignment (Type: topic) -> Parent: NULL
+[436] Geometric design (Type: sub_category) -> Parent: 3
+[437] Basic design control and criteria for design (Type: topic) -> Parent: 436
+[438] Elements of cross section, typical cross section for all roads in filling and cutting (Type: topic) -> Parent: 436
+[439] Camber (Type: topic) -> Parent: 436
+[440] Determination of radius of horizontal curves (Type: topic) -> Parent: 436
+[441] Super elevation (Type: topic) -> Parent: 436
+[442] Sight distances (Type: topic) -> Parent: 436
+[443] Gradient (Type: topic) -> Parent: 436
+[444] Use of Nepal Road standard 2027 (First revision 2045) and subsequent revision in road design. (Type: topic) -> Parent: 436
+[445] Drainage System (Type: sub_category) -> Parent: 3
+[446] Importance of drainage system and requirements of a good drainage system (Type: topic) -> Parent: 445
+[447] Road Pavement (Type: sub_category) -> Parent: 3
+[448] Pavement Structure and its components: Sub grade, sub-base, base and surface courses (Type: topic) -> Parent: 447
+[449] Road Machineries (Type: sub_category) -> Parent: 3
+[450] Earth moving and compaction machines (Type: topic) -> Parent: 449
+[451] Road Construction Technology (Type: sub_category) -> Parent: 3
+[452] Bridge (Type: sub_category) -> Parent: 3
+[453] T-beam bridge (Type: topic) -> Parent: 452
+[454] Timber bridges (Type: topic) -> Parent: 452
+[455] Road Maintenance and Repair (Type: sub_category) -> Parent: 3
+[456] Timber bridges (Type: topic) -> Parent: 455
+[457] Tracks and Trails (Type: sub_category) -> Parent: 3
+[458] Main items of work (Type: topic) -> Parent: NULL
+[459] Units of measurement and payments of various items of work and material (Type: topic) -> Parent: NULL
+[460] Standard estimate formats of government offices (Type: topic) -> Parent: NULL
+[461] Rate analysis (Type: sub_category) -> Parent: 3
+[462] Basic general knowledge on the use of rate analysis norms Government of Nepal and approved district rates (Type: topic) -> Parent: 461
+[463] Specifications (Type: sub_category) -> Parent: 3
+[464] Interpretation of specification (Type: topic) -> Parent: 463
+[465] Valuation (Type: sub_category) -> Parent: 3
+[466] Methods of valuation (Type: topic) -> Parent: 465
+[467] Basic general knowledge of standard formats used by commercial banks and NIDC for valuation (Type: topic) -> Parent: 465
+[468] Organization (Type: sub_category) -> Parent: 3
+[469] Need for organization (Type: topic) -> Parent: 468
+[470] Responsibilities of a civil overseer (Type: topic) -> Parent: 468
+[471] Relation between Owner, Contractor and Engineer (Type: topic) -> Parent: 468
+[472] Site Management (Type: sub_category) -> Parent: 3
+[473] Preparation of site plan (Type: topic) -> Parent: 472
+[474] Organizing labor (Type: topic) -> Parent: 472
+[475] Organizing labor efficiency (Type: topic) -> Parent: 472
+[476] Accident prevention (Type: topic) -> Parent: 472
+[477] Contract Procedure (Type: sub_category) -> Parent: 3
+[478] Contracts (Type: topic) -> Parent: 477
+[479] Force account and day-works (Type: topic) -> Parent: 477
+[480] Types of contracts (Type: topic) -> Parent: 477
+[481] Tender and tender notice (Type: topic) -> Parent: 477
+[482] Bid security (Type: topic) -> Parent: 477
+[483] Preparation before inviting tender (Type: topic) -> Parent: 477
+[484] Agreement (Type: topic) -> Parent: 477
+[485] Conditions of contract (Type: topic) -> Parent: 477
+[486] Construction supervision (Type: topic) -> Parent: 477
+[487] Accounts (Type: sub_category) -> Parent: 3
+[488] Administrative approval and technical sanction (Type: topic) -> Parent: 487
+[489] Familiarity with standard account keeping formats used in governmental organizations (Type: topic) -> Parent: 487
+[490] Muster roll (Type: topic) -> Parent: 487
+[491] Completion report (Type: topic) -> Parent: 487
+[492] Planning and Control (Type: sub_category) -> Parent: 3
+[493] Construction schedule (Type: topic) -> Parent: 492
+[494] Equipment and materials schedule (Type: topic) -> Parent: 492
+[495] Construction stages and operations (Type: topic) -> Parent: 492
+[496] Bar Chart (Type: topic) -> Parent: 492
+[497] Introduction to air transport system (Type: topic) -> Parent: NULL
+[498] Historic development of Airports in Nepal (Type: topic) -> Parent: NULL
+[499] Classification of Airports (Type: topic) -> Parent: NULL
+[500] Airport terminologies (Type: topic) -> Parent: NULL
+[501] Design (Type: sub_category) -> Parent: 3
+[502] Basic design control and criteria for design (Type: topic) -> Parent: 501
+[503] General items contained in ANNEX 14 (ICAO publication) (Type: topic) -> Parent: 501
+[504] Planning of Airport and its elements (Type: topic) -> Parent: 501
+[505] Terminal Building and Control Tower (Type: topic) -> Parent: 501
+[506] Drainage System (Type: topic) -> Parent: 501
+[507] Geometric design, pavement structure and its component (Type: topic) -> Parent: 501
+[508] Basic knowledge on Heliport and Hangars (Type: topic) -> Parent: 501
+[509] Airport maintenance (Type: sub_category) -> Parent: 3
+[510] Types of maintenance (Type: topic) -> Parent: 509
+[511] Methods of maintenance (Type: topic) -> Parent: 509
