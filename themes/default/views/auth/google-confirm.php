@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Interactive Google Registration Confirmation
- * Premium GitHub-style username selection
+ * Phase 27: Enhanced Google Registration Confirmation
+ * Premium Glassmorphism UI for Username Selection
  */
 ?>
 <!DOCTYPE html>
@@ -12,374 +12,235 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complete Your Profile - <?= \App\Services\SettingsService::get('site_title', 'Bishwo Calculator') ?></title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <?php if (isset($view) && method_exists($view, 'csrfMetaTag')): ?>
+        <?= $view->csrfMetaTag() ?>
+    <?php else: ?>
+        <meta name="csrf-token" content="<?= $_SESSION['csrf_token'] ?? '' ?>">
+    <?php endif; ?>
+
     <style>
-        :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --bg: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: rgba(255, 255, 255, 0.1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
         body {
-            background: var(--bg);
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
             background-image:
                 radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
                 radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
                 radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-main);
-            padding: 20px;
         }
 
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 40px;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+        .avatar-glow {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
             }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            50% {
+                box-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
+            }
+
+            100% {
+                box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
             }
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 32px;
+        .chip-gradient {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
         }
 
-        .avatar-wrap {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 16px;
-        }
-
-        .avatar {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--primary);
-            padding: 3px;
-            background: var(--bg);
-        }
-
-        .google-icon {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            background: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(to right, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        p.subtitle {
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--text-muted);
-        }
-
-        .input-wrap {
-            position: relative;
-        }
-
-        input {
-            width: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px 16px;
-            color: white;
-            font-size: 16px;
-            transition: all 0.3s;
-            outline: none;
-        }
-
-        input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
-        }
-
-        .status-icon {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 18px;
-            display: none;
-        }
-
-        .suggestions {
-            margin-top: 12px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .chip {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: var(--text-muted);
-        }
-
-        .chip:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
+        .chip-gradient:hover {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
             transform: translateY(-2px);
+            border-color: rgba(99, 102, 241, 0.3);
         }
 
-        .btn-submit {
-            width: 100%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn-submit:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
-        }
-
-        .error-box {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 14px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .validation-msg {
-            font-size: 12px;
-            margin-top: 6px;
-            display: none;
-        }
-
-        .val-error {
-            color: #f87171;
-        }
-
-        .val-success {
-            color: #4ade80;
-        }
-
-        .loader {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            display: none;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
 
-<body>
+<body class="flex items-center justify-center p-4">
 
-    <div class="container">
-        <div class="header">
-            <div class="avatar-wrap">
-                <img src="<?= $picture ?? 'https://www.gravatar.com/avatar/' . md5($email) . '?d=mp' ?>" class="avatar" alt="Profile">
-                <div class="google-icon"><i class="fab fa-google" style="color: #4285F4;"></i></div>
+    <div class="max-w-md w-full glass-card rounded-3xl p-8 space-y-8 relative overflow-hidden">
+        <!-- Decorative Background Circle -->
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-indigo-500/10 rounded-full blur-3xl"></div>
+
+        <div class="text-center space-y-4">
+            <div class="relative inline-block">
+                <img src="<?= $picture ?? 'https://www.gravatar.com/avatar/' . md5($email) . '?d=mp' ?>"
+                    alt="Google Avatar"
+                    class="w-24 h-24 rounded-full border-4 border-indigo-500/30 p-1 avatar-glow">
+                <div class="absolute bottom-1 right-1 bg-white rounded-full p-1.5 shadow-lg">
+                    <img src="https://www.google.com/favicon.ico" class="w-4 h-4" alt="Google">
+                </div>
             </div>
-            <h1>Welcome, <?= htmlspecialchars($first_name) ?>!</h1>
-            <p class="subtitle">Complete your registration by choosing a unique username.</p>
+
+            <div class="space-y-1">
+                <h1 class="text-3xl font-bold text-white tracking-tight">
+                    Welcome, <span class="text-indigo-400"><?= htmlspecialchars($first_name) ?></span>!
+                </h1>
+                <p class="text-slate-400 text-sm">Choose your unique username to complete your profile.</p>
+            </div>
         </div>
 
-        <?php if (isset($error)): ?>
-            <div class="error-box">
-                <i class="fas fa-exclamation-circle"></i>
-                <?= htmlspecialchars($error) ?>
-            </div>
-        <?php endif; ?>
+        <form action="<?= app_base_url('/user/login/google/confirm') ?>" method="POST" id="registrationForm" class="space-y-6">
+            <?php if (isset($view) && method_exists($view, 'csrfField')): ?>
+                <?= $view->csrfField() ?>
+            <?php else: ?>
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+            <?php endif; ?>
 
-        <form action="<?= app_base_url('/user/login/google/confirm') ?>" method="POST" id="confirmForm">
-            <div class="form-group">
-                <label for="username">Pick a username</label>
-                <div class="input-wrap">
-                    <input type="text" id="username" name="username" placeholder="e.g. johndoe"
-                        value="<?= htmlspecialchars($suggestions[0] ?? '') ?>" autocomplete="off" required>
-                    <div class="status-icon" id="statusIcon"></div>
-                    <div class="loader" id="checkLoader" style="position: absolute; right: 16px; top: 18px;"></div>
+            <div class="space-y-4">
+                <div class="relative">
+                    <label for="username" class="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1 mb-2 block">Username</label>
+                    <input type="text"
+                        id="username"
+                        name="username"
+                        placeholder="johndoe123"
+                        class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-lg"
+                        value="<?= htmlspecialchars($suggestions[0] ?? '') ?>"
+                        autocomplete="off"
+                        required>
+
+                    <div id="validation-spinner" class="hidden absolute right-4 top-[3.2rem]">
+                        <svg class="animate-spin h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
                 </div>
 
-                <div id="validation-msg" class="validation-msg"></div>
+                <!-- Feedback Area -->
+                <div id="feedback-area" class="min-h-[20px] ml-1">
+                    <p id="feedback-text" class="text-xs transition-all"></p>
+                </div>
 
-                <div class="suggestions">
-                    <span style="font-size: 12px; width: 100%; color: var(--text-muted); margin-bottom: 4px;">Suggestions:</span>
-                    <?php foreach ($suggestions as $sugg): ?>
-                        <div class="chip" onclick="setUsername('<?= htmlspecialchars($sugg) ?>')"><?= htmlspecialchars($sugg) ?></div>
-                        <input type="hidden" name="cached_suggestions[]" value="<?= htmlspecialchars($sugg) ?>">
-                    <?php endforeach; ?>
+                <!-- Suggestion Chips -->
+                <div class="space-y-2">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Suggestions</span>
+                    <div class="flex flex-wrap gap-2">
+                        <?php foreach ($suggestions as $sugg): ?>
+                            <button type="button"
+                                onclick="selectSuggestion('<?= htmlspecialchars($sugg) ?>')"
+                                class="chip-gradient px-4 py-2 rounded-full text-sm text-indigo-300 hover:text-white transition-all">
+                                @<?= htmlspecialchars($sugg) ?>
+                            </button>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
 
-            <button type="submit" class="btn-submit" id="submitBtn">
+            <button type="submit"
+                id="submit-btn"
+                disabled
+                class="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 group">
                 <span>Complete Registration</span>
-                <i class="fas fa-arrow-right"></i>
+                <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
             </button>
         </form>
+
+        <p class="text-center text-slate-500 text-[10px] uppercase tracking-tighter">
+            Instant Profile Setup &bull; Secured by Civil Cal
+        </p>
     </div>
 
     <script>
         const usernameInput = document.getElementById('username');
-        const statusIcon = document.getElementById('statusIcon');
-        const loader = document.getElementById('checkLoader');
-        const msg = document.getElementById('validation-msg');
-        const submitBtn = document.getElementById('submitBtn');
-        let checkTimeout;
+        const feedbackText = document.getElementById('feedback-text');
+        const spinner = document.getElementById('validation-spinner');
+        const submitBtn = document.getElementById('submit-btn');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
-        function setUsername(val) {
+        let debounceTimer;
+
+        function selectSuggestion(val) {
             usernameInput.value = val;
-            checkUsername(val);
+            validateUsername(val);
         }
 
         usernameInput.addEventListener('input', (e) => {
-            const val = e.target.value;
-            clearTimeout(checkTimeout);
+            clearTimeout(debounceTimer);
+            const val = e.target.value.trim();
 
             if (val.length < 3) {
-                hideStatus();
+                setFeedback('Username must be at least 3 characters', 'text-amber-400');
+                submitBtn.disabled = true;
                 return;
             }
 
-            loader.style.display = 'block';
-            statusIcon.style.display = 'none';
+            setFeedback('Checking availability...', 'text-slate-400');
+            spinner.classList.remove('hidden');
 
-            checkTimeout = setTimeout(() => {
-                checkUsername(val);
+            debounceTimer = setTimeout(() => {
+                validateUsername(val);
             }, 500);
         });
 
-        async function checkUsername(username) {
+        async function validateUsername(username) {
             try {
-                // Updated to use POST and new endpoint as per Phase 27 spec
-                const formData = new FormData();
-                formData.append('username', username);
+                spinner.classList.remove('hidden');
 
                 const response = await fetch('<?= app_base_url('/api/check-username') ?>', {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: `username=${encodeURIComponent(username)}&csrf_token=${encodeURIComponent(csrfToken || '')}`
                 });
+
                 const data = await response.json();
 
-                loader.style.display = 'none';
-                statusIcon.style.display = 'block';
-                msg.style.display = 'block';
+                spinner.classList.add('hidden');
 
                 if (data.available) {
-                    statusIcon.innerHTML = '<i class="fas fa-check-circle" style="color: #4ade80;"></i>';
-                    msg.innerHTML = '<i class="fas fa-check"></i> ' + data.message;
-                    msg.className = 'validation-msg val-success';
+                    setFeedback('<i class="fas fa-check-circle mr-1"></i> Username available', 'text-emerald-400');
                     submitBtn.disabled = false;
-                    submitBtn.style.opacity = '1';
+                    usernameInput.classList.add('border-emerald-500/50');
+                    usernameInput.classList.remove('border-rose-500/50');
                 } else {
-                    statusIcon.innerHTML = '<i class="fas fa-times-circle" style="color: #f87171;"></i>';
-                    msg.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + data.message;
-                    msg.className = 'validation-msg val-error';
+                    setFeedback('<i class="fas fa-times-circle mr-1"></i> ' + (data.message || 'Username already taken'), 'text-rose-400');
                     submitBtn.disabled = true;
-                    submitBtn.style.opacity = '0.7';
+                    usernameInput.classList.add('border-rose-500/50');
+                    usernameInput.classList.remove('border-emerald-500/50');
                 }
-            } catch (e) {
-                console.error(e);
-                loader.style.display = 'none';
+            } catch (err) {
+                spinner.classList.add('hidden');
+                console.error('Validation error:', err);
+                setFeedback('Error checking availability. Please try again.', 'text-rose-400');
             }
         }
 
-        function hideStatus() {
-            statusIcon.style.display = 'none';
-            loader.style.display = 'none';
-            msg.style.display = 'none';
+        function setFeedback(msg, colorClass) {
+            feedbackText.innerHTML = msg;
+            feedbackText.className = `text-xs transition-all ${colorClass}`;
         }
 
-        // Initial check
+        // Initial validation for current input (pre-filled with first suggestion)
         if (usernameInput.value) {
-            checkUsername(usernameInput.value);
+            validateUsername(usernameInput.value);
         }
     </script>
-
 </body>
 
 </html>
