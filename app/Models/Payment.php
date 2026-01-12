@@ -13,8 +13,8 @@ class Payment {
     
     public function create($data) {
         $stmt = $this->db->getPdo()->prepare("
-            INSERT INTO payments (user_id, subscription_id, amount, currency, payment_method, paypal_order_id, paypal_payer_id, status, billing_cycle, starts_at, ends_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO payments (user_id, subscription_id, amount, currency, payment_method, paypal_order_id, paypal_payer_id, transaction_id, status, billing_cycle, starts_at, ends_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         
         return $stmt->execute([
@@ -25,6 +25,7 @@ class Payment {
             isset($data['payment_method']) ? $data['payment_method'] : 'paypal',
             isset($data['paypal_order_id']) ? $data['paypal_order_id'] : null,
             isset($data['paypal_payer_id']) ? $data['paypal_payer_id'] : null,
+            isset($data['transaction_id']) ? $data['transaction_id'] : null,
             isset($data['status']) ? $data['status'] : 'pending',
             isset($data['billing_cycle']) ? $data['billing_cycle'] : 'monthly',
             isset($data['starts_at']) ? $data['starts_at'] : date('Y-m-d H:i:s'),

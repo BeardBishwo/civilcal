@@ -13,16 +13,14 @@ class AdminMiddleware
         // Start session securely
         \App\Services\Security::startSession();
 
-        // Check if user is authenticated via session
-        $isAuthenticated = $this->checkSessionAuthentication();
-
-        if (!$isAuthenticated) {
-            // Redirect to login if not authenticated
+        // Check if user is authenticated and get fresh data
+        $user = $this->getAuthenticatedUser();
+        if (!$user) {
             $this->redirectToLogin();
         }
 
-        // Check if user is admin
-        if (!$this->isAdminUser()) {
+        // Check if user is admin using fresh DB data
+        if (!$this->isAdminUser($user)) {
             $this->showAccessDenied();
         }
 
@@ -30,9 +28,9 @@ class AdminMiddleware
     }
 
     /**
-     * Check if user is authenticated via session
+     * Check if user is authenticated and return fresh user data
      */
-    private function checkSessionAuthentication()
+    private function getAuthenticatedUser()
     {
         // Check if user session exists
         if (empty($_SESSION['user_id']) && empty($_SESSION['user'])) {
@@ -54,18 +52,19 @@ class AdminMiddleware
             return false;
         }
 
-        return true;
+        return $user;
     }
 
     /**
      * Check if authenticated user has admin privileges
      */
-    private function isAdminUser()
+    private function isAdminUser($user)
     {
-        // Check admin status from session
-        $isAdmin = !empty($_SESSION['is_admin']) ||
-            (!empty($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']) ||
-            (!empty($_SESSION['user']['role']) && in_array($_SESSION['user']['role'], ['admin', 'super_admin']));
+        if (!$user) return false;
+
+        // Check admin status from fresh database roles
+        $isAdmin = (isset($user['is_admin']) && $user['is_admin']) ||
+                   (isset($user['role']) && in_array($user['role'], ['admin', 'super_admin']));
 
         return $isAdmin;
     }
@@ -73,7 +72,7 @@ class AdminMiddleware
     /**
      * Redirect to login page
      */
-    private function redirectToLogin()
+    protected function redirectToLogin()
     {
         $redirectUrl = \app_base_url("/login");
         if (!empty($_SERVER['REQUEST_URI'])) {
@@ -87,7 +86,7 @@ class AdminMiddleware
     /**
      * Show access denied page
      */
-    private function showAccessDenied()
+    protected function showAccessDenied()
     {
         // Check if this is an API/JSON request
         $isApiRequest = (

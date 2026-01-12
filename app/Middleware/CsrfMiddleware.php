@@ -6,7 +6,12 @@ class CsrfMiddleware
 {
     protected function ensureToken()
     {
-        \App\Services\Security::generateCsrfToken();
+        if (session_status() === PHP_SESSION_NONE) {
+            \App\Services\Security::startSession();
+        }
+        if (empty($_SESSION['csrf_token'])) {
+            \App\Services\Security::generateCsrfToken();
+        }
     }
 
     protected function validToken(?string $token): bool

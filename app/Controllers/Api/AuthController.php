@@ -154,20 +154,8 @@ class AuthController extends Controller
                 }
 
                 // Check for installer auto-deletion on first admin login
-                if (($user['role'] === 'admin' || $user['role'] === 'super_admin') && 
-                    class_exists('\App\Services\InstallerService')) {
-                    
-                    $installerService = \App\Services\InstallerService::class;
-                    
-                    if ($installerService::shouldAutoDelete() && 
-                        !$installerService::isInstallerProcessed() &&
-                        $installerService::isFirstAdminLogin($user['id'])) {
-                        
-                        if ($installerService::deleteInstaller()) {
-                            $installerService::markInstallerProcessed();
-                            error_log("Installer automatically deleted after first admin login: {$user['email']}");
-                        }
-                    }
+                if (class_exists('\App\Services\InstallerService')) {
+                    \App\Services\InstallerService::attemptCleanup($user);
                 }
 
                 echo json_encode([

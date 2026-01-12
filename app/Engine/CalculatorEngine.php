@@ -163,31 +163,39 @@ class CalculatorEngine
         return $config[$calculatorId];
     }
     
-    /**
-     * Find configuration file for calculator
-     */
     private function findConfigFile(string $calculatorId): ?string
     {
-        $configDir = __DIR__ . '/../Config/Calculators/';
+        $cache = \App\Services\AdvancedCache::getInstance();
+        $cacheKey = 'calculator_config_map';
         
-        // Dynamic scan of all calculator config files
-        // This avoids hardcoding categories and missing new ones
-        $files = glob($configDir . '*.php');
+        $map = $cache->get($cacheKey);
         
-        foreach ($files as $file) {
-            // We use standard PHP require to inspect the array keys without loading everything into memory permanently?
-            // require will load it. But it's cached by OPCode usually.
-            // This is acceptable for the scale.
+        // If map is missing or specific ID isn't found (might be new), rebuild
+        if (!$map || !isset($map[$calculatorId])) {
+            $configDir = __DIR__ . '/../Config/Calculators/';
             
-            // Optimization: Maybe check filename? No, calculatorId doesn't always match category.
-            
-            $config = require $file;
-            if (isset($config[$calculatorId])) {
-                return $file;
+            if (!is_dir($configDir)) {
+                return null;
             }
+
+            $files = glob($configDir . '*.php');
+            $map = [];
+            
+            foreach ($files as $file) {
+                // Using require to build the map. This is done once per cache cycle.
+                $config = require $file;
+                if (is_array($config)) {
+                    foreach (array_keys($config) as $id) {
+                        $map[$id] = $file;
+                    }
+                }
+            }
+
+            // Cache for 1 hour
+            $cache->set($cacheKey, $map, 3600);
         }
         
-        return null;
+        return $map[$calculatorId] ?? null;
     }
     
     /**
@@ -211,11 +219,16 @@ class CalculatorEngine
         }
     }
     
-    /**
-     * List all available calculators
-     */
     public function listCalculators(): array
     {
+        $cache = \App\Services\AdvancedCache::getInstance();
+        $cacheKey = 'calculator_list_full';
+        
+        $cachedList = $cache->get($cacheKey);
+        if ($cachedList) {
+            return $cachedList;
+        }
+
         $calculators = [];
         $configDir = __DIR__ . '/../Config/Calculators/';
         
@@ -229,16 +242,19 @@ class CalculatorEngine
             $category = basename($file, '.php');
             $config = require $file;
             
-            foreach ($config as $id => $calc) {
-                $calculators[] = [
-                    'id' => $id,
-                    'name' => $calc['name'] ?? '',
-                    'category' => $category,
-                    'description' => $calc['description'] ?? ''
-                ];
+            if (is_array($config)) {
+                foreach ($config as $id => $calc) {
+                    $calculators[] = [
+                        'id' => $id,
+                        'name' => $calc['name'] ?? '',
+                        'category' => $category,
+                        'description' => $calc['description'] ?? ''
+                    ];
+                }
             }
         }
         
+        $cache->set($cacheKey, $calculators, 3600);
         return $calculators;
     }
     

@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\EmailThread;
+use App\Services\RecaptchaService;
+use App\Services\Security;
 
 class ContactController extends Controller
 {
@@ -31,6 +33,37 @@ class ContactController extends Controller
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+            return;
+        }
+
+        // 1. Verify CSRF
+        $token = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if (empty($token) || !Security::validateCsrfToken($token)) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            return;
+        }
+
+        // 2. Verify Recaptcha
+        $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
+        $recaptchaService = new RecaptchaService();
+
+        // Pass IP for better score analysis
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+        if (!$recaptchaService->verify($recaptchaResponse, $ip)) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Spam detected. Please try again.']);
+            return;
+        }
+
+        // 3. Rate Limiting (5 requests per hour)
+        $rateLimiter = new \App\Services\RateLimiter();
+        // Use IP as identifier for public form
+        $rateCheck = $rateLimiter->check('ip_' . $ip, '/contact/submit', 5, 3600);
+
+        if (!$rateCheck['allowed']) {
+            http_response_code(429);
+            echo json_encode(['success' => false, 'message' => 'Too many messages. Please try again in an hour.']);
             return;
         }
 
@@ -88,7 +121,7 @@ class ContactController extends Controller
                 // Get the last inserted ID
                 $db = \App\Core\Database::getInstance();
                 $threadId = $db->lastInsertId();
-                
+
                 // Add initial message with phone number if provided
                 $fullMessage = $message;
                 if (!empty($phone)) {

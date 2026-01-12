@@ -54,6 +54,25 @@ class BankTransferService
      */
     public function processManualRequest($userId, $planId, $type, $reference = null)
     {
+         // SECURITY: Prevent payment request spam (DoS)
+         $db = \App\Core\Database::getInstance()->getPdo();
+         $stmt = $db->prepare("SELECT id FROM payments WHERE user_id = ? AND subscription_id = ? AND status = 'pending' LIMIT 1");
+         $stmt->execute([$userId, $planId]);
+         $existing = $stmt->fetch();
+         
+         if ($existing) {
+             throw new \Exception("You already have a pending payment request for this plan. Please wait for admin approval.");
+         }
+
+         // SECURITY: Check if transaction reference has already been used globally
+         if (!empty($reference)) {
+             $stmt = $db->prepare("SELECT id FROM payments WHERE transaction_id = ? LIMIT 1");
+             $stmt->execute([$reference]);
+             if ($stmt->fetch()) {
+                 throw new \Exception("This transaction ID has already been submitted.");
+             }
+         }
+
          // Create a 'pending' payment record
          $plan = $this->subscriptionModel->find($planId);
          $amount = ($type === 'monthly') ? $plan['price_monthly'] : $plan['price_yearly'];

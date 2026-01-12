@@ -34,7 +34,7 @@ class ExamEngineController extends Controller
         $this->scoringService = new ScoringService();
         $this->nonceService = new NonceService();
         $this->storagePath = __DIR__ . '/../../../storage/app/exams/';
-        
+
         if (!is_dir($this->storagePath)) {
             mkdir($this->storagePath, 0777, true);
         }
@@ -89,17 +89,17 @@ class ExamEngineController extends Controller
     {
         $date = date('Y-m-d');
         $userId = $_SESSION['user_id'];
-        
+
         // 1. Get Quiz info from Schedule
         // Using session stream_id if available, else null
         $daily = $this->dailyQuizService->getQuizForUser($date, $_SESSION['user']['stream_id'] ?? null);
-        
+
         if (!$daily) {
-             // If no quiz generated yet, trigger one? Or just show error.
-             // Auto-gen should handle it.
-             $_SESSION['flash_error'] = "No Daily Quest available for today yet. Please try again later.";
-             $this->redirect('/quiz/dashboard');
-             return;
+            // If no quiz generated yet, trigger one? Or just show error.
+            // Auto-gen should handle it.
+            $_SESSION['flash_error'] = "No Daily Quest available for today yet. Please try again later.";
+            $this->redirect('/quiz/dashboard');
+            return;
         }
 
         // 2. Check if already attempted
@@ -148,12 +148,12 @@ class ExamEngineController extends Controller
                 $stmtQ = $this->db->getPdo()->prepare($sqlQ);
                 $stmtQ->execute($questionIds);
                 $questions = $stmtQ->fetchAll(\PDO::FETCH_ASSOC);
-                
+
                 // Restore randomness/ladder order if needed, but SQL might mess it up.
                 // Re-sort based on input array order?
                 $qMap = [];
                 foreach ($questions as $q) $qMap[$q['id']] = $q;
-                
+
                 $orderedQuestions = [];
                 foreach ($questionIds as $qid) {
                     if (isset($qMap[$qid])) $orderedQuestions[] = $qMap[$qid];
@@ -205,13 +205,13 @@ class ExamEngineController extends Controller
      */
     private function regenerateCache($attemptId, $exam)
     {
-         // Same as initialize but fetch existing answers if needed?
-         // For 'ongoing' attempt without cache, we assume lost cache = empty answers or fetch from DB if partial save existed?
-         // Since we only save to DB on submit, 'ongoing' implies we rely on JSON.
-         // If JSON is gone, answers are gone. This is a trade-off. 
-         // But user is on shared hosting, file persistence is usually reliable.
-         // We'll just re-init.
-         $this->initializeCache($attemptId, $exam);
+        // Same as initialize but fetch existing answers if needed?
+        // For 'ongoing' attempt without cache, we assume lost cache = empty answers or fetch from DB if partial save existed?
+        // Since we only save to DB on submit, 'ongoing' implies we rely on JSON.
+        // If JSON is gone, answers are gone. This is a trade-off. 
+        // But user is on shared hosting, file persistence is usually reliable.
+        // We'll just re-init.
+        $this->initializeCache($attemptId, $exam);
     }
 
     /**
@@ -220,27 +220,27 @@ class ExamEngineController extends Controller
     public function room($attemptId)
     {
         $file = $this->storagePath . $attemptId . '.json';
-        
+
         if (!file_exists($file)) {
             // Fallback: Check DB if valid attempt, then regen
-             $stmt = $this->db->getPdo()->prepare("SELECT * FROM quiz_attempts WHERE id = :id AND user_id = :uid");
-             $stmt->execute(['id' => $attemptId, 'uid' => $_SESSION['user_id']]);
-             $attempt = $stmt->fetch();
-             
-             if (!$attempt || $attempt['status'] !== 'ongoing') {
-                 $this->redirect('/quiz/result/' . $attemptId);
-             }
-             
-             // Get Exam to regen
-             $stmtEx = $this->db->getPdo()->prepare("SELECT * FROM quiz_exams WHERE id = :id");
-             $stmtEx->execute(['id' => $attempt['exam_id']]);
-             $exam = $stmtEx->fetch();
-             
-             $this->regenerateCache($attemptId, $exam);
+            $stmt = $this->db->getPdo()->prepare("SELECT * FROM quiz_attempts WHERE id = :id AND user_id = :uid");
+            $stmt->execute(['id' => $attemptId, 'uid' => $_SESSION['user_id']]);
+            $attempt = $stmt->fetch();
+
+            if (!$attempt || $attempt['status'] !== 'ongoing') {
+                $this->redirect('/quiz/result/' . $attemptId);
+            }
+
+            // Get Exam to regen
+            $stmtEx = $this->db->getPdo()->prepare("SELECT * FROM quiz_exams WHERE id = :id");
+            $stmtEx->execute(['id' => $attempt['exam_id']]);
+            $exam = $stmtEx->fetch();
+
+            $this->regenerateCache($attemptId, $exam);
         }
 
         $data = json_decode(file_get_contents($file), true);
-        
+
         // Security check
         if ($data['user_id'] != $_SESSION['user_id']) {
             die("Unauthorized Access");
@@ -287,23 +287,29 @@ class ExamEngineController extends Controller
 
         if (!empty($trap)) {
             SecurityMonitor::log($_SESSION['user_id'] ?? null, 'honeypot_trigger', $_SERVER['REQUEST_URI'] ?? '', ['attempt_id' => $attemptId], 'critical');
-            http_response_code(400); echo json_encode(['error' => 'Invalid']); exit;
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid']);
+            exit;
         }
-        
+
         $file = $this->storagePath . $attemptId . '.json';
         if (!file_exists($file)) {
-            http_response_code(404); echo json_encode(['error' => 'Session expired']); exit;
+            http_response_code(404);
+            echo json_encode(['error' => 'Session expired']);
+            exit;
         }
 
         $data = json_decode(file_get_contents($file), true);
-        
+
         if ($data['user_id'] != $_SESSION['user_id']) {
-            http_response_code(403); echo json_encode(['error' => 'Unauthorized']); exit;
+            http_response_code(403);
+            echo json_encode(['error' => 'Unauthorized']);
+            exit;
         }
 
         // Update Answer
         $data['answers'][$questionId] = $selectedOptions;
-        
+
         // Write Back
         // Write Back with LOCK_EX to prevent race conditions
         file_put_contents($file, json_encode($data), LOCK_EX);
@@ -327,34 +333,37 @@ class ExamEngineController extends Controller
         if (!file_exists($file)) die("Session not found");
 
         $data = json_decode(file_get_contents($file), true);
-        
+
         // Grading Logic
         $totalScore = 0;
         $correctCount = 0;
         $correctAnswersList = [];
-        
+
         // Prepare Batch Insert SQL
         $sqlValues = [];
         $params = [];
-        
+
         // We use the questions from JSON which are the source of truth for THIS attempt
         foreach ($data['questions'] as $q) {
             $qId = $q['id'];
             $userAns = $data['answers'][$qId] ?? null;
-            
+
+            $qId = $q['id'];
+            $userAns = $data['answers'][$qId] ?? null;
+
             // Delegate to Scoring Engine
             $result = $this->scoringService->gradeQuestion($q, $userAns, $data['exam']);
-            
+
             $isCorrect = $result['isCorrect'];
             $marks = $result['marks'];
-            
+
             $totalScore += $marks;
 
             if ($isCorrect) {
                 $correctCount++;
                 $correctAnswersList[] = ['question_id' => $qId, 'difficulty' => $q['difficulty_level'] ?? 3];
             }
-            
+
             // Prepare Insert
             $sqlValues[] = "(?, ?, ?, ?, ?)";
             $params[] = $attemptId;
@@ -363,6 +372,23 @@ class ExamEngineController extends Controller
             $params[] = $isCorrect ? 1 : 0;
             $params[] = $marks;
         }
+
+        // SECURITY: Time Limit Check (Server Side)
+        // Allow 2 minute buffer for network lag
+        $allowedDuration = ($data['exam']['duration_minutes'] * 60) + 120;
+        $elapsed = time() - $data['start_time'];
+
+        if ($elapsed > $allowedDuration) {
+            // Reject Submission
+            unlink($file); // Destroy session
+            http_response_code(408); // Request Timeout
+            die(json_encode(['error' => 'Time limit exceeded. Submission rejected.']));
+        }
+
+        // SECURITY: Prevent Reward Farming (Check if previously completed)
+        $stmtCheck = $this->db->getPdo()->prepare("SELECT id FROM quiz_attempts WHERE user_id = :uid AND exam_id = :eid AND status = 'completed'");
+        $stmtCheck->execute(['uid' => $_SESSION['user_id'], 'eid' => $data['exam']['id']]);
+        $alreadyCompleted = $stmtCheck->fetch();
 
         // Bulk Insert Answers
         if (!empty($sqlValues)) {
@@ -375,13 +401,20 @@ class ExamEngineController extends Controller
             ->execute(['score' => $totalScore, 'id' => $attemptId]);
 
         // Gamification & Leaderboard
-        $this->gamificationService->processExamRewards($_SESSION['user_id'], $correctAnswersList, $attemptId);
-        
+        // Only reward if not previously completed
+        if (!$alreadyCompleted) {
+            $this->gamificationService->processExamRewards($_SESSION['user_id'], $correctAnswersList, $attemptId);
+        } else {
+            // Optional: Give reduced XP or just log it?
+            // For now, strict blocked as per prompt.
+        }
+
         try {
             require_once __DIR__ . '/../../Services/LeaderboardService.php';
             $lbService = new \App\Services\LeaderboardService();
             $lbService->updateUserRank($_SESSION['user_id'], $totalScore, count($data['questions']), $correctCount);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
 
         // --- DAILY QUEST LOGIC ---
         if (isset($data['daily_quiz_id']) && $data['daily_quiz_id']) {
@@ -390,21 +423,20 @@ class ExamEngineController extends Controller
                 // The schedule table has `reward_coins` (usually 50).
                 // Let's fetch the schedule to get the max reward.
                 // For now, let's just award what's in the schedule OR a function of score.
-                
+
                 // Let's use the StreakService directly, passing 50 as base. 
                 // Ideally, we fetch `reward_coins` from daily_quiz_schedule.
-                
+
                 $streakRes = $this->streakService->processVictory($_SESSION['user_id'], 50);
-                
+
                 // Record the Daily Attempt specifically
                 $this->dailyQuizService->recordAttempt($_SESSION['user_id'], $data['daily_quiz_id'], $totalScore, $streakRes['coins']);
-                
+
                 // Store streak info in session to show on result page
                 $_SESSION['latest_streak_info'] = $streakRes;
-
             } catch (\Exception $e) {
                 // Log error but don't fail the submit
-                 error_log("Daily Quest Error: " . $e->getMessage());
+                error_log("Daily Quest Error: " . $e->getMessage());
             }
         }
         // -------------------------
@@ -414,7 +446,7 @@ class ExamEngineController extends Controller
 
         $this->redirect('/quiz/result/' . $attemptId);
     }
-    
+
     public function result($attemptId)
     {
         // 1. Fetch Attempt Summary
@@ -441,7 +473,7 @@ class ExamEngineController extends Controller
         ");
         $stmtIncorrect->execute(['aid' => $attemptId]);
         $incorrectAnswers = $stmtIncorrect->fetchAll();
-        
+
         // Decode content for view
         foreach ($incorrectAnswers as &$inc) {
             $inc['content'] = json_decode($inc['content'], true);

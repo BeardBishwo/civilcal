@@ -20,7 +20,7 @@ class ProjectController extends Controller
     {
         $userId = $_SESSION['user']['id'];
         $projects = $this->projectModel->getAll($userId);
-        
+
         $this->view('projects/index', [
             'projects' => $projects,
             'title' => 'My Projects'
@@ -48,6 +48,12 @@ class ProjectController extends Controller
     public function store()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            // CSRF Check
+            if (!\App\Services\Security::validateCsrfToken($_POST['csrf_token'] ?? '')) {
+                die('Invalid CSRF Token');
+            }
+
             $data = [
                 'user_id' => $_SESSION['user']['id'],
                 'name' => trim($_POST['name']),
@@ -69,6 +75,12 @@ class ProjectController extends Controller
     public function delete($id)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            // CSRF Check
+            if (!\App\Services\Security::validateCsrfToken($_POST['csrf_token'] ?? '')) {
+                die('Invalid CSRF Token');
+            }
+
             $userId = $_SESSION['user']['id'];
             if ($this->projectModel->delete($id, $userId)) {
                 $this->redirect('/projects?success=deleted');

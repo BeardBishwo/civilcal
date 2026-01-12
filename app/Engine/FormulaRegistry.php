@@ -31,23 +31,36 @@ class FormulaRegistry
     public function execute(array $formulas, array $inputs): array
     {
         $results = [];
-        $context = array_merge($inputs, $results); // Allow formulas to reference previous results
         
-        // echo "REGISTRY_DEBUG: Context Keys: " . implode(', ', array_keys($context)) . "\n";
+        // Sanitize inputs: Convert hyphens to underscores for the calculation context
+        $safeInputs = [];
+        foreach ($inputs as $key => $value) {
+            $safeKey = str_replace('-', '_', $key);
+            $safeInputs[$safeKey] = $value;
+        }
+        
+        $context = $safeInputs; // Start context with sanitized inputs
         
         foreach ($formulas as $resultName => $formula) {
             try {
+                // Ensure the current result name is also sanitized if used as a variable later
+                $safeResultName = str_replace('-', '_', $resultName);
+                
                 $evaluated = $this->evaluateFormula($formula, $context);
                 
-                // If formula returns an array (e.g. from a closure), merge it into results
+                // If formula returns an array (group result), sanitize all its keys
                 if (is_array($evaluated)) {
-                    $results = array_merge($results, $evaluated);
-                    $context = array_merge($context, $evaluated);
-                    $results[$resultName] = $evaluated; // Keep the group key as well
-                    $context[$resultName] = $evaluated;
+                    $safeGroup = [];
+                    foreach ($evaluated as $k => $v) {
+                        $safeK = str_replace('-', '_', $k);
+                        $safeGroup[$safeK] = $v;
+                        $context[$safeK] = $v;
+                    }
+                    $results[$resultName] = $evaluated; // Original key for output consistency
+                    $context[$safeResultName] = $evaluated;
                 } else {
-                    $results[$resultName] = $evaluated;
-                    $context[$resultName] = $evaluated;
+                    $results[$resultName] = $evaluated; // Original key for output consistency
+                    $context[$safeResultName] = $evaluated;
                 }
             } catch (\Exception $e) {
                 // Log the error but throw a user-friendly message

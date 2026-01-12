@@ -98,9 +98,42 @@ class InstallerService
     /**
      * Check if installer has been processed
      */
+    /**
+     * Check if installer has been processed
+     */
     public static function isInstallerProcessed()
     {
         return file_exists(__DIR__ . '/../../storage/installer.processed');
+    }
+
+    /**
+     * Attempt to automatically delete installer if conditions are met
+     * 
+     * @param array $user User data array or object
+     * @return bool True if deleted or already processed
+     */
+    public static function attemptCleanup($user)
+    {
+        // Auto-cleanup disabled as per user request
+        return false;
+        
+        $user = (array) $user;
+        $role = $user['role'] ?? '';
+        $isAdmin = $role === 'admin' || $role === 'super_admin' || !empty($user['is_admin']);
+
+        if (!$isAdmin) {
+            return false;
+        }
+
+        if (self::shouldAutoDelete() && !self::isInstallerProcessed()) {
+            if (self::deleteInstaller()) {
+                self::markInstallerProcessed();
+                error_log("[Bishwo Calculator] Installer auto-deleted after admin login: " . ($user['email'] ?? 'unknown'));
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 ?>

@@ -37,14 +37,6 @@ class CostService
             
             if (isset($this->rates[$rateKey])) {
                 $rate = $this->rates[$rateKey];
-            } else {
-                // Try matching by checking if rateKey contains a rate name
-                foreach ($this->rates as $name => $price) {
-                    if ($rateKey !== '' && strpos($rateKey, $name) !== false) {
-                        $rate = $price;
-                        break;
-                    }
-                }
             }
 
             $quantity = $item['quantity'] ?? 0;

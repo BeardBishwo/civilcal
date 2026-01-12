@@ -94,14 +94,18 @@ set_exception_handler(function ($e) {
 
     if (defined('APP_DEBUG') && APP_DEBUG) {
         http_response_code(500);
-        echo "Exception: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, "UTF-8");
+        echo "<h1>Exception</h1>";
+        echo "<p>" . htmlspecialchars($e->getMessage(), ENT_QUOTES, "UTF-8") . "</p>";
+        echo "<pre>" . $e->getTraceAsString() . "</pre>";
     } else {
         http_response_code(500);
-        // Load clean error page
+        // Production: Log full details but show generic error
+        error_log($e->getMessage() . "\n" . $e->getTraceAsString());
+
         if (file_exists(BASE_PATH . '/themes/admin/views/errors/500.php')) {
             require BASE_PATH . '/themes/admin/views/errors/500.php';
         } else {
-            echo "<h1>Server Error</h1><p>Something went wrong. Please try again later.</p>";
+            echo "<h1>Server Error</h1><p>An unexpected error occurred. Administrators have been notified.</p>";
         }
     }
 });

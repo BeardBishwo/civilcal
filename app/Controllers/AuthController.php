@@ -30,7 +30,7 @@ class AuthController extends Controller
     {
         $this->view->render('auth/forgot');
     }
-    
+
     public function logout()
     {
         try {
@@ -42,9 +42,14 @@ class AuthController extends Controller
             // If it's desired to kill the session, also delete the session cookie.
             if (ini_get("session.use_cookies")) {
                 $params = session_get_cookie_params();
-                setcookie(session_name(), '', time() - 42000,
-                    $params["path"], $params["domain"],
-                    $params["secure"], $params["httponly"]
+                setcookie(
+                    session_name(),
+                    '',
+                    time() - 42000,
+                    $params["path"],
+                    $params["domain"],
+                    $params["secure"],
+                    $params["httponly"]
                 );
             }
 
@@ -70,33 +75,33 @@ class AuthController extends Controller
 
     public function login()
     {
-            $isJson = isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false;
+        $isJson = isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false;
 
-            if ($isJson) {
-                // CSRF Check for JSON
-                if (!\App\Services\Security::validateCsrfToken()) {
-                    header('Content-Type: application/json');
-                    http_response_code(403);
-                    echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-                    exit;
-                }
-                $input = json_decode(file_get_contents('php://input'), true);
-                $username = $input['username_email'] ?? $input['username'] ?? '';
-                $password = $input['password'] ?? '';
-                $rememberMe = !empty($input['remember_me']);
-                $captchaResponse = $input['g-recaptcha-response'] ?? $input['h-captcha-response'] ?? $input['cf-turnstile-response'] ?? '';
-            } else {
-                // CSRF Check for Form
-                if (!\App\Services\Security::validateCsrfToken()) {
-                     throw new Exception('Invalid CSRF token. Please refresh and try again.');
-                }
-                $username = $_POST['username'] ?? '';
-                $password = $_POST['password'] ?? '';
-                $rememberMe = isset($_POST['remember_me']);
-                $captchaResponse = $_POST['g-recaptcha-response'] ?? $_POST['h-captcha-response'] ?? $_POST['cf-turnstile-response'] ?? '';
+        if ($isJson) {
+            // CSRF Check for JSON
+            if (!\App\Services\Security::validateCsrfToken()) {
+                header('Content-Type: application/json');
+                http_response_code(403);
+                echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
+                exit;
             }
+            $input = json_decode(file_get_contents('php://input'), true);
+            $username = $input['username_email'] ?? $input['username'] ?? '';
+            $password = $input['password'] ?? '';
+            $rememberMe = !empty($input['remember_me']);
+            $captchaResponse = $input['g-recaptcha-response'] ?? $input['h-captcha-response'] ?? $input['cf-turnstile-response'] ?? '';
+        } else {
+            // CSRF Check for Form
+            if (!\App\Services\Security::validateCsrfToken()) {
+                throw new Exception('Invalid CSRF token. Please refresh and try again.');
+            }
+            $username = $_POST['username'] ?? '';
+            $password = $_POST['password'] ?? '';
+            $rememberMe = isset($_POST['remember_me']);
+            $captchaResponse = $_POST['g-recaptcha-response'] ?? $_POST['h-captcha-response'] ?? $_POST['cf-turnstile-response'] ?? '';
+        }
 
-            try {
+        try {
             // Verify Captcha
             if (\App\Services\SettingsService::get('captcha_on_login') == '1') {
                 $recaptchaService = new \App\Services\RecaptchaService();
@@ -121,7 +126,7 @@ class AuthController extends Controller
                 // Check IP Restrictions
                 $ipService = new \App\Services\IPRestrictionService();
                 $ipCheck = $ipService->checkIP($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
-                
+
                 if (!$ipCheck['allowed']) {
                     // Log attempted login from blocked IP?
                     error_log("Blocked login attempt from IP: " . ($_SERVER['REMOTE_ADDR'] ?? 'unknown') . " Reason: " . $ipCheck['reason']);
@@ -129,28 +134,30 @@ class AuthController extends Controller
                 }
 
                 if (password_verify($password, $user->password)) {
-                // Reset failed logins and log session with geolocation
-                $userModel = new User();
-                
-                // Get geolocation data
-                $geoService = new GeolocationService();
-                $locationData = $geoService->getLocationDetails();
-                
-                // Prepare device info
-                $deviceInfo = [
-                    'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
-                    'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? ''
-                ];
-                
-                // Prepare location info
-                $locationInfo = [
-                    'country' => $locationData['country'] ?? null,
-                    'region' => $locationData['region'] ?? null,
-                    'city' => $locationData['city'] ?? null,
-                    'timezone' => $locationData['timezone'] ?? null
-                ];
-                
-                $userModel->updateLastLogin($user->id, $deviceInfo, $locationInfo);
+                    // SEC: Prevent session fixation by regenerating session ID before setting data
+                    session_regenerate_id(true);
+                    // Reset failed logins and log session with geolocation
+                    $userModel = new User();
+
+                    // Get geolocation data
+                    $geoService = new GeolocationService();
+                    $locationData = $geoService->getLocationDetails();
+
+                    // Prepare device info
+                    $deviceInfo = [
+                        'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
+                        'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? ''
+                    ];
+
+                    // Prepare location info
+                    $locationInfo = [
+                        'country' => $locationData['country'] ?? null,
+                        'region' => $locationData['region'] ?? null,
+                        'city' => $locationData['city'] ?? null,
+                        'timezone' => $locationData['timezone'] ?? null
+                    ];
+
+                    $userModel->updateLastLogin($user->id, $deviceInfo, $locationInfo);
 
                     // Check if 2FA is required
                     $global2fa = \App\Services\SettingsService::get('enable_2fa', '0') === '1';
@@ -158,7 +165,7 @@ class AuthController extends Controller
                         // Start 2FA session
                         $_SESSION['2fa_pending_user_id'] = $user->id;
                         $_SESSION['2fa_pending_remember'] = $rememberMe;
-                        
+
                         if ($isJson) {
                             echo json_encode(['success' => true, 'redirect' => app_base_url('/login/2fa')]);
                             return;
@@ -174,7 +181,7 @@ class AuthController extends Controller
                     // Analyze for suspicious login patterns
                     $suspiciousDetector = new \App\Services\SuspiciousActivityDetector();
                     $analysis = $suspiciousDetector->analyzeLogin($user->id, $locationData, $deviceInfo);
-                    
+
                     // Log suspicious activity (optional: could block login if high risk)
                     if ($analysis['suspicious'] && $analysis['risk_level'] === 'high') {
                         error_log("High-risk login detected for user {$user->id}: " . json_encode($analysis['alerts']));
@@ -182,13 +189,13 @@ class AuthController extends Controller
 
                     $this->createUserSession($user, $rememberMe, $isJson);
                     return;
-                } else {  
+                } else {
                     // Increment failed logins
                     $userModel = new User();
                     $maxAttempts = (int)\App\Services\SettingsService::get('max_login_attempts', '5');
                     $lockoutDuration = (int)\App\Services\SettingsService::get('lockout_duration', '30'); // in minutes
                     $userModel->incrementFailedLogins($user->id, $maxAttempts, $lockoutDuration * 60);
-                    
+
                     throw new Exception('Invalid credentials.');
                 }
             } else {
@@ -272,7 +279,6 @@ class AuthController extends Controller
             } else {
                 throw new Exception('Invalid verification code.');
             }
-
         } catch (Exception $e) {
             $this->view->render('auth/2fa-verify', ['error' => $e->getMessage()]);
         }
@@ -300,7 +306,7 @@ class AuthController extends Controller
             exit;
         } catch (Exception $e) {
             // Redirect back with error
-             $this->view->render('auth/login', ['error' => $e->getMessage()]);
+            $this->view->render('auth/login', ['error' => $e->getMessage()]);
         }
     }
 
@@ -321,46 +327,51 @@ class AuthController extends Controller
             $existingUser = $userModel->findByEmail($email);
 
             if ($existingUser) {
+                // Check if 2FA is required for this existing user
+                $global2fa = \App\Services\SettingsService::get('enable_2fa', '0') === '1';
+                if ($global2fa && !empty($existingUser->two_factor_enabled) && !empty($existingUser->two_factor_secret)) {
+                    // Start 2FA session
+                    $_SESSION['2fa_pending_user_id'] = $existingUser->id;
+                    $_SESSION['2fa_pending_remember'] = false; // Default for social login
+
+                    header('Location: ' . app_base_url('/login/2fa'));
+                    exit;
+                }
+
                 // Log them in
                 $this->createUserSession($existingUser);
             } else {
-                // Register new user
-                // Generate random password
-                $tempPassword = bin2hex(random_bytes(8));
-                
-                $userId = $userModel->create([
-                    'username' => explode('@', $email)[0] . rand(100, 999), // Unique username attempt
+                // Intercept for interactive username selection
+                $_SESSION['pending_google_user'] = [
                     'email' => $email,
-                    'password' => password_hash($tempPassword, PASSWORD_DEFAULT),
                     'first_name' => $googleUser['given_name'] ?? '',
                     'last_name' => $googleUser['family_name'] ?? '',
-                    'role' => 'user',
-                    'is_verified' => 1 // Google emails are verified
-                ]);
+                    'picture' => $googleUser['picture'] ?? null
+                ];
 
-                if ($userId) {
-                    $newUser = $userModel->findById($userId);
-                    $this->createUserSession($newUser);
-                } else {
-                    throw new Exception('Failed to create account.');
-                }
+                header('Location: ' . app_base_url('/user/login/google/confirm'));
+                exit;
             }
-
         } catch (Exception $e) {
-             $this->view->render('auth/login', ['error' => $e->getMessage()]);
+            $this->view->render('auth/login', ['error' => $e->getMessage()]);
         }
     }
 
     private function createUserSession($user, $rememberMe = false, $isJson = false)
     {
         $user = (array) $user;
-                
+
         // Set session variables
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['user'] = $user;
         $_SESSION['is_admin'] = $user['is_admin'] ?? false;
-        
+
+        // Attempt installer cleanup if this is an admin
+        if (class_exists('\App\Services\InstallerService')) {
+            \App\Services\InstallerService::attemptCleanup($user);
+        }
+
         // Security Notification
         $ipAddress = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         $securityService = new SecurityNotificationService();
@@ -383,8 +394,8 @@ class AuthController extends Controller
             $_SERVER['HTTP_USER_AGENT'] ?? '',
             $expiresAt
         ]);
-        
-            // Set auth_token cookie
+
+        // Set auth_token cookie
         setcookie('auth_token', $sessionToken, [
             'expires' => time() + (30 * 24 * 60 * 60),
             'path' => '/',
@@ -430,11 +441,11 @@ class AuthController extends Controller
         $password = $_POST['password'] ?? '';
         $firstName = $_POST['first_name'] ?? '';
         $lastName = $_POST['last_name'] ?? '';
-        
+
         try {
             // CSRF Check
             if (!\App\Services\Security::validateCsrfToken()) {
-                 throw new Exception('Invalid CSRF token. Please refresh and try again.');
+                throw new Exception('Invalid CSRF token. Please refresh and try again.');
             }
             // Verify Captcha
             if (\App\Services\SettingsService::get('captcha_on_register') == '1') {
@@ -446,17 +457,17 @@ class AuthController extends Controller
             }
 
             // Basic validation
-        if (empty($username) || empty($email) || empty($password)) {
-            throw new Exception('All fields are required.');
-        }
+            if (empty($username) || empty($email) || empty($password)) {
+                throw new Exception('All fields are required.');
+            }
 
-        $passwordValidation = \App\Services\Security::validatePassword($password);
-        if (!$passwordValidation['valid']) {
-            throw new Exception($passwordValidation['error']);
-        }
+            $passwordValidation = \App\Services\Security::validatePassword($password);
+            if (!$passwordValidation['valid']) {
+                throw new Exception($passwordValidation['error']);
+            }
 
-        $userModel = new User();
-            
+            $userModel = new User();
+
             // Check existence
             if ($userModel->findByUsername($username)) {
                 throw new Exception('Username already taken.');
@@ -477,20 +488,134 @@ class AuthController extends Controller
             } else {
                 throw new Exception('Registration failed.');
             }
-
         } catch (Exception $e) {
-             $this->view->render('auth/register', [
-                 'error' => $e->getMessage(),
-                 'username' => $username,
-                 'email' => $email,
-                 'first_name' => $firstName,
-                 'last_name' => $lastName
-             ]);
+            $this->view->render('auth/register', [
+                'error' => $e->getMessage(),
+                'username' => $username,
+                'email' => $email,
+                'first_name' => $firstName,
+                'last_name' => $lastName
+            ]);
         }
     }
-    
+
     public function forgotPassword()
     {
-         $this->view->render('auth/forgot');
+        $this->view->render('auth/forgot');
+    }
+
+    /**
+     * Show Google Registration Confirmation Page
+     */
+    public function showGoogleConfirm()
+    {
+        if (!isset($_SESSION['pending_google_user'])) {
+            header('Location: ' . app_base_url('/login'));
+            exit;
+        }
+
+        $googleData = $_SESSION['pending_google_user'];
+        $baseUsername = explode('@', $googleData['email'])[0];
+
+        // Generate 3 unique suggestions
+        $suggestions = [];
+        $userModel = new User();
+
+        for ($i = 0; $i < 3; $i++) {
+            $candidate = $baseUsername;
+            if ($i > 0) $candidate .= rand(10, 99);
+
+            while ($userModel->findByUsername($candidate) || in_array($candidate, $suggestions)) {
+                $candidate = $baseUsername . rand(10, 999);
+            }
+            $suggestions[] = $candidate;
+        }
+
+        $this->view->render('auth/google-confirm', [
+            'email' => $googleData['email'],
+            'first_name' => $googleData['first_name'],
+            'last_name' => $googleData['last_name'],
+            'picture' => $googleData['picture'],
+            'suggestions' => $suggestions
+        ]);
+    }
+
+    /**
+     * Process Google Registration Final Step
+     */
+    public function processGoogleConfirm()
+    {
+        try {
+            if (!isset($_SESSION['pending_google_user'])) {
+                throw new Exception('Google session expired. Please try again.');
+            }
+
+            $username = trim($_POST['username'] ?? '');
+            $googleData = $_SESSION['pending_google_user'];
+
+            if (empty($username)) {
+                throw new Exception('Username is required.');
+            }
+
+            if (!preg_match('/^[a-zA-Z0-9._]{3,20}$/', $username)) {
+                throw new Exception('Username must be 3-20 characters (letters, numbers, dot, underscore only).');
+            }
+
+            $userModel = new User();
+            if ($userModel->findByUsername($username)) {
+                throw new Exception('That username is already taken. Please try another one.');
+            }
+
+            // Create the user
+            $tempPassword = bin2hex(random_bytes(8));
+            $userId = $userModel->create([
+                'username' => $username,
+                'email' => $googleData['email'],
+                'password' => password_hash($tempPassword, PASSWORD_DEFAULT),
+                'first_name' => $googleData['first_name'],
+                'last_name' => $googleData['last_name'],
+                'role' => 'user',
+                'is_verified' => 1
+            ]);
+
+            if ($userId) {
+                $newUser = $userModel->findById($userId);
+                unset($_SESSION['pending_google_user']);
+                $this->createUserSession($newUser);
+            } else {
+                throw new Exception('Failed to create account.');
+            }
+        } catch (Exception $e) {
+            $this->view->render('auth/google-confirm', [
+                'error' => $e->getMessage(),
+                'email' => $googleData['email'] ?? '',
+                'first_name' => $googleData['first_name'] ?? '',
+                'last_name' => $googleData['last_name'] ?? '',
+                'picture' => $googleData['picture'] ?? null,
+                'suggestions' => $_POST['cached_suggestions'] ?? []
+            ]);
+        }
+    }
+
+    /**
+     * Check username availability via AJAX
+     */
+    public function checkUsernameAvailability()
+    {
+        // Support both GET and POST for flexibility
+        $username = trim($_REQUEST['username'] ?? '');
+
+        if (empty($username)) {
+            $this->json(['available' => false, 'error' => 'Empty username']);
+            return;
+        }
+
+        $userModel = new User();
+        $isTaken = (bool)$userModel->findByUsername($username);
+
+        $this->json([
+            'available' => !$isTaken,
+            'message' => $isTaken ? 'Username is already taken' : 'Username is available'
+        ]);
     }
 }

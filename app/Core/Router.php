@@ -175,6 +175,10 @@ class Router
             return $this->executeController($route['controller'], $params);
         };
 
+        if (empty($pipeline)) {
+            return $next($request);
+        }
+
         // Run through pipeline in reverse order
         foreach (array_reverse($pipeline) as $middleware) {
             $next = function ($request) use ($middleware, $next) {
@@ -183,20 +187,20 @@ class Router
         }
 
         // Execute the pipeline
-        if (!empty($pipeline)) {
-            return $next($request);
-        }
-
-        return $this->executeController($route['controller'], $params);
+        return $next($request);
     }
 
     private function executeController($controllerStr, $params = [])
     {
         list($controllerClass, $method) = explode('@', $controllerStr);
 
-        if (strpos($controllerClass, '\\') === false) {
+        if (strpos($controllerClass, '\\') === false && strpos($controllerClass, 'Admin') !== 0 && strpos($controllerClass, 'Api') !== 0) {
+            $controllerClass = "App\\Controllers\\{$controllerClass}";
+        } elseif (strpos($controllerClass, 'App\\') === false && strpos($controllerClass, '\\') !== 0) {
+            // Only prepend if it's not already fully qualified or explicitly relative to root
             $controllerClass = "App\\Controllers\\{$controllerClass}";
         }
+        // If it starts with \ or App\, we use it as is.
 
         if (class_exists($controllerClass)) {
             $controller = new $controllerClass();

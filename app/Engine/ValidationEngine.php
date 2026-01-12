@@ -92,7 +92,7 @@ class ValidationEngine
                 
             case 'integer':
             case 'int':
-                if (!filter_var($value, FILTER_VALIDATE_INT)) {
+                if (filter_var($value, FILTER_VALIDATE_INT) === false) {
                     return ucfirst($fieldName) . ' must be an integer';
                 }
                 break;

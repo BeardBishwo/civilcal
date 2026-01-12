@@ -443,8 +443,8 @@ class PayPalService
             $webhookId = PayPalConfig::getWebhookId();
             
             if (empty($webhookId)) {
-                error_log('PayPal Webhook ID not configured. Verification skipped/failed.');
-                return PayPalConfig::isSandbox(); // Only skip in sandbox if explicitly allowed
+                error_log('PayPal Webhook ID not configured. Verification REJECTED.');
+                return false;
             }
 
             // Prepare verification request
@@ -460,6 +460,7 @@ class PayPalService
             $output = $signatureVerification->post($apiContext);
             $verificationStatus = json_decode($output, true);
 
+            // SECURITY: Strictly enforce SUCCESS status. Rejects if PayPal returns anything else.
             return isset($verificationStatus['verification_status']) && $verificationStatus['verification_status'] === 'SUCCESS';
             
         } catch (\Exception $e) {

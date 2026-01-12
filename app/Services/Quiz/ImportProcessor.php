@@ -96,8 +96,10 @@ class ImportProcessor {
         }
 
         // 5. GENERATE FINGERPRINT (For Duplicate Detection)
+        // Create a unique hash for the question to prevent duplicates
+        // New regex preserves mathematical operators to avoid collisions between e.g. "1+1" and "1-1"
         $qText = $row['question'] ?? '';
-        $cleanQ = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $qText)));
+        $cleanQ = strtolower(trim(preg_replace('/[^a-zA-Z0-9+\-*\/=^%]/', '', $qText)));
         $hash = hash('sha256', $cleanQ);
 
         // 6. DETECT DUPLICATE (The "Quarantine" Logic)
@@ -140,7 +142,9 @@ class ImportProcessor {
         
         // If string, lookup by Title (Smart Template support)
         $db = \App\Core\Database::getInstance();
-        $node = $db->query("SELECT id FROM syllabus_nodes WHERE title LIKE ? LIMIT 1", ["%$input%"])->fetch();
+        // SECURITY: Escape SQL wildcards to prevent query pollution
+        $escapedInput = str_replace(['%', '_', '\\'], ['\\%', '\\_', '\\\\'], $input);
+        $node = $db->query("SELECT id FROM syllabus_nodes WHERE title LIKE ? ESCAPE '\\' LIMIT 1", ["%$escapedInput%"])->fetch();
         return $node ? $node['id'] : null;
     }
 
@@ -157,6 +161,8 @@ class ImportProcessor {
     }
 
     private function cleanText($text) {
+        // SECURITY: Strip HTML tags to prevent XSS from imported CSV data
+        $text = strip_tags($text);
         // Remove weird CSV artifacts
         return trim(str_replace(['Â', 'â€™'], ['', "'"], $text));
     }

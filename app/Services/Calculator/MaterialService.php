@@ -66,14 +66,15 @@ class MaterialService
      */
     public function getBrickworkMaterials($wallVolume, $mixRatio = '1:6')
     {
-        // 1. Calculate Number of Bricks
-        $oneBrickVolume = self::BRICK_LENGTH_M * self::BRICK_WIDTH_M * self::BRICK_HEIGHT_M;
-        $numberOfBricks = ceil($wallVolume / $oneBrickVolume);
-
-        // 2. Calculate Mortar Volume (Approx 25-30% of wall volume)
-        // More accurate: Wall Vol - (No. Bricks * Actual Brick Vol)
-        // For standard estimation, 30% wet volume is a safe industry standard
+        // 1. Calculate Mortar Volume (Approx 25-30% of wall volume)
+        // Industry standard for estimating: 30% of total wall volume is wet mortar
         $wetMortarVolume = $wallVolume * 0.30;
+
+        // 2. Calculate Number of Bricks
+        // Subtract mortar volume from total wall volume to get net brick volume
+        $netBrickVolume = $wallVolume - $wetMortarVolume;
+        $oneBrickVolume = self::BRICK_LENGTH_M * self::BRICK_WIDTH_M * self::BRICK_HEIGHT_M;
+        $numberOfBricks = ceil($netBrickVolume / $oneBrickVolume);
         
         // 3. Dry Volume (Wet * 1.33)
         $dryMortarVolume = $wetMortarVolume * 1.33;

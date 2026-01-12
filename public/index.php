@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Bishwo Calculator - MVC Entry Point
  * Routes all requests through the MVC system
@@ -16,6 +17,12 @@ require_once $bootstrapPath;
 \App\Services\Security::startSession();
 \App\Services\Security::setSecureHeaders();
 \App\Services\Security::enforceHttps();
+
+// Execute Security Headers Middleware
+require_once BASE_PATH . '/app/Middleware/SecurityHeadersMiddleware.php';
+(new \App\Middleware\SecurityHeadersMiddleware())->handle($GLOBALS['request'] ?? null, function ($request) {
+    // Continue
+});
 
 
 // Initialize router
@@ -39,4 +46,3 @@ require BASE_PATH . '/app/routes.php';
 
 // Dispatch the request
 $router->dispatch();
-?>

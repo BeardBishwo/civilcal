@@ -5,6 +5,8 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Services\ImageManager;
 use App\Models\Image;
+use App\Core\Auth;
+use App\Services\Security;
 
 /**
  * Profile Image Controller
@@ -12,6 +14,14 @@ use App\Models\Image;
  */
 class ProfileImageController extends Controller
 {
+    private function requireCsrfToken()
+    {
+        $token = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if (empty($token) || !Security::validateCsrfToken($token)) {
+            $this->jsonResponse(['success' => false, 'error' => 'Invalid CSRF token'], 403);
+        }
+    }
+
     /**
      * Upload user profile image
      */
@@ -26,6 +36,8 @@ class ProfileImageController extends Controller
             return $this->jsonResponse(['success' => false, 'error' => 'Invalid request method']);
         }
 
+        $this->requireCsrfToken();
+
         if (!isset($_FILES['profile_image'])) {
             return $this->jsonResponse(['success' => false, 'error' => 'No file uploaded']);
         }
@@ -36,13 +48,16 @@ class ProfileImageController extends Controller
         }
 
         $result = ImageManager::uploadUserImage($_FILES['profile_image'], $userId);
-        
+
         if ($result['success']) {
             // Delete old image record
             Image::where('user_id', $userId)
                 ->where('image_type', ImageManager::TYPE_PROFILE)
                 ->whereNull('deleted_at')
                 ->delete();
+
+            // Verify MIME type safely
+            $realMimeType = mime_content_type($_FILES['profile_image']['tmp_name']);
 
             // Save new image to database
             Image::create([
@@ -52,7 +67,7 @@ class ProfileImageController extends Controller
                 'filename' => $result['filename'],
                 'path' => $result['path'],
                 'file_size' => $result['size'],
-                'mime_type' => $_FILES['profile_image']['type'],
+                'mime_type' => $realMimeType, // Secure MIME type
                 'is_admin' => false,
             ]);
         }
@@ -94,8 +109,10 @@ class ProfileImageController extends Controller
             return $this->jsonResponse(['success' => false, 'error' => 'Invalid request method']);
         }
 
+        $this->requireCsrfToken();
+
         $userId = Auth::user()->id ?? null;
-        
+
         // Delete image file
         $image = Image::where('user_id', $userId)
             ->where('image_type', ImageManager::TYPE_PROFILE)

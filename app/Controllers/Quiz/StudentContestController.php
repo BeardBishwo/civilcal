@@ -64,16 +64,16 @@ class StudentContestController extends Controller
                 throw new Exception("Contest starts at " . $contest['start_time']);
             }
 
-            // Pay Entry Fee
-            $user = $this->userModel->find($_SESSION['user_id']);
-            if ($user['coins'] < $contest['entry_fee']) {
-                throw new Exception("Not enough coins to join. Entry fee: " . $contest['entry_fee']);
-            }
-
-            // Deduct Coins
-            $this->userModel->update($user['id'], [
-                'coins' => $user['coins'] - $contest['entry_fee']
+            // Atomic Coin Deduction (Anti-Race Condition)
+            $stmt = $this->db->getPdo()->prepare("UPDATE users SET coins = coins - :fee WHERE id = :user_id AND coins >= :fee");
+            $stmt->execute([
+                'fee' => $contest['entry_fee'],
+                'user_id' => $_SESSION['user_id']
             ]);
+
+            if ($stmt->rowCount() === 0) {
+                throw new Exception("Insufficient coins to join.");
+            }
 
             // Create Participant
             $this->participantModel->create([
@@ -111,10 +111,16 @@ class StudentContestController extends Controller
         $stmt->execute($qIds);
         $questions = $stmt->fetchAll();
 
-        // Decode JSon content/options
+        // Decode JSON content/options and SANITIZE sensitive data
         foreach($questions as &$q) {
             $q['content'] = json_decode($q['content'], true);
             $q['options'] = json_decode($q['options'], true);
+            
+            // SECURITY: Prevent leaking correct answers to the browser
+            unset($q['correct_answer']);
+            unset($q['correct_answer_json']);
+            unset($q['answer_explanation']);
+            unset($q['note']);
         }
 
         $this->view->render('quiz/games/contest_room', [
@@ -134,14 +140,40 @@ class StudentContestController extends Controller
 
         if (!$participant) return $this->jsonResponse(['error' => 'Not participating']);
 
-        // Score logic
-        $score = (int)$_POST['score'];
+        // CRITICAL SECURITY: Calculate score server-side
+        $userAnswers = $_POST['answers'] ?? []; // Expecting key-value pair [qId => answer]
+        if (!is_array($userAnswers)) {
+            $userAnswers = json_decode($userAnswers, true) ?: [];
+        }
+
+        $qIds = json_decode($contest['questions'], true);
+        $placeholders = str_repeat('?,', count($qIds) - 1) . '?';
+        $stmt = $this->db->getPdo()->prepare("SELECT * FROM quiz_questions WHERE id IN ($placeholders)");
+        $stmt->execute($qIds);
+        $questions = $stmt->fetchAll();
+
+        $scoringService = new \App\Services\Quiz\ScoringService();
+        $totalScore = 0;
+        
+        // Mock exam settings for contest (can be pulled from contest config later)
+        $settings = [
+            'negative_marking_rate' => $contest['negative_marking'] ?? 0,
+            'negative_marking_unit' => 'percent'
+        ];
+
+        foreach ($questions as $q) {
+            $ans = $userAnswers[$q['id']] ?? null;
+            $grade = $scoringService->gradeQuestion($q, $ans, $settings);
+            $totalScore += $grade['marks'];
+        }
+
         $timeTaken = (int)$_POST['time_taken'];
 
         $this->participantModel->update($participant['id'], [
-            'score' => $score,
+            'score' => max(0, $totalScore), // Ensure no negative total scores unless intended
             'time_taken' => $timeTaken,
-            'created_at' => date('Y-m-d H:i:s') // Track finish time
+            'status' => 'completed',
+            'created_at' => date('Y-m-d H:i:s') 
         ]);
 
         return $this->jsonResponse(['success' => true]);

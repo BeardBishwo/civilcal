@@ -47,6 +47,10 @@ $router->add("POST", "/logout", "AuthController@logout"); // No middleware - can
 // Google Auth Routes
 $router->add("GET", "/user/login/google", "AuthController@loginWithGoogle");
 $router->add("GET", "/user/login/google/callback", "AuthController@handleGoogleCallback");
+$router->add("GET", "/user/login/google/confirm", "AuthController@showGoogleConfirm");
+$router->add("POST", "/user/login/google/confirm", "AuthController@processGoogleConfirm");
+// AJAX Availability Check
+$router->add("POST", "/api/check-username", "AuthController@checkUsernameAvailability");
 
 // Basic Calculator Routes moved below for priority
 
@@ -444,8 +448,8 @@ $router->add("GET", "/payment/stripe/cancel", "Payment\StripeController@cancel",
 $router->add("POST", "/webhooks/stripe", "Payment\StripeController@webhook"); // Public webhook
 
 // Project Routes
-$router->add("GET", "/project", "LandingController@management"); 
-$router->add("GET", "/projects", "ProjectController@index", ["auth"] );
+$router->add("GET", "/project", "LandingController@management");
+$router->add("GET", "/projects", "ProjectController@index", ["auth"]);
 $router->add("POST", "/projects/store", "ProjectController@store", ["auth"]);
 $router->add("GET", "/projects/view/{id}", "ProjectController@show", ["auth"]);
 $router->add("POST", "/projects/delete/{id}", "ProjectController@delete", ["auth"]);

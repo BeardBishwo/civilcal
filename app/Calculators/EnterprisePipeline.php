@@ -53,6 +53,13 @@ abstract class EnterprisePipeline
      */
     public function execute($inputs)
     {
+        // SECURITY & STABILITY: Enforce mandatory validation before processing
+        $validation = $this->validate($inputs);
+        if (!$validation['valid']) {
+            $errorMsg = !empty($validation['errors']) ? implode(', ', $validation['errors']) : 'Invalid inputs provided';
+            throw new \Exception("Calculation Pipeline Error in " . static::class . ": " . $errorMsg);
+        }
+
         // Step 1: Geometry (Volume, Area, etc.)
         $geometry = $this->calculateGeometry($inputs);
 

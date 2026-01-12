@@ -17,7 +17,7 @@ class RecaptchaService
         
         $this->client = new Client([
             'timeout'  => 5.0,
-            'verify'   => false
+            'verify'   => true
         ]);
     }
 
