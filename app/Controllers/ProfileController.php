@@ -61,10 +61,14 @@ class ProfileController extends Controller
         // Fetch available streams (Courses)
         $streams = $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' AND is_active = 1 ORDER BY order_index ASC")->fetchAll();
 
+        // Debug: Log the profile data to ensure career_interests is present
+        // error_log('Profile data: ' . json_encode($profile));
+
         $this->view('user/profile', [
             'user' => $profile['user'] ?? [],
             'stats' => $profile['stats'] ?? [],
             'wallet' => $profile['wallet'] ?? [],
+            'career_interests' => $profile['career_interests'] ?? [], // Pass career_interests to view
             'rank_data' => $rankData,
             'social_links' => $socialLinks,
             'two_factor_status' => $twoFactorStatus,
@@ -140,7 +144,9 @@ class ProfileController extends Controller
             'timezone' => 'max:100',
             'measurement_system' => 'max:20',
             'study_mode' => 'max:20',
-            'stream_id' => 'integer'
+            'stream_id' => 'integer',
+            'custom_stream' => 'max:255',
+            'education_level' => 'max:100'
         ]);
 
         if (!$validation['valid']) {
@@ -159,10 +165,10 @@ class ProfileController extends Controller
             'company' => 'string',
             'timezone' => 'string',
             'measurement_system' => 'string',
-            'timezone' => 'string',
-            'measurement_system' => 'string',
             'study_mode' => 'string',
-            'stream_id' => 'int'
+            'stream_id' => 'int',
+            'custom_stream' => 'string',
+            'education_level' => 'string'
         ]);
 
         // Social Links handling

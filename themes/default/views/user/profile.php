@@ -228,17 +228,88 @@
                                 </div>
                             </div>
 
-                            <div class="space-y-3">
-                                <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Field of Study (Stream)</label>
-                                <select name="stream_id" class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all">
-                                    <option value="" class="bg-black text-white">Select Your Stream (e.g. Civil, Computer)</option>
-                                    <?php if (!empty($streams)): ?>
-                                        <?php foreach ($streams as $stream): ?>
-                                            <option value="<?= $stream['id'] ?>" <?= ($user['stream_id'] ?? '') == $stream['id'] ? 'selected' : '' ?> class="bg-black text-white"><?= htmlspecialchars($stream['title']) ?></option>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
-                                <p class="text-[10px] text-gray-600 pl-1">This setting customizes your dashboard and hides irrelevant content.</p>
+                            <div class="space-y-6" x-data="{ 
+                                streamMode: '<?= !empty($career_interests['custom_stream']) ? 'manual' : 'select' ?>',
+                                eduMode: '<?= !empty($career_interests['education_level']) && !in_array($career_interests['education_level'], ['SEE/SLC', '+2/INTERMEDIATE', 'BACHELOR\'S', 'MASTER\'S', 'PHD']) ? 'manual' : 'select' ?>' 
+                            }">
+                                <!-- Stream Section -->
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center px-1">
+                                        <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Field of Study (Stream)</label>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[10px] font-bold text-gray-500">Manual Entry</span>
+                                            <button type="button"
+                                                @click="streamMode = (streamMode === 'select' ? 'manual' : 'select')"
+                                                class="w-8 h-4 bg-white/10 rounded-full relative transition-colors focus:outline-none"
+                                                :class="{'!bg-primary': streamMode === 'manual'}">
+                                                <div class="w-3 h-3 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform"
+                                                    :class="{'translate-x-4': streamMode === 'manual'}"></div>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Select Mode -->
+                                    <div x-show="streamMode === 'select'">
+                                        <select name="stream_id" class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all appearance-none cursor-pointer">
+                                            <option value="" class="bg-black text-white">Select Your Stream (e.g. Civil, Computer)</option>
+                                            <?php if (!empty($streams)): ?>
+                                                <?php foreach ($streams as $stream): ?>
+                                                    <option value="<?= $stream['id'] ?>" <?= ($user['stream_id'] ?? '') == $stream['id'] ? 'selected' : '' ?> class="bg-black text-white"><?= htmlspecialchars($stream['title']) ?></option>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+                                        </select>
+                                    </div>
+
+                                    <!-- Manual Mode -->
+                                    <div x-show="streamMode === 'manual'" style="display: none;">
+                                        <input type="text" name="custom_stream"
+                                            value="<?= htmlspecialchars($career_interests['custom_stream'] ?? '') ?>"
+                                            placeholder="Enter your specific field (e.g. AEROSPACE ENGINEERING)"
+                                            class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all uppercase placeholder-gray-600">
+                                        <p class="text-[10px] text-orange-400 pl-1 pt-1"><i class="fas fa-info-circle mr-1"></i> This will be saved for future content planning.</p>
+                                    </div>
+
+                                    <p class="text-[10px] text-gray-600 pl-1" x-show="streamMode === 'select'">This setting customizes your dashboard and hides irrelevant content.</p>
+                                </div>
+
+                                <!-- Education Level Section -->
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center px-1">
+                                        <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Education Level</label>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[10px] font-bold text-gray-500">Other</span>
+                                            <button type="button"
+                                                @click="eduMode = (eduMode === 'select' ? 'manual' : 'select')"
+                                                class="w-8 h-4 bg-white/10 rounded-full relative transition-colors focus:outline-none"
+                                                :class="{'!bg-primary': eduMode === 'manual'}">
+                                                <div class="w-3 h-3 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform"
+                                                    :class="{'translate-x-4': eduMode === 'manual'}"></div>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Select Mode -->
+                                    <div x-show="eduMode === 'select'">
+                                        <select name="education_level" class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all appearance-none cursor-pointer">
+                                            <option value="" class="bg-black text-white">Select Education Level</option>
+                                            <?php
+                                            $eduLevels = ['SEE/SLC', '+2/INTERMEDIATE', 'BACHELOR\'S', 'MASTER\'S', 'PHD'];
+                                            $currentEdu = $career_interests['education_level'] ?? '';
+                                            foreach ($eduLevels as $level):
+                                            ?>
+                                                <option value="<?= $level ?>" <?= $currentEdu == $level ? 'selected' : '' ?> class="bg-black text-white"><?= $level ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+
+                                    <!-- Manual Mode -->
+                                    <div x-show="eduMode === 'manual'" style="display: none;">
+                                        <input type="text" name="education_level"
+                                            value="<?= !in_array($currentEdu, $eduLevels) ? htmlspecialchars($currentEdu) : '' ?>"
+                                            placeholder="Enter your education level"
+                                            class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all uppercase placeholder-gray-600">
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="space-y-3">

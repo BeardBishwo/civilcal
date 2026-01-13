@@ -32,6 +32,7 @@ class ProfileService
      * @param int $userId User ID
      * @return array|null Profile data or null if not found
      */
+
     public function getUserProfile($userId)
     {
         $user = $this->db->findOne('users', ['id' => $userId]);
@@ -44,10 +45,15 @@ class ProfileService
         $stats = $this->db->findOne('user_stats', ['user_id' => $userId]);
         $wallet = $this->db->findOne('user_resources', ['user_id' => $userId]);
 
+        // Get Career Interests
+        $userModel = new \App\Models\User();
+        $careerInterests = $userModel->getCareerInterests($userId);
+
         return [
             'user' => $user,
             'stats' => $stats ?? [],
-            'wallet' => $wallet ?? []
+            'wallet' => $wallet ?? [],
+            'career_interests' => $careerInterests
         ];
     }
 
@@ -74,13 +80,23 @@ class ProfileService
             'measurement_system',
             'study_mode',
             'social_links',
-            'stream_id'
+            'stream_id',
+            'custom_stream',
+            'education_level'
         ];
+
         $updateData = [];
+        $careerData = [];
 
         foreach ($allowedFields as $field) {
             if (isset($data[$field])) {
-                // Special handling for social_links if it comes as an array
+                // Segregate Career Interest Data
+                if ($field === 'custom_stream' || $field === 'education_level') {
+                    $careerData[$field] = $data[$field];
+                    continue;
+                }
+
+                // standard fields
                 if ($field === 'social_links' && is_array($data[$field])) {
                     $updateData[$field] = json_encode($data[$field]);
                 } else {
@@ -89,14 +105,30 @@ class ProfileService
             }
         }
 
-        if (empty($updateData)) {
+        if (empty($updateData) && empty($careerData)) {
             return ['success' => false, 'message' => 'No valid fields to update'];
         }
 
-        $updateData['updated_at'] = date('Y-m-d H:i:s');
+        // Logic: Mutually exclusive Stream vs Custom Stream
+        if (!empty($careerData['custom_stream'])) {
+            $updateData['stream_id'] = null; // Clear standard stream (Manual Mode)
+        } elseif (!empty($updateData['stream_id'])) {
+            $careerData['custom_stream'] = null; // Clear custom stream (Select Mode)
+        }
 
         try {
-            $result = $this->db->update('users', $updateData, 'id = :id', ['id' => $userId]);
+            // Update Users Table
+            if (!empty($updateData)) {
+                $updateData['updated_at'] = date('Y-m-d H:i:s');
+                $this->db->update('users', $updateData, 'id = :id', ['id' => $userId]);
+            }
+
+            // Update Career Interests Table
+            // Always update if any career data or if we implicitly cleared custom_stream
+            if (!empty($careerData) || array_key_exists('custom_stream', $data) || array_key_exists('education_level', $data)) {
+                $userModel = new \App\Models\User();
+                $userModel->updateCareerInterests($userId, $careerData);
+            }
 
             return [
                 'success' => true,

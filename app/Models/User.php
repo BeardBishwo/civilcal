@@ -671,6 +671,77 @@ class User
         return $stmt->execute([$newRank, $userId]);
     }
 
+    /**
+     * Ensure career_interests table exists
+     */
+    public function ensureCareerInterestsTable()
+    {
+        $sql = "CREATE TABLE IF NOT EXISTS career_interests (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            custom_stream VARCHAR(255) NULL,
+            education_level VARCHAR(100) NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE KEY (user_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+
+        $this->db->getPdo()->exec($sql);
+    }
+
+    /**
+     * Update Career Interests (Custom Stream & Education)
+     */
+    public function updateCareerInterests($userId, $data)
+    {
+        $this->ensureCareerInterestsTable();
+        $pdo = $this->db->getPdo();
+
+        // Check if record exists
+        $stmt = $pdo->prepare("SELECT id FROM career_interests WHERE user_id = ?");
+        $stmt->execute([$userId]);
+        $exists = $stmt->fetch();
+
+        // Prepare values (UPPERCASE for standardization)
+        $customStream = !empty($data['custom_stream']) ? strtoupper(trim($data['custom_stream'])) : null;
+        $educationLevel = !empty($data['education_level']) ? strtoupper(trim($data['education_level'])) : null;
+
+        if ($exists) {
+            $updateSql = "UPDATE career_interests SET updated_at = NOW()";
+            $params = [];
+
+            // Only update if provided (allows partial updates)
+            if (array_key_exists('custom_stream', $data)) {
+                $updateSql .= ", custom_stream = ?";
+                $params[] = $customStream;
+            }
+            if (array_key_exists('education_level', $data)) {
+                $updateSql .= ", education_level = ?";
+                $params[] = $educationLevel;
+            }
+
+            if (empty($params)) return true; // Nothing to update
+
+            $updateSql .= " WHERE user_id = ?";
+            $params[] = $userId;
+
+            $stmt = $pdo->prepare($updateSql);
+            return $stmt->execute($params);
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO career_interests (user_id, custom_stream, education_level) VALUES (?, ?, ?)");
+            return $stmt->execute([$userId, $customStream, $educationLevel]);
+        }
+    }
+
+    public function getCareerInterests($userId)
+    {
+        $this->ensureCareerInterestsTable();
+        $stmt = $this->db->getPdo()->prepare("SELECT * FROM career_interests WHERE user_id = ?");
+        $stmt->execute([$userId]);
+        return $stmt->fetch() ?: [];
+    }
+
     // Economy / Coins Methods
 
     public function getCoins($userId = null)
