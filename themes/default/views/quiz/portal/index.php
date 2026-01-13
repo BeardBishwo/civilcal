@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PREMIUM QUIZ PORTAL - SAAS EDITION (Refactored)
  * Stack: PHP + Tailwind CSS + Alpine.js
@@ -12,7 +13,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
 
 <div class="min-h-screen bg-background text-white pb-20" x-data="quizPortal()">
-    
+
     <!-- Hero Section -->
     <div class="relative overflow-hidden bg-gradient-to-br from-background via-background to-primary/20 pt-20 pb-32">
         <!-- Animated Background Blobs -->
@@ -21,14 +22,14 @@
         <div class="container mx-auto px-6 relative z-10 text-center">
             <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-8 animate-fade-in-up">
                 <span class="relative flex h-3 w-3">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                 </span>
                 <span class="text-sm font-medium text-gray-300">50,000+ Active Learners</span>
             </div>
 
             <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight animate-fade-in-up animation-delay-100">
-                Master Your <br/>
+                Master Your <br />
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary">Engineering Dreams</span>
             </h1>
 
@@ -41,12 +42,11 @@
                 <div class="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-200"></div>
                 <div class="relative flex items-center bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl p-2">
                     <i class="fas fa-search text-gray-400 ml-4 text-lg"></i>
-                    <input 
-                        type="text" 
+                    <input
+                        type="text"
                         x-model="searchQuery"
-                        placeholder="Search for exams, topics, or categories..." 
-                        class="w-full bg-transparent border-none text-white px-4 py-3 focus:ring-0 placeholder-gray-500 text-lg"
-                    >
+                        placeholder="Search for exams, topics, or categories..."
+                        class="w-full bg-transparent border-none text-white px-4 py-3 focus:ring-0 placeholder-gray-500 text-lg">
                     <button class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-medium transition-colors">
                         Search
                     </button>
@@ -57,7 +57,22 @@
 
     <!-- Main Content Grid -->
     <div class="container mx-auto px-6 -mt-20 relative z-20">
-        
+
+        <?php if (!empty($activeStream)): ?>
+            <div class="mb-8 animate-fade-in-up">
+                <div class="bg-black/60 border border-primary/30 rounded-2xl p-4 flex items-center justify-between backdrop-blur-xl shadow-lg shadow-primary/5">
+                    <div class="flex items-center gap-4">
+                        <div class="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center text-primary text-xl border border-primary/20">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-lg">Personalized for <?= htmlspecialchars($activeStream['title']) ?></h4>
+                            <p class="text-sm text-gray-400">Showing only relevant content. <a href="<?= app_base_url('/profile') ?>" class="text-white hover:text-primary transition-colors font-bold underline decoration-primary/50 underline-offset-4">Change Preference</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
         <!-- Filters (Optional - can be expanded) -->
         <div class="flex flex-wrap justify-center gap-4 mb-12">
             <button @click="filter = 'all'" :class="{'bg-primary text-white': filter === 'all', 'bg-white/5 text-gray-400 hover:bg-white/10': filter !== 'all'}" class="px-6 py-2 rounded-full backdrop-blur-md border border-white/5 transition-all">All</button>
@@ -70,20 +85,20 @@
             <!-- Dynamic PHP Loop interacting with Alpine for filtering -->
             <?php if (!empty($exams)): ?>
                 <?php foreach ($exams as $exam): ?>
-                    <?php 
-                        // Prepare variables for the component
-                        $title = $exam['title'];
-                        $description = $exam['description'];
-                        $link = app_base_url('quiz/overview/' . $exam['slug']);
-                        $questions_count = $exam['question_count'];
-                        $category = ucfirst(str_replace('_', ' ', $exam['type']));
-                        $icon = $exam['icon'] ?? 'fas fa-graduation-cap';
+                    <?php
+                    // Prepare variables for the component
+                    $title = $exam['title'];
+                    $description = $exam['description'];
+                    $link = app_base_url('quiz/overview/' . $exam['slug']);
+                    $questions_count = $exam['question_count'];
+                    $category = ucfirst(str_replace('_', ' ', $exam['type']));
+                    $icon = $exam['icon'] ?? 'fas fa-graduation-cap';
                     ?>
-                    <div x-show="shouldShow('<?php echo $exam['type']; ?>', '<?php echo addslashes($exam['title']); ?>')" 
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 transform scale-95"
-                         x-transition:enter-end="opacity-100 transform scale-100"
-                         class="h-full">
+                    <div x-show="shouldShow('<?php echo $exam['type']; ?>', '<?php echo addslashes($exam['title']); ?>')"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 transform scale-95"
+                        x-transition:enter-end="opacity-100 transform scale-100"
+                        class="h-full">
                         <?php include dirname(__DIR__) . '/../components/quiz/card.php'; ?>
                     </div>
                 <?php endforeach; ?>
@@ -102,19 +117,19 @@
 </div>
 
 <script>
-document.addEventListener('alpine:init', () => {
-    Alpine.data('quizPortal', () => ({
-        searchQuery: '',
-        filter: 'all',
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('quizPortal', () => ({
+            searchQuery: '',
+            filter: 'all',
 
-        shouldShow(type, title) {
-            // Filter by Type
-            if (this.filter !== 'all' && type !== this.filter) return false;
-            
-            // Filter by Search
-            if (this.searchQuery === '') return true;
-            return title.toLowerCase().includes(this.searchQuery.toLowerCase());
-        }
-    }));
-});
+            shouldShow(type, title) {
+                // Filter by Type
+                if (this.filter !== 'all' && type !== this.filter) return false;
+
+                // Filter by Search
+                if (this.searchQuery === '') return true;
+                return title.toLowerCase().includes(this.searchQuery.toLowerCase());
+            }
+        }));
+    });
 </script>

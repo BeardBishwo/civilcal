@@ -73,7 +73,8 @@ class ProfileService
             'timezone',
             'measurement_system',
             'study_mode',
-            'social_links'
+            'social_links',
+            'stream_id'
         ];
         $updateData = [];
 

@@ -58,6 +58,9 @@ class ProfileController extends Controller
             'secret' => $twoFactorData['two_factor_secret'] ?? null
         ];
 
+        // Fetch available streams (Courses)
+        $streams = $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' AND is_active = 1 ORDER BY order_index ASC")->fetchAll();
+
         $this->view('user/profile', [
             'user' => $profile['user'] ?? [],
             'stats' => $profile['stats'] ?? [],
@@ -65,6 +68,7 @@ class ProfileController extends Controller
             'rank_data' => $rankData,
             'social_links' => $socialLinks,
             'two_factor_status' => $twoFactorStatus,
+            'streams' => $streams,
             'title' => 'My Profile'
         ]);
     }
@@ -133,7 +137,10 @@ class ProfileController extends Controller
             'company' => 'max:255',
             'timezone' => 'max:100',
             'measurement_system' => 'max:20',
-            'study_mode' => 'max:20'
+            'timezone' => 'max:100',
+            'measurement_system' => 'max:20',
+            'study_mode' => 'max:20',
+            'stream_id' => 'integer'
         ]);
 
         if (!$validation['valid']) {
@@ -152,7 +159,10 @@ class ProfileController extends Controller
             'company' => 'string',
             'timezone' => 'string',
             'measurement_system' => 'string',
-            'study_mode' => 'string'
+            'timezone' => 'string',
+            'measurement_system' => 'string',
+            'study_mode' => 'string',
+            'stream_id' => 'int'
         ]);
 
         // Social Links handling

@@ -377,10 +377,23 @@ class SyllabusController extends Controller
     {
         try {
             $level = $_POST['level'] ?? 'Level 5';
+
+            // Resolve course_id from position_levels
+            $posLevel = $this->db->findOne('position_levels', ['slug' => $level]);
+            if (!$posLevel) $posLevel = $this->db->findOne('position_levels', ['title' => $level]);
+            $courseId = $posLevel['course_id'] ?? null;
+
             $generator = new \App\Services\ExamGeneratorService();
             $options = ['shuffle' => true, 'duration' => (int)($_POST['duration'] ?? 45), 'negative_rate' => (float)($_POST['negative_rate'] ?? 20.00)];
             $generatedExam = $generator->generateFromSyllabus($level, $options);
-            $examId = $generator->saveGeneratedExam($generatedExam, ['title' => "Mock Exam: $level (" . date('M d, Y') . ")", 'type' => 'mock_test']);
+
+            $examData = [
+                'title' => "Mock Exam: $level (" . date('M d, Y') . ")",
+                'type' => 'mock_test',
+                'course_id' => $courseId // Save resolved course_id
+            ];
+
+            $examId = $generator->saveGeneratedExam($generatedExam, $examData);
             echo json_encode(['status' => 'success', 'message' => "Exam generated successfully with " . count($generatedExam['questions']) . " questions.", 'exam_id' => $examId, 'redirect' => app_base_url('admin/quiz/exams/edit/' . $examId)]);
         } catch (\Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);

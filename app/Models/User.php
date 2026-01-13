@@ -142,7 +142,9 @@ class User
                 'ban_reason' => "ALTER TABLE users ADD COLUMN ban_reason TEXT NULL AFTER is_banned",
                 'ban_reason' => "ALTER TABLE users ADD COLUMN ban_reason TEXT NULL AFTER is_banned",
                 'banned_at' => "ALTER TABLE users ADD COLUMN banned_at DATETIME NULL AFTER ban_reason",
-                'remember_token' => "ALTER TABLE users ADD COLUMN remember_token VARCHAR(100) NULL AFTER banned_at"
+                'remember_token' => "ALTER TABLE users ADD COLUMN remember_token VARCHAR(100) NULL AFTER banned_at",
+                'stream_id' => "ALTER TABLE users ADD COLUMN stream_id INT NULL AFTER remember_token",
+                'study_mode' => "ALTER TABLE users ADD COLUMN study_mode ENUM('psc', 'world') DEFAULT 'psc' AFTER stream_id"
             ];
 
             foreach ($requiredColumns as $columnName => $alterSql) {
@@ -252,18 +254,18 @@ class User
     public function incrementFailedLogins($userId, $maxAttempts, $lockoutSeconds)
     {
         $pdo = $this->db->getPdo();
-        
+
         // Get current attempts
         $stmt = $pdo->prepare("SELECT failed_logins FROM users WHERE id = ?");
         $stmt->execute([$userId]);
         $currentRow = $stmt->fetch();
         $attempts = ($currentRow['failed_logins'] ?? 0) + 1;
-        
+
         $lockoutUntil = null;
         if ($attempts >= $maxAttempts) {
             $lockoutUntil = date('Y-m-d H:i:s', time() + $lockoutSeconds);
         }
-        
+
         $stmt = $pdo->prepare("UPDATE users SET failed_logins = ?, lockout_until = ?, updated_at = NOW() WHERE id = ?");
         return $stmt->execute([$attempts, $lockoutUntil, $userId]);
     }
@@ -462,8 +464,15 @@ class User
     {
         // Fields that can be updated by admin
         $allowedFields = [
-            'first_name', 'last_name', 'username', 'email', 
-            'role', 'is_active', 'email_verified', 'marketing_emails', 'force_password_change'
+            'first_name',
+            'last_name',
+            'username',
+            'email',
+            'role',
+            'is_active',
+            'email_verified',
+            'marketing_emails',
+            'force_password_change'
         ];
 
         $updateFields = [];
@@ -505,7 +514,9 @@ class User
             'bio',
             'website',
             'location',
-            'social_links'
+            'social_links',
+            'stream_id',
+            'study_mode'
         ];
 
         $updateFields = [];
@@ -630,6 +641,12 @@ class User
         return $stmt->execute([$mode, $userId]);
     }
 
+    public function updateStream($userId, $streamId)
+    {
+        $stmt = $this->db->getPdo()->prepare("UPDATE users SET stream_id = ?, updated_at = NOW() WHERE id = ?");
+        return $stmt->execute([$streamId, $userId]);
+    }
+
     public function addXp($userId, $amount)
     {
         if ($amount <= 0) return false;
@@ -647,7 +664,7 @@ class User
             'xp' => $user['xp'] ?? 0
         ];
     }
-    
+
     public function updateRank($userId, $newRank)
     {
         $stmt = $this->db->getPdo()->prepare("UPDATE users SET rank_title = ?, updated_at = NOW() WHERE id = ?");
@@ -693,7 +710,7 @@ class User
         if ($amount <= 0) return false;
 
         $pdo = $this->db->getPdo();
-        
+
         // Check balance first
         $currentBalance = $this->getCoins($userId);
         if ($currentBalance < $amount) {
@@ -723,12 +740,12 @@ class User
     public function setReferral($userId, $referredByCode)
     {
         if (!$referredByCode) return;
-        
+
         $pdo = $this->db->getPdo();
         $stmt = $pdo->prepare("SELECT id FROM users WHERE referral_code = ?");
         $stmt->execute([$referredByCode]);
         $referrerId = $stmt->fetchColumn();
-        
+
         if ($referrerId && $referrerId != $userId) {
             $upd = $pdo->prepare("UPDATE users SET referred_by = ? WHERE id = ?");
             $upd->execute([$referrerId, $userId]);
@@ -738,7 +755,7 @@ class User
     public function incrementQuizCount($userId)
     {
         $pdo = $this->db->getPdo();
-        
+
         // Ensure referral code exists for self if missing (simple fix for legacy users)
         $checkRef = $pdo->prepare("SELECT referral_code FROM users WHERE id = ?");
         $checkRef->execute([$userId]);
@@ -751,18 +768,18 @@ class User
             $pdo->beginTransaction();
             $stmt = $pdo->prepare("UPDATE users SET quiz_solved_count = quiz_solved_count + 1 WHERE id = ?");
             $stmt->execute([$userId]);
-            
+
             // Check if hit 5
             $check = $pdo->prepare("SELECT quiz_solved_count, referred_by FROM users WHERE id = ?");
             $check->execute([$userId]);
             $user = $check->fetch(\PDO::FETCH_ASSOC);
-            
+
             if ($user && $user['quiz_solved_count'] == 5 && $user['referred_by']) {
                 // Reward Referrer
                 $this->addCoins($user['referred_by'], 50, "Referral Bonus", $userId);
                 // Reward User
                 $this->addCoins($userId, 20, "Referral Welcome Bonus", $user['referred_by']);
-                
+
                 // Notify Referrer (Quick inline notification logic)
                 $notifSql = "INSERT INTO notifications (user_id, message, created_at) VALUES (?, ?, NOW())";
                 $pdo->prepare($notifSql)->execute([$user['referred_by'], "You earned 50 Coins from a referral!"]);

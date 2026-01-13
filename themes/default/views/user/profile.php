@@ -229,6 +229,34 @@
                             </div>
 
                             <div class="space-y-3">
+                                <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Field of Study (Stream)</label>
+                                <select name="stream_id" class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all">
+                                    <option value="" class="bg-black text-white">Select Your Stream (e.g. Civil, Computer)</option>
+                                    <?php if (!empty($streams)): ?>
+                                        <?php foreach ($streams as $stream): ?>
+                                            <option value="<?= $stream['id'] ?>" <?= ($user['stream_id'] ?? '') == $stream['id'] ? 'selected' : '' ?> class="bg-black text-white"><?= htmlspecialchars($stream['title']) ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                                <p class="text-[10px] text-gray-600 pl-1">This setting customizes your dashboard and hides irrelevant content.</p>
+                            </div>
+
+                            <div class="space-y-3">
+                                <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Study Context</label>
+                                <div class="flex gap-2 p-1.5 bg-white/5 rounded-2xl border border-white/10">
+                                    <label class="flex-1 cursor-pointer">
+                                        <input type="radio" name="study_mode" value="psc" <?= ($user['study_mode'] ?? 'psc') === 'psc' ? 'checked' : '' ?> class="hidden peer">
+                                        <div class="py-3 text-center rounded-xl font-bold text-sm text-gray-400 peer-checked:bg-primary peer-checked:text-background transition-all">PSC Focused</div>
+                                    </label>
+                                    <label class="flex-1 cursor-pointer">
+                                        <input type="radio" name="study_mode" value="world" <?= ($user['study_mode'] ?? '') === 'world' ? 'checked' : '' ?> class="hidden peer">
+                                        <div class="py-3 text-center rounded-xl font-bold text-sm text-gray-400 peer-checked:bg-primary peer-checked:text-background transition-all">Global Field</div>
+                                    </label>
+                                </div>
+                                <p class="text-[10px] text-gray-600 pl-1">Changes calculations context to regional or international standards.</p>
+                            </div>
+
+                            <div class="space-y-3">
                                 <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Website URL</label>
                                 <input type="text" name="website" value="<?= htmlspecialchars($user['website'] ?? '') ?>" placeholder="https://example.com" class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all">
                             </div>
@@ -316,20 +344,7 @@
                                     </div>
                                 </div>
 
-                                <div class="space-y-4">
-                                    <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Study Context</label>
-                                    <div class="flex gap-2 p-1.5 bg-white/5 rounded-2xl border border-white/10">
-                                        <label class="flex-1 cursor-pointer">
-                                            <input type="radio" name="study_mode" value="psc" <?= ($user['study_mode'] ?? 'psc') === 'psc' ? 'checked' : '' ?> class="hidden peer">
-                                            <div class="py-3 text-center rounded-xl font-bold text-sm text-gray-400 peer-checked:bg-primary peer-checked:text-background transition-all">PSC Focused</div>
-                                        </label>
-                                        <label class="flex-1 cursor-pointer">
-                                            <input type="radio" name="study_mode" value="world" <?= ($user['study_mode'] ?? '') === 'world' ? 'checked' : '' ?> class="hidden peer">
-                                            <div class="py-3 text-center rounded-xl font-bold text-sm text-gray-400 peer-checked:bg-primary peer-checked:text-background transition-all">Global Field</div>
-                                        </label>
-                                    </div>
-                                    <p class="text-[10px] text-gray-600 pl-1">Changes calculations context to regional or international standards.</p>
-                                </div>
+
                             </div>
 
                             <div class="group flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-primary/20 transition-all">
