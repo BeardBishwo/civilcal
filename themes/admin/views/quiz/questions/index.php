@@ -306,11 +306,10 @@ if (!empty($subCategories)) {
                                 // Extract Data
                                 $opts = $content['options'] ?? [];
                                 $explanation = nl2br(htmlspecialchars($content['explanation'] ?? ''));
-                                $mainCatID = $q['topic_id'] ?? null;
-                                $subCatID = $q['sub_topic_id'] ?? null;
 
-                                $mainCatParams = $catMap[$mainCatID] ?? '-';
-                                $subCatParams = $subCatMap[$subCatID] ?? '-';
+                                // Use titles from DB join if available, fallback to '-'
+                                $mainCatParams = $q['course_title'] ?? '-';
+                                $subCatParams = $q['category_title'] ?? '-';
 
                                 // Truncate text
                                 if (strlen($text) > 100) $text = substr($text, 0, 100) . '...';
@@ -332,6 +331,11 @@ if (!empty($subCategories)) {
                                 }
                             ?>
                                 <tr class="question-item group" data-id="<?php echo $q['id']; ?>">
+                                    <!-- Bulk Select Checkbox -->
+                                    <td class="text-center align-middle">
+                                        <input type="checkbox" class="row-checkbox" value="<?php echo $q['id']; ?>" onchange="updateBulkToolbar()">
+                                    </td>
+
                                     <!-- 0. ID -->
                                     <td class="text-center align-middle">
                                         <span class="text-xs font-bold text-slate-400"><?php echo $q['id']; ?></span>
@@ -1324,23 +1328,38 @@ if (!empty($subCategories)) {
         });
     });
 
-    // Simple Export Function (Placeholder implementation)
+    // Integrated Export Function
     function exportTable(format) {
-        const table = document.querySelector('.table-compact');
-        // Implement actual export logic here or redirect to export endpoint
-        // For now, we'll just show a toast
+        // Get current URL and its search params
+        const currentUrl = new URL(window.location.href);
+        const exportUrl = new URL('<?php echo app_base_url('admin/quiz/export'); ?>', window.location.origin);
+
+        // Append current filters to export URL
+        currentUrl.searchParams.forEach((value, key) => {
+            exportUrl.searchParams.set(key, value);
+        });
+
+        // Add format
+        exportUrl.searchParams.set('format', format);
+
+        // Toast notification
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
-            timer: 3000,
+            timer: 2000,
             timerProgressBar: true
         });
 
         Toast.fire({
             icon: 'info',
-            title: `Exporting as ${format.toUpperCase()}...`
+            title: `Preparing ${format.toUpperCase()} export...`
         });
+
+        // Redirect after small delay
+        setTimeout(() => {
+            window.location.href = exportUrl.toString();
+        }, 500);
 
         // Close dropdown
         document.getElementById('exportDropdown').classList.remove('show');

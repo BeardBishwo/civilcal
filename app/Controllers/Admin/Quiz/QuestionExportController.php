@@ -1,95 +1,136 @@
 <?php
+
 namespace App\Controllers\Admin\Quiz;
 
 use App\Core\Controller;
 use App\Models\Question;
 use App\Models\SyllabusNode;
 
-class QuestionExportController extends Controller {
+class QuestionExportController extends Controller
+{
 
     /**
      * INTELLIGENT EXPORT ENGINE
      * Handles huge datasets without crashing RAM.
      */
-    public function export() {
-        // 1. FILTER LOGIC (Download specific category or All)
-        $categoryId = $_GET['category_id'] ?? null;
-        
-        // 2. CHECK SIZE (Traffic Intelligence)
-        $query = Question::query();
-        if ($categoryId) $query->where('syllabus_node_id', $categoryId);
-        $count = $query->count();
+    /**
+     * INTELLIGENT EXPORT ENGINE
+     * Handles huge datasets without crashing RAM.
+     */
+    public function export()
+    {
+        $db = \App\Core\Database::getInstance();
 
-        // Safety Valve: If > 5000 questions, prevent Instant Download on Shared Hosting
-        if ($count > 5000) {
-            return json_encode([
-                'status' => 'queued',
-                'message' => 'Dataset too large for instant download. We are generating it in the background. You will be notified.'
-            ]);
+        // 1. FILTER LOGIC
+        $where = [];
+        $params = [];
+
+        if (!empty($_GET['category_id'])) {
+            $where[] = "q.category_id = :cat";
+            $params['cat'] = $_GET['category_id'];
+        }
+        if (!empty($_GET['stream'])) {
+            $where[] = "q.course_id = :course";
+            $params['course'] = $_GET['stream'];
+        }
+        if (!empty($_GET['type'])) {
+            $where[] = "q.type = :type";
+            $params['type'] = $_GET['type'];
         }
 
-        // 3. START STREAMING (The "Low Resource" Magic)
-        $filename = "civil_cal_questions_" . date('Y-m-d') . ".csv";
+        $whereClause = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
 
-        // Headers to force download immediately
+        // 2. FILENAME
+        $filename = "bishwo_questions_" . date('Y-m-d_His') . ".csv";
+
+        // Headers
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Pragma: no-cache');
         header('Expires: 0');
 
-        // Open the "Output Stream" (Direct connection to browser)
         $output = fopen('php://output', 'w');
 
-        // 4. WRITE HEADERS (Matches your Import Format perfectly)
-        // This ensures "Round Trip" capability (Export -> Edit -> Import)
+        // 3. HEADERS
         fputcsv($output, [
-            'category', 'subcategory', 'language_id', 'question_type', 
-            'question', 'option 1', 'option 2', 'option 3', 'option 4', 'option 5', 
-            'answer', 'level', 'note'
+            'ID',
+            'Course',
+            'Category',
+            'Type',
+            'Question',
+            'Option A',
+            'Option B',
+            'Option C',
+            'Option D',
+            'Option E',
+            'Correct Answer',
+            'Difficulty',
+            'Explanation'
         ]);
 
-        // 5. CHUNK PROCESSING (Process 200 rows at a time)
-        // We never load more than 200 rows into RAM.
-        $query->chunk(200, function($questions) use ($output) {
-            foreach ($questions as $q) {
-                
-                // Decode JSON options back to Columns
-                $opts = json_decode($q->options, true);
-                
-                // Fetch Category Names (for human readability)
-                // Assuming Question model relationships or efficient fetching
-                // For simplicity/direct SQL, we might need a join, but let's assume Model lazy loading works or optimize later
-                // Just ensuring we don't crash is step 1.
-                $main = SyllabusNode::find($q->syllabus_main_id);
-                $sub = SyllabusNode::find($q->syllabus_node_id);
-                
-                $catName = $main->title ?? 'Unknown';
-                $subName = $sub->title ?? 'Unknown';
+        // 4. STREAM DATA
+        $sql = "
+            SELECT q.*, 
+                   sn_cat.title as category_title,
+                   sn_course.title as course_title
+            FROM quiz_questions q 
+            LEFT JOIN syllabus_nodes sn_cat ON q.category_id = sn_cat.id 
+            LEFT JOIN syllabus_nodes sn_course ON q.course_id = sn_course.id
+            $whereClause 
+            ORDER BY q.id DESC
+        ";
 
-                // Map Answer back to 'a', 'b', 'c' format
-                $ansMap = [1 => 'a', 2 => 'b', 3 => 'c', 4 => 'd'];
+        $stmt = $db->getPdo()->prepare($sql);
+        $stmt->execute($params);
 
-                fputcsv($output, [
-                    $catName,               // category
-                    $subName,               // subcategory
-                    1,                      // language_id (Default English)
-                    ($q->type == 'TF' ? 2 : 1), // question_type
-                    $q->question,           // question
-                    $opts['option_1'] ?? '', 
-                    $opts['option_2'] ?? '', 
-                    $opts['option_3'] ?? '', 
-                    $opts['option_4'] ?? '', 
-                    $opts['option_5'] ?? '', 
-                    $ansMap[$q->correct_answer] ?? 'a',
-                    $q->level == 'easy' ? 1 : ($q->level == 'hard' ? 3 : 2), // level
-                    $q->explanation         // note
-                ]);
+        while ($q = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $content = json_decode($q['content'], true);
+            $options = json_decode($q['options'], true);
+
+            $questionText = strip_tags($content['text'] ?? '');
+
+            // Format options
+            $optA = strip_tags($options[0]['text'] ?? '');
+            $optB = strip_tags($options[1]['text'] ?? '');
+            $optC = strip_tags($options[2]['text'] ?? '');
+            $optD = strip_tags($options[3]['text'] ?? '');
+            $optE = strip_tags($options[4]['text'] ?? '');
+
+            // Correct Answer calculation
+            $answerText = '-';
+            if ($q['type'] == 'MCQ' || $q['type'] == 'TF') {
+                foreach ($options as $idx => $opt) {
+                    if (!empty($opt['is_correct'])) {
+                        $answerText = ($q['type'] == 'MCQ') ? "Option " . chr(65 + $idx) : ($opt['text'] ?? '-');
+                        break;
+                    }
+                }
+            } elseif ($q['type'] == 'MULTI') {
+                $answers = [];
+                foreach ($options as $idx => $opt) {
+                    if (!empty($opt['is_correct'])) $answers[] = chr(65 + $idx);
+                }
+                $answerText = implode(', ', $answers);
+            } elseif ($q['type'] == 'ORDER') {
+                $answerText = $q['correct_answer_json'] ?? '-';
             }
-            
-            // FLUSH BUFFER (Send data to user immediately)
-            ob_flush();
-            flush();
-        });
+
+            fputcsv($output, [
+                $q['id'],
+                $q['course_title'] ?? '-',
+                $q['category_title'] ?? '-',
+                $q['type'],
+                $questionText,
+                $optA,
+                $optB,
+                $optC,
+                $optD,
+                $optE,
+                $answerText,
+                $q['difficulty_level'],
+                strip_tags($q['answer_explanation'] ?? '')
+            ]);
+        }
 
         fclose($output);
         exit;

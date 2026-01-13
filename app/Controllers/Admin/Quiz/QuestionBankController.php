@@ -107,13 +107,15 @@ class QuestionBankController extends Controller
         $stmt->execute($params);
         $total = $stmt->fetchColumn();
 
-        // Fetch items with linked education levels
+        // Fetch items with linked education levels and category/course titles
         $sql = "
             SELECT q.*, 
-                   t.name as topic_name,
+                   sn_cat.title as category_title,
+                   sn_course.title as course_title,
                    GROUP_CONCAT(DISTINCT qel.education_level_id ORDER BY qel.education_level_id) as linked_education_levels
             FROM quiz_questions q 
-            LEFT JOIN quiz_topics t ON q.topic_id = t.id 
+            LEFT JOIN syllabus_nodes sn_cat ON q.category_id = sn_cat.id 
+            LEFT JOIN syllabus_nodes sn_course ON q.course_id = sn_course.id
             LEFT JOIN question_education_levels qel ON q.id = qel.question_id
             $whereClause 
             GROUP BY q.id
