@@ -1012,8 +1012,8 @@ if (!empty($nodesTree)) {
                 qCount: 0,
                 qOptional: 0,
                 qEach: 0,
-                qType: "both",
-                difficulty: "mixed",
+                qType: "MCQ",
+                difficulty: "any",
                 selected: false
             },
             {
@@ -1026,8 +1026,8 @@ if (!empty($nodesTree)) {
                 qCount: 0,
                 qOptional: 0,
                 qEach: 0,
-                qType: "both",
-                difficulty: "mixed",
+                qType: "MCQ",
+                difficulty: "any",
                 selected: false
             },
             {
@@ -1040,8 +1040,8 @@ if (!empty($nodesTree)) {
                 qCount: 0,
                 qOptional: 0,
                 qEach: 0,
-                qType: "both",
-                difficulty: "mixed",
+                qType: "MCQ",
+                difficulty: "any",
                 selected: false
             },
             {
@@ -1054,8 +1054,8 @@ if (!empty($nodesTree)) {
                 qCount: 0,
                 qOptional: 0,
                 qEach: 0,
-                qType: "both",
-                difficulty: "mixed",
+                qType: "MCQ",
+                difficulty: "any",
                 selected: false
             },
             {
@@ -1068,8 +1068,8 @@ if (!empty($nodesTree)) {
                 qCount: 0,
                 qOptional: 0,
                 qEach: 0,
-                qType: "both",
-                difficulty: "mixed",
+                qType: "MCQ",
+                difficulty: "any",
                 selected: false
             }
         ];
@@ -1110,6 +1110,10 @@ if (!empty($nodesTree)) {
         while (container.children.length > 15) container.removeChild(container.lastChild);
 
         syllabusData.forEach((row, index) => {
+            // Ensure defaults for all rows (MCQ and Any)
+            if (!row.qType) row.qType = "MCQ";
+            if (!row.difficulty) row.difficulty = "any";
+
             const rowIndicatorClass = row.type === 'paper' ? 'row-phase-indicator' : (row.type === 'section' ? 'row-section-indicator' : 'row-unit-indicator');
 
             // 5-Level Color Mapping
@@ -1248,16 +1252,32 @@ if (!empty($nodesTree)) {
 
             // 10. Q-Type
             const qTypeOptions = [{
-                    val: 'both',
-                    label: 'Both'
+                    val: 'any',
+                    label: 'Any'
                 },
                 {
-                    val: 'objective',
-                    label: 'Objective'
+                    val: 'MCQ',
+                    label: 'MCQ'
                 },
                 {
-                    val: 'subjective',
-                    label: 'Subjective'
+                    val: 'TF',
+                    label: 'True False'
+                },
+                {
+                    val: 'ORDER',
+                    label: 'Sequence'
+                },
+                {
+                    val: 'MULTI',
+                    label: 'Multi'
+                },
+                {
+                    val: 'THEORY_SHORT',
+                    label: 'Short Theory'
+                },
+                {
+                    val: 'THEORY_LONG',
+                    label: 'Long Theory'
                 }
             ];
             const qTypeSelectHtml = `<select class="type-select-styled" onchange="updateRow(${index}, 'qType', this.value)">
@@ -1267,12 +1287,16 @@ if (!empty($nodesTree)) {
 
             // 11. Diff
             const diffOptions = [{
-                    val: 'mixed',
-                    label: 'Mixed'
+                    val: 'any',
+                    label: 'Any'
                 },
                 {
                     val: 'easy',
                     label: 'Easy'
+                },
+                {
+                    val: 'mid_easy',
+                    label: 'Mid Easy'
                 },
                 {
                     val: 'medium',
@@ -1281,6 +1305,10 @@ if (!empty($nodesTree)) {
                 {
                     val: 'hard',
                     label: 'Hard'
+                },
+                {
+                    val: 'expert',
+                    label: 'Expert'
                 }
             ];
             const diffSelectHtml = `<select class="type-select-styled" onchange="updateRow(${index}, 'difficulty', this.value)">
@@ -1460,6 +1488,8 @@ if (!empty($nodesTree)) {
             qCount: 0,
             qOptional: 0,
             qEach: 0,
+            qType: 'MCQ',
+            difficulty: 'any',
             selected: false
         });
         renderGrid();
@@ -2296,6 +2326,8 @@ if (!empty($nodesTree)) {
             qCount: 0,
             qOptional: 0,
             qEach: 0,
+            qType: 'MCQ',
+            difficulty: 'any',
             selected: false,
             [config.linkField]: id
         };

@@ -392,6 +392,7 @@ class ExamGeneratorService
     {
         $map = [
             'easy' => 1,
+            'mid_easy' => 2,
             'easy-mid' => 2,
             'easy_mid' => 2,
             'medium' => 3,
