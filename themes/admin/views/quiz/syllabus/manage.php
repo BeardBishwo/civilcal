@@ -138,7 +138,12 @@ if (!empty($nodesTree)) {
         <!-- === MAIN GRID AREA === -->
         <div class="p-0">
             <div class="bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden">
-                <div class="syllabus-grid-wrapper overflow-x-auto">
+                <!-- Top Scrollbar -->
+                <div id="grid-top-scroll" class="overflow-x-auto overflow-y-hidden border-b border-slate-100 hidden md:block" style="height: 12px;">
+                    <div id="grid-top-content" style="height: 1px; width: 1650px;"></div>
+                </div>
+
+                <div class="syllabus-grid-wrapper overflow-x-auto" id="grid-bottom-scroll">
                     <div class="syllabus-grid" id="syllabus-container">
                         <!-- Headers -->
                         <div class="grid-header"><input type="checkbox" id="select-all" class="w-4 h-4 rounded cursor-pointer" onclick="toggleSelectAll()"></div>
@@ -332,15 +337,12 @@ if (!empty($nodesTree)) {
     /* Premium Grid Styles - Beautiful Grid Transformation */
     .syllabus-grid {
         display: grid;
-        /* Columns: Ck(40), Drag(35), LVL(35), Title(1fr), Time(65), Type(110), Qty(60), Opt(60), Each(60), Q-Type(90), Diff(90), Marks(65), Hier(80), Act(90), Linked(250) */
-        grid-template-columns: 40px 35px 35px 1fr 65px 110px 60px 60px 60px 90px 90px 65px 80px 90px 250px;
+        /* Columns: Ck(40), Drag(35), LVL(35), Title(1fr), Time(90), Type(140), Qty(90), Opt(90), Each(90), Q-Type(100), Diff(100), Marks(90), Hier(90), Act(100), Linked(250) */
+        grid-template-columns: 40px 35px 35px 1fr 90px 140px 90px 90px 90px 100px 100px 90px 90px 100px 250px;
         background-color: #cbd5e1;
-        /* The color of ALL grid lines */
         gap: 1.5px;
-        /* Distinct 1.5px grid lines everywhere */
-        min-width: 1450px;
+        min-width: 1650px;
         border: 2px solid #94a3b8;
-        /* Stronger outer frame */
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         border-radius: 8px 8px 0 0;
         overflow: hidden;
@@ -394,17 +396,46 @@ if (!empty($nodesTree)) {
         transition: background-color 0.2s;
     }
 
-    /* Row Background Tints */
-    .row-phase-bg {
-        background-color: #f8fafc !important;
+    /* Row Background Tints - Multi-level Coloring */
+    .row-paper-bg {
+        background-color: #0f172a !important;
+        /* Black/Dark Slate */
+    }
+
+    .row-paper-bg .grid-cell {
+        color: #f8fafc !important;
+    }
+
+    .row-paper-bg .input-premium {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
+    .row-paper-bg .type-select-styled {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
 
     .row-section-bg {
-        background-color: #f1f5f9 !important;
+        background-color: #eff6ff !important;
+        /* Light Blue */
     }
 
-    .row-unit-bg {
-        background-color: white !important;
+    .row-category-bg {
+        background-color: #f0fdf4 !important;
+        /* Light Green */
+    }
+
+    .row-subcategory-bg {
+        background-color: #fffbeb !important;
+        /* Light Amber */
+    }
+
+    .row-topic-bg {
+        background-color: #fef2f2 !important;
+        /* Light Red */
     }
 
     /* Height variants */
@@ -435,21 +466,24 @@ if (!empty($nodesTree)) {
 
     .input-premium {
         width: 100%;
-        padding: 0 6px;
+        padding: 0 8px;
         border: 1px solid #e2e8f0;
-        border-radius: 6px;
+        border-radius: 8px;
         text-align: center;
         font-family: 'Inter', system-ui, sans-serif;
         font-weight: 700;
         font-size: 0.75rem;
         transition: all 0.2s;
-        background-color: white;
-        height: 28px;
+        background-color: rgba(255, 255, 255, 0.85);
+        /* Semi-transparent */
+        backdrop-filter: blur(4px);
+        height: 32px;
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
     }
 
     .input-premium:focus {
         border-color: #3b82f6;
+        background-color: white;
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         outline: none;
     }
@@ -520,29 +554,39 @@ if (!empty($nodesTree)) {
         background-repeat: no-repeat;
         background-position: right 8px center;
         background-size: 8px;
-        background-color: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        font-size: 10px;
+        background-color: rgba(255, 255, 255, 0.7);
+        /* Semi-transparent Glassmorphism */
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-radius: 9px;
+        font-size: 11px;
         font-weight: 700;
-        padding: 0 22px 0 10px;
-        height: 30px;
+        padding: 0 24px 0 12px;
+        height: 34px;
         width: 100%;
         cursor: pointer;
-        transition: all 0.2s;
-        color: #475569;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        color: #334155;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
     .type-select-styled:hover {
-        border-color: #cbd5e1;
-        background-color: #f8fafc;
+        border-color: #3b82f6;
+        background-color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
     .type-select-styled:focus {
         border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        background-color: white;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
         outline: none;
+    }
+
+    .type-select-styled option {
+        background-color: white;
+        color: #334155;
+        font-weight: 600;
     }
 
     /* Tree Guide Lines */
@@ -869,8 +913,8 @@ if (!empty($nodesTree)) {
         }
 
         /* Precise Column Widths */
-        .grid-header:nth-child(3),
-        .grid-cell:nth-child(3) {
+        .grid-header.lvl-header,
+        .grid-cell.lvl-cell {
             width: 35px !important;
             text-align: center;
         }
@@ -1067,7 +1111,16 @@ if (!empty($nodesTree)) {
 
         syllabusData.forEach((row, index) => {
             const rowIndicatorClass = row.type === 'paper' ? 'row-phase-indicator' : (row.type === 'section' ? 'row-section-indicator' : 'row-unit-indicator');
-            const rowBgClass = row.type === 'paper' ? 'row-phase-bg' : (row.type === 'section' ? 'row-section-bg' : 'row-unit-bg');
+
+            // 5-Level Color Mapping
+            const bgMap = {
+                'paper': 'row-paper-bg',
+                'section': 'row-section-bg',
+                'category': 'row-category-bg',
+                'sub_category': 'row-subcategory-bg',
+                'topic': 'row-topic-bg'
+            };
+            const rowBgClass = bgMap[row.type] || 'row-topic-bg';
             const rowHeightClass = row.type === 'paper' ? 'height-phase' : (row.type === 'section' ? 'height-section' : 'height-unit');
             const cellBaseClass = `grid-cell ${rowBgClass} ${rowHeightClass}`;
 
@@ -1142,10 +1195,12 @@ if (!empty($nodesTree)) {
                     return `<option value="${sId}" ${isSelected ? "selected" : ""}>${sName}</option>`;
                 }).join("") : "";
 
-                titleHtml = `${treeLinesHtml}<select class="type-select-styled font-bold text-slate-700 hover:border-blue-400" style="text-align: left; padding-left: 12px; height: 32px; font-size: 11px;" onchange="linkNodeFromDropdown(${index}, this.value, '${row.type}')">
-                    <option value="">${placeholder}</option>
+                // Use the same titleClass and extraCellClass logic to make it "beautiful"
+                const dropdownClass = `type-select-styled ${titleClass} border-none shadow-none bg-transparent`;
+                titleHtml = `${treeLinesHtml}<div class="w-full flex items-center pr-2"><select class="${dropdownClass}" style="text-align: left; padding-left: 10px; height: 32px;" onchange="linkNodeFromDropdown(${index}, this.value, '${row.type}')">
+                    <option value="" class="text-slate-400">${placeholder}</option>
                     ${options}
-                </select>`;
+                </select></div>`;
             } else {
                 titleHtml = `${treeLinesHtml}<span class="w-full ${titleClass} flex items-center ${isLinked ? "opacity-90" : ""}" title="${isLinked ? "Linked from database" : ""}"><i class="fas ${icon} mr-2 text-[10px] opacity-40"></i>${row.title}</span>`;
             }
@@ -1289,6 +1344,8 @@ if (!empty($nodesTree)) {
     function updateRow(index, field, value) {
         const stringFields = ['title', 'type', 'difficulty', 'qType'];
         if (!stringFields.includes(field)) value = parseFloat(value) || 0;
+
+        const oldType = syllabusData[index].type;
         syllabusData[index][field] = value;
 
         // Auto-adjust depth based on node type (Enterprise Rule)
@@ -1296,18 +1353,26 @@ if (!empty($nodesTree)) {
             const typeDepthMap = {
                 'paper': 0,
                 'section': 1,
-                'unit': 2
+                'category': 2,
+                'sub_category': 3,
+                'topic': 4
             };
             if (typeDepthMap[value] !== undefined) {
-                // If changing to 'unit', and current depth is < 2, force level 2
-                // If changing to 'section', force level 1
-                // If changing to 'paper', force level 0
                 syllabusData[index].depth = typeDepthMap[value];
+            }
+
+            // Clean up linking if type changed fundamentally
+            if (oldType !== value) {
+                syllabusData[index].linked_category_id = null;
+                syllabusData[index].linked_subcategory_id = null;
+                syllabusData[index].linked_topic_id = null;
+                syllabusData[index].category_name = null;
+                syllabusData[index].topic_name = null;
             }
         }
 
-        // Auto-calculation for Unit types: QTY * EACH = MARKS
-        if (syllabusData[index].type === 'unit') {
+        // Auto-calculation for Leaf types (Topic)
+        if (syllabusData[index].type === 'topic') {
             if (field === 'qCount' || field === 'qEach') {
                 const count = parseFloat(syllabusData[index].qCount) || 0;
                 const each = parseFloat(syllabusData[index].qEach) || 0;
@@ -1339,7 +1404,7 @@ if (!empty($nodesTree)) {
     function recalculateTotals() {
         for (let i = syllabusData.length - 1; i >= 0; i--) {
             const row = syllabusData[i];
-            const isLeaf = row.type === 'topic';
+            const isLeaf = row.type === 'topic' || row.type === 'position_level' || row.type === 'unit';
 
             // Only aggregates need calculation (leaves have their own values manually entered)
             if (!isLeaf) {
@@ -2269,5 +2334,17 @@ if (!empty($nodesTree)) {
         initSettings();
         renderGrid();
         initCustomDropdowns();
+
+        // Scroll Sync Initialization
+        const topScroll = document.getElementById('grid-top-scroll');
+        const bottomScroll = document.getElementById('grid-bottom-scroll');
+        if (topScroll && bottomScroll) {
+            topScroll.onscroll = () => {
+                bottomScroll.scrollLeft = topScroll.scrollLeft;
+            };
+            bottomScroll.onscroll = () => {
+                topScroll.scrollLeft = bottomScroll.scrollLeft;
+            };
+        }
     });
 </script>
