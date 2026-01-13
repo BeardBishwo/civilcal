@@ -31,20 +31,29 @@ class TopicController extends Controller
 
         // Fetch dropdown options for filters
         $courses = $this->db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course' ORDER BY order_index ASC")->fetchAll();
-        
+
         $eduLevelSql = "SELECT id, title FROM syllabus_nodes WHERE type = 'education_level'";
         $eduLevelParams = [];
-        if ($courseId) { $eduLevelSql .= " AND parent_id = :pid"; $eduLevelParams['pid'] = $courseId; }
+        if ($courseId) {
+            $eduLevelSql .= " AND parent_id = :pid";
+            $eduLevelParams['pid'] = $courseId;
+        }
         $educationLevels = $this->db->query($eduLevelSql . " ORDER BY order_index ASC", $eduLevelParams)->fetchAll();
 
         $categorySql = "SELECT id, title FROM syllabus_nodes WHERE type = 'category'";
         $categoryParams = [];
-        if ($educationLevelId) { $categorySql .= " AND parent_id = :pid"; $categoryParams['pid'] = $educationLevelId; }
+        if ($educationLevelId) {
+            $categorySql .= " AND parent_id = :pid";
+            $categoryParams['pid'] = $educationLevelId;
+        }
         $categories = $this->db->query($categorySql . " ORDER BY order_index ASC", $categoryParams)->fetchAll();
 
-        $subCategorySql = "SELECT id, title FROM syllabus_nodes WHERE type IN ('unit', 'section', 'part')";
+        $subCategorySql = "SELECT id, title FROM syllabus_nodes WHERE type = 'sub_category'";
         $subCategoryParams = [];
-        if ($categoryId) { $subCategorySql .= " AND parent_id = :pid"; $subCategoryParams['pid'] = $categoryId; }
+        if ($categoryId) {
+            $subCategorySql .= " AND parent_id = :pid";
+            $subCategoryParams['pid'] = $categoryId;
+        }
         $subCategories = $this->db->query($subCategorySql . " ORDER BY order_index ASC", $subCategoryParams)->fetchAll();
 
         // Base Query with Full Joins
@@ -61,10 +70,22 @@ class TopicController extends Controller
                 WHERE t.type = 'topic'";
 
         $params = [];
-        if ($courseId) { $sql .= " AND co.id = :course_id"; $params['course_id'] = $courseId; }
-        if ($educationLevelId) { $sql .= " AND el.id = :ed_level_id"; $params['ed_level_id'] = $educationLevelId; }
-        if ($categoryId) { $sql .= " AND c.id = :category_id"; $params['category_id'] = $categoryId; }
-        if ($subCategoryId) { $sql .= " AND t.parent_id = :subcategory_id"; $params['subcategory_id'] = $subCategoryId; }
+        if ($courseId) {
+            $sql .= " AND co.id = :course_id";
+            $params['course_id'] = $courseId;
+        }
+        if ($educationLevelId) {
+            $sql .= " AND el.id = :ed_level_id";
+            $params['ed_level_id'] = $educationLevelId;
+        }
+        if ($categoryId) {
+            $sql .= " AND c.id = :category_id";
+            $params['category_id'] = $categoryId;
+        }
+        if ($subCategoryId) {
+            $sql .= " AND t.parent_id = :subcategory_id";
+            $params['subcategory_id'] = $subCategoryId;
+        }
 
         $sql .= " ORDER BY (t.is_active = 1 AND IFNULL(sc.is_active, 1) = 1 AND IFNULL(c.is_active, 1) = 1) DESC, co.title ASC, el.title ASC, c.title ASC, sc.title ASC, t.order_index ASC";
 
@@ -117,7 +138,7 @@ class TopicController extends Controller
         $order = $data['order'] ?? ($_POST['order'] ?? []);
 
         foreach ($order as $index => $id) {
-             $this->db->update('syllabus_nodes', ['order_index' => $index + 1], "id = :id", ['id' => $id]);
+            $this->db->update('syllabus_nodes', ['order_index' => $index + 1], "id = :id", ['id' => $id]);
         }
         echo json_encode(['status' => 'success']);
     }
@@ -145,11 +166,11 @@ class TopicController extends Controller
 
         // Generate Slug
         $slug = $this->syllabusService->slugify($title);
-        
+
         // Get Max Order
         $sql = "SELECT MAX(order_index) FROM syllabus_nodes WHERE type = 'topic'";
         $params = [];
-        if($parentId) {
+        if ($parentId) {
             $sql .= " AND parent_id = :pid";
             $params['pid'] = $parentId;
         }
@@ -159,10 +180,10 @@ class TopicController extends Controller
         $maxOrder = $stmt->fetchColumn();
 
         $data = [
-            'parent_id' => $parentId, 
+            'parent_id' => $parentId,
             'title' => $title,
             'slug' => $slug,
-            'type' => 'topic', 
+            'type' => 'topic',
             'is_premium' => $isPremium,
             'unlock_price' => $unlockPrice,
             'image_path' => $image,
@@ -212,7 +233,7 @@ class TopicController extends Controller
     {
         // Check for JSON input (flags)
         $input = json_decode(file_get_contents('php://input'), true);
-        
+
         // Selective Delete
         if (isset($input['delete_types']) && is_array($input['delete_types'])) {
             $deleteTypes = $input['delete_types'];
@@ -283,14 +304,14 @@ class TopicController extends Controller
         // 2. Determine New Name (Handle V1, V2)
         $baseTitle = $original['title'];
         $baseTitle = preg_replace('/\s*\(V\d+\)$/', '', $baseTitle);
-        
+
         $newTitle = $baseTitle . ' (V1)';
         $counter = 1;
 
         while (true) {
             $check = $this->db->findOne('syllabus_nodes', [
-                'title' => $newTitle, 
-                'type' => $original['type'], 
+                'title' => $newTitle,
+                'type' => $original['type'],
                 'parent_id' => $original['parent_id'],
                 'is_active' => 0
             ]);
@@ -306,7 +327,7 @@ class TopicController extends Controller
         unset($data['updated_at']);
         $data['title'] = $newTitle;
         $data['slug'] = $this->syllabusService->slugify($newTitle);
-        $data['is_active'] = 0; 
+        $data['is_active'] = 0;
         $data['order_index'] = $original['order_index'] + 1;
 
         $this->syllabusService->createNode($data);

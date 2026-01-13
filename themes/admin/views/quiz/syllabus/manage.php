@@ -119,15 +119,11 @@ if (!empty($nodesTree)) {
 
                     <!-- Right Actions -->
                     <div class="flex items-center gap-2 print:hidden ml-auto">
-                        <button onclick="loadSubEngineerTemplate()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold transition-all border border-slate-200">
-                            <i class="fas fa-magic text-blue-500"></i> Sub-Engineer
-                        </button>
+
                         <button onclick="addTopic()" class="flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold transition-all border border-slate-200 shadow-sm">
                             <i class="fas fa-plus text-blue-500"></i> Row
                         </button>
-                        <button onclick="openCloneModal()" class="flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold transition-all border border-slate-200 shadow-sm">
-                            <i class="fas fa-copy text-indigo-500"></i> Clone
-                        </button>
+
                         <button onclick="saveSyllabus()" class="h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition shadow-md flex items-center">
                             <i class="fas fa-save mr-2"></i> Save Changes
                         </button>
@@ -373,15 +369,14 @@ if (!empty($nodesTree)) {
     /* Legacy row container not used in this flat grid model */
 
     /* Clean Title Cells - Matching Sample */
-    .cell-title-phase {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
-        color: #f8fafc !important;
-        position: relative;
+    .cell-title-phase-premium {
+        background: linear-gradient(to right, #f8fafc, #f1f5f9) !important;
+        box-shadow: inset 0 -2px 0 0 #e2e8f0;
     }
 
-    .cell-title-section {
-        background-color: #f1f5f9 !important;
-        color: #1e40af !important;
+    .cell-title-section-premium {
+        background-color: rgba(241, 245, 249, 0.3) !important;
+        box-shadow: inset 0 -1px 0 0 #e2e8f0;
     }
 
     .grid-cell {
@@ -390,29 +385,39 @@ if (!empty($nodesTree)) {
         align-items: center;
         font-size: 0.825rem;
         color: #334155;
-        background-color: white;
-        /* Base background for data cells */
+        background-color: transparent;
+        /* Changed to transparent to show row bg */
         position: relative;
         height: 54px;
-        /* Luxury spacing */
+        /* Default height */
         overflow: hidden;
+        transition: background-color 0.2s;
     }
 
     /* Row Background Tints */
-    .row-phase {
+    .row-phase-bg {
         background-color: #f8fafc !important;
-        color: #0f172a;
-        font-weight: 800;
     }
 
-    .row-section {
+    .row-section-bg {
         background-color: #f1f5f9 !important;
-        color: #1e40af;
-        font-weight: 700;
     }
 
-    .row-unit {
+    .row-unit-bg {
         background-color: white !important;
+    }
+
+    /* Height variants */
+    .height-phase {
+        height: 60px;
+    }
+
+    .height-section {
+        height: 50px;
+    }
+
+    .height-unit {
+        height: 46px;
     }
 
     /* Hierarchy Indicators - Still useful overlay on first cell */
@@ -488,6 +493,16 @@ if (!empty($nodesTree)) {
         font-weight: 700;
     }
 
+    .depth-0 {
+        color: #0f172a;
+        font-weight: 800;
+    }
+
+    .depth-1 {
+        color: #1e293b;
+        font-weight: 700;
+    }
+
     .depth-2 {
         color: #334155;
         font-weight: 600;
@@ -496,6 +511,38 @@ if (!empty($nodesTree)) {
     .depth-3 {
         color: #64748b;
         font-weight: 500;
+    }
+
+    /* Premium Dropdown Cells */
+    .type-select-styled {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 8px;
+        background-color: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 0 22px 0 10px;
+        height: 30px;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #475569;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .type-select-styled:hover {
+        border-color: #cbd5e1;
+        background-color: #f8fafc;
+    }
+
+    .type-select-styled:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        outline: none;
     }
 
     /* Tree Guide Lines */
@@ -898,45 +945,104 @@ if (!empty($nodesTree)) {
 </style>
 
 <script>
+    window.onerror = function(msg, url, line) {
+        console.error("Global Error:", msg, line);
+        // alert("JS Error: " + msg + "\nLine: " + line);
+        return false;
+    };
+</script>
+<script>
     // 1. DATA INITIALIZATION
-    let syllabusData = <?php echo !empty($initialData) ? json_encode($initialData) : '[]'; ?>;
+    window.syllabusData = <?php echo !empty($initialData) ? json_encode($initialData) : "[]"; ?>;
+    console.log("Initial Syllabus Data:", window.syllabusData);
 
-    if (syllabusData.length === 0) {
-        syllabusData = [{
-            id: Date.now(),
-            title: "Paper I: General",
-            type: "paper",
-            depth: 0,
-            weight: 100,
-            time: 0,
-            qCount: 0,
-            qOptional: 0,
-            qEach: 0,
-            selected: false
-        }];
+    if (!window.syllabusData || window.syllabusData.length === 0) {
+        console.log("Empty syllabus detected. Seeding defaults...");
+        window.syllabusData = [{
+                id: Date.now(),
+                title: "Paper I: General Subject",
+                type: "paper",
+                depth: 0,
+                weight: 100,
+                time: 0,
+                qCount: 0,
+                qOptional: 0,
+                qEach: 0,
+                qType: "both",
+                difficulty: "mixed",
+                selected: false
+            },
+            {
+                id: Date.now() + 1,
+                title: "Section A",
+                type: "section",
+                depth: 1,
+                weight: 0,
+                time: 0,
+                qCount: 0,
+                qOptional: 0,
+                qEach: 0,
+                qType: "both",
+                difficulty: "mixed",
+                selected: false
+            },
+            {
+                id: Date.now() + 2,
+                title: "General Awareness",
+                type: "category",
+                depth: 2,
+                weight: 0,
+                time: 0,
+                qCount: 0,
+                qOptional: 0,
+                qEach: 0,
+                qType: "both",
+                difficulty: "mixed",
+                selected: false
+            },
+            {
+                id: Date.now() + 3,
+                title: "Level 1: Concepts",
+                type: "sub_category",
+                depth: 3,
+                weight: 0,
+                time: 0,
+                qCount: 0,
+                qOptional: 0,
+                qEach: 0,
+                qType: "both",
+                difficulty: "mixed",
+                selected: false
+            },
+            {
+                id: Date.now() + 4,
+                title: "Geography & History",
+                type: "topic",
+                depth: 4,
+                weight: 0,
+                time: 0,
+                qCount: 0,
+                qOptional: 0,
+                qEach: 0,
+                qType: "both",
+                difficulty: "mixed",
+                selected: false
+            }
+        ];
     }
+    // Use var for hoisting - available throughout the script
+    var syllabusData = window.syllabusData;
+    const coursesData = <?php echo json_encode($allCourses ?: []); ?>;
+    const eduData = <?php echo json_encode($allEduLevels ?: []); ?>;
+    const posData = <?php echo json_encode($allPosLevels ?: []); ?>; // Safe encoding
+    const categoriesDB = <?php echo !empty($categories) ? json_encode($categories) : "[]"; ?>;
+    const subjectsDB = <?php echo !empty($quizSubjects) ? json_encode($quizSubjects) : "[]"; ?>;
+    const subcategoriesDB = <?php echo !empty($subcategories) ? json_encode($subcategories) : "[]"; ?>;
+    const topicsDB = <?php echo !empty($topics) ? json_encode($topics) : "[]"; ?>;
+    let currentLevel = "<?php echo addslashes($level); ?>";
+    let manualSettings = <?php echo !empty($settings) ? json_encode($settings) : "{}"; ?>;
 
-    let currentLevel = '<?php echo addslashes($level); ?>';
-    const coursesData = <?php echo json_encode($allCourses); ?>;
-    const eduData = <?php echo json_encode($allEduLevels); ?>;
-    const posData = <?php echo json_encode($allPosLevels); ?>;
 
-    // Data sources for dropdowns (from quiz tables)
-    const subjectsDB = <?php echo !empty($quizSubjects) ? json_encode($quizSubjects) : '[]'; ?>;
-    const subcategoriesDB = <?php echo !empty($subcategories) ? json_encode($subcategories) : '[]'; ?>;
-    const topicsDB = <?php echo !empty($topics) ? json_encode($topics) : '[]'; ?>;
-
-    let manualSettings = <?php echo !empty($settings) ? json_encode($settings) : "{ 
-        marks: null, 
-        time: null, 
-        pass: 40, 
-        negValue: 20, 
-        negUnit: 'percent',
-        negScope: 'per-q',
-        description: 'Elevate your curriculum with our high-precision syllabus engine.'
-    }"; ?>;
-
-    // --- INITIALIZATION ---
     function initSettings() {
         if (manualSettings.marks) document.getElementById('global-marks-input').value = manualSettings.marks;
         if (manualSettings.time) document.getElementById('global-time-input').value = manualSettings.time;
@@ -961,235 +1067,190 @@ if (!empty($nodesTree)) {
 
         syllabusData.forEach((row, index) => {
             const rowIndicatorClass = row.type === 'paper' ? 'row-phase-indicator' : (row.type === 'section' ? 'row-section-indicator' : 'row-unit-indicator');
+            const rowBgClass = row.type === 'paper' ? 'row-phase-bg' : (row.type === 'section' ? 'row-section-bg' : 'row-unit-bg');
+            const rowHeightClass = row.type === 'paper' ? 'height-phase' : (row.type === 'section' ? 'height-section' : 'height-unit');
+            const cellBaseClass = `grid-cell ${rowBgClass} ${rowHeightClass}`;
 
-            // Checkbox (The first cell gets the indicator bar)
-            container.appendChild(createCell(`<input type="checkbox" class="row-checkbox w-4 h-4 rounded" ${row.selected ? 'checked' : ''} onchange="toggleRowSelection(${index}, this.checked)">`, `justify-center ${rowIndicatorClass}`));
+            // 1. Checkbox
+            container.appendChild(createCell(`<input type="checkbox" class="row-checkbox w-4 h-4 rounded" ${row.selected ? 'checked' : ''} onchange="toggleRowSelection(${index}, this.checked)">`, `${cellBaseClass} justify-center ${rowIndicatorClass}`));
 
-            // Drag Handle
-            const dragCell = createCell(`<i class="fas fa-grip-vertical drag-handle"></i>`, 'justify-center');
+            // 2. Drag Handle
+            const dragCell = createCell(`<i class="fas fa-grip-vertical drag-handle"></i>`, `${cellBaseClass} justify-center`);
             dragCell.draggable = true;
             setupDragEvents(dragCell, index);
             container.appendChild(dragCell);
 
-            // Level
-            container.appendChild(createCell(row.depth, `justify-center depth-${row.depth} bg-slate-50 font-mono text-[10px]`));
+            // 3. Level
+            container.appendChild(createCell(row.depth, `${cellBaseClass} justify-center bg-slate-50/50 font-mono text-[10px]`));
 
-            // Topic / Title (with depth-based styling)
-            const indentSize = 38;
+            // 4. Topic / Title (with depth-based styling)
+            const indentSize = 34;
             const padding = 16 + (row.depth * indentSize);
             let icon = 'fa-folder';
             let titleClass = '';
             let extraCellClass = '';
 
-            if (row.depth === 0 || row.type === 'paper') {
+            if (row.type === 'paper' || row.depth === 0) {
                 icon = 'fa-layer-group';
-                titleClass = 'font-bold text-white';
-                extraCellClass = 'cell-title-phase';
+                titleClass = 'font-extrabold text-slate-800 uppercase tracking-tight';
+                extraCellClass = 'cell-title-phase-premium';
             } else if (row.type === 'section' || row.depth === 1) {
                 icon = 'fa-folder-open text-blue-500';
                 titleClass = 'font-bold text-blue-700';
-                extraCellClass = 'cell-title-section';
+                extraCellClass = 'cell-title-section-premium';
             } else {
                 icon = 'fa-folder text-slate-400';
-                titleClass = 'text-slate-600';
+                titleClass = 'text-slate-600 font-medium';
             }
 
-            // Generate Tree Lines
+            // Tree Lines
             let treeLinesHtml = '';
             for (let i = 0; i < row.depth; i++) {
-                const xPos = 16 + (i * indentSize) + 6; // Center of icon position for that level
+                const xPos = 16 + (i * indentSize) + 6;
                 treeLinesHtml += `<div class="tree-guide" style="--guide-x: ${xPos}px;"></div>`;
                 if (i === row.depth - 1) {
                     treeLinesHtml += `<div class="tree-guide-horizontal" style="--guide-x: ${xPos}px;"></div>`;
                 }
             }
 
-            // Title cell - editable for Paper, dropdown for Main Category/Sub Category/Topic if not linked
-            const isLinked = row.linked_subject_id || row.linked_subcategory_id || row.linked_topic_id;
-            const isEditable = row.type === 'paper' && !isLinked;
-            const needsDropdown = !isLinked && (row.type === 'section' || row.type === 'unit' || row.type === 'topic');
+            const isLinked = row.linked_subject_id || row.linked_subcategory_id || row.linked_topic_id || row.linked_category_id || row.linked_position_level_id;
+            const isEditable = (row.type === "paper" || row.type === "section") && !isLinked;
+            const needsDropdown = !isLinked && row.type !== "paper" && row.type !== "section";
 
             let titleHtml;
             if (isEditable) {
-                // Paper: Editable text
-                titleHtml = `<span contenteditable="true" class="w-full outline-none focus:bg-white rounded px-1 transition duration-200 ${titleClass}" onblur="updateRow(${index}, 'title', this.innerText)">${row.title}</span>`;
+                titleHtml = `${treeLinesHtml}<span contenteditable="true" class="w-full outline-none focus:bg-white rounded-lg px-2 py-1 transition duration-200 ${titleClass}" onblur="updateRow(${index}, 'title', this.innerText)">${row.title}</span>`;
             } else if (needsDropdown) {
-                // Main Category, Sub Category, or Topic: Show dropdown to select from database
-                let dataSource, placeholder, options;
-                if (row.type === 'section') {
-                    placeholder = 'Select Subject';
-                    options = typeof subjectsDB !== 'undefined' ? subjectsDB.map(s => `<option value="${s.id}">${s.name || s.title}</option>`).join('') : '';
-                } else if (row.type === 'unit') {
-                    placeholder = 'Select Sub Category';
-                    options = typeof subcategoriesDB !== 'undefined' ? subcategoriesDB.map(sc => `<option value="${sc.id}">${sc.name || sc.title}</option>`).join('') : '';
-                } else { // row.type === 'topic'
-                    placeholder = 'Select Topic';
-                    options = typeof topicsDB !== 'undefined' ? topicsDB.map(t => `<option value="${t.id}">${t.name || t.title}</option>`).join('') : '';
+                let dataSource, placeholder;
+                if (row.type === "category") {
+                    placeholder = "Select Category";
+                    dataSource = categoriesDB;
+                } else if (row.type === "sub_category") {
+                    placeholder = "Select Sub-Cat";
+                    dataSource = subcategoriesDB;
+                } else if (row.type === "topic") {
+                    placeholder = "Select Topic";
+                    dataSource = topicsDB;
                 }
 
-                titleHtml = `<select class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-sm ${titleClass}" onchange="linkNodeFromDropdown(${index}, this.value, '${row.type}')">
+                let options = dataSource ? dataSource.map(s => {
+                    const sId = s.id;
+                    const sName = s.name || s.title;
+                    const isSelected = (row.type === "category" && row.linked_category_id == sId) ||
+                        (row.type === "sub_category" && row.linked_subcategory_id == sId) ||
+                        (row.type === "topic" && row.linked_topic_id == sId);
+                    return `<option value="${sId}" ${isSelected ? "selected" : ""}>${sName}</option>`;
+                }).join("") : "";
+
+                titleHtml = `${treeLinesHtml}<select class="type-select-styled font-bold text-slate-700 hover:border-blue-400" style="text-align: left; padding-left: 12px; height: 32px; font-size: 11px;" onchange="linkNodeFromDropdown(${index}, this.value, '${row.type}')">
                     <option value="">${placeholder}</option>
                     ${options}
                 </select>`;
             } else {
-                // Linked: Read-only
-                titleHtml = `<span class="w-full ${titleClass} ${isLinked ? 'cursor-not-allowed opacity-80' : ''}" title="${isLinked ? 'Linked from database - cannot edit' : 'Select type to edit'}">${row.title}</span>`;
+                titleHtml = `${treeLinesHtml}<span class="w-full ${titleClass} flex items-center ${isLinked ? "opacity-90" : ""}" title="${isLinked ? "Linked from database" : ""}"><i class="fas ${icon} mr-2 text-[10px] opacity-40"></i>${row.title}</span>`;
             }
 
-            container.appendChild(createCell(
-                `${treeLinesHtml}
-                 <div class="flex items-center w-full relative z-10">
-                    <i class="fas ${icon} mr-3 opacity-90 text-sm ${row.type === 'paper' ? 'text-white/60' : ''}"></i> 
-                    ${titleHtml}
-                 </div>`,
-                `depth-${row.depth} ${extraCellClass}`, `padding-left: ${padding}px;`
-            ));
+            container.appendChild(createCell(titleHtml, `${cellBaseClass} relative overflow-hidden pl-4 ${extraCellClass}`, `padding-left: ${padding}px`));
 
-            // Time (with formatted display)
-            const timeBg = row.depth === 0 ? "bg-amber-100/50" : "bg-white";
-            const timeDisplay = row.depth === 0 ? `<div class="font-bold text-amber-800">${formatNumber(row.time)}</div>` : `<input type="number" class="input-premium time-input ${timeBg}" value="${row.time || 0}" onchange="updateRow(${index}, 'time', this.value)">`;
-            container.appendChild(createCell(timeDisplay, 'justify-center'));
+            // 5. Time (m)
+            container.appendChild(createCell(`<input type="number" step="1" class="input-premium time-input" value="${row.time || 0}" onchange="updateRow(${index}, 'time', this.value)">`, `${cellBaseClass} justify-center px-1`));
 
-            // Node Type (Styled visible select)
-            let typeColor = "bg-slate-100/50 text-slate-500";
-            if (row.type === 'paper') typeColor = "bg-slate-800 text-white font-bold";
-            if (row.type === 'section') typeColor = "bg-slate-200 text-slate-700 font-bold";
-            if (row.type === 'unit') typeColor = "bg-slate-50 text-slate-400";
-            if (row.type === 'topic') typeColor = "bg-blue-50 text-blue-600 font-bold";
+            // 6. Node Type
+            const typeOptions = [{
+                    val: 'paper',
+                    label: 'Paper'
+                },
+                {
+                    val: 'section',
+                    label: 'Section'
+                },
+                {
+                    val: 'category',
+                    label: 'Category'
+                },
+                {
+                    val: 'sub_category',
+                    label: 'Sub-Category'
+                },
+                {
+                    val: 'topic',
+                    label: 'Topic'
+                }
+            ];
+            const typeSelectHtml = `<select class="type-select-styled" onchange="updateRow(${index}, 'type', this.value)">
+                ${typeOptions.map(o => `<option value="${o.val}" ${row.type === o.val ? 'selected' : ''}>${o.label}</option>`).join('')}
+            </select>`;
+            container.appendChild(createCell(typeSelectHtml, `${cellBaseClass} justify-center px-1`));
 
-            container.appendChild(createCell(`
-                <select class="type-select-styled ${typeColor}" onchange="updateRow(${index}, 'type', this.value)">
-                    <option value="paper" ${row.type==='paper'?'selected':''}>Paper</option>
-                    <option value="section" ${row.type==='section'?'selected':''}>Main Category</option>
-                    <option value="unit" ${row.type==='unit'?'selected':''}>Sub Category</option>
-                    <option value="topic" ${row.type==='topic'?'selected':''}>Topic</option>
-                </select>
-            `, 'justify-center px-2'));
+            // 7. Qty
+            container.appendChild(createCell(`<input type="number" class="input-premium qty-input" value="${row.qCount || 0}" onchange="updateRow(${index}, 'qCount', this.value)">`, `${cellBaseClass} justify-center px-1`));
 
-            // Qty (with formatted display)
-            const isTopic = row.type === 'unit';
-            const qtyClass = isTopic ? 'input-premium' : 'input-readonly';
-            const qtyDisplay = `<input type="number" class="${qtyClass} qty-input" value="${row.qCount || 0}" ${!isTopic ? 'readonly' : ''} onchange="updateRow(${index}, 'qCount', this.value)">`;
-            container.appendChild(createCell(qtyDisplay, 'justify-center'));
+            // 8. Opt
+            container.appendChild(createCell(`<input type="number" class="input-premium" value="${row.qOptional || 0}" onchange="updateRow(${index}, 'qOptional', this.value)">`, `${cellBaseClass} justify-center px-1`));
 
-            // Optional (new column)
-            const optClass = isTopic ? 'input-premium bg-amber-50' : 'input-readonly';
-            const optDisplay = `<input type="number" class="${optClass} opt-input" value="${row.qOptional || 0}" ${!isTopic ? 'readonly' : ''} onchange="updateRow(${index}, 'qOptional', this.value)" placeholder="0">`;
-            container.appendChild(createCell(optDisplay, 'justify-center'));
+            // 9. Each
+            container.appendChild(createCell(`<input type="number" step="0.01" class="input-premium each-input" value="${row.qEach || 0}" onchange="updateRow(${index}, 'qEach', this.value)">`, `${cellBaseClass} justify-center px-1`));
 
-            // Each (with formatted display)
-            const eachClass = isTopic ? 'input-premium' : 'input-readonly';
-            const eachDisplay = isTopic ?
-                `<input type="number" class="${eachClass} each-input" value="${row.qEach || 0}" onchange="updateRow(${index}, 'qEach', this.value)">` :
-                `<div class="text-slate-400 font-bold text-[10px]">-</div>`;
-            container.appendChild(createCell(eachDisplay, 'justify-center'));
-
-            // Q-Type (Question Type dropdown)
+            // 10. Q-Type
             const qTypeOptions = [{
-                    value: 'any',
-                    label: 'Any',
-                    color: 'bg-slate-50 text-slate-600'
+                    val: 'both',
+                    label: 'Both'
                 },
                 {
-                    value: 'mcq_single',
-                    label: 'MCQ',
-                    color: 'bg-blue-50 text-blue-700'
+                    val: 'objective',
+                    label: 'Objective'
                 },
                 {
-                    value: 'true_false',
-                    label: 'T/F',
-                    color: 'bg-green-50 text-green-700'
-                },
-                {
-                    value: 'multi_select',
-                    label: 'Multi',
-                    color: 'bg-purple-50 text-purple-700'
-                },
-                {
-                    value: 'subjective',
-                    label: 'Theory',
-                    color: 'bg-amber-50 text-amber-700'
+                    val: 'subjective',
+                    label: 'Subjective'
                 }
             ];
-            const selectedQType = row.qType || 'any';
-            const qTypeColor = qTypeOptions.find(opt => opt.value === selectedQType)?.color || 'bg-slate-50 text-slate-600';
-            const qTypeDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400 text-[10px]">-</div>` : `
-                <select class="type-select-styled ${qTypeColor} !text-slate-500 opacity-60 hover:opacity-100" onchange="updateRow(${index}, 'qType', this.value)">
-                    ${qTypeOptions.map(opt => `<option value="${opt.value}" ${selectedQType === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('')}
-                </select>
-            `;
-            container.appendChild(createCell(qTypeDisplay, 'justify-center px-2'));
+            const qTypeSelectHtml = `<select class="type-select-styled" onchange="updateRow(${index}, 'qType', this.value)">
+                ${qTypeOptions.map(o => `<option value="${o.val}" ${row.qType === o.val ? 'selected' : ''}>${o.label}</option>`).join('')}
+            </select>`;
+            container.appendChild(createCell(qTypeSelectHtml, `${cellBaseClass} justify-center px-1`));
 
-            // Difficulty dropdown
+            // 11. Diff
             const diffOptions = [{
-                    value: 'any',
-                    label: 'Any',
-                    color: 'bg-slate-50 text-slate-600'
+                    val: 'mixed',
+                    label: 'Mixed'
                 },
                 {
-                    value: 'easy',
-                    label: 'Easy',
-                    color: 'bg-green-50 text-green-600 border-green-100'
+                    val: 'easy',
+                    label: 'Easy'
                 },
                 {
-                    value: 'easy_mid',
-                    label: 'Easy-Mid',
-                    color: 'bg-lime-50 text-lime-600 border-lime-100'
+                    val: 'medium',
+                    label: 'Medium'
                 },
                 {
-                    value: 'medium',
-                    label: 'Medium',
-                    color: 'bg-yellow-50 text-yellow-600 border-yellow-100'
-                },
-                {
-                    value: 'hard',
-                    label: 'Hard',
-                    color: 'bg-orange-50 text-orange-600 border-orange-100'
-                },
-                {
-                    value: 'expert',
-                    label: 'Expert',
-                    color: 'bg-red-50 text-red-600 border-red-100'
+                    val: 'hard',
+                    label: 'Hard'
                 }
             ];
-            const selectedDiff = row.difficulty || 'any';
-            const diffColor = diffOptions.find(opt => opt.value === selectedDiff)?.color || 'bg-slate-50 text-slate-600';
-            const diffDisplay = (row.type !== 'unit' && row.depth !== 0) ? `<div class="text-slate-400 text-[10px]">-</div>` : `
-                <select class="type-select-styled ${diffColor} !text-slate-500 opacity-60 hover:opacity-100" onchange="updateRow(${index}, 'difficulty', this.value)">
-                    ${diffOptions.map(opt => `<option value="${opt.value}" ${selectedDiff === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('')}
-                </select>
-            `;
-            container.appendChild(createCell(diffDisplay, 'justify-center px-2'));
+            const diffSelectHtml = `<select class="type-select-styled" onchange="updateRow(${index}, 'difficulty', this.value)">
+                ${diffOptions.map(o => `<option value="${o.val}" ${row.difficulty === o.val ? 'selected' : ''}>${o.label}</option>`).join('')}
+            </select>`;
+            container.appendChild(createCell(diffSelectHtml, `${cellBaseClass} justify-center px-1`));
 
-            // Marks (with formatted display)
-            const marksBg = row.depth === 0 ? "bg-slate-100" : "bg-white";
-            const marksDisplay = `<div class="font-bold ${row.depth === 0 ? 'text-slate-800' : 'text-slate-700'}">${formatNumber(row.weight)}</div>`;
-            container.appendChild(createCell(marksDisplay, 'justify-center'));
+            // 12. Marks
+            container.appendChild(createCell(`<input type="number" step="0.01" class="input-premium font-bold text-blue-600" value="${row.weight || 0}" onchange="updateRow(${index}, 'weight', this.value)">`, `${cellBaseClass} justify-center px-1`));
 
-            // Hierarchy
-            container.appendChild(createCell(`
-                <div class="flex gap-1.5 justify-center w-full">
-                    <button onclick="changeDepth(${index}, -1)" class="hierarchy-btn" title="Outdent"><i class="fas fa-chevron-left text-[10px]"></i></button>
-                    <button onclick="changeDepth(${index}, 1)" class="hierarchy-btn" title="Indent"><i class="fas fa-chevron-right text-[10px]"></i></button>
+            // 13. Hierarchy
+            const isLinkedNow = row.linked_category_id || row.linked_topic_id;
+            const linkBtnHtml = `<button onclick="openHierarchyModal(${index})" class="hierarchy-btn ${isLinkedNow ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-slate-400 border-slate-200 hover:border-blue-300'} border rounded-lg w-8 h-8 flex items-center justify-center transition-all bg-white shadow-sm" title="Link Category/Topic"><i class="fas ${isLinkedNow ? 'fa-link' : 'fa-plus'} text-[10px]"></i></button>`;
+            container.appendChild(createCell(linkBtnHtml, `${cellBaseClass} justify-center px-1`));
+
+            // 14. Actions
+            const actionsHtml = `
+                <div class="flex items-center gap-1">
+                    <button onclick="handleRowDuplicate(${index})" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all" title="Duplicate Row"><i class="fas fa-copy text-[10px]"></i></button>
+                    <button onclick="deleteRow(${index})" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all" title="Delete Row"><i class="fas fa-trash-alt text-[10px]"></i></button>
                 </div>
-            `, 'justify-center'));
+            `;
+            container.appendChild(createCell(actionsHtml, `${cellBaseClass} justify-center px-1`));
 
-            // Actions
-            container.appendChild(createCell(`
-                <button onclick="handleRowDuplicate(${index})" class="text-slate-300 hover:text-blue-500 transition px-2" title="Duplicate"><i class="fas fa-clone text-sm"></i></button>
-                <button onclick="deleteRow(${index})" class="text-slate-300 hover:text-rose-500 transition px-2" title="Delete"><i class="fas fa-trash-alt text-sm"></i></button>
-            `, 'justify-center'));
-
-            // Set depth and type attributes for styling
-            const rowElements = container.querySelectorAll('.grid-cell:nth-last-child(-n+15)');
-            const rowClass = row.type === 'paper' ? 'row-phase' : (row.type === 'section' ? 'row-section' : 'row-unit');
-            rowElements.forEach(cell => {
-                cell.setAttribute('data-depth', row.depth);
-                cell.setAttribute('data-type', row.type);
-                cell.className += ' ' + rowClass;
-            });
-
-            // Linked (Breadcrumbs)
+            // 15. Linked
             let linkedHtml = '';
             const breadcrumbBase = <?php echo json_encode($breadcrumbBase ?? []); ?>;
 
@@ -1204,16 +1265,12 @@ if (!empty($nodesTree)) {
                     type: 'topic'
                 });
 
-                let crumbsHtml = crumbs.map((c, i) => `
-                    <div class="node-badge badge-breadcrumb" title="${c.type.toUpperCase()}">${c.name}</div>
-                    ${i < crumbs.length - 1 ? '<i class="fas fa-chevron-right breadcrumb-separator"></i>' : ''}
+                linkedHtml = crumbs.map((c, i) => `
+                    <span class="text-[9px] text-slate-500 whitespace-nowrap font-medium">${c.name}</span>
+                    ${i < crumbs.length - 1 ? '<span class="text-slate-300 mx-0.5">›</span>' : ''}
                 `).join('');
-
-                linkedHtml = `<div class="linked-container cursor-pointer hover:opacity-80" onclick="openHierarchyModal(${index})">${crumbsHtml}</div>`;
-            } else {
-                linkedHtml = `<button onclick="openHierarchyModal(${index})" class="hierarchy-btn text-blue-500 hover:bg-blue-50 hover:border-blue-200" title="Link Category/Topic"><i class="fas fa-plus text-xs"></i></button>`;
             }
-            container.appendChild(createCell(linkedHtml, 'justify-center px-1'));
+            container.appendChild(createCell(linkedHtml, `${cellBaseClass} justify-start px-3 overflow-hidden truncate italic text-slate-400 font-medium`));
         });
 
         validateSyllabus();
@@ -1260,6 +1317,19 @@ if (!empty($nodesTree)) {
 
         recalculateTotals();
         renderGrid();
+
+        // Global exposure for all UI handlers
+        window.renderGrid = renderGrid;
+        window.updateRow = updateRow;
+        window.addTopic = addTopic;
+        window.deleteRow = deleteRow;
+        window.handleRowDuplicate = handleRowDuplicate;
+        window.saveSyllabus = saveSyllabus;
+        window.openHierarchyModal = openHierarchyModal;
+
+        window.linkNodeFromDropdown = linkNodeFromDropdown;
+        window.changeDepth = changeDepth;
+
     }
 
     /**
@@ -1269,9 +1339,10 @@ if (!empty($nodesTree)) {
     function recalculateTotals() {
         for (let i = syllabusData.length - 1; i >= 0; i--) {
             const row = syllabusData[i];
+            const isLeaf = row.type === 'topic';
 
-            // Phases and Sections are read-only containers for metrics
-            if (row.type !== 'unit') {
+            // Only aggregates need calculation (leaves have their own values manually entered)
+            if (!isLeaf) {
                 let totalQty = 0;
                 let totalMarks = 0;
                 let totalTime = 0;
@@ -1282,31 +1353,14 @@ if (!empty($nodesTree)) {
                     // Stop if we hit a row at the same or higher (parent) level
                     if (syllabusData[j].depth <= row.depth) break;
 
-                    // Only sum up Topic (unit) values to avoid double counting nested groups
-                    // (Phase sums its Topics, Section sums its Topics)
-                    // Actually, if we want Section to show sum of its Topics, 
-                    // and Phase to show sum of its Sections (which already have Topic sums),
-                    // we should sum DIRECT children.
+                    // Sum up values from Leaf nodes (Topic / Position Level)
+                    const descendantIsLeaf = syllabusData[j].type === 'topic' || syllabusData[j].type === 'position_level';
 
-                    // But wait, the flat array might have nesting like: Section -> Unit, Unit.
-                    // Summing direct descendants that are units works.
-                    if (syllabusData[j].type === 'unit') {
-                        // Check if this Unit belongs to this specific parent i
-                        // (i.e., no other Parent of the same depth as i exists between i and j)
-                        let isDirectDescendant = true;
-                        for (let k = i + 1; k < j; k++) {
-                            if (syllabusData[k].depth === row.depth) {
-                                isDirectDescendant = false;
-                                break;
-                            }
-                        }
-
-                        if (isDirectDescendant) {
-                            totalQty += parseFloat(syllabusData[j].qCount) || 0;
-                            totalMarks += parseFloat(syllabusData[j].weight) || 0;
-                            totalTime += parseFloat(syllabusData[j].time) || 0;
-                            totalOptional += parseFloat(syllabusData[j].qOptional) || 0;
-                        }
+                    if (descendantIsLeaf) {
+                        totalQty += parseFloat(syllabusData[j].qCount) || 0;
+                        totalMarks += parseFloat(syllabusData[j].weight) || 0;
+                        totalTime += parseFloat(syllabusData[j].time) || 0;
+                        totalOptional += parseFloat(syllabusData[j].qOptional) || 0;
                     }
                 }
 
@@ -1318,416 +1372,24 @@ if (!empty($nodesTree)) {
         }
     }
 
+
     function changeDepth(index, change) {
         let newDepth = syllabusData[index].depth + change;
-        if (newDepth >= 0 && newDepth <= 5) { // Support deeper nesting
+        if (newDepth >= 0 && newDepth <= 5) {
             syllabusData[index].depth = newDepth;
-
-            // Auto-adjust node type based on indentation (Auto-Hierarchy Rule)
-            // Phase is strictly Level 0
-            if (newDepth === 0) syllabusData[index].type = 'paper';
-            // Section is strictly Level 1
-            else if (newDepth === 1) syllabusData[index].type = 'section';
-            // Valid units can be Level 2 or deeper
-            else syllabusData[index].type = 'unit';
-
+            const typeMap = ["paper", "section", "category", "sub_category", "topic"];
+            syllabusData[index].type = typeMap[newDepth];
             recalculateTotals();
             renderGrid();
         }
     }
 
-    function loadSubEngineerTemplate() {
-        Swal.fire({
-            title: 'Sub-Engineer Template',
-            text: "This will clear your current grid and load the standard Sub-Engineer Syllabus (Paper I, II, III). Proceed?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#1e293b',
-            cancelButtonColor: '#f1f5f9',
-            confirmButtonText: 'Yes, Load Template',
-            customClass: {
-                confirmButton: 'text-white',
-                cancelButton: 'text-slate-600'
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                syllabusData = [
-                    // PAPER I
-                    {
-                        id: 'p1',
-                        title: "Paper I: General Subject (MCQ)",
-                        type: "paper",
-                        depth: 0,
-                        weight: 100,
-                        time: 45,
-                        qCount: 100,
-                        qOptional: 0,
-                        qEach: 1,
-                        qType: "mcq",
-                        difficulty: "any",
-                        selected: false
-                    },
-                    {
-                        id: 's1',
-                        title: "Part I: Gen. Awareness & Reasoning",
-                        type: "section",
-                        depth: 1,
-                        weight: 20,
-                        time: 0,
-                        qCount: 20,
-                        qOptional: 0,
-                        qEach: 1,
-                        selected: false
-                    },
-                    {
-                        id: 'u1',
-                        title: "General Awareness",
-                        type: "unit",
-                        depth: 2,
-                        weight: 10,
-                        time: 0,
-                        qCount: 10,
-                        qOptional: 0,
-                        qEach: 1,
-                        qType: "mcq",
-                        difficulty: "medium",
-                        selected: false
-                    },
-                    {
-                        id: 'u2',
-                        title: "Public Management & Reasoning",
-                        type: "unit",
-                        depth: 2,
-                        weight: 10,
-                        time: 0,
-                        qCount: 10,
-                        qOptional: 0,
-                        qEach: 1,
-                        qType: "mcq",
-                        difficulty: "medium",
-                        selected: false
-                    },
-                    {
-                        id: 's2',
-                        title: "Part II: General Technical Subject",
-                        type: "section",
-                        depth: 1,
-                        weight: 80,
-                        time: 0,
-                        qCount: 80,
-                        qOptional: 0,
-                        qEach: 1,
-                        selected: false
-                    },
-                    {
-                        id: 'u3',
-                        title: "Surveying",
-                        type: "unit",
-                        depth: 2,
-                        weight: 10,
-                        time: 0,
-                        qCount: 10,
-                        qOptional: 0,
-                        qEach: 1,
-                        qType: "mcq",
-                        difficulty: "medium",
-                        selected: false
-                    },
-                    {
-                        id: 'u4',
-                        title: "Construction Materials",
-                        type: "unit",
-                        depth: 2,
-                        weight: 10,
-                        time: 0,
-                        qCount: 10,
-                        qOptional: 0,
-                        qEach: 1,
-                        qType: "mcq",
-                        difficulty: "medium",
-                        selected: false
-                    },
-                    {
-                        id: 'u5',
-                        title: "Soil Mechanics",
-                        type: "unit",
-                        depth: 2,
-                        weight: 10,
-                        time: 0,
-                        qCount: 10,
-                        qOptional: 0,
-                        qEach: 1,
-                        qType: "mcq",
-                        difficulty: "medium",
-                        selected: false
-                    },
-                    {
-                        id: 'u6',
-                        title: "Hydraulics",
-                        type: "unit",
-                        depth: 2,
-                        weight: 10,
-                        time: 0,
-                        qCount: 10,
-                        qOptional: 0,
-                        qEach: 1,
-                        qType: "mcq",
-                        difficulty: "medium",
-                        selected: false
-                    },
-                    {
-                        id: 'u7',
-                        title: "Structural Engineering",
-                        type: "unit",
-                        depth: 2,
-                        weight: 10,
-                        time: 0,
-                        qCount: 10,
-                        qOptional: 0,
-                        qEach: 1,
-                        qType: "mcq",
-                        difficulty: "medium",
-                        selected: false
-                    },
-                    {
-                        id: 'u8',
-                        title: "Water Supply & Sanitary",
-                        type: "unit",
-                        depth: 2,
-                        weight: 10,
-                        time: 0,
-                        qCount: 10,
-                        qOptional: 0,
-                        qEach: 1,
-                        qType: "mcq",
-                        difficulty: "medium",
-                        selected: false
-                    },
-                    {
-                        id: 'u9',
-                        title: "Highway Engineering",
-                        type: "unit",
-                        depth: 2,
-                        weight: 10,
-                        time: 0,
-                        qCount: 10,
-                        qOptional: 0,
-                        qEach: 1,
-                        qType: "mcq",
-                        difficulty: "medium",
-                        selected: false
-                    },
-                    {
-                        id: 'u10',
-                        title: "Estimating & Costing",
-                        type: "unit",
-                        depth: 2,
-                        weight: 10,
-                        time: 0,
-                        qCount: 10,
-                        qOptional: 0,
-                        qEach: 1,
-                        qType: "mcq",
-                        difficulty: "medium",
-                        selected: false
-                    },
-
-                    // PAPER II
-                    {
-                        id: 'p2',
-                        title: "Paper II: Technical Subjective (Theoretical)",
-                        type: "paper",
-                        depth: 0,
-                        weight: 100,
-                        time: 135,
-                        qCount: 14,
-                        qOptional: 0,
-                        qEach: 0,
-                        qType: "subjective",
-                        difficulty: "any",
-                        selected: false
-                    },
-                    {
-                        id: 's3',
-                        title: "Section A: Structures",
-                        type: "section",
-                        depth: 1,
-                        weight: 20,
-                        time: 0,
-                        qCount: 2,
-                        qOptional: 0,
-                        qEach: 10,
-                        selected: false
-                    },
-                    {
-                        id: 'u11',
-                        title: "Structural Analysis (Subjective)",
-                        type: "unit",
-                        depth: 2,
-                        weight: 20,
-                        time: 0,
-                        qCount: 2,
-                        qOptional: 0,
-                        qEach: 10,
-                        qType: "subjective",
-                        difficulty: "hard",
-                        selected: false
-                    },
-                    {
-                        id: 's4',
-                        title: "Section B: Water Resources",
-                        type: "section",
-                        depth: 1,
-                        weight: 20,
-                        time: 0,
-                        qCount: 2,
-                        qOptional: 0,
-                        qEach: 10,
-                        selected: false
-                    },
-                    {
-                        id: 'u12',
-                        title: "Irrigation Engineering",
-                        type: "unit",
-                        depth: 2,
-                        weight: 20,
-                        time: 0,
-                        qCount: 2,
-                        qOptional: 0,
-                        qEach: 10,
-                        qType: "subjective",
-                        difficulty: "hard",
-                        selected: false
-                    },
-                    {
-                        id: 's5',
-                        title: "Section C: Transportation",
-                        type: "section",
-                        depth: 1,
-                        weight: 20,
-                        time: 0,
-                        qCount: 2,
-                        qOptional: 0,
-                        qEach: 10,
-                        selected: false
-                    },
-                    {
-                        id: 'u13',
-                        title: "Highway Design",
-                        type: "unit",
-                        depth: 2,
-                        weight: 20,
-                        time: 0,
-                        qCount: 2,
-                        qOptional: 0,
-                        qEach: 10,
-                        qType: "subjective",
-                        difficulty: "hard",
-                        selected: false
-                    },
-                    {
-                        id: 's6',
-                        title: "Section D: Public Health",
-                        type: "section",
-                        depth: 1,
-                        weight: 20,
-                        time: 0,
-                        qCount: 2,
-                        qOptional: 0,
-                        qEach: 10,
-                        selected: false
-                    },
-                    {
-                        id: 'u14',
-                        title: "Sanitary Engineering",
-                        type: "unit",
-                        depth: 2,
-                        weight: 20,
-                        time: 0,
-                        qCount: 2,
-                        qOptional: 0,
-                        qEach: 10,
-                        qType: "subjective",
-                        difficulty: "hard",
-                        selected: false
-                    },
-                    {
-                        id: 's7',
-                        title: "Section E: Management",
-                        type: "section",
-                        depth: 1,
-                        weight: 20,
-                        time: 0,
-                        qCount: 2,
-                        qOptional: 0,
-                        qEach: 10,
-                        selected: false
-                    },
-                    {
-                        id: 'u15',
-                        title: "Project Planning",
-                        type: "unit",
-                        depth: 2,
-                        weight: 20,
-                        time: 0,
-                        qCount: 2,
-                        qOptional: 0,
-                        qEach: 10,
-                        qType: "subjective",
-                        difficulty: "hard",
-                        selected: false
-                    },
-
-                    // PHASE III
-                    {
-                        id: 'p3',
-                        title: "Phase III: Interview",
-                        type: "paper",
-                        depth: 0,
-                        weight: 30,
-                        time: 30,
-                        qCount: 1,
-                        qOptional: 0,
-                        qEach: 30,
-                        qType: "oral",
-                        difficulty: "medium",
-                        selected: false
-                    },
-                    {
-                        id: 'u16',
-                        title: "Personal Interview",
-                        type: "unit",
-                        depth: 1,
-                        weight: 30,
-                        time: 30,
-                        qCount: 1,
-                        qOptional: 0,
-                        qEach: 30,
-                        qType: "oral",
-                        difficulty: "medium",
-                        selected: false
-                    }
-                ];
-
-                // Update global metrics from images
-                document.getElementById('global-marks-input').value = 230;
-                document.getElementById('global-time-input').value = "3h 30m";
-                document.getElementById('global-pass-display').innerText = 40;
-                document.getElementById('global-pass-input').value = 40;
-
-                recalculateTotals();
-                renderGrid();
-                Swal.fire('Loaded!', 'Standard Sub-Engineer curriculum has been generated.', 'success');
-            }
-        });
-    }
-
     function addTopic() {
         syllabusData.push({
             id: Date.now(),
-            title: "New Syllabus Item",
-            type: "unit",
-            depth: 2,
+            title: "New Topic",
+            type: "topic",
+            depth: 4,
             weight: 0,
             time: 0,
             qCount: 0,
@@ -1737,6 +1399,7 @@ if (!empty($nodesTree)) {
         });
         renderGrid();
     }
+
 
     function deleteRow(index) {
         syllabusData.splice(index, 1);
@@ -1904,101 +1567,7 @@ if (!empty($nodesTree)) {
             });
     }
 
-    async function openCloneModal() {
-        const {
-            value: newLabel
-        } = await Swal.fire({
-            title: 'Clone Syllabus',
-            text: 'Enter a version label to identify this new clone (e.g., "Revision 2025")',
-            input: 'text',
-            inputValue: "Revision " + new Date().getFullYear(),
-            showCancelButton: true,
-            confirmButtonText: 'Create Clone',
-            cancelButtonText: 'Cancel',
-            inputValidator: (value) => {
-                if (!value) return 'Version label is required!';
-            }
-        });
-
-        if (!newLabel) return;
-
-        const currentLevel = "<?php echo $level; ?>";
-
-        Swal.fire({
-            title: 'Creating Clone...',
-            text: 'Please wait while we duplicate the structure and settings.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        fetch('<?php echo get_app_url(); ?>/admin/quiz/syllabus/clone', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    level: currentLevel,
-                    version_label: newLabel
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Syllabus Cloned!',
-                        text: 'Redirecting to the new version...',
-                        timer: 2000,
-                        showConfirmButton: false
-                    }).then(() => {
-                        window.location.href = '<?php echo get_app_url(); ?>/admin/quiz/syllabus/manage/' + data.new_level;
-                    });
-                } else {
-                    Swal.fire('Error', data.message || 'Clone failed', 'error');
-                }
-            });
-    }
-
-    // --- HIERARCHY MODAL LOGIC ---
-    let activeRowIndex = null;
-    let activeTab = 'category';
-    const categoriesDB = <?php echo !empty($categories) ? json_encode($categories) : '[]'; ?>;
-    const subjectsDB = <?php echo !empty($subjects) ? json_encode($subjects) : '[]'; ?>;
-    let showLinkedOnly = false;
-
-    function openHierarchyModal(index) {
-        activeRowIndex = index;
-        const row = syllabusData[index];
-
-        // Reset 5 Filters
-        document.getElementById('modal-filter-course').value = '';
-        document.getElementById('modal-filter-edu').value = '';
-        document.getElementById('modal-filter-pos').value = '';
-        document.getElementById('modal-filter-cat').value = '';
-        document.getElementById('modal-filter-topic').value = '';
-        document.getElementById('hierarchy-search').value = '';
-
-        // Reset Dropdown UI Text
-        resetDropdownUI('dropdown-course', 'Course');
-        resetDropdownUI('dropdown-edu', 'Edu. Level');
-        resetDropdownUI('dropdown-cat', 'Category');
-        resetDropdownUI('dropdown-topic', 'Sub-Cat');
-        resetDropdownUI('dropdown-pos', 'Pos. Level');
-
-        showLinkedOnly = false;
-        updateLinkedBtnState();
-
-        if (row.linked_topic_id) switchHierarchyTab('topic');
-        else switchHierarchyTab('category');
-
-        document.getElementById('hierarchy-modal').classList.remove('hidden');
-        filterHierarchyList();
-        setTimeout(() => document.getElementById('hierarchy-search').focus(), 50);
-    }
-
-    function closeHierarchyModal() {
+    async function closeHierarchyModal() {
         document.getElementById('hierarchy-modal').classList.add('hidden');
         activeRowIndex = null;
     }
@@ -2183,6 +1752,14 @@ if (!empty($nodesTree)) {
         populateDropdown('topic', subjectsDB, 'id', 'name');
 
         initBodyClick();
+    }
+
+    function initBodyClick() {
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.custom-dropdown')) {
+                document.querySelectorAll('.dropdown-options').forEach(el => el.classList.add('hidden'));
+            }
+        });
     }
 
     function populateDropdown_OLD(type, data, idKey, titleKey) {
@@ -2635,8 +2212,8 @@ if (!empty($nodesTree)) {
                 linkField: 'linked_subject_id'
             },
             'topic': {
-                nodeType: 'unit',
-                depth: 2,
+                nodeType: 'topic',
+                depth: 4,
                 linkField: 'linked_topic_id'
             }
         };
@@ -2669,6 +2246,24 @@ if (!empty($nodesTree)) {
             showConfirmButton: false
         });
     }
+
+    function openHierarchyModal(index) {
+        // Placeholder to prevent crash
+        console.log("Opening hierarchy modal for index", index);
+        Swal.fire('Info', 'Hierarchical linking is being updated.', 'info');
+    }
+
+    // Global exposure for all UI handlers
+    window.renderGrid = renderGrid;
+    window.updateRow = updateRow;
+    window.addTopic = addTopic;
+    window.deleteRow = deleteRow;
+    window.handleRowDuplicate = handleRowDuplicate;
+    window.saveSyllabus = saveSyllabus;
+    window.openHierarchyModal = openHierarchyModal;
+
+    window.linkNodeFromDropdown = linkNodeFromDropdown;
+    window.changeDepth = changeDepth;
 
     document.addEventListener('DOMContentLoaded', () => {
         initSettings();

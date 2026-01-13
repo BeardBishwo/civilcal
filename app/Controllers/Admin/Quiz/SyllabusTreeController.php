@@ -18,7 +18,7 @@ class SyllabusTreeController extends Controller
     public function __construct()
     {
         parent::__construct();
-        
+
         if (!$this->auth->check() || !$this->auth->isAdmin()) {
             header('Location: ' . app_base_url('login'));
             exit;
@@ -66,7 +66,7 @@ class SyllabusTreeController extends Controller
                 'parent_id' => !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : null,
                 'title' => $_POST['title'] ?? '',
                 'slug' => $_POST['slug'] ?? '',
-                'type' => $_POST['type'] ?? 'unit',
+                'type' => $_POST['type'] ?? 'topic',
                 'description' => $_POST['description'] ?? '',
                 'level' => $_POST['level'] ?? null,
                 'order' => isset($_POST['order']) ? (int)$_POST['order'] : null,
@@ -84,7 +84,6 @@ class SyllabusTreeController extends Controller
                 'message' => 'Node created successfully',
                 'node_id' => $nodeId
             ]);
-
         } catch (Exception $e) {
             $this->jsonResponse(['success' => false, 'error' => $e->getMessage()]);
         }
@@ -110,7 +109,6 @@ class SyllabusTreeController extends Controller
             $this->syllabusService->updateNode($nodeId, $data);
 
             $this->jsonResponse(['success' => true, 'message' => 'Node updated']);
-
         } catch (Exception $e) {
             $this->jsonResponse(['success' => false, 'error' => $e->getMessage()]);
         }
@@ -136,7 +134,7 @@ class SyllabusTreeController extends Controller
     {
         try {
             $nodeIds = $_POST['node_ids'] ?? [];
-            
+
             if (empty($nodeIds) || !is_array($nodeIds)) {
                 throw new Exception("Invalid node IDs");
             }
@@ -144,7 +142,6 @@ class SyllabusTreeController extends Controller
             $this->syllabusService->reorderNodes($nodeIds);
 
             $this->jsonResponse(['success' => true, 'message' => 'Nodes reordered']);
-
         } catch (Exception $e) {
             $this->jsonResponse(['success' => false, 'error' => $e->getMessage()]);
         }
@@ -179,7 +176,6 @@ class SyllabusTreeController extends Controller
             $results = $this->syllabusService->searchNodes($query, $level, true);
 
             $this->jsonResponse(['success' => true, 'results' => $results]);
-
         } catch (Exception $e) {
             $this->jsonResponse(['success' => false, 'error' => $e->getMessage()]);
         }
@@ -191,13 +187,12 @@ class SyllabusTreeController extends Controller
     public function getNodesByType()
     {
         try {
-            $type = $_GET['type'] ?? 'unit';
+            $type = $_GET['type'] ?? 'topic';
             $level = $_GET['level'] ?? null;
 
             $nodes = $this->syllabusService->getNodesByType($type, $level);
 
             $this->jsonResponse(['success' => true, 'nodes' => $nodes]);
-
         } catch (Exception $e) {
             $this->jsonResponse(['success' => false, 'error' => $e->getMessage()]);
         }

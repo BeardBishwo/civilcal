@@ -149,8 +149,8 @@ class SyllabusService
         // Get max order for this parent
         if (!isset($data['order'])) {
             $parentId = $data['parent_id'] ?? null;
-            $sql = "SELECT MAX(`order`) FROM syllabus_nodes WHERE " . 
-                   ($parentId ? "parent_id = :parent_id" : "parent_id IS NULL");
+            $sql = "SELECT MAX(`order`) FROM syllabus_nodes WHERE " .
+                ($parentId ? "parent_id = :parent_id" : "parent_id IS NULL");
             $stmt = $this->db->getPdo()->prepare($sql);
             if ($parentId) {
                 $stmt->execute(['parent_id' => $parentId]);
@@ -176,7 +176,7 @@ class SyllabusService
         if (!empty($data['parent_id'])) {
             $children = $this->getAllChildren($nodeId);
             $childIds = array_column($children, 'id');
-            
+
             if (in_array($data['parent_id'], $childIds)) {
                 throw new Exception("Cannot set parent to a child node (circular reference)");
             }
@@ -235,7 +235,7 @@ class SyllabusService
     {
         // Search with strict hierarchy check (Active Only mode)
         $sql = "SELECT DISTINCT t1.* FROM syllabus_nodes t1";
-        
+
         if ($activeOnly) {
             // Join up to 4 levels of ancestors to ensure full chain is active
             $sql .= "
@@ -255,9 +255,9 @@ class SyllabusService
         }
 
         if ($activeOnly) {
-             // Ensure all existing ancestors are active
-             // valid = (no parent OR parent is active) AND (no grandparent OR grandparent is active) ...
-             $sql .= " 
+            // Ensure all existing ancestors are active
+            // valid = (no parent OR parent is active) AND (no grandparent OR grandparent is active) ...
+            $sql .= " 
                 AND t1.is_active = 1
                 AND (t2.is_active = 1 OR t2.id IS NULL)
                 AND (t3.is_active = 1 OR t3.id IS NULL)
@@ -301,12 +301,14 @@ class SyllabusService
         // or just iterate leaves up. A robust way is multiple passes or known depth.
         // Assuming max depth 4 (Paper->Part->Section->Unit).
 
-        // Pass 1: Roll up Units to Sections
-        $this->rollupCounts('unit', 'section');
-        // Pass 2: Roll up Sections to Parts
-        $this->rollupCounts('section', 'part');
-        // Pass 3: Roll up Parts to Papers
-        $this->rollupCounts('part', 'paper');
+        // Pass 1: Roll up Topics to Sub-Categories
+        $this->rollupCounts('topic', 'sub_category');
+        // Pass 2: Roll up Sub Categories to Categories
+        $this->rollupCounts('sub_category', 'category');
+        // Pass 3: Roll up Categories to Education Levels
+        $this->rollupCounts('category', 'education_level');
+        // Pass 4: Roll up Education Levels to Courses
+        $this->rollupCounts('education_level', 'course');
     }
 
     private function rollupCounts($childType, $parentType)
@@ -350,8 +352,8 @@ class SyllabusService
                 $context['course_id'] = $currId;
             } elseif ($node['type'] === 'education_level') {
                 $context['edu_level_id'] = $currId;
-            } elseif ($node['type'] === 'category' || $node['type'] === 'section') {
-                // In this system, Section behaves like Main Category in structural views
+            } elseif ($node['type'] === 'category' || $node['type'] === 'section' || $node['type'] === 'sub_category') {
+                // In this system, Section/SubCategory behaves like Main Category in structural views
                 if (!$context['category_id']) $context['category_id'] = $currId;
             }
 
