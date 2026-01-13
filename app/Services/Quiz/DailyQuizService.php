@@ -18,76 +18,111 @@ class DailyQuizService
      */
     public function autoGenerateWeek()
     {
-        // Get all Main Streams (Categories)
-        $streams = $this->db->query("SELECT * FROM quiz_categories WHERE is_active = 1")->fetchAll();
+        $pdo = $this->db->getPdo();
+
+        // Get all Main Courses
+        $courses = $this->db->query("SELECT * FROM syllabus_nodes WHERE type = 'course' AND is_active = 1")->fetchAll();
+
+        // Get all Education Levels
+        $eduLevels = $this->db->query("SELECT * FROM syllabus_nodes WHERE type = 'education_level' AND is_active = 1")->fetchAll();
 
         for ($i = 0; $i < 7; $i++) {
             $date = date('Y-m-d', strtotime("+$i days"));
 
-            // Generate for "General" (No stream)
-            $this->createDailyQuiz($date, null);
+            // 1. Generate "Mixed/Global" Quiz (Default fallback)
+            $this->createDailyQuiz($date, null, null);
 
-            // Generate for Specific Streams
-            foreach ($streams as $stream) {
-                $this->createDailyQuiz($date, $stream['id']);
+            // 2. Generate for Specific Courses
+            foreach ($courses as $course) {
+                $this->createDailyQuiz($date, $course['id'], null);
+            }
+
+            // 3. Generate for Specific Education Levels
+            foreach ($eduLevels as $edu) {
+                $this->createDailyQuiz($date, null, $edu['id']);
+            }
+
+            // 4. Generate for Course + Education Combinations
+            foreach ($courses as $course) {
+                foreach ($eduLevels as $edu) {
+                    $this->createDailyQuiz($date, $course['id'], $edu['id']);
+                }
             }
         }
     }
 
     /**
-     * The Recipe: 3 Easy, 2 Easy-Mid, 2 Medium, 2 Hard, 1 Expert
+     * Create a balanced 10-question quiz
      */
-    public function createDailyQuiz($date, $streamId)
+    public function createDailyQuiz($date, $courseId, $eduLevelId)
     {
         $pdo = $this->db->getPdo();
 
-        // 1. Prevent Duplicates
-        $checkSql = "SELECT 1 FROM daily_quiz_schedule WHERE date = ? AND target_stream_id " . ($streamId ? "= ?" : "IS NULL");
-        $params = $streamId ? [$date, $streamId] : [$date];
+        // Prevent Duplicates
+        $checkSql = "SELECT 1 FROM daily_quiz_schedule WHERE date = ? AND target_stream_id " . ($courseId ? "= ?" : "IS NULL") . " AND target_edu_level_id " . ($eduLevelId ? "= ?" : "IS NULL");
+        $params = [$date];
+        if ($courseId) $params[] = $courseId;
+        if ($eduLevelId) $params[] = $eduLevelId;
 
         $exists = $pdo->prepare($checkSql);
         $exists->execute($params);
-        if ($exists->fetch()) return; // Already exists
+        if ($exists->fetch()) return;
 
-        // 2. Fetch Questions (The Ladder Logic)
-        $qEasy     = $this->getRandomQuestions($streamId, 1, 3); // 1 = Easy
-        $qEasyMid  = $this->getRandomQuestions($streamId, 2, 2); // 2 = Easy-Mid
-        $qMedium   = $this->getRandomQuestions($streamId, 3, 2); // 3 = Medium
-        $qHard     = $this->getRandomQuestions($streamId, 4, 2); // 4 = Hard
-        $qExpert   = $this->getRandomQuestions($streamId, 5, 1); // 5 = Expert
+        // Fetch Questions suivant the "Ladder Logic"
+        $qEasy     = $this->getRandomQuestions($courseId, $eduLevelId, 1, 3);
+        $qEasyMid  = $this->getRandomQuestions($courseId, $eduLevelId, 2, 2);
+        $qMedium   = $this->getRandomQuestions($courseId, $eduLevelId, 3, 2);
+        $qHard     = $this->getRandomQuestions($courseId, $eduLevelId, 4, 2);
+        $qExpert   = $this->getRandomQuestions($courseId, $eduLevelId, 5, 1);
 
         $allQuestions = array_merge($qEasy, $qEasyMid, $qMedium, $qHard, $qExpert);
-        shuffle($allQuestions); // Randomize order
+        shuffle($allQuestions);
 
-        if (count($allQuestions) < 5) { // Lower threshold for testing
-            // Not enough questions? Maybe try fallback or skip
-            // For now, we skip to avoid broken quizzes
+        // Required 10 questions for Course/Edu quizzes, otherwise fallback logic handles it
+        if (count($allQuestions) < 10 && ($courseId !== null || $eduLevelId !== null)) {
             return;
         }
 
-        // 3. Save to Database
-        $stmt = $pdo->prepare("INSERT INTO daily_quiz_schedule (date, target_stream_id, questions, reward_coins, created_at) VALUES (?, ?, ?, ?, NOW())");
+        if (count($allQuestions) < 5) return; // Final safety for Mixed quiz
+
+        // Save to Database
+        $stmt = $pdo->prepare("INSERT INTO daily_quiz_schedule (date, target_stream_id, target_edu_level_id, questions, reward_coins, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
         $stmt->execute([
             $date,
-            $streamId,
+            $courseId,
+            $eduLevelId,
             json_encode($allQuestions),
-            50 // Base Reward
+            50
         ]);
     }
 
     /**
-     * Helper to fetch random questions by difficulty
+     * Helper to fetch random questions by difficulty and context
      */
-    private function getRandomQuestions($streamId, $difficulty, $limit)
+    private function getRandomQuestions($courseId, $eduLevelId, $difficulty, $limit, $studyMode = 'psc')
     {
         $pdo = $this->db->getPdo();
 
-        $sql = "SELECT id FROM quiz_questions WHERE difficulty_level = ?";
+        $sql = "SELECT id FROM quiz_questions WHERE difficulty_level = ? AND status = 'approved'";
         $params = [$difficulty];
 
-        if ($streamId) {
-            $sql .= " AND category_id = ?";
-            $params[] = $streamId;
+        // Filter by Course
+        if ($courseId) {
+            $sql .= " AND course_id = ?";
+            $params[] = $courseId;
+        }
+
+        // Filter by Education Level
+        if ($eduLevelId) {
+            $sql .= " AND edu_level_id = ?";
+            $params[] = $eduLevelId;
+        }
+
+        // Filter by Study Mode
+        if ($studyMode === 'world') {
+            $sql .= " AND (target_audience = 'world_only' OR target_audience = 'universal')";
+        } else {
+            $sql .= " AND (target_audience = 'psc_only' OR target_audience = 'universal')";
         }
 
         $sql .= " ORDER BY RAND() LIMIT " . intval($limit);
@@ -99,22 +134,38 @@ class DailyQuizService
     }
 
     /**
-     * Fetch the Quiz for a specific date and stream
+     * Fetch the Quiz for a specific date and user context
      */
-    public function getQuizForUser($date, $userStreamId = null)
+    public function getQuizForUser($date, $userCourseId = null, $userEduLevelId = null)
     {
         $pdo = $this->db->getPdo();
 
-        // Try getting stream-specific quiz first
-        if ($userStreamId) {
-            $stmt = $pdo->prepare("SELECT * FROM daily_quiz_schedule WHERE date = ? AND target_stream_id = ?");
-            $stmt->execute([$date, $userStreamId]);
+        // 1. Priority: Exact Course + Education Match
+        if ($userCourseId && $userEduLevelId) {
+            $stmt = $pdo->prepare("SELECT * FROM daily_quiz_schedule WHERE date = ? AND target_stream_id = ? AND target_edu_level_id = ?");
+            $stmt->execute([$date, $userCourseId, $userEduLevelId]);
             $quiz = $stmt->fetch();
             if ($quiz) return $quiz;
         }
 
-        // Fallback to General Quiz
-        $stmt = $pdo->prepare("SELECT * FROM daily_quiz_schedule WHERE date = ? AND target_stream_id IS NULL");
+        // 2. Secondary: Course Only Match
+        if ($userCourseId) {
+            $stmt = $pdo->prepare("SELECT * FROM daily_quiz_schedule WHERE date = ? AND target_stream_id = ? AND target_edu_level_id IS NULL");
+            $stmt->execute([$date, $userCourseId]);
+            $quiz = $stmt->fetch();
+            if ($quiz) return $quiz;
+        }
+
+        // 3. Tertiary: Education Level Only Match
+        if ($userEduLevelId) {
+            $stmt = $pdo->prepare("SELECT * FROM daily_quiz_schedule WHERE date = ? AND target_stream_id IS NULL AND target_edu_level_id = ?");
+            $stmt->execute([$date, $userEduLevelId]);
+            $quiz = $stmt->fetch();
+            if ($quiz) return $quiz;
+        }
+
+        // 4. Fallback: Global Mixed Quiz
+        $stmt = $pdo->prepare("SELECT * FROM daily_quiz_schedule WHERE date = ? AND target_stream_id IS NULL AND target_edu_level_id IS NULL");
         $stmt->execute([$date]);
         return $stmt->fetch();
     }

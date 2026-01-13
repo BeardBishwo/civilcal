@@ -1,0 +1,51 @@
+Category,Question / Statement,Correct Answer,Explanation
+Hydraulics,An ideal fluid has zero viscosity and is incompressible.,TRUE,Ideal fluids are theoretical fluids with no friction (viscosity) or compressibility.
+Hydraulics,Bernoulli’s equation is based on the conservation of mass.,FALSE,It is based on the conservation of Energy.
+Hydraulics,A venturimeter is used to measure the discharge of liquid in a pipe.,TRUE,It measures flow rate by measuring pressure difference.
+Hydraulics,The pressure at a point in a static fluid acts equally in all directions.,TRUE,This is known as Pascal’s Law.
+Hydraulics,Mercury is used in barometers because it has very low density.,FALSE,It is used because of its high density (13.6) and low vapor pressure.
+Hydraulics,Laminar flow occurs when the Reynolds number is greater than 4000.,FALSE,Laminar flow occurs when Re < 2000. Re > 4000 is Turbulent.
+Hydraulics,A pitot tube measures the static pressure of a fluid.,FALSE,A pitot tube measures Velocity head (Stagnation pressure - Static pressure).
+Hydraulics,The viscosity of liquids decreases with an increase in temperature.,TRUE,"Heat breaks the cohesive bonds, making liquids flow more easily."
+Hydraulics,"""Head loss"" in pipes is primarily caused by friction.",TRUE,Friction is the major loss; bends/valves are minor losses.
+Hydraulics,Specific gravity of pure water is taken as 1.0.,TRUE,It is the standard reference for liquids.
+Concrete Technology,"""Segregation"" is the separation of water from the concrete mix.",FALSE,Separation of water is Bleeding. Segregation is separation of aggregates.
+Concrete Technology,"The value ""20"" in M20 concrete stands for characteristic compressive strength in N/mm².",TRUE,It means 20 MPa strength at 28 days.
+Concrete Technology,Concrete is very strong in tension but weak in compression.,FALSE,Concrete is strong in compression and weak in tension.
+Concrete Technology,The Slump Test is used to measure the strength of concrete.,FALSE,It measures Workability (consistency).
+Concrete Technology,Adding more water to the concrete mix increases its strength.,FALSE,Higher water-cement ratio decreases strength and durability.
+Concrete Technology,Reinforced Cement Concrete (RCC) weighs approx 2500 kg/m³.,TRUE,Plain Cement Concrete (PCC) is approx 2400 kg/m³.
+Concrete Technology,Curing of concrete can be stopped after 2 days.,FALSE,Curing requires at least 7 to 28 days for proper hydration.
+Concrete Technology,"""Bulking of sand"" occurs due to moisture content.",TRUE,"Surface moisture pushes particles apart, increasing volume."
+Concrete Technology,Calcium Chloride (CaCl₂) is used as a retarder in concrete.,FALSE,It is an Accelerator (speeds up setting). Gypsum is a retarder.
+Concrete Technology,Vibrators are used to remove entrapped air from concrete.,TRUE,This process is called compaction.
+Water Supply,Hard water forms lather easily with soap.,FALSE,Hard water consumes soap and does not form lather easily.
+Water Supply,The pH value of neutral water is 7.,TRUE,"< 7 is acidic, > 7 is alkaline."
+Water Supply,Alum is used in water treatment for disinfection.,FALSE,Alum is used for Coagulation (settling particles). Chlorine is for disinfection.
+Water Supply,Groundwater is generally free from suspended impurities compared to river water.,TRUE,The soil layers act as a natural filter.
+Water Supply,"A ""Check Valve"" allows water to flow in both directions.",FALSE,A check (reflux) valve allows flow in only one direction.
+Water Supply,The Grid Iron system of pipe layout has more dead ends than the Tree system.,FALSE,The Tree (Dead End) system has the most dead ends. Grid Iron allows circulation.
+Water Supply,Residual chlorine in water is harmful and must be zero.,FALSE,A small amount (0.2 mg/l) is required to prevent re-contamination in pipes.
+Water Supply,"""Turbidity"" refers to the cloudiness of water.",TRUE,It is caused by suspended particles.
+Water Supply,Ferrule is a device used to connect a service pipe to the water main.,TRUE,It is inserted into the main pipe.
+Water Supply,Boiling is the most effective method of sterilization for household water.,TRUE,It kills almost all pathogens.
+Sanitary Engineering,Sewage contains about 99.9% solids and 0.1% water.,FALSE,It is the opposite: 99.9% water and 0.1% solids.
+Sanitary Engineering,"A ""Water Seal"" in traps prevents foul gases from entering the house.",TRUE,The water barrier stops gases from the sewer line.
+Sanitary Engineering,BOD stands for Biochemical Oxygen Demand.,TRUE,It measures the oxygen needed by bacteria to decompose organic matter.
+Sanitary Engineering,"A ""Combined System"" carries both sewage and rainwater in the same pipe.",TRUE,"""Separate System"" uses two different pipes."
+Sanitary Engineering,Septic tanks function on the principle of Aerobic decomposition.,FALSE,They function on Anaerobic decomposition (without oxygen).
+Sanitary Engineering,A Manhole is usually provided at every bend in a sewer line.,TRUE,To allow access for cleaning and inspection.
+Sanitary Engineering,"""Sullage"" includes waste from toilets.",FALSE,Sullage is liquid waste from kitchen/bath only. Waste from toilets is Sewage/Blackwater.
+Sanitary Engineering,The minimum diameter for a public sewer is typically 150mm (15cm).,TRUE,Anything smaller is prone to blockage.
+Sanitary Engineering,Fresh sewage is usually acidic in nature.,FALSE,Fresh sewage is Alkaline; it becomes acidic as it becomes stale/septic.
+Sanitary Engineering,"A ""Vent Pipe"" is provided to release gases from the septic tank/sewer.",TRUE,It prevents back-pressure and releases foul smells high up.
+Highway Engineering,"""Camber"" is the longitudinal slope of the road.",FALSE,Camber is the Transverse (cross) slope for drainage. Longitudinal is Gradient.
+Highway Engineering,Super-elevation is provided on curves to counteract centrifugal force.,TRUE,It raises the outer edge to keep vehicles on the road.
+Highway Engineering,Rigid pavements are made of bituminous materials.,FALSE,Rigid pavements are made of Cement Concrete. Flexible are made of Bitumen.
+Highway Engineering,"The ""Shoulder"" serves as an emergency lane for broken-down vehicles.",TRUE,It is the strip alongside the carriageway.
+Highway Engineering,CBR (California Bearing Ratio) test is done on bitumen.,FALSE,CBR is done on Sub-grade soil to test its strength.
+Highway Engineering,Stopping Sight Distance (SSD) is always greater than Overtaking Sight Distance (OSD).,FALSE,OSD is always greater than SSD because you need more space to pass.
+Highway Engineering,"""Warning Signs"" on roads are usually triangular in shape.",TRUE,"Circular are mandatory, Rectangular are informatory."
+Highway Engineering,Traffic volume is measured in PCU (Passenger Car Units).,TRUE,PCU converts different vehicle types into a standard unit.
+Highway Engineering,Expansion joints are required in Flexible Pavements.,FALSE,They are required in Rigid (Concrete) pavements due to thermal expansion.
+Highway Engineering,"A ""Gradient"" of 1 in 20 is steeper than 1 in 50.",TRUE,1 vertical unit in 20 horizontal is steeper than 1 in 50.

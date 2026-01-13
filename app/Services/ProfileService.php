@@ -457,4 +457,21 @@ class ProfileService
             ];
         }
     }
+    /**
+     * Resolve plaintext education level to a syllabus node ID
+     * 
+     * @param string $levelName The plaintext education level (e.g. "Bachelor's")
+     * @return int|null The syllabus node ID or null if not found
+     */
+    public function resolveEduLevelId($levelName)
+    {
+        if (empty($levelName)) return null;
+
+        $sql = "SELECT id FROM syllabus_nodes WHERE type = 'education_level' AND title LIKE :title LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['title' => '%' . $levelName . '%']);
+        $result = $stmt->fetch();
+
+        return $result ? (int)$result['id'] : null;
+    }
 }

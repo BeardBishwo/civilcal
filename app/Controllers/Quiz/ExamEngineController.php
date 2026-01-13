@@ -90,13 +90,19 @@ class ExamEngineController extends Controller
         $date = date('Y-m-d');
         $userId = $_SESSION['user_id'];
 
-        // 1. Get Quiz info from Schedule
-        // Using session stream_id if available, else null
-        $daily = $this->dailyQuizService->getQuizForUser($date, $_SESSION['user']['stream_id'] ?? null);
+        // 1. Get User Profile for targeting
+        $profileService = new \App\Services\ProfileService();
+        $profile = $profileService->getUserProfile($userId);
+
+        $userStreamId = $profile['user']['stream_id'] ?? null;
+        $eduLevelName = $profile['career_interests']['education_level'] ?? null;
+        $userEduLevelId = $profileService->resolveEduLevelId($eduLevelName);
+
+        // 2. Get Quiz info from Schedule
+        $daily = $this->dailyQuizService->getQuizForUser($date, $userStreamId, $userEduLevelId);
 
         if (!$daily) {
-            // If no quiz generated yet, trigger one? Or just show error.
-            // Auto-gen should handle it.
+            // If no targeted quiz found, fallback to Mixed (getQuizForUser already handles hierarchy)
             $_SESSION['flash_error'] = "No Daily Quest available for today yet. Please try again later.";
             $this->redirect('/quiz/dashboard');
             return;
