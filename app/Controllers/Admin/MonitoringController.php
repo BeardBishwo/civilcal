@@ -19,7 +19,7 @@ class MonitoringController extends Controller
     public function __construct()
     {
         parent::__construct();
-        
+
         // Check admin authentication
         if (!$this->auth->check() || !$this->auth->isAdmin()) {
             $this->redirect('/login');
@@ -232,6 +232,7 @@ class MonitoringController extends Controller
     private function getUptime()
     {
         if (function_exists('shell_exec')) {
+            // SECURITY: Internal command only. Do not add user input here.
             $uptime = shell_exec('uptime');
             return $uptime ?: 'N/A';
         }

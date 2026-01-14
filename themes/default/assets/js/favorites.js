@@ -3,6 +3,24 @@
  * Handles toggling and displaying user favorites
  */
 
+// Get dynamic base path for deployment flexibility
+function getBasePath() {
+  const path = window.location.pathname;
+  const parts = path.split('/').filter(p => p);
+  // If we're in a subdirectory (e.g., /Bishwo_Calculator/), detect it
+  // Otherwise return root
+  if (parts.length > 0 && !parts[0].includes('.')) {
+    // Check if first part is likely a base directory
+    const firstPart = parts[0];
+    if (!['calculator', 'api', 'login', 'dashboard'].includes(firstPart)) {
+      return '/' + firstPart;
+    }
+  }
+  return '';
+}
+
+const BASE_PATH = getBasePath();
+
 document.addEventListener("DOMContentLoaded", () => {
   initFavorites();
   loadFavoritesList();
@@ -42,7 +60,7 @@ async function checkFavoriteStatus() {
   if (!slug) return;
 
   try {
-    const response = await fetch("/Bishwo_Calculator/api/favorites");
+    const response = await fetch(`${BASE_PATH}/api/favorites`);
     const data = await response.json();
 
     if (data.success && data.favorites) {
@@ -65,7 +83,7 @@ async function toggleFavorite() {
   btn.innerHTML = '<i class="bi bi-hourglass-split fs-4 text-warning"></i>';
 
   try {
-    const response = await fetch("/Bishwo_Calculator/api/favorites/toggle", {
+    const response = await fetch(`${BASE_PATH}/api/favorites/toggle`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -122,14 +140,14 @@ async function loadFavoritesList() {
   if (!container) return;
 
   try {
-    const response = await fetch("/Bishwo_Calculator/api/favorites");
+    const response = await fetch(`${BASE_PATH}/api/favorites`);
     const data = await response.json();
 
     if (data.success && data.favorites.length > 0) {
       container.innerHTML = data.favorites
         .map(
           (f) => `
-                <a href="/Bishwo_Calculator/calculator/${f.calculator_slug}" class="d-flex align-items-center mb-2 text-decoration-none p-2 rounded hover-bg-white-10">
+                <a href="${BASE_PATH}/calculator/${f.calculator_slug}" class="d-flex align-items-center mb-2 text-decoration-none p-2 rounded hover-bg-white-10">
                     <i class="bi bi-star-fill text-warning me-2 small"></i>
                     <span class="text-white small text-truncate">${f.calculator_name}</span>
                 </a>
@@ -144,6 +162,6 @@ async function loadFavoritesList() {
   } catch (e) {
     // Guest or error
     container.innerHTML =
-      '<div class="text-muted small text-center p-2"><a href="/Bishwo_Calculator/login" class="text-primary">Login</a> to see favorites</div>';
+      `<div class="text-muted small text-center p-2"><a href="${BASE_PATH}/login" class="text-primary">Login</a> to see favorites</div>`;
   }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 class SystemMonitoringService
@@ -31,10 +32,10 @@ class SystemMonitoringService
             'disk_io' => $this->getDiskIo(),
             'network_io' => $this->getNetworkIo(),
         ];
-        
+
         // Determine overall status based on metrics
         $metrics['status'] = $this->determineStatus($metrics, 'server');
-        
+
         return $metrics;
     }
 
@@ -48,17 +49,17 @@ class SystemMonitoringService
             $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4';
             $pdo = new \PDO($dsn, DB_USER, DB_PASS);
             $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            
+
             // Get connection stats
             $stmt = $pdo->query("SHOW STATUS LIKE 'Threads_connected'");
             $connections = $stmt->fetch(\PDO::FETCH_ASSOC);
-            
+
             $stmt = $pdo->query("SHOW STATUS LIKE 'Questions'");
             $queries = $stmt->fetch(\PDO::FETCH_ASSOC);
-            
+
             $stmt = $pdo->query("SHOW STATUS LIKE 'Slow_queries'");
             $slowQueries = $stmt->fetch(\PDO::FETCH_ASSOC);
-            
+
             $metrics = [
                 'status' => 'online',
                 'connections' => (int)($connections['Value'] ?? 0),
@@ -67,9 +68,9 @@ class SystemMonitoringService
                 'response_time' => $this->getDatabaseResponseTime(),
                 'table_status' => $this->getTableStatus(),
             ];
-            
+
             $metrics['status'] = $this->determineStatus($metrics, 'database');
-            
+
             return $metrics;
         } catch (\Exception $e) {
             error_log('SystemMonitoringService::getDatabaseMetrics error: ' . $e->getMessage());
@@ -89,7 +90,7 @@ class SystemMonitoringService
         $free = disk_free_space(BASE_PATH);
         $used = $total - $free;
         $usagePercent = $total > 0 ? round(($used / $total) * 100, 2) : 0;
-        
+
         $metrics = [
             'status' => 'online',
             'total_space' => $this->formatBytes($total),
@@ -98,9 +99,9 @@ class SystemMonitoringService
             'usage_percent' => $usagePercent,
             'disk_partitions' => $this->getDiskPartitions(),
         ];
-        
+
         $metrics['status'] = $this->determineStatus($metrics, 'storage');
-        
+
         return $metrics;
     }
 
@@ -123,9 +124,9 @@ class SystemMonitoringService
                 'requests_per_minute' => $this->getRequestsPerMinute(),
                 'active_sessions' => $this->getActiveSessions(),
             ];
-            
+
             $metrics['status'] = $this->determineStatus($metrics, 'application');
-            
+
             return $metrics;
         } catch (\Exception $e) {
             error_log('SystemMonitoringService::getApplicationMetrics error: ' . $e->getMessage());
@@ -148,9 +149,9 @@ class SystemMonitoringService
             'ssl_certificate_status' => $this->getSslCertificateStatus(),
             'last_security_scan' => $this->getLastSecurityScan(),
         ];
-        
+
         $metrics['status'] = $this->determineStatus($metrics, 'security');
-        
+
         return $metrics;
     }
 
@@ -179,7 +180,7 @@ class SystemMonitoringService
         $memoryFree = $this->getSystemMemoryFree();
         $memoryUsed = $memoryTotal - $memoryFree;
         $percent = $memoryTotal > 0 ? round(($memoryUsed / $memoryTotal) * 100, 2) : 0;
-        
+
         return [
             'total' => $this->formatBytes($memoryTotal),
             'used' => $this->formatBytes($memoryUsed),
@@ -201,7 +202,7 @@ class SystemMonitoringService
                 'model' => $this->getCpuModel()
             ];
         }
-        
+
         // On Unix-like systems, use sys_getloadavg for non-blocking load check
         if (function_exists('sys_getloadavg')) {
             $load = sys_getloadavg();
@@ -209,7 +210,7 @@ class SystemMonitoringService
         } else {
             $cpuUsage = 'N/A';
         }
-        
+
         return [
             'usage_percent' => $cpuUsage,
             'count' => $this->getCpuCount(),
@@ -332,12 +333,12 @@ class SystemMonitoringService
         $days = floor($seconds / 86400);
         $hours = floor(($seconds % 86400) / 3600);
         $minutes = floor(($seconds % 3600) / 60);
-        
+
         $parts = [];
         if ($days > 0) $parts[] = $days . " days";
         if ($hours > 0) $parts[] = $hours . " hours";
         if ($minutes > 0) $parts[] = $minutes . " minutes";
-        
+
         return implode(", ", $parts);
     }
 
@@ -380,7 +381,7 @@ class SystemMonitoringService
             $stmt = $pdo->query('SELECT 1');
             $result = $stmt->fetch();
             $end = microtime(true);
-            
+
             return round(($end - $start) * 1000, 2) . ' ms';
         } catch (\Exception $e) {
             return 'Error';
@@ -396,19 +397,19 @@ class SystemMonitoringService
             $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4';
             $pdo = new \PDO($dsn, DB_USER, DB_PASS);
             $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            
+
             $stmt = $pdo->query("SHOW TABLE STATUS");
             $tables = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            
+
             $totalRows = 0;
             $totalSize = 0;
             $tableCount = count($tables);
-            
+
             foreach ($tables as $table) {
                 $totalRows += (int)$table['Rows'];
                 $totalSize += (int)$table['Data_length'] + (int)$table['Index_length'];
             }
-            
+
             return [
                 'count' => $tableCount,
                 'total_rows' => $totalRows,
@@ -432,6 +433,7 @@ class SystemMonitoringService
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                 $df = ''; // Not supported on Windows
             } else {
+                // SECURITY: Internal command only. Do not add user input here.
                 $df = shell_exec('df -h');
             }
             $lines = explode("\n", $df);
@@ -458,7 +460,7 @@ class SystemMonitoringService
                 'mounted_on' => 'C:',
             ];
         }
-        
+
         return $partitions;
     }
 
@@ -543,11 +545,11 @@ class SystemMonitoringService
     private function formatBytes($bytes, $precision = 2)
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
+
         return round($bytes, $precision) . ' ' . $units[$i];
     }
 
@@ -561,7 +563,7 @@ class SystemMonitoringService
                 if ($metrics['usage_percent'] > 90) return 'critical';
                 if ($metrics['usage_percent'] > 80) return 'warning';
                 return 'online';
-                
+
             case 'server':
                 // For load average, if any value is > 4, it's critical
                 if ($metrics['load_average']['1min'] > 4) return 'critical';
@@ -569,23 +571,23 @@ class SystemMonitoringService
                 if ($metrics['memory_usage']['percent'] > 90) return 'critical';
                 if ($metrics['memory_usage']['percent'] > 80) return 'warning';
                 return 'online';
-                
+
             case 'database':
                 if (isset($metrics['error'])) return 'offline';
                 if ($metrics['connections'] > 100) return 'warning';
                 if ($metrics['slow_queries'] > 10) return 'warning';
                 return 'online';
-                
+
             case 'application':
                 if (isset($metrics['error'])) return 'error';
                 if ($metrics['errors_today'] > 10) return 'warning';
                 return 'online';
-                
+
             case 'security':
                 if ($metrics['failed_login_attempts'] > 20) return 'critical';
                 if ($metrics['failed_login_attempts'] > 10) return 'warning';
                 return 'online';
-                
+
             default:
                 return 'online';
         }

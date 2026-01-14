@@ -34,7 +34,7 @@ class Cache {
             return $default;
         }
         
-        $cacheData = unserialize($data);
+        $cacheData = json_decode($data, true);
         
         // Check if cache has expired
         if ($cacheData['expires_at'] !== 0 && time() > $cacheData['expires_at']) {
@@ -57,7 +57,7 @@ class Cache {
         ];
         
         $filePath = $this->getFilePath($key);
-        $data = serialize($cacheData);
+        $data = json_encode($cacheData);
         
         return file_put_contents($filePath, $data) !== false;
     }
@@ -123,7 +123,7 @@ class Cache {
         foreach ($files as $file) {
             $totalSize += filesize($file);
             
-            $data = unserialize(file_get_contents($file));
+            $data = json_decode(file_get_contents($file), true);
             if ($data['expires_at'] !== 0 && time() > $data['expires_at']) {
                 $expiredCount++;
             }
@@ -145,7 +145,7 @@ class Cache {
         $cleanedCount = 0;
         
         foreach ($files as $file) {
-            $data = unserialize(file_get_contents($file));
+            $data = json_decode(file_get_contents($file), true);
             
             if ($data['expires_at'] !== 0 && time() > $data['expires_at']) {
                 unlink($file);

@@ -196,10 +196,10 @@ class DebugController extends \App\Core\Controller
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
         header('Content-Length: ' . filesize($logFile));
-        
+
         // Clear output buffer to avoid any extra characters
         if (ob_get_level()) ob_end_clean();
-        
+
         readfile($logFile);
         exit;
     }
@@ -883,7 +883,8 @@ class DebugController extends \App\Core\Controller
         }
 
         if (empty($_SESSION['user_id'])) {
-            header('Location: ' . app_base_url('/login?redirect=' . urlencode($_SERVER['REQUEST_URI'])));
+            $redirect = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+            header('Location: ' . app_base_url('/login?redirect=' . urlencode($redirect)));
             exit;
         }
 
