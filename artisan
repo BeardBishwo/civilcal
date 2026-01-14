@@ -1,0 +1,54 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Artisan CLI - Command Line Interface for Bishwo Calculator
+ * 
+ * Usage: php artisan <command>
+ */
+
+// Bootstrap the application
+require_once __DIR__ . '/app/bootstrap.php';
+
+// Get command from arguments
+$command = $argv[1] ?? null;
+
+if (!$command) {
+    showHelp();
+    exit(1);
+}
+
+// Route commands
+switch ($command) {
+    case 'quiz:generate-daily':
+        $cmd = new \App\Console\Commands\GenerateDailyQuizzes();
+        exit($cmd->handle());
+        
+    case 'help':
+    case '--help':
+    case '-h':
+        showHelp();
+        exit(0);
+        
+    default:
+        echo "❌ Unknown command: $command\n\n";
+        showHelp();
+        exit(1);
+}
+
+/**
+ * Display help information
+ */
+function showHelp()
+{
+    echo "Bishwo Calculator - Artisan CLI\n";
+    echo "================================\n\n";
+    echo "Usage:\n";
+    echo "  php artisan <command>\n\n";
+    echo "Available Commands:\n";
+    echo "  quiz:generate-daily    Generate daily quizzes for the week\n";
+    echo "  help                   Show this help message\n\n";
+    echo "Examples:\n";
+    echo "  php artisan quiz:generate-daily\n";
+    echo "  php artisan help\n\n";
+}

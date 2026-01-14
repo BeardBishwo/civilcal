@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MARKING SCHEME INTERFACE
  * For manual grading of theory questions
@@ -26,7 +27,7 @@ class MarkingSchemeController extends Controller
     {
         // Get exam attempt details
         $attempt = $this->db->findOne('quiz_exam_attempts', ['id' => $attemptId]);
-        
+
         if (!$attempt) {
             $_SESSION['error'] = 'Exam attempt not found';
             header('Location: ' . app_base_url('admin/quiz/results'));
@@ -35,16 +36,16 @@ class MarkingSchemeController extends Controller
 
         // Get exam details
         $exam = $this->db->findOne('quiz_exams', ['id' => $attempt['exam_id']]);
-        
+
         // Get student details
         $student = $this->db->findOne('users', ['id' => $attempt['user_id']]);
-        
+
         // Get all theory questions in this attempt
         $theoryAnswers = $this->db->query("
             SELECT 
                 qa.*,
                 q.id as question_id,
-                q.content,
+                q.question,
                 q.answer_explanation,
                 q.default_marks,
                 q.theory_type,
@@ -90,7 +91,7 @@ class MarkingSchemeController extends Controller
     public function saveMarks()
     {
         $data = json_decode(file_get_contents('php://input'), true);
-        
+
         $answerId = $data['answer_id'] ?? null;
         $marks = $data['marks'] ?? null;
         $feedback = $data['feedback'] ?? '';
@@ -166,7 +167,7 @@ class MarkingSchemeController extends Controller
     public function bulkSaveMarks()
     {
         $data = json_decode(file_get_contents('php://input'), true);
-        
+
         $attemptId = $data['attempt_id'] ?? null;
         $marks = $data['marks'] ?? [];
 

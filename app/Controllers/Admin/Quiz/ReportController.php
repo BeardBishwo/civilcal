@@ -8,47 +8,48 @@ use App\Models\Question;
 class ReportController extends Controller {
 
     public function index() {
-        // Fetch pending reports with the Question and User data
-        // Assuming simple ORM. If 'with' not supported, use loop or join.
-        // Bishwo ORM usually simple.
-        // Let's check Model... find() returns array. Relations not built-in like Eloquent.
-        // I need to join manually or loop.
-        
-        $db = \App\Core\Database::getInstance();
-        $reports = $db->query("
-            SELECT r.*, u.username as user_name, q.content as question_content, q.options as question_options, q.correct_answer as question_answer 
-            FROM question_reports r
-            LEFT JOIN users u ON r.user_id = u.id
-            LEFT JOIN quiz_questions q ON r.question_id = q.id
-            WHERE r.status = 'pending'
-            ORDER BY r.created_at DESC
-        ")->fetchAll();
-        
-        // Format for View
-        $formatted = [];
-        foreach($reports as $r) {
-            $qContent = json_decode($r['question_content'] ?? '{}', true);
-            $qText = $qContent['text'] ?? ($r['question_content'] ?? 'Error loading question');
+        try {
+            $db = \App\Core\Database::getInstance();
+            $reports = $db->query("
+                SELECT r.*, u.username as user_name, q.question as question_text
+                FROM question_reports r
+                LEFT JOIN users u ON r.user_id = u.id
+                LEFT JOIN quiz_questions q ON r.question_id = q.id
+                WHERE r.status = 'pending'
+                ORDER BY r.created_at DESC
+            ")->fetchAll();
             
-            $formatted[] = (object) [
-                'id' => $r['id'],
-                'issue_type' => $r['issue_type'],
-                'description' => $r['description'],
-                'created_at' => $r['created_at'],
-                'user' => (object) ['name' => $r['user_name'] ?? 'Unknown'],
-                'question_id' => $r['question_id'],
-                'question' => (object) [
-                    'question' => $qText,
-                    'options' => $r['question_options'],
-                    'correct_answer' => $r['question_answer']
-                ]
-            ];
-        }
+            // Format for View
+            $formatted = [];
+            foreach($reports as $r) {
+                $formatted[] = (object) [
+                    'id' => $r['id'],
+                    'issue_type' => $r['issue_type'],
+                    'description' => $r['description'] ?? '',
+                    'created_at' => $r['created_at'],
+                    'user' => (object) ['name' => $r['user_name'] ?? 'Unknown'],
+                    'question_id' => $r['question_id'],
+                    'question' => (object) [
+                        'question' => $r['question_text'] ?? 'Question not found',
+                        'options' => '',
+                        'correct_answer' => ''
+                    ]
+                ];
+            }
 
-        $this->view('admin/quiz/reports/index', [
-            'reports' => $formatted,
-            'count' => count($formatted)
-        ]);
+            $this->view('admin/quiz/reports/index', [
+                'reports' => $formatted,
+                'count' => count($formatted)
+            ]);
+        } catch (\Exception $e) {
+            // Log the error and show a friendly message
+            error_log("Report Controller Error: " . $e->getMessage());
+            $this->view('admin/quiz/reports/index', [
+                'reports' => [],
+                'count' => 0,
+                'error' => 'Unable to load reports. Please check the database connection.'
+            ]);
+        }
     }
 
     /**

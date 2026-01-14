@@ -18,36 +18,44 @@ class DailyQuizService
      */
     public function autoGenerateWeek()
     {
-        $pdo = $this->db->getPdo();
+        try {
+            $pdo = $this->db->getPdo();
 
-        // Get all Main Courses
-        $courses = $this->db->query("SELECT * FROM syllabus_nodes WHERE type = 'course' AND is_active = 1")->fetchAll();
+            // Get all Main Courses
+            $courses = $this->db->query("SELECT * FROM syllabus_nodes WHERE type = 'course' AND is_active = 1")->fetchAll();
 
-        // Get all Education Levels
-        $eduLevels = $this->db->query("SELECT * FROM syllabus_nodes WHERE type = 'education_level' AND is_active = 1")->fetchAll();
+            // Get all Education Levels
+            $eduLevels = $this->db->query("SELECT * FROM syllabus_nodes WHERE type = 'education_level' AND is_active = 1")->fetchAll();
 
-        for ($i = 0; $i < 7; $i++) {
-            $date = date('Y-m-d', strtotime("+$i days"));
+            for ($i = 0; $i < 7; $i++) {
+                $date = date('Y-m-d', strtotime("+$i days"));
 
-            // 1. Generate "Mixed/Global" Quiz (Default fallback)
-            $this->createDailyQuiz($date, null, null);
+                // 1. Generate "Mixed/Global" Quiz (Default fallback)
+                $this->createDailyQuiz($date, null, null);
 
-            // 2. Generate for Specific Courses
-            foreach ($courses as $course) {
-                $this->createDailyQuiz($date, $course['id'], null);
-            }
+                // 2. Generate for Specific Courses
+                foreach ($courses as $course) {
+                    $this->createDailyQuiz($date, $course['id'], null);
+                }
 
-            // 3. Generate for Specific Education Levels
-            foreach ($eduLevels as $edu) {
-                $this->createDailyQuiz($date, null, $edu['id']);
-            }
-
-            // 4. Generate for Course + Education Combinations
-            foreach ($courses as $course) {
+                // 3. Generate for Specific Education Levels
                 foreach ($eduLevels as $edu) {
-                    $this->createDailyQuiz($date, $course['id'], $edu['id']);
+                    $this->createDailyQuiz($date, null, $edu['id']);
+                }
+
+                // 4. Generate for Course + Education Combinations
+                foreach ($courses as $course) {
+                    foreach ($eduLevels as $edu) {
+                        $this->createDailyQuiz($date, $course['id'], $edu['id']);
+                    }
                 }
             }
+
+            return true; // Success
+        } catch (\Exception $e) {
+            error_log("Daily Quiz Generation Error: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
+            return false;
         }
     }
 

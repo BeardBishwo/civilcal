@@ -40,10 +40,10 @@ class MultiplayerController extends Controller
     public function create()
     {
         // Assume Exam ID 1 for MVP or select from POST
-        $examId = $_POST['exam_id'] ?? 1; 
-        
+        $examId = $_POST['exam_id'] ?? 1;
+
         $result = $this->lobbyService->createLobby($examId, $_SESSION['user_id']);
-        
+
         $this->redirect('/quiz/lobby/' . $result['code']);
     }
 
@@ -123,31 +123,38 @@ class MultiplayerController extends Controller
             return;
         }
 
-        $gamification = new \App\Services\GamificationService();
-        $wallet = $gamification->getWallet($_SESSION['user_id']);
+        // ATOMIC UPDATE: Prevent race condition by checking balance in WHERE clause
+        $result = $this->db->query(
+            "UPDATE user_resources SET coins = coins - :amt WHERE user_id = :uid AND coins >= :amt",
+            [
+                'amt' => $amount,
+                'uid' => $_SESSION['user_id']
+            ]
+        );
 
-        if ($wallet['coins'] < $amount) {
-            $this->json(['success' => false, 'message' => 'Not enough coins'], 400);
+        // Check if update succeeded (rowCount will be 0 if insufficient funds)
+        if ($result->rowCount() === 0) {
+            $this->json(['success' => false, 'message' => 'Insufficient coins'], 400);
+            return;
         }
 
-        // Deduct coins and update wager
-        $this->db->query("UPDATE user_resources SET coins = coins - :amt WHERE user_id = :uid", [
-            'amt' => $amount,
-            'uid' => $_SESSION['user_id']
-        ]);
-
+        // Update wager amount
         $this->db->query("UPDATE quiz_lobby_participants SET wager_amount = :amt WHERE lobby_id = :lid AND user_id = :uid", [
             'amt' => $amount,
             'lid' => $lobbyId,
             'uid' => $_SESSION['user_id']
         ]);
 
+        // Get updated balance
+        $gamification = new \App\Services\GamificationService();
+        $wallet = $gamification->getWallet($_SESSION['user_id']);
+
         $newNonce = $this->nonceService->generate($_SESSION['user_id'], 'wager');
 
         $this->json([
             'success' => true,
             'message' => 'Wager placed!',
-            'new_balance' => $wallet['coins'] - $amount,
+            'new_balance' => $wallet['coins'],
             'nonce' => $newNonce['nonce'] ?? null
         ]);
     }
@@ -159,7 +166,7 @@ class MultiplayerController extends Controller
     {
         // Resolve ID from code (or pass ID)
         $lobby = $this->lobbyService->joinLobby($code, $_SESSION['user_id']); // Re-verify join/fetch
-        
+
         if ($lobby['status'] === 'active') {
             // Trigger Bot Engine
             // Question ID is managed by client-side sync or server-side schedule?
@@ -167,19 +174,19 @@ class MultiplayerController extends Controller
             // We need current question index.
             // For MVP, client sends what Q they are on? Or Time based?
             // Time based is safer.
-            
+
             // Calc Question Index based on Time
             $elapsed = time() - strtotime($lobby['start_time']);
             // Assume 30s per question? 
-            $qDuration = 20; 
+            $qDuration = 20;
             $qIndex = floor($elapsed / $qDuration);
             $qStartTime = strtotime($lobby['start_time']) + ($qIndex * $qDuration);
-            
+
             $this->botEngine->processGamePulse($lobby['id'], $qIndex, $qStartTime);
         }
 
         $data = $this->lobbyService->getLobbyStatus($lobby['id'], $_SESSION['user_id']);
-        
+
         $this->json($data);
     }
 }

@@ -150,7 +150,7 @@ class ExamEngineController extends Controller
                 $questions = [];
             } else {
                 $placeholders = str_repeat('?,', count($questionIds) - 1) . '?';
-                $sqlQ = "SELECT id, type, content, options, correct_answer, correct_answer_json, default_marks, default_negative_marks, difficulty_level, answer_explanation as explanation FROM quiz_questions WHERE id IN ($placeholders)";
+                $sqlQ = "SELECT id, type, question, options, correct_answer_json, default_marks, default_negative_marks, difficulty_level, answer_explanation as explanation FROM quiz_questions WHERE id IN ($placeholders)";
                 $stmtQ = $this->db->getPdo()->prepare($sqlQ);
                 $stmtQ->execute($questionIds);
                 $questions = $stmtQ->fetchAll(\PDO::FETCH_ASSOC);
@@ -170,7 +170,7 @@ class ExamEngineController extends Controller
             // Standard Exam Fetch
             // Fetch Questions
             $sqlQ = "
-                SELECT q.id, q.type, q.content, q.options, q.correct_answer_json, q.default_marks, q.default_negative_marks, q.difficulty_level, q.answer_explanation as explanation
+                SELECT q.id, q.type, q.question, q.options, q.correct_answer_json, q.default_marks, q.default_negative_marks, q.difficulty_level, q.answer_explanation as explanation
                 FROM quiz_exam_questions eq
                 JOIN quiz_questions q ON eq.question_id = q.id
                 WHERE eq.exam_id = :eid
@@ -187,10 +187,12 @@ class ExamEngineController extends Controller
             $questions = $shuffler->randomize($questions, null); // True Random
         }
 
-        // Decode JSON content/options for storage
+        // Decode JSON question/options for storage
         foreach ($questions as &$q) {
-            $q['content'] = json_decode($q['content'], true);
+            // Store question as 'content' key for consistency in JSON cache
+            $q['content'] = json_decode($q['question'], true);
             $q['options'] = json_decode($q['options'], true);
+            unset($q['question']); // Remove to avoid confusion
         }
 
         $data = [
@@ -252,16 +254,29 @@ class ExamEngineController extends Controller
             die("Unauthorized Access");
         }
 
-        // Prepare View Data (Hide sensitive)
+        // Prepare View Data (Hide sensitive + Sanitize HTML)
         $viewQuestions = $data['questions'];
         foreach ($viewQuestions as &$q) {
-            if ($data['exam']['mode'] == 'exam') {
-                if (is_array($q['options'])) {
-                    foreach ($q['options'] as &$opt) {
+            // XSS Prevention: Sanitize question content
+            if (isset($q['content']['text'])) {
+                $q['content']['text'] = htmlspecialchars($q['content']['text'], ENT_QUOTES, 'UTF-8');
+            }
+
+            // Sanitize options
+            if (is_array($q['options'])) {
+                foreach ($q['options'] as $key => &$opt) {
+                    if (is_string($opt)) {
+                        $q['options'][$key] = htmlspecialchars($opt, ENT_QUOTES, 'UTF-8');
+                    }
+                    // This part was originally conditional on exam mode, but the instruction places it here.
+                    // It ensures 'is_correct' is never sent to the client if it exists within an option array.
+                    if (is_array($opt) && isset($opt['is_correct'])) {
                         unset($opt['is_correct']);
                     }
                 }
-                unset($q['correct_answer']);
+            }
+
+            if ($data['exam']['mode'] == 'exam') {
                 unset($q['correct_answer_json']);
                 unset($q['explanation']);
             }
@@ -277,7 +292,9 @@ class ExamEngineController extends Controller
             'savedAnswers' => $data['answers'],
             'quizNonce' => $nonce['nonce'] ?? null,
             'csrfToken' => $csrfToken,
-            'title' => $data['exam']['title']
+            'title' => $data['exam']['title'],
+            'server_start_time' => $data['start_time'], // For client-side timer validation
+            'server_current_time' => time() // Current server time
         ], 'layouts/quiz_focus'); // Use Distraction-Free Layout
     }
 
@@ -305,20 +322,49 @@ class ExamEngineController extends Controller
             exit;
         }
 
-        $data = json_decode(file_get_contents($file), true);
-
-        if ($data['user_id'] != $_SESSION['user_id']) {
-            http_response_code(403);
-            echo json_encode(['error' => 'Unauthorized']);
+        // ATOMIC FILE OPERATION: Use flock for entire read-modify-write cycle
+        $fp = fopen($file, 'r+');
+        if (!$fp) {
+            http_response_code(500);
+            echo json_encode(['error' => 'File access error']);
             exit;
         }
 
-        // Update Answer
-        $data['answers'][$questionId] = $selectedOptions;
+        // Acquire exclusive lock
+        if (flock($fp, LOCK_EX)) {
+            // Read current data
+            $fileSize = filesize($file);
+            $json = $fileSize > 0 ? fread($fp, $fileSize) : '{}';
+            $data = json_decode($json, true);
 
-        // Write Back
-        // Write Back with LOCK_EX to prevent race conditions
-        file_put_contents($file, json_encode($data), LOCK_EX);
+            // Validate ownership
+            if ($data['user_id'] != $_SESSION['user_id']) {
+                flock($fp, LOCK_UN);
+                fclose($fp);
+                http_response_code(403);
+                echo json_encode(['error' => 'Unauthorized']);
+                exit;
+            }
+
+            // Update answer
+            $data['answers'][$questionId] = $selectedOptions;
+
+            // Write back atomically
+            ftruncate($fp, 0);
+            rewind($fp);
+            fwrite($fp, json_encode($data));
+            fflush($fp);
+
+            // Release lock
+            flock($fp, LOCK_UN);
+        } else {
+            fclose($fp);
+            http_response_code(500);
+            echo json_encode(['error' => 'Could not acquire lock']);
+            exit;
+        }
+
+        fclose($fp);
 
         echo json_encode(['success' => true]);
     }
@@ -351,9 +397,6 @@ class ExamEngineController extends Controller
 
         // We use the questions from JSON which are the source of truth for THIS attempt
         foreach ($data['questions'] as $q) {
-            $qId = $q['id'];
-            $userAns = $data['answers'][$qId] ?? null;
-
             $qId = $q['id'];
             $userAns = $data['answers'][$qId] ?? null;
 
@@ -457,7 +500,7 @@ class ExamEngineController extends Controller
     {
         // 1. Fetch Attempt Summary
         $stmt = $this->db->getPdo()->prepare("
-            SELECT a.*, e.title, e.total_marks
+            SELECT a.*, e.title, e.total_marks, e.slug
             FROM quiz_attempts a
             JOIN quiz_exams e ON a.exam_id = e.id
             WHERE a.id = :aid AND a.user_id = :uid
@@ -471,18 +514,27 @@ class ExamEngineController extends Controller
 
         // 2. Fetch Incorrect Answers for "Smart Failure" Tool Linking
         $stmtIncorrect = $this->db->getPdo()->prepare("
-            SELECT aa.*, q.content, q.explanation
+            SELECT aa.*, q.question, q.answer_explanation as explanation, q.options, q.type, q.correct_answer_json
             FROM quiz_attempt_answers aa
             JOIN quiz_questions q ON aa.question_id = q.id
             WHERE aa.attempt_id = :aid AND aa.is_correct = 0
-            LIMIT 5
+            LIMIT 10
         ");
         $stmtIncorrect->execute(['aid' => $attemptId]);
         $incorrectAnswers = $stmtIncorrect->fetchAll();
 
-        // Decode content for view
+        // Decode JSON fields for view
         foreach ($incorrectAnswers as &$inc) {
-            $inc['content'] = json_decode($inc['content'], true);
+            try {
+                // Rename 'question' to 'content' for view consistency
+                $inc['content'] = is_string($inc['question']) ? json_decode($inc['question'], true) : $inc['question'];
+                unset($inc['question']);
+                $inc['options'] = is_string($inc['options']) ? json_decode($inc['options'], true) : $inc['options'];
+                $inc['selected_options'] = is_string($inc['selected_options']) ? json_decode($inc['selected_options'], true) : $inc['selected_options'];
+                $inc['correct_answer_json'] = is_string($inc['correct_answer_json']) ? json_decode($inc['correct_answer_json'], true) : $inc['correct_answer_json'];
+            } catch (\Exception $e) {
+                // Keep as is or handle error
+            }
         }
 
         $this->view('quiz/analysis/report', [

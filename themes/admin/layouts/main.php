@@ -12,7 +12,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title ?? 'Admin Dashboard'; ?> - <?php echo htmlspecialchars($site_name); ?></title>
     <?php if (!empty($favicon)): ?>
-    <link rel="icon" type="image/x-icon" href="<?php echo htmlspecialchars($favicon); ?>">
+        <link rel="icon" type="image/x-icon" href="<?php echo htmlspecialchars($favicon); ?>">
     <?php endif; ?>
 
     <!-- Admin Styles -->
@@ -60,7 +60,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
 
     <!-- Chart.js for analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    
+
     <!-- Bootstrap 5 JS Bundle (Required for Modals, Dropdowns) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -739,6 +739,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                 transform: translateY(20px);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
@@ -923,13 +924,14 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                             <li><a href="<?php echo app_base_url('admin/quiz/position-levels'); ?>">Position Levels</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/exams'); ?>">Exam Manager</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/daily'); ?>">Daily Quest Scheduler</a></li>
-                             <li><a href="<?php echo app_base_url('admin/quiz/blueprints'); ?>">Exam Blueprints</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/blueprints'); ?>">Exam Blueprints</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/word-bank'); ?>"><i class="fas fa-book text-info"></i> Word Bank (Admin)</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/questions'); ?>">Question Bank</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/import'); ?>">Import Questions</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/analytics'); ?>">Results & Analytics</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/leaderboard'); ?>">Leaderboard</a></li>
                             <li><a href="<?php echo app_base_url('admin/contest'); ?>"><i class="fas fa-trophy text-warning"></i> Contest Engine</a></li>
+                            <li><a href="<?php echo app_base_url('admin/quiz/reports'); ?>"><i class="fas fa-flag text-danger"></i> Reported Questions</a></li>
                             <li><a href="<?php echo app_base_url('admin/quiz/settings'); ?>">Settings</a></li>
                             <li><a href="<?php echo app_base_url('admin/settings/economy'); ?>"><i class="fas fa-coins text-warning"></i> Economy Settings</a></li>
                         </ul>
@@ -1019,7 +1021,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                     </div>
                 </div>
             </nav>
-            
+
             <!-- Bottom Sidebar Toggle -->
             <button id="sidebar-toggle-bottom" class="sidebar-toggle-bottom" title="Toggle Sidebar">
                 <i class="fas fa-angle-double-left"></i>
@@ -1147,43 +1149,43 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
     <!-- Admin Scripts -->
     <!-- TinyMCE -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"></script>
-    
+
     <!-- Media Modal Partial -->
     <?php include BASE_PATH . '/themes/admin/views/partials/media_modal.php'; ?>
 
     <script>
-    // Initialize TinyMCE globally
-    document.addEventListener('DOMContentLoaded', function() {
-        tinymce.init({
-            selector: '.rich-editor',
-            height: 300,
-            menubar: false,
-            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
-            toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image media-library | code',
-            
-            // Custom Button for Media Library
-            setup: function (editor) {
-                editor.ui.registry.addButton('media-library', {
-                    text: 'Select Image',
-                    icon: 'image',
-                    onAction: function () {
-                        // Open Media Modal
-                        MediaModal.open(function(url) {
-                            editor.insertContent(`<img src="${url}" style="max-width:100%; height:auto;" />`);
-                        });
-                    }
-                });
-            },
-            
-            // Disable default file picker in favor of custom button (optional, but cleaner)
-            image_title: true,
-            automatic_uploads: true,
-            file_picker_types: 'image',
-            content_style: 'body { font-family:Inter,sans-serif; font-size:14px }'
+        // Initialize TinyMCE globally
+        document.addEventListener('DOMContentLoaded', function() {
+            tinymce.init({
+                selector: '.rich-editor',
+                height: 300,
+                menubar: false,
+                plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
+                toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image media-library | code',
+
+                // Custom Button for Media Library
+                setup: function(editor) {
+                    editor.ui.registry.addButton('media-library', {
+                        text: 'Select Image',
+                        icon: 'image',
+                        onAction: function() {
+                            // Open Media Modal
+                            MediaModal.open(function(url) {
+                                editor.insertContent(`<img src="${url}" style="max-width:100%; height:auto;" />`);
+                            });
+                        }
+                    });
+                },
+
+                // Disable default file picker in favor of custom button (optional, but cleaner)
+                image_title: true,
+                automatic_uploads: true,
+                file_picker_types: 'image',
+                content_style: 'body { font-family:Inter,sans-serif; font-size:14px }'
+            });
         });
-    });
     </script>
-    
+
     <script src="<?php echo app_base_url('themes/admin/assets/js/admin.js?v=' . time()); ?>"></script>
     <script src="<?php echo app_base_url('public/assets/js/global-notifications.js'); ?>"></script>
     <script src="<?php echo app_base_url('themes/admin/assets/js/notification-fixed.js'); ?>"></script>
@@ -1281,7 +1283,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
     </script>
 
 
-    
+
     <!-- Global Notifications System -->
     <script src="<?php echo app_base_url('public/assets/js/global-notifications.js'); ?>"></script>
 
@@ -1327,156 +1329,194 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
     <div id="search-overlay" class="search-overlay">
         <div class="search-container">
             <div class="search-input-wrapper">
-                 <i class="fas fa-search search-icon"></i>
-                 <input type="text" id="global-search-input" placeholder="Type to search..." autocomplete="off">
-                 <i class="fas fa-spinner fa-spin search-spinner" style="display:none;"></i>
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="global-search-input" placeholder="Type to search..." autocomplete="off">
+                <i class="fas fa-spinner fa-spin search-spinner" style="display:none;"></i>
             </div>
             <div id="search-results" class="search-results"></div>
             <div class="search-footer">
-                 Press ESC to close
+                Press ESC to close
             </div>
         </div>
         <button class="close-search" onclick="toggleSearch()"><i class="fas fa-times"></i></button>
     </div>
 
     <style>
-    /* Search Overlay Styles */
-    .search-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(15, 23, 42, 0.8);
-        backdrop-filter: blur(8px);
-        z-index: 99999;
-        display: none;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        align-items: flex-start;
-        justify-content: center;
-        padding-top: 100px;
-    }
-    .search-overlay.open {
-        display: flex;
-        opacity: 1;
-    }
-    .search-container {
-        width: 100%;
-        max-width: 600px;
-        background: transparent;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        transform: translateY(-20px);
-        transition: transform 0.3s ease;
-    }
-    .search-overlay.open .search-container {
-        transform: translateY(0);
-    }
-    .search-input-wrapper {
-        position: relative;
-        width: 100%;
-        background: var(--admin-white);
-        border-radius: 12px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        display: flex;
-        align-items: center;
-        overflow: hidden;
-    }
-    .search-input-wrapper .search-icon {
-        position: absolute;
-        left: 20px;
-        font-size: 1.2rem;
-        color: var(--admin-gray-400);
-    }
-    .search-input-wrapper .search-spinner {
-        position: absolute;
-        right: 20px;
-        font-size: 1.2rem;
-        color: var(--admin-primary);
-    }
-    #global-search-input {
-        width: 100%;
-        padding: 1.5rem 1.5rem 1.5rem 3.5rem;
-        font-size: 1.2rem;
-        border: none;
-        outline: none;
-        background: transparent;
-        color: var(--admin-gray-800);
-    }
-    .search-results {
-        background: var(--admin-white);
-        border-radius: 12px;
-        overflow: hidden;
-        max-height: 50vh;
-        overflow-y: auto;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        display: none; 
-    }
-    .search-result-item {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid var(--admin-gray-200);
-        cursor: pointer;
-        text-decoration: none;
-        color: var(--admin-gray-800);
-        transition: background 0.2s;
-    }
-    .search-result-item:last-child { border-bottom: none; }
-    .search-result-item:hover { background: var(--admin-gray-50); }
-    .search-result-icon {
-        width: 32px;
-        height: 32px;
-        background: var(--admin-gray-100);
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--admin-gray-600);
-    }
-    .search-result-info {
-        display: flex;
-        flex-direction: column;
-    }
-    .search-result-title { font-weight: 500; font-size: 1rem; }
-    .search-result-type { font-size: 0.75rem; color: var(--admin-gray-500); text-transform: uppercase; font-weight: 600; }
-    .close-search {
-        position: absolute;
-        top: 30px;
-        right: 30px;
-        background: white;
-        border: none;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 1.2rem;
-        color: var(--admin-gray-600);
-        transition: transform 0.2s;
-    }
-    .close-search:hover { transform: rotate(90deg); color: var(--admin-danger); }
-    .search-footer { color: rgba(255,255,255,0.6); text-align: center; font-size: 0.8rem; margin-top: 1rem; }
+        /* Search Overlay Styles */
+        .search-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 99999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 100px;
+        }
+
+        .search-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .search-overlay.open .search-container {
+            transform: translateY(0);
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            width: 100%;
+            background: var(--admin-white);
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .search-input-wrapper .search-icon {
+            position: absolute;
+            left: 20px;
+            font-size: 1.2rem;
+            color: var(--admin-gray-400);
+        }
+
+        .search-input-wrapper .search-spinner {
+            position: absolute;
+            right: 20px;
+            font-size: 1.2rem;
+            color: var(--admin-primary);
+        }
+
+        #global-search-input {
+            width: 100%;
+            padding: 1.5rem 1.5rem 1.5rem 3.5rem;
+            font-size: 1.2rem;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: var(--admin-gray-800);
+        }
+
+        .search-results {
+            background: var(--admin-white);
+            border-radius: 12px;
+            overflow: hidden;
+            max-height: 50vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--admin-gray-200);
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--admin-gray-800);
+            transition: background 0.2s;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-item:hover {
+            background: var(--admin-gray-50);
+        }
+
+        .search-result-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--admin-gray-100);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--admin-gray-600);
+        }
+
+        .search-result-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .search-result-title {
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .search-result-type {
+            font-size: 0.75rem;
+            color: var(--admin-gray-500);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .close-search {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--admin-gray-600);
+            transition: transform 0.2s;
+        }
+
+        .close-search:hover {
+            transform: rotate(90deg);
+            color: var(--admin-danger);
+        }
+
+        .search-footer {
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        }
     </style>
 
     <script>
         function toggleSearch() {
             const overlay = document.getElementById('search-overlay');
             const input = document.getElementById('global-search-input');
-            
+
             if (overlay.classList.contains('open')) {
                 overlay.classList.remove('open');
                 setTimeout(() => overlay.style.display = 'none', 300);
-                 document.body.style.overflow = '';
+                document.body.style.overflow = '';
             } else {
                 overlay.style.display = 'flex';
                 // Trigger reflow
-                overlay.offsetHeight; 
+                overlay.offsetHeight;
                 overlay.classList.add('open');
                 setTimeout(() => input.focus(), 100);
                 document.body.style.overflow = 'hidden';
@@ -1493,7 +1533,7 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
             searchInput.addEventListener('input', (e) => {
                 const query = e.target.value.trim();
                 clearTimeout(searchTimeout);
-                
+
                 if (query.length < 2) {
                     resultsContainer.style.display = 'none';
                     resultsContainer.innerHTML = '';
@@ -1501,14 +1541,14 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                 }
 
                 searchSpinner.style.display = 'block';
-                
+
                 searchTimeout = setTimeout(() => {
                     fetch('<?php echo app_base_url('/admin/api/search?q='); ?>' + encodeURIComponent(query))
                         .then(r => r.json())
                         .then(data => {
                             searchSpinner.style.display = 'none';
                             resultsContainer.innerHTML = '';
-                            
+
                             if (data.length > 0) {
                                 resultsContainer.style.display = 'block';
                                 data.forEach(item => {
@@ -1523,8 +1563,8 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                                     `;
                                 });
                             } else {
-                                 resultsContainer.style.display = 'block';
-                                 resultsContainer.innerHTML = '<div style="padding:1.5rem; text-align:center; color:var(--admin-gray-500);">No results found</div>';
+                                resultsContainer.style.display = 'block';
+                                resultsContainer.innerHTML = '<div style="padding:1.5rem; text-align:center; color:var(--admin-gray-500);">No results found</div>';
                             }
                         })
                         .catch(err => {
@@ -1542,8 +1582,8 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
             }
             // CMD+K or CTRL+K
             if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-                 e.preventDefault();
-                 toggleSearch();
+                e.preventDefault();
+                toggleSearch();
             }
         });
     </script>

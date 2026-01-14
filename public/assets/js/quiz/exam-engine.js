@@ -84,12 +84,13 @@ const ExamEngine = {
                 optsArray.push({ key: 1, val: "True", color: "success" });
                 optsArray.push({ key: 2, val: "False", color: "danger" });
             } else {
-                // MCQ
-                for (let k = 1; k <= 5; k++) {
-                    if (opts['option_' + k]) {
-                        optsArray.push({ key: k, val: opts['option_' + k] });
+                // MCQ - Dynamically iterate over all options
+                Object.keys(opts).forEach(key => {
+                    if (opts[key] && key.startsWith('option_')) {
+                        const optNum = parseInt(key.replace('option_', ''));
+                        optsArray.push({ key: optNum, val: opts[key] });
                     }
-                }
+                });
             }
 
             inputHTML = `<div class="d-flex flex-column gap-3 mt-4">`;

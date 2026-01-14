@@ -2125,6 +2125,7 @@ $router->add("POST", "/quiz/save-answer", "Quiz\\ExamEngineController@saveAnswer
 $router->add("POST", "/quiz/submit", "Quiz\\ExamEngineController@submit", ["auth", "csrf"]);
 $router->add("GET", "/quiz/result/{id}", "Quiz\\ExamEngineController@result", ["auth"]);
 $router->add("GET", "/quiz/leaderboard", "Quiz\\LeaderboardController@index");
+$router->add("POST", "/quiz/report-question", "Quiz\\ReportController@submit", ["auth"]);
 
 
 // Multiplayer / Ghost Mode Routes
@@ -2203,6 +2204,59 @@ $router->add('GET', '/exams/result/{id}', 'ExamController@result');
 
 // Leaderboard (Phase 19)
 $router->add('GET', '/leaderboard', 'Quiz\\LeaderboardController@index', ['auth']);
+
+// ============================================
+// FIRMS/GUILDS SYSTEM
+// ============================================
+$router->add('GET', '/quiz/firms', 'Quiz\\FirmController@index', ['auth']);
+$router->add('GET', '/quiz/firms/dashboard', 'Quiz\\FirmController@dashboard', ['auth']);
+$router->add('POST', '/quiz/firms/create', 'Quiz\\FirmController@create', ['auth']);
+$router->add('POST', '/quiz/firms/join', 'Quiz\\FirmController@join', ['auth']);
+$router->add('POST', '/quiz/firms/donate', 'Quiz\\FirmController@donate', ['auth']);
+$router->add('POST', '/quiz/firms/handle-request', 'Quiz\\FirmController@handleJoinRequest', ['auth']);
+$router->add('POST', '/quiz/firms/leave', 'Quiz\\FirmController@leave', ['auth']);
+
+// ============================================
+// GAMIFICATION FEATURES
+// ============================================
+$router->add('GET', '/quiz/gamification/city', 'Quiz\\GamificationController@city', ['auth']);
+$router->add('POST', '/quiz/gamification/build', 'Quiz\\GamificationController@build', ['auth']);
+$router->add('GET', '/quiz/gamification/shop', 'Quiz\\GamificationController@shop', ['auth']);
+$router->add('POST', '/quiz/gamification/purchase-lifeline', 'Quiz\\GamificationController@purchaseLifeline', ['auth']);
+$router->add('POST', '/quiz/gamification/use-lifeline', 'Quiz\\GamificationController@useLifeline', ['auth']);
+$router->add('GET', '/quiz/gamification/sawmill', 'Quiz\\GamificationController@sawmill', ['auth']);
+$router->add('POST', '/quiz/gamification/craft', 'Quiz\\GamificationController@craft', ['auth']);
+$router->add('POST', '/quiz/gamification/purchase-resource', 'Quiz\\GamificationController@purchaseResource', ['auth']);
+$router->add('POST', '/quiz/gamification/sell-resource', 'Quiz\\GamificationController@sellResource', ['auth']);
+$router->add('POST', '/quiz/gamification/purchase-bundle', 'Quiz\\GamificationController@purchaseBundle', ['auth']);
+$router->add('GET', '/quiz/gamification/battle-pass', 'Quiz\\GamificationController@battlePass', ['auth']);
+$router->add('POST', '/quiz/gamification/claim-reward', 'Quiz\\GamificationController@claimReward', ['auth']);
+
+// ============================================
+// MULTIPLAYER SYSTEM
+// ============================================
+$router->add('GET', '/quiz/multiplayer', 'Quiz\\MultiplayerController@index', ['auth']);
+$router->add('POST', '/quiz/multiplayer/create', 'Quiz\\MultiplayerController@create', ['auth']);
+$router->add('POST', '/quiz/multiplayer/join', 'Quiz\\MultiplayerController@join', ['auth']);
+$router->add('GET', '/quiz/multiplayer/lobby/{code}', 'Quiz\\MultiplayerController@lobby', ['auth']);
+$router->add('POST', '/quiz/multiplayer/wager', 'Quiz\\MultiplayerController@placeWager', ['auth']);
+$router->add('GET', '/quiz/multiplayer/status/{code}', 'Quiz\\MultiplayerController@status', ['auth']);
+
+// ============================================
+// DAILY QUIZ SYSTEM
+// ============================================
+$router->add('GET', '/quiz/daily/start', 'Quiz\\DailyQuizController@start', ['auth']);
+$router->add('GET', '/quiz/daily/history', 'Quiz\\DailyQuizController@history', ['auth']);
+$router->add('GET', '/quiz/daily/result/{id}', 'Quiz\\DailyQuizController@result', ['auth']);
+
+// ============================================
+// CONTESTS/GAMES SYSTEM (Additional Routes)
+// ============================================
+$router->add('GET', '/quiz/contests', 'Quiz\\StudentContestController@index', ['auth']);
+$router->add('POST', '/quiz/contests/join/{id}', 'Quiz\\StudentContestController@join', ['auth']);
+$router->add('GET', '/quiz/contests/room/{id}', 'Quiz\\StudentContestController@room', ['auth']);
+$router->add('POST', '/quiz/contests/submit/{id}', 'Quiz\\StudentContestController@submit', ['auth']);
+$router->add('GET', '/quiz/contests/result/{id}', 'Quiz\\StudentContestController@result', ['auth']);
 
 // CALCULATOR PERMALINK CATCH-ALL ROUTE
 // Must be at the end to not interfere with other routes

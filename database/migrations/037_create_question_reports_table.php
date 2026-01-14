@@ -2,14 +2,16 @@
 
 use App\Core\Database;
 
-class Migration_Create_Question_Reports_Table {
-    public function up() {
+class Migration_Create_Question_Reports_Table
+{
+    public function up()
+    {
         $db = Database::getInstance();
         $sql = "CREATE TABLE IF NOT EXISTS `question_reports` (
             `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
             `question_id` BIGINT(20) UNSIGNED NOT NULL,
             `user_id` INT(11) UNSIGNED NOT NULL,
-            `issue_type` ENUM('typo', 'wrong_answer', 'confusing', 'other') DEFAULT 'other',
+            `issue_type` ENUM('typo', 'wrong_answer', 'missing_content', 'out_of_syllabus', 'other') DEFAULT 'other',
             `description` TEXT,
             `status` ENUM('pending', 'resolved', 'ignored') DEFAULT 'pending',
             `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -19,7 +21,7 @@ class Migration_Create_Question_Reports_Table {
             KEY `user_id` (`user_id`),
             KEY `status` (`status`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
-        
+
         try {
             $db->query($sql);
             echo "Table question_reports created successfully.\n";
@@ -28,7 +30,8 @@ class Migration_Create_Question_Reports_Table {
         }
     }
 
-    public function down() {
+    public function down()
+    {
         $db = Database::getInstance();
         $db->query("DROP TABLE IF EXISTS `question_reports`");
     }

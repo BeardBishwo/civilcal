@@ -11,8 +11,8 @@ class ExamController extends Controller
     {
         parent::__construct();
         if (!$this->auth->check() || !$this->auth->isAdmin()) {
-             header('Location: ' . app_base_url('login'));
-             exit;
+            header('Location: ' . app_base_url('login'));
+            exit;
         }
     }
 
@@ -25,7 +25,7 @@ class ExamController extends Controller
         // Build Query
         $params = [];
         $where = ["1=1"];
-        
+
         if (!empty($_GET['status'])) {
             $where[] = "e.status = ?";
             $params[] = $_GET['status'];
@@ -85,9 +85,9 @@ class ExamController extends Controller
         try {
             $title = $_POST['title'] ?? '';
             $slug = $_POST['slug'] ?? $this->slugify($title);
-            
+
             if (empty($title)) throw new Exception("Title is required");
-            
+
             $data = [
                 'title' => $title,
                 'slug' => $slug,
@@ -106,10 +106,10 @@ class ExamController extends Controller
                 'course_id' => !empty($_POST['course_id']) ? $_POST['course_id'] : null,
                 'education_level_id' => !empty($_POST['education_level_id']) ? $_POST['education_level_id'] : null
             ];
-            
+
             if (!empty($_POST['start_datetime'])) $data['start_datetime'] = $_POST['start_datetime'];
             if (!empty($_POST['end_datetime'])) $data['end_datetime'] = $_POST['end_datetime'];
-            
+
             $this->db->insert('quiz_exams', $data);
             $examId = $this->db->lastInsertId();
 
@@ -122,7 +122,7 @@ class ExamController extends Controller
                     ]);
                 }
             }
-            
+
             $this->jsonResponse(['success' => true, 'message' => 'Exam Created', 'redirect' => app_base_url('admin/quiz/exams/builder/' . $examId)]);
         } catch (Exception $e) {
             $this->jsonResponse(['success' => false, 'error' => $e->getMessage()]);
@@ -152,7 +152,7 @@ class ExamController extends Controller
     {
         try {
             $title = $_POST['title'] ?? '';
-            
+
             $data = [
                 'title' => $title,
                 'description' => $_POST['description'] ?? '',
@@ -170,13 +170,13 @@ class ExamController extends Controller
                 'course_id' => !empty($_POST['course_id']) ? $_POST['course_id'] : null,
                 'education_level_id' => !empty($_POST['education_level_id']) ? $_POST['education_level_id'] : null
             ];
-            
+
             if (!empty($_POST['slug'])) $data['slug'] = $_POST['slug'];
             if (!empty($_POST['start_datetime'])) $data['start_datetime'] = $_POST['start_datetime'];
             if (!empty($_POST['end_datetime'])) $data['end_datetime'] = $_POST['end_datetime'];
 
             $this->db->update('quiz_exams', $data, "id = :id", ['id' => $id]);
-            
+
             // Sync Position Levels
             $this->db->delete('exam_position_levels', "exam_id = :id", ['id' => $id]);
             if (!empty($_POST['position_levels'])) {
@@ -187,7 +187,7 @@ class ExamController extends Controller
                     ]);
                 }
             }
-            
+
             $this->jsonResponse(['success' => true, 'message' => 'Exam Updated', 'redirect' => app_base_url('admin/quiz/exams')]);
         } catch (Exception $e) {
             $this->jsonResponse(['success' => false, 'error' => $e->getMessage()]);
@@ -204,10 +204,10 @@ class ExamController extends Controller
             header('Location: ' . app_base_url('admin/quiz/exams'));
             exit;
         }
-        
+
         // Fetch existing questions in this exam
         $sql = "
-            SELECT eq.*, q.content, q.type, q.difficulty_level 
+            SELECT eq.*, q.question, q.type, q.difficulty_level 
             FROM quiz_exam_questions eq 
             JOIN quiz_questions q ON eq.question_id = q.id 
             WHERE eq.exam_id = :exam_id 
@@ -216,11 +216,18 @@ class ExamController extends Controller
         $stmt = $this->db->getPdo()->prepare($sql);
         $stmt->execute(['exam_id' => $id]);
         $questions = $stmt->fetchAll();
-        
-        // Decode JSON content slightly for summary preview
+
+
+        // Decode JSON question slightly for summary preview
         foreach ($questions as &$q) {
-            $c = json_decode($q['content'], true);
-            $q['summary_text'] = substr(strip_tags($c['text'] ?? ''), 0, 100);
+            // The 'question' field might be JSON or plain text
+            $questionText = $q['question'] ?? '';
+            if (json_decode($questionText)) {
+                $c = json_decode($questionText, true);
+                $q['summary_text'] = substr(strip_tags($c['text'] ?? $questionText), 0, 100);
+            } else {
+                $q['summary_text'] = substr(strip_tags($questionText), 0, 100);
+            }
         }
 
         $this->view->render('admin/quiz/exams/builder', [
@@ -229,7 +236,7 @@ class ExamController extends Controller
             'existing_questions' => $questions
         ]);
     }
-    
+
     /**
      * API to Add Question to Exam
      */
@@ -238,42 +245,42 @@ class ExamController extends Controller
         try {
             $examId = $_POST['exam_id'];
             $questionId = $_POST['question_id'];
-            
+
             // Check if already exists
             $exists = $this->db->count('quiz_exam_questions', ['exam_id' => $examId, 'question_id' => $questionId]);
             if ($exists) throw new Exception("Question already in this exam");
-            
+
             // Get max order
             $stmt = $this->db->getPdo()->prepare("SELECT MAX(`order`) FROM quiz_exam_questions WHERE exam_id = ?");
             $stmt->execute([$examId]);
             $maxOrder = $stmt->fetchColumn() ?: 0;
-            
+
             $this->db->insert('quiz_exam_questions', [
                 'exam_id' => $examId,
                 'question_id' => $questionId,
                 'order' => $maxOrder + 1
             ]);
-            
+
             $this->jsonResponse(['success' => true, 'message' => 'Added']);
         } catch (Exception $e) {
             $this->jsonResponse(['success' => false, 'error' => $e->getMessage()]);
         }
     }
-    
+
     public function removeQuestionFromExam()
     {
-         try {
+        try {
             $examId = $_POST['exam_id'];
             $questionId = $_POST['question_id'];
-            
+
             $this->db->delete('quiz_exam_questions', "exam_id = :eid AND question_id = :qid", ['eid' => $examId, 'qid' => $questionId]);
-            
+
             $this->jsonResponse(['success' => true, 'message' => 'Removed']);
         } catch (Exception $e) {
             $this->jsonResponse(['success' => false, 'error' => $e->getMessage()]);
         }
     }
-    
+
     // --- Helpers ---
 
     private function slugify($text)

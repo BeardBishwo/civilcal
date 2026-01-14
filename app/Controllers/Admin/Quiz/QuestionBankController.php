@@ -95,7 +95,7 @@ class QuestionBankController extends Controller
 
         // Search
         if (!empty($_GET['search'])) {
-            $where[] = "JSON_UNQUOTE(JSON_EXTRACT(q.content, '$.text')) LIKE :search";
+            $where[] = "JSON_UNQUOTE(JSON_EXTRACT(q.question, '$.text')) LIKE :search OR q.question LIKE :search";
             $params['search'] = '%' . $_GET['search'] . '%';
         }
 
@@ -230,7 +230,7 @@ class QuestionBankController extends Controller
         }
 
         // Decode JSON fields
-        $question['content'] = json_decode($question['content'], true);
+        $question['content'] = json_decode($question['question'] ?? '{}', true);
         $question['options'] = json_decode($question['options'], true);
         $question['tags'] = json_decode($question['tags'] ?? '[]', true);
         $question['level_tags'] = json_decode($question['level_tags'] ?? '[]', true);
@@ -332,7 +332,7 @@ class QuestionBankController extends Controller
                 'category_id' => $filterContext['category_id'],
                 'sub_category_id' => $filterContext['sub_category_id'],
                 'type' => $type,
-                'content' => json_encode($content),
+                'question' => json_encode($content),
                 'options' => json_encode($options),
                 'answer_explanation' => $_POST['answer_explanation'] ?? '',
                 'difficulty_level' => $_POST['difficulty_level'] ?? 3,
@@ -456,7 +456,7 @@ class QuestionBankController extends Controller
                 'edu_level_id' => $filterContext['edu_level_id'],
                 'category_id' => $filterContext['category_id'],
                 'sub_category_id' => $filterContext['sub_category_id'],
-                'content' => json_encode($content),
+                'question' => json_encode($content),
                 'options' => json_encode($options),
                 'answer_explanation' => $_POST['answer_explanation'] ?? '',
                 'difficulty_level' => $_POST['difficulty_level'] ?? 3,

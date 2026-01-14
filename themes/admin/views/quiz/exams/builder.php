@@ -4,8 +4,8 @@
             <h1 class="h3 mb-0 text-gray-800">Exam Builder: <?php echo htmlspecialchars($exam['title']); ?></h1>
             <p class="mb-0 text-gray-600">
                 <span class="mr-3"><i class="fas fa-clock"></i> <?php echo $exam['duration_minutes']; ?> mins</span>
-                <span class="mr-3"><i class="fas fa-question-circle"></i> <?php echo count($questions); ?> Questions</span>
-                <span class="mr-3"><i class="fas fa-star"></i> <?php echo $total_marks; ?> Marks</span>
+                <span class="mr-3"><i class="fas fa-question-circle"></i> <?php echo count($existing_questions); ?> Questions</span>
+                <span class="mr-3"><i class="fas fa-star"></i> <?php echo $exam['total_marks'] ?? 0; ?> Marks</span>
             </p>
         </div>
         <div>
@@ -60,22 +60,28 @@
 
         <!-- RIGHT: Current Exam Questions -->
         <div class="col-lg-7">
-             <div class="card shadow mb-4">
+            <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-success">Exam Questions (<?php echo count($questions); ?>)</h6>
+                    <h6 class="m-0 font-weight-bold text-success">Exam Questions (<?php echo count($existing_questions); ?>)</h6>
                 </div>
                 <div class="card-body p-0">
-                    <?php if (empty($questions)): ?>
+                    <?php if (empty($existing_questions)): ?>
                         <div class="text-center py-5">
                             <img src="<?php echo app_base_url('assets/images/empty.svg'); ?>" alt="Empty" style="width: 100px; opacity: 0.5;">
                             <p class="mt-3 text-gray-500">No questions in this exam yet.</p>
                         </div>
                     <?php else: ?>
                         <div class="list-group list-group-flush">
-                            <?php foreach ($questions as $index => $q): ?>
-                                <?php 
-                                    $content = json_decode($q['content'], true); 
-                                    $text = strip_tags($content['text'] ?? '');
+                            <?php foreach ($existing_questions as $index => $q): ?>
+                                <?php
+                                // Handle both 'content' (from cache) and 'question' (from DB)
+                                $questionData = isset($q['content']) ? $q['content'] : $q['question'];
+                                if (is_string($questionData)) {
+                                    $content = json_decode($questionData, true);
+                                } else {
+                                    $content = $questionData;
+                                }
+                                $text = strip_tags($content['text'] ?? $questionData ?? '');
                                 ?>
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     <div style="width: 85%;">
@@ -121,8 +127,11 @@
 
         $('#searchResults').html('<div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> Loading...</div>');
 
-        $.get(searchUrl, { q: term, type: type }, function(data) {
-            if(data.length === 0) {
+        $.get(searchUrl, {
+            q: term,
+            type: type
+        }, function(data) {
+            if (data.length === 0) {
                 $('#searchResults').html('<div class="text-center text-muted py-3">No questions found.</div>');
                 return;
             }
@@ -147,8 +156,11 @@
     }
 
     function addQuestion(questionId) {
-        $.post(addUrl, { exam_id: examId, question_id: questionId }, function(res) {
-            if(res.success) {
+        $.post(addUrl, {
+            exam_id: examId,
+            question_id: questionId
+        }, function(res) {
+            if (res.success) {
                 location.reload(); // Reload to update list and stats
             } else {
                 alert('Error: ' + res.error);
@@ -157,16 +169,19 @@
     }
 
     function removeQuestion(questionId) {
-        if(!confirm('Remove this question from exam?')) return;
-        $.post(removeUrl, { exam_id: examId, question_id: questionId }, function(res) {
-            if(res.success) {
+        if (!confirm('Remove this question from exam?')) return;
+        $.post(removeUrl, {
+            exam_id: examId,
+            question_id: questionId
+        }, function(res) {
+            if (res.success) {
                 location.reload();
             } else {
                 alert('Error: ' + res.error);
             }
         });
     }
-    
+
     // Initial load
     loadResults();
 </script>

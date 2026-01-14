@@ -63,8 +63,8 @@ class StripeService
             $price = $plan['price_yearly'];
             $description = $plan['name'] . ' - Yearly Subscription';
         } elseif ($type === 'lifetime') {
-             $price = $plan['price_lifetime'];
-             $description = $plan['name'] . ' - Lifetime Access';
+            $price = $plan['price_lifetime'];
+            $description = $plan['name'] . ' - Lifetime Access';
         }
 
         // Create Checkout Session
@@ -94,7 +94,6 @@ class StripeService
             ]);
 
             return $session->url;
-
         } catch (\Exception $e) {
             throw new \Exception('Stripe Checkout Error: ' . $e->getMessage());
         }
@@ -105,21 +104,21 @@ class StripeService
      */
     public function handleCallback($sessionId, $planId, $type)
     {
-         $config = $this->getConfig();
-         $stripe = new StripeClient($config['secret']);
+        $config = $this->getConfig();
+        $stripe = new StripeClient($config['secret']);
 
-         try {
-             $session = $stripe->checkout->sessions->retrieve($sessionId);
+        try {
+            $session = $stripe->checkout->sessions->retrieve($sessionId);
 
-             if ($session->payment_status === 'paid') {
-                 // Fulfill the order
-                 return $this->fulfillOrder($session);
-             }
-         } catch (\Exception $e) {
-             error_log('Stripe Callback Error: ' . $e->getMessage());
-         }
+            if ($session->payment_status === 'paid') {
+                // Fulfill the order
+                return $this->fulfillOrder($session);
+            }
+        } catch (\Exception $e) {
+            error_log('Stripe Callback Error: ' . $e->getMessage());
+        }
 
-         return false;
+        return false;
     }
 
     /**
@@ -127,74 +126,115 @@ class StripeService
      */
     private function fulfillOrder($session)
     {
-         $userId = $session->metadata->user_id ?? null;
-         $planId = $session->metadata->plan_id ?? null;
-         $type = $session->metadata->type ?? 'monthly';
-         $transactionId = $session->id;
+        $userId = $session->metadata->user_id ?? null;
+        $planId = $session->metadata->plan_id ?? null;
+        $type = $session->metadata->type ?? 'monthly';
+        $transactionId = $session->id;
 
-         if (!$userId) return false;
+        if (!$userId) return false;
 
-         // Idempotency check: Prevent double fulfillment
-         $existingPayment = $this->paymentModel->findByTransactionId($transactionId);
-         if ($existingPayment) {
-             return true; // Already fulfilled
-         }
+        // Idempotency check: Prevent double fulfillment
+        $existingPayment = $this->paymentModel->findByTransactionId($transactionId);
+        if ($existingPayment) {
+            return true; // Already fulfilled
+        }
 
-         // Fetch user to check current subscription
-         $userRecord = $this->userModel->find($userId);
-         if (!$userRecord) return false;
-         
-         $currentExpiry = $userRecord['subscription_ends_at'] ?? null;
-         $baseTime = time();
+        // Fetch user to check current subscription
+        $userRecord = $this->userModel->find($userId);
+        if (!$userRecord) return false;
 
-         // If current subscription is still active, stack on top of it
-         if ($currentExpiry && strtotime($currentExpiry) > $baseTime) {
-             $baseTime = strtotime($currentExpiry);
-         }
+        $currentExpiry = $userRecord['subscription_ends_at'] ?? null;
+        $baseTime = time();
 
-         // Calculate new expiry
-         if ($type === 'yearly') {
-             $expiry = date('Y-m-d H:i:s', strtotime('+1 year', $baseTime));
-         } elseif ($type === 'lifetime') {
-             $expiry = date('Y-m-d H:i:s', strtotime('+100 years', $baseTime));
-         } else {
-             $expiry = date('Y-m-d H:i:s', strtotime('+1 month', $baseTime));
-         }
+        // If current subscription is still active, stack on top of it
+        if ($currentExpiry && strtotime($currentExpiry) > $baseTime) {
+            $baseTime = strtotime($currentExpiry);
+        }
 
-         try {
-             $db = Database::getInstance();
-             $pdo = $db->getPdo();
-             
-             $pdo->beginTransaction();
+        // Calculate new expiry
+        if ($type === 'yearly') {
+            $expiry = date('Y-m-d H:i:s', strtotime('+1 year', $baseTime));
+        } elseif ($type === 'lifetime') {
+            $expiry = date('Y-m-d H:i:s', strtotime('+100 years', $baseTime));
+        } else {
+            $expiry = date('Y-m-d H:i:s', strtotime('+1 month', $baseTime));
+        }
 
-             // Update User
-             $stmt = $pdo->prepare("
-                UPDATE users 
-                SET subscription_id = ?, subscription_status = 'active', subscription_ends_at = ? 
-                WHERE id = ?
-             ");
-             $stmt->execute([$planId, $expiry, $userId]);
+        try {
+            $db = Database::getInstance();
+            $pdo = $db->getPdo();
 
-             // Log Payment
-             $this->paymentModel->create([
-                 'user_id' => $userId,
-                 'subscription_id' => $planId,
-                 'amount' => $session->amount_total / 100,
-                 'currency' => strtoupper($session->currency),
-                 'payment_method' => 'stripe',
-                 'status' => 'completed',
-                 'starts_at' => date('Y-m-d H:i:s'),
-                 'ends_at' => $expiry,
-                 'transaction_id' => $transactionId 
-             ]);
+            $pdo->beginTransaction();
 
-             $pdo->commit();
-             return true;
-         } catch (\Exception $e) {
-             if (isset($pdo)) $pdo->rollBack();
-             error_log('Fulfillment Error: ' . $e->getMessage());
-             return false;
-         }
+            // SECURITY: Prevent subscription downgrade
+            $shouldUpdatePlan = false;
+            $currentPlanId = $userRecord['subscription_id'] ?? null;
+
+            if (!$currentExpiry || strtotime($currentExpiry) < time()) {
+                // Current subscription expired, allow any plan
+                $shouldUpdatePlan = true;
+            } elseif ($currentPlanId) {
+                // Compare plan tiers
+                $currentPlan = $this->subscriptionModel->find($currentPlanId);
+                $newPlan = $this->subscriptionModel->find($planId);
+
+                if ($currentPlan && $newPlan) {
+                    // Use monthly price for comparison (normalize)
+                    $currentPrice = $currentPlan['price_monthly'] ?? 0;
+                    $newPrice = $newPlan['price_monthly'] ?? 0;
+
+                    if ($newPrice >= $currentPrice) {
+                        // Upgrading or same tier, allow
+                        $shouldUpdatePlan = true;
+                    }
+                    // else: Downgrade attempt, keep current plan
+                } else {
+                    // Can't compare, default to updating
+                    $shouldUpdatePlan = true;
+                }
+            } else {
+                // No current plan, allow any
+                $shouldUpdatePlan = true;
+            }
+
+            // Update User
+            if ($shouldUpdatePlan) {
+                $stmt = $pdo->prepare("
+                    UPDATE users 
+                    SET subscription_id = ?, subscription_status = 'active', subscription_ends_at = ? 
+                    WHERE id = ?
+                 ");
+                $stmt->execute([$planId, $expiry, $userId]);
+            } else {
+                // Just extend expiry, keep current plan (prevent downgrade)
+                $stmt = $pdo->prepare("
+                    UPDATE users 
+                    SET subscription_status = 'active', subscription_ends_at = ? 
+                    WHERE id = ?
+                 ");
+                $stmt->execute([$expiry, $userId]);
+            }
+
+            // Log Payment
+            $this->paymentModel->create([
+                'user_id' => $userId,
+                'subscription_id' => $planId,
+                'amount' => $session->amount_total / 100,
+                'currency' => strtoupper($session->currency),
+                'payment_method' => 'stripe',
+                'status' => 'completed',
+                'starts_at' => date('Y-m-d H:i:s'),
+                'ends_at' => $expiry,
+                'transaction_id' => $transactionId
+            ]);
+
+            $pdo->commit();
+            return true;
+        } catch (\Exception $e) {
+            if (isset($pdo)) $pdo->rollBack();
+            error_log('Fulfillment Error: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -207,13 +247,15 @@ class StripeService
 
         try {
             $event = Webhook::constructEvent(
-                $payload, $sigHeader, $endpoint_secret
+                $payload,
+                $sigHeader,
+                $endpoint_secret
             );
-        } catch(\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException $e) {
             // Invalid payload
             http_response_code(400);
             exit();
-        } catch(\Stripe\Exception\SignatureVerificationException $e) {
+        } catch (\Stripe\Exception\SignatureVerificationException $e) {
             // Invalid signature
             http_response_code(400);
             exit();

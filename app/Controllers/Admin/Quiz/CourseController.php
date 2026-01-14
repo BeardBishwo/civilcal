@@ -15,6 +15,7 @@ class CourseController extends Controller
     {
         parent::__construct();
         $this->requireAuth();
+        $this->requireAdmin(); // SECURITY: Ensure only admins can manage courses
         $this->db = Database::getInstance();
         $this->syllabusService = new SyllabusService();
     }
@@ -88,7 +89,7 @@ class CourseController extends Controller
 
         // Generate Slug
         $slug = $this->syllabusService->slugify($title);
-        
+
         // Get Max Order
         $stmt = $this->db->getPdo()->query("SELECT MAX(order_index) FROM syllabus_nodes WHERE type = 'course'");
         $maxOrder = $stmt->fetchColumn();
@@ -129,18 +130,18 @@ class CourseController extends Controller
     {
         // Check for JSON input (flags)
         $input = json_decode(file_get_contents('php://input'), true);
-        
+
         // If DELETE_ALL is requested or legacy simple delete
         if (isset($input['delete_all']) && $input['delete_all'] === true) {
-             // Standard recursive delete (all children go)
-             // We can simulate this by passing ALL types, or just using simple deleteNode if logic permits.
-             // But deleteNode might rely on DB cascade. Let's use simple deleteNode for "Delete All".
-             if ($this->syllabusService->deleteNode($id)) {
-                 echo json_encode(['status' => 'success']);
-             } else {
-                 echo json_encode(['status' => 'error']);
-             }
-             return;
+            // Standard recursive delete (all children go)
+            // We can simulate this by passing ALL types, or just using simple deleteNode if logic permits.
+            // But deleteNode might rely on DB cascade. Let's use simple deleteNode for "Delete All".
+            if ($this->syllabusService->deleteNode($id)) {
+                echo json_encode(['status' => 'success']);
+            } else {
+                echo json_encode(['status' => 'error']);
+            }
+            return;
         }
 
         // Selective Delete
@@ -215,7 +216,7 @@ class CourseController extends Controller
         $baseTitle = $original['title'];
         // Remove existing version suffix if any (e.g., "Course (V1)" -> "Course")
         $baseTitle = preg_replace('/\s*\(V\d+\)$/', '', $baseTitle);
-        
+
         $newTitle = $baseTitle . ' (V1)';
         $counter = 1;
 

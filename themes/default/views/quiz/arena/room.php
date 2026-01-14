@@ -70,12 +70,76 @@
                 <i class="fas" :class="focusMode ? 'fa-compress' : 'fa-expand'"></i>
             </button>
 
+            <button @click="openReportModal()" class="w-10 h-10 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center transition-colors text-red-500 border border-red-500/20" title="Report Issue">
+                <i class="fas fa-bug"></i>
+            </button>
+
             <button @click="submitExam()" class="bg-green-600 hover:bg-green-500 text-white px-5 py-2 rounded-lg font-semibold transition-all shadow-lg hover:shadow-green-500/20 flex items-center gap-2">
                 <span>Submit</span>
                 <i class="fas fa-paper-plane text-xs"></i>
             </button>
         </div>
     </header>
+
+    <!-- Report Modal -->
+    <div x-show="reporting"
+        class="fixed inset-0 z-[999] flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0">
+        <div class="glass-card w-full max-w-md p-6 border-white/10" @click.away="reporting = false">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold flex items-center gap-2">
+                    <i class="fas fa-flag text-red-500"></i> Report Question
+                </h3>
+                <button @click="reporting = false" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form @submit.prevent="submitReport()">
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-500 font-bold mb-3">What is wrong?</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <template x-for="type in [
+                                {id: 'wrong_answer', label: 'Wrong Answer', icon: 'fa-check-circle'},
+                                {id: 'typo', label: 'Typo/Error', icon: 'fa-font'},
+                                {id: 'missing_content', label: 'Missing Info', icon: 'fa-image'},
+                                {id: 'other', label: 'Other Issue', icon: 'fa-ellipsis-h'}
+                            ]">
+                                <button type="button" @click="reportForm.issue_type = type.id"
+                                    class="flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all gap-2 group"
+                                    :class="reportForm.issue_type === type.id ? 'bg-primary/20 border-primary text-primary shadow-lg shadow-primary/10' : 'bg-white/5 border-white/5 hover:border-white/10 text-gray-400 hover:text-white'">
+                                    <i class="fas text-xl" :class="type.icon"></i>
+                                    <span class="text-xs font-bold" x-text="type.label"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-500 font-bold mb-2">Optional Details</label>
+                        <textarea x-model="reportForm.description"
+                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary outline-none transition-all h-24 resize-none"
+                            placeholder="Help us fix it faster..."></textarea>
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-primary hover:bg-primary/90 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+                        :disabled="isSubmittingReport">
+                        <template x-if="!isSubmittingReport">
+                            <span>Submit Report</span>
+                        </template>
+                        <template x-if="isSubmittingReport">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </template>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Main Layout -->
     <main class="flex-1 flex overflow-hidden">
@@ -155,11 +219,21 @@
                                 class="group relative flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/[0.02] cursor-pointer transition-all hover:bg-white/[0.05] hover:border-primary/50"
                                 :class="{'border-primary bg-primary/10 shadow-lg shadow-primary/5 ring-1 ring-primary/50': isSelected(questions[currentQ].id, key)}">
 
-                                <!-- Radio Indicator -->
-                                <div class="mt-1 w-5 h-5 rounded-full border-2 border-gray-500 group-hover:border-primary flex items-center justify-center shrink-0 transition-colors"
-                                    :class="{'border-primary bg-primary': isSelected(questions[currentQ].id, key)}">
-                                    <div class="w-2 h-2 rounded-full bg-white transform scale-0 transition-transform"
+                                <!-- Radio/Checkbox Indicator -->
+                                <div class="mt-1 w-5 h-5 flex items-center justify-center shrink-0 transition-all"
+                                    :class="{
+                                        'rounded-full border-2 border-gray-500 group-hover:border-primary': questions[currentQ].type !== 'MULTI',
+                                        'rounded border-2 border-gray-500 group-hover:border-primary': questions[currentQ].type === 'MULTI',
+                                        'border-primary bg-primary': isSelected(questions[currentQ].id, key)
+                                    }">
+                                    <!-- Radio Dot -->
+                                    <div x-show="questions[currentQ].type !== 'MULTI'"
+                                        class="w-2 h-2 rounded-full bg-white transform scale-0 transition-transform"
                                         :class="{'scale-100': isSelected(questions[currentQ].id, key)}"></div>
+                                    <!-- Checkbox Tick -->
+                                    <i x-show="questions[currentQ].type === 'MULTI'"
+                                        class="fas fa-check text-[10px] text-white transform scale-0 transition-transform"
+                                        :class="{'scale-100': isSelected(questions[currentQ].id, key)}"></i>
                                 </div>
 
                                 <!-- Option Text -->
@@ -169,45 +243,47 @@
                     </div>
                 </div>
 
-                <!-- Mobile Palette Toggle (Sticky Bottom) -->
-                <div class="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-white/10 p-4 z-40 flex overflow-x-auto gap-2">
-                    <template x-for="(q, index) in questions" :key="q.id">
-                        <button @click="loadQuestion(index)"
-                            class="w-10 h-10 shrink-0 flex items-center justify-center rounded-lg text-sm font-bold border"
-                            :class="{
-                                'bg-primary border-primary text-white': currentQ === index,
-                                'bg-green-500 border-green-500 text-white': currentQ !== index && isAnswered(q.id),
-                                'bg-white/5 border-white/10 text-gray-400': currentQ !== index && !isAnswered(q.id)
-                            }">
-                            <span x-text="index + 1"></span>
-                        </button>
-                    </template>
+                <!-- Navigation Actions -->
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4 mt-8">
+                    <button @click="prevQ()" :disabled="currentQ === 0"
+                        class="w-full md:flex-1 bg-surface hover:bg-surfaceHover text-white px-10 py-4 rounded-xl font-semibold border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+                        <i class="fas fa-arrow-left text-sm"></i> Previous
+                    </button>
+
+                    <button @click="toggleMark(currentQ)"
+                        class="w-full md:flex-1 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 px-10 py-4 rounded-xl font-semibold border border-yellow-500/20 transition-all flex items-center justify-center gap-2 text-center whitespace-nowrap">
+                        <i class="fas fa-flag" :class="{'text-yellow-500': isMarked(currentQ), 'text-yellow-500/50': !isMarked(currentQ)}"></i>
+                        <span x-text="isMarked(currentQ) ? 'Unmark' : 'Mark Question'"></span>
+                    </button>
+
+                    <button @click="nextQ()"
+                        class="w-full md:flex-1 bg-primary hover:bg-primary/90 text-white px-10 py-4 rounded-xl font-semibold shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-3 group whitespace-nowrap">
+                        <span x-text="currentQ === questions.length - 1 ? 'Go to Review' : 'Save & Next'"></span>
+                        <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
+                    </button>
                 </div>
 
             </div>
         </div>
 
-        <!-- Navigation Footer (Desktop) -->
-        <div class="w-full md:w-auto fixed bottom-0 md:bottom-auto md:relative right-0 bg-background/90 md:bg-transparent backdrop-blur md:backdrop-filter-none border-t md:border-t-0 p-4 z-50 flex items-center justify-between md:justify-end gap-4 max-w-4xl mx-auto md:absolute md:bottom-8 md:right-10 md:left-10 pointer-events-none">
-            <div class="pointer-events-auto flex items-center gap-4 w-full justify-between">
-                <button @click="prevQ()" :disabled="currentQ === 0"
-                    class="bg-surface hover:bg-surfaceHover text-white px-6 py-3 rounded-xl font-semibold border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2">
-                    <i class="fas fa-arrow-left"></i> Previous
+        <!-- Mobile Palette Toggle (Sticky Bottom) -->
+        <div class="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-white/10 p-4 z-40 flex overflow-x-auto gap-2">
+            <template x-for="(q, index) in questions" :key="q.id">
+                <button @click="loadQuestion(index)"
+                    class="w-10 h-10 shrink-0 flex items-center justify-center rounded-lg text-sm font-bold border"
+                    :class="{
+                                'bg-primary border-primary text-white': currentQ === index,
+                                'bg-green-500 border-green-500 text-white': currentQ !== index && isAnswered(q.id),
+                                'bg-white/5 border-white/10 text-gray-400': currentQ !== index && !isAnswered(q.id)
+                            }">
+                    <span x-text="index + 1"></span>
                 </button>
-
-                <button @click="toggleMark(currentQ)"
-                    class="bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 px-6 py-3 rounded-xl font-semibold border border-yellow-500/20 transition-all flex items-center gap-2">
-                    <i class="fas fa-flag" :class="{'text-yellow-500': isMarked(currentQ), 'text-yellow-500/50': !isMarked(currentQ)}"></i>
-                    <span x-text="isMarked(currentQ) ? 'Unmark' : 'Mark'"></span>
-                </button>
-
-                <button @click="nextQ()"
-                    class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl font-semibold shadow-lg shadow-primary/20 transition-all flex items-center gap-2 group">
-                    <span x-text="currentQ === questions.length - 1 ? 'Review' : 'Next'"></span>
-                    <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
-                </button>
-            </div>
+            </template>
         </div>
+
+        </div>
+        </div>
+
 
     </main>
 
@@ -226,6 +302,13 @@
 
                 focusMode: false,
                 timerInterval: null,
+
+                reporting: false,
+                isSubmittingReport: false,
+                reportForm: {
+                    issue_type: 'wrong_answer',
+                    description: ''
+                },
 
                 init() {
                     this.startTimer();
@@ -279,11 +362,21 @@
                 },
 
                 parseContent(content) {
-                    // Handle array content (text + image) from legacy system
-                    if (typeof content === 'object' && content !== null) {
-                        let html = content.text || '';
-                        if (content.image) {
-                            html += `<br><img src="${content.image}" class="mt-4 rounded-lg border border-white/10 max-h-96 mx-auto">`;
+                    if (!content) return '';
+                    // Handle JSON string if passed as string
+                    let data = content;
+                    if (typeof content === 'string' && content.startsWith('{')) {
+                        try {
+                            data = JSON.parse(content);
+                        } catch (e) {}
+                    }
+
+                    if (typeof data === 'object' && data !== null) {
+                        let html = data.text || '';
+                        if (data.image) {
+                            // Ensure full URL if it's local path
+                            let imgSrc = data.image.startsWith('http') ? data.image : '<?php echo app_base_url(""); ?>' + data.image;
+                            html += `<div class="mt-6 flex justify-center"><img src="${imgSrc}" class="rounded-2xl border border-white/10 shadow-2xl max-h-96 w-auto object-contain bg-white/5 p-2"></div>`;
                         }
                         return html;
                     }
@@ -302,8 +395,11 @@
                 },
 
                 isSelected(qid, key) {
-                    // Handle looser type comparison just in case
-                    return this.storedAnswers[qid] == key;
+                    const ans = this.storedAnswers[qid];
+                    if (Array.isArray(ans)) {
+                        return ans.includes(key);
+                    }
+                    return ans == key;
                 },
 
                 isAnswered(qid) {
@@ -339,14 +435,29 @@
                 },
 
                 selectOption(qid, key) {
-                    // Optimistic UI Update
-                    this.storedAnswers[qid] = key;
+                    const qType = this.questions[this.currentQ].type;
+
+                    if (qType === 'MULTI') {
+                        if (!Array.isArray(this.storedAnswers[qid])) {
+                            this.storedAnswers[qid] = [];
+                        }
+                        const index = this.storedAnswers[qid].indexOf(key);
+                        if (index > -1) {
+                            this.storedAnswers[qid].splice(index, 1);
+                        } else {
+                            this.storedAnswers[qid].push(key);
+                        }
+                        // Re-assign for reactivity
+                        this.storedAnswers[qid] = [...this.storedAnswers[qid]];
+                    } else {
+                        this.storedAnswers[qid] = key;
+                    }
 
                     // Server Save
                     const formData = new FormData();
                     formData.append('attempt_id', this.attemptId);
                     formData.append('question_id', qid);
-                    formData.append('selected_options', key);
+                    formData.append('selected_options', JSON.stringify(this.storedAnswers[qid]));
                     formData.append('csrf_token', this.csrfToken);
 
                     fetch('<?php echo app_base_url("quiz/save-answer"); ?>', {
@@ -355,12 +466,44 @@
                     }).catch(console.error);
                 },
 
+                openReportModal() {
+                    this.reportForm.description = '';
+                    this.reporting = true;
+                },
+
+                submitReport() {
+                    this.isSubmittingReport = true;
+
+                    const formData = new FormData();
+                    formData.append('question_id', this.questions[this.currentQ].id);
+                    formData.append('issue_type', this.reportForm.issue_type);
+                    formData.append('description', this.reportForm.description); // Fixed: Added description
+                    formData.append('csrf_token', this.csrfToken);
+
+                    fetch('<?php echo app_base_url("quiz/report-question"); ?>', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(res => res.json())
+                        .then(res => {
+                            if (res.success) {
+                                alert(res.message);
+                                this.reporting = false;
+                            } else {
+                                alert('Error submitting report. Please try again.');
+                            }
+                        })
+                        .finally(() => {
+                            this.isSubmittingReport = false;
+                        });
+                },
+
                 submitExam(auto = false) {
                     if (!auto && !confirm('Are you sure you want to finish the exam?')) return;
 
                     const formData = new FormData();
                     formData.append('attempt_id', this.attemptId);
-                    formData.append('nonce', this.nonce);
+                    formData.append('csrf_token', this.csrfToken);
 
                     fetch('<?php echo app_base_url("quiz/submit"); ?>', {
                         method: 'POST',

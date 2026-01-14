@@ -90,12 +90,13 @@ class ContestService
 
         $prizePerWinner = floor($contest['prize_pool'] / max(1, count($winners)));
 
-        // 4. Distribute Prizes
+        // 4. Distribute Prizes - Single Transaction for All Winners
         $pdo = $this->db->getPdo();
-        foreach ($winners as $winner) {
-            try {
-                $pdo->beginTransaction();
 
+        try {
+            $pdo->beginTransaction();
+
+            foreach ($winners as $winner) {
                 // Give User Coins
                 $stmt = $pdo->prepare("UPDATE users SET coins = coins + ? WHERE id = ?");
                 $stmt->execute([$prizePerWinner, $winner['user_id']]);
@@ -121,12 +122,14 @@ class ContestService
                     "CONGRATULATIONS!",
                     "You won the Lucky Draw for " . $contest['title'] . "! " . $prizePerWinner . " coins added to your account."
                 ]);
-
-                $pdo->commit();
-            } catch (\Exception $e) {
-                $pdo->rollBack();
-                // Log error
             }
+
+            $pdo->commit();
+        } catch (\Exception $e) {
+            $pdo->rollBack();
+            // Log error
+            error_log("Contest prize distribution failed: " . $e->getMessage());
+            return false;
         }
 
         // Mark Contest as Ended

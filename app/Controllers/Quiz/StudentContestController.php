@@ -30,9 +30,9 @@ class StudentContestController extends Controller
     public function index()
     {
         $contests = $this->contestModel->getAll();
-        
+
         // Filter: Recent or upcoming
-        $activeContests = array_filter($contests, function($c) {
+        $activeContests = array_filter($contests, function ($c) {
             return $c['status'] !== 'ended' || strtotime($c['end_time']) > (time() - 86400);
         });
 
@@ -48,43 +48,54 @@ class StudentContestController extends Controller
      */
     public function join($id)
     {
+        $pdo = $this->db->getPdo();
+
         try {
             $contest = $this->contestModel->find($id);
             if (!$contest) throw new Exception("Contest not found");
             if ($contest['status'] == 'ended') throw new Exception("Contest has already ended");
-            
-            // Check if already participating
-            $existing = $this->participantModel->where(['contest_id' => $id, 'user_id' => $_SESSION['user_id']]);
-            if ($existing) {
-                return $this->redirect("/contest/room/$id");
-            }
 
             // Check timing
             if (time() < strtotime($contest['start_time'])) {
                 throw new Exception("Contest starts at " . $contest['start_time']);
             }
 
-            // Atomic Coin Deduction (Anti-Race Condition)
-            $stmt = $this->db->getPdo()->prepare("UPDATE users SET coins = coins - :fee WHERE id = :user_id AND coins >= :fee");
-            $stmt->execute([
-                'fee' => $contest['entry_fee'],
-                'user_id' => $_SESSION['user_id']
-            ]);
+            // ATOMIC TRANSACTION: Prevent double entry race condition
+            $pdo->beginTransaction();
 
-            if ($stmt->rowCount() === 0) {
-                throw new Exception("Insufficient coins to join.");
+            try {
+                // Re-check participation with row lock
+                $stmt = $pdo->prepare("SELECT id FROM contest_participants WHERE contest_id = ? AND user_id = ? FOR UPDATE");
+                $stmt->execute([$id, $_SESSION['user_id']]);
+
+                if ($stmt->fetch()) {
+                    $pdo->rollBack();
+                    return $this->redirect("/contest/room/$id");
+                }
+
+                // Atomic coin deduction
+                $stmt = $pdo->prepare("UPDATE users SET coins = coins - :fee WHERE id = :user_id AND coins >= :fee");
+                $stmt->execute([
+                    'fee' => $contest['entry_fee'],
+                    'user_id' => $_SESSION['user_id']
+                ]);
+
+                if ($stmt->rowCount() === 0) {
+                    $pdo->rollBack();
+                    throw new Exception("Insufficient coins to join.");
+                }
+
+                // Create participant
+                $stmt = $pdo->prepare("INSERT INTO contest_participants (contest_id, user_id, score, status, created_at) VALUES (?, ?, 0, 'ongoing', NOW())");
+                $stmt->execute([$id, $_SESSION['user_id']]);
+
+                $pdo->commit();
+            } catch (Exception $e) {
+                $pdo->rollBack();
+                throw $e;
             }
 
-            // Create Participant
-            $this->participantModel->create([
-                'contest_id' => $id,
-                'user_id' => $user['id'],
-                'score' => 0,
-                'status' => 'ongoing'
-            ]);
-
             return $this->redirect("/contest/room/$id");
-
         } catch (Exception $e) {
             $_SESSION['flash_error'] = $e->getMessage();
             return $this->redirect("/contests");
@@ -112,10 +123,10 @@ class StudentContestController extends Controller
         $questions = $stmt->fetchAll();
 
         // Decode JSON content/options and SANITIZE sensitive data
-        foreach($questions as &$q) {
+        foreach ($questions as &$q) {
             $q['content'] = json_decode($q['content'], true);
             $q['options'] = json_decode($q['options'], true);
-            
+
             // SECURITY: Prevent leaking correct answers to the browser
             unset($q['correct_answer']);
             unset($q['correct_answer_json']);
@@ -140,6 +151,16 @@ class StudentContestController extends Controller
 
         if (!$participant) return $this->jsonResponse(['error' => 'Not participating']);
 
+        // SECURITY: Check if contest has ended
+        if (time() > strtotime($contest['end_time'])) {
+            return $this->jsonResponse(['error' => 'Contest has ended. Submission rejected.'], 403);
+        }
+
+        // SECURITY: Check if already submitted
+        if ($participant['status'] === 'completed') {
+            return $this->jsonResponse(['error' => 'Already submitted'], 400);
+        }
+
         // CRITICAL SECURITY: Calculate score server-side
         $userAnswers = $_POST['answers'] ?? []; // Expecting key-value pair [qId => answer]
         if (!is_array($userAnswers)) {
@@ -154,7 +175,7 @@ class StudentContestController extends Controller
 
         $scoringService = new \App\Services\Quiz\ScoringService();
         $totalScore = 0;
-        
+
         // Mock exam settings for contest (can be pulled from contest config later)
         $settings = [
             'negative_marking_rate' => $contest['negative_marking'] ?? 0,
@@ -167,13 +188,14 @@ class StudentContestController extends Controller
             $totalScore += $grade['marks'];
         }
 
-        $timeTaken = (int)$_POST['time_taken'];
+        // SECURITY: Calculate time server-side (prevent client manipulation)
+        $timeTaken = time() - strtotime($participant['created_at']);
 
         $this->participantModel->update($participant['id'], [
-            'score' => max(0, $totalScore), // Ensure no negative total scores unless intended
-            'time_taken' => $timeTaken,
+            'score' => max(0, $totalScore),
+            'time_taken' => $timeTaken, // Server-calculated, not client-provided
             'status' => 'completed',
-            'created_at' => date('Y-m-d H:i:s') 
+            'completed_at' => date('Y-m-d H:i:s')
         ]);
 
         return $this->jsonResponse(['success' => true]);

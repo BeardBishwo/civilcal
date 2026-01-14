@@ -10,6 +10,18 @@ use App\Models\User;
 
 class BountyController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+
+        // SECURITY: Require authentication for all bounty actions
+        if (!Auth::check()) {
+            $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'] ?? '/bounty';
+            header('Location: /login');
+            exit;
+        }
+    }
+
     public function index()
     {
         $this->view('bounty/index', [
@@ -27,12 +39,12 @@ class BountyController extends Controller
             'coins' => (new User())->getCoins(Auth::id())
         ]);
     }
-    
+
     public function show($id)
     {
         $bountyModel = new BountyRequest();
         $bounty = $bountyModel->find($id);
-        
+
         if (!$bounty) {
             http_response_code(404);
             echo "Bounty not found";
@@ -41,7 +53,7 @@ class BountyController extends Controller
 
         $userId = Auth::id();
         $isOwner = ($bounty->requester_id == $userId);
-        
+
         // If owner, show submissions
         $submissions = [];
         if ($isOwner) {

@@ -42,13 +42,26 @@ class PaymentController extends Controller
             exit;
         }
 
-        $user = (new \App\Models\User())->find($_SESSION['user_id']); // Simple user retrieval
-        $planId = $_GET['plan_id'] ?? null;
-        $type = $_GET['type'] ?? 'monthly';
+        // SECURITY: CSRF Protection
+        if (!isset($_POST['csrf_token']) || !\App\Services\Security::validateCsrfToken($_POST['csrf_token'])) {
+            die('Invalid CSRF token. Please refresh the page and try again.');
+        }
+
+        $user = (new \App\Models\User())->find($_SESSION['user_id']);
+        $planId = $_POST['plan_id'] ?? null;
+        $type = $_POST['type'] ?? 'monthly';
 
         if (!$planId) {
             die('Plan ID required');
         }
+
+        // SECURITY: Store payment intent in session to prevent callback manipulation
+        $_SESSION['pending_payment'] = [
+            'plan_id' => $planId,
+            'type' => $type,
+            'user_id' => $_SESSION['user_id'],
+            'created_at' => time()
+        ];
 
         try {
             $redirectUrl = '';
@@ -80,7 +93,6 @@ class PaymentController extends Controller
                 header('Location: ' . $redirectUrl);
                 exit;
             }
-
         } catch (\Exception $e) {
             // Log error
             error_log("Checkout Error [$gateway]: " . $e->getMessage());
@@ -94,53 +106,82 @@ class PaymentController extends Controller
     public function callback($gateway)
     {
         $success = false;
-        
+
+        // SECURITY: Validate payment against session to prevent manipulation
+        $pendingPayment = $_SESSION['pending_payment'] ?? null;
+
+        if (!$pendingPayment) {
+            error_log("Payment callback without pending payment session");
+            header('Location: ' . app_base_url('/pricing?payment=failed&reason=no_session'));
+            exit;
+        }
+
+        // Check session hasn't expired (30 minutes)
+        if (time() - $pendingPayment['created_at'] > 1800) {
+            unset($_SESSION['pending_payment']);
+            error_log("Payment callback with expired session");
+            header('Location: ' . app_base_url('/pricing?payment=failed&reason=expired'));
+            exit;
+        }
+
         try {
             switch ($gateway) {
                 case 'stripe':
                     $sessionId = $_GET['session_id'] ?? null;
-                    $planId = $_GET['plan_id'] ?? null;
-                    $type = $_GET['type'] ?? 'monthly';
-                    
-                    if ($sessionId && $planId) {
-                        $success = $this->stripeService->handleCallback($sessionId, $planId, $type);
+
+                    // SECURITY: Use plan_id from session, not URL
+                    if ($sessionId) {
+                        $success = $this->stripeService->handleCallback(
+                            $sessionId,
+                            $pendingPayment['plan_id'],  // From session, not URL!
+                            $pendingPayment['type']       // From session, not URL!
+                        );
                     }
                     break;
 
                 case 'paypal':
                     $paymentId = $_GET['paymentId'] ?? null;
                     $payerId = $_GET['PayerID'] ?? null;
-                    $planId = $_GET['plan_id'] ?? null;
-                    $type = $_GET['type'] ?? 'monthly';
 
-                    if ($paymentId && $payerId && $planId) {
-                        $success = $this->payPalService->handleCallback($paymentId, $payerId, $planId, $type);
+                    // SECURITY: Use plan_id from session, not URL
+                    if ($paymentId && $payerId) {
+                        $success = $this->payPalService->handleCallback(
+                            $paymentId,
+                            $payerId,
+                            $pendingPayment['plan_id'],  // From session, not URL!
+                            $pendingPayment['type']       // From session, not URL!
+                        );
                     }
                     break;
 
                 case 'mollie':
                     $paymentId = $_GET['id'] ?? null;
-                    $planId = $_GET['plan_id'] ?? null;
-                    $type = $_GET['type'] ?? 'monthly';
-                    
-                    if ($paymentId && $planId) {
+
+                    // SECURITY: Use plan_id from session, not URL
+                    if ($paymentId) {
                         $success = $this->mollieService->verifyPayment($paymentId);
                     }
                     break;
 
                 case 'paystack':
                     $reference = $_GET['reference'] ?? null;
-                    $planId = $_GET['plan_id'] ?? null;
-                    $type = $_GET['type'] ?? 'monthly';
-                    
-                    if ($reference && $planId) {
-                        $success = $this->payStackService->handleCallback($reference, $planId, $type);
+
+                    // SECURITY: Use plan_id from session, not URL
+                    if ($reference) {
+                        $success = $this->payStackService->handleCallback(
+                            $reference,
+                            $pendingPayment['plan_id'],  // From session, not URL!
+                            $pendingPayment['type']       // From session, not URL!
+                        );
                     }
                     break;
             }
         } catch (\Exception $e) {
-             error_log("Callback Error [$gateway]: " . $e->getMessage());
+            error_log("Callback Error [$gateway]: " . $e->getMessage());
         }
+
+        // Clear pending payment from session
+        unset($_SESSION['pending_payment']);
 
         if ($success) {
             header('Location: ' . app_base_url('/dashboard?payment=success'));
@@ -156,7 +197,7 @@ class PaymentController extends Controller
     public function webhook($gateway)
     {
         $payload = @file_get_contents('php://input');
-        
+
         switch ($gateway) {
             case 'stripe':
                 $sigHeader = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
@@ -175,9 +216,7 @@ class PaymentController extends Controller
                 $this->payPalService->handleWebhook($payload);
                 break;
         }
-        
+
         exit;
     }
-
 }
-

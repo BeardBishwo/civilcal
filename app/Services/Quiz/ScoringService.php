@@ -54,26 +54,34 @@ class ScoringService
 
             case 'MULTI':
                 $ansArray = is_array($userAnswer) ? $userAnswer : json_decode($userAnswer, true);
-                $correctArray = json_decode($question['correct_answer_json'] ?? '[]', true);
+
+                // Handle both string (from DB) and array (from cache)
+                $correctData = $question['correct_answer_json'] ?? '[]';
+                $correctArray = is_string($correctData) ? json_decode($correctData, true) : $correctData;
+
                 if (!is_array($ansArray) || !is_array($correctArray)) return false;
-                
+
                 // Normalise types to string to avoid "1" !== 1 issues
                 $ansArray = array_map('strval', $ansArray);
                 $correctArray = array_map('strval', $correctArray);
-                
+
                 sort($ansArray);
                 sort($correctArray);
                 return json_encode($ansArray) === json_encode($correctArray);
 
             case 'ORDER':
                 $ansArray = is_array($userAnswer) ? $userAnswer : json_decode($userAnswer, true);
-                $correctArray = json_decode($question['correct_answer_json'] ?? '[]', true);
+
+                // Handle both string (from DB) and array (from cache)
+                $correctData = $question['correct_answer_json'] ?? '[]';
+                $correctArray = is_string($correctData) ? json_decode($correctData, true) : $correctData;
+
                 if (!is_array($ansArray) || !is_array($correctArray)) return false;
-                
+
                 // Normalise types
                 $ansArray = array_map('strval', $ansArray);
                 $correctArray = array_map('strval', $correctArray);
-                
+
                 return json_encode($ansArray) === json_encode($correctArray);
 
             default:
@@ -88,7 +96,7 @@ class ScoringService
     {
         $negRate = floatval($examSettings['negative_marking_rate'] ?? 0);
         $negUnit = $examSettings['negative_marking_unit'] ?? 'percent';
-        
+
         if ($negRate <= 0) return 0;
 
         if ($negUnit === 'percent') {
