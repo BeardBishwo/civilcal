@@ -7,6 +7,7 @@ use App\Core\Validator;
 use App\Services\ProfileService;
 use App\Services\CacheService;
 use App\Services\RankService;
+use App\Services\FileService;
 
 /**
  * Profile Controller (Refactored)
@@ -41,6 +42,14 @@ class ProfileController extends Controller
 
         if (!$profile) {
             $profile = $this->profileService->getUserProfile($userId);
+
+            if (!$profile) {
+                // User not found in DB (ghost session)
+                $this->auth->logout();
+                $this->redirect('/login');
+                return;
+            }
+
             $this->cache->set($cacheKey, $profile, 300); // 5 min cache
         }
 
@@ -390,27 +399,27 @@ class ProfileController extends Controller
             return $this->json(['error' => 'File too large (max 5MB)'], 400);
         }
 
-        // Upload file
-        $uploadDir = BASE_PATH . '/public/uploads/avatars/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
-
+        // Use FileService for "Paranoid-Grade" secure upload
         $userId = $this->auth->id();
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = $userId . '_' . time() . '.' . $extension;
-        $filepath = $uploadDir . $filename;
+        $uploadResult = FileService::uploadUserFile($file, $userId, 'avatar');
 
-        if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            $avatarPath = '/uploads/avatars/' . $filename;
-            $result = $this->profileService->updateAvatar($userId, $avatarPath);
-
-            // Invalidate cache
-            $this->cache->delete("user_profile_{$userId}");
-
-            return $this->json($result);
+        if (!$uploadResult['success']) {
+            $errorMsg = $uploadResult['error'] ?? 'Upload failed';
+            // Frontend expects 'message' key
+            return $this->json(['success' => false, 'message' => $errorMsg, 'error' => $errorMsg], 400);
         }
 
-        return $this->json(['error' => 'Upload failed'], 500);
+        $avatarPath = $uploadResult['url'] ?? $uploadResult['path'];
+        $result = $this->profileService->updateAvatar($userId, $avatarPath);
+
+        // Map 'message' to 'error' for frontend compatibility if failed
+        if (!$result['success'] && !isset($result['error'])) {
+            $result['error'] = $result['message'] ?? 'Unknown error';
+        }
+
+        // Invalidate cache
+        $this->cache->delete("user_profile_{$userId}");
+
+        return $this->json($result);
     }
 }

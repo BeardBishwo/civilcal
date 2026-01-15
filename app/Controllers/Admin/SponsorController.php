@@ -6,6 +6,7 @@ use App\Core\Controller;
 use App\Models\Sponsor;
 use App\Models\Campaign;
 use App\Core\Auth;
+use App\Services\FileService;
 
 class SponsorController extends Controller
 {
@@ -15,7 +16,7 @@ class SponsorController extends Controller
     public function __construct()
     {
         parent::__construct();
-        
+
         // Ensure Admin
         $user = Auth::user();
         if (!$user || $user->role !== 'admin') {
@@ -41,15 +42,12 @@ class SponsorController extends Controller
                 'contact_person' => $_POST['contact_person'],
                 'contact_email' => $_POST['contact_email']
             ];
-            
-            // Handle Logo Upload
-            if (isset($_FILES['logo']) && $_FILES['logo']['error'] === 0) {
-                $uploadDir = 'public/uploads/sponsors/';
-                if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-                
-                $fileName = time() . '_' . basename($_FILES['logo']['name']);
-                if (move_uploaded_file($_FILES['logo']['tmp_name'], $uploadDir . $fileName)) {
-                    $data['logo_path'] = $fileName;
+
+            // Handle Logo Upload (Paranoid-Grade)
+            if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
+                $upload = FileService::uploadAdminFile($_FILES['logo'], 'logo');
+                if ($upload['success']) {
+                    $data['logo_path'] = $upload['filename'];
                 }
             }
 
@@ -58,7 +56,7 @@ class SponsorController extends Controller
             exit;
         }
     }
-    
+
     public function createCampaign()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -72,7 +70,7 @@ class SponsorController extends Controller
                 'priority' => $_POST['priority'] ?? 0,
                 'max_impressions' => $_POST['max_impressions'] ?? 0
             ];
-            
+
             $this->campaignModel->create($data);
             header('Location: /admin/sponsors'); // Redirect back for now
             exit;

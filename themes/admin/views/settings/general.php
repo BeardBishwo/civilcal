@@ -794,10 +794,74 @@
                                 </div>
                             </div>
 
-                            <!-- Action Buttons -->
-                            <div class="button-group">
-                                <button type="submit" class="btn btn-save">💾 Save</button>
+                            <!-- Reward Settings -->
+                            <div class="section-divider"></div>
+                            <div class="form-section">
+                                <div class="section-title">
+                                    <span class="section-title-icon">🏆</span>
+                                    Gamification & Rewards
+                                </div>
+                                <div class="form-group">
+                                    <label for="report_reward_coins" class="form-label">🥇 First Reporter Reward</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control"
+                                            id="report_reward_coins"
+                                            name="report_reward_coins"
+                                            value="<?= htmlspecialchars($settings['report_reward_coins'] ?? '0') ?>"
+                                            min="0">
+                                        <span class="input-group-text">Coins</span>
+                                    </div>
+                                    <div class="form-text">Reward for the user who reported the issue <strong>first</strong>.</div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="report_reward_subsequent" class="form-label">🥈 Consolation Reward</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control"
+                                            id="report_reward_subsequent"
+                                            name="report_reward_subsequent"
+                                            value="<?= htmlspecialchars($settings['report_reward_subsequent'] ?? '0') ?>"
+                                            min="0">
+                                        <span class="input-group-text">Coins</span>
+                                    </div>
+                                    <div class="form-text">Reward for others who reported the same question <strong>later</strong>.</div>
+                                </div>
                             </div>
+
+                            <div class="section-divider"></div>
+                            <div class="section-title">
+                                <span class="section-title-icon">💌</span>
+                                Notification Messages
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="report_notification_title" class="form-label">Notification Title</label>
+                                    <input type="text" class="form-control"
+                                        id="report_notification_title"
+                                        name="report_notification_title"
+                                        value="<?= htmlspecialchars($settings['report_notification_title'] ?? 'Report Resolved') ?>"
+                                        placeholder="e.g. Report Resolved">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="report_notification_first" class="form-label">Message for First Reporter</label>
+                                    <textarea class="form-control" id="report_notification_first" name="report_notification_first" rows="2"><?= htmlspecialchars($settings['report_notification_first'] ?? 'Your eagle eyes helped us improve! Thank you for being a guardian of quality. Here is a token of our appreciation.') ?></textarea>
+                                    <div class="form-text">Heart-touching message for the primary reporter.</div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="report_notification_subsequent" class="form-label">Message for Others</label>
+                                    <textarea class="form-control" id="report_notification_subsequent" name="report_notification_subsequent" rows="2"><?= htmlspecialchars($settings['report_notification_subsequent'] ?? 'Great minds think alike! You spotted an issue we were fixing. Thank you for your care and attention to detail.') ?></textarea>
+                                    <div class="form-text">Message for users who reported duplicates.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-save">💾 Save</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -870,22 +934,65 @@
     });
 
     // Dynamic Social Links Manager
-    const popularPlatforms = [
-        { id: 'facebook', name: 'Facebook', icon: 'fab fa-facebook-f' },
-        { id: 'x', name: 'Twitter / X', icon: 'fab fa-twitter' },
-        { id: 'instagram', name: 'Instagram', icon: 'fab fa-instagram' },
-        { id: 'linkedin', name: 'LinkedIn', icon: 'fab fa-linkedin-in' },
-        { id: 'youtube', name: 'YouTube', icon: 'fab fa-youtube' },
-        { id: 'telegram', name: 'Telegram', icon: 'fab fa-telegram-plane' },
-        { id: 'whatsapp', name: 'WhatsApp', icon: 'fab fa-whatsapp' },
-        { id: 'tiktok', name: 'TikTok', icon: 'fab fa-tiktok' },
-        { id: 'pinterest', name: 'Pinterest', icon: 'fab fa-pinterest-p' },
-        { id: 'github', name: 'GitHub', icon: 'fab fa-github' }
+    const popularPlatforms = [{
+            id: 'facebook',
+            name: 'Facebook',
+            icon: 'fab fa-facebook-f'
+        },
+        {
+            id: 'x',
+            name: 'Twitter / X',
+            icon: 'fab fa-twitter'
+        },
+        {
+            id: 'instagram',
+            name: 'Instagram',
+            icon: 'fab fa-instagram'
+        },
+        {
+            id: 'linkedin',
+            name: 'LinkedIn',
+            icon: 'fab fa-linkedin-in'
+        },
+        {
+            id: 'youtube',
+            name: 'YouTube',
+            icon: 'fab fa-youtube'
+        },
+        {
+            id: 'telegram',
+            name: 'Telegram',
+            icon: 'fab fa-telegram-plane'
+        },
+        {
+            id: 'whatsapp',
+            name: 'WhatsApp',
+            icon: 'fab fa-whatsapp'
+        },
+        {
+            id: 'tiktok',
+            name: 'TikTok',
+            icon: 'fab fa-tiktok'
+        },
+        {
+            id: 'pinterest',
+            name: 'Pinterest',
+            icon: 'fab fa-pinterest-p'
+        },
+        {
+            id: 'github',
+            name: 'GitHub',
+            icon: 'fab fa-github'
+        }
     ];
 
     let socialLinks = <?= json_encode($settings['social_links'] ?? []) ?>;
     if (typeof socialLinks === 'string') {
-        try { socialLinks = JSON.parse(socialLinks); } catch(e) { socialLinks = []; }
+        try {
+            socialLinks = JSON.parse(socialLinks);
+        } catch (e) {
+            socialLinks = [];
+        }
     }
     if (!Array.isArray(socialLinks)) socialLinks = [];
 
@@ -950,7 +1057,10 @@
     };
 
     addBtn.addEventListener('click', () => {
-        socialLinks.push({ platform: 'facebook', url: '' });
+        socialLinks.push({
+            platform: 'facebook',
+            url: ''
+        });
         renderSocialLinks();
     });
 

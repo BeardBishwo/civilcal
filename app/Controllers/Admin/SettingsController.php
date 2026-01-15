@@ -5,6 +5,8 @@ namespace App\Controllers\Admin;
 use App\Core\Controller;
 use App\Services\SettingsService;
 use App\Services\GDPRService;
+use App\Services\Security;
+use App\Services\FileService;
 
 class SettingsController extends Controller
 {
@@ -275,12 +277,12 @@ class SettingsController extends Controller
 
             // Exclude specific POST keys that are NOT settings
             $excludedKeys = ['csrf_token', 'gateway', 'submit', 'setting_group'];
-            
+
             foreach ($_POST as $key => $value) {
                 if (!in_array($key, $excludedKeys)) {
                     // Handle file uploads
                     if (isset($_FILES[$key]) && $_FILES[$key]['error'] === UPLOAD_ERR_OK) {
-                        $value = $this->handleFileUpload($_FILES[$key]);
+                        $value = $this->handleFileUpload($_FILES[$key], $key);
                     }
 
                     // Handle checkboxes (boolean values)
@@ -314,7 +316,7 @@ class SettingsController extends Controller
             $fileFields = ['site_logo', 'favicon'];
             foreach ($fileFields as $field) {
                 if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
-                    $uploadedPath = $this->handleFileUpload($_FILES[$field]);
+                    $uploadedPath = $this->handleFileUpload($_FILES[$field], $field);
                     if ($uploadedPath && SettingsService::set($field, $uploadedPath, 'string', $settingGroup)) {
                         $updated++;
                     }
@@ -337,7 +339,6 @@ class SettingsController extends Controller
                 'message' => 'Settings updated successfully',
                 'updated_count' => $updated
             ]);
-
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
         }
@@ -382,18 +383,17 @@ class SettingsController extends Controller
                     }
                 }
             }
-            
+
             // Handle Mutual Exclusivity
             if ($gateway === 'stripe' && isset($_POST['stripe_enabled']) && $_POST['stripe_enabled'] == '1') {
                 SettingsService::set('paystack_enabled', '0', 'string', $group);
                 SettingsService::set('paddle_billing_enabled', '0', 'string', $group);
                 SettingsService::set('paddle_classic_enabled', '0', 'string', $group);
-            }
-            elseif ($gateway === 'paystack' && isset($_POST['paystack_enabled']) && $_POST['paystack_enabled'] == '1') {
+            } elseif ($gateway === 'paystack' && isset($_POST['paystack_enabled']) && $_POST['paystack_enabled'] == '1') {
                 SettingsService::set('stripe_enabled', '0', 'string', $group);
-            }
-            elseif (($gateway === 'paddle_billing' && isset($_POST['paddle_billing_enabled']) && $_POST['paddle_billing_enabled'] == '1') || 
-                    ($gateway === 'paddle_classic' && isset($_POST['paddle_classic_enabled']) && $_POST['paddle_classic_enabled'] == '1')) {
+            } elseif (($gateway === 'paddle_billing' && isset($_POST['paddle_billing_enabled']) && $_POST['paddle_billing_enabled'] == '1') ||
+                ($gateway === 'paddle_classic' && isset($_POST['paddle_classic_enabled']) && $_POST['paddle_classic_enabled'] == '1')
+            ) {
                 SettingsService::set('stripe_enabled', '0', 'string', $group);
             }
 
@@ -404,16 +404,15 @@ class SettingsController extends Controller
                 'success' => true,
                 'message' => "Payment settings updated successfully"
             ]);
-            
+
             // Log activity
-             GDPRService::logActivity(
+            GDPRService::logActivity(
                 $_SESSION['user_id'] ?? null,
                 'setting_updated',
                 'settings',
                 null,
                 "Payment settings updated" . ($gateway ? " for $gateway" : "")
             );
-
         } catch (\Exception $e) {
             echo json_encode([
                 'success' => false,
@@ -537,56 +536,26 @@ class SettingsController extends Controller
         }
     }
 
-    private function handleFileUpload($file)
+    private function handleFileUpload($file, $key)
     {
-        $uploadDir = __DIR__ . '/../../../public/uploads/settings/';
-        
-        // Allowed extensions and mime types
-        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'ico'];
-        $allowedMimeTypes = [
-            'image/jpeg', 
-            'image/png', 
-            'image/gif', 
-            'image/x-icon', 
-            'image/vnd.microsoft.icon',
-            'image/ico'
-        ];
-        $maxSize = 2 * 1024 * 1024; // 2MB
+        $type = 'logo'; // Default type
 
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+        // Detect type based on field key
+        if (strpos($key, 'favicon') !== false) {
+            $type = 'favicon';
+        } elseif (strpos($key, 'banner') !== false || strpos($key, 'background') !== false) {
+            $type = 'banner';
         }
 
-        // Validate size
-        if ($file['size'] > $maxSize) {
-            throw new \Exception('File is too large (max 2MB)');
+        // Use the new FileService for Paranoid-Grade security
+        $result = FileService::uploadAdminFile($file, $type);
+
+        if (!$result['success']) {
+            throw new \Exception($result['error']);
         }
 
-        // Validate extension
-        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        if (!in_array($extension, $allowedExtensions)) {
-            throw new \Exception('Invalid file extension. Allowed: ' . implode(', ', $allowedExtensions));
-        }
-
-        // Validate mime-type
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($finfo, $file['tmp_name']);
-        finfo_close($finfo);
-
-        if (!in_array($mimeType, $allowedMimeTypes)) {
-            throw new \Exception('Invalid file type. Only standard image formats are allowed.');
-        }
-
-        // Generate a clean, unique filename
-        $filename = md5(time() . '_' . $file['name']) . '.' . $extension;
-        $filepath = $uploadDir . $filename;
-
-        if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            // Return the correct URL path for web access
-            return '/uploads/settings/' . $filename;
-        }
-
-        return null;
+        // Return the public URL for storage in settings
+        return $result['url'] ?? $result['path'];
     }
 
     /**
@@ -603,7 +572,7 @@ class SettingsController extends Controller
             'maintenance_mode',
             'enable_dark_mode',
             'require_strong_password',
-            
+
             // Security
             'enable_2fa',
             'force_https',
@@ -618,10 +587,10 @@ class SettingsController extends Controller
             'enable_suspicious_detection',
             'enable_ip_restrictions',
             'auto_block_failed_logins',
-            
+
             // Email
             'smtp_enabled',
-            
+
             // Advanced / Performance
             'cache_enabled',
             'enable_cache', // legacy variation
@@ -629,14 +598,14 @@ class SettingsController extends Controller
             'enable_compression', // legacy variation
             'enable_minification',
             'enable_lazy_loading',
-            
+
             // Debug
             'debug_mode',
             'error_logging',
             'enable_error_logging', // legacy variation
             'query_debug',
             'performance_monitoring',
-            
+
             // API
             'api_enabled',
             'enable_api', // legacy variation
@@ -645,7 +614,7 @@ class SettingsController extends Controller
             'oauth_enabled',
             'cors_enabled',
             'webhook_enabled',
-            
+
             // Payments
             'paypal_basic_enabled',
             'paypal_api_enabled',
@@ -656,13 +625,13 @@ class SettingsController extends Controller
             'paddle_classic_enabled',
             'paystack_enabled',
             'bank_transfer_enabled',
-            
+
             // Other
             'google_login_enabled',
             'captcha_on_login',
             'captcha_on_register',
             'enable_captcha',
-            
+
             // User Settings
             'allow_registration',
             'email_verification',
@@ -678,20 +647,20 @@ class SettingsController extends Controller
     private function isFieldInGroup($key, $group)
     {
         $groups = [
-        'general' => ['site_name', 'site_description', 'site_logo', 'favicon', 'contact_email', 'contact_address', 'contact_phone', 'default_language', 'default_timezone', 'facebook_url', 'twitter_url', 'instagram_url', 'linkedin_url', 'enable_registration', 'require_email_verification', 'maintenance_mode', 'enable_dark_mode', 'play_store_url', 'app_store_url', 'social_links'],
-        'email' => ['smtp_enabled', 'smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_encryption', 'from_email', 'from_name'],
-        'security' => ['enable_2fa', 'force_https', 'password_min_length', 'password_complexity', 'session_timeout', 'max_login_attempts', 'ip_whitelist_enabled', 'ip_whitelist', 'admin_ip_notification', 'log_failed_logins', 'log_admin_activity', 'log_retention_days', 'csrf_protection', 'security_headers', 'rate_limiting'],
-        'advanced' => ['custom_header_code', 'custom_footer_code', 'cache_enabled', 'compression_enabled', 'enable_minification', 'enable_lazy_loading', 'debug_mode', 'error_logging', 'query_debug', 'performance_monitoring', 'api_enabled', 'require_api_key'],
-        'performance' => ['cache_enabled', 'compression_enabled', 'enable_minification', 'enable_lazy_loading'],
-        'system' => ['debug_mode', 'error_logging', 'query_debug', 'performance_monitoring'],
-        'api' => ['api_enabled', 'api_rate_limit', 'api_timeout', 'api_key_expiry', 'oauth_enabled', 'cors_enabled', 'cors_origins', 'webhook_enabled', 'webhook_timeout', 'api_documentation', 'api_version', 'api_debug', 'require_api_key'],
-        'payments' => ['paypal_basic_enabled', 'paypal_email', 'paypal_api_enabled', 'paypal_client_id', 'paypal_client_secret', 'paypal_sandbox_mode', 'stripe_enabled', 'stripe_checkout_type', 'stripe_publishable_key', 'stripe_secret_key', 'stripe_webhook_secret', 'mollie_enabled', 'mollie_api_key', 'paddle_billing_enabled', 'paddle_client_token', 'paddle_api_key', 'paddle_webhook_secret', 'paddle_classic_enabled', 'paddle_vendor_id', 'paddle_classic_api_key', 'paddle_public_key', 'paddle_monthly_plan_id', 'paddle_yearly_plan_id', 'paystack_enabled', 'paystack_secret_key', 'paystack_public_key', 'bank_transfer_enabled', 'bank_info'],
-        'google' => ['google_login_enabled', 'google_client_id', 'google_client_secret'],
-        'recaptcha' => ['captcha_provider', 'recaptcha_site_key', 'recaptcha_secret_key', 'captcha_on_login', 'captcha_on_register', 'enable_captcha'],
-        'user' => ['allow_registration', 'email_verification', 'auto_approve_users', 'password_min_length', 'password_complexity', 'session_timeout', 'max_login_attempts', 'lockout_duration', 'profile_visibility', 'user_roles_enabled']
-    ];
+            'general' => ['site_name', 'site_description', 'site_logo', 'favicon', 'contact_email', 'contact_address', 'contact_phone', 'default_language', 'default_timezone', 'facebook_url', 'twitter_url', 'instagram_url', 'linkedin_url', 'enable_registration', 'require_email_verification', 'maintenance_mode', 'enable_dark_mode', 'play_store_url', 'app_store_url', 'social_links', 'report_reward_coins', 'report_reward_subsequent', 'report_notification_title', 'report_notification_first', 'report_notification_subsequent'],
+            'email' => ['smtp_enabled', 'smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_encryption', 'from_email', 'from_name'],
+            'security' => ['enable_2fa', 'force_https', 'password_min_length', 'password_complexity', 'session_timeout', 'max_login_attempts', 'ip_whitelist_enabled', 'ip_whitelist', 'admin_ip_notification', 'log_failed_logins', 'log_admin_activity', 'log_retention_days', 'csrf_protection', 'security_headers', 'rate_limiting'],
+            'advanced' => ['custom_header_code', 'custom_footer_code', 'cache_enabled', 'compression_enabled', 'enable_minification', 'enable_lazy_loading', 'debug_mode', 'error_logging', 'query_debug', 'performance_monitoring', 'api_enabled', 'require_api_key'],
+            'performance' => ['cache_enabled', 'compression_enabled', 'enable_minification', 'enable_lazy_loading'],
+            'system' => ['debug_mode', 'error_logging', 'query_debug', 'performance_monitoring'],
+            'api' => ['api_enabled', 'api_rate_limit', 'api_timeout', 'api_key_expiry', 'oauth_enabled', 'cors_enabled', 'cors_origins', 'webhook_enabled', 'webhook_timeout', 'api_documentation', 'api_version', 'api_debug', 'require_api_key'],
+            'payments' => ['paypal_basic_enabled', 'paypal_email', 'paypal_api_enabled', 'paypal_client_id', 'paypal_client_secret', 'paypal_sandbox_mode', 'stripe_enabled', 'stripe_checkout_type', 'stripe_publishable_key', 'stripe_secret_key', 'stripe_webhook_secret', 'mollie_enabled', 'mollie_api_key', 'paddle_billing_enabled', 'paddle_client_token', 'paddle_api_key', 'paddle_webhook_secret', 'paddle_classic_enabled', 'paddle_vendor_id', 'paddle_classic_api_key', 'paddle_public_key', 'paddle_monthly_plan_id', 'paddle_yearly_plan_id', 'paystack_enabled', 'paystack_secret_key', 'paystack_public_key', 'bank_transfer_enabled', 'bank_info'],
+            'google' => ['google_login_enabled', 'google_client_id', 'google_client_secret'],
+            'recaptcha' => ['captcha_provider', 'recaptcha_site_key', 'recaptcha_secret_key', 'captcha_on_login', 'captcha_on_register', 'enable_captcha'],
+            'user' => ['allow_registration', 'email_verification', 'auto_approve_users', 'password_min_length', 'password_complexity', 'session_timeout', 'max_login_attempts', 'lockout_duration', 'profile_visibility', 'user_roles_enabled']
+        ];
 
-    if (!isset($groups[$group])) {
+        if (!isset($groups[$group])) {
             return false;
         }
 
@@ -954,7 +923,8 @@ class SettingsController extends Controller
             ]);
         }
     }
-    public function saveAdvanced() {
+    public function saveAdvanced()
+    {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
             exit(json_encode(['success' => false, 'message' => 'Method not allowed']));
@@ -980,7 +950,7 @@ class SettingsController extends Controller
             'compression_enabled' => 'performance',
             'session_lifetime' => 'performance',
             'max_concurrent_users' => 'performance',
-            
+
             // Security
             'force_https' => 'security',
             'security_headers' => 'security',
@@ -988,14 +958,14 @@ class SettingsController extends Controller
             'rate_limit_requests' => 'security',
             'login_attempts' => 'security',
             'csrf_protection' => 'security',
-            
+
             // Debug/System
             'debug_mode' => 'system',
             'error_logging' => 'system',
             'query_debug' => 'system',
             'log_level' => 'system',
             'performance_monitoring' => 'system',
-            
+
             // API
             'api_enabled' => 'api',
             'api_key' => 'api',
@@ -1021,7 +991,7 @@ class SettingsController extends Controller
         foreach ($settings as $key => $value) {
             if (isset($groupMap[$key])) {
                 $targetGroup = $groupMap[$key];
-                
+
                 if (\App\Services\SettingsService::set($key, $value, 'string', $targetGroup)) {
                     $updated++;
                 } else {
@@ -1053,13 +1023,13 @@ class SettingsController extends Controller
         exit;
     }
 
-/**
+    /**
      * Permalink Settings Page - Using Proper Admin Layout
      */
     public function permalinks()
     {
         $this->requireAdminWithBasicAuth();
-        
+
         // Handle form submission
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_permalinks'])) {
             $structure = $_POST['permalink_structure'] ?? 'calculator-only';
@@ -1067,7 +1037,7 @@ class SettingsController extends Controller
             $basePath = $_POST['permalink_base_path'] ?? 'tools';
             $customPattern = $_POST['permalink_custom_pattern'] ?? '';
             $redirectOldUrls = isset($_POST['permalink_redirect_old_urls']) ? 1 : 0;
-            
+
             // Validate custom pattern
             if ($structure === 'custom' && empty($customPattern)) {
                 $message = 'Custom pattern cannot be empty';
@@ -1079,13 +1049,13 @@ class SettingsController extends Controller
                 SettingsService::set('permalink_base_path', $basePath, 'string', 'seo');
                 SettingsService::set('permalink_custom_pattern', $customPattern, 'string', 'seo');
                 SettingsService::set('permalink_redirect_old_urls', $redirectOldUrls, 'boolean', 'seo');
-                
+
                 // Clear URL cache to ensure next read gets fresh data
                 \App\Helpers\UrlHelper::clearCache();
-                
+
                 $message = 'Permalink settings updated successfully! All links will now use the new format.';
                 $messageType = 'success';
-                
+
                 // Log the change
                 \App\Services\GDPRService::logActivity(
                     $_SESSION['user_id'] ?? null,
@@ -1104,10 +1074,10 @@ class SettingsController extends Controller
                 );
             }
         }
-        
+
         // Get current permalink structure
         $currentStructure = SettingsService::get('permalink_structure', 'calculator-only');
-        
+
         // Get permalink settings
         $settings = [
             'permalink_base_path' => SettingsService::get('permalink_base_path', 'tools'),
@@ -1115,13 +1085,13 @@ class SettingsController extends Controller
             'permalink_custom_pattern' => SettingsService::get('permalink_custom_pattern', ''),
             'permalink_redirect_old_urls' => SettingsService::get('permalink_redirect_old_urls', true)
         ];
-        
+
         // Get sample calculator for preview
         $db = \App\Core\Database::getInstance()->getPdo();
         $stmt = $db->prepare("SELECT calculator_id, category, subcategory, slug FROM calculator_urls LIMIT 1");
         $stmt->execute();
         $sampleCalculator = $stmt->fetch(\PDO::FETCH_ASSOC);
-        
+
         // Use the proper admin layout system
         $this->view->render('admin/settings/permalinks', [
             'title' => 'Permalink Settings',
@@ -1139,7 +1109,7 @@ class SettingsController extends Controller
     public function economy()
     {
         $this->requireAdminWithBasicAuth();
-        
+
         $resources = SettingsService::get('economy_resources', []);
         $ranks = SettingsService::get('economy_ranks', []);
         $hudConfig = SettingsService::get('economy_hud_config', []);
@@ -1177,7 +1147,7 @@ class SettingsController extends Controller
 
         try {
             $type = $_POST['type'] ?? '';
-            
+
             if ($type === 'resources') {
                 $resources = $_POST['resources'] ?? [];
                 SettingsService::set('economy_resources', $resources, 'json', 'economy');
@@ -1233,7 +1203,7 @@ class SettingsController extends Controller
                 ['level' => 1, 'name' => 'Intern', 'min' => 0, 'icon' => 'themes/default/assets/resources/ranks/rank_01_intern.webp', 'reward' => 'Base Avatar'],
                 ['level' => 2, 'name' => 'Apprentice', 'min' => 150, 'icon' => '', 'reward' => '+50 Coins'],
                 ['level' => 3, 'name' => 'Trainee', 'min' => 300, 'icon' => '', 'reward' => '+50 Coins'],
-                
+
                 // League 2: The Field Work
                 ['level' => 4, 'name' => 'Surveyor', 'min' => 500, 'icon' => 'themes/default/assets/resources/ranks/rank_02_surveyor.webp', 'reward' => 'Unlock: Daily Challenges'],
                 ['level' => 5, 'name' => 'Chainman', 'min' => 800, 'icon' => '', 'reward' => '+100 Coins'],
@@ -1287,12 +1257,88 @@ class SettingsController extends Controller
     public function quiz()
     {
         $this->requireAdminWithBasicAuth();
-        
+
         $settings = SettingsService::getAll('quiz');
-        
+
         $this->view->render('admin/quiz/settings', [
             'title' => 'Quiz Module Settings',
             'settings' => $settings
+        ]);
+    }
+
+    /**
+     * Quiz Modes Settings - Toggle quiz features on/off
+     */
+    public function quizModes()
+    {
+        $this->requireAdminWithBasicAuth();
+
+        // Handle POST (AJAX save)
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            header('Content-Type: application/json');
+
+            // CSRF validation
+            if (!\App\Services\Security::validateCsrfToken()) {
+                echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+                exit;
+            }
+
+            try {
+                $input = json_decode(file_get_contents('php://input'), true);
+                $modes = $input['modes'] ?? [];
+
+                $updated = 0;
+                foreach ($modes as $key => $value) {
+                    // Ensure it's a quiz_mode_* setting
+                    if (strpos($key, 'quiz_mode_') === 0) {
+                        $settingValue = $value ? '1' : '0';
+                        if (\App\Services\SettingsService::set($key, $settingValue, 'string', 'quiz_modes')) {
+                            $updated++;
+                        }
+                    }
+                }
+
+                // Clear cache
+                \App\Services\SettingsService::clearCache();
+
+                // Log activity
+                \App\Services\GDPRService::logActivity(
+                    $_SESSION['user_id'] ?? null,
+                    'quiz_modes_updated',
+                    'settings',
+                    null,
+                    "Quiz modes updated ($updated changes)"
+                );
+
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Quiz modes updated successfully',
+                    'updated' => $updated
+                ]);
+            } catch (\Exception $e) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Error: ' . $e->getMessage()
+                ]);
+            }
+            exit;
+        }
+
+        // Handle GET (display page)
+        $db = \App\Core\Database::getInstance();
+        $pdo = $db->getPdo();
+        $stmt = $pdo->query("SELECT setting_key, setting_value FROM site_settings WHERE setting_group = 'quiz_modes'");
+        $settings = $stmt->fetchAll();
+
+        // Convert to associative array
+        $modes = [];
+        foreach ($settings as $setting) {
+            $modes[$setting['setting_key']] = $setting['setting_value'] === '1';
+        }
+
+        $this->view->render('admin/settings/quiz_modes', [
+            'title' => 'Quiz Modes Settings',
+            'modes' => $modes
         ]);
     }
 }

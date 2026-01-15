@@ -4,7 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Core\Controller;
 use App\Services\ThemeManager;
-use App\Services\FileUploadService;
+use App\Services\FileService;
 use App\Services\AuditLogger;
 use Exception;
 
@@ -278,16 +278,14 @@ class ThemeController extends Controller
                 return;
             }
 
-            // Stage upload via FileUploadService (MIME + size checks)
-            $uploader = new FileUploadService();
-            $dest = (defined('STORAGE_PATH') ? STORAGE_PATH : sys_get_temp_dir()) . '/uploads/themes';
-            $upload = $uploader->uploadTheme($_FILES['theme_zip'], $dest);
-            if (!($upload['success'] ?? false)) {
-                $this->error($upload['message'] ?? 'Upload failed');
+            // Use FileService for "Paranoid-Grade" secure Theme upload
+            $upload = FileService::uploadTheme($_FILES['theme_zip']);
+            if (!$upload['success']) {
+                $this->error($upload['error'] ?? 'Upload failed');
                 return;
             }
 
-            $result = $this->themeManager->installThemeFromZip($upload['file_path']);
+            $result = $this->themeManager->installThemeFromZip($upload['path']);
 
             // Log the action
             if ($result['success']) {
@@ -449,9 +447,15 @@ class ThemeController extends Controller
             $themes = $this->themeManager->getAllThemes();
             $selected = null;
             foreach ($themes as $t) {
-                if ((int)($t['id'] ?? 0) === (int)$id) { $selected = $t; break; }
+                if ((int)($t['id'] ?? 0) === (int)$id) {
+                    $selected = $t;
+                    break;
+                }
             }
-            if (!$selected) { $this->redirect('/admin/themes'); return; }
+            if (!$selected) {
+                $this->redirect('/admin/themes');
+                return;
+            }
             $this->view->render('admin/themes/preview', ['currentPage' => 'themes', 'activeTheme' => $selected, 'title' => 'Theme Preview']);
         } catch (Exception $e) {
             $this->redirect('/admin/themes');
@@ -466,13 +470,22 @@ class ThemeController extends Controller
             $found = null;
             foreach ($themes as $t) {
                 if (is_numeric($slug)) {
-                    if ((int)($t['id'] ?? 0) === (int)$slug) { $found = $t; break; }
+                    if ((int)($t['id'] ?? 0) === (int)$slug) {
+                        $found = $t;
+                        break;
+                    }
                 } else {
                     $candidate = $t['slug'] ?? ($t['name'] ?? null);
-                    if ($candidate && strcasecmp($candidate, $slug) === 0) { $found = $t; break; }
+                    if ($candidate && strcasecmp($candidate, $slug) === 0) {
+                        $found = $t;
+                        break;
+                    }
                 }
             }
-            if (!$found) { echo json_encode(['success' => false, 'message' => 'Theme not found']); return; }
+            if (!$found) {
+                echo json_encode(['success' => false, 'message' => 'Theme not found']);
+                return;
+            }
             echo json_encode(['success' => true, 'data' => $found]);
         } catch (\Throwable $e) {
             echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Exception;
+use App\Services\GDPRService;
 
 /**
  * File Service
@@ -22,15 +23,31 @@ class FileService
             'favicon' => self::PUBLIC_BASE . '/icons',
             'banner' => self::STORAGE_BASE . '/admin/banners',
             'document' => self::STORAGE_BASE . '/admin/documents',
+            'import' => self::STORAGE_BASE . '/admin/imports',
+            'plugin' => self::STORAGE_BASE . '/admin/plugins',
+            'marketplace' => self::STORAGE_BASE . '/admin/marketplace',
         ],
         'user' => [
             'profile' => self::STORAGE_BASE . '/users',
             'avatar' => self::STORAGE_BASE . '/users',
             'document' => self::STORAGE_BASE . '/users/documents',
+            'library' => self::STORAGE_BASE . '/library/quarantine',
+            'preview' => self::STORAGE_BASE . '/library/previews',
+            'bounty' => self::STORAGE_BASE . '/bounty/quarantine',
+            'report' => self::STORAGE_BASE . '/reports',
         ],
         'theme' => BASE_PATH . '/themes', // Special path for themes
+        'media' => self::STORAGE_BASE . '/admin/media',
         'temp' => self::STORAGE_BASE . '/temp',
     ];
+
+    // Testing flag to bypass is_uploaded_file check for CLI tests
+    private static $testing = false;
+
+    public static function setTesting(bool $testing): void
+    {
+        self::$testing = $testing;
+    }
 
     // Public URL paths
     private const PUBLIC_URLS = [
@@ -39,6 +56,7 @@ class FileService
             'favicon' => '/assets/icons',
             'banner' => '/storage/uploads/admin/banners',
             'document' => '/storage/uploads/admin/documents',
+            'media' => '/storage/uploads/admin/media',
         ],
         'user' => [
             'profile' => '/storage/uploads/users',
@@ -77,6 +95,13 @@ class FileService
             'dimensions' => ['max_width' => 400, 'max_height' => 400],
             'optimize' => true,
         ],
+        'avatar' => [
+            'max_size' => 2097152, // 2MB
+            'allowed_types' => ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'],
+            'extensions' => ['png', 'jpg', 'jpeg', 'webp'],
+            'dimensions' => ['max_width' => 400, 'max_height' => 400],
+            'optimize' => true,
+        ],
         'document' => [
             'max_size' => 10485760, // 10MB
             'allowed_types' => ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'],
@@ -85,9 +110,104 @@ class FileService
         ],
         'theme' => [
             'max_size' => 52428800, // 50MB
-            'allowed_types' => ['application/zip', 'application/x-zip-compressed', 'multipart/x-zip'],
+            'allowed_types' => ['application/zip', 'application/x-zip-compressed', 'multipart/x-zip', 'application/octet-stream'],
             'extensions' => ['zip'],
             'optimize' => false,
+        ],
+        'media' => [
+            'max_size' => 20971520, // 20MB
+            'allowed_types' => [
+                'image/jpeg',
+                'image/png',
+                'image/gif',
+                'image/webp',
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/zip',
+                'text/plain'
+            ],
+            'extensions' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'zip', 'txt'],
+            'optimize' => true,
+        ],
+        'plugin' => [
+            'max_size' => 52428800, // 50MB
+            'allowed_types' => ['application/zip', 'application/x-zip-compressed', 'multipart/x-zip', 'application/octet-stream'],
+            'extensions' => ['zip'],
+            'optimize' => false,
+        ],
+        'marketplace' => [
+            'max_size' => 52428800, // 50MB
+            'allowed_types' => ['application/zip', 'application/x-zip-compressed', 'multipart/x-zip', 'application/octet-stream'],
+            'extensions' => ['zip'],
+            'optimize' => false,
+        ],
+        'question_import' => [
+            'max_size' => 10485760, // 10MB
+            'allowed_types' => [
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-excel',
+                'text/csv',
+                'text/plain',
+                'application/octet-stream'
+            ],
+            'extensions' => ['xlsx', 'xls', 'csv', 'txt'],
+            'optimize' => false,
+        ],
+        'library_file' => [
+            'max_size' => 15728640, // 15MB
+            'allowed_types' => [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/octet-stream',
+                'application/zip',
+                'application/x-rar-compressed',
+                'image/jpeg',
+                'image/png',
+                'image/webp'
+            ],
+            'extensions' => ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'xlsm', 'dwg', 'dxf', 'sldprt', 'sldasm', 'jpg', 'jpeg', 'png', 'webp', 'zip', 'rar'],
+            'optimize' => false,
+        ],
+        'library_preview' => [
+            'max_size' => 5242880, // 5MB
+            'allowed_types' => ['image/jpeg', 'image/png', 'image/webp'],
+            'extensions' => ['jpg', 'jpeg', 'png', 'webp'],
+            'optimize' => true,
+        ],
+        'bounty_file' => [
+            'max_size' => 20971520, // 20MB
+            'allowed_types' => [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/octet-stream',
+                'application/zip',
+                'application/x-rar-compressed',
+                'image/jpeg',
+                'image/png'
+            ],
+            'extensions' => ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'dwg', 'dxf', 'zip', 'rar', 'jpg', 'png'],
+            'optimize' => false,
+        ],
+        'bounty_preview' => [
+            'max_size' => 5242880, // 5MB
+            'allowed_types' => ['image/jpeg', 'image/png'],
+            'extensions' => ['jpg', 'png'],
+            'optimize' => true,
+        ],
+        'report_screenshot' => [
+            'max_size' => 5242880, // 5MB
+            'allowed_types' => ['image/jpeg', 'image/png', 'image/webp'],
+            'extensions' => ['jpg', 'jpeg', 'png', 'webp'],
+            'optimize' => true,
         ]
     ];
 
@@ -120,7 +240,7 @@ class FileService
     /**
      * Create directory with security (index.php, .htaccess)
      */
-    private static function createDirectory(string $path): bool
+    public static function createDirectory(string $path): bool
     {
         try {
             if (!is_dir($path)) {
@@ -129,15 +249,18 @@ class FileService
                 }
             }
 
-            // Create .htaccess for security
+            // Create .htaccess for security (Ruthless Security Protocol)
             $htaccess = $path . '/.htaccess';
             if (!file_exists($htaccess)) {
-                $content = "# Prevent PHP execution\n";
-                // Only effectively disable PHP execution, allow access to static files
-                $content .= "<FilesMatch \"\\.(php|phtml|php3|php4|php5|php6|phps|pht|phar)$\">\n";
+                $content = "# Kills PHP execution in this folder\n";
+                $content .= "<FilesMatch \"\\.(php|php5|phtml|php7|phar|exe|sh|bat|pl|py|cgi|asp|aspx|js)$\">\n";
                 $content .= "    Order Deny,Allow\n";
                 $content .= "    Deny from all\n";
-                $content .= "</FilesMatch>\n";
+                $content .= "</FilesMatch>\n\n";
+                $content .= "# Prevents listing files (Directory Traversal)\n";
+                $content .= "Options -Indexes -ExecCGI\n\n";
+                $content .= "# Remove handlers\n";
+                $content .= "RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .phps .phar .pl .py .cgi\n";
                 file_put_contents($htaccess, $content);
             }
 
@@ -159,59 +282,22 @@ class FileService
      */
     public static function uploadAdminFile(array $file, string $type): array
     {
-        try {
-            if (!isset(self::FILE_CONFIGS[$type])) {
-                return ['success' => false, 'error' => 'Invalid file type configuration'];
-            }
-
-            $validation = self::validateUpload($file, $type);
-            if (!$validation['success']) {
-                return $validation;
-            }
-
-            $uploadPath = self::UPLOAD_PATHS['admin'][$type] ?? null;
-            if (!$uploadPath) {
-                return ['success' => false, 'error' => 'Upload path not configured'];
-            }
-
-            self::createDirectory($uploadPath);
-
-            $filename = self::generateSecureFilename($type, $file['name']);
-            $filepath = $uploadPath . '/' . $filename;
-
-            if (!move_uploaded_file($file['tmp_name'], $filepath)) {
-                return ['success' => false, 'error' => 'Failed to move uploaded file'];
-            }
-
-            chmod($filepath, 0644);
-
-            if (self::FILE_CONFIGS[$type]['optimize']) {
-                self::optimizeImage($filepath, $type);
-            }
-
-            $publicUrl = (self::PUBLIC_URLS['admin'][$type] ?? '') . '/' . $filename;
-
-            // Delete old if needed (only for single-file types like logo/favicon)
-            // For documents/banners we might want to keep multiple, but keeping previous behavior for now
-            if (in_array($type, ['logo', 'favicon'])) {
-                self::deleteOldFiles($uploadPath, $type, $filename);
-            }
-
-            return [
-                'success' => true,
-                'filename' => $filename,
-                'path' => $filepath,
-                'url' => $publicUrl,
-                'size' => filesize($filepath),
-                'type' => $type,
-            ];
-
-        } catch (Exception $e) {
-            return ['success' => false, 'error' => 'Upload failed: ' . $e->getMessage()];
+        $uploadPath = self::UPLOAD_PATHS['admin'][$type] ?? null;
+        if (!$uploadPath) {
+            return ['success' => false, 'error' => 'Upload path not configured'];
         }
+
+        $result = self::processUpload($file, $type, $uploadPath);
+
+        if ($result['success'] && in_array($type, ['logo', 'favicon'])) {
+            $publicUrl = (self::PUBLIC_URLS['admin'][$type] ?? '') . '/' . $result['filename'];
+            $result['url'] = $publicUrl;
+            self::deleteOldFiles($uploadPath, $type, $result['filename']);
+        }
+
+        return $result;
     }
-    
-    // Alias strictly for backward compatibility logic if needed, but 'uploadAdminFile' handles it.
+
     public static function uploadAdminImage(array $file, string $type): array
     {
         return self::uploadAdminFile($file, $type);
@@ -222,56 +308,23 @@ class FileService
      */
     public static function uploadUserFile(array $file, int $userId, string $type = 'profile'): array
     {
-        try {
-            if (!isset(self::FILE_CONFIGS[$type])) {
-                return ['success' => false, 'error' => 'Invalid file type configuration'];
-            }
+        $userPath = (self::UPLOAD_PATHS['user'][$type] ?? self::UPLOAD_PATHS['user']['profile']) . '/' . $userId;
 
-            $validation = self::validateUpload($file, $type);
-            if (!$validation['success']) {
-                return $validation;
-            }
+        $result = self::processUpload($file, $type, $userPath);
 
-            $userPath = (self::UPLOAD_PATHS['user'][$type] ?? self::UPLOAD_PATHS['user']['profile']) . '/' . $userId;
-            self::createDirectory($userPath);
-
-            $filename = self::generateSecureFilename($type, $file['name']);
-            $filepath = $userPath . '/' . $filename;
+        if ($result['success']) {
+            $publicBase = self::PUBLIC_URLS['user'][$type] ?? self::PUBLIC_URLS['user']['profile'];
+            $result['url'] = $publicBase . '/' . $userId . '/' . $result['filename'];
 
             // Clean up old profile/avatar images
             if (in_array($type, ['profile', 'avatar'])) {
-                self::deleteOldFiles($userPath, $type);
+                self::deleteOldFiles($userPath, $type, $result['filename']);
             }
-
-            if (!move_uploaded_file($file['tmp_name'], $filepath)) {
-                return ['success' => false, 'error' => 'Failed to move uploaded file'];
-            }
-
-            chmod($filepath, 0644);
-
-            if (self::FILE_CONFIGS[$type]['optimize']) {
-                self::optimizeImage($filepath, $type);
-            }
-
-            $publicBase = self::PUBLIC_URLS['user'][$type] ?? self::PUBLIC_URLS['user']['profile'];
-            $publicUrl = $publicBase . '/' . $userId . '/' . $filename;
-
-            return [
-                'success' => true,
-                'filename' => $filename,
-                'path' => $filepath,
-                'url' => $publicUrl,
-                'size' => filesize($filepath),
-                'type' => $type,
-                'user_id' => $userId,
-            ];
-
-        } catch (Exception $e) {
-            return ['success' => false, 'error' => 'Upload failed: ' . $e->getMessage()];
         }
+
+        return $result;
     }
-    
-    // Alias for backward compatibility
+
     public static function uploadUserImage(array $file, int $userId): array
     {
         return self::uploadUserFile($file, $userId, 'profile');
@@ -282,34 +335,15 @@ class FileService
      */
     public static function uploadTheme(array $file): array
     {
-        try {
-            $type = 'theme';
-            $validation = self::validateUpload($file, $type);
-            if (!$validation['success']) {
-                return $validation;
-            }
+        $tempPath = self::UPLOAD_PATHS['temp'];
+        $result = self::processUpload($file, 'theme', $tempPath, 'theme_pkg');
 
-            // We upload to temp folder first
-            $tempPath = self::UPLOAD_PATHS['temp'];
-            self::createDirectory($tempPath);
-
-            $filename = self::generateSecureFilename('theme_pkg', $file['name']);
-            $filepath = $tempPath . '/' . $filename;
-
-            if (!move_uploaded_file($file['tmp_name'], $filepath)) {
-                return ['success' => false, 'error' => 'Failed to move uploaded theme file'];
-            }
-
-            return [
-                'success' => true,
-                'filepath' => $filepath,
-                'filename' => $filename,
-                'message' => 'Theme uploaded to temp storage'
-            ];
-
-        } catch (Exception $e) {
-            return ['success' => false, 'error' => 'Theme upload failed: ' . $e->getMessage()];
+        if ($result['success']) {
+            // Theme specific logic: we return the path for extraction
+            return $result;
         }
+
+        return $result;
     }
 
     /**
@@ -337,14 +371,14 @@ class FileService
             // Find theme folder
             $themeFolder = self::findThemeFolder($extractTo);
             if ($themeFolder) {
-                 return [
+                return [
                     'success' => true,
                     'theme_folder' => $themeFolder,
                     'extract_path' => $extractTo,
                     'message' => 'Theme extracted successfully'
                 ];
             }
-             
+
             return ['success' => false, 'message' => 'No theme.json found in extracted files'];
         }
 
@@ -367,16 +401,121 @@ class FileService
     }
 
     /**
-     * Validate upload
+     * Standardized Upload Processor (The Mother of All Uploads)
      */
-    private static function validateUpload(array $file, string $type): array
+    public static function processUpload(array $file, string $type, string $targetDir, string $prefix = ''): array
+    {
+        try {
+            // 1. Validation pipeline
+            $validation = self::validateUpload($file, $type);
+            if (!$validation['success']) {
+                self::logSecurityAlert($file['name'] ?? 'unknown', $validation['error'], $type);
+                return $validation;
+            }
+
+            // 2. Directory preparation
+            if (!self::createDirectory($targetDir)) {
+                return ['success' => false, 'error' => 'Failed to prepare storage directory'];
+            }
+
+            // 3. Secure filename generation
+            $filename = self::generateSecureFilename($prefix ?: $type, $file['name']);
+            $filepath = rtrim($targetDir, '/') . '/' . $filename;
+
+            // 4. Secure Move
+            if (!move_uploaded_file($file['tmp_name'], $filepath)) {
+                return ['success' => false, 'error' => 'Critical: File transfer failed'];
+            }
+
+            // 5. Hardened Permissions
+            @chmod($filepath, 0644);
+
+            // 6. Image Sanitization (Strip EXIF metadata to prevent code injection)
+            $config = self::FILE_CONFIGS[$type] ?? [];
+            if (!empty($config['optimize']) || in_array($type, ['profile', 'avatar', 'logo', 'banner', 'favicon', 'library_preview', 'bounty_preview', 'report_screenshot'])) {
+                $mimeType = mime_content_type($filepath);
+                if (strpos($mimeType, 'image/') === 0) {
+                    if (!self::sanitizeImage($filepath, $mimeType)) {
+                        @unlink($filepath); // Delete if sanitization fails
+                        self::logSecurityAlert($file['name'], 'Image sanitization failed', $type);
+                        return ['success' => false, 'error' => 'Image processing failed for security reasons'];
+                    }
+                }
+            }
+
+            // 7. Post-processing (Additional Optimization)
+            // Note: Basic sanitization already done above
+            if (!empty($config['optimize'])) {
+                self::optimizeImage($filepath, $type);
+            }
+
+            // 8. Audit Logging (Success)
+            self::logUploadSuccess($file['name'], $filename, $type);
+
+            return [
+                'success' => true,
+                'filename' => $filename,
+                'path' => $filepath,
+                'size' => @filesize($filepath) ?: 0,
+                'type' => $type
+            ];
+        } catch (Exception $e) {
+            error_log("Upload process exception: " . $e->getMessage());
+            return ['success' => false, 'error' => 'System error during upload processing'];
+        }
+    }
+
+    /**
+     * Log Security Alert
+     */
+    private static function logSecurityAlert(string $originalName, string $reason, string $type): void
+    {
+        $userId = $_SESSION['user_id'] ?? 0;
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+
+        GDPRService::logActivity(
+            $userId,
+            'file_upload_denied',
+            'security',
+            null,
+            "Security Alert: Upload of '$originalName' (Type: $type) denied. Reason: $reason",
+            null,
+            ['ip' => $ip, 'filename' => $originalName, 'type' => $type, 'reason' => $reason]
+        );
+    }
+
+    /**
+     * Log Upload Success
+     */
+    private static function logUploadSuccess(string $originalName, string $secureName, string $type): void
+    {
+        $userId = $_SESSION['user_id'] ?? 0;
+
+        GDPRService::logActivity(
+            $userId,
+            'file_upload_success',
+            'content',
+            null,
+            "File uploaded successfully: $originalName -> $secureName",
+            null,
+            ['original' => $originalName, 'secure' => $secureName, 'type' => $type]
+        );
+    }
+
+    /**
+     * Validate upload (Paranoid-Grade)
+     */
+    public static function validateUpload(array $file, string $type): array
     {
         $config = self::FILE_CONFIGS[$type] ?? null;
         if (!$config) {
             return ['success' => false, 'error' => 'Invalid upload type'];
         }
 
-        if (!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
+        // Check if file was uploaded (skip strict check in testing mode)
+        $isUploaded = self::$testing ? file_exists($file['tmp_name']) : is_uploaded_file($file['tmp_name']);
+
+        if (!isset($file['tmp_name']) || !$isUploaded) {
             return ['success' => false, 'error' => 'No file uploaded'];
         }
 
@@ -393,20 +532,44 @@ class FileService
             return ['success' => false, 'error' => 'Invalid file extension'];
         }
 
+        // 1. Strict MIME Sniffing
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $file['tmp_name']);
         finfo_close($finfo);
 
         if (!in_array($mimeType, $config['allowed_types'])) {
-             // Basic fallback check for zip types which can vary wildly
-             if ($type === 'theme' && strpos($mimeType, 'zip') !== false) {
-                 // allow
-             } else {
-                 return ['success' => false, 'error' => 'Invalid file type: ' . $mimeType];
-             }
+            // Basic fallback check for zip types which can vary wildly
+            if ($type === 'theme' && strpos($mimeType, 'zip') !== false) {
+                // allow
+            } else {
+                return ['success' => false, 'error' => 'Invalid file type: ' . $mimeType];
+            }
         }
 
-        // Image Dimension Check
+        // 2. Deep Binary Content Scan (Anti-Hacker)
+        $content = file_get_contents($file['tmp_name']);
+        $maliciousPatterns = [
+            '<?php',
+            'eval(',
+            '<script',
+            'base64_decode',
+            'shell_exec',
+            'system(',
+            'passthru(',
+            'popen(',
+            'proc_open(',
+            'pcntl_exec(',
+            'assert(',
+            'preg_replace(.*\/e',
+            '`ssh`'
+        ];
+        foreach ($maliciousPatterns as $pattern) {
+            if (stripos($content, $pattern) !== false) {
+                return ['success' => false, 'error' => 'Security Alert: Malicious content detected in file binary.'];
+            }
+        }
+
+        // 3. Image Dimension Check
         if ($config['optimize'] || in_array('image/jpeg', $config['allowed_types'])) {
             $imageInfo = @getimagesize($file['tmp_name']);
             if ($imageInfo) {
@@ -425,14 +588,92 @@ class FileService
     }
 
     /**
-     * Generate secure filename
+     * Sanitize Image - Strip EXIF Metadata (Anti-Code Injection)
+     * 
+     * Hackers can hide PHP code inside EXIF data of valid images.
+     * This function re-processes images to strip all metadata.
+     * 
+     * @param string $filepath Path to the uploaded image
+     * @param string $mimeType Verified MIME type of the image
+     * @return bool True if sanitization successful, false otherwise
+     */
+    private static function sanitizeImage(string $filepath, string $mimeType): bool
+    {
+        try {
+            // Verify file exists
+            if (!file_exists($filepath)) {
+                return false;
+            }
+
+            switch ($mimeType) {
+                case 'image/jpeg':
+                case 'image/jpg':
+                    $img = @imagecreatefromjpeg($filepath);
+                    if ($img === false) {
+                        error_log("Failed to process JPEG: $filepath");
+                        return false;
+                    }
+                    // Re-save strips EXIF data and any embedded code
+                    $result = @imagejpeg($img, $filepath, 90);
+                    imagedestroy($img);
+                    return $result !== false;
+
+                case 'image/png':
+                    $img = @imagecreatefrompng($filepath);
+                    if ($img === false) {
+                        error_log("Failed to process PNG: $filepath");
+                        return false;
+                    }
+                    // Disable alpha blending and save alpha channel
+                    imagesavealpha($img, true);
+                    $result = @imagepng($img, $filepath, 9);
+                    imagedestroy($img);
+                    return $result !== false;
+
+                case 'image/gif':
+                    $img = @imagecreatefromgif($filepath);
+                    if ($img === false) {
+                        error_log("Failed to process GIF: $filepath");
+                        return false;
+                    }
+                    $result = @imagegif($img, $filepath);
+                    imagedestroy($img);
+                    return $result !== false;
+
+                case 'image/webp':
+                    if (function_exists('imagecreatefromwebp')) {
+                        $img = @imagecreatefromwebp($filepath);
+                        if ($img === false) {
+                            error_log("Failed to process WebP: $filepath");
+                            return false;
+                        }
+                        $result = @imagewebp($img, $filepath, 90);
+                        imagedestroy($img);
+                        return $result !== false;
+                    }
+                    // If WebP not supported, log warning but don't fail
+                    error_log("WebP support not available, skipping sanitization: $filepath");
+                    return true;
+
+                default:
+                    // For unsupported image types, log and skip
+                    error_log("Unsupported image type for sanitization: $mimeType");
+                    return true; // Don't fail upload for unsupported types
+            }
+        } catch (Exception $e) {
+            error_log("Image sanitization exception: " . $e->getMessage() . " for file: $filepath");
+            return false;
+        }
+    }
+
+    /**
+     * Generate secure filename (High Entropy)
      */
     private static function generateSecureFilename(string $type, string $originalName): string
     {
         $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
-        $timestamp = time();
-        $random = bin2hex(random_bytes(8));
-        return $type . '_' . $timestamp . '_' . $random . '.' . $extension;
+        $random = bin2hex(random_bytes(12));
+        return $type . '_' . $random . '.' . $extension;
     }
 
     /**
@@ -458,12 +699,12 @@ class FileService
     {
         $realPath = realpath($filepath);
         if (!$realPath || !file_exists($realPath)) return false;
-        
+
         // Security: Ensure it's in storage or public
         $storageBase = realpath(self::STORAGE_BASE);
         $publicBase = realpath(self::PUBLIC_BASE);
         $tempBase = realpath(self::UPLOAD_PATHS['temp']);
-        
+
         $safe = false;
         if ($storageBase && strpos($realPath, $storageBase) === 0) $safe = true;
         if ($publicBase && strpos($realPath, $publicBase) === 0) $safe = true;
@@ -474,6 +715,7 @@ class FileService
         }
         return false;
     }
+
 
     /**
      * Optimize Image
@@ -488,38 +730,56 @@ class FileService
 
             $image = null;
             switch ($extension) {
-                case 'jpg': case 'jpeg': $image = @imagecreatefromjpeg($filepath); break;
-                case 'png': $image = @imagecreatefrompng($filepath); break;
-                case 'gif': $image = @imagecreatefromgif($filepath); break;
-                case 'webp': $image = @imagecreatefromwebp($filepath); break;
+                case 'jpg':
+                case 'jpeg':
+                    $image = @imagecreatefromjpeg($filepath);
+                    break;
+                case 'png':
+                    $image = @imagecreatefrompng($filepath);
+                    break;
+                case 'gif':
+                    $image = @imagecreatefromgif($filepath);
+                    break;
+                case 'webp':
+                    $image = @imagecreatefromwebp($filepath);
+                    break;
             }
             if (!$image) return false;
 
             $currentWidth = imagesx($image);
             $currentHeight = imagesy($image);
-            $maxWidth = $config['dimensions']['max_width'] ?? $currentWidth;
-            $maxHeight = $config['dimensions']['max_height'] ?? $currentHeight;
+            $maxWidth = $config['target_dimensions']['max_width'] ?? $config['dimensions']['max_width'] ?? $currentWidth;
+            $maxHeight = $config['target_dimensions']['max_height'] ?? $config['dimensions']['max_height'] ?? $currentHeight;
 
             if ($currentWidth > $maxWidth || $currentHeight > $maxHeight) {
-                 $ratio = min($maxWidth / $currentWidth, $maxHeight / $currentHeight);
-                 $newWidth = (int)($currentWidth * $ratio);
-                 $newHeight = (int)($currentHeight * $ratio);
+                $ratio = min($maxWidth / $currentWidth, $maxHeight / $currentHeight);
+                $newWidth = (int)($currentWidth * $ratio);
+                $newHeight = (int)($currentHeight * $ratio);
 
-                 $resized = imagecreatetruecolor($newWidth, $newHeight);
-                 if ($extension === 'png') {
-                     imagealphablending($resized, false);
-                     imagesavealpha($resized, true);
-                 }
-                 imagecopyresampled($resized, $image, 0, 0, 0, 0, $newWidth, $newHeight, $currentWidth, $currentHeight);
-                 imagedestroy($image);
-                 $image = $resized;
+                $resized = imagecreatetruecolor($newWidth, $newHeight);
+                if ($extension === 'png') {
+                    imagealphablending($resized, false);
+                    imagesavealpha($resized, true);
+                }
+                imagecopyresampled($resized, $image, 0, 0, 0, 0, $newWidth, $newHeight, $currentWidth, $currentHeight);
+                imagedestroy($image);
+                $image = $resized;
             }
 
             switch ($extension) {
-                case 'jpg': case 'jpeg': imagejpeg($image, $filepath, 85); break;
-                case 'png': imagepng($image, $filepath, 8); break;
-                case 'gif': imagegif($image, $filepath); break;
-                case 'webp': imagewebp($image, $filepath, 85); break;
+                case 'jpg':
+                case 'jpeg':
+                    imagejpeg($image, $filepath, 85);
+                    break;
+                case 'png':
+                    imagepng($image, $filepath, 8);
+                    break;
+                case 'gif':
+                    imagegif($image, $filepath);
+                    break;
+                case 'webp':
+                    imagewebp($image, $filepath, 85);
+                    break;
             }
             imagedestroy($image);
             return true;
@@ -527,7 +787,7 @@ class FileService
             return false;
         }
     }
-    
+
     public static function getImageConfig(string $type): ?array
     {
         return self::FILE_CONFIGS[$type] ?? null;

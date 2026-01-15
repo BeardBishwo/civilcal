@@ -59,16 +59,19 @@ if (!is_dir($__logsDir)) {
     @mkdir($__logsDir, 0755, true);
 }
 
-// Set error reporting and PHP error logging
+// Set error reporting and PHP error logging (Ruthless Security Protocol)
 if (APP_DEBUG) {
+    // Development: Show all errors
     error_reporting(E_ALL);
     ini_set("display_errors", "1");
+    ini_set("display_startup_errors", "1");
 } else {
-    // Production settings
-    error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+    // Production: Hide ALL errors from users (security best practice)
+    error_reporting(0); // Completely disable error reporting to users
     ini_set("display_errors", "0");
     ini_set("display_startup_errors", "0");
 }
+// Always log errors to file (both dev and production)
 ini_set("log_errors", "1");
 ini_set("error_log", $__logsDir . "/php_error.log");
 

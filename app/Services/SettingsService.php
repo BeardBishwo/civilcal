@@ -16,7 +16,7 @@ class SettingsService
         }
 
         $db = Database::getInstance();
-        $stmt = $db->prepare("SELECT setting_value, setting_type FROM settings WHERE setting_key = ?");
+        $stmt = $db->prepare("SELECT setting_value, setting_type FROM site_settings WHERE setting_key = ?");
         $stmt->execute([$key]);
         $result = $stmt->fetch();
 
@@ -38,17 +38,17 @@ class SettingsService
             $storageValue = self::prepareValueForStorage($value, $type);
 
             $stmt = $db->prepare("
-                INSERT INTO settings (setting_key, setting_value, setting_type, setting_group, description)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO site_settings (setting_key, setting_value, setting_type, setting_group, created_at, updated_at)
+                VALUES (?, ?, ?, ?, NOW(), NOW())
                 ON DUPLICATE KEY UPDATE
                 setting_value = VALUES(setting_value),
                 setting_type = VALUES(setting_type),
                 setting_group = VALUES(setting_group),
-                description = VALUES(description),
                 updated_at = NOW()
             ");
 
-            $result = $stmt->execute([$key, $storageValue, $type, $group, $description]);
+            // Removed description as it doesn't exist in site_settings table
+            $result = $stmt->execute([$key, $storageValue, $type, $group]);
 
             // Update cache
             if ($result) {
@@ -69,10 +69,10 @@ class SettingsService
         $db = Database::getInstance();
 
         if ($group) {
-            $stmt = $db->prepare("SELECT * FROM settings WHERE setting_group = ? ORDER BY setting_key");
+            $stmt = $db->prepare("SELECT * FROM site_settings WHERE setting_group = ? ORDER BY setting_key");
             $stmt->execute([$group]);
         } else {
-            $stmt = $db->prepare("SELECT * FROM settings ORDER BY setting_group, setting_key");
+            $stmt = $db->prepare("SELECT * FROM site_settings ORDER BY setting_group, setting_key");
             $stmt->execute();
         }
 
@@ -97,7 +97,7 @@ class SettingsService
     public static function getGroups()
     {
         $db = Database::getInstance();
-        $stmt = $db->prepare("SELECT DISTINCT setting_group FROM settings ORDER BY setting_group");
+        $stmt = $db->prepare("SELECT DISTINCT setting_group FROM site_settings ORDER BY setting_group");
         $stmt->execute();
 
         return $stmt->fetchAll(\PDO::FETCH_COLUMN);

@@ -885,6 +885,8 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                             <li><a href="<?php echo app_base_url('admin/settings/google'); ?>">Google Login</a></li>
                             <li><a href="<?php echo app_base_url('admin/settings/recaptcha'); ?>">Recaptcha</a></li>
                             <li><a href="<?php echo app_base_url('admin/settings/payments'); ?>">Payment Gateway</a></li>
+                            <li><a href="<?php echo app_base_url('admin/settings/economy'); ?>"><i class="fas fa-coins text-warning"></i> Economy</a></li>
+                            <li><a href="<?php echo app_base_url('admin/settings/quiz-modes'); ?>"><i class="fas fa-gamepad text-info"></i> Quiz Modes</a></li>
                             <li><a href="<?php echo app_base_url('admin/settings/advanced'); ?>">Advanced</a></li>
                             <li><a href="<?php echo app_base_url('admin/settings/permalinks'); ?>"><i class="fas fa-link"></i> Permalinks</a></li>
                         </ul>

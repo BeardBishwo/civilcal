@@ -4,6 +4,8 @@ namespace App\Controllers\Admin;
 
 use App\Core\Controller;
 use App\Core\Database;
+use App\Services\FileService;
+use App\Models\Media;
 
 class MediaApiController extends Controller
 {
@@ -20,7 +22,7 @@ class MediaApiController extends Controller
         $page = $_GET['page'] ?? 1;
         $perPage = 40;
         $offset = ($page - 1) * $perPage;
-        
+
         $search = $_GET['search'] ?? '';
         $type = $_GET['type'] ?? '';
 
@@ -48,11 +50,11 @@ class MediaApiController extends Controller
         $stmt->execute($params);
         $items = $stmt->fetchAll();
 
-        // Process items for display
+        // Process items for display (Secure URLs)
         foreach ($items as &$item) {
-            $item['url'] = app_base_url('uploads/' . $item['filename']);
-            $item['thumb'] = $item['url']; // Uses full image as thumb for now
-            $item['is_image'] = strpos($item['type'], 'image') === 0;
+            $item['url'] = '/storage/uploads/admin/media/' . $item['filename'];
+            $item['thumb'] = $item['url'];
+            $item['is_image'] = strpos($item['file_type'] ?? $item['type'] ?? '', 'image') === 0;
             $item['date'] = date('M j, Y', strtotime($item['created_at']));
         }
 
@@ -70,8 +72,7 @@ class MediaApiController extends Controller
 
     public function upload()
     {
-        // Simple upload handler for the modal
-        // Reuse logic from MediaController if possible, or implement simple version
+        // Hardened upload handler for the modal
         if (!current_user()) {
             http_response_code(401);
             exit;
@@ -82,32 +83,36 @@ class MediaApiController extends Controller
             return;
         }
 
-        $file = $_FILES['file'];
-        $uploadDir = BASE_PATH . '/uploads/';
-        
-        // Ensure directory exists
-        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+        // Use FileService for "Paranoid-Grade" upload
+        $upload = FileService::uploadAdminFile($_FILES['file'], 'media');
 
-        $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9_.-]/', '', $file['name']);
-        $targetPath = $uploadDir . $filename;
-
-        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+        if ($upload['success']) {
+            $filename = $upload['filename'];
             $db = Database::getInstance();
-            $db->prepare("INSERT INTO media (filename, type, size, created_at) VALUES (?, ?, ?, NOW())")
-               ->execute([$filename, $file['type'], $file['size']]);
-            
+
+            // Insert into media table using standard columns
+            $db->prepare("INSERT INTO media (original_filename, filename, file_path, file_type, file_size, mime_type, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())")
+                ->execute([
+                    $_FILES['file']['name'],
+                    $filename,
+                    $filename,
+                    strpos($_FILES['file']['type'], 'image') === 0 ? 'images' : 'documents',
+                    $_FILES['file']['size'],
+                    $_FILES['file']['type']
+                ]);
+
             $id = $db->lastInsertId();
-            
+
             echo json_encode([
                 'success' => true,
                 'data' => [
                     'id' => $id,
-                    'url' => app_base_url('uploads/' . $filename),
+                    'url' => '/storage/uploads/admin/media/' . $filename,
                     'filename' => $filename
                 ]
             ]);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Upload failed']);
+            echo json_encode(['success' => false, 'message' => $upload['error']]);
         }
     }
 }

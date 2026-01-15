@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\EmailThread;
+use App\Services\FileService;
+use App\Core\Auth;
 
 class ReportController extends Controller
 {
@@ -47,11 +49,11 @@ class ReportController extends Controller
         if (empty($name)) $errors[] = 'Name is required';
         if (empty($link)) $errors[] = 'Calculator Link is required';
         if (empty($message)) $errors[] = 'Details are required';
-        
+
         // Strictly validate link domain
         $siteUrl = parse_url(app_base_url(), PHP_URL_HOST);
         $linkUrl = parse_url($link, PHP_URL_HOST);
-        
+
         if ($linkUrl && $linkUrl !== $siteUrl) {
             $errors[] = 'Only links from ' . $siteUrl . ' are allowed.';
         }
@@ -62,50 +64,16 @@ class ReportController extends Controller
             $errors[] = 'Invalid email address';
         }
 
-        // Handle File Upload (Security Hardening)
+        // Handle File Upload (Security Hardening via FileService)
         $screenshotPath = null;
-        if (!empty($_FILES['screenshot']['name'])) {
-            $allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-            $maxSize = 5 * 1024 * 1024; // 5MB
-            
-            $file = $_FILES['screenshot'];
-            
-            // Check for upload errors
-            if ($file['error'] !== UPLOAD_ERR_OK) {
-                $errors[] = 'Error uploading screenshot.';
+        if (!empty($_FILES['screenshot']['name']) && $_FILES['screenshot']['error'] === UPLOAD_ERR_OK) {
+            $userId = Auth::id() ?: 0;
+            $upload = FileService::uploadUserFile($_FILES['screenshot'], $userId, 'report_screenshot');
+
+            if ($upload['success']) {
+                $screenshotPath = $upload['path'];
             } else {
-                // Check MIME type (not just extension)
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                $mimeType = finfo_file($finfo, $file['tmp_name']);
-                finfo_close($finfo);
-                
-                if (!in_array($mimeType, $allowedTypes)) {
-                    $errors[] = 'Only JPG, PNG, and WebP images are allowed.';
-                }
-                
-                if ($file['size'] > $maxSize) {
-                    $errors[] = 'Screenshot must be less than 5MB.';
-                }
-                
-                if (empty($errors)) {
-                    $uploadDir = BASE_PATH . '/public/uploads/reports/';
-                    if (!is_dir($uploadDir)) {
-                        mkdir($uploadDir, 0755, true);
-                        // Security: Prevent script execution in uploads folder
-                        file_put_contents($uploadDir . '.htaccess', "Options -ExecCGI -Indexes\nRemoveHandler .php .phtml .php3 .php4 .php5 .php7 .phps .pl .py .cgi\n<FilesMatch \"\\.(php|phtml|php3|php4|php5|php7|phps|pl|py|cgi)$\">\n    Order Allow,Deny\n    Deny from all\n</FilesMatch>");
-                    }
-                    
-                    // Rename file to random string
-                    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-                    $newFileName = 'report_' . bin2hex(random_bytes(8)) . '.' . $ext;
-                    $targetPath = $uploadDir . $newFileName;
-                    
-                    if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-                        $screenshotPath = 'public/uploads/reports/' . $newFileName;
-                    } else {
-                        $errors[] = 'Failed to save screenshot.';
-                    }
-                }
+                $errors[] = $upload['error'] ?? 'Screenshot upload failed';
             }
         }
 
@@ -133,7 +101,7 @@ class ReportController extends Controller
             if ($success) {
                 $db = \App\Core\Database::getInstance();
                 $threadId = $db->lastInsertId();
-                
+
                 // Add initial message
                 $fullMessage = "Link: $link\n\n" . $message;
                 $this->emailThread->addResponseToThread($threadId, null, $fullMessage, false);

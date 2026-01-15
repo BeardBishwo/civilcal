@@ -7,6 +7,7 @@ use App\Core\Auth;
 use App\Models\BountyRequest;
 use App\Models\BountySubmission;
 use App\Models\User;
+use App\Services\FileService;
 use Exception;
 
 class BountyApiController extends Controller
@@ -64,7 +65,6 @@ class BountyApiController extends Controller
 
             $this->db->commit();
             $this->json(['success' => true, 'message' => 'Bounty Posted!', 'id' => $id]);
-
         } catch (Exception $e) {
             if ($this->db->inTransaction()) {
                 $this->db->rollBack();
@@ -86,32 +86,33 @@ class BountyApiController extends Controller
 
             // Verify file logic
             $file = $_FILES['file'];
-            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-            $allowedExtensions = ['dwg', 'dxf', 'pdf', 'xlsx', 'xls', 'docx', 'doc', 'zip', 'rar', 'jpg', 'png']; 
-            
-            if (!in_array($ext, $allowedExtensions)) throw new Exception("Invalid file type: $ext", 400);
+            // Use FileService for secure Bounty submission (Binary Scanning + Entropy Filenames)
+            $upload = FileService::uploadUserFile($file, $user->id, 'bounty_file');
 
-            $uploadDir = STORAGE_PATH . '/bounty/quarantine';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+            if (!$upload['success']) {
+                throw new Exception($upload['error'] ?? 'Upload failed', 400);
+            }
 
-            $filename = uniqid('bounty_') . '_' . time() . '.' . $ext;
-            $targetPath = $uploadDir . '/' . $filename;
+            $targetPath = $upload['path'];
+            $filename = $upload['filename'];
+            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
-            // Compute Hash
-            $fileHash = hash_file('sha256', $file['tmp_name']);
+            // Compute Hash for logical integrity and duplicate check
+            $fileHash = hash_file('sha256', $targetPath);
             $submissionModel = new BountySubmission();
-            
+
             // Duplicate Check
             $existing = $submissionModel->findByHash($fileHash);
             if ($existing) {
+                // Delete the file we just uploaded since it's a duplicate
+                @unlink($targetPath);
+
                 if ($existing->uploader_id == $user->id) {
                     throw new Exception('You have already submitted this file.', 409);
                 } else {
                     throw new Exception('Duplicate file detected. This work has already been submitted by another user.', 409);
                 }
             }
-
-            if (!move_uploaded_file($file['tmp_name'], $targetPath)) throw new Exception('Upload failed', 500);
 
             // Watermark / Preview Generation
             $previewPath = null;
@@ -153,7 +154,7 @@ class BountyApiController extends Controller
             if ($previewGenerated) {
                 $previewPath = 'previews/' . $previewFilename; // Relative to public root
             }
-            
+
             // Re-instantiate model (should be stateless but good practice)
             // Or just use the one created earlier
             $submissionModel->create([
@@ -165,7 +166,6 @@ class BountyApiController extends Controller
             ]);
 
             $this->json(['success' => true, 'message' => 'Submission received! Pending review.']);
-
         } catch (Exception $e) {
             $this->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
@@ -210,15 +210,13 @@ class BountyApiController extends Controller
                 $bountyModel->updateStatus($bounty->id, 'filled');
 
                 $this->db->commit();
-                
-                $this->json(['success' => true, 'message' => 'Accepted! Payment Released.']);
 
+                $this->json(['success' => true, 'message' => 'Accepted! Payment Released.']);
             } else {
                 $reason = $input['reason'] ?? 'Client rejected';
                 $submissionModel->updateClientStatus($submissionId, 'rejected', $reason);
                 $this->json(['success' => true, 'message' => 'Submission Rejected.']);
             }
-
         } catch (Exception $e) {
             if ($this->db->inTransaction()) {
                 $this->db->rollBack();

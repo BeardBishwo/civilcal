@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPONSORSHIPS MANAGEMENT INTERFACE
  * Styled to match the premium User Management interface.
@@ -13,7 +14,7 @@ $totalSponsors = count($sponsors);
 $activeSponsors = count(array_filter($sponsors, fn($s) => ($s['status'] ?? 'active') === 'active'));
 // For campaigns, we'd ideally have a count, but we'll mock or calculate if possible
 $totalCampaigns = 0; // Placeholder until we have campaign data passed
-foreach($sponsors as $s) {
+foreach ($sponsors as $s) {
     if (isset($s['campaigns'])) $totalCampaigns += count($s['campaigns']);
 }
 ?>
@@ -146,8 +147,8 @@ foreach($sponsors as $s) {
                                             <td>
                                                 <div class="user-info-compact" style="display:flex; align-items:center; gap:0.75rem;">
                                                     <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--admin-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight:600; overflow: hidden;">
-                                                        <?php if(!empty($sponsor['logo_path'])): ?>
-                                                            <img src="/public/uploads/sponsors/<?= $sponsor['logo_path'] ?>" style="width:100%; height:100%; object-fit:cover;">
+                                                        <?php if (!empty($sponsor['logo_path'])): ?>
+                                                            <img src="/storage/uploads/admin/logos/<?= $sponsor['logo_path'] ?>" style="width:100%; height:100%; object-fit:cover;">
                                                         <?php else: ?>
                                                             <?php echo strtoupper(substr($sponsor['name'], 0, 1)); ?>
                                                         <?php endif; ?>
@@ -172,10 +173,10 @@ foreach($sponsors as $s) {
                                             </td>
                                             <td>
                                                 <div class="actions-compact">
-                                                    <button class="action-btn-icon edit-btn" 
-                                                            data-bs-toggle="modal" data-bs-target="#createCampaignModal" 
-                                                            onclick="setSponsorId(<?= $sponsor['id'] ?>, '<?= htmlspecialchars($sponsor['name'], ENT_QUOTES) ?>')"
-                                                            title="New Campaign">
+                                                    <button class="action-btn-icon edit-btn"
+                                                        data-bs-toggle="modal" data-bs-target="#createCampaignModal"
+                                                        onclick="setSponsorId(<?= $sponsor['id'] ?>, '<?= htmlspecialchars($sponsor['name'], ENT_QUOTES) ?>')"
+                                                        title="New Campaign">
                                                         <i class="fas fa-rocket"></i>
                                                     </button>
                                                     <button class="action-btn-icon" title="Edit">
@@ -221,7 +222,7 @@ foreach($sponsors as $s) {
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
+
             <div class="premium-modal-body">
                 <div class="row g-4">
                     <div class="col-12">
@@ -233,7 +234,7 @@ foreach($sponsors as $s) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-12">
                         <div class="premium-input-group">
                             <label class="premium-label">Strategic Website</label>
@@ -243,7 +244,7 @@ foreach($sponsors as $s) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <div class="premium-input-group">
                             <label class="premium-label">Primary Contact</label>
@@ -253,7 +254,7 @@ foreach($sponsors as $s) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <div class="premium-input-group">
                             <label class="premium-label">Corporate Email</label>
@@ -263,7 +264,7 @@ foreach($sponsors as $s) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-12">
                         <div class="premium-upload-zone">
                             <label class="premium-label">Brand Identity (Logo)</label>
@@ -276,7 +277,7 @@ foreach($sponsors as $s) {
                     </div>
                 </div>
             </div>
-            
+
             <div class="premium-modal-footer">
                 <button type="button" class="btn-premium-secondary" data-bs-dismiss="modal">Discard</button>
                 <button type="submit" class="btn-premium-primary">
@@ -293,7 +294,7 @@ foreach($sponsors as $s) {
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <form class="modal-content premium-modal-container bg-campaign" method="POST" action="/admin/sponsors/campaigns/create">
             <input type="hidden" name="sponsor_id" id="campaignSponsorId">
-            
+
             <div class="premium-modal-header variant-info">
                 <div class="header-icon-box shadow-info">
                     <i class="fas fa-rocket"></i>
@@ -306,7 +307,7 @@ foreach($sponsors as $s) {
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
+
             <div class="premium-modal-body">
                 <div class="row g-4">
                     <div class="col-12">
@@ -319,7 +320,7 @@ foreach($sponsors as $s) {
                             <small class="text-muted mt-1 d-block opacity-75">Internal reference name only</small>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <div class="premium-input-group">
                             <label class="premium-label">Target Calculator</label>
@@ -329,7 +330,7 @@ foreach($sponsors as $s) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <div class="premium-input-group">
                             <label class="premium-label">Priority Tier</label>
@@ -339,7 +340,7 @@ foreach($sponsors as $s) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-12">
                         <div class="premium-input-group">
                             <label class="premium-label">Ad Headline (Strategic Message)</label>
@@ -349,7 +350,7 @@ foreach($sponsors as $s) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <div class="premium-input-group">
                             <label class="premium-label">Deployment Date</label>
@@ -359,7 +360,7 @@ foreach($sponsors as $s) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <div class="premium-input-group">
                             <label class="premium-label">Expiration Date</label>
@@ -369,7 +370,7 @@ foreach($sponsors as $s) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-12">
                         <div class="premium-input-group">
                             <label class="premium-label">Impression Ceiling</label>
@@ -381,7 +382,7 @@ foreach($sponsors as $s) {
                     </div>
                 </div>
             </div>
-            
+
             <div class="premium-modal-footer">
                 <button type="button" class="btn-premium-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="submit" class="btn-premium-info">
@@ -395,468 +396,502 @@ foreach($sponsors as $s) {
 
 
 <script>
-function setSponsorId(id, name) {
-    document.getElementById('campaignSponsorId').value = id;
-    document.getElementById('campaignSponsorName').innerText = name;
-}
+    function setSponsorId(id, name) {
+        document.getElementById('campaignSponsorId').value = id;
+        document.getElementById('campaignSponsorName').innerText = name;
+    }
 
-// Logic for switching views (Table/Grid)
-document.addEventListener('DOMContentLoaded', function() {
-    const viewBtns = document.querySelectorAll('.view-btn');
-    const sections = document.querySelectorAll('.view-section');
+    // Logic for switching views (Table/Grid)
+    document.addEventListener('DOMContentLoaded', function() {
+        const viewBtns = document.querySelectorAll('.view-btn');
+        const sections = document.querySelectorAll('.view-section');
 
-    viewBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const view = this.dataset.view;
-            viewBtns.forEach(b => b.classList.toggle('active', b === btn));
-            sections.forEach(s => s.classList.toggle('active', s.id === view + '-view'));
+        viewBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const view = this.dataset.view;
+                viewBtns.forEach(b => b.classList.toggle('active', b === btn));
+                sections.forEach(s => s.classList.toggle('active', s.id === view + '-view'));
+            });
         });
     });
-});
 </script>
 
 <style>
-/* CSS CLONE FROM USERS MANAGEMENT - Optimized for consistency */
+    /* CSS CLONE FROM USERS MANAGEMENT - Optimized for consistency */
 
-.admin-wrapper-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 1rem;
-    background: #f8f9fa;
-    min-height: calc(100vh - 70px);
-}
+    .admin-wrapper-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1rem;
+        background: #f8f9fa;
+        min-height: calc(100vh - 70px);
+    }
 
-.admin-content-wrapper {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
+    .admin-content-wrapper {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
 
-.compact-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid #e5e7eb;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
+    .compact-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #e5e7eb;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
 
-.header-title {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.25rem;
-}
+    .header-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.25rem;
+    }
 
-.header-title h1 {
-    margin: 0;
-    font-size: 1.75rem;
-    font-weight: 700;
-}
+    .header-title h1 {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 700;
+    }
 
-.header-subtitle {
-    font-size: 0.875rem;
-    opacity: 0.8;
-}
+    .header-subtitle {
+        font-size: 0.875rem;
+        opacity: 0.8;
+    }
 
-.btn-compact {
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
-    border-radius: 8px;
-    font-weight: 500;
-}
+    .btn-compact {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+        border-radius: 8px;
+        font-weight: 500;
+    }
 
-.compact-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid #e5e7eb;
-}
+    .compact-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
 
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    transition: all 0.2s ease;
-}
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
+    }
 
-.stat-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1rem;
-}
+    .stat-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+    }
 
-.stat-icon.primary { background: #667eea; }
-.stat-icon.success { background: #48bb78; }
-.stat-icon.warning { background: #ed8936; }
-.stat-icon.info { background: #4299e1; }
+    .stat-icon.primary {
+        background: #667eea;
+    }
 
-.stat-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1f2937;
-    line-height: 1;
-}
+    .stat-icon.success {
+        background: #48bb78;
+    }
 
-.stat-label {
-    font-size: 0.75rem;
-    color: #6b7280;
-    font-weight: 500;
-}
+    .stat-icon.warning {
+        background: #ed8936;
+    }
 
-.compact-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    border-bottom: 1px solid #e5e7eb;
-}
+    .stat-icon.info {
+        background: #4299e1;
+    }
 
-.toolbar-left {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        line-height: 1;
+    }
 
-.search-compact {
-    position: relative;
-    min-width: 250px;
-}
+    .stat-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
 
-.search-compact i {
-    position: absolute;
-    left: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #9ca3af;
-}
+    .compact-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
 
-.search-compact input {
-    width: 100%;
-    padding: 0.625rem 0.75rem 0.625rem 2.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 0.875rem;
-}
+    .toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
 
-.filter-compact {
-    padding: 0.625rem 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    background: white;
-}
+    .search-compact {
+        position: relative;
+        min-width: 250px;
+    }
 
-.view-controls {
-    display: flex;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    overflow: hidden;
-}
+    .search-compact i {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
 
-.view-btn {
-    padding: 0.625rem;
-    border: none;
-    background: white;
-    color: #6b7280;
-    cursor: pointer;
-}
+    .search-compact input {
+        width: 100%;
+        padding: 0.625rem 0.75rem 0.625rem 2.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.875rem;
+    }
 
-.view-btn.active {
-    background: #667eea;
-    color: white;
-}
+    .filter-compact {
+        padding: 0.625rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        background: white;
+    }
 
-.table-compact {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.875rem;
-}
+    .view-controls {
+        display: flex;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        overflow: hidden;
+    }
 
-.table-compact th {
-    background: #f8f9fa;
-    padding: 1rem;
-    text-align: left;
-    font-weight: 600;
-    color: #374151;
-    border-bottom: 2px solid #e5e7eb;
-}
+    .view-btn {
+        padding: 0.625rem;
+        border: none;
+        background: white;
+        color: #6b7280;
+        cursor: pointer;
+    }
 
-.table-compact td {
-    padding: 1rem;
-    border-bottom: 1px solid #e5e7eb;
-}
+    .view-btn.active {
+        background: #667eea;
+        color: white;
+    }
 
-.table-compact tbody tr:hover { background: #f8f9fa; }
+    .table-compact {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
 
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
+    .table-compact th {
+        background: #f8f9fa;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        border-bottom: 2px solid #e5e7eb;
+    }
 
-.status-active { background: rgba(72, 187, 120, 0.1); color: #48bb78; }
-.status-inactive { background: rgba(237, 137, 54, 0.1); color: #ed8936; }
+    .table-compact td {
+        padding: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
 
-.actions-compact {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
-}
+    .table-compact tbody tr:hover {
+        background: #f8f9fa;
+    }
 
-.action-btn-icon {
-    width: 2.25rem;
-    height: 2.25rem;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    background: white;
-    color: #6b7280;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
 
-.action-btn-icon:hover {
-    background: #f3f4f6;
-    transform: translateY(-2px);
-}
+    .status-active {
+        background: rgba(72, 187, 120, 0.1);
+        color: #48bb78;
+    }
 
-.edit-btn:hover { background: #667eea; color: white; border-color: #667eea; }
-.delete-btn:hover { background: #f56565; color: white; border-color: #f56565; }
+    .status-inactive {
+        background: rgba(237, 137, 54, 0.1);
+        color: #ed8936;
+    }
 
-.empty-state-compact {
-    padding: 4rem 2rem;
-    text-align: center;
-}
+    .actions-compact {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
 
-.empty-state-compact i { font-size: 3rem; color: #9ca3af; margin-bottom: 1rem; }
+    .action-btn-icon {
+        width: 2.25rem;
+        height: 2.25rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: white;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
 
-/* ========================================
+    .action-btn-icon:hover {
+        background: #f3f4f6;
+        transform: translateY(-2px);
+    }
+
+    .edit-btn:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+
+    .delete-btn:hover {
+        background: #f56565;
+        color: white;
+        border-color: #f56565;
+    }
+
+    .empty-state-compact {
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+
+    .empty-state-compact i {
+        font-size: 3rem;
+        color: #9ca3af;
+        margin-bottom: 1rem;
+    }
+
+    /* ========================================
    ULTRA-PREMIUM MODAL SYSTEM
    ======================================== */
 
-.premium-modal-container {
-    border-radius: 24px;
-    border: none;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-    background: #ffffff;
-    overflow: hidden;
-}
+    .premium-modal-container {
+        border-radius: 24px;
+        border: none;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        background: #ffffff;
+        overflow: hidden;
+    }
 
-.premium-modal-header {
-    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-    padding: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    position: relative;
-    border: none;
-}
+    .premium-modal-header {
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        position: relative;
+        border: none;
+    }
 
-.variant-info {
-    background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
-}
+    .variant-info {
+        background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+    }
 
-.header-icon-box {
-    width: 60px;
-    height: 60px;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    font-size: 1.5rem;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
+    .header-icon-box {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-size: 1.5rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
 
-.shadow-info {
-    box-shadow: 0 10px 20px rgba(14, 165, 233, 0.2);
-}
+    .shadow-info {
+        box-shadow: 0 10px 20px rgba(14, 165, 233, 0.2);
+    }
 
-.header-text .modal-title {
-    color: #ffffff !important;
-    font-weight: 700;
-    font-size: 1.5rem;
-    margin: 0;
-    border: none;
-}
+    .header-text .modal-title {
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin: 0;
+        border: none;
+    }
 
-.header-text .modal-subtitle {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.9rem;
-    margin: 0.25rem 0 0 0;
-}
+    .header-text .modal-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+        margin: 0.25rem 0 0 0;
+    }
 
-.btn-close-premium {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
+    .btn-close-premium {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
 
-.btn-close-premium:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: rotate(90deg);
-}
+    .btn-close-premium:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(90deg);
+    }
 
-.premium-modal-body {
-    padding: 2rem;
-}
+    .premium-modal-body {
+        padding: 2rem;
+    }
 
-.premium-input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
+    .premium-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 
-.premium-label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #4b5563;
-    letter-spacing: 0.02em;
-    padding-left: 0.25rem;
-}
+    .premium-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #4b5563;
+        letter-spacing: 0.02em;
+        padding-left: 0.25rem;
+    }
 
-.input-with-icon {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
+    .input-with-icon {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
 
-.input-with-icon i {
-    position: absolute;
-    left: 1rem;
-    color: #9ca3af;
-    font-size: 1rem;
-    transition: color 0.3s ease;
-}
+    .input-with-icon i {
+        position: absolute;
+        left: 1rem;
+        color: #9ca3af;
+        font-size: 1rem;
+        transition: color 0.3s ease;
+    }
 
-.premium-control {
-    width: 100%;
-    padding: 0.875rem 1rem 0.875rem 3rem;
-    border-radius: 12px;
-    border: 2px solid #f3f4f6;
-    background: #f9fafb;
-    color: #1f2937;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-}
+    .premium-control {
+        width: 100%;
+        padding: 0.875rem 1rem 0.875rem 3rem;
+        border-radius: 12px;
+        border: 2px solid #f3f4f6;
+        background: #f9fafb;
+        color: #1f2937;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
 
-.premium-control:focus {
-    outline: none;
-    background: #ffffff;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-}
+    .premium-control:focus {
+        outline: none;
+        background: #ffffff;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
 
-.premium-upload-zone .upload-wrapper {
-    position: relative;
-    border: 2px dashed #e5e7eb;
-    border-radius: 12px;
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: #f9fafb;
-}
+    .premium-upload-zone .upload-wrapper {
+        position: relative;
+        border: 2px dashed #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+    }
 
-.premium-upload-zone .upload-wrapper:hover {
-    border-color: #6366f1;
-    background: rgba(99, 102, 241, 0.05);
-}
+    .premium-upload-zone .upload-wrapper:hover {
+        border-color: #6366f1;
+        background: rgba(99, 102, 241, 0.05);
+    }
 
-.premium-file-input {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-}
+    .premium-file-input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
 
-.upload-trigger {
-    font-size: 0.9rem;
-    color: #6b7280;
-    font-weight: 500;
-    margin: 0;
-}
+    .upload-trigger {
+        font-size: 0.9rem;
+        color: #6b7280;
+        font-weight: 500;
+        margin: 0;
+    }
 
-.premium-modal-footer {
-    padding: 1.5rem 2rem 2rem;
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    border: none;
-}
+    .premium-modal-footer {
+        padding: 1.5rem 2rem 2rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        border: none;
+    }
 
-.btn-premium-primary, .btn-premium-info {
-    padding: 0.875rem 1.75rem;
-    border-radius: 12px;
-    border: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    transition: all 0.3s ease;
-    color: #ffffff;
-}
+    .btn-premium-primary,
+    .btn-premium-info {
+        padding: 0.875rem 1.75rem;
+        border-radius: 12px;
+        border: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+        color: #ffffff;
+    }
 
-.btn-premium-primary {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-}
+    .btn-premium-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
 
-.btn-premium-info {
-    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
-}
+    .btn-premium-info {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+    }
 
-.btn-premium-primary:hover, .btn-premium-info:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.1);
-}
+    .btn-premium-primary:hover,
+    .btn-premium-info:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+    }
 
-.btn-premium-secondary {
-    padding: 0.875rem 1.75rem;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    background: #ffffff;
-    color: #4b5563;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-}
-
+    .btn-premium-secondary {
+        padding: 0.875rem 1.75rem;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        background: #ffffff;
+        color: #4b5563;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
 </style>

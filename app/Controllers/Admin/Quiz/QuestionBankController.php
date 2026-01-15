@@ -246,6 +246,9 @@ class QuestionBankController extends Controller
         $selectedEduLevels = $this->db->query("SELECT education_level_id FROM question_education_levels WHERE question_id = :id", ['id' => $id])->fetchAll(\PDO::FETCH_COLUMN);
         $question['education_level_links'] = $selectedEduLevels;
 
+        // Fetch pending report count (NEW: Phase 5)
+        $reportCount = $this->db->query("SELECT COUNT(*) FROM question_reports WHERE question_id = ? AND status = 'pending'", [$id])->fetchColumn();
+
         $mainCategories = $this->db->query("SELECT * FROM syllabus_nodes WHERE parent_id IS NULL ORDER BY order_index ASC")->fetchAll();
         $subNodes = $this->db->query("SELECT id, parent_id, title FROM syllabus_nodes WHERE parent_id IS NOT NULL ORDER BY order_index ASC")->fetchAll();
 
@@ -262,6 +265,7 @@ class QuestionBankController extends Controller
             'educationLevels' => $this->db->query("SELECT id, title, parent_id FROM syllabus_nodes WHERE type = 'education_level' ORDER BY order_index ASC")->fetchAll(),
             'positionLevels' => $this->db->query("SELECT id, title, level_number FROM position_levels WHERE is_active = 1 ORDER BY order_index ASC")->fetchAll(),
             'question' => $question,
+            'report_count' => $reportCount, // Pass to view
             'action' => app_base_url('admin/quiz/questions/update/' . $id)
         ]);
     }
@@ -471,6 +475,12 @@ class QuestionBankController extends Controller
 
             $this->db->update('quiz_questions', $data, ['id' => $id]);
 
+            // Sync Reports (NEW: Phase 5)
+            if (!empty($_POST['resolve_reports'])) {
+                $reportCtrl = new \App\Controllers\Admin\Quiz\ReportController();
+                $reportCtrl->autoResolveForQuestion($id, $_POST['resolve_message'] ?? null);
+            }
+
             // Sync Position Levels
             $this->db->delete('question_position_levels', ['question_id' => $id]);
             if (!empty($_POST['position_levels'])) {
@@ -537,7 +547,10 @@ class QuestionBankController extends Controller
             // 3. Delete education level links (Junction - NEW)
             $this->db->delete('question_education_levels', "question_id = :qid", ['qid' => $id]);
 
-            // 4. Finally delete the question
+            // 4. Delete associated reports (NEW: Bulletproof Hygiene)
+            $this->db->delete('question_reports', "question_id = :qid", ['qid' => $id]);
+
+            // 5. Finally delete the question
             $this->db->delete('quiz_questions', "id = :id", ['id' => $id]);
 
             return $this->jsonResponse(['success' => true, 'status' => 'success', 'message' => 'Question deleted successfully']);
@@ -582,7 +595,11 @@ class QuestionBankController extends Controller
                 $stmt = $this->db->prepare("DELETE FROM question_position_levels WHERE question_id IN ($placeholders)");
                 $stmt->execute($ids);
 
-                // 3. Delete all questions in one query
+                // 3. Delete all reports in one query (NEW: Bulletproof Hygiene)
+                $stmt = $this->db->prepare("DELETE FROM question_reports WHERE question_id IN ($placeholders)");
+                $stmt->execute($ids);
+
+                // 4. Delete all questions in one query
                 $stmt = $this->db->prepare("DELETE FROM quiz_questions WHERE id IN ($placeholders)");
                 $stmt->execute($ids);
 

@@ -1,8 +1,9 @@
 <?php
+
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
-use App\Services\FileUploadService;
+use App\Services\FileService;
 use App\Services\AuditLogger;
 use App\Services\PluginManager;
 use App\Core\Database;
@@ -12,7 +13,7 @@ class PluginController extends Controller
     public function __construct()
     {
         parent::__construct();
-        
+
         // Check admin authentication
         if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
             $this->redirect('/login');
@@ -24,8 +25,10 @@ class PluginController extends Controller
         // Load plugins from PluginManager
         $pm = new PluginManager();
         $plugins = $pm->scanPlugins();
-        $activePlugins = array_values(array_filter($plugins, function($p){ return !empty($p['is_active']); }));
-        
+        $activePlugins = array_values(array_filter($plugins, function ($p) {
+            return !empty($p['is_active']);
+        }));
+
         // Load the plugins management view
         $data = [
             'plugins' => $plugins,
@@ -44,15 +47,14 @@ class PluginController extends Controller
                 return;
             }
 
-            $uploader = new FileUploadService();
-            $dest = (defined('STORAGE_PATH') ? STORAGE_PATH : sys_get_temp_dir()) . '/uploads/plugins';
-            $upload = $uploader->uploadTheme($_FILES['plugin_zip'], $dest);
-            if (!($upload['success'] ?? false)) {
-                echo json_encode(['success' => false, 'message' => $upload['message'] ?? 'Upload failed']);
+            // Use FileService for secure Plugin upload (Binary Scanning + Entropy Filenames)
+            $upload = FileService::uploadAdminFile($_FILES['plugin_zip'], 'plugin');
+            if (!$upload['success']) {
+                echo json_encode(['success' => false, 'message' => $upload['error'] ?? 'Upload failed']);
                 return;
             }
 
-            $zipPath = $upload['file_path'];
+            $zipPath = $upload['path'];
             $pluginName = 'Unknown';
             $checksum = @hash_file('sha256', $zipPath) ?: null;
             $size = @filesize($zipPath) ?: null;
@@ -203,4 +205,3 @@ class PluginController extends Controller
         }
     }
 }
-?>

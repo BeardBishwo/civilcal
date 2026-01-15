@@ -141,7 +141,7 @@ if (
     <meta name="description" content="<?php echo $desc_safe; ?>">
     <link rel="manifest" href="<?php echo app_base_url("manifest.json"); ?>">
     <meta name="csrf-token" content="<?php echo csrf_token(); ?>">
-    
+
     <?php
     // Generate Canonical URL
     $canonicalUrl = $site_meta["canonical"] ?? null;
@@ -156,34 +156,34 @@ if (
         }
     }
     if ($canonicalUrl): ?>
-    <link rel="canonical" href="<?php echo htmlspecialchars($canonicalUrl); ?>">
+        <link rel="canonical" href="<?php echo htmlspecialchars($canonicalUrl); ?>">
     <?php endif; ?>
 
     <?php
     // --- SCHEMA MARKUP START ---
     require_once $basePath . '/app/Helpers/SchemaHelper.php';
     require_once $basePath . '/app/Helpers/AdHelper.php';
-    
+
     // 1. WebApplication / SoftwareApplication / Organization / BlogPosting
     if (isset($_SERVER['CALCULATOR_ID'])) {
         // Calculator Page
-        echo '<script type="application/ld+json">' . 
-             \App\Helpers\SchemaHelper::getCalculatorSchema($title_safe, $desc_safe) . 
-             "</script>\n";
+        echo '<script type="application/ld+json">' .
+            \App\Helpers\SchemaHelper::getCalculatorSchema($title_safe, $desc_safe) .
+            "</script>\n";
     } elseif ($__req_path === $__base || $__req_path === $__base . '/' || strpos($__req_path, 'index.php') !== false) {
         // Homepage - WebApplication + Organization
-        echo '<script type="application/ld+json">' . 
-             \App\Helpers\SchemaHelper::getHomepageSchema() . 
-             "</script>\n";
-             
-        echo '<script type="application/ld+json">' . 
-             \App\Helpers\SchemaHelper::getOrganizationSchema() . 
-             "</script>\n";
+        echo '<script type="application/ld+json">' .
+            \App\Helpers\SchemaHelper::getHomepageSchema() .
+            "</script>\n";
+
+        echo '<script type="application/ld+json">' .
+            \App\Helpers\SchemaHelper::getOrganizationSchema() .
+            "</script>\n";
     } elseif (isset($post) && !empty($post['slug'])) {
         // Single Blog Post
-        echo '<script type="application/ld+json">' . 
-             \App\Helpers\SchemaHelper::getBlogPostSchema($post) . 
-             "</script>\n";
+        echo '<script type="application/ld+json">' .
+            \App\Helpers\SchemaHelper::getBlogPostSchema($post) .
+            "</script>\n";
     }
 
     // 2. Breadcrumbs
@@ -191,15 +191,15 @@ if (
     $bcData = [];
     $bcPath = '';
     foreach ($bcSegments as $seg) {
-        if ($seg === 'modules' || $seg === 'index.php') continue; 
+        if ($seg === 'modules' || $seg === 'index.php') continue;
         $bcPath .= '/' . $seg;
         $bcName = ucwords(str_replace('-', ' ', $seg));
         $bcData[$bcName] = $bcPath;
     }
     if (!empty($bcData)) {
-        echo '<script type="application/ld+json">' . 
-             \App\Helpers\SchemaHelper::getBreadcrumbSchema($bcData) . 
-             "</script>\n";
+        echo '<script type="application/ld+json">' .
+            \App\Helpers\SchemaHelper::getBreadcrumbSchema($bcData) .
+            "</script>\n";
     }
     // --- SCHEMA MARKUP END ---
     ?>
@@ -247,7 +247,7 @@ if (
     <link rel="stylesheet" href="<?php echo \App\Helpers\Asset::url('public/assets/css/custom.css'); ?>">
     <link rel="stylesheet" href="<?php echo \App\Helpers\Asset::url('public/assets/css/global-notifications.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Custom Theme CSS -->
     <?php if (file_exists(BASE_PATH . '/themes/default/assets/css/theme.css')): ?>
         <link rel="stylesheet" href="<?php echo \App\Helpers\Asset::url('themes/default/assets/css/theme.css'); ?>">
@@ -255,21 +255,24 @@ if (
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     <meta name="theme-color" content="#000000">
     <!-- Inline styles removed to ensure single source of truth in theme.css -->
     <!-- Google Analytics -->
-    <?php 
+    <?php
     $gaId = \App\Services\SettingsService::get('google_analytics_id');
-    if (!empty($gaId)): 
+    if (!empty($gaId)):
     ?>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=<?= htmlspecialchars($gaId) ?>"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', '<?= htmlspecialchars($gaId) ?>');
-    </script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=<?= htmlspecialchars($gaId) ?>"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+            gtag('config', '<?= htmlspecialchars($gaId) ?>');
+        </script>
     <?php endif; ?>
 
     <!-- PWA Service Worker Registration -->
@@ -296,77 +299,77 @@ if (
     $topMenuItems = (new \App\Services\MenuService())->get('top_header');
     if (!empty($topMenuItems) && is_array($topMenuItems)):
     ?>
-    <div class="top-header has-content" id="topHeaderBar">
-        <div class="container margin-auto">
-            <div class="top-header-ticker" id="topHeaderTicker">
-                <ul id="topHeaderList">
-                    <?php foreach ($topMenuItems as $index => $item): 
-                        // Skip inactive items
-                        if (isset($item['is_active']) && $item['is_active'] === false) continue;
-                        
-                        $tParams = $item;
-                        $tUrl = $tParams['url'] ?? '#';
-                        $tLabel = $tParams['name'] ?? ($tParams['title'] ?? ($tParams['label'] ?? 'Link'));
-                        $tIcon = $tParams['icon'] ?? '';
-                        if ($tIcon && strpos($tIcon, 'fa-') === 0) $tIcon = 'fas ' . $tIcon;
-                    ?>
-                    <li>
-                        <a href="<?php echo (strpos($tUrl, 'http') === 0) ? $tUrl : app_base_url($tUrl); ?>">
-                            <?php if($index === 0): ?><span class="top-header-notice">Notice</span><?php endif; ?>
-                            <?php if($tIcon): ?><i class="<?php echo htmlspecialchars($tIcon); ?>"></i><?php endif; ?>
-                            <span><?php echo htmlspecialchars($tLabel); ?></span>
-                        </a>
-                    </li>
-                    <?php endforeach; ?>
-                </ul>
+        <div class="top-header has-content" id="topHeaderBar">
+            <div class="container margin-auto">
+                <div class="top-header-ticker" id="topHeaderTicker">
+                    <ul id="topHeaderList">
+                        <?php foreach ($topMenuItems as $index => $item):
+                            // Skip inactive items
+                            if (isset($item['is_active']) && $item['is_active'] === false) continue;
+
+                            $tParams = $item;
+                            $tUrl = $tParams['url'] ?? '#';
+                            $tLabel = $tParams['name'] ?? ($tParams['title'] ?? ($tParams['label'] ?? 'Link'));
+                            $tIcon = $tParams['icon'] ?? '';
+                            if ($tIcon && strpos($tIcon, 'fa-') === 0) $tIcon = 'fas ' . $tIcon;
+                        ?>
+                            <li>
+                                <a href="<?php echo (strpos($tUrl, 'http') === 0) ? $tUrl : app_base_url($tUrl); ?>">
+                                    <?php if ($index === 0): ?><span class="top-header-notice">Notice</span><?php endif; ?>
+                                    <?php if ($tIcon): ?><i class="<?php echo htmlspecialchars($tIcon); ?>"></i><?php endif; ?>
+                                    <span><?php echo htmlspecialchars($tLabel); ?></span>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+                <button class="top-header-close" id="closeTopHeader" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <button class="top-header-close" id="closeTopHeader" title="Close">
-                <i class="fas fa-times"></i>
-            </button>
         </div>
-    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const topHeader = document.getElementById('topHeaderBar');
-            const ticker = document.getElementById('topHeaderTicker');
-            const list = document.getElementById('topHeaderList');
-            const closeBtn = document.getElementById('closeTopHeader');
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const topHeader = document.getElementById('topHeaderBar');
+                const ticker = document.getElementById('topHeaderTicker');
+                const list = document.getElementById('topHeaderList');
+                const closeBtn = document.getElementById('closeTopHeader');
 
-            // 1. Close Functionality
-            if (closeBtn && topHeader) {
-                closeBtn.addEventListener('click', function() {
-                    topHeader.style.display = 'none';
-                    // Optional: Store in session or local storage to keep it closed
-                    localStorage.setItem('topHeaderClosed', 'true');
-                });
+                // 1. Close Functionality
+                if (closeBtn && topHeader) {
+                    closeBtn.addEventListener('click', function() {
+                        topHeader.style.display = 'none';
+                        // Optional: Store in session or local storage to keep it closed
+                        localStorage.setItem('topHeaderClosed', 'true');
+                    });
 
-                // Check if it was closed before
-                if (localStorage.getItem('topHeaderClosed') === 'true') {
-                    topHeader.style.display = 'none';
-                }
-            }
-
-            // 2. Ticker Functionality
-            function checkTicker() {
-                if (ticker && list) {
-                    const isOverflowing = list.scrollWidth > ticker.clientWidth;
-                    if (isOverflowing) {
-                        list.classList.add('ticker-active');
-                        // Calculate duration based on width for consistent speed
-                        const speed = 50; // pixels per second
-                        const duration = list.scrollWidth / speed;
-                        list.style.animationDuration = duration + 's';
-                    } else {
-                        list.classList.remove('ticker-active');
+                    // Check if it was closed before
+                    if (localStorage.getItem('topHeaderClosed') === 'true') {
+                        topHeader.style.display = 'none';
                     }
                 }
-            }
 
-            checkTicker();
-            window.addEventListener('resize', checkTicker);
-        });
-    </script>
+                // 2. Ticker Functionality
+                function checkTicker() {
+                    if (ticker && list) {
+                        const isOverflowing = list.scrollWidth > ticker.clientWidth;
+                        if (isOverflowing) {
+                            list.classList.add('ticker-active');
+                            // Calculate duration based on width for consistent speed
+                            const speed = 50; // pixels per second
+                            const duration = list.scrollWidth / speed;
+                            list.style.animationDuration = duration + 's';
+                        } else {
+                            list.classList.remove('ticker-active');
+                        }
+                    }
+                }
+
+                checkTicker();
+                window.addEventListener('resize', checkTicker);
+            });
+        </script>
     <?php endif; ?>
 
     <header class="site-header" id="siteHeader">
@@ -422,7 +425,7 @@ if (
                             style="<?php echo ($header_style === 'text_only') ? 'display: none;' : ''; ?>"
                             onerror="console.log('Logo image failed to load:', this.src); this.style.display='none'; this.parentNode.querySelector('.logo-text').style.display='block';"
                             onload="console.log('Logo image loaded successfully:', this.src);">
-                        <?php 
+                        <?php
                         $textParts = explode(' ', $logo_text);
                         if (count($textParts) > 1): ?>
                             <span class="logo-text" style="<?php echo ($header_style === 'logo_only') ? 'display: none;' : 'display: block;'; ?>">
@@ -447,7 +450,7 @@ if (
                         <?php
                         $menuSvc = new \App\Services\MenuService();
                         $primaryMenuItems = $menuSvc->get("header"); // Use 'header' location as shown in admin
-                        
+
                         // Fallback if menu is empty
                         if (empty($primaryMenuItems)) {
                             $primaryMenuItems = [
@@ -462,7 +465,7 @@ if (
                                 ['title' => 'MEP', 'url' => '/mep', 'icon' => 'fa-tools'],
                             ];
                         }
-                        
+
 
 
 
@@ -486,7 +489,7 @@ if (
                                 </a>
                             </li>
                         <?php endforeach; ?>
-                        
+
                         <li class="more-menu-item has-dropdown" id="dynamicMoreItem" style="display: none;">
                             <a href="#" aria-haspopup="true" aria-expanded="false" role="button">
                                 More <i class="fas fa-chevron-down"></i>
@@ -519,10 +522,10 @@ if (
                     <div class="user-greeting <?php echo $is_logged_in ? 'logged-in' : 'guest'; ?>" id="userGreeting">
                         <span class="greeting-text">Hi, </span>
                         <strong><?php if (!empty($userName)) {
-                                         echo htmlspecialchars(explode(" ", $userName)[0]);
-                                     } else {
-                                         echo "Guest";
-                                     } ?></strong> <?php echo $is_logged_in ? '👋' : ''; ?>
+                                    echo htmlspecialchars(explode(" ", $userName)[0]);
+                                } else {
+                                    echo "Guest";
+                                } ?></strong> <?php echo $is_logged_in ? '👋' : ''; ?>
                     </div>
 
                     <!-- Actions -->
@@ -557,33 +560,33 @@ if (
                         !empty($_SESSION["username"]) ||
                         !empty($_SESSION["full_name"]);
                     if ($is_logged_in): ?>
-                    <!-- Notifications (Only for logged-in users) -->
-                    <?php if ($is_logged_in): ?>
-                        <div class="notification-wrapper has-dropdown" id="notificationWrapper">
-                            <button class="notification-btn" id="notificationToggleBtn" title="Notifications" aria-expanded="false" aria-haspopup="true">
-                                <i class="fas fa-bell"></i>
-                                <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
-                            </button>
-                            <div class="dropdown notification-dropdown" id="notificationDropdown" role="menu">
-                                <div class="notification-header">
-                                    <h3>Notifications</h3>
-                                    <button class="mark-all-read" id="markAllReadBtn" title="Mark all as read">
-                                        <i class="fas fa-check-double"></i> Mark all read
-                                    </button>
-                                </div>
-                                <div class="notification-list" id="notificationList">
-                                    <div style="padding: 2rem; text-align: center; color: #94a3b8;">
-                                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <!-- Notifications (Only for logged-in users) -->
+                        <?php if ($is_logged_in): ?>
+                            <div class="notification-wrapper has-dropdown" id="notificationWrapper">
+                                <button class="notification-btn" id="notificationToggleBtn" title="Notifications" aria-expanded="false" aria-haspopup="true">
+                                    <i class="fas fa-bell"></i>
+                                    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                                </button>
+                                <div class="dropdown notification-dropdown" id="notificationDropdown" role="menu">
+                                    <div class="notification-header">
+                                        <h3>Notifications</h3>
+                                        <button class="mark-all-read" id="markAllReadBtn" title="Mark all as read">
+                                            <i class="fas fa-check-double"></i> Mark all read
+                                        </button>
+                                    </div>
+                                    <div class="notification-list" id="notificationList">
+                                        <div style="padding: 2rem; text-align: center; color: #94a3b8;">
+                                            <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                        </div>
+                                    </div>
+                                    <div class="notification-footer">
+                                        <a href="<?php echo app_base_url('/user/notifications'); ?>" class="view-all-btn">View All Notifications</a>
                                     </div>
                                 </div>
-                                <div class="notification-footer">
-                                    <a href="<?php echo app_base_url('/user/notifications'); ?>" class="view-all-btn">View All Notifications</a>
-                                </div>
                             </div>
-                        </div>
-                    <?php endif; ?>
+                        <?php endif; ?>
 
-                    <div class="profile-dropdown-wrapper">
+                        <div class="profile-dropdown-wrapper">
                             <button class="profile-btn" id="profileToggleBtn" title="Profile Menu">
                                 <i class="fas fa-user-circle"></i>
                             </button>
@@ -605,6 +608,10 @@ if (
                                 <a href="#" class="menu-item" id="favoritesMenuItem" onclick="const w=document.getElementById('favorites-widget'); if(w){w.scrollIntoView({behavior:'smooth'});}else{window.location.href='<?php echo app_base_url('/calculator'); ?>';} return false;">
                                     <i class="fas fa-star" style="color: #f59e0b;"></i>
                                     <span class="text">Favorites</span>
+                                </a>
+                                <a href="<?php echo app_base_url('user/reports'); ?>" class="menu-item">
+                                    <i class="fas fa-flag" style="color: #f43f5e;"></i>
+                                    <span class="text">My Reports</span>
                                 </a>
                                 <a href="<?php echo app_base_url(
                                                 "help",
@@ -631,7 +638,7 @@ if (
 
             <div class="mobile-nav" id="mobileNav">
                 <ul>
-                    <?php foreach ($primaryMenuItems as $item): 
+                    <?php foreach ($primaryMenuItems as $item):
                         // Skip inactive items
                         if (isset($item['is_active']) && $item['is_active'] === false) {
                             continue;
@@ -644,8 +651,8 @@ if (
                         }
                     ?>
                         <li><a href="<?php echo (strpos($url, 'http') === 0) ? $url : app_base_url($url); ?>">
-                            <i class="<?php echo htmlspecialchars($icon); ?>"></i> <?php echo htmlspecialchars($title); ?>
-                        </a></li>
+                                <i class="<?php echo htmlspecialchars($icon); ?>"></i> <?php echo htmlspecialchars($title); ?>
+                            </a></li>
                     <?php endforeach; ?>
                 </ul>
             </div>
@@ -660,11 +667,11 @@ if (
 
             <div class="search-input-wrapper">
                 <i class="fas fa-search search-icon"></i>
-                <input 
-                    type="text" 
-                    id="overlaySearchInput" 
+                <input
+                    type="text"
+                    id="overlaySearchInput"
                     class="search-overlay-input"
-                    placeholder="Search calculators, tools, categories..." 
+                    placeholder="Search calculators, tools, categories..."
                     autocomplete="off"
                     autofocus>
                 <div class="search-stats" id="searchStats"></div>
@@ -760,11 +767,11 @@ if (
 
                     // Available width from the middle container
                     const containerWidth = headerMiddle.getBoundingClientRect().width;
-                    
+
                     // Show all items to measure accurately
                     dynamicMoreItem.classList.add('visible');
                     const moreItemWidth = dynamicMoreItem.getBoundingClientRect().width || 80;
-                    
+
                     navItems.forEach(item => {
                         mainNavList.insertBefore(item, dynamicMoreItem);
                         item.style.display = 'flex';
@@ -840,8 +847,10 @@ if (
                         // Animate icon for feedback even if it doesn't switch theme yet
                         icon.style.transition = 'transform 0.4s ease';
                         icon.style.transform = 'rotate(360deg) scale(1.1)';
-                        setTimeout(() => { icon.style.transform = ''; }, 400);
-                        
+                        setTimeout(() => {
+                            icon.style.transform = '';
+                        }, 400);
+
                         showThemeNotification('🎨 Custom themes coming soon!');
                     });
                 }
@@ -1233,7 +1242,7 @@ if (
                 toggleBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     const isOpen = dropdown.classList.contains('active');
-                    
+
                     // Close others
                     document.querySelectorAll('.dropdown.open, .dropdown.active').forEach(d => {
                         if (d !== dropdown) d.classList.remove('active', 'open');
@@ -1265,7 +1274,7 @@ if (
                             method: 'POST'
                         });
                         const data = await res.json();
-                        
+
                         if (data.success) {
                             // Update UI
                             badge.style.display = 'none';
@@ -1285,14 +1294,14 @@ if (
                     try {
                         const res = await fetch(`${baseUrl}/api/notifications`);
                         const data = await res.json();
-                        
+
                         if (data.success) {
                             renderNotifications(data.notifications);
                             updateBadge(data.notifications.length);
                             isLoaded = true;
                         } else if (res.status === 401) {
-                             // User logged out
-                             list.innerHTML = `<div class="notification-empty">
+                            // User logged out
+                            list.innerHTML = `<div class="notification-empty">
                                 <i class="fas fa-exclamation-circle"></i>
                                 <p>Please login to view notifications</p>
                             </div>`;
@@ -1357,19 +1366,29 @@ if (
 
                 function getIconForType(type) {
                     switch (type) {
-                        case 'success': return 'fas fa-check-circle';
-                        case 'warning': return 'fas fa-exclamation-triangle';
-                        case 'error': return 'fas fa-times-circle';
-                        case 'info': default: return 'fas fa-info-circle';
+                        case 'success':
+                            return 'fas fa-check-circle';
+                        case 'warning':
+                            return 'fas fa-exclamation-triangle';
+                        case 'error':
+                            return 'fas fa-times-circle';
+                        case 'info':
+                        default:
+                            return 'fas fa-info-circle';
                     }
                 }
 
                 function getClassForType(type) {
                     switch (type) {
-                        case 'success': return 'bg-success-light';
-                        case 'warning': return 'bg-warning-light';
-                        case 'error': return 'bg-danger-light';
-                        case 'info': default: return 'bg-info-light';
+                        case 'success':
+                            return 'bg-success-light';
+                        case 'warning':
+                            return 'bg-warning-light';
+                        case 'error':
+                            return 'bg-danger-light';
+                        case 'info':
+                        default:
+                            return 'bg-info-light';
                     }
                 }
 
@@ -1400,10 +1419,10 @@ if (
 
                 // Check unread count on load
                 checkUnreadCount();
-                
+
                 // Poll every 60 seconds
                 setInterval(checkUnreadCount, 60000);
             })();
         </script>
-    <!-- Main Content Wrapper -->
-    <main class="main-content">
+        <!-- Main Content Wrapper -->
+        <main class="main-content">

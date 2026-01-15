@@ -1,4 +1,5 @@
 <?php
+
 /**
  * System Health Check API Endpoint
  * Provides system health status for monitoring
@@ -7,13 +8,28 @@
 define('BISHWO_CALCULATOR', true);
 require_once __DIR__ . '/../app/bootstrap.php';
 
+// Security: Require authentication for health check (prevents info disclosure)
+session_start();
+$isAuthenticated = isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+$hasSecretKey = isset($_GET['key']) && $_GET['key'] === getenv('HEALTH_CHECK_KEY');
+
+if (!$isAuthenticated && !$hasSecretKey) {
+    http_response_code(403);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => false,
+        'error' => 'Unauthorized. Admin access required.'
+    ]);
+    exit;
+}
+
 // Set content type to JSON
 header('Content-Type: application/json');
 
 try {
     // Get request method
     $method = $_SERVER['REQUEST_METHOD'];
-    
+
     if ($method === 'GET') {
         $health = [
             'status' => 'healthy',
@@ -22,7 +38,7 @@ try {
             'version' => '1.0.0',
             'checks' => []
         ];
-        
+
         // Database check
         try {
             $db = \App\Core\Database::getInstance();
@@ -38,7 +54,7 @@ try {
             ];
             $health['status'] = 'unhealthy';
         }
-        
+
         // File system check
         $storagePath = __DIR__ . '/../storage';
         if (is_dir($storagePath) && is_writable($storagePath)) {
@@ -53,13 +69,13 @@ try {
             ];
             $health['status'] = 'degraded';
         }
-        
+
         // Memory check
         $memoryUsage = memory_get_usage(true);
         $memoryLimit = ini_get('memory_limit');
         $memoryLimitBytes = return_bytes($memoryLimit);
         $memoryUsagePercent = ($memoryUsage / $memoryLimitBytes) * 100;
-        
+
         if ($memoryUsagePercent < 80) {
             $health['checks']['memory'] = [
                 'status' => 'pass',
@@ -89,7 +105,7 @@ try {
             ];
             $health['status'] = 'unhealthy';
         }
-        
+
         // PHP version check
         $phpVersion = PHP_VERSION;
         if (version_compare($phpVersion, '7.4.0', '>=')) {
@@ -108,17 +124,17 @@ try {
                 $health['status'] = 'degraded';
             }
         }
-        
+
         // Extensions check
         $requiredExtensions = ['pdo', 'pdo_mysql', 'json', 'mbstring'];
         $missingExtensions = [];
-        
+
         foreach ($requiredExtensions as $ext) {
             if (!extension_loaded($ext)) {
                 $missingExtensions[] = $ext;
             }
         }
-        
+
         if (empty($missingExtensions)) {
             $health['checks']['extensions'] = [
                 'status' => 'pass',
@@ -134,7 +150,7 @@ try {
             ];
             $health['status'] = 'unhealthy';
         }
-        
+
         // Session check
         if (session_status() === PHP_SESSION_ACTIVE) {
             $health['checks']['session'] = [
@@ -150,7 +166,7 @@ try {
                 $health['status'] = 'degraded';
             }
         }
-        
+
         // Set HTTP status code based on health
         if ($health['status'] === 'healthy') {
             http_response_code(200);
@@ -159,12 +175,11 @@ try {
         } else {
             http_response_code(503); // Service unavailable
         }
-        
+
         echo json_encode([
             'success' => true,
             'health' => $health
         ]);
-        
     } else {
         // Method not allowed
         http_response_code(405);
@@ -173,7 +188,6 @@ try {
             'error' => 'Method not allowed. Use GET.'
         ]);
     }
-    
 } catch (\Exception $e) {
     http_response_code(500);
     echo json_encode([
@@ -184,12 +198,13 @@ try {
 }
 
 // Helper function to convert memory limit string to bytes
-function return_bytes($val) {
+function return_bytes($val)
+{
     $val = trim($val);
-    $last = strtolower($val[strlen($val)-1]);
+    $last = strtolower($val[strlen($val) - 1]);
     $val = (int)$val;
-    
-    switch($last) {
+
+    switch ($last) {
         case 'g':
             $val *= 1024;
         case 'm':
@@ -197,6 +212,6 @@ function return_bytes($val) {
         case 'k':
             $val *= 1024;
     }
-    
+
     return $val;
 }

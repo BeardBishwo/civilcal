@@ -3,8 +3,8 @@
 return [
     'app' => [
         'name' => 'Bishwo Calculator',
-        'env' => 'production',
-        'debug' => false,
+        'env' => getenv('APP_ENV') ?? 'production',
+        'debug' => filter_var(getenv('APP_DEBUG') ?? false, FILTER_VALIDATE_BOOLEAN),
         'url' => 'http://localhost/Bishwo_Calculator',
         'timezone' => 'Asia/Kathmandu',
     ],

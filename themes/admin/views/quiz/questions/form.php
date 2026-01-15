@@ -80,6 +80,35 @@
             <!-- LEFT COLUMN: Main Editor (65%) -->
             <div class="w-full lg:w-[65%] space-y-6">
 
+                <?php if (!empty($report_count) && $report_count > 0): ?>
+                    <!-- Shadow Fix Warning Alert (Phase 5) -->
+                    <div class="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-2xl p-5 shadow-sm animate__animated animate__pulse">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-sm font-bold text-red-800">Shadow-Fix Warning!</h4>
+                                <p class="text-xs text-red-600 mt-1">This question has <strong><?php echo $report_count; ?> pending reports</strong>. Fixing it here without resolving the reports will ignore the users' efforts.</p>
+
+                                <div class="mt-4 flex items-center gap-4 p-3 bg-white/50 rounded-xl border border-red-100">
+                                    <label class="flex items-center gap-2 cursor-pointer group">
+                                        <div class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="resolve_reports" value="1" checked class="sr-only peer">
+                                            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                                        </div>
+                                        <span class="text-xs font-bold text-slate-700 group-hover:text-emerald-600 transition">Auto-Resolve & Reward Reporters on Save</span>
+                                    </label>
+                                </div>
+                                <div class="mt-2 pl-1">
+                                    <input type="text" name="resolve_message" placeholder="Optional personal message (e.g. 'Fixed the typo!')"
+                                        class="w-full px-3 py-2 text-[11px] bg-white border border-red-100 rounded-lg focus:border-red-400 outline-none transition">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <!-- 1. Question Type Tabs & Content -->
                 <div id="card_main" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all duration-300">
                     <!-- Tabs Header with Pin -->

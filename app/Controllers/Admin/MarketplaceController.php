@@ -3,7 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
-use App\Services\FileUploadService;
+use App\Services\FileService;
 use Exception;
 
 /**
@@ -17,14 +17,14 @@ use Exception;
 class MarketplaceController extends Controller
 {
     private $themeManager;
-    
+
     public function __construct()
     {
         parent::__construct();
         // PremiumThemeManager is in App\Services namespace
         $this->themeManager = new \App\Services\PremiumThemeManager($this->db);
     }
-    
+
     /**
      * Display unified marketplace
      * 
@@ -34,13 +34,12 @@ class MarketplaceController extends Controller
     {
         try {
             $items = $this->getMarketplaceItems();
-            
+
             $this->view->render('admin/marketplace/index', [
                 'title' => 'Marketplace',
                 'items' => $items,
                 'categories' => $this->getMarketplaceCategories()
             ]);
-            
         } catch (Exception $e) {
             $this->view->render('admin/error', [
                 'title' => 'Error',
@@ -48,7 +47,7 @@ class MarketplaceController extends Controller
             ]);
         }
     }
-    
+
     /**
      * Handle license validation for purchased items
      * 
@@ -63,35 +62,34 @@ class MarketplaceController extends Controller
                 $this->redirect('/admin/marketplace');
                 return;
             }
-            
+
             $licenseKey = $_POST['license_key'] ?? '';
             $domain = $_SERVER['HTTP_HOST'] ?? '';
             $userId = $_SESSION['user_id'] ?? 'default';
-            
+
             if (empty($licenseKey)) {
                 $this->addFlashMessage('error', 'License key is required');
                 $this->redirect('/admin/marketplace');
                 return;
             }
-            
+
             $result = $this->themeManager->validateLicense($licenseKey, $domain, $userId);
-            
+
             if ($result['valid']) {
                 $this->addFlashMessage('success', 'License validated successfully');
             } else {
                 $this->addFlashMessage('error', $result['message']);
             }
-            
+
             $this->redirect('/admin/marketplace');
             return;
-            
         } catch (Exception $e) {
             $this->addFlashMessage('error', 'License validation failed: ' . $e->getMessage());
             $this->redirect('/admin/marketplace');
             return;
         }
     }
-    
+
     /**
      * Handle item installation from ZIP
      * 
@@ -106,36 +104,34 @@ class MarketplaceController extends Controller
                 $this->redirect('/admin/marketplace');
                 return;
             }
-            
+
             $licenseKey = $_POST['license_key'] ?? '';
             $type = $_POST['type'] ?? 'theme'; // theme, plugin, script
             $userId = $_SESSION['user_id'] ?? 'default';
-            
+
             if (empty($licenseKey)) {
                 $this->addFlashMessage('error', 'License key is required for installation');
                 $this->redirect('/admin/marketplace');
                 return;
             }
-            
+
             if (!isset($_FILES['package_zip']) || $_FILES['package_zip']['error'] !== UPLOAD_ERR_OK) {
                 $this->addFlashMessage('error', 'Please select a valid package ZIP file');
                 $this->redirect('/admin/marketplace');
                 return;
             }
-            
-            // Validate and stage upload
-            $uploader = new FileUploadService();
-            $dest = (defined('STORAGE_PATH') ? STORAGE_PATH : sys_get_temp_dir()) . '/uploads/marketplace';
-            $upload = $uploader->uploadTheme($_FILES['package_zip'], $dest); 
-            
-            if (!($upload['success'] ?? false)) {
-                $this->addFlashMessage('error', $upload['message'] ?? 'Upload failed');
+
+            // Use FileService for secure Marketplace upload (Binary Scanning + Entropy Filenames)
+            $upload = FileService::uploadAdminFile($_FILES['package_zip'], 'marketplace');
+
+            if (!$upload['success']) {
+                $this->addFlashMessage('error', $upload['error'] ?? 'Upload failed');
                 $this->redirect('/admin/marketplace');
                 return;
             }
-            
-            $zipPath = $upload['file_path'];
-            
+
+            $zipPath = $upload['path'];
+
             // Dispatch to correct manager based on type
             if ($type === 'plugin') {
                 $pluginManager = new \App\Services\PluginManager();
@@ -145,16 +141,15 @@ class MarketplaceController extends Controller
                 // Default to Theme for 'theme' or 'script' (scripts are often bundled as themes or handled by theme manager in this architecture)
                 $result = $this->themeManager->installThemeFromZip($zipPath, $licenseKey, $userId);
             }
-            
+
             if ($result['success']) {
                 $this->addFlashMessage('success', ucfirst($type) . ' installed successfully');
             } else {
                 $this->addFlashMessage('error', $result['message']);
             }
-            
+
             $this->redirect('/admin/marketplace');
             return;
-            
         } catch (Exception $e) {
             $this->addFlashMessage('error', 'Installation failed: ' . $e->getMessage());
             $this->redirect('/admin/marketplace');
@@ -163,7 +158,7 @@ class MarketplaceController extends Controller
     }
     
     // Private helper methods
-    
+
     /**
      * Get items for the marketplace
      * 
@@ -202,7 +197,7 @@ class MarketplaceController extends Controller
             ]
         ];
     }
-    
+
     /**
      * Get marketplace categories
      * 

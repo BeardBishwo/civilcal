@@ -6,6 +6,62 @@
 // Get router from global scope
 $router = $GLOBALS["router"];
 
+// ============================================
+// QUIZ DASHBOARD (New V2) - HIGH PRIORITY
+// ============================================
+$router->add("GET", "/quiz", "Quiz\\QuizHomeController@index");
+$router->add("GET", "/quiz-home", "Quiz\\QuizHomeController@index");
+$router->add("GET", "/quiz/zone", "Quiz\\QuizZoneController@index", ["auth"]);
+$router->add("GET", "/quiz/setup", "Quiz\\QuizZoneController@setup", ["auth"]);
+$router->add("POST", "/quiz/setup/save", "Quiz\\QuizZoneController@saveSetup", ["auth"]);
+
+// ============================================
+// QUIZ MODES - GAME ROUTES
+// ============================================
+
+// 1. Contest Play
+$router->add("GET", "/quiz/contests", "Quiz\\StudentContestController@index", ["auth"]);
+$router->add("GET", "/quiz/contest/room/{id}", "Quiz\\StudentContestController@room", ["auth"]);
+$router->add("POST", "/quiz/contest/submit/{id}", "Quiz\\StudentContestController@submit", ["auth"]);
+
+// 2. Multi Match (Blueprint)
+$router->add("GET", "/quiz/multi-match", "Quiz\\TerminologyController@index", ["auth"]);
+$router->add("GET", "/blueprint", "Quiz\\TerminologyController@index", ["auth"]);
+$router->add("GET", "/blueprint/arena/{id}", "Quiz\\TerminologyController@arena", ["auth"]);
+$router->add("POST", "/blueprint/submit", "Quiz\\TerminologyController@submit", ["auth"]);
+
+// 3. Battle (Multiplayer)
+$router->add("GET", "/quiz/battle", "Quiz\\MultiplayerController@index", ["auth"]);
+$router->add("GET", "/quiz/battle-group", "Quiz\\MultiplayerController@index", ["auth"]);
+$router->add("GET", "/quiz/multiplayer", "Quiz\\MultiplayerController@index", ["auth"]);
+$router->add("GET", "/quiz/lobby/{code}", "Quiz\\MultiplayerController@lobby", ["auth"]);
+$router->add("POST", "/quiz/lobby/create", "Quiz\\MultiplayerController@create", ["auth"]);
+$router->add("POST", "/quiz/lobby/join", "Quiz\\MultiplayerController@join", ["auth"]);
+$router->add("POST", "/api/lobby/wager", "Quiz\\MultiplayerController@placeWager", ["auth"]);
+$router->add("GET", "/api/lobby/status/{code}", "Quiz\\MultiplayerController@status", ["auth"]);
+
+// 4. Gamification (City / Map)
+$router->add("GET", "/quiz/city", "Quiz\\GamificationController@city", ["auth"]);
+$router->add("POST", "/quiz/city/build", "Quiz\\GamificationController@build", ["auth"]);
+$router->add("GET", "/quiz/sawmill", "Quiz\\GamificationController@sawmill", ["auth"]);
+$router->add("POST", "/quiz/sawmill/craft", "Quiz\\GamificationController@craft", ["auth"]);
+$router->add("GET", "/quiz/shop", "Quiz\\GamificationController@shop", ["auth"]);
+$router->add("GET", "/quiz/battle-pass", "Quiz\\GamificationController@battlePass", ["auth"]);
+
+// 5. NEW MODES (Building Now)
+$router->add("GET", "/quiz/math-mania", "Quiz\\MathManiaController@index", ["auth"]);
+$router->add("GET", "/quiz/guess-word", "Quiz\\GuessWordController@index", ["auth"]);
+$router->add("GET", "/quiz/guess-word/data", "Quiz\\GuessWordController@getWord", ["auth"]); // API Route
+$router->add("GET", "/quiz/true-false", "Quiz\\TrueFalseController@index", ["auth"]);
+$router->add("GET", "/quiz/true-false/data", "Quiz\\TrueFalseController@getQuestions", ["auth"]); // API Route
+$router->add("GET", "/quiz/exam", "Quiz\\ExamModeController@index", ["auth"]);
+$router->add("GET", "/quiz/exam/start/{slug}", "Quiz\\ExamEngineController@start", ["auth"]); // Engine Start
+$router->add("GET", "/quiz/room/{id}", "Quiz\\ExamEngineController@room", ["auth"]); // Exam Room
+$router->add("POST", "/quiz/room/save", "Quiz\\ExamEngineController@saveAnswer", ["auth"]); // Save Answer
+$router->add("POST", "/quiz/room/submit", "Quiz\\ExamEngineController@submit", ["auth"]); // Submit
+$router->add("GET", "/quiz/result/{id}", "Quiz\\ExamEngineController@result", ["auth"]); // Result
+$router->add("GET", "/quiz/daily", "Quiz\\ExamEngineController@startDaily", ["auth"]); // Daily Quest
+
 // Public Routes
 $router->add("GET", "/", "HomeController@index");
 $router->add("GET", "/features", "HomeController@features");
@@ -403,6 +459,18 @@ $router->add(
     "POST",
     "/admin/settings/economy/save",
     "Admin\SettingsController@saveEconomy",
+    ["auth", "admin"],
+);
+$router->add(
+    "GET",
+    "/admin/settings/quiz-modes",
+    "Admin\\SettingsController@quizModes",
+    ["auth", "admin"],
+);
+$router->add(
+    "POST",
+    "/admin/settings/quiz-modes",
+    "Admin\\SettingsController@quizModes",
     ["auth", "admin"],
 );
 $router->add(
@@ -2050,6 +2118,7 @@ $router->add("GET", "/quiz/daily/start", "Quiz\ExamEngineController@startDaily",
 $router->add("GET", "/admin/quiz/reports", "Admin\Quiz\ReportController@index", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/report/resolve", "Admin\Quiz\ReportController@resolve", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/report/ignore", "Admin\Quiz\ReportController@ignore", ["auth", "admin"]);
+$router->add("GET", "/admin/quiz/report/getReporters", "Admin\Quiz\ReportController@getReporters", ["auth", "admin"]);
 
 // Question Bank
 $router->add("GET", "/admin/quiz/questions", "Admin\\Quiz\\QuestionBankController@index", ["auth", "admin"]);
@@ -2203,7 +2272,6 @@ $router->add("POST", "/api/shop/unlimited-coins", "HoneypotController@unlimitedC
 // [REDUNDANT FIRM ROUTES REMOVED]
 
 
-
 // ============================================
 // CONTEST ENGINE (STUDENT)
 // ============================================
@@ -2279,6 +2347,9 @@ $router->add('POST', '/quiz/contests/join/{id}', 'Quiz\\StudentContestController
 $router->add('GET', '/quiz/contests/room/{id}', 'Quiz\\StudentContestController@room', ['auth']);
 $router->add('POST', '/quiz/contests/submit/{id}', 'Quiz\\StudentContestController@submit', ['auth']);
 $router->add('GET', '/quiz/contests/result/{id}', 'Quiz\\StudentContestController@result', ['auth']);
+
+// User Question Reports
+$router->add('GET', 'user/reports', 'Quiz\UserReportController@index');
 
 // CALCULATOR PERMALINK CATCH-ALL ROUTE
 // Must be at the end to not interfere with other routes

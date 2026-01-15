@@ -1,0 +1,11 @@
+# Kills PHP execution in this folder
+<FilesMatch "\.(php|php5|phtml|php7|phar|exe|sh|bat|pl|py|cgi|asp|aspx|js)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Prevents listing files (Directory Traversal)
+Options -Indexes -ExecCGI
+
+# Remove handlers
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .phps .phar .pl .py .cgi

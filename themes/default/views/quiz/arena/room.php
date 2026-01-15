@@ -126,6 +126,18 @@
                             class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary outline-none transition-all h-24 resize-none"
                             placeholder="Help us fix it faster..."></textarea>
                     </div>
+                    <!-- Photo Evidence (Phase 8) -->
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-500 font-bold mb-2">Visual Evidence (Optional)</label>
+                        <div class="relative group">
+                            <input type="file" @change="reportForm.screenshot = $event.target.files[0]"
+                                class="w-full bg-white/5 border border-dashed border-white/20 rounded-xl px-4 py-4 text-xs text-gray-400 cursor-pointer hover:border-primary/50 transition-all file:hidden">
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-primary transition-colors">
+                                <i class="fas fa-camera mr-2"></i>
+                                <span x-text="reportForm.screenshot ? reportForm.screenshot.name : 'Tap to upload screenshot (Max 2MB)'"></span>
+                            </div>
+                        </div>
+                    </div>
                     <button type="submit"
                         class="w-full bg-primary hover:bg-primary/90 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
                         :disabled="isSubmittingReport">
@@ -307,7 +319,8 @@
                 isSubmittingReport: false,
                 reportForm: {
                     issue_type: 'wrong_answer',
-                    description: ''
+                    description: '',
+                    screenshot: null
                 },
 
                 init() {
@@ -468,6 +481,7 @@
 
                 openReportModal() {
                     this.reportForm.description = '';
+                    this.reportForm.screenshot = null;
                     this.reporting = true;
                 },
 
@@ -477,7 +491,10 @@
                     const formData = new FormData();
                     formData.append('question_id', this.questions[this.currentQ].id);
                     formData.append('issue_type', this.reportForm.issue_type);
-                    formData.append('description', this.reportForm.description); // Fixed: Added description
+                    formData.append('description', this.reportForm.description);
+                    if (this.reportForm.screenshot) {
+                        formData.append('screenshot', this.reportForm.screenshot);
+                    }
                     formData.append('csrf_token', this.csrfToken);
 
                     fetch('<?php echo app_base_url("quiz/report-question"); ?>', {

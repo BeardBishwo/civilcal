@@ -10,6 +10,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Services\FileService;
 
 /**
  * QuestionImportController - Enterprise Staging Import System
@@ -490,9 +491,11 @@ class QuestionImportController extends Controller
         ini_set('memory_limit', '256M');
         header('Content-Type: application/json');
 
-        if (!isset($_FILES['import_file']) || $_FILES['import_file']['error'] !== UPLOAD_ERR_OK) {
+        // Use FileService for "Paranoid-Grade" validation (Binary Scanning + MIME Sniffing)
+        $validation = FileService::validateUpload($_FILES['import_file'], 'question_import');
+        if (!$validation['success']) {
             http_response_code(400);
-            echo json_encode(['error' => 'No file uploaded']);
+            echo json_encode(['error' => $validation['error']]);
             return;
         }
 

@@ -608,4 +608,18 @@ class GamificationService
             }
         }
     }
+    /**
+     * Reward User for Verified Report
+     */
+    public function rewardReportVerified($userId, $amount, $reportId)
+    {
+        if ($amount <= 0) return;
+
+        $this->initWallet($userId);
+
+        $sql = "UPDATE user_resources SET coins = coins + :amt WHERE user_id = :uid";
+        $this->db->query($sql, ['amt' => $amount, 'uid' => $userId]);
+
+        $this->logTransaction($userId, 'coins', $amount, 'verified_report', $reportId);
+    }
 }

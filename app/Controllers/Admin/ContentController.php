@@ -7,6 +7,8 @@ use App\Core\Auth;
 use App\Models\Page;
 use App\Models\Menu;
 use App\Models\Media;
+use App\Services\GDPRService;
+use App\Services\FileService;
 
 class ContentController extends Controller
 {
@@ -128,10 +130,10 @@ class ContentController extends Controller
 
             $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
             $perPage = isset($_GET['per_page']) && is_numeric($_GET['per_page']) ? (int)$_GET['per_page'] : 50;
-            
+
             // Limit perPage to reasonable values
             $perPage = max(20, min($perPage, 200));
-            
+
             $filters = [
                 'search' => isset($_GET['search']) ? trim($_GET['search']) : null,
                 'type' => isset($_GET['type']) ? trim($_GET['type']) : null
@@ -147,7 +149,7 @@ class ContentController extends Controller
             $media = array_map(function ($item) use ($usageInfo) {
                 $filePath = $item['file_path'];
                 $url = app_base_url('/public/storage/' . $filePath);
-                
+
                 // If it's a theme path, don't prefix with public/storage/
                 if (strpos($filePath, 'themes/') === 0 || strpos($filePath, '/themes/') === 0) {
                     $url = app_base_url(ltrim($filePath, '/'));
@@ -406,7 +408,7 @@ class ContentController extends Controller
     public function quickAssignLocation()
     {
         $this->requireAdmin();
-        
+
         // Validate CSRF
         if (empty($_POST['csrf_token']) || !$this->validateCsrfToken($_POST['csrf_token'])) {
             return $this->json(['success' => false, 'message' => 'Invalid CSRF token']);
@@ -472,202 +474,147 @@ class ContentController extends Controller
             $errors = [];
             $maxFileSize = 10 * 1024 * 1024; // 10MB - make this configurable later
 
-            // Process each file
+            // Process each file (Hardened Pipeline)
             $fileCount = count($_FILES['files']['name']);
             for ($i = 0; $i < $fileCount; $i++) {
-                if ($_FILES['files']['error'][$i] !== UPLOAD_ERR_OK) {
-                    $errors[] = $_FILES['files']['name'][$i] . ': Upload error';
-                    continue;
-                }
-
-                $originalFilename = $_FILES['files']['name'][$i];
-                $tmpName = $_FILES['files']['tmp_name'][$i];
-                $fileSize = $_FILES['files']['size'][$i];
-
-                // Sanitize original filename
-                $originalFilename = $this->sanitizeFilename($originalFilename);
-
-                // Validate filename length
-                if (strlen($originalFilename) > 255) {
-                    $errors[] = $originalFilename . ': Filename too long (max 255 characters)';
-                    continue;
-                }
-
-                // Get mime type
-                $mimeType = mime_content_type($tmpName);
-
-                // Validate file type
-                $allowedTypes = [
-                    'image/jpeg',
-                    'image/png',
-                    'image/gif',
-                    'image/webp',
-                    'application/pdf',
-                    'application/msword',
-                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    'application/vnd.ms-excel',
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                    'application/zip'
+                $fileStruct = [
+                    'name' => $_FILES['files']['name'][$i],
+                    'type' => $_FILES['files']['type'][$i],
+                    'tmp_name' => $_FILES['files']['tmp_name'][$i],
+                    'error' => $_FILES['files']['error'][$i],
+                    'size' => $_FILES['files']['size'][$i],
                 ];
 
-                if (!in_array($mimeType, $allowedTypes)) {
-                    $errors[] = $originalFilename . ': File type not allowed';
-                    $this->logError('Invalid file type upload attempt', [
-                        'filename' => $originalFilename,
-                        'mime_type' => $mimeType,
-                        'user_id' => $user->id
-                    ]);
+                // Secure Upload using FileService
+                $upload = FileService::uploadAdminFile($fileStruct, 'media');
+
+                if (!$upload['success']) {
+                    $errors[] = $fileStruct['name'] . ': ' . $upload['error'];
                     continue;
                 }
 
-                // Validate file size
-                if ($fileSize > $maxFileSize) {
-                    $errors[] = $originalFilename . ': File too large (max ' . $this->formatSize($maxFileSize) . ')';
-                    continue;
-                }
+                $filename = $upload['filename'];
+                $filePath = $upload['path'];
+                $fileSize = $upload['size'];
+                $originalFilename = $fileStruct['name'];
 
-                // Determine file type category
+                // Get mime type and determine category
+                $mimeType = mime_content_type($filePath);
                 $fileType = 'other';
                 if (strpos($mimeType, 'image/') === 0) {
                     $fileType = 'images';
-                } elseif (
-                    strpos($mimeType, 'application/pdf') === 0 ||
-                    strpos($mimeType, 'application/msword') === 0 ||
-                    strpos($mimeType, 'application/vnd.') === 0
-                ) {
+                } elseif (strpos($mimeType, 'application/') === 0) {
                     $fileType = 'documents';
                 }
 
-                // Generate unique filename
-                $extension = pathinfo($originalFilename, PATHINFO_EXTENSION);
-                $filename = uniqid() . '_' . time() . '.' . strtolower($extension);
+                $relativeFilePath = $filename; // Store relative to media dir
+                $storagePath = dirname($filePath) . '/';
 
-                // Create storage path
-                $storagePath = __DIR__ . '/../../../public/storage/media/' . $fileType . '/';
-                if (!is_dir($storagePath)) {
-                    if (!mkdir($storagePath, 0755, true)) {
-                        $errors[] = $originalFilename . ': Failed to create storage directory';
-                        $this->logError('Failed to create storage directory', ['path' => $storagePath]);
-                        continue;
-                    }
-                }
-
-                $filePath = $storagePath . $filename;
-                $relativeFilePath = 'media/' . $fileType . '/' . $filename;
-
-                // Check for duplicate files (by hash)
-                $fileHash = md5_file($tmpName);
+                // Check for duplicate files (hashed from the saved file to be sure)
+                $fileHash = md5_file($filePath);
                 if ($this->isDuplicateFile($fileHash)) {
+                    // Cleanup if duplicate
+                    @unlink($filePath);
                     $errors[] = $originalFilename . ': Duplicate file already exists';
                     continue;
                 }
+                // Collect image dimensions if applicable
+                $width = null;
+                $height = null;
+                $optimizedData = [];
 
-                if (move_uploaded_file($tmpName, $filePath)) {
-                    // Collect image dimensions if applicable
-                    $width = null;
-                    $height = null;
-                    $optimizedData = [];
-                    
-                    if ($fileType === 'images') {
-                        $imageInfo = @getimagesize($filePath);
-                        if ($imageInfo) {
-                            $width = $imageInfo[0];
-                            $height = $imageInfo[1];
-                        }
-
-                        // Optimization Logic
-                        try {
-                            $optimizer = new \App\Services\ImageOptimizer();
-                            
-                            // 1. Optimize Original
-                            $optResult = $optimizer->optimize($filePath);
-                            if ($optResult) {
-                                $optimizedData['optimized'] = 1;
-                                $optimizedData['original_size'] = $optResult['original_size'];
-                                $optimizedData['optimized_size'] = $optResult['optimized_size'];
-                                $optimizedData['compression_ratio'] = ($optResult['original_size'] > 0) 
-                                    ? round((($optResult['original_size'] - $optResult['optimized_size']) / $optResult['original_size']) * 100, 2) 
-                                    : 0;
-                            }
-
-                            // 2. Generate Thumbnail (150px)
-                            $thumbDir = $storagePath . 'thumbnails/';
-                            if (!is_dir($thumbDir)) mkdir($thumbDir, 0755, true);
-                            
-                            $thumbFilename = 'thumb_' . $filename;
-                            $thumbPath = $thumbDir . $thumbFilename;
-                            
-                            if ($optimizer->resize($filePath, $thumbPath, 150)) {
-                                $optimizedData['thumbnail_path'] = 'media/' . $fileType . '/thumbnails/' . $thumbFilename;
-                            }
-
-                            // 3. Generate Medium (800px)
-                            $mediumDir = $storagePath . 'medium/';
-                            if (!is_dir($mediumDir)) mkdir($mediumDir, 0755, true);
-                            
-                            $mediumFilename = 'medium_' . $filename;
-                            $mediumPath = $mediumDir . $mediumFilename;
-                            
-                            if ($width > 800) {
-                                if ($optimizer->resize($filePath, $mediumPath, 800)) {
-                                    $optimizedData['medium_path'] = 'media/' . $fileType . '/medium/' . $mediumFilename;
-                                }
-                            }
-
-                            // 4. Convert to WebP
-                            $webpFilename = pathinfo($filename, PATHINFO_FILENAME) . '.webp';
-                            $webpPath = $storagePath . $webpFilename;
-                            
-                            if ($optimizer->convertToWebP($filePath, $webpPath)) {
-                                $optimizedData['has_webp'] = 1;
-                            }
-
-                        } catch (\Exception $e) {
-                            $this->logError('Image optimization failed', ['error' => $e->getMessage(), 'file' => $filename]);
-                        }
+                if ($fileType === 'images') {
+                    $imageInfo = @getimagesize($filePath);
+                    if ($imageInfo) {
+                        $width = $imageInfo[0];
+                        $height = $imageInfo[1];
                     }
 
-                    // Save to database
-                    $mediaId = $this->mediaModel->create(array_merge([
-                        'original_filename' => $originalFilename,
-                        'filename' => $filename,
-                        'file_path' => $relativeFilePath,
-                        'file_size' => $fileSize,
-                        'file_type' => $fileType,
-                        'mime_type' => $mimeType,
-                        'width' => $width,
-                        'height' => $height,
-                        'uploaded_by' => $user->id,
-                        'file_hash' => $fileHash // Store the hash
-                    ], $optimizedData));
+                    // Optimization Logic
+                    try {
+                        $optimizer = new \App\Services\ImageOptimizer();
 
-                    if ($mediaId) {
-                        $uploadedFiles[] = [
-                            'id' => $mediaId,
-                            'filename' => $originalFilename,
-                            'url' => app_base_url('/storage/' . $relativeFilePath)
-                        ];
-
-                        // Log successful upload
-                        $this->logInfo('Media uploaded', [
-                            'media_id' => $mediaId,
-                            'filename' => $originalFilename,
-                            'user_id' => $user->id
-                        ]);
-                    } else {
-                        // Delete file if database insert failed
-                        if (file_exists($filePath)) {
-                            unlink($filePath);
+                        // 1. Optimize Original
+                        $optResult = $optimizer->optimize($filePath);
+                        if ($optResult) {
+                            $optimizedData['optimized'] = 1;
+                            $optimizedData['original_size'] = $optResult['original_size'];
+                            $optimizedData['optimized_size'] = $optResult['optimized_size'];
+                            $optimizedData['compression_ratio'] = ($optResult['original_size'] > 0)
+                                ? round((($optResult['original_size'] - $optResult['optimized_size']) / $optResult['original_size']) * 100, 2)
+                                : 0;
                         }
-                        $errors[] = $originalFilename . ': Database error';
-                        $this->logError('Database insert failed for media', ['filename' => $originalFilename]);
+
+                        // 2. Generate Thumbnail (150px)
+                        $thumbDir = $storagePath . 'thumbnails/';
+                        if (!is_dir($thumbDir)) mkdir($thumbDir, 0755, true);
+
+                        $thumbFilename = 'thumb_' . $filename;
+                        $thumbPath = $thumbDir . $thumbFilename;
+
+                        if ($optimizer->resize($filePath, $thumbPath, 150)) {
+                            $optimizedData['thumbnail_path'] = 'media/' . $fileType . '/thumbnails/' . $thumbFilename;
+                        }
+
+                        // 3. Generate Medium (800px)
+                        $mediumDir = $storagePath . 'medium/';
+                        if (!is_dir($mediumDir)) mkdir($mediumDir, 0755, true);
+
+                        $mediumFilename = 'medium_' . $filename;
+                        $mediumPath = $mediumDir . $mediumFilename;
+
+                        if ($width > 800) {
+                            if ($optimizer->resize($filePath, $mediumPath, 800)) {
+                                $optimizedData['medium_path'] = 'media/' . $fileType . '/medium/' . $mediumFilename;
+                            }
+                        }
+
+                        // 4. Convert to WebP
+                        $webpFilename = pathinfo($filename, PATHINFO_FILENAME) . '.webp';
+                        $webpPath = $storagePath . $webpFilename;
+
+                        if ($optimizer->convertToWebP($filePath, $webpPath)) {
+                            $optimizedData['has_webp'] = 1;
+                        }
+                    } catch (\Exception $e) {
+                        $this->logError('Image optimization failed', ['error' => $e->getMessage(), 'file' => $filename]);
                     }
-                } else {
-                    $errors[] = $originalFilename . ': Failed to save file';
-                    $this->logError('Failed to move uploaded file', [
+                }
+
+                // Save to database
+                $mediaId = $this->mediaModel->create(array_merge([
+                    'original_filename' => $originalFilename,
+                    'filename' => $filename,
+                    'file_path' => $relativeFilePath,
+                    'file_size' => $fileSize,
+                    'file_type' => $fileType,
+                    'mime_type' => $mimeType,
+                    'width' => $width,
+                    'height' => $height,
+                    'uploaded_by' => $user->id,
+                    'file_hash' => $fileHash // Store the hash
+                ], $optimizedData));
+
+                if ($mediaId) {
+                    $uploadedFiles[] = [
+                        'id' => $mediaId,
                         'filename' => $originalFilename,
-                        'destination' => $filePath
+                        'url' => '/storage/uploads/admin/media/' . $filename
+                    ];
+
+                    // Log successful upload (Legacy logging)
+                    $this->logInfo('Media uploaded', [
+                        'media_id' => $mediaId,
+                        'filename' => $originalFilename,
+                        'user_id' => $user->id
                     ]);
+                } else {
+                    // Delete file if database insert failed
+                    if (file_exists($filePath)) {
+                        unlink($filePath);
+                    }
+                    $errors[] = $originalFilename . ': Database error';
+                    $this->logError('Database insert failed for media', ['filename' => $originalFilename]);
                 }
             }
 
@@ -763,7 +710,7 @@ class ContentController extends Controller
         }
 
         $menuId = $_POST['id'] ?? null;
-        
+
         // Validate CSRF
         if (empty($_POST['csrf_token']) || !$this->validateCsrfToken($_POST['csrf_token'])) {
             echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
@@ -906,7 +853,7 @@ class ContentController extends Controller
     public function syncMedia()
     {
         $this->requireAdmin();
-        
+
         // Validate CSRF token
         $token = $_POST['csrf_token'] ?? '';
         if (!$this->validateCsrfToken($token)) {
@@ -924,7 +871,7 @@ class ContentController extends Controller
 
             $fileSize = filesize($fullPath);
             $mimeType = mime_content_type($fullPath);
-            
+
             $width = null;
             $height = null;
             if (strpos($mimeType, 'image/') === 0) {
@@ -952,7 +899,7 @@ class ContentController extends Controller
         }
 
         echo json_encode([
-            'success' => true, 
+            'success' => true,
             'message' => "$syncedCount new files discovered and added to library."
         ]);
     }
@@ -963,7 +910,7 @@ class ContentController extends Controller
     public function bulkDeleteUnused()
     {
         $this->requireAdmin();
-        
+
         // Validate CSRF token
         $token = $_POST['csrf_token'] ?? '';
         if (!$this->validateCsrfToken($token)) {
@@ -1003,7 +950,7 @@ class ContentController extends Controller
         }
 
         echo json_encode([
-            'success' => true, 
+            'success' => true,
             'message' => "Cleanup complete. Removed $deletedCount unused files."
         ]);
     }
@@ -1014,7 +961,7 @@ class ContentController extends Controller
     public function bulkDeleteMedia()
     {
         $this->requireAdmin();
-        
+
         // Validate CSRF token
         $token = $_POST['csrf_token'] ?? '';
         if (!$this->validateCsrfToken($token)) {
@@ -1042,7 +989,7 @@ class ContentController extends Controller
                 if (file_exists($fullPath)) {
                     @unlink($fullPath);
                 }
-                
+
                 // Delete from DB
                 if ($this->mediaModel->delete($id)) {
                     $deletedCount++;
@@ -1051,7 +998,7 @@ class ContentController extends Controller
         }
 
         echo json_encode([
-            'success' => true, 
+            'success' => true,
             'message' => "Successfully deleted $deletedCount items."
         ]);
     }
