@@ -141,14 +141,22 @@ class Controller
      */
     protected function requireAuth()
     {
-        if (isset($this->auth) && !$this->auth->check()) {
-            // Store return URL
+        $isAuthenticated = (isset($this->auth) && $this->auth->check()) || (!isset($this->auth) && isset($_SESSION['user_id']));
+
+        if (!$isAuthenticated) {
+            // Check if this is an API request
+            if (isset($_SERVER['REQUEST_URI']) && (strpos($_SERVER['REQUEST_URI'], '/api/') !== false || strpos($_SERVER['REQUEST_URI'], '/quiz/') !== false)) {
+                // For quiz and api routes, return 401 if it's an AJAX request or expects JSON
+                // But specifically for API routes it should definitely be JSON
+                if (stripos($_SERVER['REQUEST_URI'], '/api/') !== false) {
+                    $this->json(['success' => false, 'message' => 'Authentication required'], 401);
+                    exit;
+                }
+            }
+
+            // Standard redirect
             $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
             $this->redirect('/login');
-        } elseif (!isset($this->auth) && !isset($_SESSION['user_id'])) {
-             // Fallback auth check
-             $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
-             $this->redirect('/login');
         }
     }
 
@@ -158,7 +166,7 @@ class Controller
     protected function requireAdmin()
     {
         $this->requireAuth();
-        
+
         if (isset($this->auth) && !$this->auth->isAdmin()) {
             $this->redirect('/');
         } elseif (!isset($this->auth)) {

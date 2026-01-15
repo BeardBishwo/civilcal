@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Engineering Firms: Index (Alliance Discovery)
  * Premium Dark Mode UI - Refactored
@@ -6,6 +7,7 @@
 ?>
 <!DOCTYPE html>
 <html lang="en" class="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,6 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body class="bg-background text-white font-sans min-h-screen pb-20" x-data="firmsIndex()">
 
     <!-- Header -->
@@ -48,7 +51,7 @@
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Conquer together.</span>
                     </h1>
                     <p class="text-xl text-gray-400 mb-8 max-w-lg leading-relaxed">Form elite crews, pool resources, and unlock mega projects with premium-grade collaboration tools.</p>
-                    
+
                     <div class="flex flex-wrap gap-8">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-surface/50 border border-white/10 flex items-center justify-center text-green-400">
@@ -85,10 +88,11 @@
                             </div>
                         </div>
 
-                        <form action="/api/firms/create" method="POST" @submit.prevent="createFirm">
+                        <form action="<?php echo app_base_url('api/firms/create'); ?>" method="POST" @submit.prevent="createFirm">
+                            <?php echo csrf_field(); ?>
                             <input type="hidden" name="nonce" value="<?php echo htmlspecialchars($createNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                             <input type="text" name="trap_answer" id="firm_create_trap" style="display:none" autocomplete="off">
-                            
+
                             <div class="space-y-4 mb-6">
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Firm Name</label>
@@ -132,38 +136,38 @@
         <?php else: ?>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <?php foreach ($firms as $f): ?>
-                <div class="glass-card p-1 rounded-2xl hover:-translate-y-2 transition-transform duration-300">
-                    <div class="bg-gray-900/60 backdrop-blur-md rounded-[14px] p-6 h-full flex flex-col border border-white/10 hover:border-cyan-500/30 transition-all shadow-lg">
-                        <div class="flex items-center gap-4 mb-4">
-                            <img src="<?php echo $f['logo_url'] ?: app_base_url('themes/default/assets/images/default-firm.png'); ?>" 
-                                 class="w-16 h-16 rounded-xl object-cover border border-white/10 bg-black/20"
-                                 onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($f['name']); ?>&background=0D8ABC&color=fff'">
-                            <div>
-                                <h4 class="font-bold text-white text-lg leading-tight mb-1"><?php echo htmlspecialchars($f['name']); ?></h4>
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-white/10 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Lvl <?php echo $f['level']; ?></span>
-                                    <span class="text-gray-500 text-xs font-medium"><i class="fas fa-users mr-1"></i><?php echo $f['member_count']; ?></span>
+                    <div class="glass-card p-1 rounded-2xl hover:-translate-y-2 transition-transform duration-300">
+                        <div class="bg-gray-900/60 backdrop-blur-md rounded-[14px] p-6 h-full flex flex-col border border-white/10 hover:border-cyan-500/30 transition-all shadow-lg">
+                            <div class="flex items-center gap-4 mb-4">
+                                <img src="<?php echo $f['logo_url'] ?: app_base_url('themes/default/assets/images/default-firm.png'); ?>"
+                                    class="w-16 h-16 rounded-xl object-cover border border-white/10 bg-black/20"
+                                    onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($f['name']); ?>&background=0D8ABC&color=fff'">
+                                <div>
+                                    <h4 class="font-bold text-white text-lg leading-tight mb-1"><?php echo htmlspecialchars($f['name']); ?></h4>
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-white/10 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Lvl <?php echo $f['level']; ?></span>
+                                        <span class="text-gray-500 text-xs font-medium"><i class="fas fa-users mr-1"></i><?php echo $f['member_count']; ?></span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <p class="text-gray-400 text-sm mb-6 line-clamp-2 flex-grow h-10">
-                            <?php echo htmlspecialchars($f['description'] ?: 'No description provided.'); ?>
-                        </p>
+                            <p class="text-gray-400 text-sm mb-6 line-clamp-2 flex-grow h-10">
+                                <?php echo htmlspecialchars($f['description'] ?: 'No description provided.'); ?>
+                            </p>
 
-                        <div class="flex items-center justify-between mt-auto">
-                            <div class="flex -space-x-2">
-                                <!-- Placeholders for member avatars if available, otherwise generic circles -->
-                                <div class="w-8 h-8 rounded-full bg-white/10 border-2 border-[#0f172a] flex items-center justify-center text-[10px] text-gray-500">
-                                    <i class="fas fa-user"></i>
+                            <div class="flex items-center justify-between mt-auto">
+                                <div class="flex -space-x-2">
+                                    <!-- Placeholders for member avatars if available, otherwise generic circles -->
+                                    <div class="w-8 h-8 rounded-full bg-white/10 border-2 border-[#0f172a] flex items-center justify-center text-[10px] text-gray-500">
+                                        <i class="fas fa-user"></i>
+                                    </div>
                                 </div>
+                                <button @click="requestJoin(<?php echo $f['id']; ?>)" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-bold text-white transition-colors">
+                                    Request Join
+                                </button>
                             </div>
-                            <button @click="requestJoin(<?php echo $f['id']; ?>)" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-bold text-white transition-colors">
-                                Request Join
-                            </button>
                         </div>
                     </div>
-                </div>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
@@ -171,6 +175,7 @@
 
     <script>
         const joinNonce = '<?php echo htmlspecialchars($joinNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>';
+        const appBase = '<?php echo rtrim(APP_BASE, "/"); ?>';
 
         function firmsIndex() {
             return {
@@ -184,17 +189,38 @@
 
                     try {
                         Swal.showLoading();
-                        const res = await fetch(form.action, { method: 'POST', body: fd });
+                        const res = await fetch(form.action, {
+                            method: 'POST',
+                            body: fd
+                        });
                         const data = await res.json();
 
                         if (data.success) {
-                            await Swal.fire({ icon: 'success', title: 'Established!', text: 'Firm created successfully.', background: '#1e293b', color: '#fff' });
-                            location.href = data.redirect || '/quiz/firms/dashboard';
+                            await Swal.fire({
+                                icon: 'success',
+                                title: 'Established!',
+                                text: 'Firm created successfully.',
+                                background: '#1e293b',
+                                color: '#fff'
+                            });
+                            location.href = data.redirect || (appBase + '/quiz/firms/dashboard');
                         } else {
-                            Swal.fire({ icon: 'error', title: 'Start-up Failed', text: data.message, background: '#1e293b', color: '#fff' });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Start-up Failed',
+                                text: data.message,
+                                background: '#1e293b',
+                                color: '#fff'
+                            });
                         }
                     } catch (err) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'Connection failed.', background: '#1e293b', color: '#fff' });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Connection failed.',
+                            background: '#1e293b',
+                            color: '#fff'
+                        });
                     }
                 },
 
@@ -216,16 +242,37 @@
 
                     if (result.isConfirmed) {
                         try {
-                            const res = await fetch('/api/firms/join', { method: 'POST', body: fd });
+                            const res = await fetch(appBase + '/api/firms/join', {
+                                method: 'POST',
+                                body: fd
+                            });
                             const data = await res.json();
-                            
+
                             if (data.success) {
-                                Swal.fire({ icon: 'success', title: 'Sent', text: data.message, background: '#1e293b', color: '#fff' });
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sent',
+                                    text: data.message,
+                                    background: '#1e293b',
+                                    color: '#fff'
+                                });
                             } else {
-                                Swal.fire({ icon: 'error', title: 'Failed', text: data.message, background: '#1e293b', color: '#fff' });
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Failed',
+                                    text: data.message,
+                                    background: '#1e293b',
+                                    color: '#fff'
+                                });
                             }
                         } catch (e) {
-                             Swal.fire({ icon: 'error', title: 'Error', text: 'Connection failed.', background: '#1e293b', color: '#fff' });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Connection failed.',
+                                background: '#1e293b',
+                                color: '#fff'
+                            });
                         }
                     }
                 }
@@ -233,4 +280,5 @@
         }
     </script>
 </body>
+
 </html>

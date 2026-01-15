@@ -49,7 +49,7 @@ class Router
         }
 
         $methodUpper = strtoupper($method);
-        if (in_array($methodUpper, ['POST','PUT','PATCH','DELETE'], true) && !in_array('csrf', $mw, true)) {
+        if (in_array($methodUpper, ['POST', 'PUT', 'PATCH', 'DELETE'], true) && !in_array('csrf', $mw, true)) {
             $mw[] = 'csrf';
         }
 
@@ -84,7 +84,7 @@ class Router
         }
 
         http_response_code(404);
-        
+
         // Try to load custom 404 view
         $viewPath = BASE_PATH . '/themes/admin/views/errors/404.php';
         if (file_exists($viewPath)) {
@@ -147,25 +147,35 @@ class Router
             $middlewareClass = $this->middlewareMap[$middlewareName] ?? null;
 
             if ($middlewareClass && class_exists($middlewareClass)) {
-                $middleware = new $middlewareClass();
-
-                if (method_exists($middleware, 'handle')) {
+                if ($middlewareClass && class_exists($middlewareClass)) {
                     try {
-                        $ref = new \ReflectionMethod($middleware, 'handle');
-                        if ($ref->getNumberOfParameters() >= 2) {
-                            $pipeline[] = $middleware;
-                        } else {
-                            // Legacy middleware with no parameters - execute immediately
-                            if ($middleware->handle() === false) {
-                                return;
+                        $middleware = new $middlewareClass();
+
+                        if (method_exists($middleware, 'handle')) {
+                            try {
+                                $ref = new \ReflectionMethod($middleware, 'handle');
+                                if ($ref->getNumberOfParameters() >= 2) {
+                                    $pipeline[] = $middleware;
+                                } else {
+                                    // Legacy middleware with no parameters - execute immediately
+                                    if ($middleware->handle() === false) {
+                                        return;
+                                    }
+                                }
+                            } catch (\ReflectionException $e) {
+                                // Fallback to legacy behavior
+                                if ($middleware->handle() === false) {
+                                    return;
+                                }
                             }
                         }
-                    } catch (\ReflectionException $e) {
-                        // Fallback to legacy behavior
-                        if ($middleware->handle() === false) {
-                            return;
-                        }
+                    } catch (\Throwable $e) {
+                        error_log("Middleware instantiation failed for {$middlewareName}: " . $e->getMessage());
+                        // Skip broken middleware
+                        continue;
                     }
+                } else {
+                    error_log("Middleware Class not found: {$middlewareName}");
                 }
             }
         }

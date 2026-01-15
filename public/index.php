@@ -9,6 +9,10 @@
 define('BISHWO_CALCULATOR', true);
 
 // Load application bootstrap FIRST (defines BASE_PATH)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 $bootstrapPath = dirname(__DIR__) . '/app/bootstrap.php';
 require_once $bootstrapPath;
 

@@ -123,7 +123,12 @@ class CalculatorController extends Controller
     public function dashboard()
     {
         $userId = $_SESSION['user_id'];
-        $user = $this->db->find('users', $userId);
+        $user = $this->db->findOne('users', ['id' => $userId]);
+
+        if (!$user) {
+            // This shouldn't happen if session is valid, but let's be safe
+            $this->redirect('/login');
+        }
         
         // 1. Rank Data
         $stats = $this->db->findOne('user_stats', ['user_id' => $userId]) ?: [];

@@ -90,27 +90,18 @@ class CacheService
     public function remember($key, $ttl, callable $callback)
     {
         $value = $this->get($key);
-        
+
         if ($value !== null) {
             return $value;
         }
-        
+
         $value = $callback();
         $this->set($key, $value, $ttl);
-        
+
         return $value;
     }
 
-    /**
-     * Check if key exists in cache
-     * 
-     * @param string $key Cache key
-     * @return bool True if exists
-     */
-    public function has($key)
-    {
-        return $this->advancedCache->has($key);
-    }
+
 
     /**
      * Check if key exists in cache

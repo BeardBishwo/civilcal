@@ -29,18 +29,25 @@ class AnalyticsTracker
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 
         // Log slow requests (> 500ms)
-        if ($duration > 500) {
-            Logger::warning("Slow Request: {$method} {$uri}", [
-                'duration_ms' => $duration,
-                'memory_kb' => $memory,
-                'ip' => $ip
-            ]);
+        try {
+            if ($duration > 500) {
+                if (class_exists('App\Core\Logger')) {
+                    Logger::warning("Slow Request: {$method} {$uri}", [
+                        'duration_ms' => $duration,
+                        'memory_kb' => $memory,
+                        'ip' => $ip
+                    ]);
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silently ignore logging errors to prevent breaking the request
+            // error_log("Analytics error: " . $e->getMessage()); 
         }
 
         // In a real APM, we would send this to StatsD or Prometheus
         // For now, we can log it to a separate 'metrics' channel if highly active,
         // or just debug log.
-        // Logger::get('metrics')->info("Request", compact('method', 'uri', 'duration', 'memory', 'ip'));
+        // if (class_exists('App\Core\Logger')) Logger::get('metrics')->info("Request", compact('method', 'uri', 'duration', 'memory', 'ip'));
 
         return $response;
     }

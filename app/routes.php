@@ -798,6 +798,24 @@ $router->add("GET", "/admin/bounty/requests", "Admin\BountyController@index", ["
 
 // Human Elements API
 $router->add("GET", "/api/notifications", "Api\HumanApiController@getNotifications", ["auth"]);
+
+// ==========================================
+// FIRM / GUILD ROUTES (Missing Links)
+// ==========================================
+
+// Views
+$router->add('GET', '/quiz/firms', 'Quiz\\FirmController@index', ['auth']);
+$router->add('GET', '/quiz/firms/dashboard', 'Quiz\\FirmController@dashboard', ['auth']);
+
+// API Actions
+$router->add('POST', '/api/firms/create', 'Quiz\\FirmController@create', ['auth']);
+$router->add('POST', '/api/firms/join', 'Quiz\\FirmController@join', ['auth']);
+$router->add('POST', '/api/firms/donate', 'Quiz\\FirmController@donate', ['auth']);
+$router->add('POST', '/api/firms/leave', 'Quiz\\FirmController@leave', ['auth']);
+$router->add('POST', '/api/firms/handle-request', 'Quiz\\FirmController@handleJoinRequest', ['auth']);
+$router->add('POST', '/api/firms/purchase-perk', 'Quiz\\FirmController@purchasePerk', ['auth']);
+$router->add('POST', '/api/firms/distribute-dividends', 'Quiz\\FirmController@distributeDividends', ['auth']);
+$router->add('POST', '/api/firms/promote', 'Quiz\\FirmController@promote', ['auth']);
 $router->add("POST", "/api/notifications/read", "Api\HumanApiController@markNotificationRead", ["auth"]);
 $router->add("POST", "/api/library/review", "Api\HumanApiController@submitReview", ["auth"]);
 $router->add("POST", "/api/library/report", "Api\HumanApiController@submitReport", ["auth"]);
@@ -1528,6 +1546,25 @@ $router->add('GET', '/api/interests/categories', 'InterestController@getCategori
 $router->add('POST', '/api/interests/save', 'InterestController@saveInterests');
 $router->add('GET', '/api/feed', 'InterestController@getFeed');
 
+// ==========================================
+// FIRM / GUILD ROUTES (Fixed by Ruthless Mentor)
+// ==========================================
+// Views
+$router->add('GET', '/quiz/firms', 'Quiz\\FirmController@index', ['auth']);
+$router->add('GET', '/quiz/firms/dashboard', 'Quiz\\FirmController@dashboard', ['auth']);
+
+// API Actions
+$router->add('POST', '/api/firms/create', 'Quiz\\FirmController@create', ['auth']);
+$router->add('POST', '/api/firms/join', 'Quiz\\FirmController@join', ['auth']);
+$router->add('POST', '/api/firms/donate', 'Quiz\\FirmController@donate', ['auth']);
+$router->add('POST', '/quiz/firms/handle-request', 'Quiz\\FirmController@handleJoinRequest', ['auth']);
+$router->add('POST', '/quiz/firms/leave', 'Quiz\\FirmController@leave', ['auth']);
+$router->add('POST', '/quiz/firms/purchase_perk', 'Quiz\\FirmController@purchase_perk', ['auth']);
+// Additional Gameplay Routes (Restored from duplicates)
+$router->add("POST", "/api/firms/dividends", "Quiz\\FirmController@distributeDividends", ["auth"]);
+$router->add("POST", "/api/firms/promote", "Quiz\\FirmController@promote", ["auth"]);
+// ==========================================
+
 // Shop & Economy System
 $router->add('GET', '/shop', 'ShopController@index');
 $router->add('GET', '/api/shop/items', 'ShopController@getItems');
@@ -2163,13 +2200,7 @@ $router->add("POST", "/api/admin/grant-resources", "HoneypotController@grantReso
 $router->add("GET", "/api/shop/unlimited-coins", "HoneypotController@unlimitedCoins");
 $router->add("POST", "/api/shop/unlimited-coins", "HoneypotController@unlimitedCoins");
 
-// Engineering Firms (Guilds)
-$router->add("GET", "/quiz/firms", "Quiz\\FirmController@index", ["auth"]);
-$router->add("GET", "/quiz/firms/dashboard", "Quiz\\FirmController@dashboard", ["auth"]);
-$router->add("POST", "/api/firms/create", "Quiz\\FirmController@create", ["auth"]);
-$router->add("POST", "/api/firms/donate", "Quiz\\FirmController@donate", ["auth"]);
-$router->add("POST", "/api/firms/handle-request", "Quiz\\FirmController@handleJoinRequest", ["auth"]);
-$router->add("GET", "/quiz/firms/leave", "Quiz\\FirmController@leave", ["auth"]);
+// [REDUNDANT FIRM ROUTES REMOVED]
 
 
 
@@ -2205,16 +2236,7 @@ $router->add('GET', '/exams/result/{id}', 'ExamController@result');
 // Leaderboard (Phase 19)
 $router->add('GET', '/leaderboard', 'Quiz\\LeaderboardController@index', ['auth']);
 
-// ============================================
-// FIRMS/GUILDS SYSTEM
-// ============================================
-$router->add('GET', '/quiz/firms', 'Quiz\\FirmController@index', ['auth']);
-$router->add('GET', '/quiz/firms/dashboard', 'Quiz\\FirmController@dashboard', ['auth']);
-$router->add('POST', '/quiz/firms/create', 'Quiz\\FirmController@create', ['auth']);
-$router->add('POST', '/quiz/firms/join', 'Quiz\\FirmController@join', ['auth']);
-$router->add('POST', '/quiz/firms/donate', 'Quiz\\FirmController@donate', ['auth']);
-$router->add('POST', '/quiz/firms/handle-request', 'Quiz\\FirmController@handleJoinRequest', ['auth']);
-$router->add('POST', '/quiz/firms/leave', 'Quiz\\FirmController@leave', ['auth']);
+// [REDUNDANT FIRM ROUTES REMOVED]
 
 // ============================================
 // GAMIFICATION FEATURES
