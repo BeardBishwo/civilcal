@@ -30,8 +30,14 @@ class MultiplayerController extends Controller
      */
     public function index()
     {
+        $db = \App\Core\Database::getInstance();
+        $exam = $db->findOne('quiz_exams', ['status' => 'published']);
+
         // Simple view to Create or Join
-        $this->view('quiz/multiplayer/menu', ['title' => 'Multiplayer Battle']);
+        $this->view('quiz/multiplayer/menu', [
+            'title' => 'Multiplayer Battle',
+            'exam_id' => $exam['id'] ?? null
+        ]);
     }
 
     /**
@@ -39,8 +45,19 @@ class MultiplayerController extends Controller
      */
     public function create()
     {
-        // Assume Exam ID 1 for MVP or select from POST
-        $examId = $_POST['exam_id'] ?? 1;
+        // Select from POST or find a fallback
+        $examId = $_POST['exam_id'] ?? null;
+
+        if (!$examId) {
+            $db = \App\Core\Database::getInstance();
+            $exam = $db->findOne('quiz_exams', ['status' => 'published']);
+            $examId = $exam['id'] ?? null;
+        }
+
+        if (!$examId) {
+            $this->redirect('/quiz/battle');
+            return;
+        }
 
         $result = $this->lobbyService->createLobby($examId, $_SESSION['user_id']);
 
@@ -75,6 +92,15 @@ class MultiplayerController extends Controller
         $wagerNonce = $this->nonceService->generate($_SESSION['user_id'], 'wager');
         $lifelineNonce = $this->nonceService->generate($_SESSION['user_id'], 'lifeline');
 
+        // Firebase Token
+        $firebaseToken = '';
+        try {
+            $firebaseService = new \App\Services\FirebaseAuthService();
+            $firebaseToken = $firebaseService->createCustomToken($_SESSION['user_id']);
+        } catch (\Exception $e) {
+            error_log("Firebase Token Gen Error: " . $e->getMessage());
+        }
+
         // This is the hybrid view. JS handles "Waiting" vs "Active" state.
         $this->view('quiz/multiplayer/lobby', [
             'code' => $code,
@@ -82,6 +108,7 @@ class MultiplayerController extends Controller
             'participant' => $participant,
             'wagerNonce' => $wagerNonce['nonce'] ?? null,
             'lifelineNonce' => $lifelineNonce['nonce'] ?? null,
+            'firebaseToken' => $firebaseToken
         ]);
     }
 
@@ -159,34 +186,4 @@ class MultiplayerController extends Controller
         ]);
     }
 
-    /**
-     * API: Get Lobby Status (Pulse)
-     */
-    public function status($code)
-    {
-        // Resolve ID from code (or pass ID)
-        $lobby = $this->lobbyService->joinLobby($code, $_SESSION['user_id']); // Re-verify join/fetch
 
-        if ($lobby['status'] === 'active') {
-            // Trigger Bot Engine
-            // Question ID is managed by client-side sync or server-side schedule?
-            // "Ghost Protocol" Plan: "Server Logic: Iterate bots... Delay... Answer"
-            // We need current question index.
-            // For MVP, client sends what Q they are on? Or Time based?
-            // Time based is safer.
-
-            // Calc Question Index based on Time
-            $elapsed = time() - strtotime($lobby['start_time']);
-            // Assume 30s per question? 
-            $qDuration = 20;
-            $qIndex = floor($elapsed / $qDuration);
-            $qStartTime = strtotime($lobby['start_time']) + ($qIndex * $qDuration);
-
-            $this->botEngine->processGamePulse($lobby['id'], $qIndex, $qStartTime);
-        }
-
-        $data = $this->lobbyService->getLobbyStatus($lobby['id'], $_SESSION['user_id']);
-
-        $this->json($data);
-    }
-}

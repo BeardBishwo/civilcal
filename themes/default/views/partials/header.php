@@ -139,6 +139,7 @@ if (
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $title_safe; ?></title>
     <meta name="description" content="<?php echo $desc_safe; ?>">
+    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars($favicon); ?>">
     <link rel="manifest" href="<?php echo app_base_url("manifest.json"); ?>">
     <meta name="csrf-token" content="<?php echo csrf_token(); ?>">
 
@@ -206,7 +207,7 @@ if (
 
     <script>
         window.appConfig = {
-            baseUrl: "<?php echo rtrim(defined('APP_BASE') ? APP_BASE : '', '/'); ?>",
+            baseUrl: "<?php echo rtrim(app_base_url(), '/'); ?>",
             csrfToken: "<?php echo csrf_token(); ?>"
         };
     </script>
@@ -242,9 +243,9 @@ if (
     ?>
 
     <!-- Global CSS includes -->
-    <link rel="stylesheet" href="<?php echo \App\Helpers\Asset::url('public/assets/css/bootstrap.min.css'); ?>">
-    <link rel="stylesheet" href="<?php echo \App\Helpers\Asset::url('public/assets/css/styles.css'); ?>">
-    <link rel="stylesheet" href="<?php echo \App\Helpers\Asset::url('public/assets/css/custom.css'); ?>">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/library.min.css'); ?>">
+    <link rel="stylesheet" href="<?php echo app_base_url('/themes/default/assets/css/quiz.min.css'); ?>">
     <link rel="stylesheet" href="<?php echo \App\Helpers\Asset::url('public/assets/css/global-notifications.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -519,7 +520,7 @@ if (
                         !empty($_SESSION["full_name"]);
                     ?>
                     <!-- User greeting -->
-                    <div class="user-greeting <?php echo $is_logged_in ? 'logged-in' : 'guest'; ?>" id="userGreeting">
+                    <div class="user-greeting <?php echo $is_logged_in ? 'logged-in' : 'guest'; ?>" id="userGreeting" style="padding: 0.3rem 0.75rem; font-size: 0.8rem;">
                         <span class="greeting-text">Hi, </span>
                         <strong><?php if (!empty($userName)) {
                                     echo htmlspecialchars(explode(" ", $userName)[0]);
@@ -567,7 +568,7 @@ if (
                                     <i class="fas fa-bell"></i>
                                     <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
                                 </button>
-                                <div class="dropdown notification-dropdown" id="notificationDropdown" role="menu">
+                                <div class="notification-dropdown" id="notificationDropdown" role="menu">
                                     <div class="notification-header">
                                         <h3>Notifications</h3>
                                         <button class="mark-all-read" id="markAllReadBtn" title="Mark all as read">
@@ -688,186 +689,185 @@ if (
 
 
 
-    <main class="main-content">
 
 
 
-        <script>
-            // Profile dropdown functionality with hover and click
-            (function() {
-                const profileToggle = document.getElementById('profileToggleBtn');
-                const profileDropdown = document.getElementById('profileDropdown');
-                const profileWrapper = document.querySelector('.profile-dropdown-wrapper');
+    <script>
+        // Profile dropdown functionality with hover and click
+        (function() {
+            const profileToggle = document.getElementById('profileToggleBtn');
+            const profileDropdown = document.getElementById('profileDropdown');
+            const profileWrapper = document.querySelector('.profile-dropdown-wrapper');
 
-                // Profile dropdown toggle
-                if (profileToggle && profileDropdown && profileWrapper) {
-                    let dropdownTimeout;
+            // Profile dropdown toggle
+            if (profileToggle && profileDropdown && profileWrapper) {
+                let dropdownTimeout;
 
-                    // Show on hover
-                    profileWrapper.addEventListener('mouseenter', function() {
-                        clearTimeout(dropdownTimeout);
-                        profileDropdown.classList.add('active');
-                    });
-
-                    // Hide on mouse leave
-                    profileWrapper.addEventListener('mouseleave', function() {
-                        dropdownTimeout = setTimeout(() => {
-                            profileDropdown.classList.remove('active');
-                        }, 200);
-                    });
-
-                    // Toggle on click
-                    profileToggle.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        profileDropdown.classList.toggle('active');
-                    });
-
-                    // Close profile dropdown when clicking outside
-                    document.addEventListener('click', function(e) {
-                        if (!profileToggle.contains(e.target) && !profileDropdown.contains(e.target)) {
-                            profileDropdown.classList.remove('active');
-                        }
-                    });
-                }
-            })();
-
-            // Favorites and Help functionality
-            (function() {
-                // Favorites Logic dealt with inline or via separate script
-                const helpItem = document.getElementById('helpMenuItem');
-            })();
-
-
-
-            // Enhanced JavaScript for header functionality
-            document.addEventListener('DOMContentLoaded', function() {
-                const header = document.getElementById('siteHeader');
-                const hamburgerBtn = document.getElementById('hamburgerBtn');
-                const mobileNav = document.getElementById('mobileNav');
-                const themeToggleBtn = document.getElementById('themeToggleBtn');
-
-                // Scroll effect for header
-                window.addEventListener('scroll', function() {
-                    if (window.scrollY > 50) {
-                        header.classList.add('scrolled');
-                    } else {
-                        header.classList.remove('scrolled');
-                    }
+                // Show on hover
+                profileWrapper.addEventListener('mouseenter', function() {
+                    clearTimeout(dropdownTimeout);
+                    profileDropdown.classList.add('active');
                 });
 
-                // Dynamic Menu Overflow (Priority+ Pattern)
-                const mainNavList = document.getElementById('mainNavList');
-                const dynamicMoreItem = document.getElementById('dynamicMoreItem');
-                const moreToolsMenu = document.getElementById('moreToolsMenu');
-                const navItems = Array.from(mainNavList.querySelectorAll('.nav-item'));
+                // Hide on mouse leave
+                profileWrapper.addEventListener('mouseleave', function() {
+                    dropdownTimeout = setTimeout(() => {
+                        profileDropdown.classList.remove('active');
+                    }, 200);
+                });
 
-                function updateMenuOverflow() {
-                    const headerMiddle = document.querySelector('.header-middle');
-                    if (!headerMiddle || !mainNavList || !dynamicMoreItem || !moreToolsMenu) return;
+                // Toggle on click
+                profileToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    profileDropdown.classList.toggle('active');
+                });
 
-                    // Available width from the middle container
-                    const containerWidth = headerMiddle.getBoundingClientRect().width;
-
-                    // Show all items to measure accurately
-                    dynamicMoreItem.classList.add('visible');
-                    const moreItemWidth = dynamicMoreItem.getBoundingClientRect().width || 80;
-
-                    navItems.forEach(item => {
-                        mainNavList.insertBefore(item, dynamicMoreItem);
-                        item.style.display = 'flex';
-                    });
-
-                    let currentWidth = 0;
-                    let overflowed = false;
-                    const itemsToMove = [];
-                    const gap = 8;
-
-                    for (let i = 0; i < navItems.length; i++) {
-                        const item = navItems[i];
-                        const itemWidth = item.getBoundingClientRect().width;
-                        const itemTotalWidth = (i > 0 ? gap : 0) + itemWidth;
-
-                        if (overflowed) {
-                            itemsToMove.push(item);
-                            continue;
-                        }
-
-                        // Check if this item fits
-                        // If it's NOT the last item, we need to consider if we'll need 'More' button
-                        const isLast = (i === navItems.length - 1);
-                        const spaceForMore = isLast ? 0 : gap + moreItemWidth;
-
-                        if (currentWidth + itemTotalWidth + spaceForMore > containerWidth) {
-                            // If even the first item doesn't fit with 'More', we must move it
-                            overflowed = true;
-                            itemsToMove.push(item);
-                        } else {
-                            currentWidth += itemTotalWidth;
-                        }
+                // Close profile dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!profileToggle.contains(e.target) && !profileDropdown.contains(e.target)) {
+                        profileDropdown.classList.remove('active');
                     }
+                });
+            }
+        })();
 
-                    // Move items to dropdown
-                    itemsToMove.forEach(item => moreToolsMenu.appendChild(item));
+        // Favorites and Help functionality
+        (function() {
+            // Favorites Logic dealt with inline or via separate script
+            const helpItem = document.getElementById('helpMenuItem');
+        })();
+
+
+
+        // Enhanced JavaScript for header functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.getElementById('siteHeader');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const mobileNav = document.getElementById('mobileNav');
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+            // Scroll effect for header
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // Dynamic Menu Overflow (Priority+ Pattern)
+            const mainNavList = document.getElementById('mainNavList');
+            const dynamicMoreItem = document.getElementById('dynamicMoreItem');
+            const moreToolsMenu = document.getElementById('moreToolsMenu');
+            const navItems = Array.from(mainNavList.querySelectorAll('.nav-item'));
+
+            function updateMenuOverflow() {
+                const headerMiddle = document.querySelector('.header-middle');
+                if (!headerMiddle || !mainNavList || !dynamicMoreItem || !moreToolsMenu) return;
+
+                // Available width from the middle container
+                const containerWidth = headerMiddle.getBoundingClientRect().width;
+
+                // Show all items to measure accurately
+                dynamicMoreItem.classList.add('visible');
+                const moreItemWidth = dynamicMoreItem.getBoundingClientRect().width || 80;
+
+                navItems.forEach(item => {
+                    mainNavList.insertBefore(item, dynamicMoreItem);
+                    item.style.display = 'flex';
+                });
+
+                let currentWidth = 0;
+                let overflowed = false;
+                const itemsToMove = [];
+                const gap = 8;
+
+                for (let i = 0; i < navItems.length; i++) {
+                    const item = navItems[i];
+                    const itemWidth = item.getBoundingClientRect().width;
+                    const itemTotalWidth = (i > 0 ? gap : 0) + itemWidth;
 
                     if (overflowed) {
-                        dynamicMoreItem.classList.add('visible');
-                        dynamicMoreItem.style.display = 'flex';
+                        itemsToMove.push(item);
+                        continue;
+                    }
+
+                    // Check if this item fits
+                    // If it's NOT the last item, we need to consider if we'll need 'More' button
+                    const isLast = (i === navItems.length - 1);
+                    const spaceForMore = isLast ? 0 : gap + moreItemWidth;
+
+                    if (currentWidth + itemTotalWidth + spaceForMore > containerWidth) {
+                        // If even the first item doesn't fit with 'More', we must move it
+                        overflowed = true;
+                        itemsToMove.push(item);
                     } else {
-                        dynamicMoreItem.classList.remove('visible');
-                        dynamicMoreItem.style.display = 'none';
+                        currentWidth += itemTotalWidth;
                     }
                 }
 
-                // Initial run and resize listener
-                if (mainNavList && dynamicMoreItem && moreToolsMenu) {
-                    window.addEventListener('resize', updateMenuOverflow);
-                    // Run after a small delay to ensure styles are applied
-                    setTimeout(updateMenuOverflow, 100);
-                }
+                // Move items to dropdown
+                itemsToMove.forEach(item => moreToolsMenu.appendChild(item));
 
-                // Mobile menu toggle
-                hamburgerBtn.addEventListener('click', function() {
-                    mobileNav.classList.toggle('active');
-                    this.innerHTML = mobileNav.classList.contains('active') ?
-                        '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+                if (overflowed) {
+                    dynamicMoreItem.classList.add('visible');
+                    dynamicMoreItem.style.display = 'flex';
+                } else {
+                    dynamicMoreItem.classList.remove('visible');
+                    dynamicMoreItem.style.display = 'none';
+                }
+            }
+
+            // Initial run and resize listener
+            if (mainNavList && dynamicMoreItem && moreToolsMenu) {
+                window.addEventListener('resize', updateMenuOverflow);
+                // Run after a small delay to ensure styles are applied
+                setTimeout(updateMenuOverflow, 100);
+            }
+
+            // Mobile menu toggle
+            hamburgerBtn.addEventListener('click', function() {
+                mobileNav.classList.toggle('active');
+                this.innerHTML = mobileNav.classList.contains('active') ?
+                    '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+            });
+
+            // Theme Toggle - Icon preserved but logic moved to placeholder for New Theme
+            if (themeToggleBtn) {
+                // Always force dark-theme state for now
+                if (!document.body.classList.contains('dark-theme')) {
+                    document.body.classList.add('dark-theme');
+                }
+                document.body.setAttribute('data-theme', 'dark');
+                themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+                themeToggleBtn.setAttribute('data-label', 'Navy Blue Theme');
+
+                themeToggleBtn.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    // Animate icon for feedback even if it doesn't switch theme yet
+                    icon.style.transition = 'transform 0.4s ease';
+                    icon.style.transform = 'rotate(360deg) scale(1.1)';
+                    setTimeout(() => {
+                        icon.style.transform = '';
+                    }, 400);
+
+                    showThemeNotification('🎨 Custom themes coming soon!');
                 });
+            }
 
-                // Theme Toggle - Icon preserved but logic moved to placeholder for New Theme
-                if (themeToggleBtn) {
-                    // Always force dark-theme state for now
-                    if (!document.body.classList.contains('dark-theme')) {
-                        document.body.classList.add('dark-theme');
-                    }
-                    document.body.setAttribute('data-theme', 'dark');
-                    themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
-                    themeToggleBtn.setAttribute('data-label', 'Navy Blue Theme');
-
-                    themeToggleBtn.addEventListener('click', function() {
-                        const icon = this.querySelector('i');
-                        // Animate icon for feedback even if it doesn't switch theme yet
-                        icon.style.transition = 'transform 0.4s ease';
-                        icon.style.transform = 'rotate(360deg) scale(1.1)';
-                        setTimeout(() => {
-                            icon.style.transform = '';
-                        }, 400);
-
-                        showThemeNotification('🎨 Custom themes coming soon!');
-                    });
+            // Show theme change notification
+            function showThemeNotification(message) {
+                // Remove existing notification if any
+                const existing = document.querySelector('.theme-notification');
+                if (existing) {
+                    existing.remove();
                 }
 
-                // Show theme change notification
-                function showThemeNotification(message) {
-                    // Remove existing notification if any
-                    const existing = document.querySelector('.theme-notification');
-                    if (existing) {
-                        existing.remove();
-                    }
-
-                    // Create notification
-                    const notification = document.createElement('div');
-                    notification.className = 'theme-notification';
-                    notification.textContent = message;
-                    notification.style.cssText = `
+                // Create notification
+                const notification = document.createElement('div');
+                notification.className = 'theme-notification';
+                notification.textContent = message;
+                notification.style.cssText = `
                     position: fixed;
                     top: 80px;
                     right: 20px;
@@ -885,118 +885,118 @@ if (
                     transition: all 0.3s ease;
                 `;
 
-                    document.body.appendChild(notification);
+                document.body.appendChild(notification);
 
-                    // Animate in
-                    setTimeout(() => {
-                        notification.style.opacity = '1';
-                        notification.style.transform = 'translateY(0)';
-                    }, 10);
+                // Animate in
+                setTimeout(() => {
+                    notification.style.opacity = '1';
+                    notification.style.transform = 'translateY(0)';
+                }, 10);
 
-                    // Animate out and remove
+                // Animate out and remove
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateY(-10px)';
                     setTimeout(() => {
-                        notification.style.opacity = '0';
-                        notification.style.transform = 'translateY(-10px)';
-                        setTimeout(() => {
-                            notification.remove();
-                        }, 300);
-                    }, 2000);
+                        notification.remove();
+                    }, 300);
+                }, 2000);
+            }
+
+            console.log('Theme toggle enabled - Day/Night mode ready');
+
+            // Enhanced search functionality
+            let searchTimer = null;
+
+            function displaySearchResults(results) {
+                if (results.length === 0) {
+                    searchSuggestions.innerHTML = '<div class="p-3 text-gray-500">No tools found</div>';
+                    return;
                 }
 
-                console.log('Theme toggle enabled - Day/Night mode ready');
-
-                // Enhanced search functionality
-                let searchTimer = null;
-
-                function displaySearchResults(results) {
-                    if (results.length === 0) {
-                        searchSuggestions.innerHTML = '<div class="p-3 text-gray-500">No tools found</div>';
-                        return;
-                    }
-
-                    searchSuggestions.innerHTML = results.map(result => `
+                searchSuggestions.innerHTML = results.map(result => `
                     <a href="${result.url}" class="block p-3 hover:bg-blue-50 border-b border-gray-100 last:border-0">
                         <div class="font-medium text-gray-800">${result.name}</div>
                         <div class="text-sm text-gray-500">${result.category}</div>
                     </a>
                 `).join('');
+            }
+
+            // Close mobile menu and any open dropdowns when clicking outside the header
+            document.addEventListener('click', function(event) {
+                if (header && !header.contains(event.target)) {
+                    if (mobileNav) mobileNav.classList.remove('active');
+                    if (hamburgerBtn) hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    // Close any open dropdowns
+                    document.querySelectorAll('.has-dropdown.open, .has-dropdown.active').forEach(d => d.classList.remove('open', 'active'));
+                    // Update aria-expanded attributes
+                    document.querySelectorAll('.has-dropdown [aria-expanded="true"]').forEach(el => el.setAttribute('aria-expanded', 'false'));
                 }
+            });
 
-                // Close mobile menu and any open dropdowns when clicking outside the header
-                document.addEventListener('click', function(event) {
-                    if (header && !header.contains(event.target)) {
-                        if (mobileNav) mobileNav.classList.remove('active');
-                        if (hamburgerBtn) hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                        // Close any open dropdowns
-                        document.querySelectorAll('.has-dropdown.open, .has-dropdown.active').forEach(d => d.classList.remove('open', 'active'));
-                        // Update aria-expanded attributes
-                        document.querySelectorAll('.has-dropdown [aria-expanded="true"]').forEach(el => el.setAttribute('aria-expanded', 'false'));
+            // Enhanced dropdown functionality for both hover and click
+            document.querySelectorAll('.has-dropdown').forEach(dropdown => {
+                const trigger = dropdown.querySelector('[role="button"]');
+                const menu = dropdown.querySelector('.dropdown');
+
+                // Show on hover for desktop
+                dropdown.addEventListener('mouseenter', () => {
+                    if (window.innerWidth > 768) {
+                        dropdown.classList.add('open');
+                        if (trigger) trigger.setAttribute('aria-expanded', 'true');
                     }
                 });
 
-                // Enhanced dropdown functionality for both hover and click
-                document.querySelectorAll('.has-dropdown').forEach(dropdown => {
-                    const trigger = dropdown.querySelector('[role="button"]');
-                    const menu = dropdown.querySelector('.dropdown');
-
-                    // Show on hover for desktop
-                    dropdown.addEventListener('mouseenter', () => {
-                        if (window.innerWidth > 768) {
-                            dropdown.classList.add('open');
-                            if (trigger) trigger.setAttribute('aria-expanded', 'true');
-                        }
-                    });
-
-                    dropdown.addEventListener('mouseleave', () => {
-                        if (window.innerWidth > 768) {
-                            dropdown.classList.remove('open');
-                            if (trigger) trigger.setAttribute('aria-expanded', 'false');
-                        }
-                    });
-
-                    // Toggle on click
-                    trigger.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const wasOpen = dropdown.classList.contains('open');
-
-                        // Close all other dropdowns
-                        document.querySelectorAll('.has-dropdown.open').forEach(d => {
-                            if (d !== dropdown) {
-                                d.classList.remove('open');
-                                const t = d.querySelector('[aria-expanded]');
-                                if (t) t.setAttribute('aria-expanded', 'false');
-                            }
-                        });
-
-                        // Toggle this dropdown
-                        dropdown.classList.toggle('open');
-                        trigger.setAttribute('aria-expanded', !wasOpen);
-                    });
-
-                    // Keyboard support (Enter/Space)
-                    if (trigger) {
-                        trigger.addEventListener('keydown', function(ev) {
-                            if (ev.key === 'Enter' || ev.key === ' ') {
-                                ev.preventDefault();
-                                drop.classList.toggle('open');
-                                trigger.setAttribute('aria-expanded', drop.classList.contains('open') ? 'true' : 'false');
-                            }
-                        });
+                dropdown.addEventListener('mouseleave', () => {
+                    if (window.innerWidth > 768) {
+                        dropdown.classList.remove('open');
+                        if (trigger) trigger.setAttribute('aria-expanded', 'false');
                     }
                 });
 
-                // Header dynamic update helpers (allow login page to refresh header without full reload)
-                const HEADER_STATUS_URL = '<?php echo app_base_url(
-                                                "api/header_status.php",
-                                            ); ?>';
+                // Toggle on click
+                trigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const wasOpen = dropdown.classList.contains('open');
 
-                function buildUserActionsHtml(user, isAdmin) {
-                    const name = user.name || '';
-                    const initial = user.initial || (name ? name.charAt(0).toUpperCase() : 'U');
-                    const role = user.role || '';
+                    // Close all other dropdowns
+                    document.querySelectorAll('.has-dropdown.open').forEach(d => {
+                        if (d !== dropdown) {
+                            d.classList.remove('open');
+                            const t = d.querySelector('[aria-expanded]');
+                            if (t) t.setAttribute('aria-expanded', 'false');
+                        }
+                    });
 
-                    return `
+                    // Toggle this dropdown
+                    dropdown.classList.toggle('open');
+                    trigger.setAttribute('aria-expanded', !wasOpen);
+                });
+
+                // Keyboard support (Enter/Space)
+                if (trigger) {
+                    trigger.addEventListener('keydown', function(ev) {
+                        if (ev.key === 'Enter' || ev.key === ' ') {
+                            ev.preventDefault();
+                            drop.classList.toggle('open');
+                            trigger.setAttribute('aria-expanded', drop.classList.contains('open') ? 'true' : 'false');
+                        }
+                    });
+                }
+            });
+
+            // Header dynamic update helpers (allow login page to refresh header without full reload)
+            const HEADER_STATUS_URL = '<?php echo app_base_url(
+                                            "api/header_status.php",
+                                        ); ?>';
+
+            function buildUserActionsHtml(user, isAdmin) {
+                const name = user.name || '';
+                const initial = user.initial || (name ? name.charAt(0).toUpperCase() : 'U');
+                const role = user.role || '';
+
+                return `
                     <div class="has-dropdown">
                         <div class="user-avatar" title="${escapeHtml(name)}">${escapeHtml(initial)}</div>
                         <ul class="dropdown user-dropdown">
@@ -1011,186 +1011,186 @@ if (
                         </ul>
                     </div>
                 `;
-                }
+            }
 
-                // Allow immediate header update using server-returned user object (from login API)
-                window.applyHeaderUser = function(serverUser, isAdmin) {
-                    if (!serverUser) return;
-                    // serverUser may contain full_name, username or name/initial from header_status
-                    var name = serverUser.full_name || serverUser.name || serverUser.username || '';
-                    var initial = serverUser.initial || (name ? name.charAt(0).toUpperCase() : 'U');
-                    var role = serverUser.role || serverUser.user_role || serverUser.role_name || '';
-                    var userObj = {
-                        name: name,
-                        initial: initial,
-                        role: role
-                    };
-                    try {
-                        const ua = document.querySelector('.user-actions');
-                        if (!ua) return;
-                        ua.innerHTML = buildUserActionsHtml(userObj, !!isAdmin);
-                    } catch (e) {
-                        console.warn('applyHeaderUser failed', e);
-                    }
+            // Allow immediate header update using server-returned user object (from login API)
+            window.applyHeaderUser = function(serverUser, isAdmin) {
+                if (!serverUser) return;
+                // serverUser may contain full_name, username or name/initial from header_status
+                var name = serverUser.full_name || serverUser.name || serverUser.username || '';
+                var initial = serverUser.initial || (name ? name.charAt(0).toUpperCase() : 'U');
+                var role = serverUser.role || serverUser.user_role || serverUser.role_name || '';
+                var userObj = {
+                    name: name,
+                    initial: initial,
+                    role: role
                 };
+                try {
+                    const ua = document.querySelector('.user-actions');
+                    if (!ua) return;
+                    ua.innerHTML = buildUserActionsHtml(userObj, !!isAdmin);
+                } catch (e) {
+                    console.warn('applyHeaderUser failed', e);
+                }
+            };
 
-                function escapeHtml(str) {
-                    if (!str) return '';
-                    return String(str).replace(/[&<>"'`]/g, function(s) {
-                        return ({
-                            '&': '&',
-                            '<': '<',
-                            '>': '>',
-                            '"': '"',
-                            "'": '&#39;',
-                            '`': '&#96;'
-                        })[s];
+            function escapeHtml(str) {
+                if (!str) return '';
+                return String(str).replace(/[&<>"'`]/g, function(s) {
+                    return ({
+                        '&': '&',
+                        '<': '<',
+                        '>': '>',
+                        '"': '"',
+                        "'": '&#39;',
+                        '`': '&#96;'
+                    })[s];
+                });
+            }
+
+            window.refreshHeaderFromServer = async function() {
+                try {
+                    const res = await fetch(HEADER_STATUS_URL, {
+                        credentials: 'include'
                     });
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    const ua = document.querySelector('.user-actions');
+                    if (!ua) return;
+
+                    if (data.logged_in) {
+                        ua.innerHTML = buildUserActionsHtml(data.user, data.is_admin);
+                    } else {
+                        ua.innerHTML = '<a href="<?php echo app_base_url(
+                                                        "login",
+                                                    ); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
+                    }
+                } catch (e) {
+                    console.warn('refreshHeaderFromServer failed', e);
                 }
+            };
 
-                window.refreshHeaderFromServer = async function() {
-                    try {
-                        const res = await fetch(HEADER_STATUS_URL, {
-                            credentials: 'include'
-                        });
-                        if (!res.ok) return;
-                        const data = await res.json();
-                        const ua = document.querySelector('.user-actions');
-                        if (!ua) return;
+            // Apply logged-out header - now shows login button
+            if (!document.querySelector('.user-actions .has-dropdown')) {
+                // No user actions dropdown found, means not logged in
+            }
 
-                        if (data.logged_in) {
-                            ua.innerHTML = buildUserActionsHtml(data.user, data.is_admin);
-                        } else {
-                            ua.innerHTML = '<a href="<?php echo app_base_url(
-                                                            "login",
-                                                        ); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
+            // Intercept logout link clicks to update header immediately (AJAX-friendly)
+            document.addEventListener('click', function(ev) {
+                const a = ev.target.closest && ev.target.closest('a');
+                if (!a) return;
+                const href = a.getAttribute('href') || '';
+                if (href.indexOf('logout') !== -1) {
+                    // Prevent default navigation to allow immediate header update
+                    ev.preventDefault();
+                    (async function() {
+                        try {
+                            // Call logout endpoint (GET). include credentials to ensure session is destroyed.
+                            await fetch(href, {
+                                method: 'GET',
+                                credentials: 'include'
+                            });
+                        } catch (e) {
+                            // ignore network errors
                         }
-                    } catch (e) {
-                        console.warn('refreshHeaderFromServer failed', e);
-                    }
-                };
-
-                // Apply logged-out header - now shows login button
-                if (!document.querySelector('.user-actions .has-dropdown')) {
-                    // No user actions dropdown found, means not logged in
+                        // Update header - show login button
+                        try {
+                            const ua = document.querySelector('.user-actions');
+                            if (ua) ua.innerHTML = '<a href="<?php echo app_base_url(
+                                                                    "login",
+                                                                ); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
+                        } catch (e) {
+                            console.warn('Header update failed', e);
+                        }
+                        // Then navigate to the logout href (redirect) or homepage
+                        window.location.href = href || '<?php echo app_base_url(
+                                                            "/",
+                                                        ); ?>';
+                    })();
                 }
-
-                // Intercept logout link clicks to update header immediately (AJAX-friendly)
-                document.addEventListener('click', function(ev) {
-                    const a = ev.target.closest && ev.target.closest('a');
-                    if (!a) return;
-                    const href = a.getAttribute('href') || '';
-                    if (href.indexOf('logout') !== -1) {
-                        // Prevent default navigation to allow immediate header update
-                        ev.preventDefault();
-                        (async function() {
-                            try {
-                                // Call logout endpoint (GET). include credentials to ensure session is destroyed.
-                                await fetch(href, {
-                                    method: 'GET',
-                                    credentials: 'include'
-                                });
-                            } catch (e) {
-                                // ignore network errors
-                            }
-                            // Update header - show login button
-                            try {
-                                const ua = document.querySelector('.user-actions');
-                                if (ua) ua.innerHTML = '<a href="<?php echo app_base_url(
-                                                                        "login",
-                                                                    ); ?>" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>';
-                            } catch (e) {
-                                console.warn('Header update failed', e);
-                            }
-                            // Then navigate to the logout href (redirect) or homepage
-                            window.location.href = href || '<?php echo app_base_url(
-                                                                "/",
-                                                            ); ?>';
-                        })();
-                    }
-                });
-
-                // Keyboard shortcuts
-                document.addEventListener('keydown', function(event) {
-                    // Ctrl+K or / for search
-                    if ((event.ctrlKey && event.key === 'k') || event.key === '/') {
-                        event.preventDefault();
-                        const searchToggleBtn = document.getElementById('searchToggleBtn');
-                        if (searchToggleBtn) searchToggleBtn.click();
-                    }
-
-                    // Escape to close mobile menu
-                    if (event.key === 'Escape') {
-                        mobileNav.classList.remove('active');
-                        hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                    }
-                });
-
-                // Add search shortcut hint
-
             });
 
-            // Auto-fit user greeting text
-            (function() {
-                const userGreeting = document.getElementById('userGreeting');
-                if (!userGreeting) return;
-
-                function autoFitGreeting() {
-                    const greeting = userGreeting;
-                    const strongElement = greeting.querySelector('strong');
-                    if (!strongElement) return;
-
-                    const nameText = strongElement.textContent.trim();
-                    const nameLength = nameText.length;
-
-                    // Reset classes
-                    greeting.classList.remove('long-name', 'very-long-name', 'extra-long-name');
-
-                    // Add appropriate class based on name length
-                    if (nameLength > 15) {
-                        greeting.classList.add('extra-long-name');
-                    } else if (nameLength > 10) {
-                        greeting.classList.add('very-long-name');
-                    } else if (nameLength > 7) {
-                        greeting.classList.add('long-name');
-                    }
-
-                    // Dynamic font size adjustment
-                    let fontSize = '0.8rem';
-                    if (nameLength > 15) {
-                        fontSize = '0.65rem';
-                    } else if (nameLength > 10) {
-                        fontSize = '0.7rem';
-                    } else if (nameLength > 7) {
-                        fontSize = '0.75rem';
-                    }
-
-                    greeting.style.fontSize = fontSize;
-
-                    // Adjust strong element max-width
-                    let maxWidth = '120px';
-                    if (nameLength > 15) {
-                        maxWidth = '90px';
-                    } else if (nameLength > 10) {
-                        maxWidth = '100px';
-                    } else if (nameLength > 7) {
-                        maxWidth = '110px';
-                    }
-
-                    strongElement.style.maxWidth = maxWidth;
-
-                    console.log(`Auto-fit greeting: "${nameText}" (${nameLength} chars) -> ${fontSize}, max-width: ${maxWidth}`);
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(event) {
+                // Ctrl+K or / for search
+                if ((event.ctrlKey && event.key === 'k') || event.key === '/') {
+                    event.preventDefault();
+                    const searchToggleBtn = document.getElementById('searchToggleBtn');
+                    if (searchToggleBtn) searchToggleBtn.click();
                 }
 
-                // Run on page load
-                autoFitGreeting();
+                // Escape to close mobile menu
+                if (event.key === 'Escape') {
+                    mobileNav.classList.remove('active');
+                    hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+            });
 
-                // Run on window resize
-                window.addEventListener('resize', autoFitGreeting);
+            // Add search shortcut hint
 
-                // Add CSS classes for different name lengths
-                const style = document.createElement('style');
-                style.textContent = `
+        });
+
+        // Auto-fit user greeting text
+        (function() {
+            const userGreeting = document.getElementById('userGreeting');
+            if (!userGreeting) return;
+
+            function autoFitGreeting() {
+                const greeting = userGreeting;
+                const strongElement = greeting.querySelector('strong');
+                if (!strongElement) return;
+
+                const nameText = strongElement.textContent.trim();
+                const nameLength = nameText.length;
+
+                // Reset classes
+                greeting.classList.remove('long-name', 'very-long-name', 'extra-long-name');
+
+                // Add appropriate class based on name length
+                if (nameLength > 15) {
+                    greeting.classList.add('extra-long-name');
+                } else if (nameLength > 10) {
+                    greeting.classList.add('very-long-name');
+                } else if (nameLength > 7) {
+                    greeting.classList.add('long-name');
+                }
+
+                // Dynamic font size adjustment
+                let fontSize = '0.8rem';
+                if (nameLength > 15) {
+                    fontSize = '0.65rem';
+                } else if (nameLength > 10) {
+                    fontSize = '0.7rem';
+                } else if (nameLength > 7) {
+                    fontSize = '0.75rem';
+                }
+
+                greeting.style.fontSize = fontSize;
+
+                // Adjust strong element max-width
+                let maxWidth = '120px';
+                if (nameLength > 15) {
+                    maxWidth = '90px';
+                } else if (nameLength > 10) {
+                    maxWidth = '100px';
+                } else if (nameLength > 7) {
+                    maxWidth = '110px';
+                }
+
+                strongElement.style.maxWidth = maxWidth;
+
+                console.log(`Auto-fit greeting: "${nameText}" (${nameLength} chars) -> ${fontSize}, max-width: ${maxWidth}`);
+            }
+
+            // Run on page load
+            autoFitGreeting();
+
+            // Run on window resize
+            window.addEventListener('resize', autoFitGreeting);
+
+            // Add CSS classes for different name lengths
+            const style = document.createElement('style');
+            style.textContent = `
                 .user-greeting.long-name {
                     padding: 0.35rem 0.65rem;
                 }
@@ -1222,135 +1222,181 @@ if (
                 }
 
             `;
-                document.head.appendChild(style);
-            })();
+            document.head.appendChild(style);
+        })();
 
-            // Notification System Logic
-            (function() {
-                const wrapper = document.getElementById('notificationWrapper');
-                const toggleBtn = document.getElementById('notificationToggleBtn');
-                const dropdown = document.getElementById('notificationDropdown');
-                const badge = document.getElementById('notificationBadge');
-                const list = document.getElementById('notificationList');
-                const markAllBtn = document.getElementById('markAllReadBtn');
-                const baseUrl = '<?php echo app_base_url(''); ?>';
-                let isLoaded = false;
+        // Notification System Logic
+        (function() {
+            const wrapper = document.getElementById('notificationWrapper');
+            const toggleBtn = document.getElementById('notificationToggleBtn');
+            const dropdown = document.getElementById('notificationDropdown');
+            const badge = document.getElementById('notificationBadge');
+            const list = document.getElementById('notificationList');
+            const markAllBtn = document.getElementById('markAllReadBtn');
+            const baseUrl = '<?php echo app_base_url(''); ?>';
+            let isLoaded = false;
 
-                if (!wrapper || !toggleBtn || !dropdown) return;
+            if (!wrapper || !toggleBtn || !dropdown) return;
 
-                // Toggle dropdown
-                toggleBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const isOpen = dropdown.classList.contains('active');
+            // Toggle dropdown
+            toggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isOpen = dropdown.classList.contains('active');
 
-                    // Close others
-                    document.querySelectorAll('.dropdown.open, .dropdown.active').forEach(d => {
-                        if (d !== dropdown) d.classList.remove('active', 'open');
+                // Close others
+                document.querySelectorAll('.dropdown.open, .dropdown.active').forEach(d => {
+                    if (d !== dropdown) d.classList.remove('active', 'open');
+                });
+                document.querySelectorAll('.profile-dropdown.active').forEach(d => d.classList.remove('active'));
+
+                dropdown.classList.toggle('active');
+                toggleBtn.setAttribute('aria-expanded', !isOpen);
+
+                if (!isOpen && !isLoaded) {
+                    fetchNotifications();
+                }
+            });
+
+            // Close on outside click
+            document.addEventListener('click', function(e) {
+                if (!wrapper.contains(e.target)) {
+                    dropdown.classList.remove('active');
+                    toggleBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            // Mark all as read
+            markAllBtn.addEventListener('click', async function(e) {
+                e.stopPropagation();
+                try {
+                    markAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    const res = await fetch(`${window.appConfig.baseUrl}/api/notifications/mark-all-read`, {
+                        method: 'POST'
                     });
-                    document.querySelectorAll('.profile-dropdown.active').forEach(d => d.classList.remove('active'));
+                    const data = await res.json();
 
-                    dropdown.classList.toggle('active');
-                    toggleBtn.setAttribute('aria-expanded', !isOpen);
-
-                    if (!isOpen && !isLoaded) {
+                    if (data.success) {
+                        // Update UI
+                        badge.style.display = 'none';
+                        badge.textContent = '0';
+                        // Reload list
                         fetchNotifications();
                     }
-                });
+                } catch (err) {
+                    console.error('Failed to mark all read', err);
+                } finally {
+                    markAllBtn.innerHTML = '<i class="fas fa-check-double"></i> Mark all read';
+                }
+            });
 
-                // Close on outside click
-                document.addEventListener('click', function(e) {
-                    if (!wrapper.contains(e.target)) {
-                        dropdown.classList.remove('active');
-                        toggleBtn.setAttribute('aria-expanded', 'false');
-                    }
-                });
+            // Fetch notifications
+            async function fetchNotifications() {
+                try {
+                    const res = await fetch(`${window.appConfig.baseUrl}/api/notifications/list`);
+                    const data = await res.json();
 
-                // Mark all as read
-                markAllBtn.addEventListener('click', async function(e) {
-                    e.stopPropagation();
-                    try {
-                        markAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-                        const res = await fetch(`${baseUrl}/api/notifications/mark-all-read`, {
-                            method: 'POST'
-                        });
-                        const data = await res.json();
-
-                        if (data.success) {
-                            // Update UI
-                            badge.style.display = 'none';
-                            badge.textContent = '0';
-                            // Reload list
-                            fetchNotifications();
-                        }
-                    } catch (err) {
-                        console.error('Failed to mark all read', err);
-                    } finally {
-                        markAllBtn.innerHTML = '<i class="fas fa-check-double"></i> Mark all read';
-                    }
-                });
-
-                // Fetch notifications
-                async function fetchNotifications() {
-                    try {
-                        const res = await fetch(`${baseUrl}/api/notifications`);
-                        const data = await res.json();
-
-                        if (data.success) {
-                            renderNotifications(data.notifications);
-                            updateBadge(data.notifications.length);
-                            isLoaded = true;
-                        } else if (res.status === 401) {
-                            // User logged out
-                            list.innerHTML = `<div class="notification-empty">
+                    if (data.success) {
+                        renderNotifications(data.notifications);
+                        updateBadge(data.notifications.length);
+                        isLoaded = true;
+                    } else if (res.status === 401) {
+                        // User logged out
+                        list.innerHTML = `<div class="notification-empty">
                                 <i class="fas fa-exclamation-circle"></i>
                                 <p>Please login to view notifications</p>
                             </div>`;
-                        }
-                    } catch (err) {
-                        console.error('Failed to fetch notifications', err);
                     }
+                } catch (err) {
+                    console.error('Failed to fetch notifications', err);
+                }
+            }
+
+            // Initial Badge Count
+            async function checkUnreadCount() {
+                try {
+                    // Use the correct list endpoint
+                    const res = await fetch(`${window.appConfig.baseUrl}/api/notifications/list`);
+                    const data = await res.json();
+                    if (data.success) {
+                        updateBadge(data.notifications.length);
+                    }
+                } catch (err) {
+                    // Silent fail
+                }
+            }
+
+            window.handleNotificationClick = async function(id, url) {
+                // Navigate immediately if no ID or already read (managed by UI class)
+                if (!id) {
+                    if (url && url !== '#') window.location.href = url;
+                    return;
                 }
 
-                // Initial Badge Count
-                async function checkUnreadCount() {
-                    try {
-                        // Re-use same endpoint as it returns unread list
-                        const res = await fetch(`${baseUrl}/api/notifications`);
-                        const data = await res.json();
-                        if (data.success) {
-                            updateBadge(data.notifications.length);
-                        }
-                    } catch (err) {
-                        // Silent fail
-                    }
-                }
-
-                function updateBadge(count) {
+                // Optimistic UI update
+                const badge = document.getElementById('notificationBadge');
+                if (badge) {
+                    let count = parseInt(badge.textContent) || 0;
                     if (count > 0) {
+                        count--;
                         badge.textContent = count > 99 ? '99+' : count;
-                        badge.style.display = 'flex';
-                    } else {
-                        badge.style.display = 'none';
+                        if (count === 0) badge.style.display = 'none';
                     }
                 }
 
-                function renderNotifications(notifications) {
-                    if (!notifications || notifications.length === 0) {
-                        list.innerHTML = `<div class="notification-empty">
+                // Send API request in background
+                try {
+                    // Use sendBeacon for reliable delivery during navigation if supported, falling back to fetch
+                    const apiUrl = `${window.appConfig.baseUrl}/api/notifications/${id}/read`;
+
+                    if (navigator.sendBeacon) {
+                        const data = new FormData();
+                        navigator.sendBeacon(apiUrl, data);
+                    } else {
+                        fetch(apiUrl, {
+                            method: 'POST',
+                            keepalive: true
+                        });
+                    }
+                } catch (e) {
+                    console.error('Failed to mark read', e);
+                }
+
+                // Navigate
+                if (url && url !== '#') {
+                    window.location.href = url;
+                }
+            };
+
+            function updateBadge(count) {
+                if (count > 0) {
+                    badge.textContent = count > 99 ? '99+' : count;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            function renderNotifications(notifications) {
+                if (!notifications || notifications.length === 0) {
+                    list.innerHTML = `<div class="notification-empty">
                             <i class="far fa-bell" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
                             <p>No notifications yet</p>
                         </div>`;
-                        return;
-                    }
+                    return;
+                }
 
-                    list.innerHTML = notifications.map(n => {
-                        const icon = getIconForType(n.type);
-                        const bgClass = getClassForType(n.type);
-                        const timeAgo = getTimeAgo(new Date(n.created_at));
-                        const unreadClass = n.read_at ? '' : 'unread';
+                list.innerHTML = notifications.map(n => {
+                    const icon = getIconForType(n.type);
+                    const bgClass = getClassForType(n.type);
+                    const timeAgo = getTimeAgo(new Date(n.created_at));
+                    const unreadClass = n.read_at ? '' : 'unread';
 
-                        return `
-                        <div class="notification-item ${unreadClass}" onclick="window.location.href='${n.link || '#'}'">
+                    const actionUrl = n.action_url || '#';
+                    const safeUrl = actionUrl.startsWith('javascript:') ? '#' : actionUrl;
+                    const safeUrlStr = String(safeUrl).replace(/'/g, "\\'");
+
+                    return `
+                        <div class="notification-item ${unreadClass}" onclick="window.handleNotificationClick(${n.id}, '${safeUrlStr}')">
                             <div class="notification-icon ${bgClass}">
                                 <i class="${icon}"></i>
                             </div>
@@ -1361,68 +1407,67 @@ if (
                             </div>
                         </div>
                         `;
-                    }).join('');
+                }).join('');
+            }
+
+            function getIconForType(type) {
+                switch (type) {
+                    case 'success':
+                        return 'fas fa-check-circle';
+                    case 'warning':
+                        return 'fas fa-exclamation-triangle';
+                    case 'error':
+                        return 'fas fa-times-circle';
+                    case 'info':
+                    default:
+                        return 'fas fa-info-circle';
                 }
+            }
 
-                function getIconForType(type) {
-                    switch (type) {
-                        case 'success':
-                            return 'fas fa-check-circle';
-                        case 'warning':
-                            return 'fas fa-exclamation-triangle';
-                        case 'error':
-                            return 'fas fa-times-circle';
-                        case 'info':
-                        default:
-                            return 'fas fa-info-circle';
-                    }
+            function getClassForType(type) {
+                switch (type) {
+                    case 'success':
+                        return 'bg-success-light';
+                    case 'warning':
+                        return 'bg-warning-light';
+                    case 'error':
+                        return 'bg-danger-light';
+                    case 'info':
+                    default:
+                        return 'bg-info-light';
                 }
+            }
 
-                function getClassForType(type) {
-                    switch (type) {
-                        case 'success':
-                            return 'bg-success-light';
-                        case 'warning':
-                            return 'bg-warning-light';
-                        case 'error':
-                            return 'bg-danger-light';
-                        case 'info':
-                        default:
-                            return 'bg-info-light';
-                    }
-                }
+            function getTimeAgo(date) {
+                const seconds = Math.floor((new Date() - date) / 1000);
+                let interval = seconds / 31536000;
+                if (interval > 1) return Math.floor(interval) + " years ago";
+                interval = seconds / 2592000;
+                if (interval > 1) return Math.floor(interval) + " months ago";
+                interval = seconds / 86400;
+                if (interval > 1) return Math.floor(interval) + " days ago";
+                interval = seconds / 3600;
+                if (interval > 1) return Math.floor(interval) + " hours ago";
+                interval = seconds / 60;
+                if (interval > 1) return Math.floor(interval) + " minutes ago";
+                return Math.floor(seconds) + " seconds ago";
+            }
 
-                function getTimeAgo(date) {
-                    const seconds = Math.floor((new Date() - date) / 1000);
-                    let interval = seconds / 31536000;
-                    if (interval > 1) return Math.floor(interval) + " years ago";
-                    interval = seconds / 2592000;
-                    if (interval > 1) return Math.floor(interval) + " months ago";
-                    interval = seconds / 86400;
-                    if (interval > 1) return Math.floor(interval) + " days ago";
-                    interval = seconds / 3600;
-                    if (interval > 1) return Math.floor(interval) + " hours ago";
-                    interval = seconds / 60;
-                    if (interval > 1) return Math.floor(interval) + " minutes ago";
-                    return Math.floor(seconds) + " seconds ago";
-                }
+            function escapeHtml(text) {
+                if (!text) return '';
+                return text
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
 
-                function escapeHtml(text) {
-                    if (!text) return '';
-                    return text
-                        .replace(/&/g, "&amp;")
-                        .replace(/</g, "&lt;")
-                        .replace(/>/g, "&gt;")
-                        .replace(/"/g, "&quot;")
-                        .replace(/'/g, "&#039;");
-                }
+            // Check unread count on load
+            checkUnreadCount();
 
-                // Check unread count on load
-                checkUnreadCount();
-
-                // Poll every 60 seconds
-                setInterval(checkUnreadCount, 60000);
-            })();
-        </script>
-        <!-- Main Content Wrapper -->
-        <main class="main-content">
+            // Poll every 60 seconds
+            setInterval(checkUnreadCount, 60000);
+        })();
+    </script>
+    <main class="main-content">

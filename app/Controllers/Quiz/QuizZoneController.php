@@ -12,80 +12,109 @@ class QuizZoneController extends Controller
     {
         $this->requireAuth();
         $user = Auth::user();
+        if (!$user) return;
 
-        // 1. Check if user has selected a course
         $db = Database::getInstance();
-        $userData = $db->find('users', ['id' => $user->id]);
+        $userData = $db->findOne('users', ['id' => $user->id]);
 
         if (empty($userData['selected_course_id'])) {
             $this->redirect('/quiz/setup');
             return;
         }
 
-        // 2. Fetch Course and Education Level info
-        $course = $db->find('syllabus_nodes', ['id' => $userData['selected_course_id']]);
-        $eduLevel = $userData['selected_edu_level_id'] 
-            ? $db->find('syllabus_nodes', ['id' => $userData['selected_edu_level_id']]) 
+        // 1. Fetch Course and Education Level info
+        $course = $db->findOne('syllabus_nodes', ['id' => $userData['selected_course_id']]);
+        $eduLevel = !empty($userData['selected_edu_level_id'])
+            ? $db->findOne('syllabus_nodes', ['id' => $userData['selected_edu_level_id']])
             : null;
 
         // 3. Fetch Syllabus Hierarchy
-        // Get all nodes for this course (Papers, Categories, Units)
-        $pdo = $db->getPdo();
-        
-        // Fetch Papers (top-level subjects under the course)
-        $stmt = $pdo->prepare("
-            SELECT * FROM syllabus_nodes 
-            WHERE parent_id = ? AND type = 'paper' AND is_active = 1
-            ORDER BY `order` ASC
-        ");
-        $stmt->execute([$userData['selected_course_id']]);
-        $papers = $stmt->fetchAll();
+        // Primary Hierarchy in DB: Category -> Sub Category -> Topic
+        $db_categories = $db->fetchAll("SELECT * FROM syllabus_nodes WHERE parent_id = ? AND type = 'category' AND is_active = 1", [$userData['selected_course_id']]);
 
-        // For each paper, fetch categories and units
-        foreach ($papers as &$paper) {
-            // Fetch categories under this paper
-            $stmt = $pdo->prepare("
-                SELECT * FROM syllabus_nodes 
-                WHERE parent_id = ? AND type = 'category' AND is_active = 1
-                ORDER BY `order` ASC
-            ");
-            $stmt->execute([$paper['id']]);
-            $paper['categories'] = $stmt->fetchAll();
+        $papers = [];
+        if (!empty($db_categories)) {
+            foreach ($db_categories as $db_cat) {
+                $paper = [
+                    'id' => $db_cat['id'],
+                    'title' => $db_cat['title'],
+                    'categories' => []
+                ];
 
-            // For each category, fetch units
-            foreach ($paper['categories'] as &$category) {
-                $stmt = $pdo->prepare("
-                    SELECT * FROM syllabus_nodes 
-                    WHERE parent_id = ? AND type = 'unit' AND is_active = 1
-                    ORDER BY `order` ASC
-                ");
-                $stmt->execute([$category['id']]);
-                $category['units'] = $stmt->fetchAll();
+                // Fetch Sub Categories as 'UI Categories'
+                $sub_cats = $db->fetchAll("SELECT * FROM syllabus_nodes WHERE parent_id = ? AND type = 'sub_category' AND is_active = 1", [$db_cat['id']]);
 
-                // For each unit, check progress and quiz availability
-                foreach ($category['units'] as &$unit) {
-                    // Check if user has completed this unit
-                    $stmt = $pdo->prepare("
-                        SELECT * FROM user_syllabus_progress 
-                        WHERE user_id = ? AND syllabus_node_id = ?
-                    ");
-                    $stmt->execute([$user->id, $unit['id']]);
-                    $progress = $stmt->fetch();
+                if (empty($sub_cats)) {
+                    // Fallback: Check for questions directly under this category
+                    $qCount = $db->fetch("SELECT COUNT(*) as total FROM quiz_questions WHERE category_id = ? AND status = 'approved'", [$db_cat['id']])['total'] ?? 0;
+                    $paper['categories'][] = [
+                        'id' => $db_cat['id'],
+                        'title' => 'General',
+                        'units' => [[
+                            'id' => $db_cat['id'],
+                            'title' => 'Introduction to ' . $db_cat['title'],
+                            'quiz_count' => $qCount,
+                            'is_completed' => false,
+                            'completion_percentage' => 0
+                        ]]
+                    ];
+                } else {
+                    foreach ($sub_cats as $sc) {
+                        $category = [
+                            'id' => $sc['id'],
+                            'title' => $sc['title'],
+                            'units' => []
+                        ];
 
-                    $unit['progress'] = $progress;
-                    $unit['is_completed'] = $progress && $progress['is_completed'];
-                    $unit['completion_percentage'] = $progress ? $progress['completion_percentage'] : 0;
+                        // Fetch Topics as 'UI Units'
+                        $topics = $db->fetchAll("SELECT * FROM syllabus_nodes WHERE parent_id = ? AND type = 'topic' AND is_active = 1", [$sc['id']]);
+                        foreach ($topics as $t) {
+                            $progress = $db->findOne('user_syllabus_progress', ['user_id' => $user->id, 'syllabus_node_id' => $t['id']]);
+                            // Note: We check both topic_id and sub_category_id as backup
+                            $qCount = $db->fetch("SELECT COUNT(*) as total FROM quiz_questions WHERE (topic_id = ? OR sub_category_id = ?) AND status = 'approved'", [$t['id'], $t['id']])['total'] ?? 0;
+                            $category['units'][] = [
+                                'id' => $t['id'],
+                                'title' => $t['title'],
+                                'description' => $t['description'] ?? '',
+                                'progress' => $progress,
+                                'is_completed' => $progress && $progress['is_completed'],
+                                'completion_percentage' => $progress ? ($progress['score'] / 100) * 100 : 0,
+                                'quiz_count' => $qCount
+                            ];
+                        }
 
-                    // Check if there are quizzes for this unit
-                    $stmt = $pdo->prepare("
-                        SELECT COUNT(*) as quiz_count FROM quiz_exams 
-                        WHERE syllabus_node_id = ? AND status = 'published'
-                    ");
-                    $stmt->execute([$unit['id']]);
-                    $quizData = $stmt->fetch();
-                    $unit['quiz_count'] = $quizData['quiz_count'];
+                        if (empty($category['units'])) {
+                            $qCount = $db->fetch("SELECT COUNT(*) as total FROM quiz_questions WHERE sub_category_id = ? AND status = 'approved'", [$sc['id']])['total'] ?? 0;
+                            $category['units'][] = [
+                                'id' => $sc['id'],
+                                'title' => 'Core concepts',
+                                'quiz_count' => $qCount,
+                                'is_completed' => false,
+                                'completion_percentage' => 0
+                            ];
+                        }
+                        $paper['categories'][] = $category;
+                    }
                 }
+                $papers[] = $paper;
             }
+        } else {
+            // Flatest fallback
+            $papers[] = [
+                'id' => 0,
+                'title' => 'Curriculum Overview',
+                'categories' => [[
+                    'id' => 0,
+                    'title' => 'General Topics',
+                    'units' => [[
+                        'id' => $userData['selected_course_id'],
+                        'title' => 'Subject Fundamentals',
+                        'quiz_count' => $db->fetch("SELECT COUNT(*) as total FROM quiz_questions WHERE course_id = ? AND status = 'approved'", [$userData['selected_course_id']])['total'] ?? 0,
+                        'is_completed' => false,
+                        'completion_percentage' => 0
+                    ]]
+                ]]
+            ];
         }
 
         // 4. Calculate overall progress
@@ -95,9 +124,7 @@ class QuizZoneController extends Controller
             foreach ($paper['categories'] as $category) {
                 foreach ($category['units'] as $unit) {
                     $totalUnits++;
-                    if ($unit['is_completed']) {
-                        $completedUnits++;
-                    }
+                    if (!empty($unit['is_completed'])) $completedUnits++;
                 }
             }
         }
@@ -118,8 +145,15 @@ class QuizZoneController extends Controller
     public function setup()
     {
         $this->requireAuth();
+        $db = Database::getInstance();
+
+        $courses = $db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'course'")->fetchAll();
+        $eduLevels = $db->query("SELECT id, title FROM syllabus_nodes WHERE type = 'education_level'")->fetchAll();
+
         $this->view('quiz/setup', [
-            'title' => 'Setup Your Learning Path'
+            'title' => 'Setup Your Learning Path',
+            'courses' => $courses,
+            'edu_levels' => $eduLevels
         ]);
     }
 
@@ -128,24 +162,40 @@ class QuizZoneController extends Controller
         $this->requireAuth();
         $user = Auth::user();
 
-        $courseId = $_POST['course_id'] ?? null;
-        $eduLevelId = $_POST['edu_level_id'] ?? null;
+        $courseId = isset($_POST['course_id']) ? (int)$_POST['course_id'] : null;
+        $eduLevelId = isset($_POST['edu_level_id']) ? (int)$_POST['edu_level_id'] : null;
 
         if (!$courseId || !$eduLevelId) {
-            // Error handling
             $this->redirect('/quiz/setup');
+            return;
         }
 
-        $db = Database::getInstance();
-        $db->update(
-            'users',
-            ['id' => $user->id],
-            [
-                'selected_course_id' => $courseId,
-                'selected_edu_level_id' => $eduLevelId
-            ]
-        );
+        try {
+            $db = Database::getInstance();
+            $course = $db->findOne('syllabus_nodes', ['id' => $courseId]);
+            $eduLevel = $db->findOne('syllabus_nodes', ['id' => $eduLevelId]);
 
-        $this->redirect('/quiz/zone');
+            if (!$course || !$eduLevel) {
+                $this->redirect('/quiz/setup');
+                return;
+            }
+
+            // Update user preferences
+            $db->update(
+                'users',
+                [
+                    'selected_course_id' => $courseId,
+                    'selected_edu_level_id' => $eduLevelId,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ],
+                'id = :id',
+                ['id' => $user->id]
+            );
+
+            $this->redirect('/quiz/zone');
+        } catch (\Exception $e) {
+            error_log("Setup Save Error: " . $e->getMessage());
+            $this->redirect('/quiz/setup');
+        }
     }
 }

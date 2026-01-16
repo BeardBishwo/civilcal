@@ -21,7 +21,7 @@ class UserReportController extends Controller
         $db = Database::getInstance();
 
         $reports = $db->query("
-            SELECT r.*, q.question as q_json, q.type as q_type
+            SELECT r.*, q.content as q_json, q.type as q_type
             FROM question_reports r
             LEFT JOIN quiz_questions q ON r.question_id = q.id
             WHERE r.user_id = ?

@@ -20,7 +20,8 @@
 
 .header-content {
   width: 100%;
-  height: 80px; /* Explicit height for logo scaling */
+  height: 80px;
+  /* Explicit height for logo scaling */
   padding: 0 2px;
   display: flex;
   align-items: center;
@@ -46,7 +47,8 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   height: 100% !important;
   padding: 0 !important;
-  margin-right: 0.5rem; /* Space between logo and nav */
+  margin-right: 0.5rem;
+  /* Space between logo and nav */
 }
 
 .logo:hover {
@@ -54,9 +56,11 @@
 }
 
 .logo-img {
-  height: 80px !important; /* Exact match with header height */
+  height: 80px !important;
+  /* Exact match with header height */
   width: auto !important;
-  min-width: 80px !important; /* Square base */
+  min-width: 80px !important;
+  /* Square base */
   max-height: 80px !important;
   object-fit: contain !important;
   transition: all 0.3s ease;
@@ -72,10 +76,12 @@
   flex: 1 1 auto;
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* Better for handling overflow */
+  justify-content: flex-start;
+  /* Better for handling overflow */
   gap: 0.5rem;
   min-width: 0;
-  overflow: visible; /* Changed from hidden to allow dropdowns */
+  overflow: visible;
+  /* Changed from hidden to allow dropdowns */
 }
 
 .main-nav ul {
@@ -86,7 +92,8 @@
   gap: 0.5rem;
   flex-wrap: nowrap;
   align-items: center;
-  overflow: visible; /* Changed from hidden to avoid clipping dropdowns */
+  overflow: visible;
+  /* Changed from hidden to avoid clipping dropdowns */
 }
 
 .main-nav a {
@@ -125,11 +132,9 @@
   position: absolute;
   top: 100%;
   left: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(10, 10, 10, 0.95),
-    rgba(5, 5, 5, 0.95)
-  );
+  background: linear-gradient(180deg,
+      rgba(10, 10, 10, 0.95),
+      rgba(5, 5, 5, 0.95));
 
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
@@ -160,7 +165,8 @@
 /* More Tools Dropdown - Dynamic handling */
 .more-menu-item {
   position: relative;
-  display: none; /* Initially hidden, JS will show if needed */
+  display: none;
+  /* Initially hidden, JS will show if needed */
 }
 
 .more-menu-item.visible {
@@ -186,12 +192,14 @@
   top: calc(100% + 0.5rem);
   right: 0;
   left: auto;
-  margin-top: 0; /* Removed to use top calc */
+  margin-top: 0;
+  /* Removed to use top calc */
   background: rgba(10, 10, 10, 0.98);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
   box-shadow: var(--shadow-2xl);
-  z-index: 2000; /* Ensure it stays above everything */
+  z-index: 2000;
+  /* Ensure it stays above everything */
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
@@ -257,7 +265,7 @@
     min-width: 250px;
     max-width: 280px;
   }
-  
+
   #moreToolsMenu a {
     font-size: 0.8125rem;
     padding: 0.5rem 0.625rem;
@@ -317,7 +325,7 @@
   border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-.search-input:focus + .search-suggestions,
+.search-input:focus+.search-suggestions,
 .search-suggestions:hover {
   opacity: 1;
   visibility: visible;
@@ -512,10 +520,12 @@
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.7;
   }
@@ -528,19 +538,24 @@
     padding: 0 1rem;
     gap: 0.5rem;
   }
+
   .header-left {
     margin-right: -0.5rem;
   }
+
   .logo {
     margin-right: 0.5rem;
     font-size: 1.1rem;
   }
+
   .header-middle {
     gap: 0.5rem;
   }
+
   .main-nav ul {
     gap: 0.25rem;
   }
+
   .main-nav a {
     padding: 0.4rem 0.6rem;
     font-size: 0.8125rem;
@@ -551,16 +566,20 @@
   .header-middle {
     display: none;
   }
+
   .hamburger-btn {
     display: flex;
   }
+
   .mobile-nav.active {
     display: block;
     animation: fadeInDown 0.3s ease;
   }
+
   .user-greeting {
     display: none;
   }
+
   .user-actions .btn {
     padding: 0.5rem 1rem;
     font-size: 0.75rem;
@@ -571,13 +590,16 @@
   .header-content {
     padding: 0.5rem 0.75rem;
   }
+
   .logo span {
     display: none;
   }
+
   .user-actions .btn-text {
     display: none;
   }
 }
+
 /* User Greeting Badge */
 .user-greeting {
   padding: 0.4rem 1rem;
@@ -701,11 +723,9 @@
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(10, 10, 10, 0.98),
-    rgba(5, 5, 5, 0.98)
-  );
+  background: linear-gradient(180deg,
+      rgba(10, 10, 10, 0.98),
+      rgba(5, 5, 5, 0.98));
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
   padding: 0.5rem;
@@ -775,11 +795,9 @@
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(10, 10, 10, 0.98),
-    rgba(5, 5, 5, 0.98)
-  );
+  background: linear-gradient(180deg,
+      rgba(10, 10, 10, 0.98),
+      rgba(5, 5, 5, 0.98));
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
   min-width: 320px;
@@ -855,8 +873,8 @@
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   z-index: 9999;
   display: none;
   align-items: center;
@@ -889,7 +907,7 @@
 
 .search-overlay-close {
   position: absolute;
-  top: -3rem;
+  top: 1rem;
   right: 0;
   background: transparent;
   border: none;
@@ -966,7 +984,8 @@
   background: rgba(15, 15, 25, 0.95);
   border-radius: 16px;
   border: 1px solid rgba(139, 92, 246, 0.2);
-  display: none; /* Hidden by default */
+  display: none;
+  /* Hidden by default */
 }
 
 #searchResultsWrapper.has-results {
@@ -1193,7 +1212,7 @@
   }
 
   .search-overlay-close {
-    top: -2.5rem;
+    top: 1rem;
     right: 0;
     font-size: 1.25rem;
   }
@@ -1249,7 +1268,7 @@
   }
 
   .search-overlay-close {
-    top: -2rem;
+    top: 1rem;
     width: 36px;
     height: 36px;
     font-size: 1.125rem;
@@ -1320,10 +1339,155 @@
     max-width: 400px;
     min-width: 280px;
     transform: translateX(-50%) translateY(-10px);
-    z-index: 1100; /* Ensure it is above other elements */
+    z-index: 1100;
+    /* Ensure it is above other elements */
   }
 
   .notification-dropdown.active {
     transform: translateX(-50%) translateY(0);
   }
+}/* Premium Notification UI Refinements */
+.notification-dropdown {
+    width: 380px;
+    /* Slightly wider */
+    max-width: 90vw;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    /* Glassmorphism enhancement */
+    background: rgba(10, 10, 15, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.notification-header {
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.notification-header h3 {
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.notification-list {
+    padding: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(139, 92, 246, 0.3) transparent;
+}
+
+.notification-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+    background-color: rgba(139, 92, 246, 0.3);
+    border-radius: 4px;
+}
+
+.notification-item {
+    padding: 1rem 1.25rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.notification-item:hover {
+    background: rgba(139, 92, 246, 0.08);
+    /* Subtle highlight */
+}
+
+/* Unread Indicator */
+.notification-item.unread {
+    background: rgba(139, 92, 246, 0.04);
+}
+
+.notification-item.unread::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #8b5cf6;
+}
+
+.notification-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.05);
+    /* Fallback */
+}
+
+/* Icon Type Styles - refined colors */
+.bg-info-light {
+    color: #60a5fa;
+    background: rgba(96, 165, 250, 0.1);
+}
+
+.bg-success-light {
+    color: #34d399;
+    background: rgba(52, 211, 153, 0.1);
+}
+
+.bg-warning-light {
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.1);
+}
+
+.bg-danger-light {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+}
+
+.notification-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.notification-title {
+    font-size: 0.925rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    line-height: 1.3;
+}
+
+.notification-message {
+    font-size: 0.825rem;
+    color: #94a3b8;
+    /* Lighter text for description */
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    /* Limit to 2 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.notification-time {
+    font-size: 0.7rem;
+    color: #64748b;
+    margin-top: 0.15rem;
+}
+
+.notification-footer {
+    padding: 0.85rem;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.view-all-btn,
+.mark-all-read {
+    font-weight: 500;
+    font-size: 0.85rem;
 }

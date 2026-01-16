@@ -1,0 +1,102 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients for different layers -->
+    <linearGradient id="steelGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4a5568;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2d3748;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="concreteGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#cbd5e0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a0aec0;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Layer 1: Foundation/Base (Always visible - Basic structure) -->
+  <g id="layer-foundation" class="blueprint-layer" data-layer="1" data-difficulty="1">
+    <!-- Concrete foundation -->
+    <rect x="50" y="500" width="700" height="80" fill="url(#concreteGradient)" stroke="#718096" stroke-width="2"/>
+    <text x="400" y="540" text-anchor="middle" fill="#2d3748" font-family="Arial, sans-serif" font-size="12" font-weight="bold">CONCRETE FOUNDATION</text>
+
+    <!-- Steel column base plates -->
+    <rect x="370" y="480" width="60" height="20" fill="url(#steelGradient)" stroke="#4a5568" stroke-width="1"/>
+    <rect x="170" y="480" width="60" height="20" fill="url(#steelGradient)" stroke="#4a5568" stroke-width="1"/>
+    <rect x="570" y="480" width="60" height="20" fill="url(#steelGradient)" stroke="#4a5568" stroke-width="1"/>
+  </g>
+
+  <!-- Layer 2: Structural Frame (Revealed after basic terminology) -->
+  <g id="layer-frame" class="blueprint-layer" data-layer="2" data-difficulty="2" opacity="0.3">
+    <!-- Main steel columns -->
+    <rect x="180" y="100" width="20" height="380" fill="url(#steelGradient)" stroke="#2d3748" stroke-width="2"/>
+    <rect x="380" y="100" width="20" height="380" fill="url(#steelGradient)" stroke="#2d3748" stroke-width="2"/>
+    <rect x="580" y="100" width="20" height="380" fill="url(#steelGradient)" stroke="#2d3748" stroke-width="2"/>
+
+    <!-- Column labels -->
+    <text x="190" y="90" text-anchor="middle" fill="#e53e3e" font-family="Arial, sans-serif" font-size="10" font-weight="bold">W12×40</text>
+    <text x="390" y="90" text-anchor="middle" fill="#e53e3e" font-family="Arial, sans-serif" font-size="10" font-weight="bold">W14×53</text>
+    <text x="590" y="90" text-anchor="middle" fill="#e53e3e" font-family="Arial, sans-serif" font-size="10" font-weight="bold">W12×40</text>
+  </g>
+
+  <!-- Layer 3: Beams and Connections (Revealed after intermediate knowledge) -->
+  <g id="layer-beams" class="blueprint-layer" data-layer="3" data-difficulty="3" opacity="0.3">
+    <!-- Floor beams -->
+    <rect x="200" y="250" width="180" height="16" fill="url(#steelGradient)" stroke="#2d3748" stroke-width="1"/>
+    <rect x="400" y="250" width="180" height="16" fill="url(#steelGradient)" stroke="#2d3748" stroke-width="1"/>
+    <rect x="200" y="350" width="380" height="16" fill="url(#steelGradient)" stroke="#2d3748" stroke-width="1"/>
+
+    <!-- Beam labels -->
+    <text x="290" y="240" text-anchor="middle" fill="#3182ce" font-family="Arial, sans-serif" font-size="9" font-weight="bold">W16×31</text>
+    <text x="490" y="240" text-anchor="middle" fill="#3182ce" font-family="Arial, sans-serif" font-size="9" font-weight="bold">W16×31</text>
+    <text x="390" y="340" text-anchor="middle" fill="#3182ce" font-family="Arial, sans-serif" font-size="9" font-weight="bold">W18×35</text>
+
+    <!-- Connection bolts (simplified) -->
+    <circle cx="200" cy="258" r="3" fill="#4a5568"/>
+    <circle cx="380" cy="258" r="3" fill="#4a5568"/>
+    <circle cx="400" cy="258" r="3" fill="#4a5568"/>
+    <circle cx="580" cy="258" r="3" fill="#4a5568"/>
+  </g>
+
+  <!-- Layer 4: Detailed Connections (Revealed after advanced understanding) -->
+  <g id="layer-connections" class="blueprint-layer" data-layer="4" data-difficulty="4" opacity="0.3">
+    <!-- Moment connections detail -->
+    <rect x="195" y="245" width="10" height="20" fill="none" stroke="#e53e3e" stroke-width="2"/>
+    <rect x="375" y="245" width="10" height="20" fill="none" stroke="#e53e3e" stroke-width="2"/>
+    <rect x="395" y="245" width="10" height="20" fill="none" stroke="#e53e3e" stroke-width="2"/>
+    <rect x="575" y="245" width="10" height="20" fill="none" stroke="#e53e3e" stroke-width="2"/>
+
+    <!-- Weld symbols -->
+    <path d="M 195 235 L 205 235 L 200 240 Z" fill="#f6ad55" stroke="#dd6b20" stroke-width="1"/>
+    <path d="M 375 235 L 385 235 L 380 240 Z" fill="#f6ad55" stroke="#dd6b20" stroke-width="1"/>
+    <path d="M 395 235 L 405 235 L 400 240 Z" fill="#f6ad55" stroke="#dd6b20" stroke-width="1"/>
+    <path d="M 575 235 L 585 235 L 580 240 Z" fill="#f6ad55" stroke="#dd6b20" stroke-width="1"/>
+  </g>
+
+  <!-- Layer 5: Dimensions and Specifications (Master level) -->
+  <g id="layer-dimensions" class="blueprint-layer" data-layer="5" data-difficulty="5" opacity="0.3">
+    <!-- Dimension lines -->
+    <line x1="50" y1="520" x2="750" y2="520" stroke="#38a169" stroke-width="1" marker-start="url(#arrowhead)" marker-end="url(#arrowhead)"/>
+    <text x="400" y="515" text-anchor="middle" fill="#38a169" font-family="Arial, sans-serif" font-size="10">7000mm</text>
+
+    <line x1="190" y1="80" x2="190" y2="500" stroke="#38a169" stroke-width="1" marker-start="url(#arrowhead)" marker-end="url(#arrowhead)"/>
+    <text x="195" y="290" text-anchor="start" fill="#38a169" font-family="Arial, sans-serif" font-size="10" transform="rotate(-90 195 290)">4200mm</text>
+
+    <!-- Specifications box -->
+    <rect x="600" y="50" width="180" height="120" fill="#f7fafc" stroke="#e2e8f0" stroke-width="1" opacity="0.9"/>
+    <text x="610" y="70" fill="#2d3748" font-family="Arial, sans-serif" font-size="10" font-weight="bold">SPECIFICATIONS</text>
+    <text x="610" y="90" fill="#4a5568" font-family="Arial, sans-serif" font-size="8">Material: ASTM A36</text>
+    <text x="610" y="105" fill="#4a5568" font-family="Arial, sans-serif" font-size="8">Load: 50 kN/m²</text>
+    <text x="610" y="120" fill="#4a5568" font-family="Arial, sans-serif" font-size="8">Seismic Zone: 3</text>
+    <text x="610" y="135" fill="#4a5568" font-family="Arial, sans-serif" font-size="8">Wind Speed: 150 km/h</text>
+    <text x="610" y="150" fill="#4a5568" font-family="Arial, sans-serif" font-size="8">Concrete: f'c = 25 MPa</text>
+  </g>
+
+  <!-- Arrow markers for dimensions -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#38a169"/>
+    </marker>
+  </defs>
+
+  <!-- Title and metadata -->
+  <text x="400" y="30" text-anchor="middle" fill="#2d3748" font-family="Arial, sans-serif" font-size="16" font-weight="bold">STRUCTURAL BEAM LAYOUT - COMMERCIAL BUILDING</text>
+  <text x="400" y="50" text-anchor="middle" fill="#718096" font-family="Arial, sans-serif" font-size="12">Scale: 1:50 | Drawn by: AutoCAD | Date: 2026</text>
+</svg>

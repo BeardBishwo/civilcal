@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Gamification: Sawmill (Resource Processing)
  * Premium Dark Mode UI - Refactored
@@ -6,6 +7,7 @@
 ?>
 <!DOCTYPE html>
 <html lang="en" class="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,6 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body class="bg-background text-white font-sans min-h-screen pb-20" x-data="sawmillOps()">
 
     <!-- Header -->
@@ -30,7 +33,7 @@
     </header>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
         <!-- Dashboard Header -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12 items-center">
             <div class="flex items-center gap-6">
@@ -70,14 +73,14 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
+
             <!-- Left: Resource Stockpile -->
             <div class="lg:col-span-4">
                 <div class="glass-card p-1 rounded-3xl h-full">
                     <div class="bg-surface rounded-[20px] p-8 h-full border border-white/10 relative overflow-hidden group">
                         <!-- Decor -->
                         <div class="absolute -top-20 -left-20 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
-                        
+
                         <h3 class="flex items-center gap-2 text-xl font-black text-white mb-8 relative z-10">
                             <i class="fas fa-warehouse text-amber-500"></i> Stockpile
                         </h3>
@@ -119,7 +122,7 @@
             <div class="lg:col-span-8">
                 <div class="glass-card p-1 rounded-3xl h-full">
                     <div class="bg-surface rounded-[20px] h-full border border-white/10 flex flex-col">
-                        
+
                         <div class="p-6 border-b border-white/5 flex items-center justify-between">
                             <div>
                                 <h3 class="text-lg font-bold text-white">Wood Processing Terminal</h3>
@@ -131,7 +134,7 @@
                         </div>
 
                         <div class="p-8 flex-grow flex flex-col items-center justify-center">
-                            
+
                             <!-- Visualization -->
                             <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 mb-12 w-full">
                                 <!-- Input -->
@@ -168,7 +171,7 @@
                                     <button @click="qty = Math.max(1, qty - 1)" class="w-12 h-12 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-colors border border-white/5 hover:border-white/20">
                                         <i class="fas fa-minus"></i>
                                     </button>
-                                    
+
                                     <div class="text-center">
                                         <div class="text-4xl font-black text-white font-mono" x-text="qty">1</div>
                                         <div class="text-xs uppercase tracking-widest text-gray-500 mt-1">Batch Size</div>
@@ -183,7 +186,7 @@
                                     <span x-show="!loading"><i class="fas fa-cogs mr-2"></i> Initiate Operations</span>
                                     <span x-show="loading"><i class="fas fa-spinner fa-spin mr-2"></i> Processing...</span>
                                 </button>
-                                
+
                                 <div class="flex justify-between mt-4 text-xs font-mono text-gray-500">
                                     <span>Cost: <span class="text-white" x-text="qty * 10">10</span> Coins</span>
                                     <span>Uses: <span class="text-white" x-text="qty">1</span> Log</span>
@@ -213,11 +216,23 @@
                     const currentLogs = <?php echo $wallet['wood_logs'] ?? 0; ?>;
 
                     if (currentCoins < cost) {
-                        Swal.fire({ icon: 'error', title: 'Insufficient Funds', text: 'You need more coins.', background: '#1e293b', color: '#fff' });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Insufficient Funds',
+                            text: 'You need more coins.',
+                            background: '#1e293b',
+                            color: '#fff'
+                        });
                         return;
                     }
                     if (currentLogs < logs) {
-                        Swal.fire({ icon: 'error', title: 'Insufficient Materials', text: 'You need more logs.', background: '#1e293b', color: '#fff' });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Insufficient Materials',
+                            text: 'You need more logs.',
+                            background: '#1e293b',
+                            color: '#fff'
+                        });
                         return;
                     }
 
@@ -227,7 +242,10 @@
                         fd.append('quantity', this.qty);
                         fd.append('csrf_token', '<?php echo csrf_token(); ?>');
 
-                        const res = await fetch('/api/city/craft', { method: 'POST', body: fd });
+                        const res = await fetch('<?php echo app_base_url("/api/city/craft"); ?>', {
+                            method: 'POST',
+                            body: fd
+                        });
                         const data = await res.json();
 
                         if (res.ok) {
@@ -245,7 +263,13 @@
                             throw new Error(data.message);
                         }
                     } catch (e) {
-                         Swal.fire({ icon: 'error', title: 'Operation Failed', text: e.message, background: '#1e293b', color: '#fff' });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Operation Failed',
+                            text: e.message,
+                            background: '#1e293b',
+                            color: '#fff'
+                        });
                     } finally {
                         this.loading = false;
                     }
@@ -254,4 +278,5 @@
         }
     </script>
 </body>
+
 </html>

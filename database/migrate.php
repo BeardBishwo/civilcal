@@ -28,6 +28,7 @@ try {
         '018_create_complete_system_tables.php',
         '019_enhance_settings_table.php',
         '023_set_default_logo_favicon.php',
+        '053_blueprint_revelation_system.php',
 
 
     ];

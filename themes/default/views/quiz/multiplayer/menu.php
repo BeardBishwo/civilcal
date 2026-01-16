@@ -1,11 +1,10 @@
-
 <?php include_once __DIR__ . '/../../partials/header.php'; ?>
 
 <!-- Load Tailwind CSS -->
 <link rel="stylesheet" href="<?php echo app_base_url('themes/default/assets/css/quiz.min.css?v=' . time()); ?>">
 
 <div class="bg-background min-h-screen font-sans text-white pb-20 overflow-x-hidden relative">
-    
+
     <!-- Background Gradient Orbs -->
     <!-- Background Gradient Orbs Removed per user request -->
     <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
@@ -14,25 +13,25 @@
 
     <!-- Main Content -->
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 lg:pt-32">
-        
+
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
+
             <!-- Hero Text -->
             <div class="lg:col-span-7">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold uppercase tracking-wider mb-6 text-accent animate-fade-in-up">
                     <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
                     Realtime Arena
                 </div>
-                
+
                 <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 leading-tight animate-fade-in-up animation-delay-100">
                     Engineering <br>
                     <span class="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">Battle Royale</span>
                 </h1>
-                
+
                 <p class="text-xl text-gray-400 mb-10 max-w-2xl leading-relaxed animate-fade-in-up animation-delay-200">
                     Join friends or create your own lobby. Server-locked scoring, anti-replay wagers, and premium-grade distinction.
                 </p>
-                
+
                 <div class="flex flex-wrap gap-8 animate-fade-in-up animation-delay-300">
                     <div class="flex flex-col gap-1">
                         <span class="text-xs uppercase tracking-wider text-gray-500 font-bold">Latency Guard</span>
@@ -58,7 +57,7 @@
             <!-- Join Card -->
             <div class="lg:col-span-5 relative">
                 <!-- Decorative Blur Removed -->
-                
+
                 <div class="glass-card p-1 rounded-3xl animate-fade-in-up animation-delay-400">
                     <!-- Darker, higher contrast background -->
                     <div class="bg-gray-900/60 backdrop-blur-2xl rounded-[20px] p-8 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
@@ -72,13 +71,13 @@
                             </div>
                         </div>
 
-                        <form action="/quiz/lobby/join" method="POST" class="space-y-4">
+                        <form action="<?= app_base_url('/quiz/lobby/join') ?>" method="POST" class="space-y-4">
                             <input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
-                            
+
                             <div class="relative group">
-                                <input type="text" name="code" 
-                                       class="glass-input w-full px-5 py-4 pl-12 rounded-xl bg-black/50 border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:border-primary focus:bg-black/70 transition-all font-mono text-lg uppercase tracking-widest shadow-inner"
-                                       placeholder="A7X92" required>
+                                <input type="text" name="code"
+                                    class="glass-input w-full px-5 py-4 pl-12 rounded-xl bg-black/50 border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:border-primary focus:bg-black/70 transition-all font-mono text-lg uppercase tracking-widest shadow-inner"
+                                    placeholder="A7X92" required>
                                 <i class="fas fa-hashtag absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-primary transition-colors"></i>
                             </div>
 
@@ -93,7 +92,7 @@
 
         <!-- Options Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-20">
-            
+
             <!-- Host Card -->
             <div class="glass-card p-1 rounded-3xl group hover:-translate-y-1 transition-transform duration-300">
                 <!-- Darker background for better text contrast -->
@@ -107,14 +106,14 @@
                             <h3 class="text-xl font-bold text-white">Create a Lobby</h3>
                         </div>
                     </div>
-                    
+
                     <p class="text-gray-400 mb-8 leading-relaxed">
                         Spin up a secure lobby, invite friends via code, and let the server handle fairness and scoring.
                     </p>
 
-                    <form action="/quiz/lobby/create" method="POST">
+                    <form action="<?= app_base_url('/quiz/lobby/create') ?>" method="POST">
                         <input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
-                        <input type="hidden" name="exam_id" value="1"> <!-- Default exam for now -->
+                        <input type="hidden" name="exam_id" value="<?= $exam_id ?? '' ?>"> <!-- Dynamic exam ID -->
                         <button type="submit" class="w-full py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl font-bold transition-all flex items-center justify-center gap-2 group-hover:border-accent/50 group-hover:text-accent">
                             Create New Room <i class="fas fa-plus"></i>
                         </button>
@@ -151,7 +150,7 @@
                     </ul>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </div>

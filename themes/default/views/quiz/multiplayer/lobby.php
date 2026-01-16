@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="<?php echo app_base_url('themes/default/assets/css/quiz.min.css?v=' . time()); ?>">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
+<script src="<?php echo app_base_url('themes/default/assets/js/BotManager.js?v=' . time()); ?>"></script>
 
 <div class="lobby-premium" x-data="lobbyManager()">
     <!-- Lobby Header -->
@@ -43,7 +44,7 @@
                     <div class="glass-panel h-100">
                         <div class="panel-header">
                             <h3 class="panel-title">
-                                <i class="fas fa-users text-primary-gradient"></i> 
+                                <i class="fas fa-users text-primary-gradient"></i>
                                 Agents in Lobby (<span id="player-count">0</span>)
                             </h3>
                         </div>
@@ -83,30 +84,30 @@
                         </div>
                         <div class="panel-body">
                             <?php if (($participant['wager_amount'] ?? 0) <= 0): ?>
-                            <div class="wager-options">
-                                <p class="wager-hint">Double your coins if you place Top 3!</p>
-                                <div class="wager-buttons">
-                                    <button class="btn-wager" data-amt="50">
-                                        <span class="coin-icon">🪙</span> 50
-                                    </button>
-                                    <button class="btn-wager" data-amt="100">
-                                        <span class="coin-icon">💰</span> 100
-                                    </button>
-                                    <button class="btn-wager" data-amt="500">
-                                        <span class="coin-icon">💎</span> 500
-                                    </button>
+                                <div class="wager-options">
+                                    <p class="wager-hint">Double your coins if you place Top 3!</p>
+                                    <div class="wager-buttons">
+                                        <button class="btn-wager" data-amt="50">
+                                            <span class="coin-icon">🪙</span> 50
+                                        </button>
+                                        <button class="btn-wager" data-amt="100">
+                                            <span class="coin-icon">💰</span> 100
+                                        </button>
+                                        <button class="btn-wager" data-amt="500">
+                                            <span class="coin-icon">💎</span> 500
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
                             <?php else: ?>
-                            <div class="wager-active">
-                                <div class="wager-amount">
-                                    <span class="amount"><?php echo $participant['wager_amount']; ?></span>
-                                    <span class="currency">COINS</span>
+                                <div class="wager-active">
+                                    <div class="wager-amount">
+                                        <span class="amount"><?php echo $participant['wager_amount']; ?></span>
+                                        <span class="currency">COINS</span>
+                                    </div>
+                                    <div class="wager-status">
+                                        <i class="fas fa-check-circle"></i> LOCKED IN
+                                    </div>
                                 </div>
-                                <div class="wager-status">
-                                    <i class="fas fa-check-circle"></i> LOCKED IN
-                                </div>
-                            </div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -127,15 +128,15 @@
                             </div>
                             <div class="q-time-text" id="q-timer">20s</div>
                         </div>
-                        
+
                         <div class="question-content">
                             <h2 class="question-text" id="q-text">Decrypting mission objective...</h2>
                         </div>
-                        
+
                         <div class="options-grid" id="q-options">
                             <!-- Options injected via JS -->
                         </div>
-                        
+
                         <!-- Panic Buttons (Lifelines) -->
                         <div class="lifeline-bar" id="panic-buttons">
                             <button class="btn-lifeline" data-type="50_50" id="btn-50_50">
@@ -174,7 +175,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Event Feed Overlay -->
     <div class="event-feed-container" id="event-feed"></div>
 
@@ -183,331 +184,558 @@
 </div>
 
 <style>
-/* ============================================
+    /* ============================================
    PREMIUM LOBBY STYLES
    ============================================ */
-:root {
-    --lobby-bg: #0f172a;
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --primary-grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --accent-grad: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-    --text-primary: #ffffff;
-    --text-secondary: #94a3b8;
-}
+    :root {
+        --lobby-bg: #0f172a;
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --primary-grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --accent-grad: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+        --text-primary: #ffffff;
+        --text-secondary: #94a3b8;
+    }
 
-.lobby-premium {
-    background: var(--lobby-bg);
-    min-height: 100vh;
-    color: var(--text-primary);
-    font-family: 'Inter', system-ui, sans-serif;
-    position: relative;
-    overflow-x: hidden;
-    padding-bottom: 50px;
-}
+    .lobby-premium {
+        background: var(--lobby-bg);
+        min-height: 100vh;
+        color: var(--text-primary);
+        font-family: 'Inter', system-ui, sans-serif;
+        position: relative;
+        overflow-x: hidden;
+        padding-bottom: 50px;
+    }
 
-/* Background Effects */
-/* Orbs removed */
-.grid-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-image: linear-gradient(var(--glass-border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
-    background-size: 50px 50px;
-    opacity: 0.05;
-    z-index: 0;
-    pointer-events: none;
-}
+    /* Background Effects */
+    /* Orbs removed */
+    .grid-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(var(--glass-border) 1px, transparent 1px),
+            linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
+        background-size: 50px 50px;
+        opacity: 0.05;
+        z-index: 0;
+        pointer-events: none;
+    }
 
-.lobby-content, .lobby-header { position: relative; z-index: 2; }
+    .lobby-content,
+    .lobby-header {
+        position: relative;
+        z-index: 2;
+    }
 
-/* Header */
-.lobby-header { padding: 20px 0; margin-bottom: 20px; }
-.back-link {
-    color: var(--text-secondary);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    transition: color 0.3s;
-}
-.back-link:hover { color: white; }
-.status-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(16, 185, 129, 0.1);
-    padding: 6px 12px;
-    border-radius: 20px;
-    border: 1px solid rgba(16, 185, 129, 0.2);
-}
-.status-dot {
-    width: 8px; height: 8px; background: #10b981; border-radius: 50%;
-    box-shadow: 0 0 10px #10b981;
-    animation: pulse-dot 2s infinite;
-}
-.status-text { color: #10b981; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; }
+    /* Header */
+    .lobby-header {
+        padding: 20px 0;
+        margin-bottom: 20px;
+    }
 
-/* Room Info */
-.room-label {
-    letter-spacing: 0.2em;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin-bottom: 10px;
-    font-weight: 600;
-}
-.room-code-display {
-    font-size: 5rem;
-    font-weight: 900;
-    background: var(--primary-grad);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin: 0;
-    line-height: 1;
-    text-shadow: 0 10px 30px rgba(118, 75, 162, 0.3);
-}
-.btn-copy-code {
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: color 0.3s;
-    margin-top: 10px;
-}
-.btn-copy-code:hover { color: white; }
+    .back-link {
+        color: var(--text-secondary);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        transition: color 0.3s;
+    }
 
-/* Glass Panels */
-.glass-panel {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(12px);
-    border-radius: 24px;
-    overflow: hidden;
-    transition: transform 0.3s;
-}
-.highlight-panel {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-    border-color: rgba(102, 126, 234, 0.3);
-}
-.panel-header {
-    padding: 20px 25px;
-    border-bottom: 1px solid var(--glass-border);
-}
-.panel-title { margin: 0; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-.panel-body { padding: 25px; }
+    .back-link:hover {
+        color: white;
+    }
 
-/* Participants */
-.participants-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 15px;
-}
-.player-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
-    padding: 15px;
-    text-align: center;
-    transition: all 0.3s;
-    border: 1px solid transparent;
-}
-.player-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); }
-.player-avatar {
-    width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 10px;
-    border: 2px solid rgba(255,255,255,0.1);
-    object-fit: cover;
-}
-.player-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.player-status { font-size: 0.75rem; color: #10b981; margin-top: 5px; }
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(16, 185, 129, 0.1);
+        padding: 6px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
 
-/* Countdown */
-.timer-label { font-size: 0.8rem; letter-spacing: 0.1em; color: var(--text-secondary); margin-bottom: 5px; }
-.countdown-display { font-size: 4rem; font-weight: 700; line-height: 1; }
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+        box-shadow: 0 0 10px #10b981;
+        animation: pulse-dot 2s infinite;
+    }
 
-/* Wager */
-.wager-options { text-align: center; }
-.wager-hint { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px; }
-.wager-buttons { display: flex; gap: 10px; justify-content: center; }
-.btn-wager {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--glass-border);
-    color: #f59e0b;
-    padding: 10px 15px;
-    border-radius: 12px;
-    font-weight: 700;
-    transition: all 0.2s;
-    flex: 1;
-}
-.btn-wager:hover { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.4); transform: translateY(-2px); }
-.wager-active { text-align: center; }
-.wager-amount { font-size: 2.5rem; font-weight: 900; color: #f59e0b; line-height: 1; }
-.wager-amount .currency { font-size: 0.8rem; display: block; color: var(--text-secondary); letter-spacing: 0.2em; font-weight: normal; margin-top: 5px; }
-.wager-status { margin-top: 10px; color: #10b981; font-weight: 600; font-size: 0.9rem; }
+    .status-text {
+        color: #10b981;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
 
-/* Game Arena */
-.question-card { min-height: 400px; display: flex; flex-direction: column; }
-.question-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; }
-.q-badge { background: var(--primary-grad); padding: 5px 15px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; }
-.q-timer-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin: 0 20px; overflow: hidden; }
-.q-progress { height: 100%; background: #f59e0b; width: 100%; transition: width 1s linear; }
-.q-time-text { font-weight: 700; font-variant-numeric: tabular-nums; }
-.question-content { flex: 1; margin-bottom: 30px; }
-.question-text { font-size: 1.8rem; font-weight: 700; line-height: 1.4; }
-.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    /* Room Info */
+    .room-label {
+        letter-spacing: 0.2em;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
 
-/* Lifelines */
-.lifeline-bar { display: flex; gap: 15px; padding-top: 20px; border-top: 1px solid var(--glass-border); margin-top: auto; }
-.btn-lifeline {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 12px;
-    color: white;
-    text-align: left;
-    transition: all 0.2s;
-}
-.btn-lifeline:hover:not(:disabled) { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
-.btn-lifeline:disabled { opacity: 0.5; cursor: not-allowed; }
-.lifeline-icon { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); display: grid; place-items: center; font-size: 1.2rem; }
-.lifeline-info { display: flex; flex-direction: column; }
-.lifeline-info .name { font-weight: 600; font-size: 0.9rem; }
-.lifeline-info .count-badge { font-size: 0.75rem; color: var(--text-secondary); }
+    .room-code-display {
+        font-size: 5rem;
+        font-weight: 900;
+        background: var(--primary-grad);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+        line-height: 1;
+        text-shadow: 0 10px 30px rgba(118, 75, 162, 0.3);
+    }
 
-/* Live Rankings */
-.live-rankings .ranking-item {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 15px 20px;
-    border-bottom: 1px solid var(--glass-border);
-    transition: background 0.2s;
-}
-.live-rankings .ranking-item:last-child { border-bottom: none; }
-.live-rankings .ranking-item:hover { background: rgba(255,255,255,0.02); }
-.rank-pos { width: 30px; font-weight: 900; color: var(--text-secondary); }
-.rank-user { font-weight: 600; }
-.rank-score { color: #10b981; font-weight: 700; }
+    .btn-copy-code {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: color 0.3s;
+        margin-top: 10px;
+    }
 
-/* Animations */
-@keyframes float { 0% { transform: translateY(0); } 100% { transform: translateY(20px); } }
-@keyframes pulse-dot { 0% { opacity: 0.5; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { opacity: 1; box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { opacity: 0.5; } }
+    .btn-copy-code:hover {
+        color: white;
+    }
 
-/* Responsive */
-@media (max-width: 991px) {
-    .options-grid { grid-template-columns: 1fr; }
-    .room-code-display { font-size: 3.5rem; }
-}
+    /* Glass Panels */
+    .glass-panel {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(12px);
+        border-radius: 24px;
+        overflow: hidden;
+        transition: transform 0.3s;
+    }
+
+    .highlight-panel {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .panel-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .panel-title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .panel-body {
+        padding: 25px;
+    }
+
+    /* Participants */
+    .participants-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 15px;
+    }
+
+    .player-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.3s;
+        border: 1px solid transparent;
+    }
+
+    .player-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .player-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        object-fit: cover;
+    }
+
+    .player-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .player-status {
+        font-size: 0.75rem;
+        color: #10b981;
+        margin-top: 5px;
+    }
+
+    /* Countdown */
+    .timer-label {
+        font-size: 0.8rem;
+        letter-spacing: 0.1em;
+        color: var(--text-secondary);
+        margin-bottom: 5px;
+    }
+
+    .countdown-display {
+        font-size: 4rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    /* Wager */
+    .wager-options {
+        text-align: center;
+    }
+
+    .wager-hint {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 15px;
+    }
+
+    .wager-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .btn-wager {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--glass-border);
+        color: #f59e0b;
+        padding: 10px 15px;
+        border-radius: 12px;
+        font-weight: 700;
+        transition: all 0.2s;
+        flex: 1;
+    }
+
+    .btn-wager:hover {
+        background: rgba(245, 158, 11, 0.1);
+        border-color: rgba(245, 158, 11, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .wager-active {
+        text-align: center;
+    }
+
+    .wager-amount {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #f59e0b;
+        line-height: 1;
+    }
+
+    .wager-amount .currency {
+        font-size: 0.8rem;
+        display: block;
+        color: var(--text-secondary);
+        letter-spacing: 0.2em;
+        font-weight: normal;
+        margin-top: 5px;
+    }
+
+    .wager-status {
+        margin-top: 10px;
+        color: #10b981;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    /* Game Arena */
+    .question-card {
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .question-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 30px;
+    }
+
+    .q-badge {
+        background: var(--primary-grad);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .q-timer-bar {
+        flex: 1;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        margin: 0 20px;
+        overflow: hidden;
+    }
+
+    .q-progress {
+        height: 100%;
+        background: #f59e0b;
+        width: 100%;
+        transition: width 1s linear;
+    }
+
+    .q-time-text {
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .question-content {
+        flex: 1;
+        margin-bottom: 30px;
+    }
+
+    .question-text {
+        font-size: 1.8rem;
+        font-weight: 700;
+        line-height: 1.4;
+    }
+
+    .options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    /* Lifelines */
+    .lifeline-bar {
+        display: flex;
+        gap: 15px;
+        padding-top: 20px;
+        border-top: 1px solid var(--glass-border);
+        margin-top: auto;
+    }
+
+    .btn-lifeline {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 12px;
+        color: white;
+        text-align: left;
+        transition: all 0.2s;
+    }
+
+    .btn-lifeline:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .btn-lifeline:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .lifeline-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        display: grid;
+        place-items: center;
+        font-size: 1.2rem;
+    }
+
+    .lifeline-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .lifeline-info .name {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .lifeline-info .count-badge {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    /* Live Rankings */
+    .live-rankings .ranking-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--glass-border);
+        transition: background 0.2s;
+    }
+
+    .live-rankings .ranking-item:last-child {
+        border-bottom: none;
+    }
+
+    .live-rankings .ranking-item:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .rank-pos {
+        width: 30px;
+        font-weight: 900;
+        color: var(--text-secondary);
+    }
+
+    .rank-user {
+        font-weight: 600;
+    }
+
+    .rank-score {
+        color: #10b981;
+        font-weight: 700;
+    }
+
+    /* Animations */
+    @keyframes float {
+        0% {
+            transform: translateY(0);
+        }
+
+        100% {
+            transform: translateY(20px);
+        }
+    }
+
+    @keyframes pulse-dot {
+        0% {
+            opacity: 0.5;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+        }
+
+        60% {
+            opacity: 1;
+            box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+        }
+
+        100% {
+            opacity: 0.5;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .options-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .room-code-display {
+            font-size: 3.5rem;
+        }
+    }
 </style>
 
-<!-- JS Logic (Preserving Original Logic) -->
 <script>
     const ROOM_CODE = "<?php echo $code; ?>";
-    const API_URL = "/api/lobby/" + ROOM_CODE + "/status";
+    const APP_BASE = window.appConfig.baseUrl || "";
+    const AUTH_TOKEN = "<?php echo $firebaseToken; ?>";
+    const CURRENT_USER = {
+        id: "<?php echo $_SESSION['user_id']; ?>",
+        name: "<?php echo htmlspecialchars($participant['name'] ?? 'Agent'); ?>",
+        avatar: "<?php echo htmlspecialchars($participant['avatar'] ?? 'default.png'); ?>",
+        is_bot: false
+    };
+
     let wagerNonce = '<?php echo htmlspecialchars($wagerNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>';
-    let lifelineNonce = '<?php echo htmlspecialchars($lifelineNonce ?? '', ENT_QUOTES, 'UTF-8'); ?>';
-    const trapInput = document.createElement('input');
-    trapInput.type = 'text';
-    trapInput.name = 'trap_answer';
-    trapInput.id = 'lobby_trap';
-    trapInput.autocomplete = 'off';
-    trapInput.style.display = 'none';
-    document.body.appendChild(trapInput);
-    
+
+    // Firebase Refs
+    let roomRef, playersRef, statusRef;
     let currentState = 'waiting';
-    
-    // Init Pulse
-    setInterval(pulse, 1000);
-    
-    // Copy Code Function
-    function copyRoomCode() {
-        navigator.clipboard.writeText(ROOM_CODE).then(() => {
-            const btn = document.querySelector('.btn-copy-code');
-            const original = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-            setTimeout(() => btn.innerHTML = original, 2000);
-        });
-    }
 
-    async function pulse() {
-        try {
-            const response = await fetch(API_URL);
-            const data = await response.json();
-            
-            if (!data || !data.lobby) return;
-            
-            updateUI(data);
-            document.getElementById('connection-status').innerText = 'Connected';
-            document.getElementById('connection-status').className = 'status-text text-success';
-            document.querySelector('.status-dot').style.background = '#10b981';
-        } catch (e) {
-            document.getElementById('connection-status').innerText = 'Reconnecting...';
-            document.getElementById('connection-status').className = 'status-text text-danger';
-            document.querySelector('.status-dot').style.background = '#ef4444';
+    // Init Firebase
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!firebase.apps.length) {
+            console.error("Firebase not initialized! Check partial.");
+            return;
         }
-    }
-    
-    function updateUI(data) {
-        if (data.lobby.status !== currentState) {
-            currentState = data.lobby.status;
-            if (currentState === 'active') {
-                document.getElementById('waiting-room').style.display = 'none';
-                document.getElementById('game-arena').style.display = 'block';
-                loadInventory();
+
+        firebase.auth().signInWithCustomToken(AUTH_TOKEN)
+            .then((userCred) => {
+                console.log("🔥 Lobby: Auth Success");
+                initLobby();
+            })
+            .catch(err => console.error("🔥 Lobby: Auth Failed", err));
+    });
+
+    function initLobby() {
+        const db = firebase.database();
+        roomRef = db.ref(`rooms/${ROOM_CODE}`);
+        playersRef = roomRef.child('players');
+        statusRef = roomRef.child('status');
+
+        // 1. Join Presence
+        const myRef = playersRef.child(CURRENT_USER.id);
+        myRef.set({
+            ...CURRENT_USER,
+            status: 'ready',
+            joined_at: firebase.database.ServerValue.TIMESTAMP
+        });
+        myRef.onDisconnect().remove(); // Auto-leave on tab close
+
+        // 2. Listen for Players
+        playersRef.on('value', (snapshot) => {
+            const players = [];
+            snapshot.forEach(child => players.push(child.val()));
+            updateParticipants(players);
+        });
+
+        // 3. Listen for Game Status & Host Info
+        roomRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (!data) return;
+
+            const status = data.status || 'waiting';
+            if (status !== currentState) {
+                currentState = status;
+                handleStateChange(status);
             }
-        }
-        
-        if (currentState === 'waiting') {
-            updateParticipants(data.participants);
-            updateTimer(data.time_remaining);
-        } else if (currentState === 'active') {
-            updateLeaderboard(data.participants);
-            // Handle active game state updates (question display, etc.) here
-        }
-    }
-    
-    function updateParticipants(users) {
-        const container = document.getElementById('participants-list');
-        document.getElementById('player-count').innerText = users.length;
-        
-        let html = '';
-        users.forEach(u => {
-            html += `
-                <div class="player-card">
-                    <img src="${u.avatar}" class="player-avatar">
-                    <div class="player-name">${u.name}</div>
-                    <div class="player-status">${u.is_bot ? '🤖 Ready' : 'Ready'}</div>
-                </div>
-            `;
+
+            // Check if I am the Puppet Master
+            checkLeaderAndDrive(data);
         });
-        container.innerHTML = html;
-    }
-    
-    function updateTimer(seconds) {
-        const el = document.getElementById('countdown-timer');
-        el.innerText = seconds > 0 ? seconds : "GO!";
-    }
-    
-    function updateLeaderboard(users) {
-        users.sort((a, b) => b.current_score - a.current_score);
-        const list = document.getElementById('live-leaderboard');
-        let html = '';
-        users.forEach((u, index) => {
-            html += `
-                <div class="ranking-item">
-                    <div class="rank-pos">#${index+1}</div>
-                    <div class="rank-user">${u.name}</div>
-                    <div class="rank-score">${u.current_score}</div>
-                </div>
-            `;
-        });
-        list.innerHTML = html;
+
+        // 4. Update UI to Connected
+        document.getElementById('connection-status').innerText = 'SECURE LINK';
+        document.querySelector('.status-dot').style.background = '#10b981';
     }
 
-    // Wager Logic
+    function handleStateChange(status) {
+        if (status === 'active') {
+            document.getElementById('waiting-room').style.display = 'none';
+            document.getElementById('game-arena').style.display = 'block';
+            // Trigger Game Load
+            console.log("🚀 Mission Launching...");
+        }
+    }
+
+    // Keep Wager Logic (Secure PHP Transaction)
     document.querySelectorAll('.btn-wager').forEach(btn => {
         btn.addEventListener('click', async function() {
             const amt = this.dataset.amt;
@@ -517,67 +745,63 @@
             fd.append('amount', amt);
             fd.append('lobby_id', '<?php echo $participant["lobby_id"]; ?>');
             fd.append('nonce', wagerNonce);
-            fd.append('trap_answer', document.getElementById('lobby_trap').value || '');
 
             try {
-                const res = await fetch('/api/lobby/wager', { method: 'POST', body: fd });
+                const res = await fetch(APP_BASE + '/api/lobby/wager', {
+                    method: 'POST',
+                    body: fd
+                });
                 const data = await res.json();
                 if (data.success) {
                     location.reload();
                 } else {
                     alert(data.message);
                 }
-            } catch (e) { alert('Error placing wager'); }
+            } catch (e) {
+                alert('Error placing wager');
+            }
         });
     });
 
-    // Lifeline Logic
-    async function loadInventory() {
-        // Mock inventory loading
-        // In real impl, fetch from API or use echo'd data
+    // --- UI HELPERS ---
+    function updateParticipants(users) {
+        const container = document.getElementById('participants-list');
+        document.getElementById('player-count').innerText = users.length;
+        let html = '';
+        users.forEach(u => {
+            html += `
+                <div class="player-card">
+                    <img src="${u.avatar}" class="player-avatar">
+                    <div class="player-name">${u.name}</div>
+                    <div class="player-status">AGENT</div>
+                </div>`;
+        });
+        container.innerHTML = html;
     }
-    
-    // Alpine Lobby Manager Component
-    function lobbyManager() {
-        return {
-            roomCode: "<?php echo $code; ?>",
-            connectionStatus: 'Connected',
-            currentState: 'waiting',
-            
-            copyRoomCode() {
-                navigator.clipboard.writeText(this.roomCode).then(() => {
-                    Swal.fire({ icon: 'success', title: 'Copied!', text: 'Room code copied to clipboard.', timer: 1500, showConfirmButton: false, background: '#1e293b', color: '#fff' });
-                }).catch(() => {
-                    alert('Failed to copy code');
-                });
-            },
-            
-            async pulse() {
-                try {
-                    const response = await fetch('/api/lobby/' + this.roomCode + '/status');
-                    const data = await response.json();
-                    
-                    if (!data || !data.lobby) return;
-                    
-                    this.connectionStatus = 'Connected';
-                    
-                    if (data.lobby.status !== this.currentState) {
-                        this.currentState = data.lobby.status;
-                        if (this.currentState === 'active') {
-                            document.getElementById('waiting-room').style.display = 'none';
-                            document.getElementById('game-arena').style.display = 'block';
-                        }
-                    }
-                } catch (e) {
-                    this.connectionStatus = 'Reconnecting...';
-                }
-            },
-            
-            init() {
-                setInterval(() => this.pulse(), 1000);
+
+    function copyRoomCode() {
+        navigator.clipboard.writeText(ROOM_CODE);
+        alert('Code Copied!');
+    }
+
+    // --- PUPPET MASTER LOGIC (The "Bulletproof" Client-Side Torch) ---
+    let botManager = null;
+
+    function checkLeaderAndDrive(roomData) {
+        // If we represent the Host ID, we start the engine
+        if (roomData.host_user_id == CURRENT_USER.id) {
+
+            // Show Start Button for Host if Waiting
+            if (currentState === 'waiting') {
+                document.getElementById('host-controls').style.display = 'block';
+            }
+
+            // Initialize Bot Manager once
+            if (!botManager) {
+                console.log("👑 Host Detected. Initializing Bot Manager (Client-Side)...");
+                botManager = new BotManager(ROOM_CODE, firebase.database(), roomData.host_user_id, CURRENT_USER.id);
+                botManager.start();
             }
         }
     }
-    
-    // ... Additional game logic can be preserved or enhanced ...
 </script>

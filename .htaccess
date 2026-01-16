@@ -67,7 +67,7 @@ RedirectMatch 403 ^/(app|config|database|includes|storage|vendor|tests)/.*$
     RewriteRule ^assets/(.*)$ public/assets/$1 [L]
     
     # Redirect favicon.ico requests to the actual favicon
-    RewriteRule ^favicon\.ico$ public/uploads/settings/favicon.png [L]
+    # RewriteRule ^favicon\.ico$ public/uploads/settings/favicon.png [L]
     
     # Redirect any other /public URL to clean URL
     RewriteCond %{REQUEST_URI} public

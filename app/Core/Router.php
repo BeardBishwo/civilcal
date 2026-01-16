@@ -76,6 +76,11 @@ class Router
             }
         }
 
+        // Ensure URI starts with /
+        if ($uri !== '/' && strpos($uri, '/') !== 0) {
+            $uri = '/' . $uri;
+        }
+
         foreach ($this->routes as $route) {
             $matches = $this->matchRoute($route, $uri, $method);
             if ($matches !== false) {
@@ -214,7 +219,15 @@ class Router
 
         if (class_exists($controllerClass)) {
             $controller = new $controllerClass();
-            return call_user_func_array([$controller, $method], $params);
+            try {
+                return call_user_func_array([$controller, $method], $params);
+            } catch (\Throwable $e) {
+                http_response_code(500);
+                error_log("Controller Exception in {$controllerClass}@{$method}: " . $e->getMessage());
+                error_log("Stack trace: " . $e->getTraceAsString());
+                echo "Internal Server Error: " . $e->getMessage();
+                return null;
+            }
         }
 
         http_response_code(500);

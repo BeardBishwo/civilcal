@@ -63,6 +63,8 @@ $themeFooter = BASE_PATH . '/themes/' . $activeTheme . '/views/partials/footer.p
     ?>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Firebase Realtime Engine -->
+    <?php include BASE_PATH . '/themes/default/views/partials/firebase_core.php'; ?>
 </body>
 
 </html>

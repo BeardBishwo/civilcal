@@ -162,6 +162,60 @@ class SettingsController extends Controller
         ]);
     }
 
+    public function firebase()
+    {
+        $this->requireAdminWithBasicAuth();
+        $settings = SettingsService::getAll('firebase');
+
+        $this->view->render('admin/settings/firebase', [
+            'title' => 'Firebase Settings',
+            'settings' => $settings
+        ]);
+    }
+
+    public function uploadFirebaseCredentials()
+    {
+        $this->requireAdminWithBasicAuth();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /admin/settings/firebase');
+            exit;
+        }
+
+        if (!isset($_FILES['service_account']) || $_FILES['service_account']['error'] !== UPLOAD_ERR_OK) {
+            $_SESSION['flash_error'] = 'Upload failed';
+            header('Location: /admin/settings/firebase');
+            exit;
+        }
+
+        $tmp = $_FILES['service_account']['tmp_name'];
+        if (strtolower(pathinfo($_FILES['service_account']['name'], PATHINFO_EXTENSION)) !== 'json') {
+            $_SESSION['flash_error'] = 'Invalid file type. Only JSON allowed.';
+            header('Location: /admin/settings/firebase');
+            exit;
+        }
+
+        // Validate JSON content
+        $content = file_get_contents($tmp);
+        $json = json_decode($content, true);
+        if (!$json || !isset($json['project_id'])) {
+            $_SESSION['flash_error'] = 'Invalid Service Account JSON.';
+            header('Location: /admin/settings/firebase');
+            exit;
+        }
+
+        // Move to Config
+        $target = BASE_PATH . '/config/firebase_credentials.json';
+        if (move_uploaded_file($tmp, $target)) {
+            $_SESSION['flash_success'] = 'Credentials updated successfully!';
+        } else {
+            $_SESSION['flash_error'] = 'Failed to save credentials file.';
+        }
+
+        header('Location: /admin/settings/firebase');
+        exit;
+    }
+
     private function ensureCsrfToken(): void
     {
         if (session_status() === PHP_SESSION_NONE) {
@@ -657,7 +711,8 @@ class SettingsController extends Controller
             'payments' => ['paypal_basic_enabled', 'paypal_email', 'paypal_api_enabled', 'paypal_client_id', 'paypal_client_secret', 'paypal_sandbox_mode', 'stripe_enabled', 'stripe_checkout_type', 'stripe_publishable_key', 'stripe_secret_key', 'stripe_webhook_secret', 'mollie_enabled', 'mollie_api_key', 'paddle_billing_enabled', 'paddle_client_token', 'paddle_api_key', 'paddle_webhook_secret', 'paddle_classic_enabled', 'paddle_vendor_id', 'paddle_classic_api_key', 'paddle_public_key', 'paddle_monthly_plan_id', 'paddle_yearly_plan_id', 'paystack_enabled', 'paystack_secret_key', 'paystack_public_key', 'bank_transfer_enabled', 'bank_info'],
             'google' => ['google_login_enabled', 'google_client_id', 'google_client_secret'],
             'recaptcha' => ['captcha_provider', 'recaptcha_site_key', 'recaptcha_secret_key', 'captcha_on_login', 'captcha_on_register', 'enable_captcha'],
-            'user' => ['allow_registration', 'email_verification', 'auto_approve_users', 'password_min_length', 'password_complexity', 'session_timeout', 'max_login_attempts', 'lockout_duration', 'profile_visibility', 'user_roles_enabled']
+            'user' => ['allow_registration', 'email_verification', 'auto_approve_users', 'password_min_length', 'password_complexity', 'session_timeout', 'max_login_attempts', 'lockout_duration', 'profile_visibility', 'user_roles_enabled'],
+            'firebase' => ['firebase_apiKey', 'firebase_authDomain', 'firebase_databaseURL', 'firebase_projectId', 'firebase_storageBucket', 'firebase_messagingSenderId', 'firebase_appId', 'firebase_measurementId']
         ];
 
         if (!isset($groups[$group])) {

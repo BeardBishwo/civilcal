@@ -1,543 +1,248 @@
 <?php
-// Notification Center View - Beautiful UI
-$content = '
-<div class="admin-content">
-    <!-- Page Header -->
-    <div class="page-header">
-        <h1 class="page-title">
-            <i class="fas fa-bell"></i>
-            Notification Center
-        </h1>
-        <p class="page-description">Manage and view system notifications</p>
-    </div>
+$page_title = 'Notification Manager';
+?>
 
-    <!-- Notification Actions -->
-    <div class="toolbar">
-        <div class="toolbar-actions">
-            <button id="mark-all-read" class="btn btn-secondary">
-                <i class="fas fa-check-circle"></i>
-                Mark All as Read
-            </button>
-            <button id="refresh-notifications" class="btn btn-outline-secondary">
-                <i class="fas fa-sync"></i>
-                Refresh
-            </button>
+<div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+                Notification Manager
+            </h1>
+            <p class="text-gray-400 text-sm mt-1">Broadcast alerts or message specific users.</p>
         </div>
-        <div class="notification-stats">
-            <span class="stats-label">Total: <span class="stats-value">' . count($notifications ?? []) . '</span></span>
-            <span class="stats-label">Unread: <span class="stats-value unread-count">' . ($unreadCount ?? 0) . '</span></span>
+
+        <div class="flex items-center gap-3">
+            <a href="/user/notifications" target="_blank" class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm hover:bg-white/10 text-gray-300">
+                <i class="fas fa-external-link-alt me-2"></i> View My History
+            </a>
         </div>
     </div>
 
-    <!-- Notification List -->
-    <div class="notifications-container">
-        ' . (empty($notifications ?? []) ? '<div class="empty-state">
-            <i class="fas fa-bell-slash fa-3x"></i>
-            <h3>No Notifications</h3>
-            <p>You have no notifications at this time</p>
-        </div>' : '') . '
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        <div class="notification-list">
-            ' . implode('', array_map(function($notification) {
-                $typeClass = '';
-                $icon = 'info-circle';
-                switch ($notification['type']) {
-                    case 'success':
-                        $typeClass = 'notification-success';
-                        $icon = 'check-circle';
-                        break;
-                    case 'warning':
-                        $typeClass = 'notification-warning';
-                        $icon = 'exclamation-triangle';
-                        break;
-                    case 'error':
-                        $typeClass = 'notification-error';
-                        $icon = 'exclamation-circle';
-                        break;
-                    case 'info':
-                    default:
-                        $typeClass = 'notification-info';
-                        break;
-                }
+        <!-- Compose Form -->
+        <div class="lg:col-span-2">
+            <div class="backdrop-blur-xl bg-surface/50 border border-white/10 rounded-2xl shadow-2xl p-6 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none"></div>
 
-                $timeAgo = '';
-                if (!empty($notification['created_at'])) {
-                    $createdAt = new DateTime($notification['created_at']);
-                    $now = new DateTime();
-                    $diff = $now->diff($createdAt);
+                <h2 class="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+                    <i class="fas fa-paper-plane text-indigo-400"></i> Compose Notification
+                </h2>
 
-                    if ($diff->days > 0) {
-                        $timeAgo = $diff->days . 'd ago';
-                    } elseif ($diff->h > 0) {
-                        $timeAgo = $diff->h . 'h ago';
-                    } elseif ($diff->i > 0) {
-                        $timeAgo = $diff->i . 'm ago';
-                    } else {
-                        $timeAgo = 'Just now';
-                    }
-                }
-
-                return '<div class="notification-item ' . $typeClass . ' ' . ($notification['is_read'] ? '' : 'notification-unread') . '" data-id="' . $notification['id'] . '">
-                    <div class="notification-icon">
-                        <i class="fas fa-' . $icon . '"></i>
-                    </div>
-                    <div class="notification-content">
-                        <div class="notification-header">
-                            <h4 class="notification-title">' . htmlspecialchars($notification['title']) . '</h4>
-                            <div class="notification-meta">
-                                <span class="notification-time">' . $timeAgo . '</span>
-                                <button class="btn btn-sm btn-icon notification-dismiss" data-id="' . $notification['id'] . '" title="Delete">
-                                    <i class="fas fa-times"></i>
-                                </button>
+                <form id="notificationForm" class="space-y-6 relative z-10">
+                    <!-- Target Selection -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-300">Target Audience</label>
+                            <div class="flex gap-4 p-1 bg-white/5 rounded-xl border border-white/10">
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="target" value="user" class="peer sr-only" checked onchange="toggleUserSelect(true)">
+                                    <div class="text-center py-2 rounded-lg text-gray-400 peer-checked:bg-indigo-600 peer-checked:text-white transition-all hover:bg-white/5">
+                                        Single User
+                                    </div>
+                                </label>
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="target" value="all" class="peer sr-only" onchange="toggleUserSelect(false)">
+                                    <div class="text-center py-2 rounded-lg text-gray-400 peer-checked:bg-purple-600 peer-checked:text-white transition-all hover:bg-white/5">
+                                        Broadcast All
+                                    </div>
+                                </label>
                             </div>
                         </div>
-                        <div class="notification-message">
-                            ' . htmlspecialchars($notification['message']) . '
-                        </div>
-                        <div class="notification-footer">
-                            <span class="notification-date">' . date('M j, Y g:i A', strtotime($notification['created_at'])) . '</span>
-                            ' . ($notification['is_read'] ? '<span class="read-badge"><i class="fas fa-check-circle"></i> Read</span>' : '<span class="unread-badge"><i class="fas fa-circle"></i> Unread</span>') . '
+
+                        <div class="space-y-2 transition-all duration-300" id="userSelectContainer">
+                            <label class="text-sm font-medium text-gray-300">Select User</label>
+                            <select name="user_id" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                                <option value="">Select a user...</option>
+                                <?php foreach ($users as $u): ?>
+                                    <option value="<?php echo $u['id']; ?>">
+                                        <?php echo htmlspecialchars($u['username'] . ' (' . $u['email'] . ')'); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
-                </div>';
-            }, $notifications ?? [])) . '
+
+                    <!-- Type Selection -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">Notification Type</label>
+                        <div class="flex gap-3">
+                            <?php
+                            $types = [
+                                'info' => ['icon' => 'fa-info-circle', 'color' => 'bg-blue-500'],
+                                'success' => ['icon' => 'fa-check-circle', 'color' => 'bg-emerald-500'],
+                                'warning' => ['icon' => 'fa-exclamation-triangle', 'color' => 'bg-amber-500'],
+                                'error' => ['icon' => 'fa-times-circle', 'color' => 'bg-rose-500']
+                            ];
+                            foreach ($types as $key => $style): ?>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="type" value="<?php echo $key; ?>" class="peer sr-only" <?php echo $key === 'info' ? 'checked' : ''; ?>>
+                                    <div class="px-4 py-2 rounded-lg border border-white/10 text-gray-400 hover:bg-white/5 peer-checked:border-<?php echo explode('-', $style['color'])[1]; ?>-500 peer-checked:text-white transition-all peer-checked:bg-white/10 flex items-center gap-2">
+                                        <i class="fas <?php echo $style['icon']; ?> <?php echo str_replace('bg-', 'text-', $style['color']); ?>"></i>
+                                        <span class="capitalize"><?php echo $key; ?></span>
+                                    </div>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-300">Title</label>
+                            <input type="text" name="title" required placeholder="e.g., System Maintenance Alert"
+                                class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none placeholder-gray-600">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-300">Message</label>
+                            <textarea name="message" required rows="3" placeholder="Enter notification content..."
+                                class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none placeholder-gray-600"></textarea>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-300">Action URL <span class="text-gray-500 text-xs">(Optional)</span></label>
+                            <input type="text" name="url" placeholder="https://..." value="#"
+                                class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none placeholder-gray-600">
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-white/10 flex justify-end">
+                        <button type="submit" id="sendBtn" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl font-medium shadow-lg shadow-indigo-500/25 active:scale-95 transition-all flex items-center gap-2">
+                            <i class="fas fa-paper-plane text-sm"></i>
+                            Send Notification
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Preview / Tips -->
+        <div class="space-y-8">
+            <div class="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6">
+                <h3 class="text-lg font-semibold text-white mb-4">Preview</h3>
+                <div class="bg-black/40 rounded-xl p-4 border-l-4 border-indigo-500 relative overflow-hidden" id="previewCard">
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 flex-shrink-0">
+                            <i class="fas fa-info-circle text-lg" id="previewIcon"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-white font-medium truncate" id="previewTitle">Notification Title</h4>
+                            <p class="text-gray-400 text-sm mt-1 line-clamp-2" id="previewMessage">Preview message content will appear here...</p>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex gap-2">
+                        <button class="text-xs text-indigo-400 hover:text-indigo-300 font-medium">View Details</button>
+                        <button class="text-xs text-gray-500 hover:text-gray-300">Mark as read</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="backdrop-blur-xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/20 rounded-2xl p-6">
+                <h3 class="text-lg font-semibold text-amber-500 mb-2">
+                    <i class="fas fa-lightbulb me-2"></i> Pro Tips
+                </h3>
+                <ul class="text-sm text-gray-400 space-y-2 list-disc list-inside">
+                    <li>Use <strong>Broadcast</strong> sparingly to avoid spamming all users.</li>
+                    <li><strong>Action URLs</strong> can link to internal pages (e.g., `/pricing`) or external sites.</li>
+                    <li><strong>Success</strong> type is great for payment confirmations.</li>
+                    <li><strong>Warning</strong> type is ideal for expiration alerts.</li>
+                </ul>
+            </div>
         </div>
     </div>
-
-    <!-- Pagination -->
-    ' . ((($page ?? 1) > 1 || count($notifications ?? []) === 20) ? '<div class="pagination">
-        ' . (($page ?? 1) > 1 ? '<a href="?page=' . (($page ?? 1) - 1) . '" class="page-link">
-            <i class="fas fa-chevron-left"></i> Previous
-        </a>' : '') . '
-        <span class="page-link active">' . ($page ?? 1) . '</span>
-        ' . (count($notifications ?? []) === 20 ? '<a href="?page=' . (($page ?? 1) + 1) . '" class="page-link">
-            Next <i class="fas fa-chevron-right"></i>
-        </a>' : '') . '
-    </div>' : '') . '
 </div>
 
 <script>
-// Enhanced JavaScript with better UX
-document.addEventListener("DOMContentLoaded", function() {
-    // Mark all as read button
-    document.getElementById("mark-all-read").addEventListener("click", markAllAsRead);
-
-    // Refresh button
-    document.getElementById("refresh-notifications").addEventListener("click", refreshNotifications);
-
-    // Create test notification button (if empty state)
-    const createTestBtn = document.getElementById("create-test-notification");
-    if (createTestBtn) {
-        createTestBtn.addEventListener("click", createTestNotification);
-    }
-
-    // Add event listeners to dismiss buttons
-    document.querySelectorAll(".notification-dismiss").forEach(button => {
-        button.addEventListener("click", function(e) {
-            e.stopPropagation();
-            const notificationId = this.getAttribute("data-id");
-            dismissNotification(notificationId);
-        });
-    });
-
-    // Add event listeners to notification items to mark as read when clicked
-    document.querySelectorAll(".notification-item").forEach(item => {
-        item.addEventListener("click", function() {
-            const notificationId = this.getAttribute("data-id");
-            if (!this.classList.contains("notification-unread")) return;
-
-            markAsRead(notificationId);
-        });
-    });
-
-    // Add smooth animations on page load
-    setTimeout(() => {
-        document.querySelectorAll(".notification-item").forEach((item, index) => {
-            item.style.animation = "fadeIn 0.5s ease-out " + (index * 0.1) + "s forwards";
-            item.style.opacity = "0";
-            setTimeout(() => {
-                item.style.opacity = "1";
-            }, 10);
-        });
-    }, 100);
-});
-
-async function markAsRead(notificationId) {
-    try {
-        const response = await fetch("' . app_base_url('/admin/notifications/mark-read/') . '" + notificationId, {
-            method: "POST"
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            // Remove the unread class from the notification
-            const notification = document.querySelector(`[data-id="${notificationId}"]`);
-            if (notification) {
-                notification.classList.remove("notification-unread");
-                
-                // Update the unread count in the header
-                updateUnreadCount(-1);
-            }
+    function toggleUserSelect(show) {
+        const container = document.getElementById('userSelectContainer');
+        if (show) {
+            container.classList.remove('opacity-50', 'pointer-events-none');
+        } else {
+            container.classList.add('opacity-50', 'pointer-events-none');
         }
-    } catch (error) {
-        console.error("Error marking notification as read:", error);
     }
-}
 
-async function markAllAsRead() {
-    showConfirmModal(\'Mark All Read\', "Are you sure you want to mark all notifications as read?", async () => {
+    // Live Preview
+    const form = document.getElementById('notificationForm');
+    const titleInput = form.querySelector('[name="title"]');
+    const messageInput = form.querySelector('[name="message"]');
+    const typeInputs = form.querySelectorAll('[name="type"]');
+
+    function updatePreview() {
+        document.getElementById('previewTitle').textContent = titleInput.value || 'Notification Title';
+        document.getElementById('previewMessage').textContent = messageInput.value || 'Preview message content will appear here...';
+
+        const type = document.querySelector('[name="type"]:checked').value;
+        const iconMap = {
+            'info': ['fa-info-circle', 'text-indigo-400', 'bg-indigo-500/10', 'border-indigo-500'],
+            'success': ['fa-check-circle', 'text-emerald-400', 'bg-emerald-500/10', 'border-emerald-500'],
+            'warning': ['fa-exclamation-triangle', 'text-amber-400', 'bg-amber-500/10', 'border-amber-500'],
+            'error': ['fa-times-circle', 'text-rose-400', 'bg-rose-500/10', 'border-rose-500']
+        };
+
+        const styles = iconMap[type];
+        const card = document.getElementById('previewCard');
+        const icon = document.getElementById('previewIcon');
+        const iconBox = icon.parentElement;
+
+        // Reset classes
+        card.className = `bg-black/40 rounded-xl p-4 border-l-4 relative overflow-hidden transition-colors duration-300 ${styles[3]}`;
+        icon.className = `fas ${styles[0]} text-lg`;
+        iconBox.className = `w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${styles[1]} ${styles[2]}`;
+    }
+
+    [titleInput, messageInput, ...typeInputs].forEach(el => el.addEventListener('input', updatePreview));
+
+    // Form Submit
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!confirm('Send this notification?')) return;
+
+        const btn = document.getElementById('sendBtn');
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending...';
+        btn.disabled = true;
+
         try {
-            const response = await fetch("' . app_base_url('/admin/notifications/mark-all-read') . '", {
-                method: "POST"
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            const res = await fetch('<?php echo app_base_url("api/notifications/create"); ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
             });
-            
-            const result = await response.json();
-            
+
+            const result = await res.json();
+
             if (result.success) {
-                // Remove unread class from all notifications
-                document.querySelectorAll(".notification-item.notification-unread").forEach(item => {
-                    item.classList.remove("notification-unread");
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sent!',
+                    text: result.message,
+                    background: '#18181b',
+                    color: '#fff'
                 });
-                
-                // Update the unread count in the header
-                updateUnreadCount(-999); // Reset to 0
+                form.reset();
+                updatePreview();
+            } else {
+                throw new Error(result.error || 'Failed to send');
             }
         } catch (error) {
-            console.error("Error marking all notifications as read:", error);
-        }
-    });
-}
-
-async function dismissNotification(notificationId) {
-    showConfirmModal(\'Delete Notification\', "Are you sure you want to delete this notification?", async () => {
-        try {
-            const response = await fetch("' . app_base_url('/admin/notifications/delete/') . '" + notificationId, {
-                method: "DELETE"
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message,
+                background: '#18181b',
+                color: '#fff'
             });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                // Remove the notification from the DOM
-                const notification = document.querySelector(`[data-id="${notificationId}"]`);
-                if (notification) {
-                    notification.remove();
-                    
-                    // Update the unread count in the header
-                    if (notification.classList.contains("notification-unread")) {
-                        updateUnreadCount(-1);
-                    }
-                    
-                    // Show empty state if no notifications remain
-                    if (document.querySelectorAll(".notification-item").length === 0) {
-                        showEmptyState();
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error dismissing notification:", error);
+        } finally {
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
         }
     });
-}
-
-async function refreshNotifications() {
-    try {
-        window.location.reload();
-    } catch (error) {
-        console.error("Error refreshing notifications:", error);
-    }
-}
-
-function updateUnreadCount(change) {
-    // This function would update the unread count displayed in the admin header
-    // In a real implementation, this would modify a badge counter in the top navigation
-    console.log("Unread count change:", change);
-}
-
-function showEmptyState() {
-    // Show the empty state if no notifications remain
-    if (document.querySelectorAll(".notification-item").length === 0) {
-        document.querySelector(".notifications-container").innerHTML = \'
-            <div class="empty-state">
-                <i class="fas fa-bell-slash fa-3x"></i>
-                <h3>No Notifications</h3>
-                <p>You have no notifications at this time</p>
-            </div>
-        \';
-    }
-}
 </script>
-
-
-<style>
-
-/* Additional inline styles for specific elements */
-.notification-stats {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    font-size: 14px;
-    color: var(--admin-gray-600);
-}
-
-.stats-label {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.stats-value {
-    font-weight: 600;
-    color: var(--admin-primary);
-    font-size: 16px;
-}
-
-.stats-value.unread-count {
-    color: var(--admin-danger);
-    font-size: 16px;
-}
-
-.read-badge {
-    background: var(--admin-success);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    margin-left: 12px;
-}
-
-.unread-badge {
-    background: var(--admin-danger);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    margin-left: 12px;
-}
-
-.notification-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--admin-gray-100);
-    font-size: 12px;
-    color: var(--admin-gray-500);
-}
-
-.notification-date {
-    color: var(--admin-gray-400);
-    font-size: 11px;
-}
-
-.mt-3 {
-    margin-top: 16px;
-}
-
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3000;
-}
-
-.loading-spinner {
-    background: white;
-    padding: 24px 32px;
-    border-radius: 12px;
-    text-align: center;
-    color: var(--admin-gray-700);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.loading-spinner i {
-    font-size: 24px;
-    margin-bottom: 12px;
-    color: var(--admin-primary);
-    animation: spin 1s linear infinite;
-}
-
-.loading-state {
-    padding: 16px;
-    text-align: center;
-    color: var(--admin-gray-500);
-    font-size: 14px;
-}
-
-.loading-state i {
-    font-size: 18px;
-    margin-right: 8px;
-    color: var(--admin-primary);
-    animation: spin 1s linear infinite;
-}
-
-/* Toast notifications */
-.notification-toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    min-width: 280px;
-    max-width: 400px;
-    padding: 0;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    z-index: 10000;
-    transform: translateX(400px);
-    transition: transform 0.3s ease-in-out, opacity 0.3s ease;
-    opacity: 0;
-    font-family: Inter, sans-serif;
-}
-
-.notification-toast.show {
-    transform: translateX(0);
-    opacity: 1;
-}
-
-.notification-toast.notification-success {
-    border-left: 4px solid var(--admin-success);
-}
-
-.notification-toast.notification-error {
-    border-left: 4px solid var(--admin-danger);
-}
-
-.notification-toast.notification-warning {
-    border-left: 4px solid var(--admin-warning);
-}
-
-.notification-toast.notification-info {
-    border-left: 4px solid var(--admin-info);
-}
-
-.toast-content {
-    display: flex;
-    align-items: center;
-    padding: 16px 20px;
-    background: white;
-    border-radius: 12px;
-}
-
-.toast-icon {
-    font-size: 20px;
-    margin-right: 12px;
-    width: 24px;
-    text-align: center;
-}
-
-.toast-icon.fa-check-circle {
-    color: var(--admin-success);
-}
-
-.toast-icon.fa-exclamation-circle {
-    color: var(--admin-danger);
-}
-
-.toast-icon.fa-exclamation-triangle {
-    color: var(--admin-warning);
-}
-
-.toast-icon.fa-info-circle {
-    color: var(--admin-info);
-}
-
-.toast-message {
-    flex: 1;
-    font-size: 14px;
-    line-height: 1.4;
-    color: var(--admin-gray-800);
-}
-
-.toast-close {
-    background: none;
-    border: none;
-    color: var(--admin-gray-400);
-    cursor: pointer;
-    padding: 4px;
-    margin-left: 8px;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-    font-size: 16px;
-}
-
-.toast-close:hover {
-    background: var(--admin-gray-100);
-    color: var(--admin-gray-600);
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(20px);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .toolbar {
-        flex-direction: column;
-        gap: 16px;
-        align-items: stretch;
-    }
-
-    .toolbar-actions {
-        justify-content: space-between;
-    }
-
-    .notification-stats {
-        flex-direction: column;
-        gap: 8px;
-        align-items: flex-start;
-    }
-}
-</style>
-';
-
-// Set breadcrumbs
-$breadcrumbs = [
-    ['title' => 'Notifications']
-];
-
-$page_title = $page_title ?? 'Notifications - Admin Panel';
-$currentPage = $currentPage ?? 'notifications';
-
-// Include the layout
-// Include the layout
-include BASE_PATH . '/themes/admin/layouts/main.php';
-
-// Add the beautiful CSS link after the layout
-echo '<link rel="stylesheet" href="' . app_base_url('themes/admin/assets/css/notifications-beautiful.css') . '">';

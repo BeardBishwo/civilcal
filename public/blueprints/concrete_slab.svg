@@ -1,0 +1,121 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="concreteGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e2e8f0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#cbd5e0;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="rebarGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4a5568;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2d3748;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="meshGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#718096;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4a5568;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Layer 1: Basic Slab Outline (Foundation) -->
+  <g id="layer-slab-outline" class="blueprint-layer" data-layer="1" data-difficulty="1">
+    <!-- Main slab -->
+    <rect x="100" y="150" width="600" height="400" fill="url(#concreteGradient)" stroke="#a0aec0" stroke-width="3"/>
+    <text x="400" y="360" text-anchor="middle" fill="#2d3748" font-family="Arial, sans-serif" font-size="14" font-weight="bold">REINFORCED CONCRETE SLAB</text>
+    <text x="400" y="380" text-anchor="middle" fill="#718096" font-family="Arial, sans-serif" font-size="10">Thickness: 150mm | f'c = 25 MPa</text>
+  </g>
+
+  <!-- Layer 2: Support Structure (Basic reinforcement concept) -->
+  <g id="layer-supports" class="blueprint-layer" data-layer="2" data-difficulty="2" opacity="0.3">
+    <!-- Beams supporting the slab -->
+    <rect x="80" y="130" width="640" height="30" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
+    <rect x="100" y="120" width="20" height="60" fill="#e2e8f0" stroke="#a0aec0" stroke-width="1"/>
+    <rect x="350" y="120" width="20" height="60" fill="#e2e8f0" stroke="#a0aec0" stroke-width="1"/>
+    <rect x="680" y="120" width="20" height="60" fill="#e2e8f0" stroke="#a0aec0" stroke-width="1"/>
+
+    <!-- Support labels -->
+    <text x="110" y="115" text-anchor="middle" fill="#e53e3e" font-family="Arial, sans-serif" font-size="9" font-weight="bold">COLUMN</text>
+    <text x="360" y="115" text-anchor="middle" fill="#e53e3e" font-family="Arial, sans-serif" font-size="9" font-weight="bold">COLUMN</text>
+    <text x="690" y="115" text-anchor="middle" fill="#e53e3e" font-family="Arial, sans-serif" font-size="9" font-weight="bold">COLUMN</text>
+    <text x="400" y="145" text-anchor="middle" fill="#3182ce" font-family="Arial, sans-serif" font-size="10" font-weight="bold">SUPPORTING BEAMS</text>
+  </g>
+
+  <!-- Layer 3: Main Reinforcement (Intermediate knowledge) -->
+  <g id="layer-main-rebar" class="blueprint-layer" data-layer="3" data-difficulty="3" opacity="0.3">
+    <!-- Bottom reinforcement -->
+    <line x1="120" y1="480" x2="680" y2="480" stroke="url(#rebarGradient)" stroke-width="3"/>
+    <line x1="120" y1="460" x2="680" y2="460" stroke="url(#rebarGradient)" stroke-width="3"/>
+    <line x1="120" y1="500" x2="680" y2="500" stroke="url(#rebarGradient)" stroke-width="3"/>
+
+    <!-- Top reinforcement -->
+    <line x1="120" y1="200" x2="680" y2="200" stroke="url(#rebarGradient)" stroke-width="3"/>
+    <line x1="120" y1="180" x2="680" y2="180" stroke="url(#rebarGradient)" stroke-width="3"/>
+    <line x1="120" y1="220" x2="680" y2="220" stroke="url(#rebarGradient)" stroke-width="3"/>
+
+    <!-- Vertical stirrups -->
+    <rect x="140" y="180" width="2" height="320" fill="url(#rebarGradient)"/>
+    <rect x="240" y="180" width="2" height="320" fill="url(#rebarGradient)"/>
+    <rect x="340" y="180" width="2" height="320" fill="url(#rebarGradient)"/>
+    <rect x="440" y="180" width="2" height="320" fill="url(#rebarGradient)"/>
+    <rect x="540" y="180" width="2" height="320" fill="url(#rebarGradient)"/>
+    <rect x="640" y="180" width="2" height="320" fill="url(#rebarGradient)"/>
+
+    <!-- Rebar labels -->
+    <text x="400" y="195" text-anchor="middle" fill="#38a169" font-family="Arial, sans-serif" font-size="9" font-weight="bold">4-#16 TOP REBAR @ 150mm C/C</text>
+    <text x="400" y="475" text-anchor="middle" fill="#38a169" font-family="Arial, sans-serif" font-size="9" font-weight="bold">4-#20 BOTTOM REBAR @ 125mm C/C</text>
+    <text x="130" y="300" text-anchor="middle" fill="#e53e3e" font-family="Arial, sans-serif" font-size="8" font-weight="bold" transform="rotate(-90 130 300)">STIRRUPS #10@150mm</text>
+  </g>
+
+  <!-- Layer 4: Shear Reinforcement & Details (Advanced) -->
+  <g id="layer-shear-details" class="blueprint-layer" data-layer="4" data-difficulty="4" opacity="0.3">
+    <!-- Shear studs -->
+    <circle cx="200" cy="480" r="4" fill="url(#rebarGradient)" stroke="#2d3748" stroke-width="1"/>
+    <circle cx="300" cy="480" r="4" fill="url(#rebarGradient)" stroke="#2d3748" stroke-width="1"/>
+    <circle cx="400" cy="480" r="4" fill="url(#rebarGradient)" stroke="#2d3748" stroke-width="1"/>
+    <circle cx="500" cy="480" r="4" fill="url(#rebarGradient)" stroke="#2d3748" stroke-width="1"/>
+    <circle cx="600" cy="480" r="4" fill="url(#rebarGradient)" stroke="#2d3748" stroke-width="1"/>
+
+    <!-- Construction joints -->
+    <line x1="400" y1="150" x2="400" y2="550" stroke="#f6ad55" stroke-width="2" stroke-dasharray="5,5"/>
+    <text x="410" y="350" fill="#dd6b20" font-family="Arial, sans-serif" font-size="9" font-weight="bold">CONSTRUCTION JOINT</text>
+
+    <!-- Temperature reinforcement -->
+    <line x1="120" y1="320" x2="680" y2="320" stroke="#9f7aea" stroke-width="2" stroke-dasharray="3,3"/>
+    <text x="400" y="315" text-anchor="middle" fill="#6b46c1" font-family="Arial, sans-serif" font-size="8" font-weight="bold">TEMPERATURE REINFORCEMENT #12@300mm</text>
+  </g>
+
+  <!-- Layer 5: Complete Specifications (Master level) -->
+  <g id="layer-specifications" class="blueprint-layer" data-layer="5" data-difficulty="5" opacity="0.3">
+    <!-- Detailed specifications -->
+    <rect x="50" y="50" width="250" height="80" fill="#f7fafc" stroke="#e2e8f0" stroke-width="1" opacity="0.95"/>
+    <text x="60" y="70" fill="#2d3748" font-family="Arial, sans-serif" font-size="11" font-weight="bold">REINFORCEMENT DETAILS</text>
+    <text x="60" y="85" fill="#4a5568" font-family="Arial, sans-serif" font-size="8">• Bottom: 4-#20 @ 125mm c/c</text>
+    <text x="60" y="98" fill="#4a5568" font-family="Arial, sans-serif" font-size="8">• Top: 4-#16 @ 150mm c/c</text>
+    <text x="60" y="111" fill="#4a5568" font-family="Arial, sans-serif" font-size="8">• Stirrups: #10 @ 150mm c/c</text>
+    <text x="60" y="124" fill="#4a5568" font-family="Arial, sans-serif" font-size="8">• Cover: 25mm clear</text>
+
+    <!-- Load information -->
+    <rect x="320" y="50" width="200" height="80" fill="#f7fafc" stroke="#e2e8f0" stroke-width="1" opacity="0.95"/>
+    <text x="330" y="70" fill="#2d3748" font-family="Arial, sans-serif" font-size="11" font-weight="bold">DESIGN LOADS</text>
+    <text x="330" y="85" fill="#4a5568" font-family="Arial, sans-serif" font-size="8">• Dead Load: 3.5 kN/m²</text>
+    <text x="330" y="98" fill="#4a5568" font-family="Arial, sans-serif" font-size="8">• Live Load: 4.0 kN/m²</text>
+    <text x="330" y="111" fill="#4a5568" font-family="Arial, sans-serif" font-size="8">• Total: 7.5 kN/m²</text>
+    <text x="330" y="124" fill="#4a5568" font-family="Arial, sans-serif" font-size="8">• Seismic: UBC97 Zone 3</text>
+
+    <!-- Dimensions -->
+    <line x1="100" y1="570" x2="700" y2="570" stroke="#38a169" stroke-width="1" marker-start="url(#arrowhead)" marker-end="url(#arrowhead)"/>
+    <text x="400" y="565" text-anchor="middle" fill="#38a169" font-family="Arial, sans-serif" font-size="10">6000mm</text>
+
+    <line x1="720" y1="150" x2="720" y2="550" stroke="#38a169" stroke-width="1" marker-start="url(#arrowhead)" marker-end="url(#arrowhead)"/>
+    <text x="725" y="350" text-anchor="start" fill="#38a169" font-family="Arial, sans-serif" font-size="10" transform="rotate(-90 725 350)">4000mm</text>
+  </g>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#38a169"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="400" y="25" text-anchor="middle" fill="#2d3748" font-family="Arial, sans-serif" font-size="16" font-weight="bold">REINFORCED CONCRETE SLAB DETAIL</text>
+  <text x="400" y="45" text-anchor="middle" fill="#718096" font-family="Arial, sans-serif" font-size="12">Scale: 1:50 | ACI 318-14 | Design by: Structural Engineer</text>
+</svg>

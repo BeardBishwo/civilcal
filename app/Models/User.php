@@ -175,6 +175,16 @@ class User
         }
     }
 
+    public function findAll($options = [])
+    {
+        $limit = $options['limit'] ?? 50;
+        $order = $options['order'] ?? 'created_at DESC';
+
+        $sql = "SELECT * FROM users ORDER BY $order LIMIT $limit";
+        $stmt = $this->db->getPdo()->query($sql);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC); // Fetch as associative array
+    }
+
     public function getAll()
     {
         $stmt = $this->db->getPdo()->query("SELECT * FROM users ORDER BY created_at DESC");

@@ -118,6 +118,18 @@ class Database
         return $stmt;
     }
 
+    public function fetchAll($sql, $params = [])
+    {
+        $stmt = $this->query($sql, $params);
+        return ($stmt && method_exists($stmt, 'fetchAll')) ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
+    }
+
+    public function fetch($sql, $params = [])
+    {
+        $stmt = $this->query($sql, $params);
+        return ($stmt && method_exists($stmt, 'fetch')) ? $stmt->fetch(\PDO::FETCH_ASSOC) : false;
+    }
+
     public function prepare($sql)
     {
         // For manual prepare, we default to Write to be safe,

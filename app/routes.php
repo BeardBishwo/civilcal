@@ -25,10 +25,10 @@ $router->add("GET", "/quiz/contest/room/{id}", "Quiz\\StudentContestController@r
 $router->add("POST", "/quiz/contest/submit/{id}", "Quiz\\StudentContestController@submit", ["auth"]);
 
 // 2. Multi Match (Blueprint)
-$router->add("GET", "/quiz/multi-match", "Quiz\\TerminologyController@index", ["auth"]);
-$router->add("GET", "/blueprint", "Quiz\\TerminologyController@index", ["auth"]);
+$router->add("GET", "/quiz/multi-match", "Quiz\\BlueprintController@index", ["auth"]);
+$router->add("GET", "/blueprint", "Quiz\\BlueprintController@index", ["auth"]);
 $router->add("GET", "/blueprint/arena/{id}", "Quiz\\TerminologyController@arena", ["auth"]);
-$router->add("POST", "/blueprint/submit", "Quiz\\TerminologyController@submit", ["auth"]);
+$router->add("POST", "/blueprint/submit", "Quiz\\BlueprintController@submit", ["auth"]);
 
 // 3. Battle (Multiplayer)
 $router->add("GET", "/quiz/battle", "Quiz\\MultiplayerController@index", ["auth"]);
@@ -51,16 +51,21 @@ $router->add("GET", "/quiz/battle-pass", "Quiz\\GamificationController@battlePas
 // 5. NEW MODES (Building Now)
 $router->add("GET", "/quiz/math-mania", "Quiz\\MathManiaController@index", ["auth"]);
 $router->add("GET", "/quiz/guess-word", "Quiz\\GuessWordController@index", ["auth"]);
-$router->add("GET", "/quiz/guess-word/data", "Quiz\\GuessWordController@getWord", ["auth"]); // API Route
+$router->add("GET", "/quiz/guess-word/data", "Quiz\\GuessWordController@getWord", ["auth"]); // API Route - Get puzzle
+$router->add("POST", "/quiz/guess-word/check", "Quiz\\GuessWordController@checkAnswer", ["auth"]); // API Route - Verify answer
+$router->add("POST", "/quiz/guess-word/hint", "Quiz\\GuessWordController@useHint", ["auth"]); // API Route - Get hint
+$router->add("GET", "/quiz/guess-word/progress", "Quiz\\GuessWordController@getProgress", ["auth"]); // API Route - Get stats
 $router->add("GET", "/quiz/true-false", "Quiz\\TrueFalseController@index", ["auth"]);
 $router->add("GET", "/quiz/true-false/data", "Quiz\\TrueFalseController@getQuestions", ["auth"]); // API Route
 $router->add("GET", "/quiz/exam", "Quiz\\ExamModeController@index", ["auth"]);
 $router->add("GET", "/quiz/exam/start/{slug}", "Quiz\\ExamEngineController@start", ["auth"]); // Engine Start
+$router->add("GET", "/quiz/start/{id}", "Quiz\\ExamEngineController@startPractice", ["auth"]); // Practice Start
 $router->add("GET", "/quiz/room/{id}", "Quiz\\ExamEngineController@room", ["auth"]); // Exam Room
 $router->add("POST", "/quiz/room/save", "Quiz\\ExamEngineController@saveAnswer", ["auth"]); // Save Answer
 $router->add("POST", "/quiz/room/submit", "Quiz\\ExamEngineController@submit", ["auth"]); // Submit
 $router->add("GET", "/quiz/result/{id}", "Quiz\\ExamEngineController@result", ["auth"]); // Result
 $router->add("GET", "/quiz/daily", "Quiz\\ExamEngineController@startDaily", ["auth"]); // Daily Quest
+$router->add("POST", "/quiz/daily", "Quiz\\ExamEngineController@startDaily", ["auth"]);
 
 // Public Routes
 $router->add("GET", "/", "HomeController@index");
@@ -168,6 +173,16 @@ $router->add(
     "ApiController@traditionalUnitsAllConversions",
     ["auth"],
 );
+
+// Notification Routes (Consolidated)
+$router->add("GET", "/api/notifications/list", "Admin\NotificationController@getNotifications", ["auth"]);
+$router->add("GET", "/api/notifications/unread-count", "Admin\NotificationController@getUnreadCount", ["auth"]);
+$router->add("POST", "/api/notifications/create", "Admin\NotificationController@create", ["auth"]);
+$router->add("POST", "/api/notifications/mark-all-read", "Admin\NotificationController@markAllAsRead", ["auth"]);
+$router->add("POST", "/api/notifications/{id}/read", "Admin\NotificationController@markAsRead", ["auth"]);
+$router->add("POST", "/api/notifications/{id}/delete", "Admin\NotificationController@delete", ["auth"]);
+$router->add("GET", "/admin/notifications", "Admin\NotificationController@index", ["auth", "admin"]);
+$router->add("GET", "/user/notifications", "NotificationController@index", ["auth"]);
 
 // User Routes
 // User Routes (Consolidated)
@@ -461,6 +476,11 @@ $router->add(
     "Admin\SettingsController@saveEconomy",
     ["auth", "admin"],
 );
+
+// Firebase Settings
+$router->add("GET", "/admin/settings/firebase", "Admin\SettingsController@firebase", ["auth", "admin"]);
+$router->add("POST", "/admin/settings/firebase/upload", "Admin\SettingsController@uploadFirebaseCredentials", ["auth", "admin"]);
+
 $router->add(
     "GET",
     "/admin/settings/quiz-modes",
@@ -1404,6 +1424,12 @@ $router->add(
 // API v1 Health
 $router->add("GET", "/api/v1/health", "Api\\V1\\HealthController@health");
 
+// Blueprint API Routes
+$router->add("GET", "/api/blueprint/render/{id}", "BlueprintApiController@render");
+$router->add("GET", "/api/blueprint/{id}", "BlueprintApiController@getBlueprint");
+$router->add("GET", "/api/blueprint/progress/{id}", "BlueprintApiController@getProgress");
+$router->add("POST", "/api/blueprint/progress/{id}", "BlueprintApiController@updateProgress");
+
 // Additional Admin Routes (using existing controllers)
 $router->add("GET", "/admin/users", "Admin\UserController@index", [
     "auth",
@@ -2166,6 +2192,7 @@ $router->add("POST", "/admin/quiz/marking/bulk-save", "Admin\\Quiz\\MarkingSchem
 // Terminology Manager (Word Bank)
 $router->add("GET", "/admin/quiz/word-bank", "Admin\\Quiz\\WordBankController@index", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/word-bank/store", "Admin\\Quiz\\WordBankController@store", ["auth", "admin"]);
+$router->add("POST", "/admin/quiz/word-bank/bulk-import", "Admin\\Quiz\\WordBankController@bulkImport", ["auth", "admin"]);
 $router->add("POST", "/admin/quiz/word-bank/delete/{id}", "Admin\\Quiz\\WordBankController@delete", ["auth", "admin"]);
 
 // Leaderboard Manager

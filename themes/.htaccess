@@ -1,7 +1,13 @@
 # Kills PHP execution in this folder
-<FilesMatch "\.(php|php5|phtml|php7|phar|exe|sh|bat|pl|py|cgi|asp|aspx|js)$">
+<FilesMatch "\.(php|php5|phtml|php7|phar|exe|sh|bat|pl|py|cgi|asp|aspx)$">
     Order Deny,Allow
     Deny from all
+</FilesMatch>
+
+# Allow JavaScript files
+<FilesMatch "\.(js)$">
+    Order Allow,Deny
+    Allow from all
 </FilesMatch>
 
 # Prevents listing files (Directory Traversal)

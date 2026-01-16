@@ -315,7 +315,7 @@
                 <!-- Danger Zone -->
                 <div class="glass-card p-6 rounded-3xl opacity-60 hover:opacity-100 transition-opacity">
                     <h3 class="text-sm font-bold text-gray-400 mb-4 uppercase tracking-widest">Zone of Danger</h3>
-                    <a href="/quiz/firms/leave" onclick="return confirm('Are you sure? This cannot be undone.')" class="block w-full py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl text-center text-red-500 font-bold text-sm transition-colors">
+                    <a href="<?= app_base_url('/quiz/firms/leave') ?>" onclick="return confirm('Are you sure? This cannot be undone.')" class="block w-full py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl text-center text-red-500 font-bold text-sm transition-colors">
                         Leave Firm
                     </a>
                 </div>
@@ -352,7 +352,7 @@
 
                     this.donating = true;
 
-                    fetch('/api/firms/donate-resources', {
+                    fetch('<?php echo app_base_url("/api/firms/donate-resources"); ?>', {
                             method: 'POST',
                             body: fd
                         })
@@ -414,7 +414,7 @@
 
             try {
                 Swal.showLoading();
-                const res = await fetch('/api/firms/donate', {
+                const res = await fetch('<?php echo app_base_url("/api/firms/donate"); ?>', {
                     method: 'POST',
                     body: fd
                 });
@@ -458,7 +458,7 @@
                 fd.append('action', action);
                 fd.append('csrf_token', '<?php echo csrf_token(); ?>');
 
-                const res = await fetch('/api/firms/handle-request', {
+                const res = await fetch('<?php echo app_base_url("/api/firms/handle-request"); ?>', {
                     method: 'POST',
                     body: fd
                 });
@@ -504,7 +504,7 @@
             fd.append('csrf_token', '<?php echo csrf_token(); ?>');
 
             try {
-                const res = await fetch('/api/firms/perk/purchase', {
+                const res = await fetch('<?php echo app_base_url("/api/firms/perk/purchase"); ?>', {
                     method: 'POST',
                     body: fd
                 });
@@ -559,7 +559,7 @@
             fd.append('csrf_token', '<?php echo csrf_token(); ?>');
 
             try {
-                const res = await fetch('/api/firms/promote', {
+                const res = await fetch('<?php echo app_base_url("/api/firms/promote"); ?>', {
                     method: 'POST',
                     body: fd
                 });
@@ -616,7 +616,7 @@
             fd.append('csrf_token', '<?php echo csrf_token(); ?>');
 
             try {
-                const res = await fetch('/api/firms/dividends', {
+                const res = await fetch('<?php echo app_base_url("/api/firms/dividends"); ?>', {
                     method: 'POST',
                     body: fd
                 });
@@ -676,7 +676,7 @@
 
             this.donating = true;
 
-            fetch('/api/firms/donate', { // Corrected URL
+            fetch('<?php echo app_base_url("/api/firms/donate"); ?>', { // Corrected URL
                     method: 'POST',
                     body: fd
                 })

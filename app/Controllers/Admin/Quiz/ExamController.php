@@ -207,7 +207,7 @@ class ExamController extends Controller
 
         // Fetch existing questions in this exam
         $sql = "
-            SELECT eq.*, q.question, q.type, q.difficulty_level 
+            SELECT eq.*, q.content, q.type, q.difficulty_level 
             FROM quiz_exam_questions eq 
             JOIN quiz_questions q ON eq.question_id = q.id 
             WHERE eq.exam_id = :exam_id 
@@ -220,8 +220,8 @@ class ExamController extends Controller
 
         // Decode JSON question slightly for summary preview
         foreach ($questions as &$q) {
-            // The 'question' field might be JSON or plain text
-            $questionText = $q['question'] ?? '';
+            // The 'content' field might be JSON or plain text
+            $questionText = $q['content'] ?? '';
             if (json_decode($questionText)) {
                 $c = json_decode($questionText, true);
                 $q['summary_text'] = substr(strip_tags($c['text'] ?? $questionText), 0, 100);

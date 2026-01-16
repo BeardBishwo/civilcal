@@ -24,7 +24,7 @@ class ReportController extends Controller
                        GROUP_CONCAT(DISTINCT r.description SEPARATOR ' || ') as all_descriptions,
                        GROUP_CONCAT(DISTINCT u.username ORDER BY r.created_at ASC SEPARATOR ', ') as reporters,
                        
-                       q.question as question_json,
+                       q.content as question_json,
                        q.type as q_type,
                        q.difficulty_level,
                        sn_cat.title as category_title,

@@ -65,7 +65,7 @@ class LeaderboardService
     public function getLeaderboard($periodType = 'weekly', $periodValue = null, $categoryId = 0, $limit = 100)
     {
         if (!$periodValue) {
-            $periodValue = match($periodType) {
+            $periodValue = match ($periodType) {
                 'weekly' => date('Y-W'),
                 'monthly' => date('Y-m'),
                 'yearly' => date('Y'),

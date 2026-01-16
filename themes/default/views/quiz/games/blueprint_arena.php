@@ -153,7 +153,7 @@ async function finishProject() {
     const resp = await fetch('<?= app_base_url("/blueprint/submit") ?>', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `blueprint_id=<?= $blueprint_id ?>&correct_matches=${matches}&total_terms=${total}`
+        body: `blueprint_id=<?= $blueprint['id'] ?>&correct_matches=${matches}&total_terms=${total}`
     });
     const data = await resp.json();
     if(data.success) {

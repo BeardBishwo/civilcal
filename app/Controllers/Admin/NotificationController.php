@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers\Admin;
 
 use App\Core\Controller;
@@ -22,9 +23,9 @@ class NotificationController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if (!$user || !$user->is_admin) {
-            http_response_code(403);
-            die('Access denied');
+        if (!$user) {
+            header('Location: /login');
+            exit;
         }
 
         $page = (int)($_GET['page'] ?? 1);
@@ -34,11 +35,21 @@ class NotificationController extends Controller
         $notifications = $this->notificationModel->getByUser($user->id, $limit, $offset);
         $unreadCount = $this->notificationModel->getCountByUser($user->id);
 
+        $totalNotifications = $this->notificationModel->getTotalCountByUser($user->id);
+        $totalPages = ceil($totalNotifications / $limit);
+
+        // Fetch users for the dropdown (limit to 100 for performance, or use searching later)
+        $userModel = new \App\Models\User();
+        $users = $userModel->findAll(['limit' => 100, 'order' => 'created_at DESC']);
+
         $data = [
             'user' => $user,
+            'users' => $users,
             'notifications' => $notifications,
             'unreadCount' => $unreadCount,
             'page' => $page,
+            'totalPages' => $totalPages,
+            'totalNotifications' => $totalNotifications,
             'page_title' => 'Notifications - Admin Panel',
             'currentPage' => 'notifications'
         ];
@@ -163,12 +174,12 @@ class NotificationController extends Controller
         }
 
         $input = json_decode(file_get_contents('php://input'), true);
-
-        $userId = $input['user_id'] ?? null;
+        $target = $input['target'] ?? 'user'; // 'user' or 'all'
         $title = $input['title'] ?? '';
         $message = $input['message'] ?? '';
         $type = $input['type'] ?? 'info';
-        $data = $input['data'] ?? [];
+        $userId = $input['user_id'] ?? null;
+        $url = $input['url'] ?? '#';
 
         if (empty($title) || empty($message)) {
             http_response_code(400);
@@ -176,12 +187,21 @@ class NotificationController extends Controller
             return;
         }
 
-        $result = $this->notificationModel->createNotification($userId, $title, $message, $type, $data);
+        if ($target === 'all') {
+            $result = $this->notificationModel->broadcast($title, $message, $type, $url);
+        } else {
+            if (!$userId) {
+                http_response_code(400);
+                echo json_encode(['error' => 'User ID is required for single notification']);
+                return;
+            }
+            $result = $this->notificationModel->create($userId, $title, $message, $url, $type);
+        }
 
         header('Content-Type: application/json');
         echo json_encode([
             'success' => $result,
-            'message' => $result ? 'Notification created successfully' : 'Failed to create notification'
+            'message' => $result ? 'Notification sent successfully' : 'Failed to send notification'
         ]);
     }
 

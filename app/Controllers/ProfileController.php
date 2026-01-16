@@ -389,17 +389,7 @@ class ProfileController extends Controller
 
         $file = $_FILES['avatar'];
 
-        // Validate file
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        if (!in_array($file['type'], $allowedTypes)) {
-            return $this->json(['error' => 'Invalid file type'], 400);
-        }
-
-        if ($file['size'] > 5 * 1024 * 1024) { // 5MB
-            return $this->json(['error' => 'File too large (max 5MB)'], 400);
-        }
-
-        // Use FileService for "Paranoid-Grade" secure upload
+        // Delegate validation and upload to FileService
         $userId = $this->auth->id();
         $uploadResult = FileService::uploadUserFile($file, $userId, 'avatar');
 

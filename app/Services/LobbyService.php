@@ -24,19 +24,19 @@ class LobbyService
         $code = strtoupper(substr(md5(uniqid()), 0, 5));
         $sql = "INSERT INTO quiz_lobbies (code, exam_id, host_user_id, status, start_time) 
                 VALUES (:code, :eid, :uid, 'waiting', :start)";
-        
+
         $startTime = date('Y-m-d H:i:s', time() + 30);
-        
+
         $this->db->query($sql, [
             'code' => $code,
             'eid' => $examId,
             'uid' => $hostUserId,
             'start' => $startTime
         ]);
-        
+
         $lobbyId = $this->db->getPdo()->lastInsertId();
         $this->joinLobby($code, $hostUserId);
-        
+
         return ['lobby_id' => $lobbyId, 'code' => $code];
     }
 
@@ -45,12 +45,12 @@ class LobbyService
      */
     public function joinLobby($code, $userId)
     {
-        $lobby = $this->db->find('quiz_lobbies', ['code' => $code]);
+        $lobby = $this->db->findOne('quiz_lobbies', ['code' => $code]);
         if (!$lobby) {
             throw new Exception("Lobby not found");
         }
-        
-        $exists = $this->db->find('quiz_lobby_participants', ['lobby_id' => $lobby['id'], 'user_id' => $userId]);
+
+        $exists = $this->db->findOne('quiz_lobby_participants', ['lobby_id' => $lobby['id'], 'user_id' => $userId]);
         if ($exists) {
             return $lobby;
         }
@@ -59,7 +59,7 @@ class LobbyService
             'lid' => $lobby['id'],
             'uid' => $userId
         ]);
-        
+
         return $lobby;
     }
 
@@ -68,14 +68,14 @@ class LobbyService
      */
     public function getLobbyStatus($lobbyId, $currentUserId)
     {
-
+        $lobby = $this->db->findOne('quiz_lobbies', ['id' => $lobbyId]);
         if (!$lobby) return null;
 
         $participants = $this->getParticipants($lobbyId);
-        
+
         // 1. Ghost Injection
         $this->checkGhostInjection($lobby, count($participants));
-        
+
         // 2. Payout Protocol (If game finished)
         if ($lobby['status'] === 'finished' && $lobby['payout_distributed'] == 0) {
             $this->distributeWagerRewards($lobbyId);
@@ -113,7 +113,7 @@ class LobbyService
         $this->db->query("UPDATE quiz_lobbies SET payout_distributed = 1 WHERE id = :id", ['id' => $lobbyId]);
 
         $participants = $this->getParticipants($lobbyId);
-        usort($participants, function($a, $b) {
+        usort($participants, function ($a, $b) {
             return $b['current_score'] - $a['current_score'];
         });
 
@@ -154,7 +154,7 @@ class LobbyService
         if ($lobby['status'] !== 'waiting') return;
         $timeLeft = strtotime($lobby['start_time']) - time();
         $targetPlayers = 4;
-        
+
         if ($timeLeft <= 10 && $timeLeft > 0 && $currentCount < $targetPlayers) {
             $needed = $targetPlayers - $currentCount;
             $this->injectBots($lobby['id'], $needed);
@@ -163,19 +163,51 @@ class LobbyService
 
     private function injectBots($lobbyId, $count)
     {
-        $sql = "SELECT id FROM bot_profiles WHERE is_active = 1 ORDER BY RAND() LIMIT $count";
+        // Get Lobby Code for Firebase path
+        $lobby = $this->db->findOne('quiz_lobbies', ['id' => $lobbyId]);
+        if (!$lobby) return;
+
+        $sql = "SELECT * FROM bot_profiles WHERE is_active = 1 ORDER BY RAND() LIMIT $count";
         $bots = $this->db->fetchAll($sql);
-        
+
+        // Init Firebase (One-off connection)
+        $firebaseDb = null;
+        try {
+            $factory = (new \Kreait\Firebase\Factory)
+                ->withServiceAccount(\App\Config\Firebase::getCredentialsPath())
+                ->withDatabaseUri(\App\Config\Firebase::getConfig()['databaseURL']);
+            $firebaseDb = $factory->createDatabase();
+        } catch (Exception $e) {
+            error_log("Firebase Init Fail in InjectBots: " . $e->getMessage());
+        }
+
         foreach ($bots as $bot) {
             try {
-                $check = $this->db->find('quiz_lobby_participants', ['lobby_id' => $lobbyId, 'bot_profile_id' => $bot['id']]);
+                $check = $this->db->findOne('quiz_lobby_participants', ['lobby_id' => $lobbyId, 'bot_profile_id' => $bot['id']]);
                 if (!$check) {
+                    // 1. MySQL
                     $this->db->query("INSERT INTO quiz_lobby_participants (lobby_id, bot_profile_id, is_bot, status) VALUES (:lid, :bid, 1, 'ready')", [
                         'lid' => $lobbyId,
                         'bid' => $bot['id']
                     ]);
+
+                    // 2. Firebase Push
+                    if ($firebaseDb) {
+                        $firebaseDb->getReference("rooms/{$lobby['code']}/players/{$bot['id']}")->set([
+                            'id' => $bot['id'],
+                            'name' => $bot['username'],
+                            'avatar' => $bot['avatar_url'] ?? 'default.png',
+                            'is_bot' => true,
+                            'skill_level' => (int)$bot['skill_level'],
+                            'status' => 'ready',
+                            'joined_at' => time() * 1000,
+                            'current_score' => 0
+                        ]);
+                    }
                 }
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+                error_log("Bot Injection Error: " . $e->getMessage());
+            }
         }
     }
 }

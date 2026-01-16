@@ -31,7 +31,7 @@ class Notification
         $stmt = $this->db->getPdo()->prepare("UPDATE notifications SET is_read = 1, read_at = NOW() WHERE id = ? AND user_id = ?");
         return $stmt->execute([$id, $userId]);
     }
-    
+
     public function markAllAsRead($userId)
     {
         $stmt = $this->db->getPdo()->prepare("UPDATE notifications SET is_read = 1, read_at = NOW() WHERE user_id = ?");
@@ -41,6 +41,13 @@ class Notification
     public function getCountByUser($userId)
     {
         $stmt = $this->db->getPdo()->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0");
+        $stmt->execute([$userId]);
+        return (int)$stmt->fetchColumn();
+    }
+
+    public function getTotalCountByUser($userId)
+    {
+        $stmt = $this->db->getPdo()->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ?");
         $stmt->execute([$userId]);
         return (int)$stmt->fetchColumn();
     }
@@ -69,12 +76,20 @@ class Notification
     {
         $stmt = $this->db->getPdo()->prepare("INSERT INTO notifications (user_id, title, message, type, metadata, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
         return $stmt->execute([
-            $userId, 
-            $title, 
-            $message, 
-            $type, 
+            $userId,
+            $title,
+            $message,
+            $type,
             !empty($data) ? json_encode($data) : null
         ]);
+    }
+
+    public function broadcast($title, $message, $type = 'info', $actionUrl = '#')
+    {
+        $sql = "INSERT INTO notifications (user_id, title, message, type, action_url, created_at) 
+                SELECT id, ?, ?, ?, ?, NOW() FROM users WHERE status = 'active'";
+        $stmt = $this->db->getPdo()->prepare($sql);
+        return $stmt->execute([$title, $message, $type, $actionUrl]);
     }
 
     public function delete($id, $userId)

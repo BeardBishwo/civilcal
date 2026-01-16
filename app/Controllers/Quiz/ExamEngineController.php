@@ -108,31 +108,120 @@ class ExamEngineController extends Controller
             return;
         }
 
-        // 2. Check if already attempted
+        // 3. Check if already attempted
         if ($this->dailyQuizService->checkAttempt($userId, $date)) {
             $_SESSION['flash_info'] = "You have already completed today's quest!";
             $this->redirect('/quiz/dashboard');
             return;
         }
 
-        // 3. Get Placeholder Exam
-        $stmt = $this->db->getPdo()->prepare("SELECT * FROM quiz_exams WHERE slug = 'daily-quest'");
-        $stmt->execute();
-        $exam = $stmt->fetch();
+        // 4. Handle Start Action (POST)
+        if (isset($_POST['action']) && $_POST['action'] === 'start') {
+            // Get Placeholder Exam
+            $stmt = $this->db->getPdo()->prepare("SELECT * FROM quiz_exams WHERE slug = 'daily-quest'");
+            $stmt->execute();
+            $exam = $stmt->fetch();
 
-        if (!$exam) {
-            die("System Error: Daily Quest configuration missing.");
+            if (!$exam) {
+                die("System Error: Daily Quest configuration missing.");
+            }
+
+            // Create Attempt 
+            $sql = "INSERT INTO quiz_attempts (user_id, exam_id, status, started_at) VALUES (:uid, :eid, 'ongoing', NOW())";
+            $stmtInsert = $this->db->getPdo()->prepare($sql);
+            $stmtInsert->execute(['uid' => $userId, 'eid' => $exam['id']]);
+            $attemptId = $this->db->getPdo()->lastInsertId();
+
+            // Initialize Cache with Questions
+            $questionIds = json_decode($daily['questions'], true);
+            $this->initializeCache($attemptId, $exam, $questionIds, $daily['id']);
+
+            // Safety check: ensure questions were actually loaded
+            $attemptJson = file_get_contents($this->storagePath . $attemptId . '.json');
+            $attemptData = json_decode($attemptJson, true);
+            if (empty($attemptData['questions'])) {
+                header('Location: ' . app_base_url('/quiz?error=No+questions+available+for+today+quest'));
+                exit;
+            }
+
+            $this->redirect('/quiz/room/' . $attemptId);
+            return;
         }
 
-        // 4. Create Attempt 
-        $sql = "INSERT INTO quiz_attempts (user_id, exam_id, status, started_at) VALUES (:uid, :eid, 'ongoing', NOW())";
-        $stmtInsert = $this->db->getPdo()->prepare($sql);
-        $stmtInsert->execute(['uid' => $userId, 'eid' => $exam['id']]);
+        // 5. Show Lobby (GET)
+        $user = $this->db->findOne('users', ['id' => $userId]);
+
+        // Determine focus area title
+        $focusArea = 'Mixed Engineering';
+        if (!empty($daily['target_stream_id'])) {
+            $node = $this->db->findOne('syllabus_nodes', ['id' => $daily['target_stream_id']]);
+            if ($node) $focusArea = $node['title'];
+        }
+
+        $this->view->render('quiz/daily_lobby', [
+            'daily' => $daily,
+            'user' => $user,
+            'focus_area' => $focusArea
+        ]);
+    }
+
+    /**
+     * Start Practice Quiz from Syllabus Topic
+     */
+    public function startPractice($id)
+    {
+        // 1. Get Node Info
+        $node = $this->db->findOne('syllabus_nodes', ['id' => $id]);
+
+        if (!$node) {
+            $this->redirect('/quiz/zone');
+        }
+
+        // 2. Determine column to search in quiz_questions
+        $column = 'topic_id';
+        switch ($node['type']) {
+            case 'course':
+                $column = 'course_id';
+                break;
+            case 'category':
+                $column = 'category_id';
+                break;
+            case 'sub_category':
+                $column = 'sub_category_id';
+                break;
+        }
+
+        // 3. Fetch Questions
+        $sql = "SELECT id FROM quiz_questions WHERE {$column} = :id AND status = 'approved' ORDER BY RAND() LIMIT 20";
+        $stmt = $this->db->getPdo()->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        $questionIds = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+
+        if (empty($questionIds)) {
+            // Fallback: search by title
+            $sql = "SELECT id FROM quiz_questions WHERE content LIKE :title AND status = 'approved' ORDER BY RAND() LIMIT 20";
+            $stmt = $this->db->getPdo()->prepare($sql);
+            $stmt->execute(['title' => '%' . $node['title'] . '%']);
+            $questionIds = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        }
+
+        if (empty($questionIds)) {
+            $this->redirect('/quiz/zone?error=No+questions+available+for+this+section');
+        }
+
+        // 4. Create Attempt
+        $sql = "INSERT INTO quiz_attempts (user_id, exam_id, status, started_at) VALUES (?, NULL, 'ongoing', NOW())";
+        $this->db->query($sql, [$_SESSION['user_id']]);
         $attemptId = $this->db->getPdo()->lastInsertId();
 
-        // 5. Initialize Cache with Questions
-        $questionIds = json_decode($daily['questions'], true);
-        $this->initializeCache($attemptId, $exam, $questionIds, $daily['id']);
+        // 5. Initialize Cache
+        $this->initializeCache($attemptId, [
+            'id' => null,
+            'title' => 'Practice: ' . $node['title'],
+            'duration_minutes' => 20,
+            'mode' => 'practice',
+            'shuffle_questions' => 1
+        ], $questionIds);
 
         $this->redirect('/quiz/room/' . $attemptId);
     }
@@ -150,7 +239,7 @@ class ExamEngineController extends Controller
                 $questions = [];
             } else {
                 $placeholders = str_repeat('?,', count($questionIds) - 1) . '?';
-                $sqlQ = "SELECT id, type, question, options, correct_answer_json, default_marks, default_negative_marks, difficulty_level, answer_explanation as explanation FROM quiz_questions WHERE id IN ($placeholders)";
+                $sqlQ = "SELECT id, type, content, options, correct_answer_json, default_marks, default_negative_marks, difficulty_level, answer_explanation as explanation FROM quiz_questions WHERE id IN ($placeholders)";
                 $stmtQ = $this->db->getPdo()->prepare($sqlQ);
                 $stmtQ->execute($questionIds);
                 $questions = $stmtQ->fetchAll(\PDO::FETCH_ASSOC);
@@ -170,7 +259,7 @@ class ExamEngineController extends Controller
             // Standard Exam Fetch
             // Fetch Questions
             $sqlQ = "
-                SELECT q.id, q.type, q.question, q.options, q.correct_answer_json, q.default_marks, q.default_negative_marks, q.difficulty_level, q.answer_explanation as explanation
+                SELECT q.id, q.type, q.content, q.options, q.correct_answer_json, q.default_marks, q.default_negative_marks, q.difficulty_level, q.answer_explanation as explanation
                 FROM quiz_exam_questions eq
                 JOIN quiz_questions q ON eq.question_id = q.id
                 WHERE eq.exam_id = :eid
@@ -190,9 +279,8 @@ class ExamEngineController extends Controller
         // Decode JSON question/options for storage
         foreach ($questions as &$q) {
             // Store question as 'content' key for consistency in JSON cache
-            $q['content'] = json_decode($q['question'], true);
-            $q['options'] = json_decode($q['options'], true);
-            unset($q['question']); // Remove to avoid confusion
+            $q['content'] = is_string($q['content']) ? json_decode($q['content'], true) : $q['content'];
+            $q['options'] = is_string($q['options']) ? json_decode($q['options'], true) : $q['options'];
         }
 
         $data = [
@@ -514,7 +602,7 @@ class ExamEngineController extends Controller
 
         // 2. Fetch Incorrect Answers for "Smart Failure" Tool Linking
         $stmtIncorrect = $this->db->getPdo()->prepare("
-            SELECT aa.*, q.question, q.answer_explanation as explanation, q.options, q.type, q.correct_answer_json
+            SELECT aa.*, q.content, q.answer_explanation as explanation, q.options, q.type, q.correct_answer_json
             FROM quiz_attempt_answers aa
             JOIN quiz_questions q ON aa.question_id = q.id
             WHERE aa.attempt_id = :aid AND aa.is_correct = 0
@@ -527,8 +615,7 @@ class ExamEngineController extends Controller
         foreach ($incorrectAnswers as &$inc) {
             try {
                 // Rename 'question' to 'content' for view consistency
-                $inc['content'] = is_string($inc['question']) ? json_decode($inc['question'], true) : $inc['question'];
-                unset($inc['question']);
+                $inc['content'] = is_string($inc['content']) ? json_decode($inc['content'], true) : $inc['content'];
                 $inc['options'] = is_string($inc['options']) ? json_decode($inc['options'], true) : $inc['options'];
                 $inc['selected_options'] = is_string($inc['selected_options']) ? json_decode($inc['selected_options'], true) : $inc['selected_options'];
                 $inc['correct_answer_json'] = is_string($inc['correct_answer_json']) ? json_decode($inc['correct_answer_json'], true) : $inc['correct_answer_json'];

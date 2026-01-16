@@ -22,20 +22,20 @@ class MissionService
     public function updateProgress($userId, $type, $inc = 1)
     {
         $today = date('Y-m-d');
-        
+
         // 1. Get active missions for today's user
-        $missions = $this->db->query("SELECT * FROM daily_missions WHERE requirement_type = :type", ['type' => $type])->fetchAll();
-        
+        $missions = $this->db->fetchAll("SELECT * FROM daily_missions WHERE requirement_type = :type", ['type' => $type]);
+
         foreach ($missions as $mission) {
             // Check if user already has progress record for today
-            $progress = $this->db->query("
+            $progress = $this->db->fetch("
                 SELECT * FROM user_mission_progress 
                 WHERE user_id = :uid AND mission_id = :mid AND mission_date = :date
             ", [
                 'uid' => $userId,
                 'mid' => $mission['id'],
                 'date' => $today
-            ])->fetch();
+            ]);
 
             if (!$progress) {
                 // Initialize progress
@@ -102,7 +102,7 @@ class MissionService
             'amt' => $mission['coin_reward'],
             'uid' => $userId
         ]);
-        
+
         // Log transaction
         $gs = new GamificationService();
         //$gs->logTransaction($userId, 'coins', $mission['coin_reward'], 'mission_reward', $missionId); // Private method, skipping for now or make it protected

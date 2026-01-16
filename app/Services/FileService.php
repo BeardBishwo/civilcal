@@ -68,10 +68,11 @@ class FileService
     // File configurations
     private const FILE_CONFIGS = [
         'logo' => [
-            'max_size' => 5242880, // 5MB
+            'max_size' => 10485760, // 10MB
             'allowed_types' => ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/webp'],
             'extensions' => ['png', 'jpg', 'jpeg', 'svg', 'webp'],
-            'dimensions' => ['max_width' => 500, 'max_height' => 200],
+            'dimensions' => ['max_width' => 5000, 'max_height' => 5000],
+            'target_dimensions' => ['max_width' => 500, 'max_height' => 200],
             'optimize' => true,
         ],
         'favicon' => [
@@ -85,21 +86,24 @@ class FileService
             'max_size' => 10485760, // 10MB
             'allowed_types' => ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'],
             'extensions' => ['png', 'jpg', 'jpeg', 'webp'],
-            'dimensions' => ['max_width' => 2560, 'max_height' => 800],
+            'dimensions' => ['max_width' => 5000, 'max_height' => 5000],
+            'target_dimensions' => ['max_width' => 2560, 'max_height' => 800],
             'optimize' => true,
         ],
         'profile' => [
-            'max_size' => 2097152, // 2MB
+            'max_size' => 10485760, // 10MB
             'allowed_types' => ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'],
             'extensions' => ['png', 'jpg', 'jpeg', 'webp'],
-            'dimensions' => ['max_width' => 400, 'max_height' => 400],
+            'dimensions' => ['max_width' => 5000, 'max_height' => 5000],
+            'target_dimensions' => ['max_width' => 400, 'max_height' => 400],
             'optimize' => true,
         ],
         'avatar' => [
-            'max_size' => 2097152, // 2MB
+            'max_size' => 10485760, // 10MB
             'allowed_types' => ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'],
             'extensions' => ['png', 'jpg', 'jpeg', 'webp'],
-            'dimensions' => ['max_width' => 400, 'max_height' => 400],
+            'dimensions' => ['max_width' => 5000, 'max_height' => 5000],
+            'target_dimensions' => ['max_width' => 400, 'max_height' => 400],
             'optimize' => true,
         ],
         'document' => [
