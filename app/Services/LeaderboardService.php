@@ -11,7 +11,7 @@ class LeaderboardService
 
     public function __construct()
     {
-        $this->db = \App\Core\Database::getInstance();
+        $this->db = Database::getInstance();
     }
 
     /**

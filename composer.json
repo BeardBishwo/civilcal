@@ -3,7 +3,7 @@
     "type": "project",
     "description": "AEC Calculator Framework",
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.3",
         "abraham/twitteroauth": "^3.1",
         "altcha-org/altcha": "^1.1",
         "bacon/bacon-qr-code": "^2.0",

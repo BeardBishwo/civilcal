@@ -5,6 +5,8 @@ namespace App\Services;
 /**
  * Advanced caching service
  * Provides multi-tier caching with Redis support, cache warming, and intelligent invalidation
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AdvancedCache
 {
