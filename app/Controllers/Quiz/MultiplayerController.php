@@ -187,3 +187,108 @@ class MultiplayerController extends Controller
     }
 
 
+    /**
+     * API: Trigger Bot Injection (Auto-Fill)
+     * Called by Host Client when timer is low and room not full.
+     */
+    public function injectBots($code)
+    {
+        try {
+            $db = \App\Core\Database::getInstance();
+            $lobby = $db->findOne('quiz_lobbies', ['code' => $code]);
+
+            if (!$lobby || $lobby['status'] !== 'waiting') {
+                $this->json(['message' => 'Game active or invalid']);
+                return;
+            }
+
+            if ($lobby['host_user_id'] != $_SESSION['user_id']) {
+                $this->json(['message' => 'Not Host'], 403);
+                return;
+            }
+
+            // Trigger injection via Service
+            $this->lobbyService->checkGhostInjection($lobby, count($this->lobbyService->getParticipants($lobby['id'])));
+
+            $this->json(['success' => true]);
+        } catch (\Exception $e) {
+            $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * API: Finish Game & Sync Scores
+     * Called by Host when game ends.
+     */
+    public function finish($code)
+    {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        $scores = $data['scores'] ?? [];
+
+        try {
+            $db = \App\Core\Database::getInstance();
+            $lobby = $db->findOne('quiz_lobbies', ['code' => $code]);
+
+            if (!$lobby || $lobby['status'] !== 'active') {
+                if ($lobby['status'] === 'finished') {
+                    $this->json(['success' => true]);
+                    return;
+                }
+            }
+
+            if ($lobby['host_user_id'] != $_SESSION['user_id']) {
+                $this->json(['message' => 'Not Host'], 403);
+                return;
+            }
+
+            // 1. Sync Scores to MySQL
+            $MAX_POSSIBLE_SCORE = 50 * 4; // 50 questions max * 4 pts = 200. Adjust based on Exam Config if needed.
+            // Better: Get Question Count from Exam.
+            $exam = $db->findOne('quiz_exams', ['id' => $lobby['exam_id']]);
+            // Assume 20 questions for safety if not found.
+            // Actually, let's set a hard cap to stop Infinite Money Glitch.
+            // If user score > 500, flag it.
+            $HARD_CAP = 500;
+
+            foreach ($scores as $score) {
+                $isBot = $score['is_bot'] ?? false;
+                $pId = $score['id'];
+                $finalScore = (int)$score['score'];
+
+                // --- SECURITY CHECK ---
+                if (!$isBot && $finalScore > $HARD_CAP) {
+                    SecurityMonitor::log($_SESSION['user_id'], 'score_manipulation', "Lobby {$lobby['code']}", ['score' => $finalScore], 'critical');
+                    // Cap the score or ban?
+                    // Cap it for now to prevent economy crash.
+                    $finalScore = 0;
+                }
+                // Check negative overflow
+                if ($finalScore < -200) $finalScore = -200;
+
+                $sql = "UPDATE quiz_lobby_participants SET current_score = :score WHERE lobby_id = :lid AND ";
+                $params = ['score' => $finalScore, 'lid' => $lobby['id']];
+
+                if ($isBot) {
+                    $sql .= "bot_profile_id = :pid";
+                    $params['pid'] = $pId;
+                } else {
+                    $sql .= "user_id = :pid";
+                    $params['pid'] = $pId;
+                }
+
+                $db->query($sql, $params);
+            }
+
+            // 2. Mark Finished
+            $db->query("UPDATE quiz_lobbies SET status = 'finished' WHERE id = :id", ['id' => $lobby['id']]);
+
+            // 3. Distribute Rewards
+            $this->lobbyService->distributeWagerRewards($lobby['id']);
+
+            $this->json(['success' => true]);
+        } catch (\Exception $e) {
+            $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
+}

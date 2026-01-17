@@ -175,13 +175,21 @@ $router->add(
 );
 
 // Notification Routes (Consolidated)
+// Notification Routes (Consolidated)
 $router->add("GET", "/api/notifications/list", "Admin\NotificationController@getNotifications", ["auth"]);
 $router->add("GET", "/api/notifications/unread-count", "Admin\NotificationController@getUnreadCount", ["auth"]);
-$router->add("POST", "/api/notifications/create", "Admin\NotificationController@create", ["auth"]);
 $router->add("POST", "/api/notifications/mark-all-read", "Admin\NotificationController@markAllAsRead", ["auth"]);
 $router->add("POST", "/api/notifications/{id}/read", "Admin\NotificationController@markAsRead", ["auth"]);
 $router->add("POST", "/api/notifications/{id}/delete", "Admin\NotificationController@delete", ["auth"]);
-$router->add("GET", "/admin/notifications", "Admin\NotificationController@index", ["auth", "admin"]);
+
+// Admin Notification Management (New Broadcast System)
+$router->add("GET", "/admin/notifications", "Admin\NotificationManagementController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/notifications/create", "Admin\NotificationManagementController@create", ["auth", "admin"]);
+$router->add("POST", "/admin/api/notifications/broadcast", "Admin\NotificationManagementController@broadcast", ["auth", "admin"]);
+$router->add("POST", "/admin/api/notifications/send", "Admin\NotificationManagementController@send", ["auth", "admin"]);
+$router->add("POST", "/admin/api/notifications/{id}/delete", "Admin\NotificationManagementController@deleteGlobal", ["auth", "admin"]);
+
+// User Front-End Notifications
 $router->add("GET", "/user/notifications", "NotificationController@index", ["auth"]);
 
 // User Routes
@@ -226,7 +234,12 @@ $router->add(
     "Api\AuthController@resendVerification",
 );
 $router->add("GET", "/api/location", "Api\LocationController@getLocation");
-$router->add("GET", "/api/location/status", "Api\LocationController@getStatus");
+// Sponsorship Management (New Structure)
+$router->add("GET", "/admin/sponsors", "Admin\SponsorController@index", ["auth", "admin"]);
+$router->add("GET", "/admin/sponsors/create", "Admin\SponsorController@create", ["auth", "admin"]);
+$router->add("POST", "/admin/sponsors/store", "Admin\SponsorController@store", ["auth", "admin"]);
+$router->add("GET", "/admin/sponsors/campaign/{id}", "Admin\SponsorController@campaign", ["auth", "admin"]);
+$router->add("POST", "/admin/sponsors/campaigns/create", "Admin\SponsorController@createCampaign", ["auth", "admin"]);
 $router->add(
     "GET",
     "/api/marketing/stats",
@@ -645,8 +658,8 @@ $router->add("GET", "/calculators/statistics/probability", "StatisticsCalculator
 
 $router->add(
     "POST",
-    "/admin/email/send-test",
-    "Admin\SettingsController@sendTestEmail",
+    "/admin/api/settings/test-email",
+    "Admin\SettingsController@testEmail",
     ["auth", "admin"],
 );
 

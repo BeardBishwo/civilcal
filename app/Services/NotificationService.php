@@ -116,7 +116,7 @@ class NotificationService
             }
 
             $emailService = new EmailService();
-            
+
             // Prepare email data
             $emailData = [
                 'to' => $email,
@@ -127,8 +127,9 @@ class NotificationService
                     'title' => $title,
                     'message' => $message,
                     'icon' => $options['icon'] ?? '🔔',
-                    'actionUrl' => $options['action_url'] ?? null,
+                    'actionUrl' => $options['action_url'] ?? $options['actionUrl'] ?? null,
                     'actionText' => $options['action_text'] ?? null,
+                    'image_url' => $options['image_url'] ?? null, // Pass Billboard Image
                     'metadata' => $options['metadata'] ?? null,
                     'siteName' => \App\Services\SettingsService::get('site_name', 'Bishwo Calculator'),
                     'baseUrl' => app_base_url()
@@ -145,16 +146,24 @@ class NotificationService
     /**
      * Broadcast notification to all users
      */
+    /**
+     * Broadcast notification to all users (Scalable)
+     */
     public function broadcast($type, $title, $message, $options = [])
     {
-        $db = \App\Core\Database::getInstance();
-        $stmt = $db->prepare("SELECT id FROM users");
-        $stmt->execute();
-        $userIds = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        $targetGroup = $options['target_group'] ?? 'all';
+        $targetValue = $options['target_value'] ?? null;
+        $expiresAt = $options['expires_at'] ?? date('Y-m-d H:i:s', strtotime('+7 days'));
 
-        if (empty($userIds)) return [];
-
-        return $this->sendBulk($userIds, $type, $title, $message, $options);
+        return $this->notificationModel->createGlobal(
+            $title,
+            $message,
+            $type,
+            $options['icon'] ?? 'fas fa-info-circle',
+            $targetGroup,
+            $targetValue,
+            $expiresAt
+        );
     }
 
     /**
@@ -166,7 +175,7 @@ class NotificationService
         $sql = "DELETE FROM notifications 
                 WHERE created_at < DATE_SUB(NOW(), INTERVAL ? DAY)
                 AND is_archived = 1";
-        
+
         $stmt = $db->prepare($sql);
         return $stmt->execute([$days]);
     }

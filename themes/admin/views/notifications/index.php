@@ -5,7 +5,7 @@ $page_title = 'Notification Manager';
 <div class="max-w-7xl mx-auto px-6 py-8">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-            <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+            <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
                 Notification Manager
             </h1>
             <p class="text-gray-400 text-sm mt-1">Broadcast alerts or message specific users.</p>
@@ -209,7 +209,7 @@ $page_title = 'Notification Manager';
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
 
-            const res = await fetch('<?php echo app_base_url("api/notifications/create"); ?>', {
+            const res = await fetch('<?php echo app_base_url("/admin/notifications/broadcast"); ?>', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

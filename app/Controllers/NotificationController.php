@@ -28,8 +28,27 @@ class NotificationController extends Controller
         $limit = 20;
         $offset = ($page - 1) * $limit;
 
-        $notifications = $this->notificationModel->getByUser($user->id, $limit, $offset);
-        $unreadCount = $this->notificationModel->getCountByUser($user->id);
+        $personal = $this->notificationModel->getByUser($user->id, $limit, $offset);
+
+        // Fetch Global (Only on first page to keep pagination simple, or separate section?)
+        // For "Timeline" view, we should merge.
+        // But pagination of merged arrays is complex without a robust SQL Union.
+        // Quick Fix: Fetch Globals and prepend them to the list if on page 1.
+        $globals = [];
+        if ($page === 1) {
+            $globals = $this->notificationModel->getGlobalUnread($user->id, $user->role ?? 'user', $user->plan_id ?? null);
+        }
+
+        // Merge & Sort
+        $notifications = array_merge($globals, $personal);
+        usort($notifications, function ($a, $b) {
+            return strtotime($b['created_at']) - strtotime($a['created_at']);
+        });
+
+        // Slice to respect limit if globbals pushed us over (Optional, but UI wants 20)
+        // $notifications = array_slice($notifications, 0, $limit);
+
+        $unreadCount = $this->notificationModel->getCountByUser($user->id) + count($globals);
 
         $totalNotifications = $this->notificationModel->getTotalCountByUser($user->id);
         $totalPages = ceil($totalNotifications / $limit);

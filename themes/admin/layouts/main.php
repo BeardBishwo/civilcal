@@ -22,6 +22,24 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS (Premium Design Support) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            corePlugins: {
+                preflight: false, // Prevent conflict with Bootstrap
+            },
+            theme: {
+                extend: {
+                    colors: {
+                        surface: '#18181b', // Dark surface color
+                    }
+                }
+            }
+        }
+    </script>
+
     <meta name="csrf-token" content="<?php echo function_exists('csrf_token') ? csrf_token() : ($_SESSION['csrf_token'] ?? ''); ?>">
     <script>
         window.appConfig = {
@@ -957,6 +975,19 @@ $site_name = $site_meta['title'] ?? 'Admin Panel';
                             <i class="nav-icon fas fa-history"></i>
                             <span class="nav-text">Audit Logs</span>
                         </a>
+                    </li>
+
+                    <!-- Notification Manager -->
+                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/admin/notifications') !== false ? 'active' : ''; ?>">
+                        <a href="javascript:void(0)" class="nav-link">
+                            <i class="nav-icon fas fa-bell"></i>
+                            <span class="nav-text">Notifications</span>
+                            <i class="nav-arrow fas fa-chevron-right"></i>
+                        </a>
+                        <ul class="nav-submenu">
+                            <li><a href="<?php echo app_base_url('admin/notifications'); ?>">Manage Broadcasts</a></li>
+                            <li><a href="<?php echo app_base_url('admin/notifications/create'); ?>">Send New</a></li>
+                        </ul>
                     </li>
 
                     <!-- Email Manager -->

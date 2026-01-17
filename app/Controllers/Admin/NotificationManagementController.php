@@ -25,10 +25,12 @@ class NotificationManagementController extends Controller
     {
         // Get all notifications for admin view
         $notifications = $this->getAllNotifications();
-        
+
         // Render view
-        $title = 'Notification Management';
-        require __DIR__ . '/../../../themes/admin/views/admin/notifications/index.php';
+        $this->view->render('admin/notifications/index', [
+            'notifications' => $notifications,
+            'title' => 'Notification Management'
+        ]);
     }
 
     /**
@@ -37,8 +39,9 @@ class NotificationManagementController extends Controller
     public function create()
     {
         // Render view
-        $title = 'Send Notification';
-        require __DIR__ . '/../../../themes/admin/views/admin/notifications/create.php';
+        $this->view->render('admin/notifications/create', [
+            'title' => 'Send Notification'
+        ]);
     }
 
     /**
@@ -47,7 +50,7 @@ class NotificationManagementController extends Controller
     public function send()
     {
         $input = json_decode(file_get_contents('php://input'), true);
-        
+
         if (!$input || !isset($input['user_ids'], $input['type'], $input['title'], $input['message'])) {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Invalid input']);
@@ -75,18 +78,29 @@ class NotificationManagementController extends Controller
     public function broadcast()
     {
         $input = json_decode(file_get_contents('php://input'), true);
-        
+
         if (!$input || !isset($input['type'], $input['title'], $input['message'])) {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Invalid input']);
             exit;
         }
 
+        $options = $input['options'] ?? [];
+        if (!empty($input['image_url'])) {
+            $options['image_url'] = $input['image_url'];
+        }
+        if (!empty($input['send_email'])) {
+            $options['send_email'] = true;
+        }
+        if (!empty($input['scheduled_at'])) {
+            $options['scheduled_at'] = $input['scheduled_at'];
+        }
+
         $result = $this->notificationService->broadcast(
             $input['type'],
             $input['title'],
             $input['message'],
-            $input['options'] ?? []
+            $options
         );
 
         echo json_encode([
@@ -101,7 +115,7 @@ class NotificationManagementController extends Controller
     public function sendToAdmins()
     {
         $input = json_decode(file_get_contents('php://input'), true);
-        
+
         if (!$input || !isset($input['type'], $input['title'], $input['message'])) {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Invalid input']);
@@ -122,15 +136,27 @@ class NotificationManagementController extends Controller
     }
 
     /**
+     * Delete global notification
+     */
+    public function deleteGlobal($id)
+    {
+        if ($this->notificationModel->deleteGlobal($id)) {
+            echo json_encode(['success' => true, 'message' => 'Broadcast deleted successfully']);
+        } else {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Failed to delete broadcast']);
+        }
+    }
+
+    /**
      * Get all notifications (admin view)
      */
     private function getAllNotifications()
     {
         $db = \App\Core\Database::getInstance();
         $stmt = $db->prepare("
-            SELECT n.*, u.email, u.first_name, u.last_name 
-            FROM notifications n
-            LEFT JOIN users u ON n.user_id = u.id
+            SELECT n.* 
+            FROM global_notifications n
             ORDER BY n.created_at DESC
             LIMIT 100
         ");

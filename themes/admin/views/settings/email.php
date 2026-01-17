@@ -1,26 +1,27 @@
 <?php
 
 /**
- * Email Settings Page - Beautiful Modern Design
- * Features: Card-based layout, organized sections, responsive grid
+ * Email Settings Page - Premium Design
  */
 ?>
+<?php include_once __DIR__ . '/../../layouts/header.php'; ?>
 
 <style>
     .email-settings-container {
         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         min-height: 100vh;
         padding: 2rem;
+        font-family: 'Inter', sans-serif;
     }
 
     .settings-header {
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
         animation: slideDown 0.6s ease-out;
     }
 
     .settings-header h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
+        font-size: 2.2rem;
+        font-weight: 800;
         color: #1a202c;
         margin-bottom: 0.5rem;
         letter-spacing: -0.5px;
@@ -29,26 +30,22 @@
     .settings-header p {
         font-size: 1rem;
         color: #718096;
-        margin-bottom: 0;
     }
 
-    .settings-form {
-        max-width: 1000px;
-        margin: 0 auto;
-    }
-
+    /* Cards */
     .settings-section {
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         margin-bottom: 2rem;
         overflow: hidden;
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
         animation: fadeInUp 0.6s ease-out;
     }
 
     .settings-section:hover {
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     }
 
     .section-header {
@@ -60,151 +57,115 @@
         gap: 1rem;
     }
 
-    .section-header.from-section {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    .section-header.driver-header {
+        background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
+        color: #555;
+    }
+
+    .section-header.driver-header h2,
+    .section-header.driver-header .section-icon {
+        color: #2d3748;
     }
 
     .section-icon {
-        font-size: 1.8rem;
-        line-height: 1;
+        font-size: 1.5rem;
     }
 
     .section-title-group h2 {
-        font-size: 1.4rem;
+        font-size: 1.25rem;
         font-weight: 700;
-        margin-bottom: 0.25rem;
-        color: white;
+        margin: 0;
     }
 
     .section-title-group p {
-        font-size: 0.9rem;
-        opacity: 0.95;
-        margin-bottom: 0;
+        font-size: 0.85rem;
+        opacity: 0.9;
+        margin: 0;
     }
 
     .section-body {
         padding: 2rem;
     }
 
-    .form-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
+    /* Forms */
+    .form-group {
         margin-bottom: 1.5rem;
     }
 
-    .form-row.full {
-        grid-template-columns: 1fr;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-
     .form-label {
-        font-size: 0.95rem;
         font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 0.6rem;
-        letter-spacing: 0.3px;
-    }
-
-    .form-control,
-    .form-select {
-        padding: 0.85rem 1rem;
-        border: 2px solid #e2e8f0;
-        border-radius: 8px;
+        color: #4a5568;
+        margin-bottom: 0.5rem;
+        display: block;
         font-size: 0.95rem;
-        transition: all 0.3s ease;
-        font-family: inherit;
-        background-color: #f8f9fa;
     }
 
-    .form-control:focus,
-    .form-select:focus {
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        transition: all 0.2s;
+        font-size: 1rem;
+        background: #f8fafc;
+    }
+
+    .form-control:focus {
         border-color: #667eea;
-        background-color: white;
+        background: white;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         outline: none;
     }
 
-    .form-check {
+    .driver-select {
+        font-size: 1.1rem;
         padding: 1rem;
-        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-        border-radius: 8px;
-        margin-bottom: 1.5rem;
-        border-left: 4px solid #f5576c;
+        border-color: #cbd5e0;
     }
 
-    .form-check-input {
-        width: 1.3rem;
-        height: 1.3rem;
-        margin-top: 0.3rem;
-        cursor: pointer;
-        accent-color: #667eea;
-    }
-
-    .form-check-label {
-        font-weight: 600;
-        color: #2d3748;
-        margin-left: 0.5rem;
-        cursor: pointer;
-        margin-bottom: 0.25rem;
-    }
-
-    .form-text {
-        font-size: 0.85rem;
-        color: #718096;
-        margin-top: 0.4rem;
-    }
-
-    .button-group {
-        display: flex;
-        gap: 1rem;
-        padding-top: 1rem;
-        border-top: 2px solid #e2e8f0;
-        margin-top: 2rem;
-    }
-
-    .btn {
-        padding: 0.85rem 1.8rem;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.95rem;
-        cursor: pointer;
-        border: none;
-        transition: all 0.3s ease;
-        letter-spacing: 0.3px;
-    }
-
-    .btn-primary {
+    /* Buttons */
+    .btn-save {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        padding: 1rem 2rem;
+        border-radius: 10px;
+        border: none;
+        font-weight: 700;
+        font-size: 1.1rem;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     }
 
-    .btn-primary:hover {
+    .btn-save:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
     }
 
-    .btn-secondary {
+    .btn-test {
         background: white;
-        color: #667eea;
-        border: 2px solid #667eea;
+        color: #10b981;
+        border: 2px solid #10b981;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-weight: 600;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.2s;
     }
 
-    .btn-secondary:hover {
-        background: #f7fafc;
-        transform: translateY(-2px);
+    .btn-test:hover {
+        background: #ecfdf5;
     }
 
+    /* Animations */
     @keyframes slideDown {
         from {
             opacity: 0;
             transform: translateY(-20px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -216,240 +177,330 @@
             opacity: 0;
             transform: translateY(20px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
         }
     }
 
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .email-settings-container {
-            padding: 1rem;
-        }
+    /* Columns */
+    .row-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
 
-        .settings-header h1 {
-            font-size: 1.8rem;
-        }
-
-        .section-header {
-            padding: 1.2rem 1.5rem;
-        }
-
-        .section-body {
-            padding: 1.5rem;
-        }
-
-        .form-row {
+    @media (max-width: 900px) {
+        .row-grid {
             grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-
-        .button-group {
-            flex-direction: column;
-        }
-
-        .btn {
-            width: 100%;
         }
     }
 </style>
 
-<div class="admin-content">
-    <div class="email-settings-container">
-        <div class="settings-header">
-            <h1>📧 Email Configuration</h1>
-            <p>Manage your email delivery system and SMTP settings</p>
-        </div>
-
-        <form action="<?php echo app_base_url('/admin/settings/update'); ?>" method="POST" class="settings-form ajax-form" id="emailSettingsForm">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
-            <input type="hidden" name="setting_group" value="email">
-
-        <!-- SMTP Configuration Section -->
-        <div class="settings-section">
-            <div class="section-header">
-                <span class="section-icon">🔗</span>
-                <div class="section-title-group">
-                    <h2>SMTP Configuration</h2>
-                    <p>Configure your mail server connection</p>
-                </div>
-            </div>
-
-            <div class="section-body">
-                <!-- Enable SMTP Toggle -->
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="smtp_enabled" name="smtp_enabled" value="1" <?= ($settings['smtp_enabled'] ?? '0') == '1' ? 'checked' : '' ?>>
-                    <label class="form-check-label" for="smtp_enabled">Enable SMTP</label>
-                    <div class="form-text">Use SMTP for sending emails instead of PHP mail().</div>
-                </div>
-
-                <!-- SMTP Host and Port -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="smtp_host" class="form-label">SMTP Host</label>
-                        <input type="text" class="form-control" id="smtp_host" name="smtp_host" placeholder="mail.example.com" value="<?= htmlspecialchars($settings['smtp_host'] ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label for="smtp_port" class="form-label">SMTP Port</label>
-                        <input type="number" class="form-control" id="smtp_port" name="smtp_port" placeholder="587" value="<?= htmlspecialchars($settings['smtp_port'] ?? '587') ?>">
-                    </div>
-                </div>
-
-                <!-- Authentication -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="smtp_username" class="form-label">SMTP Username</label>
-                        <input type="text" class="form-control" id="smtp_username" name="smtp_username" placeholder="your-email@example.com" value="<?= htmlspecialchars($settings['smtp_username'] ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label for="smtp_password" class="form-label">SMTP Password</label>
-                        <input type="password" class="form-control" id="smtp_password" name="smtp_password" placeholder="••••••••••" value="<?= htmlspecialchars($settings['smtp_password'] ?? '') ?>">
-                    </div>
-                </div>
-
-                <!-- Encryption -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="smtp_encryption" class="form-label">Encryption Type</label>
-                        <select class="form-select" id="smtp_encryption" name="smtp_encryption">
-                            <option value="tls" <?= ($settings['smtp_encryption'] ?? '') == 'tls' ? 'selected' : '' ?>>TLS (Recommended / 587)</option>
-                            <option value="ssl" <?= ($settings['smtp_encryption'] ?? '') == 'ssl' ? 'selected' : '' ?>>SSL (465)</option>
-                            <option value="none" <?= ($settings['smtp_encryption'] ?? '') == 'none' ? 'selected' : '' ?>>None (25)</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- From Address Section -->
-        <div class="settings-section">
-            <div class="section-header from-section">
-                <span class="section-icon">✉️</span>
-                <div class="section-title-group">
-                    <h2>From Address</h2>
-                    <p>Configure the sender email information</p>
-                </div>
-            </div>
-
-            <div class="section-body">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="from_email" class="form-label">From Email Address</label>
-                        <input type="email" class="form-control" id="from_email" name="from_email" placeholder="noreply@example.com" value="<?= htmlspecialchars($settings['from_email'] ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label for="from_name" class="form-label">From Name</label>
-                        <input type="text" class="form-control" id="from_name" name="from_name" placeholder="Your Company Name" value="<?= htmlspecialchars($settings['from_name'] ?? '') ?>">
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="button-group">
-                    <button type="submit" class="btn btn-primary">💾 Save</button>
-                    <button type="button" class="btn btn-secondary" id="sendTestEmail">🧪 Send Test Email</button>
-                </div>
-                
-                <!-- Test Email Input -->
-                <div class="form-group" style="margin-top: 1rem;">
-                    <label for="test_email" class="form-label">Test Email Address</label>
-                    <input type="email" class="form-control" id="test_email" name="test_email" placeholder="admin@example.com" value="<?= htmlspecialchars($settings['test_email'] ?? $_SESSION['user']['email'] ?? '') ?>">
-                    <div class="form-text">Enter the email address where you want to receive the test email.</div>
-                </div>
-            </div>
-            </div>
-        </form>
+<div class="email-settings-container">
+    <div class="settings-header">
+        <h1>📧 Email System</h1>
+        <p>Configure your delivery drivers and verify connections.</p>
     </div>
+
+    <form action="/admin/settings/save" method="POST" id="emailSettingsForm">
+        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+        <input type="hidden" name="setting_group" value="email">
+
+        <div class="row-grid">
+            <!-- Main Configuration -->
+            <div class="main-column">
+
+                <!-- Driver Selection Card -->
+                <div class="settings-section">
+                    <div class="section-header driver-header">
+                        <span class="section-icon">🚀</span>
+                        <div class="section-title-group">
+                            <h2>Sending Driver</h2>
+                            <p>Choose your email delivery service provider</p>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label class="form-label">Active Driver</label>
+                            <select class="form-control driver-select" name="driver" id="driverSelect" onchange="toggleDrivers()">
+                                <option value="smtp" <?php echo ($settings['driver'] ?? 'smtp') === 'smtp' ? 'selected' : ''; ?>>SMTP (Standard)</option>
+                                <option value="active_campaign" <?php echo ($settings['driver'] ?? '') === 'active_campaign' ? 'selected' : ''; ?>>ActiveCampaign (Postmark)</option>
+                                <option value="sendgrid" <?php echo ($settings['driver'] ?? '') === 'sendgrid' ? 'selected' : ''; ?>>SendGrid</option>
+                                <option value="mailgun" <?php echo ($settings['driver'] ?? '') === 'mailgun' ? 'selected' : ''; ?>>Mailgun</option>
+                                <option value="brevo" <?php echo ($settings['driver'] ?? '') === 'brevo' ? 'selected' : ''; ?>>Brevo (Sendinblue)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SMTP Settings -->
+                <div id="smtp_settings" class="driver-settings settings-section">
+                    <div class="section-header">
+                        <span class="section-icon">🔌</span>
+                        <div class="section-title-group">
+                            <h2>SMTP Configuration</h2>
+                            <p>Connection details for your mail server</p>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group row">
+                            <div class="col-md-8">
+                                <label class="form-label">SMTP Host</label>
+                                <input type="text" class="form-control" name="smtp_host" value="<?php echo $settings['smtp_host'] ?? ''; ?>" placeholder="smtp.example.com">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Port</label>
+                                <input type="text" class="form-control" name="smtp_port" value="<?php echo $settings['smtp_port'] ?? '587'; ?>" placeholder="587">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" name="smtp_username" value="<?php echo $settings['smtp_username'] ?? ''; ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Password</label>
+                                <input type="password" class="form-control" name="smtp_password" value="<?php echo $settings['smtp_password'] ?? ''; ?>">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Encryption</label>
+                            <select class="form-control" name="smtp_encryption">
+                                <option value="tls" <?php echo ($settings['smtp_encryption'] ?? 'tls') === 'tls' ? 'selected' : ''; ?>>TLS</option>
+                                <option value="ssl" <?php echo ($settings['smtp_encryption'] ?? '') === 'ssl' ? 'selected' : ''; ?>>SSL</option>
+                                <option value="" <?php echo ($settings['smtp_encryption'] ?? '') === '' ? 'selected' : ''; ?>>None</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ActiveCampaign -->
+                <div id="active_campaign_settings" class="driver-settings settings-section" style="display:none;">
+                    <div class="section-header">
+                        <span class="section-icon">📢</span>
+                        <div class="section-title-group">
+                            <h2>ActiveCampaign</h2>
+                            <p>Marketing automation integration</p>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label class="form-label">API URL</label>
+                            <input type="text" class="form-control" name="active_campaign_url" value="<?php echo $settings['active_campaign_url'] ?? ''; ?>">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">API Key</label>
+                            <input type="password" class="form-control" name="active_campaign_key" value="<?php echo $settings['active_campaign_key'] ?? ''; ?>">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SendGrid -->
+                <div id="sendgrid_settings" class="driver-settings settings-section" style="display:none;">
+                    <div class="section-header">
+                        <span class="section-icon">📧</span>
+                        <div class="section-title-group">
+                            <h2>SendGrid API</h2>
+                            <p>High-volume delivery service</p>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label class="form-label">API Key</label>
+                            <input type="password" class="form-control" name="sendgrid_key" value="<?php echo $settings['sendgrid_key'] ?? ''; ?>">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mailgun -->
+                <div id="mailgun_settings" class="driver-settings settings-section" style="display:none;">
+                    <div class="section-header">
+                        <span class="section-icon">📫</span>
+                        <div class="section-title-group">
+                            <h2>Mailgun API</h2>
+                            <p>Developer-focused email API</p>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label class="form-label">Domain</label>
+                            <input type="text" class="form-control" name="mailgun_domain" value="<?php echo $settings['mailgun_domain'] ?? ''; ?>">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">API Key</label>
+                            <input type="password" class="form-control" name="mailgun_key" value="<?php echo $settings['mailgun_key'] ?? ''; ?>">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Endpoint</label>
+                            <select class="form-control" name="mailgun_endpoint">
+                                <option value="api.mailgun.net" <?php echo ($settings['mailgun_endpoint'] ?? 'api.mailgun.net') === 'api.mailgun.net' ? 'selected' : ''; ?>>US (api.mailgun.net)</option>
+                                <option value="api.eu.mailgun.net" <?php echo ($settings['mailgun_endpoint'] ?? '') === 'api.eu.mailgun.net' ? 'selected' : ''; ?>>EU (api.eu.mailgun.net)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Brevo -->
+                <div id="brevo_settings" class="driver-settings settings-section" style="display:none;">
+                    <div class="section-header">
+                        <span class="section-icon">📨</span>
+                        <div class="section-title-group">
+                            <h2>Brevo (SendinBlue)</h2>
+                            <p>Marketing & Transactional API</p>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label class="form-label">API Key</label>
+                            <input type="password" class="form-control" name="brevo_key" value="<?php echo $settings['brevo_key'] ?? ''; ?>">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sender Identity -->
+                <div class="settings-section">
+                    <div class="section-header">
+                        <span class="section-icon">👤</span>
+                        <div class="section-title-group">
+                            <h2>Sender Identity</h2>
+                            <p>How you appear in inboxes</p>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <label class="form-label">From Name</label>
+                                <input type="text" class="form-control" name="from_name" value="<?php echo $settings['from_name'] ?? 'Bishwo Calculator'; ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">From Email</label>
+                                <input type="email" class="form-control" name="from_email" value="<?php echo $settings['from_email'] ?? 'noreply@example.com'; ?>">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-save">💾 Save Configuration</button>
+            </div>
+
+            <!-- Sidebar / Testing -->
+            <div class="side-column">
+                <div class="settings-section">
+                    <div class="section-body" style="background: #f0fff4; border-left: 4px solid #10b981;">
+                        <h3 style="margin-top:0; color:#047857; font-size:1.1rem; font-weight:700;">✅ Connection Test</h3>
+                        <p style="font-size:0.9rem; color:#065f46; margin-bottom:1rem;">Verify your settings instantly.</p>
+
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="testEmail" placeholder="your@email.com" style="background:white;">
+                        </div>
+                        <button type="button" class="btn-test" onclick="sendTestEmail()">Send Test Email</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="section-body">
+                        <h4 style="font-size:1rem; font-weight:700; margin-bottom:1rem;">ℹ️ Quick Tips</h4>
+                        <ul style="padding-left:1.2rem; margin:0; font-size:0.9rem; color:#4a5568; line-height:1.6;">
+                            <li><strong>SMTP</strong> is best for low volumes or personal servers.</li>
+                            <li><strong>API Drivers</strong> (SendGrid, Mailgun) are recommended for high deliverability.</li>
+                            <li>Always <strong>Save</strong> before testing a new driver.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 
 <script>
-    document.getElementById('sendTestEmail').addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        // First, save the settings before sending test email
-        const formData = new FormData(document.getElementById('emailSettingsForm'));
-        
-        // Save settings first
-        fetch('<?php echo app_base_url("/admin/settings/update"); ?>', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Settings saved:', data.message);
-                // Now send test email
-                sendTestEmail();
-            } else {
-                showNotification('Failed to save settings: ' + data.message, 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error saving settings:', error);
-            showNotification('Error saving settings. Attempting to send test email anyway...', 'warning');
-            sendTestEmail();
-        });
-    });
+    function toggleDrivers() {
+        const driver = document.getElementById('driverSelect').value;
+        document.querySelectorAll('.driver-settings').forEach(el => el.style.display = 'none');
 
-    function sendTestEmail() {
-        const testEmail = document.getElementById('test_email').value;
-        if (!testEmail) {
-            showNotification('Please enter a test email address', 'warning');
-            return;
+        const target = document.getElementById(driver + '_settings');
+        if (target) {
+            target.style.display = 'block';
+            target.style.animation = 'fadeInUp 0.5s ease';
         }
-        
-        showConfirmModal('Send Test Email', 'Send a test email to ' + testEmail + ' to verify SMTP settings?', () => {
-            const button = document.getElementById('sendTestEmail');
-            button.disabled = true;
-            button.textContent = '⏳ Sending...';
-
-            fetch('<?php echo app_base_url("/admin/email/send-test"); ?>', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': document.querySelector('input[name="csrf_token"]').value
-                },
-                body: JSON.stringify({test_email: testEmail})
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('HTTP ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                button.disabled = false;
-                button.textContent = '🧪 Send Test Email';
-                
-                if (data.success) {
-                    console.log('✅ Success:', data.message);
-                    const message = data.message || 'Test email sent successfully!';
-                    showNotification(message, 'success');
-                } else {
-                    console.log('❌ Error:', data.message);
-                    const message = data.message || 'Failed to send test email';
-                    showNotification(message, 'error');
-                }
-            })
-            .catch(error => {
-                button.disabled = false;
-                button.textContent = '🧪 Send Test Email';
-                console.error('Error:', error);
-                showNotification('Error: ' + error.message, 'error');
-            });
-        });
     }
 
-    // Handle form submission with visual feedback
-    document.getElementById('emailSettingsForm').addEventListener('submit', function(e) {
-        const submitButton = this.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.textContent = '⏳ Saving...';
-        
-        // Re-enable after 3 seconds
-        setTimeout(() => {
-            submitButton.disabled = false;
-            submitButton.textContent = '💾 Save';
-        }, 3000);
+    // Initialize on load
+    toggleDrivers();
+
+    async function sendTestEmail() {
+        const email = document.getElementById('testEmail').value;
+        if (!email) {
+            alert('Please enter a test email address.');
+            return;
+        }
+
+        const btn = event.target;
+        const origText = btn.innerHTML;
+        btn.innerHTML = '⏳ Sending...';
+        btn.disabled = true;
+
+        try {
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+
+            const res = await fetch('/admin/api/settings/test-email', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                alert('Success! ' + data.message);
+            } else {
+                alert('Failed: ' + data.message);
+            }
+        } catch (e) {
+            alert('Error connecting to server.');
+            console.error(e);
+        } finally {
+            btn.innerHTML = origText;
+            btn.disabled = false;
+        }
+    }
+
+    // AJAX Save
+    document.getElementById('emailSettingsForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('.btn-save');
+        const origText = btn.innerHTML;
+        btn.innerHTML = '⏳ Saving...';
+        btn.disabled = true;
+
+        try {
+            const formData = new FormData(e.target);
+            const res = await fetch('/admin/settings/save', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                btn.innerHTML = '✅ Saved Successfully!';
+                btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                setTimeout(() => {
+                    btn.innerHTML = origText;
+                    btn.style.background = '';
+                    btn.disabled = false;
+                }, 2000);
+            } else {
+                alert('Save failed: ' + data.message);
+                btn.innerHTML = origText;
+                btn.disabled = false;
+            }
+        } catch (e) {
+            alert('Save error.');
+            btn.innerHTML = origText;
+            btn.disabled = false;
+        }
     });
 </script>
+
+<?php include_once __DIR__ . '/../../layouts/footer.php'; ?>

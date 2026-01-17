@@ -103,12 +103,11 @@ class View
         // Otherwise, wrap in layout
         // For admin views, use themes/admin/layouts/main.php
         if (strpos($view, "admin/") === 0) {
-            // Use logical path resolution relative to this file
-            $rootPath = dirname(__DIR__, 2);
-            $layoutPath = $rootPath . "/themes/admin/layouts/main.php";
+            // Use BASE_PATH for consistent resolution
+            $layoutPath = BASE_PATH . "/themes/admin/layouts/main.php";
 
             if (!file_exists($layoutPath)) {
-                $layoutPath = $rootPath . "/app/Views/layouts/admin.php";
+                $layoutPath = BASE_PATH . "/app/Views/layouts/admin.php";
             }
         } else {
             $layoutPath = $this->themesPath() . "layouts/main.php";

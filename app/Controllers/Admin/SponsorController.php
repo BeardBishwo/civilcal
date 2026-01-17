@@ -20,7 +20,7 @@ class SponsorController extends Controller
         // Ensure Admin
         $user = Auth::user();
         if (!$user || $user->role !== 'admin') {
-            header('Location: /login');
+            header('Location: ' . app_base_url('login'));
             exit;
         }
         $this->sponsorModel = new Sponsor();
@@ -31,6 +31,21 @@ class SponsorController extends Controller
     {
         $sponsors = $this->sponsorModel->getAll();
         $this->view('admin/sponsors/index', ['sponsors' => $sponsors]);
+    }
+
+    public function create()
+    {
+        $this->view('admin/sponsors/create');
+    }
+
+    public function campaign($id)
+    {
+        $sponsor = $this->sponsorModel->find($id);
+        if (!$sponsor) {
+            header('Location: /admin/sponsors');
+            exit;
+        }
+        $this->view('admin/sponsors/campaign', ['sponsor' => $sponsor]);
     }
 
     public function store()

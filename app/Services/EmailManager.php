@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 /**
@@ -35,7 +36,7 @@ class EmailManager
         // Note: Existing code used direct query to 'site_settings', but SettingsService uses 'settings' table.
         // We will stick to the existing class logic which queries 'site_settings' directly for 'email_%' keys
         // as per the existing codebase style, but we will make it robust.
-        
+
         $dbSettings = [];
         try {
             $db = Database::getInstance();
@@ -54,34 +55,55 @@ class EmailManager
         // 2. Define defaults using .env as fallback (Soft Coding)
         $this->settings = [
             'use_phpmailer' => $dbSettings['use_phpmailer'] ?? filter_var(getenv('USE_PHPMAILER') ?: true, FILTER_VALIDATE_BOOLEAN),
-            
+
             // Prioritize Database -> Then ENV -> Then empty
             'smtp_host' => $dbSettings['smtp_host'] ?? getenv('SMTP_HOST') ?: '',
             'smtp_port' => $dbSettings['smtp_port'] ?? getenv('SMTP_PORT') ?: 587,
             'smtp_username' => $dbSettings['smtp_username'] ?? getenv('SMTP_USER') ?: '',
             'smtp_password' => $dbSettings['smtp_password'] ?? getenv('SMTP_PASS') ?: '',
             'smtp_encryption' => $dbSettings['smtp_encryption'] ?? getenv('SMTP_ENCRYPTION') ?: 'tls',
-            
+
             'from_email' => $dbSettings['from_email'] ?? getenv('MAIL_FROM_ADDRESS') ?: 'noreply@example.com',
             'from_name' => $dbSettings['from_name'] ?? getenv('MAIL_FROM_NAME') ?? \App\Services\SettingsService::get('site_name', 'Bishwo Calculator'),
-            'reply_to' => $dbSettings['reply_to'] ?? getenv('MAIL_REPLY_TO') ?: 'support@example.com'
+            'reply_to' => $dbSettings['reply_to'] ?? getenv('MAIL_REPLY_TO') ?: 'support@example.com',
+
+            // Driver Settings
+            'driver' => $dbSettings['driver'] ?? 'smtp', // smtp, active_campaign, sendgrid, mailgun, brevo
+
+            // API Keys & URLs
+            'active_campaign_url' => $dbSettings['active_campaign_url'] ?? '',
+            'active_campaign_key' => $dbSettings['active_campaign_key'] ?? '',
+
+            'sendgrid_key' => $dbSettings['sendgrid_key'] ?? '',
+
+            'mailgun_domain' => $dbSettings['mailgun_domain'] ?? '',
+            'mailgun_key' => $dbSettings['mailgun_key'] ?? '',
+            'mailgun_endpoint' => $dbSettings['mailgun_endpoint'] ?? 'api.mailgun.net',
+
+            'brevo_key' => $dbSettings['brevo_key'] ?? '',
         ];
 
-        // Check if PHPMailer should be used
-        $this->usePHPMailer = ($this->settings['use_phpmailer'] ?? true) && !empty($this->settings['smtp_host']);
+        // Check availability
+        $this->usePHPMailer = ($this->settings['driver'] === 'smtp') && !empty($this->settings['smtp_host']);
+    }
+
+    public function getDriver()
+    {
+        return $this->settings['driver'] ?? 'smtp';
     }
 
     /**
-     * Initialize PHPMailer or prepare for PHP mail()
+     * Initialize PHPMailer or prepare for other drivers
      */
     private function initializeMailer()
     {
-        if (!$this->usePHPMailer) {
+        if ($this->settings['driver'] !== 'smtp') {
             return;
         }
 
         try {
             $this->mailer = new PHPMailer(true);
+            // ... (rest of PHPMailer init)
 
             // Server settings
             $this->mailer->isSMTP();
@@ -193,7 +215,11 @@ class EmailManager
     public function sendEmail($to, $subject, $body, $isHtml = true)
     {
         try {
-            if ($this->usePHPMailer && $this->mailer) {
+            $driver = $this->settings['driver'] ?? 'smtp';
+
+            if ($driver === 'active_campaign') {
+                return $this->sendViaActiveCampaign($to, $subject, $body, $isHtml);
+            } elseif ($driver === 'smtp' && $this->mailer) {
                 return $this->sendViaPHPMailer($to, $subject, $body, $isHtml);
             } else {
                 return $this->sendViaPHPMail($to, $subject, $body, $isHtml);
@@ -202,6 +228,54 @@ class EmailManager
             error_log('Email sending failed: ' . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * Send via ActiveCampaign (Postmark/Transactional API style or generic HTTP)
+     * Note: ActiveCampaign Transactional is actually "Postmark" now, but legacy campaigns API exists.
+     * We will implement a generic "External API" template here for the user to configure.
+     */
+    private function sendViaActiveCampaign($to, $subject, $body, $isHtml = true)
+    {
+        $url = $this->settings['active_campaign_url'];
+        $key = $this->settings['active_campaign_key'];
+
+        if (empty($url) || empty($key)) {
+            error_log("ActiveCampaign credentials missing");
+            return false;
+        }
+
+        // ActiveCampaign API v3 (Transactional) usage
+        // This is a mock implementation of the request structure.
+        $data = [
+            "message" => [
+                "to" => $to,
+                "from" => $this->settings['from_email'],
+                "subject" => $subject,
+                "html" => $isHtml ? $body : null,
+                "text" => !$isHtml ? $body : strip_tags($body)
+            ]
+        ];
+
+        $ch = curl_init($url . '/api/3/smtp/email'); // Example Endpoint
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Api-Token: ' . $key
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode >= 200 && $httpCode < 300) {
+            return true;
+        }
+
+        error_log("ActiveCampaign Error: " . $response);
+        return false;
     }
 
     /**
@@ -283,7 +357,7 @@ class EmailManager
         }
 
         $templatePath = __DIR__ . '/../../themes/default/emails/' . $fileName;
-        
+
         if (!file_exists($templatePath)) {
             error_log("Email template not found: " . $templatePath);
             return '';

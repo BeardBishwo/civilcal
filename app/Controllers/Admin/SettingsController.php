@@ -702,7 +702,7 @@ class SettingsController extends Controller
     {
         $groups = [
             'general' => ['site_name', 'site_description', 'site_logo', 'favicon', 'contact_email', 'contact_address', 'contact_phone', 'default_language', 'default_timezone', 'facebook_url', 'twitter_url', 'instagram_url', 'linkedin_url', 'enable_registration', 'require_email_verification', 'maintenance_mode', 'enable_dark_mode', 'play_store_url', 'app_store_url', 'social_links', 'report_reward_coins', 'report_reward_subsequent', 'report_notification_title', 'report_notification_first', 'report_notification_subsequent'],
-            'email' => ['smtp_enabled', 'smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_encryption', 'from_email', 'from_name'],
+            'email' => ['driver', 'smtp_enabled', 'smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_encryption', 'from_email', 'from_name', 'active_campaign_url', 'active_campaign_key', 'sendgrid_key', 'mailgun_domain', 'mailgun_key', 'mailgun_endpoint', 'brevo_key'],
             'security' => ['enable_2fa', 'force_https', 'password_min_length', 'password_complexity', 'session_timeout', 'max_login_attempts', 'ip_whitelist_enabled', 'ip_whitelist', 'admin_ip_notification', 'log_failed_logins', 'log_admin_activity', 'log_retention_days', 'csrf_protection', 'security_headers', 'rate_limiting'],
             'advanced' => ['custom_header_code', 'custom_footer_code', 'cache_enabled', 'compression_enabled', 'enable_minification', 'enable_lazy_loading', 'debug_mode', 'error_logging', 'query_debug', 'performance_monitoring', 'api_enabled', 'require_api_key'],
             'performance' => ['cache_enabled', 'compression_enabled', 'enable_minification', 'enable_lazy_loading'],
@@ -725,6 +725,41 @@ class SettingsController extends Controller
     private function isCheckboxField($key)
     {
         return in_array($key, $this->getCheckboxFields());
+    }
+
+    public function testEmail()
+    {
+        $this->requireAdminWithBasicAuth();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid Request']);
+            exit;
+        }
+
+        $email = $_POST['email'] ?? '';
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid Email Address']);
+            exit;
+        }
+
+        try {
+            // Force re-initialization of EmailManager to pick up any unsaved changes if we were doing that,
+            // but for now we assume settings are saved.
+            $emailManager = new \App\Services\EmailManager();
+
+            // We need to add a public test method to EmailManager or just use sendEmail
+            // Since sendEmail is public, we can use it.
+            $sent = $emailManager->sendEmail($email, "Test Email from Bishwo Calculator", "<h1>Success!</h1><p>Your email settings are configured correctly.</p><p>Driver: " . ($emailManager->getDriver() ?? 'Unknown') . "</p>");
+
+            if ($sent) {
+                echo json_encode(['success' => true, 'message' => 'Email sent successfully!']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to send email. Check logs.']);
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+        exit;
     }
 
     /**

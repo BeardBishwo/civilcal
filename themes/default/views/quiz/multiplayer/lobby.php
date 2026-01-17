@@ -176,11 +176,30 @@
         </div>
     </div>
 
-    <!-- Event Feed Overlay -->
-    <div class="event-feed-container" id="event-feed"></div>
+    <!-- RESULTS SCREEN -->
+    <div id="results-screen" style="display:none;" class="glass-panel text-center">
+        <div class="panel-body">
+            <h1 class="text-gradient mb-4">MISSION ACCOMPLISHED</h1>
+            <div class="winner-display mb-5">
+                <div class="ranking-podium">
+                    <!-- Winner Injected Here -->
+                </div>
+            </div>
+            <div class="final-leaderboard mb-4">
+                <!-- Full List -->
+            </div>
+            <button onclick="window.location.href='/quiz/multiplayer'" class="btn-premium">
+                <i class="fas fa-home"></i> Return to Base
+            </button>
+        </div>
+    </div>
+</div>
 
-    <!-- Background Elements Removed -->
-    <div class="grid-overlay"></div>
+<!-- Event Feed Overlay -->
+<div class="event-feed-container" id="event-feed"></div>
+
+<!-- Background Elements Removed -->
+<div class="grid-overlay"></div>
 </div>
 
 <style>
@@ -729,9 +748,16 @@
     function handleStateChange(status) {
         if (status === 'active') {
             document.getElementById('waiting-room').style.display = 'none';
+            document.getElementById('results-screen').style.display = 'none';
             document.getElementById('game-arena').style.display = 'block';
-            // Trigger Game Load
             console.log("🚀 Mission Launching...");
+        } else if (status === 'finished') {
+            document.getElementById('waiting-room').style.display = 'none';
+            document.getElementById('game-arena').style.display = 'none';
+            document.getElementById('results-screen').style.display = 'block';
+            // Render Final Standings from existing participants logic or fetch?
+            // Since we reload, Firebase snapshot might have final scores.
+            // But usually we want to celebrate.
         }
     }
 

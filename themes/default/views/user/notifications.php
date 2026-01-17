@@ -78,54 +78,89 @@ $page_title = 'Notifications';
                     $actionUrl = $notification['action_url'] ?? '#';
                     ?>
 
-                    <div class="notification-row group relative p-6 transition-all duration-300 hover:bg-white/5 <?php echo $isUnread ? 'bg-white/[0.02]' : ''; ?>"
+                    <div class="notification-row group relative transition-all duration-300 hover:bg-white/5 <?php echo $isUnread ? 'bg-white/[0.02]' : ''; ?> rounded-2xl overflow-hidden"
                         data-id="<?php echo $notification['id']; ?>">
 
-                        <!-- Unread Indicator (Left Border) -->
-                        <div class="absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300 <?php echo $isUnread ? $borderClass : 'border-transparent'; ?>"></div>
-
-                        <div class="flex gap-5 items-start">
-                            <!-- Icon -->
-                            <div class="flex-shrink-0">
-                                <div class="w-12 h-12 rounded-xl flex items-center justify-center <?php echo $iconBg; ?> <?php echo $iconColor; ?> shadow-lg ring-1 ring-white/10 group-hover:scale-110 transition-transform duration-300">
-                                    <i class="fas <?php echo $icon; ?>"></i>
+                        <!-- Billboard Mode (If Image Exists) -->
+                        <?php if (!empty($notification['image_url'])): ?>
+                            <div class="relative w-full h-48 md:h-64 overflow-hidden group">
+                                <img src="<?php echo htmlspecialchars($notification['image_url']); ?>" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+                                <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent"></div>
+                                <div class="absolute bottom-0 left-0 p-6 z-10 w-full">
+                                    <div class="flex justify-between items-end">
+                                        <div>
+                                            <span class="inline-block px-3 py-1 mb-2 text-xs font-bold tracking-wider text-white uppercase bg-purple-600 rounded-lg">
+                                                Sponsored
+                                            </span>
+                                            <h4 class="text-2xl font-bold text-white mb-2 shadow-sm"><?php echo htmlspecialchars($notification['title']); ?></h4>
+                                            <p class="text-gray-200 text-sm line-clamp-2 max-w-2xl"><?php echo htmlspecialchars($notification['message']); ?></p>
+                                        </div>
+                                        <?php if ($actionUrl && $actionUrl !== '#'): ?>
+                                            <a href="<?php echo $actionUrl; ?>" class="hidden md:inline-flex items-center gap-2 px-6 py-2 bg-white text-gray-900 font-bold rounded-xl hover:bg-gray-100 transition-colors">
+                                                Visit Link <i class="fas fa-external-link-alt"></i>
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             </div>
+                            <!-- Mark Read Button for Billboard -->
+                            <?php if ($isUnread): ?>
+                                <button onclick="markAsRead(<?php echo $notification['id']; ?>, this)" class="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-md transition-all">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            <?php endif; ?>
 
-                            <!-- Content -->
-                            <div class="flex-grow min-w-0 pt-1">
-                                <div class="flex justify-between items-start gap-4 mb-2">
-                                    <h4 class="text-lg font-semibold text-white truncate pr-4 <?php echo $isUnread ? '' : 'font-normal text-gray-200'; ?>">
-                                        <?php echo htmlspecialchars($notification['title']); ?>
-                                    </h4>
-                                    <span class="text-xs font-mono text-gray-500 whitespace-nowrap bg-white/5 px-2 py-1 rounded">
-                                        <?php echo date('M j, H:i', strtotime($notification['created_at'])); ?>
-                                    </span>
-                                </div>
+                            <!-- Standard Mode -->
+                        <?php else: ?>
+                            <div class="p-6">
+                                <!-- Unread Indicator (Left Border) -->
+                                <div class="absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300 <?php echo $isUnread ? $borderClass : 'border-transparent'; ?>"></div>
 
-                                <p class="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-2">
-                                    <?php echo htmlspecialchars($notification['message']); ?>
-                                </p>
+                                <div class="flex gap-5 items-start">
+                                    <!-- Icon -->
+                                    <div class="flex-shrink-0">
+                                        <div class="w-12 h-12 rounded-xl flex items-center justify-center <?php echo $iconBg; ?> <?php echo $iconColor; ?> shadow-lg ring-1 ring-white/10 group-hover:scale-110 transition-transform duration-300">
+                                            <i class="fas <?php echo $icon; ?>"></i>
+                                        </div>
+                                    </div>
 
-                                <!-- Actions -->
-                                <div class="flex items-center gap-3">
-                                    <?php if ($actionUrl && $actionUrl !== '#'): ?>
-                                        <a href="<?php echo $actionUrl; ?>" class="inline-flex items-center gap-2 px-4 py-1.5 text-xs font-medium text-white bg-white/10 hover:bg-white/20 rounded-lg transition-colors ring-1 ring-white/10">
-                                            <span>View Details</span>
-                                            <i class="fas fa-arrow-right text-[10px] opacity-70"></i>
-                                        </a>
-                                    <?php endif; ?>
+                                    <!-- Content -->
+                                    <div class="flex-grow min-w-0 pt-1">
+                                        <div class="flex justify-between items-start gap-4 mb-2">
+                                            <h4 class="text-lg font-semibold text-white truncate pr-4 <?php echo $isUnread ? '' : 'font-normal text-gray-200'; ?>">
+                                                <?php echo htmlspecialchars($notification['title']); ?>
+                                            </h4>
+                                            <span class="text-xs font-mono text-gray-500 whitespace-nowrap bg-white/5 px-2 py-1 rounded">
+                                                <?php echo date('M j, H:i', strtotime($notification['created_at'])); ?>
+                                            </span>
+                                        </div>
 
-                                    <?php if ($isUnread): ?>
-                                        <button onclick="markAsRead(<?php echo $notification['id']; ?>, this)"
-                                            class="mark-read-btn inline-flex items-center gap-2 px-4 py-1.5 text-xs font-medium text-violet-300 hover:text-violet-200 hover:bg-violet-500/10 rounded-lg transition-all ml-auto">
-                                            <i class="fas fa-check"></i>
-                                            Mark as read
-                                        </button>
-                                    <?php endif; ?>
+                                        <p class="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-2">
+                                            <?php echo htmlspecialchars($notification['message']); ?>
+                                        </p>
+
+                                        <!-- Actions -->
+                                        <div class="flex items-center gap-3">
+                                            <?php if ($actionUrl && $actionUrl !== '#'): ?>
+                                                <a href="<?php echo $actionUrl; ?>" class="inline-flex items-center gap-2 px-4 py-1.5 text-xs font-medium text-white bg-white/10 hover:bg-white/20 rounded-lg transition-colors ring-1 ring-white/10">
+                                                    <span>View Details</span>
+                                                    <i class="fas fa-arrow-right text-[10px] opacity-70"></i>
+                                                </a>
+                                            <?php endif; ?>
+
+                                            <?php if ($isUnread): ?>
+                                                <button onclick="markAsRead(<?php echo $notification['id']; ?>, this)"
+                                                    class="mark-read-btn inline-flex items-center gap-2 px-4 py-1.5 text-xs font-medium text-violet-300 hover:text-violet-200 hover:bg-violet-500/10 rounded-lg transition-all ml-auto">
+                                                    <i class="fas fa-check"></i>
+                                                    Mark as read
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        <?php endif; ?>
+
                     </div>
                 <?php endforeach; ?>
             </div>

@@ -24,7 +24,7 @@ class DashboardController extends Controller
 
         // Get dashboard statistics from Analytics model
         $counts = $this->analytics->getDashboardCounts();
-        
+
         $stats = [
             'total_users' => $this->getTotalUsers(),
             'active_users' => $counts['visitors_today'] ?? 0,
@@ -100,7 +100,7 @@ class DashboardController extends Controller
 
             return $activeModules;
         } catch (\Exception $e) {
-            return 0; 
+            return 0;
         }
     }
 
@@ -420,7 +420,7 @@ class DashboardController extends Controller
             'menuItems' => $this->getMenuItems()
         ];
 
-        $this->view->render('admin/widget-management', $data);
+        $this->view->render('admin/widgets/index', $data);
     }
 
     /**
@@ -626,7 +626,7 @@ class DashboardController extends Controller
         try {
             $type = $_GET['type'] ?? 'page_view';
             $days = (int)($_GET['days'] ?? 30);
-            
+
             // Get data from analytics model
             // Note: Since we don't have a background job filling the summary table yet,
             // we'll query the events table directly for immediate real-time data.
@@ -636,26 +636,26 @@ class DashboardController extends Controller
                     AND created_at >= DATE_SUB(CURDATE(), INTERVAL :days DAY)
                     GROUP BY DATE(created_at) 
                     ORDER BY date ASC";
-            
+
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':type', $type);
             $stmt->bindValue(':days', $days, \PDO::PARAM_INT);
             $stmt->execute();
             $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            
+
             // Fill in missing dates
             $data = [];
             $startDate = new \DateTime("-{$days} days");
             $endDate = new \DateTime();
             $interval = new \DateInterval('P1D');
             $period = new \DatePeriod($startDate, $interval, $endDate->modify('+1 day'));
-            
+
             // Convert results to map for easy lookup
             $counts = [];
             foreach ($results as $row) {
                 $counts[$row['date']] = (int)$row['count'];
             }
-            
+
             foreach ($period as $dt) {
                 $date = $dt->format('Y-m-d');
                 $data[] = [
@@ -663,7 +663,7 @@ class DashboardController extends Controller
                     'count' => $counts[$date] ?? 0
                 ];
             }
-            
+
             $this->jsonResponse($data);
         } catch (\Exception $e) {
             $this->jsonResponse(['error' => $e->getMessage()]);
@@ -678,7 +678,7 @@ class DashboardController extends Controller
         try {
             $type = $_GET['type'] ?? 'page_view';
             $limit = (int)($_GET['limit'] ?? 10);
-            
+
             $data = $this->analytics->getPopularContent($type, $limit);
             $this->jsonResponse($data);
         } catch (\Exception $e) {

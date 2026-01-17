@@ -108,7 +108,7 @@ class LobbyService
         ];
     }
 
-    private function distributeWagerRewards($lobbyId)
+    public function distributeWagerRewards($lobbyId)
     {
         $this->db->query("UPDATE quiz_lobbies SET payout_distributed = 1 WHERE id = :id", ['id' => $lobbyId]);
 
@@ -149,7 +149,7 @@ class LobbyService
         return $this->db->fetchAll($sql, ['lid' => $lobbyId]);
     }
 
-    private function checkGhostInjection($lobby, $currentCount)
+    public function checkGhostInjection($lobby, $currentCount)
     {
         if ($lobby['status'] !== 'waiting') return;
         $timeLeft = strtotime($lobby['start_time']) - time();
