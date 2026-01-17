@@ -1,8 +1,0 @@
-Subjects Count (No Active Check): 0
-SQL: 
-            SELECT qs.*, qc.name as category_name
-            FROM quiz_subjects qs
-            LEFT JOIN quiz_categories qc ON qs.category_id = qc.id
-            ORDER BY qs.name ASC
-        
-First Item: None
