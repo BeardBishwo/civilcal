@@ -130,6 +130,9 @@ class CalculatorController extends Controller
             $this->redirect('/login');
         }
         
+        // Check for payment success parameter
+        $paymentSuccess = isset($_GET['payment']) && $_GET['payment'] === 'success';
+        
         // 1. Rank Data
         $stats = $this->db->findOne('user_stats', ['user_id' => $userId]) ?: [];
         $wallet = $this->db->findOne('user_wallets', ['user_id' => $userId]) ?: [];
@@ -154,6 +157,7 @@ class CalculatorController extends Controller
             'user' => $user, // Ensure view gets user array
             'rank' => $rankData,
             'quest' => $questData,
+            'payment_success' => $paymentSuccess,
             'daily_quest' => [
                 'available' => (bool)$dailyQuiz,
                 'completed' => (bool)$dailyAttempt,

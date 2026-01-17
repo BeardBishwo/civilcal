@@ -160,7 +160,7 @@ class PayPalService
                  $stmt->execute([$planId, $expiry, $userId]);
 
                  // Log Payment
-                 $this->paymentModel->create([
+                 $paymentData = [
                      'user_id' => $userId,
                      'subscription_id' => $planId,
                      'amount' => $result->transactions[0]->amount->total,
@@ -170,7 +170,12 @@ class PayPalService
                      'starts_at' => date('Y-m-d H:i:s'),
                      'ends_at' => $expiry,
                      'paypal_order_id' => $paymentId
-                 ]);
+                 ];
+
+                 $this->paymentModel->create($paymentData);
+
+                 // Send payment confirmation email
+                 $this->sendPaymentConfirmationEmail($userId, $paymentData);
                  
                  return true;
             }
@@ -182,5 +187,51 @@ class PayPalService
         }
 
         return false;
+    }
+
+    /**
+     * Send payment confirmation email
+     */
+    private function sendPaymentConfirmationEmail($userId, $paymentData)
+    {
+        try {
+            // Get user details
+            $user = $this->userModel->find($userId);
+            if (!$user) return false;
+
+            // Get plan details
+            $plan = $this->subscriptionModel->find($paymentData['subscription_id']);
+            if (!$plan) return false;
+
+            // Send notification using template
+            $notificationService = new \App\Services\NotificationService();
+            $success = $notificationService->send(
+                $userId,
+                'payment_success',
+                'Payment Successful - Welcome to Premium!',
+                "Thank you for your payment of \${$paymentData['amount']} for {$plan['name']}. Your premium features are now active.",
+                [
+                    'user_email' => $user['email'],
+                    'action_url' => app_base_url('/dashboard'),
+                    'action_text' => 'Go to Dashboard',
+                    'template' => 'payment_confirmation',
+                    'template_data' => [
+                        'transaction_id' => $paymentData['paypal_order_id'],
+                        'plan_name' => $plan['name'],
+                        'amount' => $paymentData['amount'],
+                        'currency_symbol' => '$',
+                        'payment_method' => 'PayPal',
+                        'payment_date' => date('M j, Y g:i A'),
+                        'dashboard_url' => app_base_url('/dashboard'),
+                        'site_name' => \App\Services\SettingsService::get('site_name', 'Bishwo Calculator')
+                    ]
+                ]
+            );
+
+            return $success;
+        } catch (\Exception $e) {
+            error_log('Email sending error: ' . $e->getMessage());
+            return false;
+        }
     }
 }

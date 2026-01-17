@@ -60,9 +60,59 @@ class EmailService
     }
 
     /**
-     * Send a direct email
+     * Send email using template with data
      */
-    public function sendEmail($to, $subject, $body, $from = null, $replyTo = null)
+    public function sendTemplateEmail($emailData)
+    {
+        try {
+            // Validate required parameters
+            if (empty($emailData['to']) || empty($emailData['subject'])) {
+                throw new Exception("Missing required email parameters");
+            }
+
+            // Get template if specified
+            $template = null;
+            if (isset($emailData['template'])) {
+                $template = $this->emailTemplateModel->findByName($emailData['template']);
+                if (!$template) {
+                    // Fallback to notification template
+                    $template = $this->emailTemplateModel->findByName('notification');
+                }
+            }
+
+            $content = $emailData['content'] ?? '';
+            $subject = $emailData['subject'];
+
+            // Process template if available
+            if ($template && isset($emailData['data'])) {
+                $templateData = array_merge($emailData['data'], [
+                    'site_name' => \App\Services\SettingsService::get('site_name', 'Bishwo Calculator'),
+                    'base_url' => app_base_url()
+                ]);
+
+                $processed = $this->emailTemplateModel->processTemplate($template['id'], $templateData);
+                if ($processed) {
+                    $content = $processed['content'];
+                    $subject = $processed['subject'];
+                }
+            }
+
+            // Send the email
+            return $this->sendEmail(
+                $emailData['to'],
+                $subject,
+                $content,
+                null,
+                null
+            );
+
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Template email sending failed: ' . $e->getMessage()
+            ];
+        }
+    }
     {
         try {
             // Validate required parameters

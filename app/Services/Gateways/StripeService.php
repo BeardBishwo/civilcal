@@ -216,7 +216,7 @@ class StripeService
             }
 
             // Log Payment
-            $this->paymentModel->create([
+            $paymentData = [
                 'user_id' => $userId,
                 'subscription_id' => $planId,
                 'amount' => $session->amount_total / 100,
@@ -226,13 +226,65 @@ class StripeService
                 'starts_at' => date('Y-m-d H:i:s'),
                 'ends_at' => $expiry,
                 'transaction_id' => $transactionId
-            ]);
+            ];
+
+            $this->paymentModel->create($paymentData);
 
             $pdo->commit();
+
+            // Send payment confirmation email
+            $this->sendPaymentConfirmationEmail($userId, $paymentData);
+
             return true;
         } catch (\Exception $e) {
             if (isset($pdo)) $pdo->rollBack();
             error_log('Fulfillment Error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Send payment confirmation email
+     */
+    private function sendPaymentConfirmationEmail($userId, $paymentData)
+    {
+        try {
+            // Get user details
+            $user = $this->userModel->find($userId);
+            if (!$user) return false;
+
+            // Get plan details
+            $plan = $this->subscriptionModel->find($paymentData['subscription_id']);
+            if (!$plan) return false;
+
+            // Send notification using template
+            $notificationService = new \App\Services\NotificationService();
+            $success = $notificationService->send(
+                $userId,
+                'payment_success',
+                'Payment Successful - Welcome to Premium!',
+                "Thank you for your payment of \${$paymentData['amount']} for {$plan['name']}. Your premium features are now active.",
+                [
+                    'user_email' => $user['email'],
+                    'action_url' => app_base_url('/dashboard'),
+                    'action_text' => 'Go to Dashboard',
+                    'template' => 'payment_confirmation',
+                    'template_data' => [
+                        'transaction_id' => $paymentData['transaction_id'],
+                        'plan_name' => $plan['name'],
+                        'amount' => $paymentData['amount'],
+                        'currency_symbol' => '$',
+                        'payment_method' => 'Stripe',
+                        'payment_date' => date('M j, Y g:i A'),
+                        'dashboard_url' => app_base_url('/dashboard'),
+                        'site_name' => \App\Services\SettingsService::get('site_name', 'Bishwo Calculator')
+                    ]
+                ]
+            );
+
+            return $success;
+        } catch (\Exception $e) {
+            error_log('Email sending error: ' . $e->getMessage());
             return false;
         }
     }

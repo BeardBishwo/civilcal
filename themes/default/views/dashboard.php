@@ -39,6 +39,27 @@ $page_title = 'Command Center - ' . \App\Services\SettingsService::get('site_nam
                 </p>
             </div>
 
+            <!-- Payment Success Notification -->
+            <?php if (isset($payment_success) && $payment_success): ?>
+            <div class="fixed top-4 right-4 z-50 animate-fade-in-up">
+                <div class="bg-green-500/10 border border-green-500/20 rounded-lg p-4 max-w-sm shadow-xl backdrop-blur-sm">
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-green-400 font-semibold text-sm">Payment Successful!</h3>
+                            <p class="text-green-200 text-sm mt-1">Welcome to premium! Your subscription is now active.</p>
+                            <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                                    class="mt-2 text-green-300 hover:text-green-100 text-xs underline">
+                                Dismiss
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <div class="glass-panel p-1.5 rounded-xl flex items-center gap-1" x-data="{ mode: '<?php echo $user['study_mode'] ?? 'psc'; ?>' }">
                 <button @click="mode = 'psc'; toggleMode('psc')"
                     :class="mode === 'psc' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-gray-400 hover:text-white'"

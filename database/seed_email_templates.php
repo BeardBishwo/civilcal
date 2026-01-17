@@ -70,23 +70,67 @@ try {
             'is_active' => 1
         ],
         [
-            'name' => 'Calculation Help',
-            'subject' => 'Help with {{calculation_type}} Calculations',
-            'content' => '<p>Hello {{user_name}},</p>
-<p>Thank you for your question about <strong>{{calculation_type}}</strong> calculations.</p>
-<p>Here are some helpful resources:</p>
-<ul>
-    <li>Documentation: {{doc_link}}</li>
-    <li>Video Tutorial: {{video_link}}</li>
-    <li>Example: {{example_link}}</li>
-</ul>
-<p>If you need additional assistance, please feel free to reply to this email.</p>
-<p>Best regards,<br>Technical Support Team</p>',
-            'category' => 'technical',
-            'description' => 'Template for providing calculation help and resources',
-            'variables' => json_encode(['user_name', 'calculation_type', 'doc_link', 'video_link', 'example_link']),
+            'name' => 'Payment Confirmation',
+            'subject' => 'Payment Successful - Welcome to {{site_name}} Premium!',
+            'content' => '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 20px;">
+    <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #28a745; margin: 0; font-size: 24px;">🎉 Payment Successful!</h1>
+            <p style="color: #6c757d; margin: 10px 0 0 0;">Welcome to {{site_name}} Premium</p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin: 0 0 15px 0; color: #495057;">Payment Details</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #dee2e6; color: #6c757d;">Transaction ID:</td>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #dee2e6; color: #495057; font-weight: bold;">{{transaction_id}}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #dee2e6; color: #6c757d;">Plan:</td>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #dee2e6; color: #495057; font-weight: bold;">{{plan_name}}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #dee2e6; color: #6c757d;">Amount:</td>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #dee2e6; color: #495057; font-weight: bold;">{{currency_symbol}}{{amount}}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #dee2e6; color: #6c757d;">Payment Method:</td>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #dee2e6; color: #495057; font-weight: bold;">{{payment_method}}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #6c757d;">Date:</td>
+                    <td style="padding: 8px 0; color: #495057; font-weight: bold;">{{payment_date}}</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin: 0 0 15px 0; color: #1976d2;">What\'s Next?</h3>
+            <ul style="color: #1976d2; margin: 0; padding-left: 20px;">
+                <li style="margin-bottom: 8px;">✅ Your premium subscription is now active</li>
+                <li style="margin-bottom: 8px;">✅ All calculator features are unlocked</li>
+                <li style="margin-bottom: 8px;">✅ Export and sharing options are now available</li>
+                <li style="margin-bottom: 8px;">✅ Priority support is enabled</li>
+                <li>✅ Advanced calculation tools are accessible</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{dashboard_url}}" style="background: #28a745; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Go to Dashboard</a>
+        </div>
+        
+        <div style="border-top: 1px solid #dee2e6; padding-top: 20px; margin-top: 30px; text-align: center; color: #6c757d; font-size: 14px;">
+            <p>If you have any questions, please contact our support team.</p>
+            <p>Thank you for choosing {{site_name}}!</p>
+        </div>
+    </div>
+</div>',
+            'category' => 'payment',
+            'description' => 'Email sent after successful payment confirmation',
+            'variables' => json_encode(['transaction_id', 'plan_name', 'amount', 'currency_symbol', 'payment_method', 'payment_date', 'dashboard_url']),
             'is_active' => 1
-        ]
+        ],
     ];
 
     $inserted = 0;
