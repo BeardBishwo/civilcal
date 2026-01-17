@@ -3,7 +3,7 @@
     "type": "project",
     "description": "AEC Calculator Framework",
     "require": {
-        "php": ">=8.3",
+        "php": ">=8.2",
         "2checkout/2checkout-php": "^0.4.0",
         "abraham/twitteroauth": "^3.1",
         "adyen/php-api-library": "^28.3",
@@ -17,24 +17,24 @@
         "guzzlehttp/guzzle": "^7.0",
         "intervention/image": "^3.11",
         "jaybizzle/crawler-detect": "^1.2",
-        "kreait/firebase-php": "^7.9",
+        "kreait/firebase-php": "^7.0",
         "league/csv": "^9.0",
         "markrogoyski/math-php": "^1.0",
         "maxmind-db/reader": "^1.12",
         "mollie/mollie-api-php": "^2.71",
-        "monolog/monolog": "^2.0",
+        "monolog/monolog": "^3.5",
         "mpdf/mpdf": "^8.1",
         "nesbot/carbon": "^2.0",
         "nikic/fast-route": "^1.3",
         "paypal/paypal-checkout-sdk": "^1.0",
         "paypal/rest-api-sdk-php": "^1.6",
-        "phpfastcache/phpfastcache": "^8.0",
+        "phpfastcache/phpfastcache": "^9.2",
         "phpmailer/phpmailer": "^7.0",
         "phpoffice/phpspreadsheet": "^5.3",
         "pragmarx/google2fa": "^9.0",
         "ramsey/uuid": "^4.7",
         "razorpay/razorpay": "^2.9",
-        "sentry/sentry": "^4.18",
+        "sentry/sentry": "^4.0",
         "square/square": "^43.2",
         "stripe/stripe-php": "^15.10",
         "symfony/cache": "^5.4",
@@ -46,7 +46,9 @@
         "platform-check": false,
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "minimum-stability": "dev",
+        "prefer-stable": true
     },
     "autoload": {
         "psr-4": {
@@ -55,5 +57,8 @@
         "classmap": [
             "app/Services/EmailManager.php"
         ]
+    },
+    "require-dev": {
+        "laravel/breeze": "^1.19"
     }
 }
