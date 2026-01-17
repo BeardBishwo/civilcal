@@ -131,6 +131,31 @@ Finds a solution to the given challenge.
 
 **Returns:** `null|Solution`
 
+## Generate obfuscation payload
+
+Generate an obfuscated payload for client-side clarification:
+
+```php
+<?php
+
+// With optional maxNumber (defaults to 10_000)
+$obfuscator = new \AltchaOrg\Altcha\Obfuscator(); 
+
+// Text to reveal after client-side PoW
+$plaintext = 'mailto:hello@example.com';
+
+// Optional shared key
+$key = 'shared-secret';
+
+// Optionally fix the counter; omit to use a random counter in [0, maxNumber]
+$fixedCounter = null;
+
+// Generate base64 obfuscated payload 
+$payload = $obfuscator->obfuscateData($plaintext, $key, $fixedCounter);
+
+echo $payload;
+// P7bJsUgzxP416d1voeF/QnQOD5g7GItB/zdfkoBrKgZK4N4IYkDJqg==
+```
 
 ## Tests
 

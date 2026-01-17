@@ -6,5 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Twocheckout' => array($vendorDir . '/2checkout/2checkout-php/lib'),
+    'Rs\\Json' => array($vendorDir . '/php-jsonpointer/php-jsonpointer/src'),
     'PayPal' => array($vendorDir . '/paypal/rest-api-sdk-php/lib'),
 );
